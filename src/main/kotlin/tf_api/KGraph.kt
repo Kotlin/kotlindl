@@ -15,12 +15,10 @@ class KGraph(private val graphDef: ByteArray) {
         val operations = graph.operations()
 
         var s = ""
-
         while (operations.hasNext()) {
             val operation = operations.next() as GraphOperation
             s += "Name: " + operation.name() + "; Type: " + operation.type() + "; Out #tensors:  " + operation.numOutputs() + "\n"
         }
-
         return s
     }
 }

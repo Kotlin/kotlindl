@@ -4,7 +4,6 @@ import org.tensorflow.SavedModelBundle
 import util.MnistUtils
 import java.io.File
 
-
 class TFModel(val graph: KGraph) {
     fun predict(image: MnistUtils.Image): Double {
         return 0.0
