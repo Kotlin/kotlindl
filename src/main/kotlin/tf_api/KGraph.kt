@@ -3,16 +3,23 @@ package tf_api
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
 
-class KGraph(private val graphDef: ByteArray) {
-    override fun toString(): String {
-        Graph().use { g ->
-            g.importGraphDef(graphDef)
-            return convertGraphDef(g)
-        }
+class KGraph(graphDef: ByteArray) : AutoCloseable {
+    var tfGraph: Graph = Graph()
+
+    init {
+        tfGraph.importGraphDef(graphDef)
     }
 
-    private fun convertGraphDef(graph: Graph): String {
-        val operations = graph.operations()
+    override fun close() {
+        tfGraph.close()
+    }
+
+    override fun toString(): String {
+        return convertGraphDefToString()
+    }
+
+    private fun convertGraphDefToString(): String {
+        val operations = tfGraph.operations()
 
         var s = ""
         while (operations.hasNext()) {
