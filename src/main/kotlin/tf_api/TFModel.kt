@@ -10,6 +10,8 @@ class TFModel() : AutoCloseable {
     private lateinit var bundle: SavedModelBundle
     private lateinit var kGraph: KGraph
     private lateinit var reshape: (DoubleArray) -> Tensor<*>?
+    private lateinit var input: Input
+    private lateinit var output: Output
 
     fun predict(image: MnistUtils.Image): LongArray {
         return predictOnImage(image)
@@ -19,8 +21,8 @@ class TFModel() : AutoCloseable {
         image: MnistUtils.Image
     ): LongArray {
         val runner = session.runner()
-        return runner.feed("Placeholder", reshape(image.pixels))
-            .fetch("ArgMax")
+        return runner.feed(input.tfName, reshape(image.pixels))
+            .fetch(output.tfName)
             .run()[0]
             .copyTo(LongArray(1))
     }
@@ -55,7 +57,7 @@ class TFModel() : AutoCloseable {
 
      }*/
 
-    public fun evaluateTFModel(
+    fun evaluateTFModel(
         images: MutableList<MnistUtils.LabeledImage>,
         metric: Metrics
     ): Double {
@@ -72,8 +74,6 @@ class TFModel() : AutoCloseable {
         } else {
             Double.NaN
         }
-
-
     }
 
 
@@ -95,15 +95,18 @@ class TFModel() : AutoCloseable {
         bundle.close()
     }
 
-    fun input(placeholder: Input) {
+    fun input(inputOp: Input) {
+        input = inputOp
 
     }
 
-    fun output(argmax: Output) {
-
+    fun output(outputOp: Output) {
+        output = outputOp
     }
 
     fun reshape(function: (DoubleArray) -> Tensor<*>?) {
         reshape = function
     }
 }
+
+fun prepareModelForInference(init: TFModel.() -> Unit): TFModel = TFModel().apply(init)

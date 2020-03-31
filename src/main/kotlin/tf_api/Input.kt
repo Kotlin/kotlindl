@@ -1,5 +1,5 @@
 package tf_api
 
-enum class Input(name: String) {
+enum class Input(val tfName: String) {
     PLACEHOLDER("Placeholder")
 }
