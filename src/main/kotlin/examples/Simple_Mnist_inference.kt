@@ -1,4 +1,4 @@
-package tf_api.examples
+package examples
 
 import org.tensorflow.Tensor
 import tf_api.Input
@@ -16,13 +16,12 @@ private const val LABEL_PATH = "src/main/resources/datasets/test/t10k-labels-idx
 fun main() {
     val images = MnistUtils.mnistAsList(IMAGE_PATH, LABEL_PATH, Random(0), 10000)
     TFModel().use {
-        it.loadModel(PATH_TO_MODEL) // TODO: need to combine with Reciever to avoid it. Create method with scope with name "inference or predict or tf"
+        it.loadModel(PATH_TO_MODEL)
         println(it)
 
-        // TODO: extract reshape function, input and output tensors
         it.reshape(::reshape)
-        it.input(Input.PLACEHOLDER) // TODO: add STRINGs too
-        it.output(Output.ARGMAX)    // TODO: add STRINGs too
+        it.input(Input.PLACEHOLDER)
+        it.output(Output.ARGMAX)
 
         val prediction = it.predict(images[0])
         println("Predicted Label is: " + prediction[0].toInt())
