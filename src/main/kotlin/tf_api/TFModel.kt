@@ -45,17 +45,7 @@ class TFModel() : AutoCloseable {
         return listOf()
     }
 
-    /* companion object {
-         fun loadGraph(pathToModel: String): TFModel {
-             val graphDef = File(pathToModel).readBytes()
-
-             return TFModel(KGraph(graphDef))
-         }
-
-
-     }*/
-
-    public fun evaluateTFModel(
+    fun evaluateTFModel(
         images: MutableList<MnistUtils.LabeledImage>,
         metric: Metrics
     ): Double {
@@ -75,7 +65,6 @@ class TFModel() : AutoCloseable {
 
 
     }
-
 
     fun loadModel(pathToModel: String): TFModel {
         bundle = SavedModelBundle.load(pathToModel, "serve")
