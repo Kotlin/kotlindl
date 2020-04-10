@@ -1,112 +1,25 @@
 package tf_api
 
-import org.tensorflow.SavedModelBundle
-import org.tensorflow.Session
-import org.tensorflow.Tensor
+import tf_api.blocks.Metric
+import tf_api.blocks.Optimizer
 import util.MnistUtils
 
-class TFModel() : AutoCloseable {
-    private lateinit var session: Session
-    private lateinit var bundle: SavedModelBundle
-    private lateinit var kGraph: KGraph
-    private lateinit var reshape: (DoubleArray) -> Tensor<*>?
-    private lateinit var input: Input
-    private lateinit var output: Output
+class TFModel : InferenceTFModel() {
 
-    fun predict(image: MnistUtils.Image): LongArray {
-        return predictOnImage(image)
-    }
-
-    private fun predictOnImage(
-        image: MnistUtils.Image
-    ): LongArray {
-        val runner = session.runner()
-        return runner.feed(input.tfName, reshape(image.pixels))
-            .fetch(output.tfName)
-            .run()[0]
-            .copyTo(LongArray(1))
-    }
-
-
-    fun predictAll(images: List<MnistUtils.Image>): List<Double> {
-        val predictedLabels: MutableList<Double> = mutableListOf()
-
-        for (image in images) {
-            val predictedLabel = predictOnImage(image)
-            predictedLabels.add(predictedLabel[0].toDouble())
-        }
-
-        return predictedLabels
-    }
-
-    fun predict(inputData: DoubleArray): Double {
-        return 0.0
-    }
-
-    fun predict(inputData: List<DoubleArray>): List<Double> {
-        return listOf()
-    }
-
-    /* companion object {
-         fun loadGraph(pathToModel: String): TFModel {
-             val graphDef = File(pathToModel).readBytes()
-
-             return TFModel(KGraph(graphDef))
-         }
-
-
-     }*/
-
-    fun evaluateTFModel(
-        images: MutableList<MnistUtils.LabeledImage>,
-        metric: Metrics
-    ): Double {
-
-        return if (metric == Metrics.ACCURACY) {
-            var counter = 0
-            for (image in images) {
-                val result = predictOnImage(image)
-                if (result[0].toInt() == image.label)
-                    counter++
-            }
-
-            (counter.toDouble() / images.size)
-        } else {
-            Double.NaN
-        }
-    }
-
-
-    fun loadModel(pathToModel: String): TFModel {
-        bundle = SavedModelBundle.load(pathToModel, "serve")
-        session = bundle.session()
-        val graph = bundle.graph()
-        val graphDef = graph.toGraphDef()
-        kGraph = KGraph(graphDef)
-        return this
-    }
-
-    override fun toString(): String {
-        return "Model contains $kGraph"
-    }
-
-    override fun close() {
-        session.close()
-        bundle.close()
-    }
-
-    fun input(inputOp: Input) {
-        input = inputOp
+    /**
+     * @optimizer — This is how the model is updated based on the data it sees and its loss function.
+     * @loss — This measures how accurate the model is during training.
+     * @metric — Used to monitor the training and testing steps.
+     */
+    fun compile(
+        optimizer: Optimizer = Optimizer.ADAM,
+        loss: LossFunction = LossFunction.SPARSE_CATEGORICAL_CROSS_ENTROPY,
+        metric: Metric = Metric.ACCURACY
+    ) {
 
     }
 
-    fun output(outputOp: Output) {
-        output = outputOp
-    }
+    fun fit(trainImages: MutableList<MnistUtils.LabeledImage>) {
 
-    fun reshape(function: (DoubleArray) -> Tensor<*>?) {
-        reshape = function
     }
 }
-
-fun prepareModelForInference(init: TFModel.() -> Unit): TFModel = TFModel().apply(init)

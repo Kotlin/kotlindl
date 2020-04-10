@@ -1,4 +1,4 @@
-package tf_api.examples
+package examples
 
 import tf_api.tensor.KTensor
 

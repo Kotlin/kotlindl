@@ -1,6 +1,6 @@
 package examples
 
-import tf_api.TFModel
+import tf_api.InferenceTFModel
 import tf_api.TensorFlow
 import util.MnistUtils
 import java.util.*
@@ -19,7 +19,7 @@ fun main() {
 
     println(model1.toString())*/
 
-    val model2: TFModel = TFModel().loadModel(PATH_TO_MODEL_2)
+    val model2: InferenceTFModel = InferenceTFModel().loadModel(PATH_TO_MODEL_2)
 
     println(model2.toString())
 }

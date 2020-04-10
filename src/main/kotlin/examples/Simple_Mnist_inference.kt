@@ -1,10 +1,10 @@
 package examples
 
 import org.tensorflow.Tensor
-import tf_api.Input
-import tf_api.Metrics
-import tf_api.Output
-import tf_api.TFModel
+import tf_api.InferenceTFModel
+import tf_api.blocks.Input
+import tf_api.blocks.Metric
+import tf_api.blocks.Output
 import util.MnistUtils
 import java.util.*
 
@@ -15,7 +15,7 @@ private const val LABEL_PATH = "src/main/resources/datasets/test/t10k-labels-idx
 
 fun main() {
     val images = MnistUtils.mnistAsList(IMAGE_PATH, LABEL_PATH, Random(0), 10000)
-    TFModel().use {
+    InferenceTFModel().use {
         it.loadModel(PATH_TO_MODEL)
         println(it)
 
@@ -30,7 +30,7 @@ fun main() {
         val predictions = it.predictAll(images)
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluateTFModel(images, Metrics.ACCURACY)}")
+        println("Accuracy is : ${it.evaluateTFModel(images, Metric.ACCURACY)}")
 
     }
 }

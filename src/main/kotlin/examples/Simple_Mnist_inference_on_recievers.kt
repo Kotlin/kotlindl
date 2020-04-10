@@ -1,7 +1,10 @@
 package examples
 
 import org.tensorflow.Tensor
-import tf_api.*
+import tf_api.blocks.Input
+import tf_api.blocks.Metric
+import tf_api.blocks.Output
+import tf_api.prepareModelForInference
 import util.MnistUtils
 import java.util.*
 
@@ -20,7 +23,6 @@ fun main() {
         output(Output.ARGMAX)
     }
 
-
     mnistModel.use {
         val prediction = it.predict(images[0])
         println("Predicted Label is: " + prediction[0].toInt())
@@ -29,7 +31,7 @@ fun main() {
         val predictions = it.predictAll(images)
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluateTFModel(images, Metrics.ACCURACY)}")
+        println("Accuracy is : ${it.evaluateTFModel(images, Metric.ACCURACY)}")
     }
 }
 
