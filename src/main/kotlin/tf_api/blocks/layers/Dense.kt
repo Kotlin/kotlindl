@@ -4,7 +4,7 @@ import tf_api.blocks.Activation
 import tf_api.blocks.Initializer
 
 class Dense(
-    units: Int,
+    outputSize: Int,
     activation: Activation = Activation.Relu,
     kernelInitializer: Initializer = Initializer.TRUNCATED_NORMAL,
     biasInitializer: Initializer = Initializer.ZEROS

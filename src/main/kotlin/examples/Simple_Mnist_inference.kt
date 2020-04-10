@@ -30,7 +30,7 @@ fun main() {
         val predictions = it.predictAll(images)
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluateTFModel(images, Metric.ACCURACY)}")
+        println("Accuracy is : ${it.evaluate(images, Metric.ACCURACY)}")
 
     }
 }

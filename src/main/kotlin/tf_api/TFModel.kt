@@ -1,8 +1,10 @@
 package tf_api
 
+import org.tensorflow.op.Ops
+import tensorflow.training.util.ImageDataset
+import tf_api.blocks.LossFunction
 import tf_api.blocks.Metric
 import tf_api.blocks.Optimizer
-import util.MnistUtils
 
 class TFModel : InferenceTFModel() {
 
@@ -19,7 +21,8 @@ class TFModel : InferenceTFModel() {
 
     }
 
-    fun fit(trainImages: MutableList<MnistUtils.LabeledImage>) {
-
+    fun fit(tf: Ops?, trainDataset: ImageDataset, epochs: Int, batchSize: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
 }

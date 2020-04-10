@@ -1,4 +1,6 @@
 package tf_api.blocks.layers
 
-class Conv2D : Layer() {
+import tf_api.blocks.Activation
+
+class Conv2D(filterShape: IntArray, padding: IntArray, activation: Activation) : Layer() {
 }

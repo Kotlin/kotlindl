@@ -79,6 +79,10 @@ class ImageDataset private constructor(
         )
     }
 
+    fun split(d: Double): Pair<ImageDataset, ImageDataset> {
+        return Pair(this, this)
+    }
+
     companion object {
         fun create(validationSize: Int): ImageDataset {
             return try {

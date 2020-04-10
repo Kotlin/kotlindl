@@ -3,6 +3,7 @@ package tf_api
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Session
 import org.tensorflow.Tensor
+import tensorflow.training.util.ImageDataset
 import tf_api.blocks.Input
 import tf_api.blocks.Metric
 import tf_api.blocks.Output
@@ -50,7 +51,7 @@ open class InferenceTFModel() : AutoCloseable {
         return listOf()
     }
 
-    fun evaluateTFModel(
+    fun evaluate(
         testImages: MutableList<MnistUtils.LabeledImage>,
         metric: Metric
     ): Double {
@@ -99,6 +100,10 @@ open class InferenceTFModel() : AutoCloseable {
 
     fun reshape(function: (DoubleArray) -> Tensor<*>?) {
         reshape = function
+    }
+
+    fun evaluate(testDataset: ImageDataset, metric: Metric): Double {
+        return Double.NaN
     }
 }
 
