@@ -1,10 +1,13 @@
 package examples
 
 import org.tensorflow.Graph
-import org.tensorflow.op.Ops
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.*
+import tf_api.blocks.Activation
+import tf_api.blocks.Metric
+import tf_api.blocks.Sequential
 import tf_api.blocks.layers.*
+import tf_api.blocks.loss.LossFunctions
+import tf_api.blocks.optimizers.Optimizers
 
 
 private const val LEARNING_RATE = 0.2f
@@ -72,11 +75,9 @@ fun main() {
     val (train, test) = dataset.split(0.75)
 
     Graph().use { graph ->
-        val tf = Ops.create(graph)
+        model.compile(optimizer = Optimizers.SGD, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        model.compile(optimizer = Optimizer.SGD, loss = LossFunction.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
-
-        model.fit(tf, trainDataset = train, epochs = 100, batchSize = 1000)
+        model.fit(graph, trainDataset = train, epochs = 100, batchSize = 1000)
 
         val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
 

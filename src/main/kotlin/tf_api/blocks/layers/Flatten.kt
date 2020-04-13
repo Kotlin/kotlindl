@@ -1,4 +1,4 @@
 package tf_api.blocks.layers
 
-class Flatten : Layer() {
+class Flatten<T : Number> : Layer<T>() {
 }

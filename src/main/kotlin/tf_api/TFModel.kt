@@ -1,28 +1,23 @@
 package tf_api
 
-import org.tensorflow.op.Ops
+import org.tensorflow.Graph
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.LossFunction
 import tf_api.blocks.Metric
-import tf_api.blocks.Optimizer
+import tf_api.blocks.loss.LossFunctions
+import tf_api.blocks.optimizers.Optimizers
 
-class TFModel : InferenceTFModel() {
+abstract class TFModel<T : Number> : InferenceTFModel() {
 
     /**
      * @optimizer — This is how the model is updated based on the data it sees and its loss function.
      * @loss — This measures how accurate the model is during training.
      * @metric — Used to monitor the training and testing steps.
      */
-    fun compile(
-        optimizer: Optimizer = Optimizer.ADAM,
-        loss: LossFunction = LossFunction.SPARSE_CATEGORICAL_CROSS_ENTROPY,
+    abstract fun compile(
+        optimizer: Optimizers = Optimizers.ADAM,
+        loss: LossFunctions = LossFunctions.SPARSE_CATEGORICAL_CROSS_ENTROPY,
         metric: Metric = Metric.ACCURACY
-    ) {
+    )
 
-    }
-
-    fun fit(tf: Ops?, trainDataset: ImageDataset, epochs: Int, batchSize: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+    abstract fun fit(tf: Graph, trainDataset: ImageDataset, epochs: Int, batchSize: Int)
 }

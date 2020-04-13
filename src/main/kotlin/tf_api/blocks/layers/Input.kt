@@ -1,4 +1,4 @@
 package tf_api.blocks.layers
 
-class Source(vararg dims: Int) : Layer() {
+class Source<T : Number>(vararg dims: Int) : Layer<T>() {
 }
