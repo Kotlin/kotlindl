@@ -8,6 +8,7 @@ import tensorflow.training.util.ImageBatch
 import tensorflow.training.util.ImageDataset
 import tf_api.TFModel
 import tf_api.blocks.layers.Layer
+import tf_api.blocks.layers.Source
 import tf_api.blocks.loss.LossFunctions
 import tf_api.blocks.loss.SoftmaxCrossEntropyWithLogits
 import tf_api.blocks.optimizers.GradientDescentOptimizer
@@ -24,7 +25,9 @@ private const val PIXEL_DEPTH = 255f
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
-class Sequential<T : Number>(vararg layers: Layer<T>) : TFModel<T>() {
+class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFModel<T>() {
+    private val firstLayer: Source<T> = source
+
     private val layers: List<Layer<T>> = listOf(*layers)
 
     private var trainableVars: MutableList<Variable<T>> = mutableListOf()
@@ -37,21 +40,26 @@ class Sequential<T : Number>(vararg layers: Layer<T>) : TFModel<T>() {
 
     private var metrics: List<Metric> = listOf(Metric.ACCURACY)
 
-    override fun compile(optimizer: Optimizers, loss: LossFunctions, metric: Metric) {
+    override fun compile(tf: Ops, optimizer: Optimizers, loss: LossFunctions, metric: Metric) {
         this.loss = loss
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
 
+        var inputShape: Shape = firstLayer.computeOutputShape(Shape.make(-1)) // Empty shape will not be used
+        firstLayer.addTFOperands(tf, inputShape)
+
         layers.forEach {
             trainableVars.addAll(it.variables.values)
             initializers.addAll(it.initializers.values)
+
+            it.addTFOperands(tf, inputShape = inputShape)
+            inputShape = it.computeOutputShape(inputShape)
         }
     }
 
-    override fun fit(graph: Graph, dataset: ImageDataset, epochs: Int, batchSize: Int) {
-        val tf = Ops.create(graph)
+    override fun fit(graph: Graph, tf: Ops, dataset: ImageDataset, epochs: Int, batchSize: Int) {
 
-        val images = tf.withName(INPUT_NAME).placeholder(
+        val xOp = tf.withName(INPUT_NAME).placeholder(
             Float::class.javaObjectType,
             Placeholder.shape(
                 Shape.make(
@@ -62,26 +70,32 @@ class Sequential<T : Number>(vararg layers: Layer<T>) : TFModel<T>() {
                 )
             )
         )
-        val labels = tf.placeholder(Float::class.javaObjectType)
+        val yOp = tf.placeholder(Float::class.javaObjectType)
+
+
+        // Compute Output / Loss / Accuracy
+        val yTrue: Operand<T> = yOp as Operand<T>
+        val yPred: Operand<T> = addModelTFGraph(tf, xOp)
 
 
         val imageShape = longArrayOf(
-            //batch.size().toLong(),
-            //IMAGE_SIZE,
-            //IMAGE_SIZE,
-            //NUM_CHANNELS
+            batchSize.toLong(),
+            IMAGE_SIZE,
+            IMAGE_SIZE,
+            NUM_CHANNELS
         )
 
         val labelShape = longArrayOf(
-            //batch.size().toLong(),
+            batchSize.toLong(),
             10
         )
+
 
         val loss = when (loss) {
             LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits<Float>().getTFOperand(
                 tf,
                 logits,
-                labels
+                yOp
             )
             else -> TODO("Implement it")
         }
@@ -119,6 +133,10 @@ class Sequential<T : Number>(vararg layers: Layer<T>) : TFModel<T>() {
                 }
             }
         }
+    }
+
+    private fun addModelTFGraph(tf: Ops, xOp: Operand<Float>): Operand<T> {
+
     }
 
     private fun trainOnEpoch(
@@ -173,8 +191,8 @@ class Sequential<T : Number>(vararg layers: Layer<T>) : TFModel<T>() {
     }
 
     companion object {
-        fun <T : Number> of(vararg layers: Layer<T>): TFModel<T> {
-            return Sequential()
+        fun <T : Number> of(source: Source<T>, vararg layers: Layer<T>): TFModel<T> {
+            return Sequential(source, *layers)
         }
     }
 }

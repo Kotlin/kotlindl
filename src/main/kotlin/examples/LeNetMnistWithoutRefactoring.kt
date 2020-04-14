@@ -47,22 +47,6 @@ fun main() {
 
         val labels = tf.placeholder(Float::class.javaObjectType)
 
-
-        val centeringFactor = tf.constant(PIXEL_DEPTH / 2.0f)
-        val scalingFactor = tf.constant(PIXEL_DEPTH)
-
-        // Scaling and one-hot are done in dataset preparation process (look to toNormalize and toOneHot) methods on Image Dataset
-        val scaledInput = tf.math
-            .div(
-                tf.math
-                    .sub(
-                        tf.dtypes
-                            .cast(images, Float::class.javaObjectType), centeringFactor
-                    ),
-                scalingFactor
-            )
-
-
         // First conv layer
 
         // Generate random data to fill the weight matrix
@@ -199,29 +183,12 @@ fun main() {
         // Predicted outputs
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(logits)
 
-        // Loss function & regularization
-        /*val oneHot = tf.oneHot(tf.dtypes
-             .cast(labels, Int::class.javaObjectType), tf.constant(10), tf.constant(1.0f), tf.constant(0.0f))*/
-
         // labels are one-hot due to preprocessing
         val batchLoss = tf.nn.softmaxCrossEntropyWithLogits(logits, labels)
 
-        val labelLoss = tf.withName(TRAINING_LOSS).math.mean(batchLoss.loss(), tf.constant(0))
-
-        val regularizers = tf.math.add(
-            tf.nn.l2Loss(fc1Weights), tf.math
-                .add(
-                    tf.nn.l2Loss(fc1Biases),
-                    tf.math.add(tf.nn.l2Loss(fc2Weights), tf.nn.l2Loss(fc2Biases))
-                )
-        )
-
-        val loss = labelLoss /*tf.withName(TRAINING_LOSS).math
-            .add(labelLoss, tf.math.mul(regularizers, tf.constant(5e-6f)))*/
-
+        val loss = tf.withName(TRAINING_LOSS).math.mean(batchLoss.loss(), tf.constant(0))
 
         // Define gradients
-
         val learningRate = tf.constant(LEARNING_RATE)
         val variables =
             listOf(conv1Weights, conv1Biases, conv2Weights, conv2Biases, fc1Weights, fc1Biases, fc2Weights, fc2Biases)
