@@ -33,9 +33,9 @@ private const val TRAINING_LOSS = "training_loss"
  */
 private val model = Sequential.of<Float>(
     Source(28, 28),
-    Conv2D(filterShape = intArrayOf(5, 5, 1, 6), padding = intArrayOf(1, 1), activation = Activations.Relu),
+    Conv2D(filterShape = intArrayOf(5, 5, 1, 6), strides = longArrayOf(1, 1), activation = Activations.Relu),
     AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
-    Conv2D(filterShape = intArrayOf(5, 5, 6, 16), padding = intArrayOf(1, 1), activation = Activations.Relu),
+    Conv2D(filterShape = intArrayOf(5, 5, 6, 16), strides = longArrayOf(1, 1), activation = Activations.Relu),
     AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
     Flatten(),
     Dense(inputSize = 400, outputSize = 120, activation = Activations.Relu),

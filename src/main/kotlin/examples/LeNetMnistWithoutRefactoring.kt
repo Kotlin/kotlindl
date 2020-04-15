@@ -20,7 +20,7 @@ private const val IMAGE_SIZE = 28L
 private const val VALIDATION_SIZE = 0
 
 private const val SEED = 12L
-private const val PADDING_TYPE = "SAME"
+const val PADDING_TYPE = "SAME"
 private const val INPUT_NAME = "input"
 private const val OUTPUT_NAME = "output"
 private const val TRAINING_LOSS = "training_loss"

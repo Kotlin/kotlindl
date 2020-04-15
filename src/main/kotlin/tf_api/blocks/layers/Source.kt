@@ -26,6 +26,6 @@ class Source<T : Number>(vararg dims: Long) : Layer<T>() {
     }
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
-        TODO("Not yet implemented")
+        return input
     }
 }
