@@ -14,7 +14,7 @@ import tf_api.blocks.optimizers.Optimizers
 
 private const val VALIDATION_SIZE = 0
 
-private val model = Sequential.of(
+private val model = Sequential.of<Float>(
     Source(784),
     Dense(784, 128, Activations.Sigmoid, Initializer.TRUNCATED_NORMAL, Initializer.ZEROS),
     Dense(128, 10, Activations.Softmax, Initializer.TRUNCATED_NORMAL, Initializer.ZEROS)

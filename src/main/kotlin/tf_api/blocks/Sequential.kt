@@ -69,13 +69,13 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
                     NUM_CHANNELS
                 )
             )
-        )
+        ) as Operand<T>
         val yOp = tf.placeholder(Float::class.javaObjectType)
 
 
         // Compute Output / Loss / Accuracy
         val yTrue: Operand<T> = yOp as Operand<T>
-        val yPred: Operand<T> = addModelTFGraph(tf, xOp)
+        val yPred = transformInputWithNNModel(tf, xOp)
 
 
         val imageShape = longArrayOf(
@@ -90,11 +90,10 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
             10
         )
 
-
         val loss = when (loss) {
-            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits<Float>().getTFOperand(
+            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits<T>().getTFOperand(
                 tf,
-                logits,
+                yPred,
                 yOp
             )
             else -> TODO("Implement it")
@@ -135,8 +134,12 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
         }
     }
 
-    private fun addModelTFGraph(tf: Ops, xOp: Operand<Float>): Operand<T> {
-
+    private fun transformInputWithNNModel(tf: Ops, input: Operand<T>): Operand<T> {
+        var out: Operand<T> = input
+        for (layer in layers) {
+            out = layer.transformInput(tf, out)
+        }
+        return out
     }
 
     private fun trainOnEpoch(

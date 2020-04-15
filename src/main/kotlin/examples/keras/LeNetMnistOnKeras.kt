@@ -31,7 +31,7 @@ private const val TRAINING_LOSS = "training_loss"
  * Kotlin implementation of LeNet on Keras.
  * https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
  */
-private val model = Sequential.of(
+private val model = Sequential.of<Float>(
     Source(28, 28),
     Conv2D(filterShape = intArrayOf(5, 5, 1, 6), padding = intArrayOf(1, 1), activation = Activations.Relu),
     AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
