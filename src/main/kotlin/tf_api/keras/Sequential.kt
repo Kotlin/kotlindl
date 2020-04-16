@@ -45,8 +45,9 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
 
-        var inputShape: Shape = firstLayer.computeOutputShape(Shape.make(-1)) // Empty shape will not be used
-        firstLayer.defineVariables(tf, inputShape)
+        firstLayer.defineVariables(tf)
+        var inputShape: Shape = firstLayer.computeOutputShape()
+
 
         layers.forEach {
             trainableVars.addAll(it.variables.values)
