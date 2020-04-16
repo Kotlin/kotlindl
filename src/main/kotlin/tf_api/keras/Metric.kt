@@ -1,4 +1,4 @@
-package tf_api.blocks
+package tf_api.keras
 
 enum class Metric {
     ACCURACY

@@ -3,12 +3,12 @@ package examples.keras
 import org.tensorflow.Graph
 import org.tensorflow.op.Ops
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.Metric
-import tf_api.blocks.Sequential
-import tf_api.blocks.activations.Activations
-import tf_api.blocks.layers.*
-import tf_api.blocks.loss.LossFunctions
-import tf_api.blocks.optimizers.Optimizers
+import tf_api.keras.Metric
+import tf_api.keras.Sequential
+import tf_api.keras.activations.Activations
+import tf_api.keras.layers.*
+import tf_api.keras.loss.LossFunctions
+import tf_api.keras.optimizers.Optimizers
 
 
 private const val LEARNING_RATE = 0.2f

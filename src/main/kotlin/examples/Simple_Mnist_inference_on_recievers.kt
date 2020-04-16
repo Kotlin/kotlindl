@@ -1,10 +1,10 @@
 package examples
 
 import org.tensorflow.Tensor
-import tf_api.blocks.Input
-import tf_api.blocks.Metric
-import tf_api.blocks.Output
-import tf_api.prepareModelForInference
+import tf_api.inference.prepareModelForInference
+import tf_api.keras.Input
+import tf_api.keras.Metric
+import tf_api.keras.Output
 import util.MnistUtils
 import java.util.*
 

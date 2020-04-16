@@ -1,4 +1,4 @@
-package tf_api.blocks.loss
+package tf_api.keras.loss
 
 enum class LossFunctions {
     SPARSE_CATEGORICAL_CROSS_ENTROPY,

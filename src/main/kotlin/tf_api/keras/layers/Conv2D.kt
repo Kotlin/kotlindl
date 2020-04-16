@@ -1,25 +1,26 @@
-package tf_api.blocks.layers
+package tf_api.keras.layers
 
 import examples.PADDING_TYPE
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
-import tf_api.blocks.Initializer
-import tf_api.blocks.activations.Activations
+import tf_api.keras.activations.Activations
+import tf_api.keras.initializers.Initializers
 
-class Conv2D<T : Number>(private val filterShape: IntArray,
-                         private val strides: LongArray,
-                         private val activation: Activations = Activations.Relu,
-                         private val kernelInitializer: Initializer = Initializer.TRUNCATED_NORMAL,
-                         private val biasInitializer: Initializer = Initializer.ZEROS
+class Conv2D<T : Number>(
+    private val filterShape: IntArray,
+    private val strides: LongArray,
+    private val activation: Activations = Activations.Relu,
+    private val kernelInitializer: Initializers = Initializers.TRUNCATED_NORMAL,
+    private val biasInitializer: Initializers = Initializers.ZEROS
 ) : Layer<T>() {
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
 
 
-    override fun addTFOperands(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, inputShape: Shape) {
         TODO("Not yet implemented")
     }
 
@@ -31,6 +32,4 @@ class Conv2D<T : Number>(private val filterShape: IntArray,
         val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), PADDING_TYPE), bias)
         return Activations.convert<T>(activation).apply(tf, signal)
     }
-
-
 }

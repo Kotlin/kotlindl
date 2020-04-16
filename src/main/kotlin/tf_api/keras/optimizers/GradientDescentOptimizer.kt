@@ -1,4 +1,4 @@
-package tf_api.blocks.optimizers
+package tf_api.keras.optimizers
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops

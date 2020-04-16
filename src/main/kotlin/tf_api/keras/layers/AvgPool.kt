@@ -1,4 +1,4 @@
-package tf_api.blocks.layers
+package tf_api.keras.layers
 
 import examples.PADDING_TYPE
 import org.tensorflow.Operand
@@ -7,7 +7,7 @@ import org.tensorflow.op.Ops
 
 class AvgPool<T : Number>(private val poolSize: IntArray,
                           private val strides: IntArray) : Layer<T>() {
-    override fun addTFOperands(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, inputShape: Shape) {
         TODO("Not yet implemented")
     }
 

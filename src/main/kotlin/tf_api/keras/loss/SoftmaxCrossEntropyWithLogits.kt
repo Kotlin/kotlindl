@@ -1,4 +1,4 @@
-package tf_api.blocks.loss
+package tf_api.keras.loss
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops

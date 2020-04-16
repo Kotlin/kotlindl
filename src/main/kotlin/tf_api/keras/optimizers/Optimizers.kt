@@ -1,4 +1,4 @@
-package tf_api.blocks.optimizers
+package tf_api.keras.optimizers
 
 enum class Optimizers {
     SGD, ADAM

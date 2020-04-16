@@ -3,9 +3,10 @@ package tf_api
 import org.tensorflow.Graph
 import org.tensorflow.op.Ops
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.Metric
-import tf_api.blocks.loss.LossFunctions
-import tf_api.blocks.optimizers.Optimizers
+import tf_api.inference.InferenceTFModel
+import tf_api.keras.Metric
+import tf_api.keras.loss.LossFunctions
+import tf_api.keras.optimizers.Optimizers
 
 abstract class TFModel<T : Number> : InferenceTFModel() {
 

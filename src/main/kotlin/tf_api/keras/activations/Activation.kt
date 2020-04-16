@@ -1,4 +1,4 @@
-package tf_api.blocks.activations
+package tf_api.keras.activations
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops

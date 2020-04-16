@@ -1,4 +1,4 @@
-package tf_api.blocks.layers
+package tf_api.keras.layers
 
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -9,7 +9,7 @@ class Source<T : Number>(vararg dims: Long) : Layer<T>() {
     private lateinit var input: Placeholder<T>
     private val packedDims: LongArray = dims
 
-    override fun addTFOperands(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, inputShape: Shape) {
         input = tf.placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))

@@ -3,21 +3,21 @@ package examples.keras
 import org.tensorflow.Graph
 import org.tensorflow.op.Ops
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.Initializer
-import tf_api.blocks.Metric
-import tf_api.blocks.Sequential
-import tf_api.blocks.activations.Activations
-import tf_api.blocks.layers.Dense
-import tf_api.blocks.layers.Source
-import tf_api.blocks.loss.LossFunctions
-import tf_api.blocks.optimizers.Optimizers
+import tf_api.keras.Metric
+import tf_api.keras.Sequential
+import tf_api.keras.activations.Activations
+import tf_api.keras.initializers.Initializers
+import tf_api.keras.layers.Dense
+import tf_api.keras.layers.Source
+import tf_api.keras.loss.LossFunctions
+import tf_api.keras.optimizers.Optimizers
 
 private const val VALIDATION_SIZE = 0
 
 private val model = Sequential.of<Float>(
     Source(784),
-    Dense(784, 128, Activations.Sigmoid, Initializer.TRUNCATED_NORMAL, Initializer.ZEROS),
-    Dense(128, 10, Activations.Softmax, Initializer.TRUNCATED_NORMAL, Initializer.ZEROS)
+    Dense(784, 128, Activations.Sigmoid, Initializers.TRUNCATED_NORMAL, Initializers.ZEROS),
+    Dense(128, 10, Activations.Softmax, Initializers.TRUNCATED_NORMAL, Initializers.ZEROS)
 )
 
 fun main() {

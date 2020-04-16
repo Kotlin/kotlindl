@@ -1,12 +1,13 @@
-package tf_api
+package tf_api.inference
 
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Session
 import org.tensorflow.Tensor
 import tensorflow.training.util.ImageDataset
-import tf_api.blocks.Input
-import tf_api.blocks.Metric
-import tf_api.blocks.Output
+import tf_api.KGraph
+import tf_api.keras.Input
+import tf_api.keras.Metric
+import tf_api.keras.Output
 import util.MnistUtils
 
 open class InferenceTFModel() : AutoCloseable {
@@ -107,4 +108,5 @@ open class InferenceTFModel() : AutoCloseable {
     }
 }
 
-fun prepareModelForInference(init: InferenceTFModel.() -> Unit): InferenceTFModel = InferenceTFModel().apply(init)
+fun prepareModelForInference(init: InferenceTFModel.() -> Unit): InferenceTFModel = InferenceTFModel()
+    .apply(init)

@@ -1,4 +1,4 @@
-package tf_api.blocks
+package tf_api.keras
 
 import org.tensorflow.*
 import org.tensorflow.op.Ops
@@ -7,12 +7,12 @@ import org.tensorflow.op.core.Variable
 import tensorflow.training.util.ImageBatch
 import tensorflow.training.util.ImageDataset
 import tf_api.TFModel
-import tf_api.blocks.layers.Layer
-import tf_api.blocks.layers.Source
-import tf_api.blocks.loss.LossFunctions
-import tf_api.blocks.loss.SoftmaxCrossEntropyWithLogits
-import tf_api.blocks.optimizers.GradientDescentOptimizer
-import tf_api.blocks.optimizers.Optimizers
+import tf_api.keras.layers.Layer
+import tf_api.keras.layers.Source
+import tf_api.keras.loss.LossFunctions
+import tf_api.keras.loss.SoftmaxCrossEntropyWithLogits
+import tf_api.keras.optimizers.GradientDescentOptimizer
+import tf_api.keras.optimizers.Optimizers
 
 
 private const val SEED = 12L
@@ -46,19 +46,18 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
         this.optimizer = optimizer
 
         var inputShape: Shape = firstLayer.computeOutputShape(Shape.make(-1)) // Empty shape will not be used
-        firstLayer.addTFOperands(tf, inputShape)
+        firstLayer.defineVariables(tf, inputShape)
 
         layers.forEach {
             trainableVars.addAll(it.variables.values)
             initializers.addAll(it.initializers.values)
 
-            it.addTFOperands(tf, inputShape = inputShape)
+            it.defineVariables(tf, inputShape = inputShape)
             inputShape = it.computeOutputShape(inputShape)
         }
     }
 
     override fun fit(graph: Graph, tf: Ops, dataset: ImageDataset, epochs: Int, batchSize: Int) {
-
         val xOp = tf.withName(INPUT_NAME).placeholder(
             Float::class.javaObjectType,
             Placeholder.shape(

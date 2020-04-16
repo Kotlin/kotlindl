@@ -1,11 +1,11 @@
-package tf_api.blocks.layers
+package tf_api.keras.layers
 
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
-import tf_api.blocks.Initializer
-import tf_api.blocks.activations.Activations
+import tf_api.keras.activations.Activations
+import tf_api.keras.initializers.Initializers
 
 class Dense<T : Number>(
     private val inputSize: Int,
@@ -13,15 +13,19 @@ class Dense<T : Number>(
     // activation function
     private val activation: Activations = Activations.Sigmoid,
     // initializers
-    private val kernelInitializer: Initializer = Initializer.TRUNCATED_NORMAL,
-    private val biasInitializer: Initializer = Initializer.ZEROS
+    private val kernelInitializer: Initializers = Initializers.TRUNCATED_NORMAL,
+    private val biasInitializer: Initializers = Initializers.ZEROS
 ) : Layer<T>() {
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
 
-    override fun addTFOperands(tf: Ops, inputShape: Shape) {
-        TODO("Not yet implemented")
+    override fun defineVariables(tf: Ops, inputShape: Shape) {
+        // Compute shapes of kernel and bias matrices
+        val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), inputSize.toLong())
+        val biasShape = Shape.make(inputSize.toLong())
+
+
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
