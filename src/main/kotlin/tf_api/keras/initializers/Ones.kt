@@ -3,8 +3,8 @@ package tf_api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-class Ones : Initializer() {
-    override fun <T : Number> initialize(
+class Ones<T : Number> : Initializer<T>() {
+    override fun initialize(
         tf: Ops,
         shape: Operand<Int>,
         dtype: Class<T>

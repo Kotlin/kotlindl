@@ -8,11 +8,11 @@ import org.tensorflow.op.Ops
 class AvgPool<T : Number>(private val poolSize: IntArray,
                           private val strides: IntArray) : Layer<T>() {
     override fun defineVariables(tf: Ops, inputShape: Shape) {
-        TODO("Not yet implemented")
+        // Empty method
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        TODO("Not yet implemented")
+        return inputShape
     }
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {

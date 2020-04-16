@@ -15,3 +15,16 @@ fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
     }
     return tf.constant(shapeArray)
 }
+
+private fun head(vararg dims: Long): Long {
+    return dims[0]
+}
+
+private fun tail(vararg dims: Long): LongArray {
+    return dims.copyOfRange(1, dims.size)
+}
+
+fun shapeFromDims(vararg dims: Long): Shape {
+    return Shape.make(head(*dims), *tail(*dims))
+}
+

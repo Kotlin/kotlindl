@@ -3,12 +3,14 @@ package tf_api.keras.layers
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Constant
 
 class Flatten<T : Number> : Layer<T>() {
     private val NEED_TO_CALCULATE = 400
+    private lateinit var units: Constant<Int>
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
-        TODO("Not yet implemented")
+        // NEED_TO_CALCULATE = should be calculated
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

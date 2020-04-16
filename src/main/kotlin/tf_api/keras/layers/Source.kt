@@ -21,10 +21,6 @@ class Source<T : Number>(vararg dims: Long) : Layer<T>() {
     }
 
 
-    fun getDType(): Class<T> {
-        return Float::class.javaObjectType as Class<T>
-    }
-
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
         return input
     }

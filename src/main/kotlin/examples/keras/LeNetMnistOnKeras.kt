@@ -6,6 +6,9 @@ import tensorflow.training.util.ImageDataset
 import tf_api.keras.Metric
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
+import tf_api.keras.initializers.Ones
+import tf_api.keras.initializers.TruncatedNormal
+import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.*
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.optimizers.Optimizers
@@ -33,14 +36,41 @@ private const val TRAINING_LOSS = "training_loss"
  */
 private val model = Sequential.of<Float>(
     Source(28, 28),
-    Conv2D(filterShape = intArrayOf(5, 5, 1, 6), strides = longArrayOf(1, 1), activation = Activations.Relu),
+    Conv2D(
+        filterShape = longArrayOf(5, 5, 1, 6),
+        strides = longArrayOf(1, 1),
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(123L),
+        biasInitializer = Ones()
+    ),
     AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
-    Conv2D(filterShape = intArrayOf(5, 5, 6, 16), strides = longArrayOf(1, 1), activation = Activations.Relu),
+    Conv2D(
+        filterShape = longArrayOf(5, 5, 6, 16),
+        strides = longArrayOf(1, 1),
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(123L),
+        biasInitializer = Ones()
+    ),
     AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
-    Flatten(),
-    Dense(inputSize = 400, outputSize = 120, activation = Activations.Relu),
-    Dense(inputSize = 120, outputSize = 84, activation = Activations.Relu),
-    Dense(inputSize = 84, outputSize = 10, activation = Activations.Softmax)
+    Flatten(), // 400
+    Dense(
+        outputSize = 120,
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(123L),
+        biasInitializer = Zeros()
+    ),
+    Dense(
+        outputSize = 84,
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(123L),
+        biasInitializer = Zeros()
+    ),
+    Dense(
+        outputSize = 10,
+        activation = Activations.Softmax,
+        kernelInitializer = TruncatedNormal(123L),
+        biasInitializer = Zeros()
+    )
 )
 
 fun main() {

@@ -5,7 +5,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
 import tf_api.keras.shapeOperand
 
-abstract class Initializer {
+abstract class Initializer<T : Number> {
     /**
      * Adds an `Assign` Op to the graph to initialize
      * a tensorflow variable as specified by the initializer.
@@ -14,7 +14,7 @@ abstract class Initializer {
      * @param `in` Variable to initialize
      * @return Assign Operand created
      */
-    fun <T : Number> apply(
+    fun apply(
         tf: Ops,
         input: Operand<T>,
         dtype: Class<T>
@@ -29,7 +29,7 @@ abstract class Initializer {
      * @param tf    Tensorflow Ops Handle
      * @param shape Shape of the tensor
      */
-    abstract fun <T : Number> initialize(
+    abstract fun initialize(
         tf: Ops,
         shape: Operand<Int>,
         dtype: Class<T>

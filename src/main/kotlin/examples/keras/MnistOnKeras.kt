@@ -6,7 +6,8 @@ import tensorflow.training.util.ImageDataset
 import tf_api.keras.Metric
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
-import tf_api.keras.initializers.Initializers
+import tf_api.keras.initializers.TruncatedNormal
+import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Source
 import tf_api.keras.loss.LossFunctions
@@ -16,8 +17,8 @@ private const val VALIDATION_SIZE = 0
 
 private val model = Sequential.of<Float>(
     Source(784),
-    Dense(784, 128, Activations.Sigmoid, Initializers.TRUNCATED_NORMAL, Initializers.ZEROS),
-    Dense(128, 10, Activations.Softmax, Initializers.TRUNCATED_NORMAL, Initializers.ZEROS)
+    Dense(128, Activations.Sigmoid, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
+    Dense(10, Activations.Softmax, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros())
 )
 
 fun main() {
