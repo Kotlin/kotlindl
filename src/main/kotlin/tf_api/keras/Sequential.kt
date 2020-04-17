@@ -70,7 +70,7 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
                     -1,
                     IMAGE_SIZE,
                     IMAGE_SIZE,
-                    NUM_CHANNELS
+                    NUM_CHANNELS * 4
                 )
             )
         ) as Operand<T>

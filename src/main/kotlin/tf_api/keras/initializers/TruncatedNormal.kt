@@ -11,10 +11,13 @@ class TruncatedNormal<T : Number>(private val seed: Long) :
         shape: Operand<Int>,
         dtype: Class<T>
     ): Operand<T> {
-        return tf.random.truncatedNormal(
+
+
+        val truncatedNormal = tf.random.truncatedNormal(
             shape,
             dtype,
             TruncatedNormal.seed(seed)
         )
+        return tf.math.mul(truncatedNormal, tf.constant(0.1f) as Operand<T>)
     }
 }
