@@ -13,6 +13,7 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.loss.SoftmaxCrossEntropyWithLogits
 import tf_api.keras.optimizers.GradientDescentOptimizer
 import tf_api.keras.optimizers.Optimizers
+import java.util.*
 
 
 private const val SEED = 12L
@@ -50,11 +51,14 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
 
 
         layers.forEach {
+            it.defineVariables(tf, inputShape = inputShape)
+
             trainableVars.addAll(it.variables.values)
             initializers.addAll(it.initializers.values)
 
-            it.defineVariables(tf, inputShape = inputShape)
             inputShape = it.computeOutputShape(inputShape)
+
+            println(it.toString() + " " + TensorShape(inputShape).dims().contentToString())
         }
     }
 
@@ -125,7 +129,7 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
                         batch.images()
                     ).use { batchImages ->
                         Tensor.create(labelShape, batch.labels()).use { batchLabels ->
-                            trainOnEpoch(session, targets, tf, batchImages, batchLabels, i)
+                            trainOnEpoch(session, targets, batchImages, batchLabels, i, xOp, yOp)
                         }
                     }
 
@@ -145,10 +149,11 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
     private fun trainOnEpoch(
         session: Session,
         targets: List<Operand<T>>,
-        tf: Ops,
-        batchImages: Tensor<Float>?,
-        batchLabels: Tensor<Float>?,
-        i: Int
+        batchImages: Tensor<Float>,
+        batchLabels: Tensor<Float>,
+        i: Int,
+        xOp: Operand<T>,
+        yOp: Operand<T>
     ) {
         val runner = session.runner()
 
@@ -156,41 +161,16 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
             runner.addTarget(it)
         }
 
-        feedRunner(tf, runner, batchImages, batchLabels)
+        runner
+            .feed(xOp.asOutput(), batchImages)
+            .feed(yOp.asOutput(), batchLabels)
 
         runner
             .fetch(TRAINING_LOSS)
 
         val lossValue = runner.run()[0].floatValue()
         println("epochs: $i lossValue: $lossValue")
-    }
 
-    private fun feedRunner(
-        tf: Ops,
-        runner: Session.Runner,
-        batchImages: Tensor<Float>?,
-        batchLabels: Tensor<Float>?
-    ) {
-
-        // TODO: remove after correct input() layer
-        // Define placeholders
-        val images = tf.withName(INPUT_NAME).placeholder(
-            Float::class.javaObjectType,
-            Placeholder.shape(
-                Shape.make(
-                    -1,
-                    IMAGE_SIZE,
-                    IMAGE_SIZE,
-                    NUM_CHANNELS
-                )
-            )
-        )
-
-        val labels = tf.placeholder(Float::class.javaObjectType)
-
-        runner
-            .feed(images.asOutput(), batchImages)
-            .feed(labels.asOutput(), batchLabels)
     }
 
     companion object {

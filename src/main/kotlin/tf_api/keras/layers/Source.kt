@@ -10,10 +10,7 @@ class Source<T : Number>(vararg dims: Long) : Layer<T>() {
     private val packedDims: LongArray = dims
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
-        input = tf.placeholder(
-            getDType(),
-            Placeholder.shape(Shape.make(-1L, *packedDims))
-        )
+       TODO()
     }
 
     fun defineVariables(tf: Ops) {

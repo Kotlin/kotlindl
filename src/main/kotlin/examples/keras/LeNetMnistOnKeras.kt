@@ -35,32 +35,26 @@ private const val TRAINING_LOSS = "training_loss"
  * https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
  */
 private val model = Sequential.of<Float>(
-    Source(28, 28),
+    Source(28, 28, 4),
     Conv2D(
-        filterShape = longArrayOf(5, 5, 1, 6),
-        strides = longArrayOf(1, 1),
+        filterShape = longArrayOf(5, 5, 1, 32),
+        strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = TruncatedNormal(123L),
         biasInitializer = Ones()
     ),
-    AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
+    AvgPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
     Conv2D(
-        filterShape = longArrayOf(5, 5, 6, 16),
-        strides = longArrayOf(1, 1),
+        filterShape = longArrayOf(5, 5, 32, 64),
+        strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = TruncatedNormal(123L),
         biasInitializer = Ones()
     ),
-    AvgPool(poolSize = intArrayOf(2, 2), strides = intArrayOf(2, 2)),
-    Flatten(), // 400
+    AvgPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    Flatten(), // 3136
     Dense(
-        outputSize = 120,
-        activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(123L),
-        biasInitializer = Zeros()
-    ),
-    Dense(
-        outputSize = 84,
+        outputSize = 512,
         activation = Activations.Relu,
         kernelInitializer = TruncatedNormal(123L),
         biasInitializer = Zeros()

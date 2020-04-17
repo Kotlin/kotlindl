@@ -1,6 +1,7 @@
 package tf_api.keras
 
 import org.tensorflow.Shape
+import kotlin.math.abs
 
 class TensorShape() {
     private lateinit var dims: LongArray
@@ -19,6 +20,18 @@ class TensorShape() {
         this.dims = LongArray(dims.size + 1)
         this.dims[0] = firstDimension
         System.arraycopy(dims, 0, this.dims, 1, dims.size)
+    }
+
+    fun numDimensions(): Int {
+        return dims.size
+    }
+
+    fun numElements(): Long {
+        var prod = 1L
+        for (i in 0 until numDimensions()) {
+            prod *= abs(dims[i])
+        }
+        return prod
     }
 
     /** Returns the rank of this shape.  */
