@@ -105,7 +105,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
 
         val targets = when (optimizer) {
-            Optimizers.SGD -> GradientDescentOptimizer<T>(0.2f).prepareTargets(tf, loss, trainableVars)
+            Optimizers.SGD -> GradientDescentOptimizer<T>(0.05f).prepareTargets(tf, loss, trainableVars)
             else -> TODO("Implement it")
         }
 
@@ -136,7 +136,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
                 }
             }
+
         }
+    }
+
+
+    override fun evaluate(testDataset: ImageDataset, metric: Metric): Double {
+        TODO("Not yet implemented")
     }
 
     private fun transformInputWithNNModel(tf: Ops, input: Operand<T>): Operand<T> {
@@ -179,4 +185,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             return Sequential(input, *layers)
         }
     }
+
+
 }

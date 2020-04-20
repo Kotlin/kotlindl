@@ -15,8 +15,8 @@ import tf_api.keras.optimizers.Optimizers
 
 
 private const val LEARNING_RATE = 0.2f
-private const val EPOCHS = 10
-private const val TRAINING_BATCH_SIZE = 500
+private const val EPOCHS = 20
+private const val TRAINING_BATCH_SIZE = 1000
 
 private const val NUM_LABELS = 10
 private const val PIXEL_DEPTH = 255f
@@ -34,7 +34,7 @@ private const val TRAINING_LOSS = "training_loss"
  * Kotlin implementation of LeNet on Keras.
  * https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
  */
-private val model = Sequential.of<Float>(
+private val modelOld = Sequential.of<Float>(
     Input(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS),
     Conv2D(
         filters = 32,
@@ -65,7 +65,51 @@ private val model = Sequential.of<Float>(
     ),
     Dense(
         outputSize = NUM_LABELS,
-        activation = Activations.Softmax,
+        activation = Activations.Linear, // TODO: https://stats.stackexchange.com/questions/348036/difference-between-mathematical-and-tensorflow-implementation-of-softmax-crossen
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Constant(0.1f)
+    )
+)
+
+
+private val model = Sequential.of<Float>(
+    Input(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS),
+    Conv2D(
+        filters = 32,
+        kernelSize = longArrayOf(3, 3),
+        strides = longArrayOf(1, 1, 1, 1),
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Zeros(),
+        padding = ConvPadding.SAME
+    ),
+    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    Conv2D(
+        filters = 64,
+        kernelSize = longArrayOf(3, 3),
+        strides = longArrayOf(1, 1, 1, 1),
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Zeros(),
+        padding = ConvPadding.SAME
+    ),
+    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    Flatten(), // 3136
+    Dense(
+        outputSize = 120,
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Constant(0.1f)
+    ),
+    Dense(
+        outputSize = 84,
+        activation = Activations.Relu,
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Constant(0.1f)
+    ),
+    Dense(
+        outputSize = NUM_LABELS,
+        activation = Activations.Linear, // TODO: https://stats.stackexchange.com/questions/348036/difference-between-mathematical-and-tensorflow-implementation-of-softmax-crossen
         kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Constant(0.1f)
     )

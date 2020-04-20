@@ -3,7 +3,6 @@ package tf_api.inference
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Session
 import org.tensorflow.Tensor
-import tensorflow.training.util.ImageDataset
 import tf_api.KGraph
 import tf_api.keras.Input
 import tf_api.keras.Metric
@@ -103,9 +102,7 @@ open class InferenceTFModel() : AutoCloseable {
         reshape = function
     }
 
-    fun evaluate(testDataset: ImageDataset, metric: Metric): Double {
-        return Double.NaN
-    }
+
 }
 
 fun prepareModelForInference(init: InferenceTFModel.() -> Unit): InferenceTFModel = InferenceTFModel()

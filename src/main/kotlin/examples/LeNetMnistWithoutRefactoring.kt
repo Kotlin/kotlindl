@@ -23,7 +23,7 @@ private const val VALIDATION_SIZE = 0
 private const val SEED = 12L
 const val PADDING_TYPE = "SAME"
 private const val INPUT_NAME = "input"
-private const val OUTPUT_NAME = "output"
+const val OUTPUT_NAME = "output"
 private const val TRAINING_LOSS = "training_loss"
 
 fun main() {
@@ -170,6 +170,8 @@ fun main() {
 
         val fc1Weights: Variable<Float> =
             tf.variable(Shape.make(IMAGE_SIZE * IMAGE_SIZE * 4, 512), Float::class.javaObjectType)
+
+        println("fc1Weights" + TensorShape(fc1Weights.ref().shape()).dims().contentToString())
 
         val fc1WeightsInit = tf.assign(fc1Weights, tf.math.mul(truncatedNormal3, tf.constant(0.1f)))
 
