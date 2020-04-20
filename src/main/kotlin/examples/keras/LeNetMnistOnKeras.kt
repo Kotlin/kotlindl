@@ -7,7 +7,6 @@ import tf_api.keras.Metric
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.Constant
-import tf_api.keras.initializers.Ones
 import tf_api.keras.initializers.TruncatedNormal
 import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.*
@@ -19,7 +18,7 @@ private const val LEARNING_RATE = 0.2f
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 500
 
-private const val NUM_LABELS = 10L
+private const val NUM_LABELS = 10
 private const val PIXEL_DEPTH = 255f
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -36,34 +35,38 @@ private const val TRAINING_LOSS = "training_loss"
  * https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
  */
 private val model = Sequential.of<Float>(
-    Source(28, 28, 1),
+    Input(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS),
     Conv2D(
-        filterShape = longArrayOf(5, 5, 1, 32),
+        filters = 32,
+        kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Zeros(),
+        padding = ConvPadding.SAME
     ),
-    AvgPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
     Conv2D(
-        filterShape = longArrayOf(5, 5, 32, 64),
+        filters = 64,
+        kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = TruncatedNormal(SEED),
+        biasInitializer = Zeros(),
+        padding = ConvPadding.SAME
     ),
-    AvgPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
     Flatten(), // 3136
     Dense(
         outputSize = 512,
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(12L),
+        kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = 10,
+        outputSize = NUM_LABELS,
         activation = Activations.Softmax,
-        kernelInitializer = TruncatedNormal(12L),
+        kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
 )
@@ -77,7 +80,7 @@ fun main() {
 
         model.compile(tf, optimizer = Optimizers.SGD, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        model.fit(graph, tf, trainDataset = train, epochs = 10, batchSize = 500)
+        model.fit(graph, tf, trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
 

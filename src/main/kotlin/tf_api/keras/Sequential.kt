@@ -7,13 +7,12 @@ import org.tensorflow.op.core.Variable
 import tensorflow.training.util.ImageBatch
 import tensorflow.training.util.ImageDataset
 import tf_api.TFModel
+import tf_api.keras.layers.Input
 import tf_api.keras.layers.Layer
-import tf_api.keras.layers.Source
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.loss.SoftmaxCrossEntropyWithLogits
 import tf_api.keras.optimizers.GradientDescentOptimizer
 import tf_api.keras.optimizers.Optimizers
-import java.util.*
 
 
 private const val SEED = 12L
@@ -26,8 +25,8 @@ private const val PIXEL_DEPTH = 255f
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
-class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFModel<T>() {
-    private val firstLayer: Source<T> = source
+class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
+    private val firstLayer: Input<T> = input
 
     private val layers: List<Layer<T>> = listOf(*layers)
 
@@ -56,6 +55,8 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
             trainableVars.addAll(it.variables.values)
             initializers.addAll(it.initializers.values)
 
+            println(it.toString() + " " + TensorShape(inputShape).dims().contentToString())
+
             inputShape = it.computeOutputShape(inputShape)
 
             println(it.toString() + " " + TensorShape(inputShape).dims().contentToString())
@@ -70,7 +71,7 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
                     -1,
                     IMAGE_SIZE,
                     IMAGE_SIZE,
-                    NUM_CHANNELS * 4
+                    NUM_CHANNELS
                 )
             )
         ) as Operand<T>
@@ -174,8 +175,8 @@ class Sequential<T : Number>(source: Source<T>, vararg layers: Layer<T>) : TFMod
     }
 
     companion object {
-        fun <T : Number> of(source: Source<T>, vararg layers: Layer<T>): TFModel<T> {
-            return Sequential(source, *layers)
+        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TFModel<T> {
+            return Sequential(input, *layers)
         }
     }
 }

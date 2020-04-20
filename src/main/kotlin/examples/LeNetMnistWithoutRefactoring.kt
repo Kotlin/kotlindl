@@ -8,6 +8,7 @@ import org.tensorflow.op.core.Variable
 import org.tensorflow.op.random.TruncatedNormal
 import tensorflow.training.util.ImageBatch
 import tensorflow.training.util.ImageDataset
+import tf_api.keras.TensorShape
 
 private const val LEARNING_RATE = 0.2f
 private const val EPOCHS = 10
@@ -59,6 +60,8 @@ fun main() {
         val conv1Weights: Variable<Float> =
             tf.variable(Shape.make(5L, 5L, NUM_CHANNELS, 32), Float::class.javaObjectType)
 
+        println("Conv1W" + TensorShape(conv1Weights.ref().shape()).dims().contentToString())
+
         val conv1WeightsInit = tf.assign(conv1Weights, tf.math.mul(truncatedNormal, tf.constant(0.1f)))
 
         val conv1 = tf.nn.conv2d(
@@ -66,7 +69,11 @@ fun main() {
             PADDING_TYPE
         );
 
+        println("Conv1" + TensorShape(conv1.output().shape()).dims().contentToString())
+
         val conv1Biases: Variable<Float> = tf.variable(Shape.make(32), Float::class.javaObjectType)
+
+        println("conv1Biases" + TensorShape(conv1Biases.ref().shape()).dims().contentToString())
 
         val conv1BiasesInit = tf.assign(
             conv1Biases, tf.zeros(
@@ -79,6 +86,8 @@ fun main() {
 
         val relu1 = tf.nn.relu(tf.nn.biasAdd(conv1, conv1Biases))
 
+        println("relu1" + TensorShape(relu1.asOutput().shape()).dims().contentToString())
+
         // First pooling layer
         val pool1 = tf.nn.maxPool(
             relu1,
@@ -87,6 +96,7 @@ fun main() {
             PADDING_TYPE
         )
 
+        println("pool1" + TensorShape(pool1.output().shape()).dims().contentToString())
 
         // Second conv layer
         val truncatedNormal2 = tf.random.truncatedNormal(
@@ -98,12 +108,16 @@ fun main() {
         val conv2Weights: Variable<Float> =
             tf.variable(Shape.make(5, 5, 32, 64), Float::class.javaObjectType)
 
+        println("Conv2W" + TensorShape(conv2Weights.ref().shape()).dims().contentToString())
+
         val conv2WeightsInit = tf.assign(conv2Weights, tf.math.mul(truncatedNormal2, tf.constant(0.1f)))
 
         val conv2 = tf.nn.conv2d(
             pool1, conv2Weights, mutableListOf(1L, 1L, 1L, 1L),
             PADDING_TYPE
         );
+
+        println("conv2" + TensorShape(conv2.output().shape()).dims().contentToString())
 
         val conv2Biases: Variable<Float> = tf.variable(Shape.make(64), Float::class.javaObjectType)
 
@@ -126,6 +140,8 @@ fun main() {
             PADDING_TYPE
         )
 
+        println("pool2" + TensorShape(pool2.output().shape()).dims().contentToString())
+
         // Flatten inputs
         val slice: Slice<Int> = tf.slice(
             tf.shape(pool2),
@@ -142,6 +158,8 @@ fun main() {
                 tf.constant(0)
             )
         )
+
+        println("flatten" + TensorShape(flatten.output().shape()).dims().contentToString())
 
         // Fully connected layer
         val truncatedNormal3 = tf.random.truncatedNormal(
@@ -161,6 +179,8 @@ fun main() {
 
         val relu3 = tf.nn.relu(tf.math.add(tf.linalg.matMul(flatten, fc1Weights), fc1Biases))
 
+        println("fc1WeightsInit" + TensorShape(fc1WeightsInit.outputRef().shape()).dims().contentToString())
+
         // Softmax layer
         val truncatedNormal4 = tf.random.truncatedNormal(
             tf.constant(longArrayOf(512, NUM_LABELS)),
@@ -172,6 +192,9 @@ fun main() {
             tf.variable(Shape.make(512, NUM_LABELS), Float::class.javaObjectType)
 
         val fc2WeightsInit = tf.assign(fc2Weights, tf.math.mul(truncatedNormal4, tf.constant(0.1f)))
+
+        println("fc2WeightsInit" + TensorShape(fc2WeightsInit.outputRef().shape()).dims().contentToString())
+
 
         val fc2Biases: Variable<Float> = tf.variable(Shape.make(NUM_LABELS), Float::class.javaObjectType)
 

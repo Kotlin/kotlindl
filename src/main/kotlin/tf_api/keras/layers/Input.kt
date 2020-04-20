@@ -5,12 +5,12 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 
-class Source<T : Number>(vararg dims: Long) : Layer<T>() {
+class Input<T : Number>(vararg dims: Long) : Layer<T>() {
     private lateinit var input: Placeholder<T>
     private val packedDims: LongArray = dims
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
-       TODO()
+        TODO()
     }
 
     fun defineVariables(tf: Ops) {

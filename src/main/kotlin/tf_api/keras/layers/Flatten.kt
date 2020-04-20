@@ -13,12 +13,12 @@ class Flatten<T : Number> : Layer<T>() {
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
-        units = tf.constant(intArrayOf(-1, 4*(tensorShape.numElements() / abs(tensorShape.size(0))).toInt()))
+        units = tf.constant(intArrayOf(-1, (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()))
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
-        return Shape.make(4 * TensorShape(inputShape).numElements());
+        return Shape.make(TensorShape(inputShape).numElements());
     }
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {

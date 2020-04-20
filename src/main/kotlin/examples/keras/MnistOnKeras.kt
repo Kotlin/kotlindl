@@ -9,14 +9,14 @@ import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.TruncatedNormal
 import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.Dense
-import tf_api.keras.layers.Source
+import tf_api.keras.layers.Input
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.optimizers.Optimizers
 
 private const val VALIDATION_SIZE = 0
 
 private val model = Sequential.of<Float>(
-    Source(784),
+    Input(784),
     Dense(128, Activations.Sigmoid, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
     Dense(10, Activations.Softmax, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros())
 )
