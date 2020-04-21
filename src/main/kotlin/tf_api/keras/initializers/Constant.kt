@@ -11,5 +11,4 @@ class Constant<T : Number>(private val constantValue: Any) : Initializer<T>() {
     ): Operand<T> {
         return tf.fill(shape, tf.constant(constantValue, dtype))
     }
-
 }

@@ -10,7 +10,7 @@ import tf_api.keras.Output
 import util.MnistUtils
 
 open class InferenceTFModel() : AutoCloseable {
-    private lateinit var session: Session
+    protected lateinit var session: Session
     private lateinit var bundle: SavedModelBundle
     private lateinit var kGraph: KGraph
     private lateinit var reshape: (DoubleArray) -> Tensor<*>?

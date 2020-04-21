@@ -6,7 +6,7 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import java.util.*
 
-class GradientDescentOptimizer<T : Number>(private val learningRate: Float) : Optimizer<T>() {
+class SGD<T : Number>(private val learningRate: Float) : Optimizer<T>() {
     override fun applyGradients(tf: Ops, weights: List<Variable<T>>, gradients: Gradients): List<Operand<T>> {
         val targets: MutableList<Operand<T>> =
             ArrayList()

@@ -1,7 +1,5 @@
 package examples.keras
 
-import org.tensorflow.Graph
-import org.tensorflow.op.Ops
 import tensorflow.training.util.ImageDataset
 import tf_api.keras.Metric
 import tf_api.keras.Sequential
@@ -11,7 +9,7 @@ import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Input
 import tf_api.keras.loss.LossFunctions
-import tf_api.keras.optimizers.Optimizers
+import tf_api.keras.optimizers.SGD
 
 private const val VALIDATION_SIZE = 0
 
@@ -25,15 +23,13 @@ fun main() {
     val dataset = ImageDataset.create(VALIDATION_SIZE)
     val (train, test) = dataset.split(0.75)
 
-    Graph().use { graph ->
-        val tf = Ops.create(graph)
+    model.compile(optimizer = SGD(0.2f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        model.compile(tf, optimizer = Optimizers.SGD, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    model.fit(trainDataset = train, epochs = 1, batchSize = 100)
 
-        model.fit(graph, tf, trainDataset = train, epochs = 1, batchSize = 100)
+    val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
 
-        val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
+    model.close()
 
-        println("Accuracy: $accuracy")
-    }
+    println("Accuracy: $accuracy")
 }
