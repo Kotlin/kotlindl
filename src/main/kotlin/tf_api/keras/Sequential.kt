@@ -234,4 +234,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
     override fun close() {
         session.close()
     }
+
+    override fun pipeline(function: () -> Unit) {
+        this.apply { function }
+    }
 }

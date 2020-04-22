@@ -1,11 +1,12 @@
-package tf_api.keras.layers
+package tf_api.keras.layers.twodim
 
 import examples.PADDING_TYPE
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
+import tf_api.keras.layers.Layer
 
-class MaxPool<T : Number>(
+class MaxPool2D<T : Number>(
     private val poolSize: IntArray,
     private val strides: IntArray
 ) : Layer<T>() {

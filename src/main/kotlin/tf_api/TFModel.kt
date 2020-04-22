@@ -22,4 +22,6 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
     abstract fun fit(trainDataset: ImageDataset, epochs: Int, batchSize: Int)
 
     abstract fun evaluate(testDataset: ImageDataset, metric: Metric): Double
+    abstract fun pipeline(function: () -> Unit)
+
 }

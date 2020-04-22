@@ -7,7 +7,12 @@ import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.Constant
 import tf_api.keras.initializers.TruncatedNormal
 import tf_api.keras.initializers.Zeros
-import tf_api.keras.layers.*
+import tf_api.keras.layers.Dense
+import tf_api.keras.layers.Flatten
+import tf_api.keras.layers.Input
+import tf_api.keras.layers.twodim.AvgPool2D
+import tf_api.keras.layers.twodim.Conv2D
+import tf_api.keras.layers.twodim.ConvPadding
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.optimizers.SGD
 
@@ -36,7 +41,10 @@ private val model = Sequential.of<Float>(
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
-    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    AvgPool2D(
+        poolSize = intArrayOf(1, 2, 2, 1),
+        strides = intArrayOf(1, 2, 2, 1)
+    ),
     Conv2D(
         filters = 64,
         kernelSize = longArrayOf(5, 5),
@@ -46,7 +54,10 @@ private val model = Sequential.of<Float>(
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
-    MaxPool(poolSize = intArrayOf(1, 2, 2, 1), strides = intArrayOf(1, 2, 2, 1)),
+    AvgPool2D(
+        poolSize = intArrayOf(1, 2, 2, 1),
+        strides = intArrayOf(1, 2, 2, 1)
+    ),
     Flatten(), // 3136
     Dense(
         outputSize = 512,
