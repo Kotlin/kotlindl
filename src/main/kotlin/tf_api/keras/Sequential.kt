@@ -119,14 +119,22 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             else -> TODO("Implement it")
         }
 
+
+        // To calculate train accuracy on batch
+        val prediction = tf.withName(examples.OUTPUT_NAME).nn.softmax(yPred)
+        val yTrue: Operand<T> = yOp
+
+        // Define multi-classification metric
+        val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yTrue, getDType())
+
         val targets = optimizer.prepareTargets(tf, loss, trainableVars)
 
-            // Initialize graph variables
-            val runner = session.runner()
-            initializers.forEach {
-                runner.addTarget(it)
-            }
-            runner.run()
+        // Initialize graph variables
+        val runner = session.runner()
+        initializers.forEach {
+            runner.addTarget(it)
+        }
+        runner.run()
 
             for (i in 1..epochs) {
                 // Train the graph
@@ -141,7 +149,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                         batch.images()
                     ).use { batchImages ->
                         Tensor.create(labelShape, batch.labels()).use { batchLabels ->
-                            trainOnEpoch(targets, batchImages, batchLabels, i, xOp, yOp)
+                            trainOnEpoch(targets, batchImages, batchLabels, i, metricOp)
                         }
                     }
 
@@ -194,8 +202,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         batchImages: Tensor<Float>,
         batchLabels: Tensor<Float>,
         i: Int,
-        xOp: Operand<T>,
-        yOp: Operand<T>
+        metricOp: Operand<T>
     ) {
         val runner = session.runner()
 
@@ -209,9 +216,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
         runner
             .fetch(TRAINING_LOSS)
+            .fetch(metricOp)
 
-        val lossValue = runner.run()[0].floatValue()
-        println("epochs: $i lossValue: $lossValue")
+        val tensorList = runner.run()
+        val lossValue = tensorList[0].floatValue()
+        val metricValue = tensorList[1].floatValue()
+        println("epochs: $i lossValue: $lossValue metricValue: $metricValue")
 
     }
 
