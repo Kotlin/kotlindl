@@ -1,7 +1,6 @@
 package examples.keras
 
 import tensorflow.training.util.ImageDataset
-import tf_api.keras.Metric
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.TruncatedNormal
@@ -9,6 +8,7 @@ import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Input
 import tf_api.keras.loss.LossFunctions
+import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
 private const val VALIDATION_SIZE = 0
@@ -27,7 +27,7 @@ fun main() {
 
     model.fit(trainDataset = train, epochs = 1, batchSize = 100)
 
-    val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
+    val accuracy = model.evaluate(testDataset = test, metric = Metrics.ACCURACY)
 
     model.close()
 

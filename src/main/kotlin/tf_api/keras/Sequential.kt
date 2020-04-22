@@ -11,6 +11,7 @@ import tf_api.keras.layers.Input
 import tf_api.keras.layers.Layer
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.loss.SoftmaxCrossEntropyWithLogits
+import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 import tf_api.keras.optimizers.SGD
 
@@ -40,7 +41,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
     private var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
 
-    private var metrics: List<Metric> = listOf(Metric.ACCURACY)
+    private var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
 
     // Required for evaluation
     private lateinit var yPred: Operand<T>
@@ -57,7 +58,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         session = Session(graph)
     }
 
-    override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metric) {
+    override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metrics) {
         this.loss = loss
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
@@ -94,10 +95,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         ) as Operand<T>
         yOp = tf.placeholder(Float::class.javaObjectType) as Operand<T>
 
-
         // Compute Output / Loss / Accuracy
         yPred = transformInputWithNNModel(xOp)
-
 
         val imageShape = longArrayOf(
             batchSize.toLong(),
@@ -121,7 +120,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
 
         val targets = optimizer.prepareTargets(tf, loss, trainableVars)
-
 
             // Initialize graph variables
             val runner = session.runner()
@@ -151,7 +149,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
     }
 
-    override fun evaluate(testDataset: ImageDataset, metric: Metric): Double {
+    override fun evaluate(testDataset: ImageDataset, metric: Metrics): Double {
         val imageShape = longArrayOf(
             10000,
             IMAGE_SIZE,
@@ -160,18 +158,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         )
 
         val prediction = tf.withName(examples.OUTPUT_NAME).nn.softmax(yPred)
-        val predicted: Operand<Long> = tf.math.argMax(prediction, tf.constant(1))
-
         val yTrue: Operand<T> = yOp
-        val expected: Operand<Long> = tf.math.argMax(yTrue, tf.constant(1))
 
         // Define multi-classification metric
-        val accuracy = tf.math.mean(
-            tf.dtypes.cast(
-                tf.math.equal(predicted, expected),
-                Float::class.javaObjectType
-            ), examples.constArray(tf, 0)
-        )
+        val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yTrue, getDType())
 
         val testBatch: ImageBatch = testDataset.testBatch()
 
@@ -181,7 +171,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         ).use { testImages ->
             Tensor.create(testBatch.shape(NUM_LABELS.toInt()), testBatch.labels()).use { testLabels ->
                 val metricValue = session.runner()
-                    .fetch(accuracy)
+                    .fetch(metricOp)
                     .feed(xOp.asOutput(), testImages)
                     .feed(yOp.asOutput(), testLabels)
                     .run()[0]
@@ -235,7 +225,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         session.close()
     }
 
-    override fun pipeline(function: () -> Unit) {
-        this.apply { function }
+    fun getDType(): Class<T> {
+        return Float::class.javaObjectType as Class<T>
     }
 }

@@ -5,8 +5,8 @@ import org.tensorflow.Session
 import org.tensorflow.Tensor
 import tf_api.KGraph
 import tf_api.keras.Input
-import tf_api.keras.Metric
 import tf_api.keras.Output
+import tf_api.keras.metric.Metrics
 import util.MnistUtils
 
 open class InferenceTFModel() : AutoCloseable {
@@ -53,10 +53,10 @@ open class InferenceTFModel() : AutoCloseable {
 
     fun evaluate(
         testImages: MutableList<MnistUtils.LabeledImage>,
-        metric: Metric
+        metric: Metrics
     ): Double {
 
-        return if (metric == Metric.ACCURACY) {
+        return if (metric == Metrics.ACCURACY) {
             var counter = 0
             for (image in testImages) {
                 val result = predictOnImage(image)

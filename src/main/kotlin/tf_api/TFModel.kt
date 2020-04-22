@@ -2,8 +2,8 @@ package tf_api
 
 import tensorflow.training.util.ImageDataset
 import tf_api.inference.InferenceTFModel
-import tf_api.keras.Metric
 import tf_api.keras.loss.LossFunctions
+import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 
 abstract class TFModel<T : Number> : InferenceTFModel() {
@@ -16,12 +16,10 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
     abstract fun compile(
         optimizer: Optimizer<T>,
         loss: LossFunctions = LossFunctions.SPARSE_CATEGORICAL_CROSS_ENTROPY,
-        metric: Metric = Metric.ACCURACY
+        metric: Metrics = Metrics.ACCURACY
     )
 
     abstract fun fit(trainDataset: ImageDataset, epochs: Int, batchSize: Int)
 
-    abstract fun evaluate(testDataset: ImageDataset, metric: Metric): Double
-    abstract fun pipeline(function: () -> Unit)
-
+    abstract fun evaluate(testDataset: ImageDataset, metric: Metrics): Double
 }

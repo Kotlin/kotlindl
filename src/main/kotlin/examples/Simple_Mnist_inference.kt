@@ -3,8 +3,8 @@ package examples
 import org.tensorflow.Tensor
 import tf_api.inference.InferenceTFModel
 import tf_api.keras.Input
-import tf_api.keras.Metric
 import tf_api.keras.Output
+import tf_api.keras.metric.Metrics
 import util.MnistUtils
 import java.util.*
 
@@ -30,7 +30,7 @@ fun main() {
         val predictions = it.predictAll(images)
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluate(images, Metric.ACCURACY)}")
+        println("Accuracy is : ${it.evaluate(images, Metrics.ACCURACY)}")
 
     }
 }

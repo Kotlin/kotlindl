@@ -1,7 +1,6 @@
 package examples.keras
 
 import tensorflow.training.util.ImageDataset
-import tf_api.keras.Metric
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.Constant
@@ -14,6 +13,7 @@ import tf_api.keras.layers.twodim.Conv2D
 import tf_api.keras.layers.twodim.ConvPadding
 import tf_api.keras.layers.twodim.MaxPool2D
 import tf_api.keras.loss.LossFunctions
+import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
 
@@ -137,7 +137,7 @@ fun main() {
 
     model.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-    val accuracy = model.evaluate(testDataset = test, metric = Metric.ACCURACY)
+    val accuracy = model.evaluate(testDataset = test, metric = Metrics.ACCURACY)
 
     model.close()
 
