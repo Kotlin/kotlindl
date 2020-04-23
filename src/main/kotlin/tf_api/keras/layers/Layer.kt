@@ -10,6 +10,12 @@ import tf_api.keras.initializers.Initializer
 abstract class Layer<T : Number> {
     protected var dtype: Class<T> = getDType()
 
+    /** Returns number of input parameters. */
+    protected var fanIn: Int = 100
+
+    /** Returns number of output parameters. */
+    protected var fanOut: Int = 100
+
     var variables: Map<String, Variable<T>> = mutableMapOf()
 
     var initializers: Map<String, Assign<T>> = mutableMapOf()
@@ -39,7 +45,7 @@ abstract class Layer<T : Number> {
         initializer: Initializer<T>
     ): Variable<T> {
         variables = variables + Pair(name, variable)
-        initializers = initializers + Pair(initializerName, initializer.apply(tf, variable, dtype))
+        initializers = initializers + Pair(initializerName, initializer.apply(fanIn, fanOut, tf, variable, dtype))
         return variable
     }
 }

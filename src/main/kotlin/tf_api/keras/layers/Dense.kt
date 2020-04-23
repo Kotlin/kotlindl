@@ -30,12 +30,17 @@ class Dense<T : Number>(
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         val biasShape = Shape.make(outputSize.toLong())
 
+
+        fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
+        fanOut = outputSize
+
         // Create dense kernel tensor
         kernel =
             addWeight(tf, KERNEL, tf.variable(kernelShape, dtype), KERNEL_INIT, kernelInitializer)
 
         // Create bias tensor
         bias = addWeight(tf, BIAS, tf.variable(biasShape, dtype), BIAS_INIT, biasInitializer)
+
 
     }
 

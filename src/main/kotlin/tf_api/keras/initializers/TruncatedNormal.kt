@@ -6,13 +6,7 @@ import org.tensorflow.op.random.TruncatedNormal
 
 class TruncatedNormal<T : Number>(private val seed: Long) :
     Initializer<T>() {
-    override fun initialize(
-        tf: Ops,
-        shape: Operand<Int>,
-        dtype: Class<T>
-    ): Operand<T> {
-
-
+    override fun initialize(funIn: Int, funOut: Int, tf: Ops, shape: Operand<Int>, dtype: Class<T>): Operand<T> {
         val truncatedNormal = tf.random.truncatedNormal(
             shape,
             dtype,

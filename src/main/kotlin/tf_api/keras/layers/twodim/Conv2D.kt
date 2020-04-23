@@ -9,6 +9,7 @@ import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.Initializer
 import tf_api.keras.layers.Layer
 import tf_api.keras.shapeFromDims
+import kotlin.math.roundToInt
 
 
 enum class ConvPadding {
@@ -25,6 +26,7 @@ class Conv2D<T : Number>(
     private val biasInitializer: Initializer<T>,
     private val padding: ConvPadding
 ) : Layer<T>() {
+
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
@@ -49,12 +51,22 @@ class Conv2D<T : Number>(
         kernel = tf.variable(kernelShape, getDType())
         bias = tf.variable(biasShape, getDType())
 
+
+        // calculate fanIn, fanOut
+        val inputDepth = lastElement // amount of channels
+        val outputDepth = filters // amount of channels for the next layer
+
+        fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
+        fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
+
         // Create dense kernel tensor
         kernel =
             addWeight(tf, KERNEL, tf.variable(kernelShape, dtype), KERNEL_INIT, kernelInitializer)
 
         // Create bias tensor
         bias = addWeight(tf, BIAS, tf.variable(biasShape, dtype), BIAS_INIT, biasInitializer)
+
+
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

@@ -13,7 +13,11 @@ class Flatten<T : Number> : Layer<T>() {
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
-        units = tf.constant(intArrayOf(-1, (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()))
+        val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
+        units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))
+
+        fanIn = tensorShape.numElements().toInt()
+        fanOut = amountOfNeuronsInFlattenLayer
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

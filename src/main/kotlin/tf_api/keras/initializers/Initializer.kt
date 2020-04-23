@@ -15,11 +15,13 @@ abstract class Initializer<T : Number> {
      * @return Assign Operand created
      */
     fun apply(
+        funIn: Int,
+        funOut: Int,
         tf: Ops,
         input: Operand<T>,
         dtype: Class<T>
     ): Assign<T> {
-        return tf.assign(input, initialize(tf, shapeOperand(tf, input.asOutput().shape()), dtype))
+        return tf.assign(input, initialize(funIn, funOut, tf, shapeOperand(tf, input.asOutput().shape()), dtype))
     }
 
     /**
@@ -30,6 +32,8 @@ abstract class Initializer<T : Number> {
      * @param shape Shape of the tensor
      */
     abstract fun initialize(
+        fanIn: Int,
+        fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
         dtype: Class<T>
