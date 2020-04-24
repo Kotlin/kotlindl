@@ -15,9 +15,9 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
-private const val LEARNING_RATE = 0.2f
-private const val EPOCHS = 2
-private const val TRAINING_BATCH_SIZE = 500
+private const val LEARNING_RATE = 0.01f
+private const val EPOCHS = 10
+private const val TRAINING_BATCH_SIZE = 100
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 1L
@@ -40,15 +40,6 @@ private val vgg11 = Sequential.of<Float>(
         biasInitializer = Xavier(SEED),
         padding = ConvPadding.SAME
     ),
-    /*Conv2D(
-        filters = 64,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = Constant(constantValue),
-        biasInitializer = Constant(constantValue),
-        padding = ConvPadding.SAME
-    ),*/
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
         strides = intArrayOf(1, 2, 2, 1)
@@ -62,15 +53,6 @@ private val vgg11 = Sequential.of<Float>(
         biasInitializer = Xavier(SEED),
         padding = ConvPadding.SAME
     ),
-    /* Conv2D(
-         filters = 128,
-         kernelSize = longArrayOf(3, 3),
-         strides = longArrayOf(1, 1, 1, 1),
-         activation = Activations.Relu,
-         kernelInitializer = Constant(constantValue),
-         biasInitializer = Constant(constantValue),
-         padding = ConvPadding.SAME
-     ),*/
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
         strides = intArrayOf(1, 2, 2, 1)
@@ -120,7 +102,7 @@ private val vgg11 = Sequential.of<Float>(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Conv2D(
-        filters = 256,
+        filters = 128,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
@@ -129,7 +111,7 @@ private val vgg11 = Sequential.of<Float>(
         padding = ConvPadding.SAME
     ),
     Conv2D(
-        filters = 256,
+        filters = 128,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
@@ -142,22 +124,22 @@ private val vgg11 = Sequential.of<Float>(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Flatten(),
-    Dense(
+    /*Dense(
         outputSize = 4096,
         activation = Activations.Relu,
         kernelInitializer = Zeros(),
         biasInitializer = Zeros()
-    ),
+    ),*/
     Dense(
-        outputSize = 4096,
+        outputSize = 2048,
         activation = Activations.Relu,
-        kernelInitializer = Zeros(),
+        kernelInitializer = Xavier(12L),
         biasInitializer = Zeros()
     ),
     Dense(
         outputSize = 1000,
         activation = Activations.Relu,
-        kernelInitializer = Zeros(),
+        kernelInitializer = Xavier(12L),
         biasInitializer = Zeros()
     ),
     Dense(
