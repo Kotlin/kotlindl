@@ -18,7 +18,6 @@ import tf_api.keras.optimizers.SGD
 private const val LEARNING_RATE = 0.01f
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 100
-private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -26,7 +25,8 @@ private const val VALIDATION_SIZE = 0
 private const val SEED = 12L
 
 /**
- * Kotlin implementation of VGG'13 on Keras.
+ * Kotlin implementation of VGG'11 on Keras.
+ * Make accuracy ~ 0.929 on Mnist Test dataset
  * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
  */
 private val vgg11 = Sequential.of<Float>(
