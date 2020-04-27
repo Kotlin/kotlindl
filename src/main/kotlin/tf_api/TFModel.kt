@@ -7,6 +7,7 @@ import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 
 abstract class TFModel<T : Number> : InferenceTFModel() {
+    protected var isDebugMode = false
 
     /**
      * @optimizer — This is how the model is updated based on the data it sees and its loss function.
@@ -19,7 +20,12 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
         metric: Metrics = Metrics.ACCURACY
     )
 
-    abstract fun fit(trainDataset: ImageDataset, epochs: Int, batchSize: Int)
+    abstract fun fit(
+        trainDataset: ImageDataset,
+        epochs: Int,
+        batchSize: Int,
+        isDebugMode: Boolean
+    )
 
     abstract fun evaluate(testDataset: ImageDataset, metric: Metrics): Double
 }
