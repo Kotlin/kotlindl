@@ -290,9 +290,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             )
 
             var averageAccuracyAccum = 0.0f
+            var amountOfBatches = 0
 
             while (batchIter.hasNext()) {
                 val batch: ImageBatch = batchIter.next()
+                amountOfBatches++
 
                 Tensor.create(
                     imageShape,
@@ -305,7 +307,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                             .feed(yOp.asOutput(), testLabels)
                             .run()[0]
 
-                        println("test batch acc: $metricValue")
+                        println("test batch acc: ${metricValue.floatValue()}")
 
                         averageAccuracyAccum += metricValue.floatValue()
                     }
@@ -313,10 +315,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
             }
 
-            return (averageAccuracyAccum / batchSize).toDouble()
+            return (averageAccuracyAccum / amountOfBatches).toDouble()
         }
-
-
     }
 
     private fun transformInputWithNNModel(input: Operand<T>): Operand<T> {
