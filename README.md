@@ -43,7 +43,7 @@ private val model = Sequential.of<Float>(
     ),
     Dense(
         outputSize = NUM_LABELS,
-        activation = Activations.Linear, // TODO: https://stats.stackexchange.com/questions/348036/difference-between-mathematical-and-tensorflow-implementation-of-softmax-crossen
+        activation = Activations.Linear,
         kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
