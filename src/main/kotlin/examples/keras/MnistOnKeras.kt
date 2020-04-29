@@ -27,7 +27,7 @@ fun main() {
 
     model.fit(trainDataset = train, epochs = 1, batchSize = 100, isDebugMode = false)
 
-    val accuracy = model.evaluate(testDataset = test, metric = Metrics.ACCURACY)
+    val accuracy = model.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
     model.close()
 

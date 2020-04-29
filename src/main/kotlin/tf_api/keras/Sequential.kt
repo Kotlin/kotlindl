@@ -237,36 +237,86 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
     }
 
-    override fun evaluate(testDataset: ImageDataset, metric: Metrics): Double {
-        val imageShape = longArrayOf(
-            10000,
-            IMAGE_SIZE,
-            IMAGE_SIZE,
-            NUM_CHANNELS
-        )
-
+    override fun evaluate(
+        testDataset: ImageDataset,
+        metric: Metrics,
+        batchSize: Int
+    ): Double {
         val prediction = tf.withName(examples.OUTPUT_NAME).nn.softmax(yPred)
         val yTrue: Operand<T> = yOp
 
         // Define multi-classification metric
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yTrue, getDType())
 
-        val testBatch: ImageBatch = testDataset.testBatch()
+        if (batchSize == -1) {
+            val imageShape = longArrayOf(
+                testDataset.testBatch().size().toLong(),
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            )
 
-        Tensor.create(
-            imageShape,
-            testBatch.images()
-        ).use { testImages ->
-            Tensor.create(testBatch.shape(NUM_LABELS.toInt()), testBatch.labels()).use { testLabels ->
-                val metricValue = session.runner()
-                    .fetch(metricOp)
-                    .feed(xOp.asOutput(), testImages)
-                    .feed(yOp.asOutput(), testLabels)
-                    .run()[0]
+            val testBatch: ImageBatch = testDataset.testBatch()
 
-                return metricValue.floatValue().toDouble()
+            Tensor.create(
+                imageShape,
+                testBatch.images()
+            ).use { testImages ->
+                Tensor.create(testBatch.shape(NUM_LABELS.toInt()), testBatch.labels()).use { testLabels ->
+                    val metricValue = session.runner()
+                        .fetch(metricOp)
+                        .feed(xOp.asOutput(), testImages)
+                        .feed(yOp.asOutput(), testLabels)
+                        .run()[0]
+
+                    return metricValue.floatValue().toDouble()
+                }
             }
+        } else {
+            val imageShape = longArrayOf(
+                batchSize.toLong(),
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            )
+
+            val labelShape = longArrayOf(
+                batchSize.toLong(),
+                NUM_LABELS
+            )
+
+            val batchIter: ImageDataset.ImageBatchIterator = testDataset.testBatchIterator(
+                batchSize
+            )
+
+            var averageAccuracyAccum = 0.0f
+
+            while (batchIter.hasNext()) {
+                val batch: ImageBatch = batchIter.next()
+
+                Tensor.create(
+                    imageShape,
+                    batch.images()
+                ).use { testImages ->
+                    Tensor.create(labelShape, batch.labels()).use { testLabels ->
+                        val metricValue = session.runner()
+                            .fetch(metricOp)
+                            .feed(xOp.asOutput(), testImages)
+                            .feed(yOp.asOutput(), testLabels)
+                            .run()[0]
+
+                        println("test batch acc: $metricValue")
+
+                        averageAccuracyAccum += metricValue.floatValue()
+                    }
+                }
+
+            }
+
+            return (averageAccuracyAccum / batchSize).toDouble()
         }
+
+
     }
 
     private fun transformInputWithNNModel(input: Operand<T>): Operand<T> {
@@ -300,8 +350,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         val tensorList = runner.run()
         val lossValue = tensorList[0].floatValue()
         val metricValue = tensorList[1].floatValue()
-
-
 
         return Pair(lossValue, metricValue)
     }

@@ -82,7 +82,7 @@ fun main() {
 
         it.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
 
-        val accuracy = it.evaluate(testDataset = test, metric = Metrics.ACCURACY)
+        val accuracy = it.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
     }

@@ -59,6 +59,11 @@ class ImageDataset private constructor(
         return ImageBatchIterator(batchSize, trainingImages, trainingLabels)
     }
 
+    fun testBatchIterator(batchSize: Int): ImageBatchIterator {
+        return ImageBatchIterator(batchSize, testImages, testLabels)
+    }
+
+
     fun validationBatchIterator(batchSize: Int): ImageBatchIterator {
         return ImageBatchIterator(batchSize, validationImages, validationLabels)
     }

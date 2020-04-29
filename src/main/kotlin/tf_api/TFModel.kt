@@ -27,5 +27,9 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
         isDebugMode: Boolean
     )
 
-    abstract fun evaluate(testDataset: ImageDataset, metric: Metrics): Double
+    abstract fun evaluate(
+        testDataset: ImageDataset,
+        metric: Metrics,
+        batchSize: Int
+    ): Double
 }
