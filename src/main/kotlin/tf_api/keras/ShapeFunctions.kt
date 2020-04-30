@@ -16,10 +16,18 @@ fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
     return tf.constant(shapeArray)
 }
 
-fun shapeArray(shape: Shape): IntArray {
+fun shapeToIntArray(shape: Shape): IntArray {
     val shapeArray = IntArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i).toInt()
+    }
+    return shapeArray
+}
+
+fun shapeToLongArray(shape: Shape): LongArray {
+    val shapeArray = LongArray(shape.numDimensions())
+    for (i in shapeArray.indices) {
+        shapeArray[i] = shape.size(i)
     }
     return shapeArray
 }
@@ -32,12 +40,20 @@ fun shapeArrayToString(shape: Shape): String {
     return shapeArray.contentToString()
 }
 
-private fun head(vararg dims: Long): Long {
+fun head(vararg dims: Long): Long {
     return dims[0]
 }
 
-private fun tail(vararg dims: Long): LongArray {
+fun tail(vararg dims: Long): LongArray {
     return dims.copyOfRange(1, dims.size)
+}
+
+fun tail(shape: Shape): LongArray {
+    val shapeArray = LongArray(shape.numDimensions())
+    for (i in shapeArray.indices) {
+        shapeArray[i] = shape.size(i)
+    }
+    return tail(*shapeArray)
 }
 
 fun shapeFromDims(vararg dims: Long): Shape {

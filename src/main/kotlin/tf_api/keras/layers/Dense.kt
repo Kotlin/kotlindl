@@ -9,7 +9,7 @@ import tf_api.keras.activations.Activations
 import tf_api.keras.initializers.Initializer
 
 class Dense<T : Number>(
-    private val outputSize: Int,
+    val outputSize: Int,
     // activation function
     private val activation: Activations = Activations.Sigmoid,
     // initializers

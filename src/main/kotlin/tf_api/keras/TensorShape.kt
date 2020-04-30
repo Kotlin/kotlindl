@@ -142,11 +142,11 @@ class TensorShape() {
         return dims
     }
 
-    private fun head(vararg dims: Long): Long {
+    fun head(vararg dims: Long): Long {
         return dims[0]
     }
 
-    private fun tail(vararg dims: Long): LongArray {
+    fun tail(vararg dims: Long): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
 
