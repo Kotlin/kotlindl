@@ -3,9 +3,9 @@ package tf_api.keras
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
-import tensorflow.training.util.ImageBatch
-import tensorflow.training.util.ImageDataset
 import tf_api.TFModel
+import tf_api.keras.dataset.ImageBatch
+import tf_api.keras.dataset.ImageDataset
 import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Input
 import tf_api.keras.layers.Layer

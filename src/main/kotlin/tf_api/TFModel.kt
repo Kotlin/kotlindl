@@ -1,7 +1,7 @@
 package tf_api
 
-import tensorflow.training.util.ImageDataset
 import tf_api.inference.InferenceTFModel
+import tf_api.keras.dataset.ImageDataset
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
