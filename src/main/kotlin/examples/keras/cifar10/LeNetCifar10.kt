@@ -1,5 +1,7 @@
 package examples.keras.cifar10
 
+import examples.keras.cifar10.util.extractCifar10Images
+import examples.keras.cifar10.util.extractCifar10Labels
 import examples.keras.mnist.util.TEST_IMAGES_ARCHIVE
 import examples.keras.mnist.util.TEST_LABELS_ARCHIVE
 import examples.keras.mnist.util.TRAIN_IMAGES_ARCHIVE

@@ -1,5 +1,6 @@
 package examples.keras.cifar10.util
 
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import tf_api.keras.dataset.ImageDataset
 import java.io.DataInputStream
 import java.io.IOException
@@ -8,12 +9,7 @@ import java.util.zip.GZIPInputStream
 private const val IMAGE_ARCHIVE_MAGIC = 2051
 private const val LABEL_ARCHIVE_MAGIC = 2049
 
-const val FASHION_TRAIN_IMAGES_ARCHIVE = "fashionmnist/train-images-idx3-ubyte.gz"
-const val FASHION_TRAIN_LABELS_ARCHIVE = "fashionmnist/train-labels-idx1-ubyte.gz"
-const val FASHION_TEST_IMAGES_ARCHIVE = "fashionmnist/t10k-images-idx3-ubyte.gz"
-const val FASHION_TEST_LABELS_ARCHIVE = "fashionmnist/t10k-labels-idx1-ubyte.gz"
-
-
+// TODO: implement the method
 @Throws(IOException::class)
 fun extractCifar10Images(archiveName: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
@@ -49,24 +45,32 @@ fun extractCifar10Images(archiveName: String): Array<FloatArray> {
 }
 
 @Throws(IOException::class)
-fun extractCifar10Labels(archiveName: String, numClasses: Int): Array<FloatArray> {
-    val archiveStream = DataInputStream(
-        GZIPInputStream(
-            ImageDataset::class.java.classLoader.getResourceAsStream(archiveName)
-        )
-    )
-    val magic = archiveStream.readInt()
-    require(LABEL_ARCHIVE_MAGIC == magic) { "\"$archiveName\" is not a valid image archive" }
-    val labelCount = archiveStream.readInt()
-    println(String.format("Extracting %d labels from %s", labelCount, archiveName))
+fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArray> {
+    val labelCount = 50000
+    println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelBuffer = ByteArray(labelCount)
-    archiveStream.readFully(labelBuffer)
+
+    val dictionary = mapOf(
+        "airplane" to 1, "automobile" to 2, "bird" to 3, "cat" to 4, "deer" to 5, "dog" to 6, "frog" to 7,
+        "horse" to 8,
+        "ship" to 9,
+        "truck" to 10
+    )
+
+    var cnt = 0
+    csvReader().open(pathToLabels) {
+        readAllAsSequence().forEach { row ->
+            labelBuffer[cnt] = dictionary.getOrElse(row[1]) { 1 }.toByte()
+            cnt++
+        }
+    }
+
     val floats =
-        Array(labelCount) { FloatArray(10) }
+        Array(labelCount) { FloatArray(numClasses) }
     for (i in 0 until labelCount) {
         floats[i] =
             ImageDataset.toOneHotVector(
-                10,
+                numClasses,
                 labelBuffer[i]
             )
     }
