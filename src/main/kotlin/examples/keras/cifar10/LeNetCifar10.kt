@@ -20,9 +20,9 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
-private const val LEARNING_RATE = 0.2f
-private const val EPOCHS = 2
-private const val TRAINING_BATCH_SIZE = 500
+private const val LEARNING_RATE = 0.05f
+private const val EPOCHS = 10
+private const val TRAINING_BATCH_SIZE = 100
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
