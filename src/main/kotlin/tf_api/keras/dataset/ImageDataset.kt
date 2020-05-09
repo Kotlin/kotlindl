@@ -158,5 +158,54 @@ class ImageDataset internal constructor(
                 throw AssertionError(e)
             }
         }
+
+        fun create(
+            imagesPath: String,
+            labelsPath: String,
+            numClasses: Int,
+            validationSize: Int,
+            imageExtractor: (String) -> Array<FloatArray>,
+            labelExtractor: (String, Int) -> Array<FloatArray>
+        ): ImageDataset {
+            return try {
+                val trainImages =
+                    imageExtractor.invoke(
+                        imagesPath
+                    )
+                val trainLabels =
+                    labelExtractor.invoke(
+                        labelsPath,
+                        numClasses
+                    )
+                val testImages =
+                    imageExtractor.invoke(
+                        imagesPath
+                    )
+                val testLabels =
+                    labelExtractor.invoke(
+                        labelsPath,
+                        numClasses
+                    )
+                if (validationSize > 0) {
+                    ImageDataset(
+                        trainImages.copyOfRange(validationSize, trainImages.size),
+                        trainLabels.copyOfRange(validationSize, trainLabels.size),
+                        trainImages.copyOfRange(0, validationSize),
+                        trainLabels.copyOfRange(0, validationSize),
+                        testImages,
+                        testLabels
+                    )
+                } else ImageDataset(
+                    trainImages,
+                    trainLabels,
+                    arrayOf(),
+                    arrayOf(),
+                    testImages,
+                    testLabels
+                )
+            } catch (e: IOException) {
+                throw AssertionError(e)
+            }
+        }
     }
 }

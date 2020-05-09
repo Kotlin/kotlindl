@@ -1,11 +1,9 @@
 package examples.keras.cifar10
 
+import examples.keras.cifar10.util.IMAGES_ARCHIVE
+import examples.keras.cifar10.util.LABELS_ARCHIVE
 import examples.keras.cifar10.util.extractCifar10Images
 import examples.keras.cifar10.util.extractCifar10Labels
-import examples.keras.mnist.util.TEST_IMAGES_ARCHIVE
-import examples.keras.mnist.util.TEST_LABELS_ARCHIVE
-import examples.keras.mnist.util.TRAIN_IMAGES_ARCHIVE
-import examples.keras.mnist.util.TRAIN_LABELS_ARCHIVE
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.dataset.ImageDataset
@@ -28,7 +26,7 @@ private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 1L
-private const val IMAGE_SIZE = 28L
+private const val IMAGE_SIZE = 32L
 private const val VALIDATION_SIZE = 0
 private const val SEED = 12L
 
@@ -81,10 +79,8 @@ private val model = Sequential.of<Float>(
 
 fun main() {
     val dataset = ImageDataset.create(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
+        IMAGES_ARCHIVE,
+        LABELS_ARCHIVE,
         NUM_LABELS,
         VALIDATION_SIZE,
         ::extractCifar10Images,
