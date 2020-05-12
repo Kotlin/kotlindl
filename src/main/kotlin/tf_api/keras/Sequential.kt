@@ -10,7 +10,6 @@ import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Input
 import tf_api.keras.layers.Layer
 import tf_api.keras.loss.LossFunctions
-import tf_api.keras.loss.SoftmaxCrossEntropyWithLogits
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 import tf_api.keras.optimizers.SGD
@@ -18,6 +17,7 @@ import java.io.BufferedWriter
 import java.io.File
 
 private const val TRAINING_LOSS = "training_loss"
+private const val OUTPUT_NAME = "output"
 
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
     private val firstLayer: Input<T> = input
@@ -109,23 +109,18 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                 amountOfClasses
             )
 
-            val loss = when (loss) {
-                LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits<T>().getTFOperand(
-                    tf,
-                    yPred,
-                    yOp
-                )
-                else -> TODO("Implement it")
-            }
+
+            val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+
 
             // To calculate train accuracy on batch
-            val prediction = tf.withName(examples.OUTPUT_NAME).nn.softmax(yPred)
+            val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             val yTrue: Operand<T> = yOp
 
             // Define multi-classification metric
             val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yTrue, getDType())
 
-            val targets = optimizer.prepareTargets(tf, loss, trainableVars)
+            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars)
 
             file.write("Initialization")
             file.newLine()
@@ -172,7 +167,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         metric: Metrics,
         batchSize: Int
     ): Double {
-        val prediction = tf.withName(examples.OUTPUT_NAME).nn.softmax(yPred)
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
         val yTrue: Operand<T> = yOp
 
         // Define multi-classification metric
