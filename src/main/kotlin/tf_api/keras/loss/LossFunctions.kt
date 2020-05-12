@@ -41,7 +41,7 @@ class AbsoluteDifference<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
         val losses = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(losses, tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(losses.y(), tf.constant(0))
     }
 }
 
@@ -53,18 +53,20 @@ class HingeLoss<T : Number> : LossFunction<T> {
         val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2) as Operand<T>, labels), allOnes)
 
 
-        return tf.withName(TRAINING_LOSS).nn.relu(
-            tf.math.sub(allOnes, tf.math.mul(labels, actual))
+        return tf.withName(TRAINING_LOSS).math.mean(
+            tf.nn.relu(
+                tf.math.sub(allOnes, tf.math.mul(labelsShifted, actual))
+            ), tf.constant(0)
         )
     }
 }
 
 class LogLoss<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        val epsilon = 1e-7
+        val epsilon = 1e-7f
 
-        val oneOp = tf.constant(1.0) as Operand<T>
-        val minusOneOp = tf.constant(-1.0) as Operand<T>
+        val oneOp = tf.constant(1.0f) as Operand<T>
+        val minusOneOp = tf.constant(-1.0f) as Operand<T>
         val epsilonOp = tf.constant(epsilon) as Operand<T>
 
         val right = tf.math.mul(labels, tf.math.log(tf.math.add(actual, epsilonOp)))
@@ -72,6 +74,6 @@ class LogLoss<T : Number> : LossFunction<T> {
             tf.math.mul(tf.math.log(tf.math.add(tf.math.sub(oneOp, actual), epsilonOp)), tf.math.sub(oneOp, labels))
 
         val sum = tf.math.add(right, left)
-        return tf.withName(TRAINING_LOSS).math.mul(minusOneOp, sum)
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mul(minusOneOp, sum), tf.constant(0))
     }
 }
