@@ -30,18 +30,15 @@ fun main() {
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
         NUM_LABELS,
-        examples.keras.mnist.util.VALIDATION_SIZE,
         ::extractImages,
         ::extractLabels
     )
 
-    val (train, test) = dataset.split(0.75)
-
     model.compile(optimizer = SGD(0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    model.fit(trainDataset = train, epochs = 10, batchSize = 100, isDebugMode = false)
+    model.fit(dataset = dataset, epochs = 10, batchSize = 100, isDebugMode = false)
 
-    val accuracy = model.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = model.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = -1)
 
     model.close()
 

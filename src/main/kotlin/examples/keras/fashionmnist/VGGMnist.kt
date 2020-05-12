@@ -161,7 +161,6 @@ fun main() {
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
         examples.keras.mnist.util.NUM_LABELS,
-        examples.keras.mnist.util.VALIDATION_SIZE,
         ::extractFashionImages,
         ::extractFashionLabels
     )
@@ -170,9 +169,9 @@ fun main() {
     vgg11.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
 
-        val accuracy = it.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
         println("Accuracy: $accuracy")
     }

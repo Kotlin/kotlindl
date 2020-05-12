@@ -168,7 +168,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
 
     override fun evaluate(
-        testDataset: ImageDataset,
+        dataset: ImageDataset,
         metric: Metrics,
         batchSize: Int
     ): Double {
@@ -184,11 +184,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
 
             val imageShape = longArrayOf(
-                testDataset.testBatch().size().toLong(),
+                dataset.testBatch().size().toLong(),
                 *tail(xTensorShape)
             )
 
-            val testBatch: ImageBatch = testDataset.testBatch()
+            val testBatch: ImageBatch = dataset.testBatch()
 
             Tensor.create(
                 imageShape,
@@ -215,7 +215,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                 amountOfClasses
             )
 
-            val batchIter: ImageDataset.ImageBatchIterator = testDataset.testBatchIterator(
+            val batchIter: ImageDataset.ImageBatchIterator = dataset.testBatchIterator(
                 batchSize
             )
 

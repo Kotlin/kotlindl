@@ -26,7 +26,7 @@ private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 32L
-private const val VALIDATION_SIZE = 0
+private const val VALIDATION_RATE = 0.75
 private const val SEED = 12L
 
 private val vgg11 = Sequential.of<Float>(
@@ -159,19 +159,17 @@ fun main() {
         IMAGES_ARCHIVE,
         LABELS_ARCHIVE,
         NUM_LABELS,
-        VALIDATION_SIZE,
+        VALIDATION_RATE,
         ::extractCifar10Images,
         ::extractCifar10Labels
     )
 
-    val (train, test) = dataset.split(0.75)
-
     vgg11.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
+        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
 
-        val accuracy = it.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
     }

@@ -21,14 +21,14 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
     )
 
     abstract fun fit(
-        trainDataset: ImageDataset,
+        dataset: ImageDataset,
         epochs: Int,
         batchSize: Int,
         isDebugMode: Boolean
     )
 
     abstract fun evaluate(
-        testDataset: ImageDataset,
+        dataset: ImageDataset,
         metric: Metrics,
         batchSize: Int
     ): Double

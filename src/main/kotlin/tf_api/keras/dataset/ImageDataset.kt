@@ -4,12 +4,11 @@ import java.io.IOException
 import java.nio.FloatBuffer
 import kotlin.experimental.and
 import kotlin.math.min
+import kotlin.math.truncate
 
 class ImageDataset internal constructor(
     private val trainingImages: Array<FloatArray>,
     private val trainingLabels: Array<FloatArray>,
-    private val validationImages: Array<FloatArray>,
-    private val validationLabels: Array<FloatArray>,
     private val testImages: Array<FloatArray>,
     private val testLabels: Array<FloatArray>
 ) {
@@ -61,10 +60,6 @@ class ImageDataset internal constructor(
         return ImageBatchIterator(batchSize, testImages, testLabels)
     }
 
-    fun validationBatchIterator(batchSize: Int): ImageBatchIterator {
-        return ImageBatchIterator(batchSize, validationImages, validationLabels)
-    }
-
     fun testBatch(): ImageBatch {
         return ImageBatch(
             serializeToBuffer(
@@ -81,7 +76,7 @@ class ImageDataset internal constructor(
         )
     }
 
-    fun split(d: Double): Pair<ImageDataset, ImageDataset> {
+    fun split(rate: Double): Pair<ImageDataset, ImageDataset> {
         return Pair(this, this)
     }
 
@@ -114,7 +109,6 @@ class ImageDataset internal constructor(
             testImagesPath: String,
             testLabelsPath: String,
             numClasses: Int,
-            validationSize: Int,
             imageExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
         ): ImageDataset {
@@ -137,20 +131,9 @@ class ImageDataset internal constructor(
                         testLabelsPath,
                         numClasses
                     )
-                if (validationSize > 0) {
-                    ImageDataset(
-                        trainImages.copyOfRange(validationSize, trainImages.size),
-                        trainLabels.copyOfRange(validationSize, trainLabels.size),
-                        trainImages.copyOfRange(0, validationSize),
-                        trainLabels.copyOfRange(0, validationSize),
-                        testImages,
-                        testLabels
-                    )
-                } else ImageDataset(
+                ImageDataset(
                     trainImages,
                     trainLabels,
-                    arrayOf(),
-                    arrayOf(),
                     testImages,
                     testLabels
                 )
@@ -163,45 +146,39 @@ class ImageDataset internal constructor(
             imagesPath: String,
             labelsPath: String,
             numClasses: Int,
-            validationSize: Int,
+            validationRate: Double,
             imageExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
         ): ImageDataset {
             return try {
-                val trainImages =
+                val images =
                     imageExtractor.invoke(
                         imagesPath
                     )
-                val trainLabels =
+                val labels =
                     labelExtractor.invoke(
                         labelsPath,
                         numClasses
                     )
-                val testImages =
-                    imageExtractor.invoke(
-                        imagesPath
-                    )
-                val testLabels =
-                    labelExtractor.invoke(
-                        labelsPath,
-                        numClasses
-                    )
-                if (validationSize > 0) {
+
+                // TODO: convert to exception
+                assert(images.size == labels.size)
+                assert(validationRate in 0.0..1.0)
+
+                if (validationRate > 0) {
+                    val trainDatasetLastIndex = truncate(images.size * validationRate).toInt()
+
                     ImageDataset(
-                        trainImages.copyOfRange(validationSize, trainImages.size),
-                        trainLabels.copyOfRange(validationSize, trainLabels.size),
-                        trainImages.copyOfRange(0, validationSize),
-                        trainLabels.copyOfRange(0, validationSize),
-                        testImages,
-                        testLabels
+                        images.copyOfRange(0, trainDatasetLastIndex),
+                        labels.copyOfRange(0, trainDatasetLastIndex),
+                        images.copyOfRange(trainDatasetLastIndex, images.size),
+                        labels.copyOfRange(trainDatasetLastIndex, labels.size)
                     )
                 } else ImageDataset(
-                    trainImages,
-                    trainLabels,
+                    images,
+                    labels,
                     arrayOf(),
-                    arrayOf(),
-                    testImages,
-                    testLabels
+                    arrayOf()
                 )
             } catch (e: IOException) {
                 throw AssertionError(e)

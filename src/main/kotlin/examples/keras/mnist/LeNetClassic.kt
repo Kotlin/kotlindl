@@ -84,18 +84,15 @@ fun main() {
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
         NUM_LABELS,
-        VALIDATION_SIZE,
         ::extractImages,
         ::extractLabels
     )
 
-
-    val (train, test) = dataset.split(0.75)
     LeNet5.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    LeNet5.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = false)
+    LeNet5.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = false)
 
-    val accuracy = LeNet5.evaluate(testDataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = LeNet5.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = -1)
 
     LeNet5.close()
 
