@@ -4,6 +4,7 @@ import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 import tf_api.TFModel
+import tf_api.TrainingHistory
 import tf_api.keras.dataset.ImageBatch
 import tf_api.keras.dataset.ImageDataset
 import tf_api.keras.layers.Dense
@@ -19,6 +20,10 @@ import java.io.File
 private const val TRAINING_LOSS = "training_loss"
 private const val OUTPUT_NAME = "output"
 
+/**
+ * Sequential groups a linear stack of layers into a TFModel.
+ * Also, it provides training and inference features on this model.
+ */
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
     private val firstLayer: Input<T> = input
 
@@ -64,7 +69,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         firstLayer.defineVariables(tf)
         var inputShape: Shape = firstLayer.computeOutputShape()
 
-
         layers.forEach {
             it.defineVariables(tf, inputShape = inputShape)
 
@@ -83,13 +87,15 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         dataset: ImageDataset,
         epochs: Int,
         batchSize: Int,
-        isDebugMode: Boolean
-    ) {
+        verbose: Boolean
+    ): TrainingHistory {
+        val trainingHistory = TrainingHistory()
+
 
         File("logs.txt").bufferedWriter().use { // TODO: add logger
                 file ->
 
-            this.isDebugMode = isDebugMode
+            this.isDebugMode = verbose
 
             xOp = firstLayer.input
             yOp = tf.placeholder(getDType()) as Operand<T>
@@ -109,9 +115,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                 amountOfClasses
             )
 
-
             val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
-
 
             // To calculate train accuracy on batch
             val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -134,7 +138,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
             for (i in 1..epochs) {
 
-                if (isDebugMode) {
+                if (verbose) {
                     debugSequentialTraining(file, i)
                 }
 
@@ -142,6 +146,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                 val batchIter: ImageDataset.ImageBatchIterator = dataset.trainingBatchIterator(
                     batchSize
                 )
+
+                var batchCounter = 0
+
                 while (batchIter.hasNext()) {
                     val batch: ImageBatch = batchIter.next()
 
@@ -152,15 +159,19 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                         Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
                             val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
 
+                            trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
+
                             println("epochs: $i lossValue: $lossValue metricValue: $metricValue")
                         }
                     }
 
+                    batchCounter++
                 }
             }
         }
-    }
 
+        return trainingHistory
+    }
 
     override fun evaluate(
         dataset: ImageDataset,
@@ -176,8 +187,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         val xTensorShape = firstLayer.input.asOutput().shape()
 
         if (batchSize == -1) {
-
-
             val imageShape = longArrayOf(
                 dataset.testBatch().size().toLong(),
                 *tail(xTensorShape)

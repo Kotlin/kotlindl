@@ -8,6 +8,8 @@ import org.tensorflow.op.core.Variable
 import tf_api.keras.initializers.Initializer
 
 abstract class Layer<T : Number> {
+    lateinit var name: String
+
     protected var dtype: Class<T> = getDType()
 
     /** Returns number of input parameters. */

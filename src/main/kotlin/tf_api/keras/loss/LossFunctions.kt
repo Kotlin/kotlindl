@@ -41,7 +41,7 @@ class AbsoluteDifference<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
         val losses = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(losses.y(), tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(losses, tf.constant(0)), tf.constant(0))
     }
 }
 
@@ -50,20 +50,24 @@ class HingeLoss<T : Number> : LossFunction<T> {
 
         // We first need to convert binary labels to -1/1 labels (as floats).
         val allOnes: Variable<T> = tf.variable(labels.asOutput().shape(), dtype)
-        val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2) as Operand<T>, labels), allOnes)
+        // TODO: add assign operators
+        val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2f) as Operand<T>, labels), allOnes)
 
 
         return tf.withName(TRAINING_LOSS).math.mean(
-            tf.nn.relu(
-                tf.math.sub(allOnes, tf.math.mul(labelsShifted, actual))
-            ), tf.constant(0)
+            tf.math.mean(
+                tf.nn.relu(
+                    tf.math.sub(allOnes, tf.math.mul(labelsShifted, actual))
+                ), tf.constant(0)
+            )
+            , tf.constant(0)
         )
     }
 }
 
 class LogLoss<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        val epsilon = 1e-7f
+        val epsilon = 1e-5f
 
         val oneOp = tf.constant(1.0f) as Operand<T>
         val minusOneOp = tf.constant(-1.0f) as Operand<T>
@@ -74,6 +78,9 @@ class LogLoss<T : Number> : LossFunction<T> {
             tf.math.mul(tf.math.log(tf.math.add(tf.math.sub(oneOp, actual), epsilonOp)), tf.math.sub(oneOp, labels))
 
         val sum = tf.math.add(right, left)
-        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mul(minusOneOp, sum), tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(
+            tf.reduceSum(tf.math.mul(minusOneOp, sum), tf.constant(0)),
+            tf.constant(0)
+        )
     }
 }

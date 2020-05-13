@@ -95,7 +95,7 @@ fun main() {
     model.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = false)
+        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
 
         val accuracy = it.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = -1)
 

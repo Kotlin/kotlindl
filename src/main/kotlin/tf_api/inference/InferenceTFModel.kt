@@ -31,7 +31,6 @@ open class InferenceTFModel() : AutoCloseable {
             .copyTo(LongArray(1))
     }
 
-
     fun predictAll(images: List<MnistUtils.Image>): List<Double> {
         val predictedLabels: MutableList<Double> = mutableListOf()
 
