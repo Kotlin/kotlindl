@@ -41,4 +41,8 @@ abstract class TFModel<T : Number> : InferenceTFModel() {
         metric: Metrics,
         batchSize: Int
     ): Double
+
+    abstract fun predict(dataset: ImageDataset, batchSize: Int): IntArray
+
+    abstract fun predict(image: FloatArray): Int
 }

@@ -95,7 +95,7 @@ class ImageDataset internal constructor(
             return floats
         }
 
-        private fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
+        fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
             val buffer = FloatBuffer.allocate(length * src[0].size)
             for (i in start until start + length) {
                 buffer.put(src[i])
@@ -185,4 +185,17 @@ class ImageDataset internal constructor(
             }
         }
     }
+
+    fun testImagesSize(): Int {
+        return testImages.size
+    }
+
+    fun getTrainImage(idx: Int): FloatArray {
+        return trainingImages[idx]
+    }
+
+    fun getTrainImageLabel(idx: Int): FloatArray {
+        return trainingLabels[idx]
+    }
+
 }

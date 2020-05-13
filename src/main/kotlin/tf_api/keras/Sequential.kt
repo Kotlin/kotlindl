@@ -372,4 +372,118 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
         file.flush()
     }
+
+    // code is copied from evaluation method and should be refactored together
+
+    /**
+     * Extracts data for prediction from test subset (TODO: refactor it)
+     *
+     * TODO: need check that dataset size % batchSize == 0
+     */
+    override fun predict(dataset: ImageDataset, batchSize: Int): IntArray {
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val xTensorShape = firstLayer.input.asOutput().shape()
+
+        if (batchSize == -1) {
+            val predictions = IntArray(dataset.testImagesSize()) { Int.MIN_VALUE }
+            /* val imageShape = longArrayOf(
+                 dataset.testBatch().size().toLong(),
+                 *tail(xTensorShape)
+             )
+
+             val batch: ImageBatch = dataset.testBatch()
+
+             Tensor.create(
+                 imageShape,
+                 batch.images()
+             ).use { testImages ->
+                 val predictionsTensor = session.runner()
+                     .fetch(prediction)
+                     .feed(xOp.asOutput(), testImages)
+                     .run()[0]
+
+                 val dst = FloatArray(imageShape[0].toInt()) { 0.0f }
+                 predictionsTensor.copyTo(dst)
+ */
+            return predictions
+
+
+        } else {
+            val predictions = IntArray(dataset.testImagesSize()) { Int.MIN_VALUE }
+
+            val imageShape = longArrayOf(
+                batchSize.toLong(),
+                *tail(xTensorShape)
+            )
+
+            val batchIter: ImageDataset.ImageBatchIterator = dataset.testBatchIterator(
+                batchSize
+            )
+
+            var amountOfBatches = 0
+
+            while (batchIter.hasNext()) {
+                val batch: ImageBatch = batchIter.next()
+                amountOfBatches++
+
+                Tensor.create(
+                    imageShape,
+                    batch.images()
+                ).use { testImages ->
+                    val predictionsTensor = session.runner()
+                        .fetch(prediction)
+                        .feed(xOp.asOutput(), testImages)
+                        .run()[0]
+
+
+                    val dst = Array(imageShape[0].toInt()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+                    predictionsTensor.copyTo(dst)
+
+                    val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
+
+
+                    dst.forEachIndexed { index, element ->
+                        argMaxBatchPrediction[index] = element.indexOf(element.max()!!)
+                    }
+
+                    argMaxBatchPrediction.copyInto(predictions, batchSize * (amountOfBatches - 1))
+                }
+            }
+            return predictions
+        }
+    }
+
+    // add predictSoftly (with return all raw array of predictions)
+    override fun predict(image: FloatArray): Int {
+        val predictionData: Array<FloatArray> = arrayOf(image)
+
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val xTensorShape = firstLayer.input.asOutput().shape()
+
+        val imageShape = longArrayOf(
+            1,
+            *tail(xTensorShape)
+        )
+
+        Tensor.create(
+            imageShape,
+            ImageDataset.serializeToBuffer(predictionData, 0, 1)
+        ).use { testImages ->
+
+            val predictionsTensor = session.runner()
+                .fetch(prediction)
+                .feed(xOp.asOutput(), testImages)
+                .run()[0]
+
+            val dst = Array(1) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+            predictionsTensor.copyTo(dst)
+
+            // find index of max element in the given FloatArray
+            return dst[0].indexOf(dst[0].max()!!)
+        }
+    }
 }
