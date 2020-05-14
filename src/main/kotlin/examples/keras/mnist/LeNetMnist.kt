@@ -18,7 +18,7 @@ import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
 private const val LEARNING_RATE = 0.2f
-private const val EPOCHS = 2
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
@@ -77,8 +77,7 @@ private val model = Sequential.of<Float>(
 )
 
 fun main() {
-
-    val dataset = ImageDataset.create(
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -91,9 +90,9 @@ fun main() {
     model.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val accuracy = it.evaluate(dataset = dataset, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
     }

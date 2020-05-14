@@ -78,7 +78,7 @@ private val LeNet5 = Sequential.of<Float>(
 )
 
 fun main() {
-    val dataset = ImageDataset.create(
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -90,9 +90,9 @@ fun main() {
 
     LeNet5.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    LeNet5.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
+    LeNet5.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
 
-    val accuracy = LeNet5.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = LeNet5.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
     LeNet5.close()
 

@@ -7,10 +7,8 @@ import kotlin.math.min
 import kotlin.math.truncate
 
 class ImageDataset internal constructor(
-    private val trainingImages: Array<FloatArray>,
-    private val trainingLabels: Array<FloatArray>,
-    private val testImages: Array<FloatArray>,
-    private val testLabels: Array<FloatArray>
+    private val images: Array<FloatArray>,
+    private val labels: Array<FloatArray>
 ) {
     inner class ImageBatchIterator internal constructor(
         private val batchSize: Int,
@@ -52,32 +50,26 @@ class ImageDataset internal constructor(
 
     }
 
-    fun trainingBatchIterator(batchSize: Int): ImageBatchIterator {
-        return ImageBatchIterator(batchSize, trainingImages, trainingLabels)
+    fun batchIterator(batchSize: Int): ImageBatchIterator {
+        return ImageBatchIterator(batchSize, images, labels)
     }
 
-    fun testBatchIterator(batchSize: Int): ImageBatchIterator {
-        return ImageBatchIterator(batchSize, testImages, testLabels)
-    }
+    fun split(validationRate: Double): Pair<ImageDataset, ImageDataset> {
+        // TODO: convert to exception
+        assert(validationRate in 0.0..1.0)
 
-    fun testBatch(): ImageBatch {
-        return ImageBatch(
-            serializeToBuffer(
-                testImages,
-                0,
-                testImages.size
+        val trainDatasetLastIndex = truncate(images.size * validationRate).toInt()
+
+        return Pair(
+            ImageDataset(
+                images.copyOfRange(0, trainDatasetLastIndex),
+                labels.copyOfRange(0, trainDatasetLastIndex)
             ),
-            serializeToBuffer(
-                testLabels,
-                0,
-                testLabels.size
-            ),
-            testImages.size
+            ImageDataset(
+                images.copyOfRange(trainDatasetLastIndex, images.size),
+                labels.copyOfRange(trainDatasetLastIndex, labels.size)
+            )
         )
-    }
-
-    fun split(rate: Double): Pair<ImageDataset, ImageDataset> {
-        return Pair(this, this)
     }
 
     companion object {
@@ -103,7 +95,7 @@ class ImageDataset internal constructor(
             return buffer.rewind() as FloatBuffer
         }
 
-        fun create(
+        fun createTrainAndTestDatasets(
             trainImagesPath: String,
             trainLabelsPath: String,
             testImagesPath: String,
@@ -111,7 +103,7 @@ class ImageDataset internal constructor(
             numClasses: Int,
             imageExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
-        ): ImageDataset {
+        ): Pair<ImageDataset, ImageDataset> {
             return try {
                 val trainImages =
                     imageExtractor.invoke(
@@ -131,12 +123,7 @@ class ImageDataset internal constructor(
                         testLabelsPath,
                         numClasses
                     )
-                ImageDataset(
-                    trainImages,
-                    trainLabels,
-                    testImages,
-                    testLabels
-                )
+                Pair(ImageDataset(trainImages, trainLabels), ImageDataset(testImages, testLabels))
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
@@ -146,7 +133,6 @@ class ImageDataset internal constructor(
             imagesPath: String,
             labelsPath: String,
             numClasses: Int,
-            validationRate: Double,
             imageExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
         ): ImageDataset {
@@ -160,42 +146,25 @@ class ImageDataset internal constructor(
                         labelsPath,
                         numClasses
                     )
-
                 // TODO: convert to exception
                 assert(images.size == labels.size)
-                assert(validationRate in 0.0..1.0)
 
-                if (validationRate > 0) {
-                    val trainDatasetLastIndex = truncate(images.size * validationRate).toInt()
-
-                    ImageDataset(
-                        images.copyOfRange(0, trainDatasetLastIndex),
-                        labels.copyOfRange(0, trainDatasetLastIndex),
-                        images.copyOfRange(trainDatasetLastIndex, images.size),
-                        labels.copyOfRange(trainDatasetLastIndex, labels.size)
-                    )
-                } else ImageDataset(
-                    images,
-                    labels,
-                    arrayOf(),
-                    arrayOf()
-                )
+                ImageDataset(images, labels)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
     }
 
-    fun testImagesSize(): Int {
-        return testImages.size
+    fun imagesSize(): Int {
+        return images.size
     }
 
-    fun getTrainImage(idx: Int): FloatArray {
-        return trainingImages[idx]
+    fun getImage(idx: Int): FloatArray {
+        return images[idx]
     }
 
-    fun getTrainImageLabel(idx: Int): FloatArray {
-        return trainingLabels[idx]
+    fun getImageLabel(idx: Int): FloatArray {
+        return labels[idx]
     }
-
 }

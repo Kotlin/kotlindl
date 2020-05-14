@@ -82,17 +82,18 @@ fun main() {
         IMAGES_ARCHIVE,
         LABELS_ARCHIVE,
         NUM_LABELS,
-        VALIDATION_RATE,
         ::extractCifar10Images,
         ::extractCifar10Labels
     )
 
+    val (train, test) = dataset.split(VALIDATION_RATE)
+
     model.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val accuracy = it.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
     }

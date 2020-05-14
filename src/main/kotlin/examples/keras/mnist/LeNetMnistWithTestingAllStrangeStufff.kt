@@ -78,7 +78,7 @@ private val model = Sequential.of<Float>(
 
 fun main() {
 
-    val dataset = ImageDataset.create(
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -91,25 +91,25 @@ fun main() {
     model.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        val history = it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        val history = it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
         println(history.history[0].toString())
 
-        val accuracy = it.evaluate(dataset = dataset, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
 
-        val prediction = it.predict(dataset.getTrainImage(0))
+        val prediction = it.predict(train.getImage(0))
 
         println("Prediction: $prediction")
 
-        val trainImageLabel = dataset.getTrainImageLabel(0)
+        val trainImageLabel = train.getImageLabel(0)
 
         val maxIdx = trainImageLabel.indexOf(trainImageLabel.max()!!)
 
         println("Ground Truth: $maxIdx")
 
-        val predictions = it.predict(dataset, 1000)
+        val predictions = it.predict(test, 1000)
 
         println("Prediction: " + predictions[0])
     }

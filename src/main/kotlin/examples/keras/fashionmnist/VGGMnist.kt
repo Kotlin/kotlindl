@@ -155,7 +155,7 @@ private val vgg11 = Sequential.of<Float>(
 )
 
 fun main() {
-    val dataset = ImageDataset.create(
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
@@ -164,7 +164,6 @@ fun main() {
         ::extractFashionImages,
         ::extractFashionLabels
     )
-    val (train, test) = dataset.split(0.75)
 
     vgg11.use {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)

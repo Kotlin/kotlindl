@@ -24,7 +24,7 @@ private val model = Sequential.of<Float>(
 )
 
 fun main() {
-    val dataset = ImageDataset.create(
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -36,9 +36,9 @@ fun main() {
 
     model.compile(optimizer = SGD(0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    model.fit(dataset = dataset, epochs = 10, batchSize = 100, verbose = false)
+    model.fit(dataset = train, epochs = 10, batchSize = 100, verbose = false)
 
-    val accuracy = model.evaluate(dataset = dataset, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = model.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
     model.close()
 
