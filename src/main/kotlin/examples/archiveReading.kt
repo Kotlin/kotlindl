@@ -11,9 +11,7 @@ import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 import kotlin.experimental.and
 
-
 private const val MILLS_IN_DAY = 86400000L
-
 
 @Throws(IOException::class)
 fun main() {

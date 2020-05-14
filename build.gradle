@@ -13,6 +13,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3'
+    implementation 'io.jhdf:jhdf:0.5.7'
     /* compile 'org.tensorflow:libtensorflow:1.15.0'
     compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0' */
 }
