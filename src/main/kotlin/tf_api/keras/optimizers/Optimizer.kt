@@ -8,15 +8,21 @@ import org.tensorflow.op.core.Variable
 abstract class Optimizer<T : Number> {
     private lateinit var dtype: Class<T>
 
-    fun prepareTargets(tf: Ops, loss: Operand<T>, weights: List<Variable<T>>): List<Operand<T>> {
+    fun prepareTargets(
+        tf: Ops,
+        loss: Operand<T>,
+        weights: List<Variable<T>>,
+        epochNumber: Int
+    ): List<Operand<T>> {
         val gradients: Gradients = computeGradients(tf, loss, weights)
-        return applyGradients(tf, weights, gradients)
+        return applyGradients(tf, weights, gradients, epochNumber)
     }
 
     protected abstract fun applyGradients(
         tf: Ops,
         weights: List<Variable<T>>,
-        gradients: Gradients
+        gradients: Gradients,
+        epochNumber: Int
     ): List<Operand<T>>
 
     private fun computeGradients(

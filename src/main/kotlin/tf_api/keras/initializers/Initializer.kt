@@ -3,7 +3,7 @@ package tf_api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
-import tf_api.keras.shapeOperand
+import tf_api.keras.shape.shapeOperand
 
 abstract class Initializer<T : Number> {
     /**
@@ -21,7 +21,12 @@ abstract class Initializer<T : Number> {
         input: Operand<T>,
         dtype: Class<T>
     ): Assign<T> {
-        return tf.assign(input, initialize(funIn, funOut, tf, shapeOperand(tf, input.asOutput().shape()), dtype))
+        return tf.assign(
+            input, initialize(
+                funIn, funOut, tf,
+                shapeOperand(tf, input.asOutput().shape()), dtype
+            )
+        )
     }
 
     /**

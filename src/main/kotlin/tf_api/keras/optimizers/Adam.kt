@@ -16,7 +16,12 @@ class Adam<T : Number>(
     private val beta2: Float,
     private val epsilon: Float
 ) : Optimizer<T>() {
-    override fun applyGradients(tf: Ops, weights: List<Variable<T>>, gradients: Gradients): List<Operand<T>> {
+    override fun applyGradients(
+        tf: Ops,
+        weights: List<Variable<T>>,
+        gradients: Gradients,
+        epochNumber: Int
+    ): List<Operand<T>> {
         val targets: MutableList<Operand<T>> =
             ArrayList()
 

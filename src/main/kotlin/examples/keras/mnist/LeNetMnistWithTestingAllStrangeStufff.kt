@@ -89,7 +89,9 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        val learningSchedule = mapOf(1 to 0.2f, 2 to 0.1f, 3 to 0.5f, 4 to 0.1f, 5 to 0.01f)
+
+        it.compile(optimizer = SGD(learningSchedule), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         val history = it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

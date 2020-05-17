@@ -14,6 +14,8 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 import tf_api.keras.optimizers.SGD
+import tf_api.keras.shape.TensorShape
+import tf_api.keras.shape.tail
 import java.io.BufferedWriter
 import java.io.File
 
@@ -129,7 +131,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             // Define multi-classification metric
             val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yTrue, getDType())
 
-            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars)
+
 
             file.write("Initialization")
             file.newLine()
@@ -142,6 +144,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             runner.run()
 
             for (i in 1..epochs) {
+
+                val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
 
                 if (verbose) {
                     debugSequentialTraining(file, i)

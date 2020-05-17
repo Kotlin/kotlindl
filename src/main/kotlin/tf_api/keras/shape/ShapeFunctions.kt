@@ -1,4 +1,4 @@
-package tf_api.keras
+package tf_api.keras.shape
 
 import org.tensorflow.Operand
 import org.tensorflow.Shape

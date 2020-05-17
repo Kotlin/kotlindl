@@ -4,7 +4,7 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
-import tf_api.keras.TensorShape
+import tf_api.keras.shape.TensorShape
 import kotlin.math.abs
 
 
