@@ -17,7 +17,6 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
-private const val LEARNING_RATE = 0.2f
 private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 2000
@@ -89,7 +88,7 @@ fun main() {
     )
 
     model.use {
-        val learningSchedule = mapOf(1 to 0.2f, 2 to 0.1f, 3 to 0.5f, 4 to 0.1f, 5 to 0.01f)
+        val learningSchedule = mapOf(1 to 0.2f, 2 to 0.1f, 3 to 0.05f, 4 to 0.02f, 5 to 0.01f)
 
         it.compile(optimizer = SGD(learningSchedule), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
