@@ -47,10 +47,8 @@ class Conv2D<T : Number>(
         println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
         println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
-
         kernel = tf.variable(kernelShape, getDType())
         bias = tf.variable(biasShape, getDType())
-
 
         // calculate fanIn, fanOut
         val inputDepth = lastElement // amount of channels

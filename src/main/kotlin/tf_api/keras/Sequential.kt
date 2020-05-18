@@ -20,36 +20,53 @@ import java.io.BufferedWriter
 import java.io.File
 
 private const val TRAINING_LOSS = "training_loss"
+
 private const val OUTPUT_NAME = "output"
 
 /**
  * Sequential groups a linear stack of layers into a TFModel.
  * Also, it provides training and inference features on this model.
+ *
+ * @param T the type of data elements in Tensors.
+ * @property [input] the input layer with initial shapes.
+ * @property [layers] the layers to describe the model design.
+ * @constructor Creates a Sequential group with [input] and [layers].
  */
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
+    /** Input layer. */
     private val firstLayer: Input<T> = input
 
+    /** The bunch of layers. */
     private val layers: List<Layer<T>> = listOf(*layers)
 
+    /** A list of variables to train. */
     private var trainableVars: MutableList<Variable<T>> = mutableListOf()
 
+    /** A list of initializer to initialize the trainableVariables. */
     private var initializers: MutableList<Operand<T>> = mutableListOf()
 
+    /** Optimizer. Approach how aggressively to update the weights. */
     private var optimizer: Optimizer<T> = SGD(0.2f)
 
+    /** Loss function. */
     private var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
 
+    /** List of metrics for evaluation phase. */
     private var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
 
-    // Required for evaluation
+    /** TensorFlow operand for prediction phase. */
     private lateinit var yPred: Operand<T>
 
+    /** TensorFlow operand for X data. */
     private lateinit var xOp: Operand<T>
 
+    /** TensorFlow operand for Y data. */
     private lateinit var yOp: Operand<T>
 
+    /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     private var amountOfClasses: Long = -1
 
+    /** The namespace wrapper for all TensorFlow graph operations. */
     private var tf: Ops
 
     init {
@@ -64,11 +81,26 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
     }
 
     companion object {
+        /**
+         * Creates the [Sequential] model.
+         *
+         * @param [T] The type of data elements in Tensors.
+         * @property [input] The input layer with initial shapes.
+         * @property [layers] The layers to describe the model design.
+         * @return the [Sequential] model.
+         */
         fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TFModel<T> {
             return Sequential(input, *layers)
         }
     }
 
+    /**
+     * Configures the model for training.
+     *
+     * @param [optimizer] Optimizer instance.
+     * @param [loss] Loss function.
+     * @param [metric] Metric to evaluate during training.
+     */
     override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metrics) {
         this.loss = loss
         this.metrics = listOf(metric) // handle multiple metrics
@@ -91,6 +123,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         }
     }
 
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     *
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [batchSize] Number of samples per gradient update.
+     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
+     *
+     * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
+     */
     override fun fit(
         dataset: ImageDataset,
         epochs: Int,
@@ -182,6 +224,15 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         return trainingHistory
     }
 
+    /**
+     * Returns the loss value & metrics values for the model in test (evaluation) mode.
+     *
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [batchSize] Number of samples per batch of computation.
+     * @param [metric] Metric to evaluate during test phase.
+     *
+     * @return Value of calculated metric.
+     */
     override fun evaluate(
         dataset: ImageDataset,
         metric: Metrics,
@@ -353,6 +404,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
     // code is copied from evaluation method and should be refactored together
 
     /**
+     * Generates output predictions for the input samples.
+     * Computation is done in batches.
+     *
      * Extracts data for prediction from test subset (TODO: refactor it)
      *
      * TODO: need check that dataset size % batchSize == 0
@@ -407,7 +461,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
     }
 
-    // add predictSoftly (with return all raw array of predictions)
+    /**
+     * Predict the unknown class for the given image.
+     */
     override fun predict(image: FloatArray): Int {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
@@ -436,6 +492,37 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
             // find index of max element in the given FloatArray
             return dst[0].indexOf(dst[0].max()!!)
+        }
+    }
+
+    // copy of previous method TODO: refactor it
+    override fun predictSoftly(image: FloatArray): FloatArray {
+        val predictionData: Array<FloatArray> = arrayOf(image)
+
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val xTensorShape = firstLayer.input.asOutput().shape()
+
+        val imageShape = longArrayOf(
+            1,
+            *tail(xTensorShape)
+        )
+
+        Tensor.create(
+            imageShape,
+            ImageDataset.serializeToBuffer(predictionData, 0, 1)
+        ).use { testImages ->
+
+            val predictionsTensor = session.runner()
+                .fetch(prediction)
+                .feed(xOp.asOutput(), testImages)
+                .run()[0]
+
+            val dst = Array(1) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+            predictionsTensor.copyTo(dst)
+
+            return dst[0]
         }
     }
 }

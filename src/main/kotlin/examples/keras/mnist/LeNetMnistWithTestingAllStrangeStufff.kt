@@ -92,13 +92,21 @@ fun main() {
 
         it.compile(optimizer = SGD(learningSchedule), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
+        // it.summary()
+
         val history = it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+        // val conv2dLayer = it.getLayer("conv2d_1")
+        // println(conv2dLayer.weights())
 
         println(history.history[0].toString())
 
         val accuracy = it.evaluate(dataset = test, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
+
+        val predictionByClasses = it.predictSoftly(train.getImage(0))
+        println("Prediction by classes: ${predictionByClasses.contentToString()}")
 
         val prediction = it.predict(train.getImage(0))
 
