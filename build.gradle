@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.zaleslaw'
-version '1.0-SNAPSHOT'
+version '0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -12,8 +12,11 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
-    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3'
-    implementation 'io.jhdf:jhdf:0.5.7'
+    compile 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
+    compile 'io.github.microutils:kotlin-logging:1.7.9' // for logging
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
+
     /* compile 'org.tensorflow:libtensorflow:1.15.0'
     compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0' */
 }

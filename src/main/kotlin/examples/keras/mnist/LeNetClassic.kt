@@ -90,7 +90,7 @@ fun main() {
 
     LeNet5.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    LeNet5.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
+    LeNet5.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
     val accuracy = LeNet5.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
