@@ -7,7 +7,7 @@ import tf_api.keras.dataset.ImageDataset
 import java.io.File
 
 fun main() {
-    val pathToLabels = "models/lenet_weights.hdf5"
+    val pathToLabels = "models/mnist/lenet_weights.hdf5"
     val realPathToLabels = ImageDataset::class.java.classLoader.getResource(pathToLabels).path.toString()
 
     val file = File(realPathToLabels)
@@ -33,6 +33,11 @@ fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
     for (node in group) {
         println(indent + node.name)
 
+
+        for (entry in node.attributes.entries) {
+            println(entry.value)
+        }
+
         if (node is Group) {
             recursivePrintGroup(hdfFile, node, level)
         } else {
@@ -44,19 +49,19 @@ fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
             when (dataset.dimensions.size) {
                 4 -> {
                     val data = dataset.data as Array<Array<Array<FloatArray>>>
-                    println(data.contentDeepToString())
+                    //println(data.contentDeepToString())
                 }
                 3 -> {
                     val data = dataset.data as Array<Array<FloatArray>>
-                    println(data.contentDeepToString())
+                    //println(data.contentDeepToString())
                 }
                 2 -> {
                     val data = dataset.data as Array<FloatArray>
-                    println(data.contentDeepToString())
+                    //println(data.contentDeepToString())
                 }
                 1 -> {
                     val data = dataset.data as FloatArray
-                    println(data.contentToString())
+                    //println(data.contentToString())
                 }
             }
         }

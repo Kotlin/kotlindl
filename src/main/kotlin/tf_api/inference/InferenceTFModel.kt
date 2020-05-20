@@ -12,7 +12,7 @@ import util.MnistUtils
 open class InferenceTFModel() : AutoCloseable {
     protected lateinit var session: Session
     private lateinit var bundle: SavedModelBundle
-    private lateinit var kGraph: KGraph
+    lateinit var kGraph: KGraph
     private lateinit var reshape: (DoubleArray) -> Tensor<*>?
     private lateinit var input: Input
     private lateinit var output: Output
@@ -69,7 +69,6 @@ open class InferenceTFModel() : AutoCloseable {
         }
     }
 
-
     fun loadModel(pathToModel: String): InferenceTFModel {
         bundle = SavedModelBundle.load(pathToModel, "serve")
         session = bundle.session()
@@ -86,6 +85,7 @@ open class InferenceTFModel() : AutoCloseable {
     override fun close() {
         session.close()
         bundle.close()
+        kGraph.close()
     }
 
     fun input(inputOp: Input) {
@@ -100,8 +100,6 @@ open class InferenceTFModel() : AutoCloseable {
     fun reshape(function: (DoubleArray) -> Tensor<*>?) {
         reshape = function
     }
-
-
 }
 
 fun prepareModelForInference(init: InferenceTFModel.() -> Unit): InferenceTFModel = InferenceTFModel()

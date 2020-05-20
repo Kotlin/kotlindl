@@ -1,6 +1,7 @@
-package examples.keras.mnist
+package examples.exportimport
 
 import examples.keras.mnist.util.*
+import tf_api.KGraph
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.dataset.ImageDataset
@@ -16,9 +17,10 @@ import tf_api.keras.layers.twodim.ConvPadding
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
+import java.io.File
 
 private const val LEARNING_RATE = 0.05f
-private const val EPOCHS = 4
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
@@ -92,8 +94,19 @@ fun main() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.MAE, batchSize = TEST_BATCH_SIZE)
 
-        println("Accuracy: $accuracy")
+        val kGraph = (it as Sequential).getGraph()
+        println(kGraph)
+
+        println("--------------Save graph to file----------------")
+        File("lenetTFGraph").writeBytes(kGraph.tfGraph.toGraphDef())
+
+        it.kGraph = KGraph(File("lenetTFGraph").readBytes(), "INFERENCE")
+
+        println(it.kGraph)
+        val predictions = it.predict(test, 1000)
+
+        println("Prediction: " + predictions[0])
     }
 }

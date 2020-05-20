@@ -3,11 +3,17 @@ package tf_api
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
 
-class KGraph(graphDef: ByteArray) : AutoCloseable {
+class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
+    constructor(graphDef: ByteArray) : this(graphDef, "")
+
     var tfGraph: Graph = Graph()
 
     init {
-        tfGraph.importGraphDef(graphDef)
+        if (prefix.isEmpty()) {
+            tfGraph.importGraphDef(graphDef)
+        } else {
+            tfGraph.importGraphDef(graphDef, prefix)
+        }
     }
 
     override fun close() {

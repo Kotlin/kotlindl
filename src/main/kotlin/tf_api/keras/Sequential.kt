@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
+import tf_api.KGraph
 import tf_api.TFModel
 import tf_api.TrainingHistory
 import tf_api.keras.dataset.ImageBatch
@@ -37,6 +38,7 @@ private val logger = KotlinLogging.logger {}
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
  */
+
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
     /** Input layer. */
     private val firstLayer: Input<T> = input
@@ -83,9 +85,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
     init {
         logger.level = Level.DEBUG
 
-        val graph = Graph()
-        tf = Ops.create(graph)
-        session = Session(graph)
+        kGraph = KGraph(Graph().toGraphDef())
+        tf = Ops.create(kGraph.tfGraph)
+        session = Session(kGraph.tfGraph)
 
         // TODO: think about different logic for different architectures and regression and unsupervised tasks
         if (layers.last() is Dense) {
@@ -429,6 +431,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
 
     fun getDType(): Class<T> {
         return Float::class.javaObjectType as Class<T>
+    }
+
+    fun getGraph(): KGraph {
+        return kGraph
     }
 
     private fun debugSequentialTraining(file: BufferedWriter, i: Int) {
