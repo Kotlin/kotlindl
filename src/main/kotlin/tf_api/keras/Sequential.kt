@@ -2,6 +2,8 @@ package tf_api.keras
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import examples.exportimport.ReluGraphics
+import examples.exportimport.ReluGraphics2
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
@@ -22,6 +24,7 @@ import tf_api.keras.shape.TensorShape
 import tf_api.keras.shape.tail
 import java.io.BufferedWriter
 import java.io.File
+import javax.swing.JFrame
 
 private const val TRAINING_LOSS = "training_loss"
 
@@ -371,10 +374,43 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             ImageDataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
 
-            val predictionsTensor = session.runner()
+            val tensorList = session.runner()
                 .fetch(prediction)
+                .fetch("Relu")
+                .fetch("Relu_1")
+                .fetch("Conv2d")
+                .fetch("Conv2d_1")
                 .feed(xOp.asOutput(), testImages)
-                .run()[0]
+                .run()
+            val predictionsTensor = tensorList[0]
+            val reluTensor = tensorList[1]
+            val relu1Tensor = tensorList[2]
+            val conv2dTensor = tensorList[3]
+            val conv2d1Tensor = tensorList[4]
+
+            //[1, 28, 28, 32]
+            //[1, 14, 14, 64]
+
+            val dstData = Array(1) { Array(28) { Array(28) { FloatArray(32) } } }
+            reluTensor.copyTo(dstData)
+
+            val frame = JFrame("Visualise the matrix weights on Relu")
+            frame.contentPane.add(ReluGraphics(dstData))
+            frame.setSize(1500, 1500)
+            frame.isVisible = true
+            frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+            frame.isResizable = false
+
+
+            val dstData2 = Array(1) { Array(14) { Array(14) { FloatArray(64) } } }
+            relu1Tensor.copyTo(dstData2)
+
+            val frame2 = JFrame("Visualise the matrix weights on Relu_1")
+            frame2.contentPane.add(ReluGraphics2(dstData2))
+            frame2.setSize(1500, 1500)
+            frame2.isVisible = true
+            frame2.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+            frame2.isResizable = false
 
             val dst = Array(1) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
 
@@ -383,6 +419,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             return dst[0]
         }
     }
+
 
     /**
      * Predicts the unknown class for the given image.
@@ -499,6 +536,15 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
                     file.newLine()
                     file.write(dst.contentDeepToString())
                     file.newLine()
+
+                    /*if(dst.size == 5) {
+                        val frame = JFrame("Visualise the matrix weights on $i epochs")
+                        frame.contentPane.add(JFrameGraphics(dst))
+                        frame.setSize(1000, 1000)
+                        frame.isVisible = true
+                        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+                        frame.isResizable = false
+                    }*/
                 }
             }
         }
