@@ -9,7 +9,7 @@ import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 import tf_api.KGraph
-import tf_api.TFModel
+import tf_api.TrainableTFModel
 import tf_api.TrainingHistory
 import tf_api.keras.dataset.ImageBatch
 import tf_api.keras.dataset.ImageDataset
@@ -42,7 +42,7 @@ private val logger = KotlinLogging.logger {}
  * @constructor Creates a Sequential group with [input] and [layers].
  */
 
-class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel<T>() {
+class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
     /** Input layer. */
     private val firstLayer: Input<T> = input
 
@@ -76,9 +76,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     private var amountOfClasses: Long = -1
 
-    /** The namespace wrapper for all TensorFlow graph operations. */
-    private var tf: Ops
-
     private var mu.KLogger.level
         get() = (logger.underlyingLogger as Logger).level
         set(value) {
@@ -107,7 +104,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TFModel<T> {
+        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TrainableTFModel<T> {
             return Sequential(input, *layers)
         }
     }
@@ -466,10 +463,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
         session.close()
     }
 
-    fun getDType(): Class<T> {
-        return Float::class.javaObjectType as Class<T>
-    }
-
     fun getGraph(): KGraph {
         return kGraph
     }
@@ -549,5 +542,97 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TFModel
             }
         }
         file.flush()
+    }
+
+    override fun save(pathToModelDirectory: String) {
+        val directory = File(pathToModelDirectory);
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+        File("$pathToModelDirectory/graph.pb").writeBytes(kGraph.tfGraph.toGraphDef())
+
+        val modelWeightsExtractorRunner = session.runner()
+
+        trainableVars.forEach {
+            modelWeightsExtractorRunner.fetch(it)
+        }
+
+        val modelWeights = modelWeightsExtractorRunner.run()
+
+        File("$pathToModelDirectory/variableNames.txt").bufferedWriter().use { variableNamesFile ->
+
+
+            for (modelWeight in modelWeights.withIndex()) {
+                val variableName = trainableVars[modelWeight.index].asOutput().op().name()
+                variableNamesFile.write(variableName)
+                variableNamesFile.newLine()
+
+
+                File("$pathToModelDirectory/$variableName.txt").bufferedWriter().use { file ->
+                    val tensorForCopying = modelWeight.value
+
+                    when (modelWeight.value.shape().size) {
+                        1 -> {
+                            val dst = FloatArray(modelWeight.value.shape()[0].toInt()) { 0.0f }
+                            tensorForCopying.copyTo(dst)
+                            // file.write("Variable $variableName")
+                            // file.newLine()
+                            file.write(dst.contentToString())
+                            //  file.newLine()
+                        }
+                        2 -> {
+                            val dst =
+                                Array(modelWeight.value.shape()[0].toInt()) { FloatArray(modelWeight.value.shape()[1].toInt()) }
+                            tensorForCopying.copyTo(dst)
+
+                            // file.write("Variable $variableName")
+                            // file.newLine()
+                            file.write(dst.contentDeepToString())
+                            //file.newLine()
+                        }
+                        3 -> {
+                            val dst = Array(modelWeight.value.shape()[0].toInt()) {
+                                Array(modelWeight.value.shape()[1].toInt()) {
+                                    FloatArray(modelWeight.value.shape()[2].toInt())
+                                }
+                            }
+                            tensorForCopying.copyTo(dst)
+                            // file.write("Variable $variableName")
+                            // file.newLine()
+                            file.write(dst.contentDeepToString())
+                            // file.newLine()
+
+                        }
+                        4 -> {
+                            val dst = Array(modelWeight.value.shape()[0].toInt()) {
+                                Array(modelWeight.value.shape()[1].toInt()) {
+                                    Array(modelWeight.value.shape()[2].toInt()) {
+                                        FloatArray(modelWeight.value.shape()[3].toInt())
+                                    }
+                                }
+                            }
+                            tensorForCopying.copyTo(dst)
+                            // file.write("Variable $variableName")
+                            file.newLine()
+                            // file.write(dst.contentDeepToString())
+                            // file.newLine()
+
+                            /*if(dst.size == 5) {
+                                val frame = JFrame("Visualise the matrix weights on $i epochs")
+                                frame.contentPane.add(JFrameGraphics(dst))
+                                frame.setSize(1000, 1000)
+                                frame.isVisible = true
+                                frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+                                frame.isResizable = false
+                            }*/
+                        }
+                    }
+
+                    file.flush()
+                }
+                variableNamesFile.flush()
+            }
+
+        }
     }
 }

@@ -1,0 +1,10 @@
+Variable_2
+Variable_3
+Variable_6
+Variable_7
+Variable_8
+Variable_9
+Variable_10
+Variable_11
+Variable_12
+Variable_13

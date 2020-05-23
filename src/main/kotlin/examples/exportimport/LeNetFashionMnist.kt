@@ -110,14 +110,6 @@ fun main() {
             5 to 0.005f,
             6 to 0.0025f,
             7 to 0.001f
-            /*8 to 0.001f,
-            9 to 0.0005f,
-            10 to 0.00025f*/
-            /*11 to 0.0005f,
-            12 to 0.0004f,
-            13 to 0.0003f,
-            14 to 0.0002f,
-            15 to 0.0001f*/
         )
 
         it.compile(optimizer = SGD(learningSchedule), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)

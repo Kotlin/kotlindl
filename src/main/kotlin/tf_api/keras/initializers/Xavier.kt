@@ -17,7 +17,7 @@ class Xavier<T : Number>(
 
         println("fanIn $fanIn fanOut $fanOut stddev $stddev")
 
-        return tf.random.parameterizedTruncatedNormal(
+        return tf.withName("Xavier").random.parameterizedTruncatedNormal(
             shape,
             tf.constant(0f, dtype),
             tf.constant(stddev, dtype),

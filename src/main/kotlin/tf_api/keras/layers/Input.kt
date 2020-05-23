@@ -15,7 +15,7 @@ class Input<T : Number>(vararg dims: Long) : Layer<T>() {
     }
 
     fun defineVariables(tf: Ops) {
-        input = tf.placeholder(
+        input = tf.withName("x").placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))
         )
