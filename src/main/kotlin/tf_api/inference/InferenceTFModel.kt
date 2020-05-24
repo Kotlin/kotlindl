@@ -13,6 +13,7 @@ import tf_api.keras.shape.TensorShape
 import util.MnistUtils
 import java.io.File
 import java.nio.file.NotDirectoryException
+import java.util.*
 
 open class InferenceTFModel() : AutoCloseable {
     protected lateinit var session: Session
@@ -157,17 +158,24 @@ open class InferenceTFModel() : AutoCloseable {
             if (variableNames.isNotEmpty()) {
                 for (variableName in variableNames) {
                     val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
+                    val tensorShape = TensorShape(shape)
+
 
                     println(variableName)
-                    println(TensorShape(shape).dims().contentToString())
+                    println(tensorShape.dims().contentToString())
+                    println(tensorShape.numElements())
+
+                    /* // limited by 2GB files
+                     val tensorData = File("$pathToModelDirectory/$variableName.txt").readText()*/
+                    val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
+                    scanner.useLocale(Locale.US)
 
                     when (variableName) {
                         "Variable_2" -> {
-                            val const = 0.01f
                             val initializerName = "Xavier"
                             val assignOpName = "Assign"
 
-                            val source = create4DimFloatArray(shape, const)
+                            val source = create4DimFloatArray(shape, scanner)
                             populateVariable(initializerName, source, assignOpName)
 
                             // Extract variable
@@ -184,111 +192,87 @@ open class InferenceTFModel() : AutoCloseable {
 
                         }
                         "Variable_3" -> {
-                            val const = 0.01f
                             val initializerName = "Xavier_1"
                             val assignOpName = "Assign_1"
 
-                            val source = create1DimFloatArray(shape, const)
+                            val source = create1DimFloatArray(shape, scanner)
                             populateVariable(initializerName, source, assignOpName)
                         }
                         "Variable_6" -> {
-
-                            val const = 0.02f
                             val initializerName = "Xavier_2"
                             val assignOpName = "Assign_2"
 
-                            val org = create4DimFloatArray(shape, const)
+                            val source = create4DimFloatArray(shape, scanner)
 
                             // populate variable
-                            populateVariable(initializerName, org, assignOpName)
+                            populateVariable(initializerName, source, assignOpName)
                         }
                         "Variable_7" -> {
-                            val const = 0.02f
                             val initializerName = "Xavier_3"
                             val assignOpName = "Assign_3"
 
-                            val org = create1DimFloatArray(shape, const)
+                            val org = create1DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_8" -> {
-                            val const = 0.94f
                             val initializerName = "Xavier_4"
                             val assignOpName = "Assign_4"
 
-                            val org = create2DimFloatArray(shape, const)
+                            val org = create2DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_9" -> {
-                            val const = 0.54f
                             val initializerName = "Xavier_5"
                             val assignOpName = "Assign_5"
 
-                            val org = create1DimFloatArray(shape, const)
+                            val org = create1DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_10" -> {
-                            val const = 0.44f
                             val initializerName = "Xavier_6"
                             val assignOpName = "Assign_6"
 
-                            val org = create2DimFloatArray(shape, const)
+                            val org = create2DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_11" -> {
-                            val const = 0.44f
                             val initializerName = "Xavier_7"
                             val assignOpName = "Assign_7"
 
-                            val org = create1DimFloatArray(shape, const)
+                            val org = create1DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_12" -> {
-                            val const = 0.44f
                             val initializerName = "Xavier_8"
                             val assignOpName = "Assign_8"
 
-                            val org = create2DimFloatArray(shape, const)
+                            val org = create2DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                         "Variable_13" -> {
-                            val const = 0.54f
                             val initializerName = "Xavier_9"
                             val assignOpName = "Assign_9"
 
-                            val org = create1DimFloatArray(shape, const)
+                            val org = create1DimFloatArray(shape, scanner)
 
                             // populate variable
                             populateVariable(initializerName, org, assignOpName)
                         }
                     }
-
-
-
-                    for (variableName in variableNames) {
-
-                    }
                 }
             }
-            // Load variables
-            /*val runner = session.runner()
-
-           runner.addTarget(it)
-
-
-            runner.run()*/
-
         }
     }
 
@@ -305,42 +289,95 @@ open class InferenceTFModel() : AutoCloseable {
 
     private fun create4DimFloatArray(
         shape: Shape,
-        const: Float
+        scanner: Scanner
     ): Array<Array<Array<FloatArray>>> {
-        return Array(shape.size(0).toInt()) {
+        val result = Array(shape.size(0).toInt()) {
             Array(shape.size(1).toInt()) {
                 Array(shape.size(2).toInt()) {
-                    FloatArray(shape.size(3).toInt()) { const }
+                    FloatArray(shape.size(3).toInt()) { 0.0f }
                 }
             }
         }
+
+        var cnt = 0
+
+        for (i in result.indices) {
+            for (j in result[i].indices) {
+                for (k in result[i][j].indices) {
+                    for (m in result[i][j][k].indices) {
+                        if (scanner.hasNextFloat()) {
+                            val weight = scanner.nextFloat()
+                            result[i][j][k][m] = weight
+                            cnt++
+                        } else {
+                            println(cnt)
+                        }
+                    }
+                }
+            }
+        }
+
+        return result
     }
 
     private fun create3DimFloatArray(
         shape: Shape,
-        const: Float
+        scanner: Scanner
     ): Array<Array<FloatArray>> {
-        return Array(shape.size(0).toInt()) {
+        val result = Array(shape.size(0).toInt()) {
             Array(shape.size(1).toInt()) {
-                FloatArray(shape.size(2).toInt()) { const }
+                FloatArray(shape.size(2).toInt()) { 0.0f }
             }
         }
+
+        for (i in result.indices) {
+            for (j in result[i].indices) {
+                for (k in result[i][j].indices) {
+
+                    val weight = scanner.nextFloat()
+                    result[i][j][k] = weight
+
+                }
+            }
+        }
+
+        return result
     }
 
     private fun create2DimFloatArray(
         shape: Shape,
-        const: Float
+        scanner: Scanner
     ): Array<FloatArray> {
-        return Array(shape.size(0).toInt()) {
-            FloatArray(shape.size(1).toInt()) { const }
+        val result = Array(shape.size(0).toInt()) {
+            FloatArray(shape.size(1).toInt()) { 0.0f }
         }
+
+        for (i in result.indices) {
+            for (j in result[i].indices) {
+                val weight = scanner.nextFloat()
+                result[i][j] = weight
+
+
+            }
+        }
+
+        return result
     }
 
     private fun create1DimFloatArray(
         shape: Shape,
-        const: Float
+        scanner: Scanner
     ): FloatArray {
-        return FloatArray(shape.size(0).toInt()) { const }
+        val result = FloatArray(shape.size(0).toInt()) { 0.0f }
+
+        for (i in result.indices) {
+
+            val weight = scanner.nextFloat()
+            result[i] = weight
+
+        }
+
+        return result
     }
 }
 

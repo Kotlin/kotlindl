@@ -3,6 +3,7 @@ package tf_api.keras.shape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
+import kotlin.math.abs
 
 fun constArray(tf: Ops, vararg i: Int): Operand<Int> {
     return tf.constant(i)
@@ -58,5 +59,14 @@ fun tail(shape: Shape): LongArray {
 
 fun shapeFromDims(vararg dims: Long): Shape {
     return Shape.make(head(*dims), *tail(*dims))
+}
+
+
+fun numElementsInShape(shape: LongArray): Long {
+    var prod = 1L
+    for (i in shape.indices) {
+        prod *= abs(shape[i])
+    }
+    return prod
 }
 

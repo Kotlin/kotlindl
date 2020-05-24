@@ -13,10 +13,11 @@ import tf_api.keras.layers.twodim.Conv2D
 import tf_api.keras.layers.twodim.ConvPadding
 import tf_api.keras.layers.twodim.MaxPool2D
 import tf_api.keras.loss.LossFunctions
+import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
 
-private const val EPOCHS = 1
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
@@ -103,38 +104,57 @@ fun main() {
         ::extractLabels
     )
 
-    val imageId = 0
+    val imageId1 = 4
+    val imageId2 = 5
+    val imageId3 = 6
 
     model.use {
         it.compile(optimizer = SGD(LEARNING_SCHEDULE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        println(it.kGraph)
+        //println(it.kGraph)
 
         it.save("lenet5")
+
+        val prediction = it.predict(train.getImage(imageId1))
+
+        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
+
+        val prediction2 = it.predict(train.getImage(imageId2))
+
+        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
+
+        val prediction3 = it.predict(train.getImage(imageId2))
+
+        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        println("Accuracy $accuracy")
     }
 
     InferenceTFModel().use {
         it.load("lenet5")
 
-        println(it)
+        //println(it)
 
-        val prediction = it.predict(train.getImage(imageId))
+        val prediction = it.predict(train.getImage(imageId1))
 
-        println("Prediction: $prediction")
+        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
 
-        val prediction2 = it.predict(train.getImage(imageId + 10))
+        val prediction2 = it.predict(train.getImage(imageId2))
 
-        println("Prediction2: $prediction2")
+        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val trainImageLabel = train.getImageLabel(imageId)
+        val prediction3 = it.predict(train.getImage(imageId2))
 
-        val maxIdx = trainImageLabel.indexOf(trainImageLabel.max()!!)
-
-        println("Ground Truth: $maxIdx")
-
-        /*val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
-        println("Accuracy $accuracy")*/
+        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
     }
+}
+
+private fun getLabel(train: ImageDataset, imageId1: Int): Int {
+    val trainImageLabel = train.getImageLabel(imageId1)
+
+    val maxIdx = trainImageLabel.indexOf(trainImageLabel.max()!!)
+    return maxIdx
 }

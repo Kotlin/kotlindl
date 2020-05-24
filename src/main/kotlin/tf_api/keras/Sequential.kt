@@ -21,6 +21,7 @@ import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.Optimizer
 import tf_api.keras.optimizers.SGD
 import tf_api.keras.shape.TensorShape
+import tf_api.keras.shape.numElementsInShape
 import tf_api.keras.shape.tail
 import java.io.BufferedWriter
 import java.io.File
@@ -571,51 +572,58 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 File("$pathToModelDirectory/$variableName.txt").bufferedWriter().use { file ->
                     val tensorForCopying = modelWeight.value
 
-                    when (modelWeight.value.shape().size) {
+                    val shape = tensorForCopying.shape()
+
+                    when (shape.size) {
                         1 -> {
-                            val dst = FloatArray(modelWeight.value.shape()[0].toInt()) { 0.0f }
+                            val dst = FloatArray(shape[0].toInt()) { 0.0f }
                             tensorForCopying.copyTo(dst)
-                            // file.write("Variable $variableName")
-                            // file.newLine()
-                            file.write(dst.contentToString())
-                            //  file.newLine()
+
+                            for (i in 0..dst.size - 2) {
+                                file.write(dst[i].toString() + " ")
+                            }
+                            file.write(dst[dst.size - 1].toString())
                         }
                         2 -> {
                             val dst =
-                                Array(modelWeight.value.shape()[0].toInt()) { FloatArray(modelWeight.value.shape()[1].toInt()) }
+                                Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
+
                             tensorForCopying.copyTo(dst)
 
-                            // file.write("Variable $variableName")
-                            // file.newLine()
-                            file.write(dst.contentDeepToString())
-                            //file.newLine()
+                            val reshaped = reshape2DTo1D(dst, numElementsInShape(shape).toInt())
+
+                            for (i in 0..reshaped.size - 2) {
+                                file.write(reshaped[i].toString() + " ")
+                            }
+                            file.write(reshaped[reshaped.size - 1].toString())
                         }
                         3 -> {
-                            val dst = Array(modelWeight.value.shape()[0].toInt()) {
-                                Array(modelWeight.value.shape()[1].toInt()) {
-                                    FloatArray(modelWeight.value.shape()[2].toInt())
+                            val dst = Array(shape[0].toInt()) {
+                                Array(shape[1].toInt()) {
+                                    FloatArray(shape[2].toInt())
                                 }
                             }
                             tensorForCopying.copyTo(dst)
-                            // file.write("Variable $variableName")
-                            // file.newLine()
-                            file.write(dst.contentDeepToString())
-                            // file.newLine()
-
+                            val reshaped = reshape3DTo1D(dst, numElementsInShape(shape).toInt())
+                            for (i in 0..reshaped.size - 2) {
+                                file.write(reshaped[i].toString() + " ")
+                            }
+                            file.write(reshaped[reshaped.size - 1].toString())
                         }
                         4 -> {
-                            val dst = Array(modelWeight.value.shape()[0].toInt()) {
-                                Array(modelWeight.value.shape()[1].toInt()) {
-                                    Array(modelWeight.value.shape()[2].toInt()) {
-                                        FloatArray(modelWeight.value.shape()[3].toInt())
+                            val dst = Array(shape[0].toInt()) {
+                                Array(shape[1].toInt()) {
+                                    Array(shape[2].toInt()) {
+                                        FloatArray(shape[3].toInt())
                                     }
                                 }
                             }
                             tensorForCopying.copyTo(dst)
-                            // file.write("Variable $variableName")
-                            file.newLine()
-                            // file.write(dst.contentDeepToString())
-                            // file.newLine()
+                            val reshaped = reshape4DTo1D(dst, numElementsInShape(shape).toInt())
+                            for (i in 0..reshaped.size - 2) {
+                                file.write(reshaped[i].toString() + " ")
+                            }
+                            file.write(reshaped[reshaped.size - 1].toString())
 
                             /*if(dst.size == 5) {
                                 val frame = JFrame("Visualise the matrix weights on $i epochs")
@@ -632,7 +640,56 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 }
                 variableNamesFile.flush()
             }
-
         }
+    }
+
+    private fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
+        val result = FloatArray(size) { 0.0f }
+
+        var pos = 0
+
+        for (i in dst.indices) {
+            for (j in dst[i].indices) {
+                result[pos] = dst[i][j]
+                pos++
+            }
+        }
+
+        return result
+    }
+
+    private fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
+        val result = FloatArray(size) { 0.0f }
+
+        var pos = 0
+        for (i in dst.indices) {
+            for (j in dst[i].indices) {
+                for (k in dst[i][j].indices) {
+
+                    result[pos] = dst[i][j][k]
+                    pos++
+                }
+
+            }
+        }
+
+        return result
+    }
+
+    private fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
+        val result = FloatArray(size) { 0.0f }
+
+        var pos = 0
+        for (i in dst.indices) {
+            for (j in dst[i].indices) {
+                for (k in dst[i][j].indices) {
+                    for (m in dst[i][j][k].indices) {
+                        result[pos] = dst[i][j][k][m]
+                        pos++
+                    }
+                }
+            }
+        }
+        return result
     }
 }
