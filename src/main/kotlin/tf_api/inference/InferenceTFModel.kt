@@ -17,7 +17,7 @@ import java.util.*
 
 open class InferenceTFModel() : AutoCloseable {
     protected lateinit var session: Session
-    private lateinit var bundle: SavedModelBundle
+    private lateinit var bundle: SavedModelBundle // extract for inference with SavedModelBundle and move this property to this
     lateinit var kGraph: KGraph
 
     /** The namespace wrapper for all TensorFlow graph operations. */

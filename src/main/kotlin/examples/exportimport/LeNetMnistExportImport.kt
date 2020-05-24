@@ -23,6 +23,7 @@ private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
+
 private val LEARNING_SCHEDULE = mapOf(
     1 to 0.1f,
     2 to 0.05f,
@@ -104,9 +105,9 @@ fun main() {
         ::extractLabels
     )
 
-    val imageId1 = 4
-    val imageId2 = 5
-    val imageId3 = 6
+    val imageId1 = 0
+    val imageId2 = 1
+    val imageId3 = 2
 
     model.use {
         it.compile(optimizer = SGD(LEARNING_SCHEDULE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
@@ -125,7 +126,7 @@ fun main() {
 
         println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val prediction3 = it.predict(train.getImage(imageId2))
+        val prediction3 = it.predict(train.getImage(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
 
@@ -146,7 +147,7 @@ fun main() {
 
         println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val prediction3 = it.predict(train.getImage(imageId2))
+        val prediction3 = it.predict(train.getImage(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
     }
