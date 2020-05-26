@@ -1,7 +1,7 @@
 package examples.inference
 
 import org.tensorflow.Tensor
-import tf_api.inference.InferenceTFModel
+import tf_api.inference.SavedModelInferenceModel
 import tf_api.keras.Input
 import tf_api.keras.Output
 import tf_api.keras.metric.Metrics
@@ -18,7 +18,8 @@ fun main() {
         IMAGE_PATH,
         LABEL_PATH, Random(0), 10000
     )
-    InferenceTFModel().use {
+
+    SavedModelInferenceModel().use {
         it.loadModel(PATH_TO_MODEL)
         println(it)
 

@@ -1,6 +1,6 @@
 package examples.keras.fashionmnist
 
-import examples.keras.mnist.util.*
+import examples.keras.fashionmnist.util.*
 import tf_api.keras.Sequential
 import tf_api.keras.activations.Activations
 import tf_api.keras.dataset.ImageDataset

@@ -10,9 +10,9 @@ import tf_api.keras.initializers.Zeros
 import tf_api.keras.layers.Dense
 import tf_api.keras.layers.Flatten
 import tf_api.keras.layers.Input
-import tf_api.keras.layers.twodim.AvgPool2D
 import tf_api.keras.layers.twodim.Conv2D
 import tf_api.keras.layers.twodim.ConvPadding
+import tf_api.keras.layers.twodim.MaxPool2D
 import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
@@ -44,7 +44,7 @@ private val model = Sequential.of<Float>(
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
-    AvgPool2D(
+    MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
         strides = intArrayOf(1, 2, 2, 1)
     ),
@@ -57,7 +57,7 @@ private val model = Sequential.of<Float>(
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
-    AvgPool2D(
+    MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
         strides = intArrayOf(1, 2, 2, 1)
     ),

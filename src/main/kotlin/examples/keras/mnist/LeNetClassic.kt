@@ -23,8 +23,9 @@ private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
+private const val TEST_BATCH_SIZE = 1000
 
-private val LeNet5 = Sequential.of<Float>(
+private val lenet5Classic = Sequential.of<Float>(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
@@ -88,13 +89,13 @@ fun main() {
         ::extractLabels
     )
 
-    LeNet5.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    lenet5Classic.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    LeNet5.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+    lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = LeNet5.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = lenet5Classic.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
-    LeNet5.close()
+    lenet5Classic.close()
 
     println("Accuracy: $accuracy")
 }

@@ -2,8 +2,8 @@ package tf_api.keras
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
-import examples.exportimport.ReluGraphics
-import examples.exportimport.ReluGraphics2
+import examples.production.ReluGraphics
+import examples.production.ReluGraphics2
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
@@ -546,7 +546,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     override fun save(pathToModelDirectory: String) {
-        val directory = File(pathToModelDirectory);
+        val directory = File(pathToModelDirectory)
         if (!directory.exists()) {
             directory.mkdir()
         }

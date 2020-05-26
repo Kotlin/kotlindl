@@ -8,7 +8,6 @@ import tf_api.keras.metric.Metrics
 import util.MnistUtils
 import java.util.*
 
-
 private const val PATH_TO_MODEL = "src/main/resources/model1"
 private const val IMAGE_PATH = "src/main/resources/datasets/test/t10k-images-idx3-ubyte"
 private const val LABEL_PATH = "src/main/resources/datasets/test/t10k-labels-idx1-ubyte"

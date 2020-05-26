@@ -12,8 +12,6 @@ import tf_api.keras.loss.LossFunctions
 import tf_api.keras.metric.Metrics
 import tf_api.keras.optimizers.SGD
 
-private const val VALIDATION_SIZE = 0
-
 private val model = Sequential.of<Float>(
     Input(784),
     Dense(1024, Activations.Relu, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
@@ -36,7 +34,7 @@ fun main() {
 
     model.compile(optimizer = SGD(0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    model.fit(dataset = train, epochs = 10, batchSize = 100, verbose = false)
+    model.fit(dataset = train, epochs = 10, batchSize = 100, verbose = true)
 
     val accuracy = model.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
 
