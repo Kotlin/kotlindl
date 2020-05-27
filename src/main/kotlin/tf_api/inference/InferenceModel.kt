@@ -34,7 +34,7 @@ open class InferenceModel() : AutoCloseable {
         val arr = Array(1) { FloatArray(10) { 0.0f } }
         result1.copyTo(arr)
 
-        println(arr.contentDeepToString())
+        //println(arr.contentDeepToString())
 
         val runner = session.runner()
         val result = runner.feed("x", reshape2(image))
