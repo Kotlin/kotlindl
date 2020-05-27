@@ -12,8 +12,15 @@ class RandomNormal<T : Number>(
     private val seed: Long
 ) :
     Initializer<T>() {
-    override fun initialize(funIn: Int, funOut: Int, tf: Ops, shape: Operand<Int>, dtype: Class<T>): Operand<T> {
-        return tf.random.parameterizedTruncatedNormal(
+    override fun initialize(
+        funIn: Int,
+        funOut: Int,
+        tf: Ops,
+        shape: Operand<Int>,
+        dtype: Class<T>,
+        name: String
+    ): Operand<T> {
+        return tf.withName(name).random.parameterizedTruncatedNormal(
             shape,
             tf.constant(mean, dtype),
             tf.constant(stdev, dtype),

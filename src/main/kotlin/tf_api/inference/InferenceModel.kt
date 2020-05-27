@@ -82,7 +82,7 @@ open class InferenceModel() : AutoCloseable {
                     val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
                     val tensorShape = TensorShape(shape)
 
-
+                    // TODO: move to logging
                     println(variableName)
                     println(tensorShape.dims().contentToString())
                     println(tensorShape.numElements())
@@ -92,108 +92,47 @@ open class InferenceModel() : AutoCloseable {
                     val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
                     scanner.useLocale(Locale.US)
 
-                    when (variableName) {
-                        "Variable_2" -> {
-                            val initializerName = "Xavier"
-                            val assignOpName = "Assign"
+                    // TODO: describe this convention about naming
+                    val initializerName = "Init_$variableName"
+                    val assignOpName = "Assign_$variableName"
 
-                            val source = create4DimFloatArray(shape, scanner)
-                            populateVariable(initializerName, source, assignOpName)
+                    val source = createFloatArrayFromScanner(shape, scanner)
+                    populateVariable(initializerName, source, assignOpName)
 
-                            // Extract variable
-                            /* val variableExtractor = session.runner()
-                                        val variableTensors = variableExtractor
-                                            .fetch(variableName)
-                                            .run();
+                    // Extract variable
+                    /* val variableExtractor = session.runner()
+                                val variableTensors = variableExtractor
+                                    .fetch(variableName)
+                                    .run();
 
-                                        val dst = create4DimFloatArray(shape, 0.0f)
+                                val dst = create4DimFloatArray(shape, 0.0f)
 
-                                        variableTensors[0].copyTo(dst)
-                                        println(dst[0][0][0][0])*/
-
-
-                        }
-                        "Variable_3" -> {
-                            val initializerName = "Xavier_1"
-                            val assignOpName = "Assign_1"
-
-                            val source = create1DimFloatArray(shape, scanner)
-                            populateVariable(initializerName, source, assignOpName)
-                        }
-                        "Variable_6" -> {
-                            val initializerName = "Xavier_2"
-                            val assignOpName = "Assign_2"
-
-                            val source = create4DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, source, assignOpName)
-                        }
-                        "Variable_7" -> {
-                            val initializerName = "Xavier_3"
-                            val assignOpName = "Assign_3"
-
-                            val org = create1DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_8" -> {
-                            val initializerName = "Xavier_4"
-                            val assignOpName = "Assign_4"
-
-                            val org = create2DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_9" -> {
-                            val initializerName = "Xavier_5"
-                            val assignOpName = "Assign_5"
-
-                            val org = create1DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_10" -> {
-                            val initializerName = "Xavier_6"
-                            val assignOpName = "Assign_6"
-
-                            val org = create2DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_11" -> {
-                            val initializerName = "Xavier_7"
-                            val assignOpName = "Assign_7"
-
-                            val org = create1DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_12" -> {
-                            val initializerName = "Xavier_8"
-                            val assignOpName = "Assign_8"
-
-                            val org = create2DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                        "Variable_13" -> {
-                            val initializerName = "Xavier_9"
-                            val assignOpName = "Assign_9"
-
-                            val org = create1DimFloatArray(shape, scanner)
-
-                            // populate variable
-                            populateVariable(initializerName, org, assignOpName)
-                        }
-                    }
+                                variableTensors[0].copyTo(dst)
+                                println(dst[0][0][0][0])*/
                 }
+            }
+        }
+
+
+    }
+
+
+    private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {
+        when (shape.numDimensions()) {
+            1 -> {
+                return create1DimFloatArray(shape, scanner)
+            }
+            2 -> {
+                return create2DimFloatArray(shape, scanner)
+            }
+            3 -> {
+                return create3DimFloatArray(shape, scanner)
+            }
+            4 -> {
+                return create4DimFloatArray(shape, scanner)
+            }
+            else -> {
+                throw RuntimeException("The loading of tensors with 5 and more dimenstions is not supported yet")
             }
         }
     }

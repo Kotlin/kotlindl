@@ -24,17 +24,22 @@ class Conv2D<T : Number>(
     private val activation: Activations = Activations.Relu,
     private val kernelInitializer: Initializer<T>,
     private val biasInitializer: Initializer<T>,
-    private val padding: ConvPadding
+    private val padding: ConvPadding,
+    name: String = ""
 ) : Layer<T>() {
 
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
 
-    private val KERNEL = "conv_kernel"
-    private val KERNEL_INIT = "conv_kernelInit"
-    private val BIAS = "conv_bias"
-    private val BIAS_INIT = "conv_biasInit"
+    private val KERNEL = "conv2d_kernel"
+    private val KERNEL_INIT = "conv2d_kernelInit"
+    private val BIAS = "conv2d_bias"
+    private val BIAS_INIT = "conv2d_biasInit"
+
+    init {
+        this.name = name
+    }
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
@@ -44,12 +49,12 @@ class Conv2D<T : Number>(
         val kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
         val biasShape = Shape.make(filters)
 
+        // TODO: refactor to logging
         println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
         println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
-        kernel = tf.variable(kernelShape, getDType())
-        bias = tf.variable(biasShape, getDType())
 
+        // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
         val inputDepth = lastElement // amount of channels
         val outputDepth = filters // amount of channels for the next layer
@@ -57,13 +62,24 @@ class Conv2D<T : Number>(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        // Create dense kernel tensor
-        kernel =
-            addWeight(tf, KERNEL, tf.variable(kernelShape, dtype), KERNEL_INIT, kernelInitializer)
+        // TODO: refactor to remove duplicated code
+        if (name.isNotEmpty()) {
+            val kernelVariableName = name + "_" + KERNEL
+            val biasVariableName = name + "_" + BIAS
+            val kernelInitName = name + "_" + KERNEL_INIT
+            val biasInitName = name + "_" + BIAS_INIT
 
-        // Create bias tensor
-        bias = addWeight(tf, BIAS, tf.variable(biasShape, dtype), BIAS_INIT, biasInitializer)
+            kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
+            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
+            kernel = addWeight(tf, kernelVariableName, kernel, kernelInitName, kernelInitializer)
+            bias = addWeight(tf, biasVariableName, bias, biasInitName, biasInitializer)
+        } else {
+            kernel = tf.variable(kernelShape, getDType())
+            bias = tf.variable(biasShape, getDType())
+            kernel = addWeight(tf, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
+            bias = addWeight(tf, BIAS, bias, BIAS_INIT, biasInitializer)
+        }
 
     }
 

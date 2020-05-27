@@ -29,7 +29,8 @@ val lenet5 = Sequential.of<Float>(
         activation = Activations.Relu,
         kernelInitializer = Xavier(SEED),
         biasInitializer = Xavier(SEED),
-        padding = ConvPadding.SAME
+        padding = ConvPadding.SAME,
+        name = "1"
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
@@ -42,7 +43,8 @@ val lenet5 = Sequential.of<Float>(
         activation = Activations.Relu,
         kernelInitializer = Xavier(SEED),
         biasInitializer = Xavier(SEED),
-        padding = ConvPadding.SAME
+        padding = ConvPadding.SAME,
+        name = "2"
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
@@ -53,19 +55,22 @@ val lenet5 = Sequential.of<Float>(
         outputSize = 120,
         activation = Activations.Relu,
         kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED)
+        biasInitializer = Xavier(SEED),
+        name = "3"
     ),
     Dense(
         outputSize = 84,
         activation = Activations.Relu,
         kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED)
+        biasInitializer = Xavier(SEED),
+        name = "4"
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
         kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED)
+        biasInitializer = Xavier(SEED),
+        name = "5"
     )
 )
 

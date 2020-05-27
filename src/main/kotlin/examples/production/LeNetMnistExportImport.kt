@@ -45,6 +45,8 @@ fun main() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
+        println(it.kGraph)
+
         it.save(PATH_TO_MODEL)
 
         val prediction = it.predict(train.getImage(imageId1))

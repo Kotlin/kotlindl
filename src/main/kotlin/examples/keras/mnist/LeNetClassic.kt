@@ -38,7 +38,8 @@ private val lenet5Classic = Sequential.of<Float>(
         activation = Activations.Tanh,
         kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Zeros(),
-        padding = ConvPadding.SAME
+        padding = ConvPadding.SAME,
+        name = "1"
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
@@ -51,7 +52,8 @@ private val lenet5Classic = Sequential.of<Float>(
         activation = Activations.Tanh,
         kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Zeros(),
-        padding = ConvPadding.SAME
+        padding = ConvPadding.SAME,
+        name = "2"
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
@@ -62,19 +64,22 @@ private val lenet5Classic = Sequential.of<Float>(
         outputSize = 120,
         activation = Activations.Tanh,
         kernelInitializer = TruncatedNormal(SEED),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = Constant(0.1f),
+        name = "3"
     ),
     Dense(
         outputSize = 84,
         activation = Activations.Tanh,
         kernelInitializer = TruncatedNormal(SEED),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = Constant(0.1f),
+        name = "4"
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
         kernelInitializer = TruncatedNormal(SEED),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = Constant(0.1f),
+        name = "5"
     )
 )
 

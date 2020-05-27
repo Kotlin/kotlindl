@@ -47,7 +47,7 @@ abstract class Layer<T : Number> {
         initializer: Initializer<T>
     ): Variable<T> {
         variables = variables + Pair(name, variable)
-        initializers = initializers + Pair(initializerName, initializer.apply(fanIn, fanOut, tf, variable, dtype))
+        initializers = initializers + Pair(name, initializer.apply(fanIn, fanOut, tf, variable, dtype, name))
         return variable
     }
 }

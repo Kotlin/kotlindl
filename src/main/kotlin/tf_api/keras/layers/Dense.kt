@@ -14,34 +14,51 @@ class Dense<T : Number>(
     private val activation: Activations = Activations.Sigmoid,
     // initializers
     private val kernelInitializer: Initializer<T>,
-    private val biasInitializer: Initializer<T>
+    private val biasInitializer: Initializer<T>,
+    name: String = ""
 ) : Layer<T>() {
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
 
-    private val KERNEL = "kernel"
-    private val KERNEL_INIT = "kernelInit"
-    private val BIAS = "bias"
-    private val BIAS_INIT = "biasInit"
+    private val KERNEL = "dense_kernel"
+    private val KERNEL_INIT = "dense_kernelInit"
+    private val BIAS = "dense_bias"
+    private val BIAS_INIT = "dense_biasInit"
+
+    init {
+        this.name = name
+    }
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         val biasShape = Shape.make(outputSize.toLong())
 
+        // TODO: refactor to logging
+        println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
+        println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
-        // Create dense kernel tensor
-        kernel =
-            addWeight(tf, KERNEL, tf.variable(kernelShape, dtype), KERNEL_INIT, kernelInitializer)
+        if (name.isNotEmpty()) {
+            val kernelVariableName = name + "_" + KERNEL
+            val biasVariableName = name + "_" + BIAS
+            val kernelInitName = name + "_" + KERNEL_INIT
+            val biasInitName = name + "_" + BIAS_INIT
 
-        // Create bias tensor
-        bias = addWeight(tf, BIAS, tf.variable(biasShape, dtype), BIAS_INIT, biasInitializer)
+            kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
+            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-
+            kernel = addWeight(tf, kernelVariableName, kernel, kernelInitName, kernelInitializer)
+            bias = addWeight(tf, biasVariableName, bias, biasInitName, biasInitializer)
+        } else {
+            kernel = tf.variable(kernelShape, getDType())
+            bias = tf.variable(biasShape, getDType())
+            kernel = addWeight(tf, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
+            bias = addWeight(tf, BIAS, bias, BIAS_INIT, biasInitializer)
+        }
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

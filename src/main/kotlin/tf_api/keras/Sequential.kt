@@ -7,6 +7,7 @@ import examples.production.ReluGraphics2
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Variable
 import tf_api.KGraph
 import tf_api.TrainableTFModel
@@ -54,7 +55,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private var trainableVars: MutableList<Variable<T>> = mutableListOf()
 
     /** A list of initializer to initialize the trainableVariables. */
-    private var initializers: MutableList<Operand<T>> = mutableListOf()
+    private var initializers: Map<String, Assign<T>> = mapOf()
 
     /** Optimizer. Approach how aggressively to update the weights. */
     private var optimizer: Optimizer<T> = SGD(0.2f)
@@ -128,8 +129,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         layers.forEach {
             it.defineVariables(tf, inputShape = inputShape)
 
-            trainableVars.addAll(it.variables.values)
-            initializers.addAll(it.initializers.values)
+            trainableVars.addAll(it.variables.values)  // TODO: keep here and variable names too (if it exist)
+            initializers = initializers + it.initializers
 
             logger.debug { it.toString() + " " + TensorShape(inputShape).dims().contentToString() }
 
@@ -223,7 +224,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val runner = session.runner()
 
         initializers.forEach {
-            runner.addTarget(it)
+            runner.addTarget(it.value as Operand<T>)
         }
 
         runner.run()
@@ -561,13 +562,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val modelWeights = modelWeightsExtractorRunner.run()
 
         File("$pathToModelDirectory/variableNames.txt").bufferedWriter().use { variableNamesFile ->
-
-
             for (modelWeight in modelWeights.withIndex()) {
                 val variableName = trainableVars[modelWeight.index].asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
-
 
                 File("$pathToModelDirectory/$variableName.txt").bufferedWriter().use { file ->
                     val tensorForCopying = modelWeight.value
