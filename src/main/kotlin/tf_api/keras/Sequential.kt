@@ -107,7 +107,20 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
          * @return the [Sequential] model.
          */
         fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TrainableTFModel<T> {
+            preprocessLayerNames(layers)
             return Sequential(input, *layers)
+        }
+
+        private fun <T : Number> preprocessLayerNames(layers: Array<out Layer<T>>) {
+            // TODO: control the unique names of layers, if not, throw exception non unique layer names, add test for that case
+
+            var cnt = 1
+            for (layer in layers) {
+                if (layer.name.isEmpty()) {
+                    layer.name = "layer_$cnt"
+                    cnt++
+                }
+            }
         }
     }
 
