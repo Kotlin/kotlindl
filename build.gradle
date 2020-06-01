@@ -16,6 +16,9 @@ dependencies {
     implementation 'io.github.microutils:kotlin-logging:1.7.9' // for logging
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
     // to run on GPU (if CUDA is updated and machine with NVIDIA onboard)
     /* compile 'org.tensorflow:libtensorflow:1.15.0'
@@ -27,4 +30,8 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    useJUnitPlatform()
 }
