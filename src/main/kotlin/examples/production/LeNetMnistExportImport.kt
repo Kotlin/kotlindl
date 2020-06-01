@@ -1,11 +1,11 @@
 package examples.production
 
+import api.inference.InferenceModel
+import api.keras.dataset.ImageDataset
+import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
+import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
-import tf_api.inference.InferenceModel
-import tf_api.keras.dataset.ImageDataset
-import tf_api.keras.loss.LossFunctions
-import tf_api.keras.metric.Metrics
-import tf_api.keras.optimizers.SGD
 
 private const val PATH_TO_MODEL = "lenet5"
 private const val EPOCHS = 1

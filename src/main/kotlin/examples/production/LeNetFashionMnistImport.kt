@@ -1,8 +1,8 @@
 package examples.production
 
+import api.inference.InferenceModel
+import api.keras.dataset.ImageDataset
 import examples.keras.mnist.util.*
-import tf_api.inference.InferenceModel
-import tf_api.keras.dataset.ImageDataset
 
 private const val PATH_TO_MODEL = "fashionLenet"
 

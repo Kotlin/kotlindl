@@ -1,6 +1,6 @@
 package examples.util
 
-import tf_api.keras.dataset.ImageDataset
+import api.keras.dataset.ImageDataset
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayOutputStream

@@ -1,10 +1,10 @@
 package examples.inference
 
+import api.inference.prepareModelForInference
+import api.keras.Input
+import api.keras.Output
+import api.keras.metric.Metrics
 import org.tensorflow.Tensor
-import tf_api.inference.prepareModelForInference
-import tf_api.keras.Input
-import tf_api.keras.Output
-import tf_api.keras.metric.Metrics
 import util.MnistUtils
 import java.util.*
 

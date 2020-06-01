@@ -1,10 +1,10 @@
 package examples.production
 
+import api.keras.dataset.ImageDataset
+import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
+import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
-import tf_api.keras.dataset.ImageDataset
-import tf_api.keras.loss.LossFunctions
-import tf_api.keras.metric.Metrics
-import tf_api.keras.optimizers.SGD
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500

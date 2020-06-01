@@ -1,6 +1,6 @@
 package examples.inference
 
-import tf_api.inference.SavedModelInferenceModel
+import api.inference.SavedModelInferenceModel
 
 private const val PATH_TO_MODEL = "src/main/resources/model1"
 

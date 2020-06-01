@@ -1,8 +1,8 @@
 package examples.keras.cifar10.util
 
+import api.keras.dataset.ImageDataset
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import examples.util.getImage
-import tf_api.keras.dataset.ImageDataset
 import java.awt.image.DataBufferByte
 import java.io.IOException
 import java.util.zip.ZipEntry

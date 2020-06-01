@@ -1,21 +1,21 @@
 package examples.experimental
 
+import api.keras.Sequential
+import api.keras.activations.Activations
+import api.keras.dataset.ImageDataset
+import api.keras.initializers.Constant
+import api.keras.initializers.TruncatedNormal
+import api.keras.initializers.Zeros
+import api.keras.layers.Dense
+import api.keras.layers.Flatten
+import api.keras.layers.Input
+import api.keras.layers.twodim.AvgPool2D
+import api.keras.layers.twodim.Conv2D
+import api.keras.layers.twodim.ConvPadding
+import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
+import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
-import tf_api.keras.Sequential
-import tf_api.keras.activations.Activations
-import tf_api.keras.dataset.ImageDataset
-import tf_api.keras.initializers.Constant
-import tf_api.keras.initializers.TruncatedNormal
-import tf_api.keras.initializers.Zeros
-import tf_api.keras.layers.Dense
-import tf_api.keras.layers.Flatten
-import tf_api.keras.layers.Input
-import tf_api.keras.layers.twodim.AvgPool2D
-import tf_api.keras.layers.twodim.Conv2D
-import tf_api.keras.layers.twodim.ConvPadding
-import tf_api.keras.loss.LossFunctions
-import tf_api.keras.metric.Metrics
-import tf_api.keras.optimizers.SGD
 
 private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 1000
@@ -69,7 +69,7 @@ private val model = Sequential.of<Float>(
     ),
     Dense(
         outputSize = NUM_LABELS,
-        activation = Activations.Linear, // TODO: https://stats.stackexchange.com/questions/348036/difference-between-mathematical-and-tensorflow-implementation-of-softmax-crossen
+        activation = Activations.Linear,
         kernelInitializer = TruncatedNormal(SEED),
         biasInitializer = Constant(0.1f)
     )

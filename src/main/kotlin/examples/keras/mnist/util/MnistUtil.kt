@@ -1,6 +1,6 @@
 package examples.keras.mnist.util
 
-import tf_api.keras.dataset.ImageDataset
+import api.keras.dataset.ImageDataset
 import java.io.DataInputStream
 import java.io.IOException
 import java.util.zip.GZIPInputStream

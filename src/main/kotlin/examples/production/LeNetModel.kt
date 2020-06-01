@@ -1,16 +1,16 @@
 package examples.production
 
+import api.keras.Sequential
+import api.keras.activations.Activations
+import api.keras.dataset.ImageDataset
+import api.keras.initializers.Xavier
+import api.keras.layers.Dense
+import api.keras.layers.Flatten
+import api.keras.layers.Input
+import api.keras.layers.twodim.Conv2D
+import api.keras.layers.twodim.ConvPadding
+import api.keras.layers.twodim.MaxPool2D
 import examples.keras.mnist.util.NUM_LABELS
-import tf_api.keras.Sequential
-import tf_api.keras.activations.Activations
-import tf_api.keras.dataset.ImageDataset
-import tf_api.keras.initializers.Xavier
-import tf_api.keras.layers.Dense
-import tf_api.keras.layers.Flatten
-import tf_api.keras.layers.Input
-import tf_api.keras.layers.twodim.Conv2D
-import tf_api.keras.layers.twodim.ConvPadding
-import tf_api.keras.layers.twodim.MaxPool2D
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L

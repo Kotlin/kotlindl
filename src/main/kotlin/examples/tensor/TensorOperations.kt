@@ -1,6 +1,6 @@
 package examples.tensor
 
-import tf_api.tensor.KTensor
+import api.tensor.KTensor
 
 
 fun main() {
