@@ -17,6 +17,7 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
