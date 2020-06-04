@@ -1,5 +1,8 @@
 /gradlew
 /gradlew.bat
+/gradle.properties
+/logs.txt
+/savedmodels/
 /.gradle/
 /.idea/
 /build/

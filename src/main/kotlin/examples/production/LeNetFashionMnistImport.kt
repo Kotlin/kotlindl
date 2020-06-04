@@ -4,7 +4,7 @@ import api.inference.InferenceModel
 import api.keras.dataset.ImageDataset
 import examples.keras.mnist.util.*
 
-private const val PATH_TO_MODEL = "fashionLenet"
+private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(

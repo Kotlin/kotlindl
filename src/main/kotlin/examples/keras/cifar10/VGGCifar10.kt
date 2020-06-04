@@ -20,7 +20,7 @@ import examples.keras.cifar10.util.extractCifar10Images
 import examples.keras.cifar10.util.extractCifar10Labels
 
 private const val LEARNING_RATE = 0.1f
-private const val EPOCHS = 20
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
@@ -169,6 +169,8 @@ fun main() {
         it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+        it.save("vgg11")
 
         val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 

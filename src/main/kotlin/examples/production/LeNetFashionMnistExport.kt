@@ -62,6 +62,6 @@ fun main() {
 
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
 
-        it.save("fashionLenet")
+        it.save("savedmodels/fashionLenet")
     }
 }

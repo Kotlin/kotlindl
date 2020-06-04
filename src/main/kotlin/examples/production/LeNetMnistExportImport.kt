@@ -7,7 +7,7 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
 
-private const val PATH_TO_MODEL = "lenet5"
+private const val PATH_TO_MODEL = "savedmodels/lenet5"
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000

@@ -1,9 +1,15 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.70'
+    id 'maven-publish'
+    id 'maven'
+    id "com.jfrog.artifactory" version "4.15.2"
 }
 
-group 'com.zaleslaw'
-version '0.1-SNAPSHOT'
+group 'org.jetbrains.kotlin.tensorflow'
+version '0.0.1'
+apply plugin: "com.jfrog.artifactory"
+apply plugin: "maven-publish"
+apply plugin: "maven"
 
 repositories {
     mavenCentral()
@@ -11,7 +17,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
+    compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
     implementation 'io.github.microutils:kotlin-logging:1.7.9' // for logging
     implementation 'ch.qos.logback:logback-classic:1.2.3'
@@ -35,4 +41,30 @@ compileTestKotlin {
 
 test {
     useJUnitPlatform()
+}
+
+//artifactoryPublish.skip = true
+
+artifactory {
+    contextUrl = "https://repo.labs.intellij.net"
+    publish {
+        repository {
+            repoKey = 'kotlin-data-science'
+            maven = true
+            username = "${artifactory_user}"
+            password = "${artifactory_api_key}"
+        }
+        defaults {
+            publishConfigs('archives', 'published')
+            publishArtifacts = true
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'all'
+            maven = true
+            username = "${artifactory_user}"
+            password = "${artifactory_api_key}"
+        }
+    }
 }
