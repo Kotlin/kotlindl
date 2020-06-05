@@ -3,6 +3,7 @@ package examples.production
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
+import api.keras.initializers.HeNormal
 import api.keras.initializers.Xavier
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -16,6 +17,10 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
+private val kernelInitializer = HeNormal<Float>(SEED)
+
+private val biasInitializer = Xavier<Float>(SEED)
+
 val lenet5 = Sequential.of<Float>(
     Input(
         IMAGE_SIZE,
@@ -27,8 +32,8 @@ val lenet5 = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
         padding = ConvPadding.SAME,
         name = "1"
     ),
@@ -41,8 +46,8 @@ val lenet5 = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
         padding = ConvPadding.SAME,
         name = "2"
     ),
@@ -54,22 +59,22 @@ val lenet5 = Sequential.of<Float>(
     Dense(
         outputSize = 120,
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
         name = "3"
     ),
     Dense(
         outputSize = 84,
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
         name = "4"
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
         name = "5"
     )
 )

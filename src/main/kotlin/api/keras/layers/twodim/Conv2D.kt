@@ -53,7 +53,6 @@ class Conv2D<T : Number>(
         println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
         println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
-
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
         val inputDepth = lastElement // amount of channels
@@ -80,7 +79,6 @@ class Conv2D<T : Number>(
             kernel = addWeight(tf, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
             bias = addWeight(tf, BIAS, bias, BIAS_INIT, biasInitializer)
         }
-
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

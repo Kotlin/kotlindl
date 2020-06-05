@@ -14,11 +14,10 @@ class TruncatedNormal<T : Number>(private val seed: Long) :
         dtype: Class<T>,
         name: String
     ): Operand<T> {
-        val truncatedNormal = tf.random.truncatedNormal(
+        return tf.withName(name).random.truncatedNormal(
             shape,
             dtype,
             TruncatedNormal.seed(seed)
         )
-        return tf.withName(name).math.mul(truncatedNormal, tf.constant(0.1f) as Operand<T>)
     }
 }
