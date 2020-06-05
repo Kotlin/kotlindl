@@ -14,6 +14,7 @@ import api.keras.optimizers.Optimizer
 import api.keras.optimizers.SGD
 import api.keras.shape.*
 import ch.qos.logback.classic.Level
+import examples.production.Conv2dJPanel
 import examples.production.ReluGraphics
 import examples.production.ReluGraphics2
 import mu.KotlinLogging
@@ -534,14 +535,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                     file.write(dst.contentDeepToString())
                     file.newLine()
 
-                    /*if(dst.size == 5) {
+                    if (dst.size == 5) {
                         val frame = JFrame("Visualise the matrix weights on $i epochs")
-                        frame.contentPane.add(JFrameGraphics(dst))
+                        frame.contentPane.add(Conv2dJPanel(dst))
                         frame.setSize(1000, 1000)
                         frame.isVisible = true
                         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
                         frame.isResizable = false
-                    }*/
+                    }
                 }
             }
         }
@@ -625,14 +626,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                             }
                             file.write(reshaped[reshaped.size - 1].toString())
 
-                            /*if(dst.size == 5) {
-                                val frame = JFrame("Visualise the matrix weights on $i epochs")
-                                frame.contentPane.add(JFrameGraphics(dst))
-                                frame.setSize(1000, 1000)
-                                frame.isVisible = true
-                                frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-                                frame.isResizable = false
-                            }*/
+
                         }
                     }
 

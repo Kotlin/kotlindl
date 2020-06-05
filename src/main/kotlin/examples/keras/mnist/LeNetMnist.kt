@@ -18,7 +18,7 @@ import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
 
 private const val LEARNING_RATE = 0.05f
-private const val EPOCHS = 4
+private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L

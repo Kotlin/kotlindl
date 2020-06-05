@@ -12,13 +12,42 @@ class Conv2dJPanel(val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
         for (k in 0 until 32) {
             for (i in dst.indices) {
                 for (j in dst[i].indices) {
-                    val float = dst[i][j][0][k]
+
+                    val width = 15
+                    val height = 15
+                    var x = 10 + i * width
+                    val y = 10 + j * height + k % 8 * 150
+                    when (k) {
+                        in 8..15 -> {
+                            x += 150
+                        }
+                        in 16..23 -> {
+                            x += 150 * 2
+                        }
+                        in 24..31 -> {
+                            x += 150 * 3
+                        }
+                    }
+
+                    val float = dst[0][i][j][k]
+                    val grey = (min(1.0f, max(float * 8, 0.0f)) * 255).toInt()
+                    val color = Color(grey, grey, grey)
+                    g.color = color
+
+                    g.fillRect(y, x, width, height)
+                    g.color = Color.BLACK;
+                    g.drawRect(y, x, width, height)
+
+
+                    /*val float = dst[i][j][0][k]
                     val grey = (min(1.0f, max(float * 2, 0.0f)) * 255).toInt()
                     val color = Color(grey, grey, grey)
                     g.color = color;
                     g.fillRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
                     g.color = Color.BLACK;
-                    g.drawRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
+                    g.drawRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)*/
+
+
                 }
             }
         }
