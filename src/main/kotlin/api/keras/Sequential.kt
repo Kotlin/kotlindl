@@ -22,7 +22,7 @@ import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Variable
-import java.io.BufferedWriter
+import org.tensorflow.op.nn.Softmax
 import java.io.File
 import javax.swing.JFrame
 
@@ -161,65 +161,62 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     ): TrainingHistory {
         val trainingHistory = TrainingHistory()
 
-        File("logs.txt").bufferedWriter().use { file ->
 
-            this.isDebugMode = verbose
-            if (!isDebugMode) {
-                logger.level = Level.INFO
+        this.isDebugMode = verbose
+        if (!isDebugMode) {
+            logger.level = Level.INFO
+        }
+
+        xOp = firstLayer.input
+        yOp = tf.placeholder(getDType()) as Operand<T>
+
+        yPred = transformInputWithNNModel(xOp)
+
+        val (xBatchShape, yBatchShape) = calculateXYShapes(batchSize)
+
+        val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yOp, getDType())
+
+        logger.debug { "Initialization of TensorFlow Graph variables" }
+
+        initializeGraphVariables()
+
+        for (i in 1..epochs) {
+
+            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
+
+            if (verbose) {
+                debugSequentialTraining(i)
             }
 
-            xOp = firstLayer.input
-            yOp = tf.placeholder(getDType()) as Operand<T>
+            val batchIter: ImageDataset.ImageBatchIterator = dataset.batchIterator(
+                batchSize
+            )
 
-            yPred = transformInputWithNNModel(xOp)
+            var batchCounter = 0
 
-            val (xBatchShape, yBatchShape) = calculateXYShapes(batchSize)
+            while (batchIter.hasNext()) {
+                val batch: ImageBatch = batchIter.next()
 
-            val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+                Tensor.create(
+                    xBatchShape,
+                    batch.images()
+                ).use { batchImages ->
+                    Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
+                        val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
 
-            val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+                        trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
 
-            val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yOp, getDType())
-
-            file.write("Initialization")
-            file.newLine()
-            logger.debug { "Initialization of TensorFlow Graph variables" }
-
-            initializeGraphVariables()
-
-            for (i in 1..epochs) {
-
-                val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
-
-                if (verbose) {
-                    debugSequentialTraining(file, i)
-                }
-
-                val batchIter: ImageDataset.ImageBatchIterator = dataset.batchIterator(
-                    batchSize
-                )
-
-                var batchCounter = 0
-
-                while (batchIter.hasNext()) {
-                    val batch: ImageBatch = batchIter.next()
-
-                    Tensor.create(
-                        xBatchShape,
-                        batch.images()
-                    ).use { batchImages ->
-                        Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
-                            val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
-
-                            trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
-
-                            logger.debug { "epochs: $i lossValue: $lossValue metricValue: $metricValue" }
-                        }
+                        logger.debug { "epochs: $i lossValue: $lossValue metricValue: $metricValue" }
                     }
-                    batchCounter++
                 }
+                batchCounter++
             }
         }
+
         return trainingHistory
     }
 
@@ -317,7 +314,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * Generates output predictions for the input samples.
      * Computation is done in batches.
      */
-    override fun predict(dataset: ImageDataset, batchSize: Int): IntArray {
+    override fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray {
         assert(dataset.imagesSize() % batchSize == 0)
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -364,7 +361,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     /**
      * Predicts the probability distribution for all classes for the given image.
      */
-    override fun predictSoftly(image: FloatArray): FloatArray {
+    override fun predictSoftly(image: FloatArray, visualizationIsEnabled: Boolean): FloatArray {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -375,16 +372,38 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             imageShape,
             ImageDataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
+            val predictionsTensor = formPredictionTensor(prediction, testImages, visualizationIsEnabled)
 
-            val tensorList = session.runner()
-                .fetch(prediction)
+            val dst = Array(1) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+            predictionsTensor.copyTo(dst)
+
+            return dst[0]
+        }
+    }
+
+    private fun formPredictionTensor(
+        prediction: Softmax<T>,
+        testImages: Tensor<Float>,
+        visualizationIsEnabled: Boolean
+    ): Tensor<*> {
+
+        val runner = session
+            .runner()
+            .fetch(prediction)
+            .feed(xOp.asOutput(), testImages)
+
+        if (visualizationIsEnabled) {
+            runner
                 .fetch("Relu")
                 .fetch("Relu_1")
                 .fetch("Conv2d")
                 .fetch("Conv2d_1")
-                .feed(xOp.asOutput(), testImages)
-                .run()
-            val predictionsTensor = tensorList[0]
+        }
+
+        val tensorList = runner.run()
+
+        if (visualizationIsEnabled) {
             val reluTensor = tensorList[1]
             val relu1Tensor = tensorList[2]
             val conv2dTensor = tensorList[3]
@@ -413,21 +432,22 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             frame2.isVisible = true
             frame2.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             frame2.isResizable = false
-
-            val dst = Array(1) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
-
-            predictionsTensor.copyTo(dst)
-
-            return dst[0]
         }
+        return tensorList[0]
     }
-
 
     /**
      * Predicts the unknown class for the given image.
      */
     override fun predict(image: FloatArray): Int {
-        val softPrediction = predictSoftly(image)
+        return predict(image, false)
+    }
+
+    /**
+     * Predicts the unknown class for the given image.
+     */
+    override fun predict(image: FloatArray, visualizationIsEnabled: Boolean): Int {
+        val softPrediction = predictSoftly(image, visualizationIsEnabled)
         return softPrediction.indexOf(softPrediction.max()!!)
     }
 
@@ -472,10 +492,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return kGraph
     }
 
-    private fun debugSequentialTraining(file: BufferedWriter, i: Int) {
-        file.write("Epoch # $i started")
-        file.newLine()
-
+    private fun debugSequentialTraining(i: Int) {
         val modelWeightsExtractorRunner = session.runner()
 
         trainableVars.forEach {
@@ -493,20 +510,20 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 1 -> {
                     val dst = FloatArray(modelWeight.value.shape()[0].toInt()) { 0.0f }
                     tensorForCopying.copyTo(dst)
-                    file.write("Variable $variableName")
-                    file.newLine()
-                    file.write(dst.contentToString())
-                    file.newLine()
+                    /* file.write("Variable $variableName")
+                     file.newLine()
+                     file.write(dst.contentToString())
+                     file.newLine()*/
                 }
                 2 -> {
                     val dst =
                         Array(modelWeight.value.shape()[0].toInt()) { FloatArray(modelWeight.value.shape()[1].toInt()) }
                     tensorForCopying.copyTo(dst)
 
-                    file.write("Variable $variableName")
-                    file.newLine()
-                    file.write(dst.contentDeepToString())
-                    file.newLine()
+                    /* file.write("Variable $variableName")
+                     file.newLine()
+                     file.write(dst.contentDeepToString())
+                     file.newLine()*/
                 }
                 3 -> {
                     val dst = Array(modelWeight.value.shape()[0].toInt()) {
@@ -515,10 +532,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                         }
                     }
                     tensorForCopying.copyTo(dst)
-                    file.write("Variable $variableName")
+                    /*file.write("Variable $variableName")
                     file.newLine()
                     file.write(dst.contentDeepToString())
-                    file.newLine()
+                    file.newLine()*/
 
                 }
                 4 -> {
@@ -530,10 +547,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                         }
                     }
                     tensorForCopying.copyTo(dst)
-                    file.write("Variable $variableName")
-                    file.newLine()
-                    file.write(dst.contentDeepToString())
-                    file.newLine()
+                    /* file.write("Variable $variableName")
+                     file.newLine()
+                     file.write(dst.contentDeepToString())
+                     file.newLine()*/
 
                     if (dst.size == 5) {
                         val frame = JFrame("Visualise the matrix weights on $i epochs")
@@ -546,7 +563,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 }
             }
         }
-        file.flush()
     }
 
     override fun save(pathToModelDirectory: String) {

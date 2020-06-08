@@ -118,7 +118,7 @@ fun main() {
 
         println("Ground Truth: $maxIdx")
 
-        val predictions = it.predict(test, 1000)
+        val predictions = it.predictAll(test, 1000)
 
         println("Prediction: " + predictions[0])
     }

@@ -58,7 +58,7 @@ fun main() {
 
         println("Ground Truth: ${fashionMnistLabelEncoding[getLabel(train, imageId)]}")
 
-        val prediction = it.predict(train.getImage(imageId))
+        val prediction = it.predict(train.getImage(imageId), visualizationIsEnabled = true)
 
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
 

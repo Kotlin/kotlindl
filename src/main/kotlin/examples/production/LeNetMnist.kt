@@ -44,7 +44,7 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        val prediction = it.predict(train.getImage(imageId))
+        val prediction = it.predict(train.getImage(imageId), visualizationIsEnabled = true)
 
         println("Prediction: $prediction")
 

@@ -42,10 +42,12 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
         batchSize: Int
     ): Double
 
-    abstract fun predict(dataset: ImageDataset, batchSize: Int): IntArray
+    abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
 
+    // TODO: up from sequential common implementations
+    abstract fun predict(image: FloatArray, visualizationIsEnabled: Boolean = false): Int
 
-    abstract fun predictSoftly(image: FloatArray): FloatArray
+    abstract fun predictSoftly(image: FloatArray, visualizationIsEnabled: Boolean = false): FloatArray
 
     /**
      * Saves the model as graph and weights.
