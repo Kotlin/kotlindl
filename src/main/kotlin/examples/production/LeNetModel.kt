@@ -4,7 +4,7 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
 import api.keras.initializers.HeNormal
-import api.keras.initializers.Xavier
+import api.keras.initializers.YetAnotherXavier
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
 import api.keras.layers.Input
@@ -19,7 +19,7 @@ private const val SEED = 12L
 
 private val kernelInitializer = HeNormal<Float>(SEED)
 
-private val biasInitializer = Xavier<Float>(SEED)
+private val biasInitializer = YetAnotherXavier<Float>(SEED)
 
 val lenet5 = Sequential.of<Float>(
     Input(

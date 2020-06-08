@@ -3,7 +3,7 @@ package examples.keras.fashionmnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
-import api.keras.initializers.Xavier
+import api.keras.initializers.YetAnotherXavier
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -40,8 +40,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,8 +53,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -66,8 +66,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -75,8 +75,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -88,8 +88,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -97,8 +97,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(12L),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(12L),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -110,8 +110,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -119,8 +119,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = Xavier(SEED),
-        biasInitializer = Xavier(SEED),
+        kernelInitializer = YetAnotherXavier(SEED),
+        biasInitializer = YetAnotherXavier(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -137,13 +137,13 @@ private val vgg11 = Sequential.of<Float>(
     Dense(
         outputSize = 2048,
         activation = Activations.Relu,
-        kernelInitializer = Xavier(12L),
+        kernelInitializer = YetAnotherXavier(12L),
         biasInitializer = Zeros()
     ),
     Dense(
         outputSize = 1000,
         activation = Activations.Relu,
-        kernelInitializer = Xavier(12L),
+        kernelInitializer = YetAnotherXavier(12L),
         biasInitializer = Zeros()
     ),
     Dense(

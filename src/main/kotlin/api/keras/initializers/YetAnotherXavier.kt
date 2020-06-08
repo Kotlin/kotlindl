@@ -5,7 +5,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.random.ParameterizedTruncatedNormal
 import kotlin.math.sqrt
 
-class Xavier<T : Number>(
+class YetAnotherXavier<T : Number>(
     private val seed: Long
 ) :
     Initializer<T>() {
