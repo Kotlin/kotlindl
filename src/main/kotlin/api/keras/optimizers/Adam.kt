@@ -10,11 +10,11 @@ import java.util.*
 // TODO: https://github.com/tensorflow/tensorflow/blob/v2.1.0/tensorflow/python/training/adam.py#L32-L235
 // TODO: copy the optimizer from here https://github.com/tensorflow/java/blob/master/tensorflow-training/src/main/java/org/tensorflow/training/optimizers/Adam.java
 class Adam<T : Number>(
-    private val beta1Power: Float, private val beta2Power: Float,
-    private val learningRate: Float,
-    private val beta1: Float,
-    private val beta2: Float,
-    private val epsilon: Float
+    private val beta1Power: Float = 1.0f, private val beta2Power: Float = 1.0f,
+    private val learningRate: Float = 0.001f,
+    private val beta1: Float = 0.9f,
+    private val beta2: Float = 0.999f,
+    private val epsilon: Float = 1e-07f
 ) : Optimizer<T>() {
     override fun applyGradients(
         tf: Ops,

@@ -14,7 +14,6 @@ import api.keras.optimizers.Optimizer
 import api.keras.optimizers.SGD
 import api.keras.shape.*
 import ch.qos.logback.classic.Level
-import examples.production.Conv2dJPanel
 import examples.production.ReluGraphics
 import examples.production.ReluGraphics2
 import mu.KotlinLogging
@@ -60,6 +59,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     /** Loss function. */
     private var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
+
+    /** Metric on validation dataset for training phase. */
+    private var metric: Metrics = Metrics.ACCURACY
 
     /** List of metrics for evaluation phase. */
     private var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
@@ -143,6 +145,91 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
     }
 
+    override fun fit(
+        trainingDataset: ImageDataset,
+        validationDataset: ImageDataset,
+        epochs: Int,
+        trainBatchSize: Int,
+        validationBatchSize: Int,
+        validationMetric: Metrics,
+        verbose: Boolean
+    ): TrainingHistory {
+        val validationIsEnbaled = true
+
+        val trainingHistory = TrainingHistory()
+
+        this.isDebugMode = verbose
+        if (!isDebugMode) {
+            logger.level = Level.INFO
+        }
+
+        xOp = firstLayer.input
+        yOp = tf.placeholder(getDType()) as Operand<T>
+
+        yPred = transformInputWithNNModel(xOp)
+
+        val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
+
+        val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yOp, getDType())
+
+        logger.debug { "Initialization of TensorFlow Graph variables" }
+
+        initializeGraphVariables()
+
+        for (i in 1..epochs) {
+            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
+
+            if (verbose) {
+                debugSequentialTraining(i)
+            }
+
+            val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
+                trainBatchSize
+            )
+
+            var batchCounter = 0
+            var averageTrainingMetricAccum = 0.0f
+            var averageTrainingLossAccum = 0.0f
+
+
+            while (batchIter.hasNext()) {
+                val batch: ImageBatch = batchIter.next()
+
+                Tensor.create(
+                    xBatchShape,
+                    batch.images()
+                ).use { batchImages ->
+                    Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
+                        val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
+
+                        averageTrainingLossAccum += lossValue
+                        averageTrainingMetricAccum += metricValue
+                        trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
+
+                        //logger.debug { "epochs: $i lossValue: $lossValue metricValue: $metricValue" }
+                    }
+                }
+                batchCounter++
+            }
+
+            val avgTrainingMetricValue = (averageTrainingMetricAccum / batchCounter)
+            val avgLossValue = (averageTrainingLossAccum / batchCounter)
+
+            if (validationIsEnbaled) {
+                val validationMetricValue = evaluate(validationDataset, validationMetric, validationBatchSize)
+                logger.debug { "epochs: $i avgLossValue: $avgLossValue avgTrainingMetricValue: $avgTrainingMetricValue validationMetricValue: $validationMetricValue" }
+            } else {
+                logger.debug { "epochs: $i avgLossValue: $avgLossValue avgTrainingMetricValue: $avgTrainingMetricValue" }
+            }
+        }
+
+        return trainingHistory
+    }
+
     /**
      * Trains the model for a fixed number of [epochs] (iterations on a dataset).
      *
@@ -160,7 +247,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         verbose: Boolean
     ): TrainingHistory {
         val trainingHistory = TrainingHistory()
-
 
         this.isDebugMode = verbose
         if (!isDebugMode) {
@@ -230,6 +316,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         runner.run()
     }
 
+    /**
+     * Returns the loss value and metric value on train batch.
+     *
+     * TODO: disable the metric value calculation to speed up the training (measure that)
+     */
     private fun trainOnEpoch(
         targets: List<Operand<T>>,
         batchImages: Tensor<Float>,
@@ -248,7 +339,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         runner
             .fetch(TRAINING_LOSS)
-            .fetch(metricOp)
+            .fetch(metricOp) // TODO: comment to measure
 
         val tensorList = runner.run()
         val lossValue = tensorList[0].floatValue()
@@ -281,7 +372,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             batchSize
         )
 
-        var averageAccuracyAccum = 0.0f
+        var averageMetricAccum = 0.0f
         var amountOfBatches = 0
 
         while (batchIter.hasNext()) {
@@ -299,14 +390,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                         .feed(yOp.asOutput(), testLabels)
                         .run()[0]
 
-                    logger.info { "test batch acc: ${metricValue.floatValue()}" }
+                    // logger.debug { "test batch acc: ${metricValue.floatValue()}" }
 
-                    averageAccuracyAccum += metricValue.floatValue()
+                    averageMetricAccum += metricValue.floatValue()
                 }
             }
         }
 
-        return (averageAccuracyAccum / amountOfBatches).toDouble()
+        return (averageMetricAccum / amountOfBatches).toDouble()
     }
 
 
@@ -552,14 +643,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                      file.write(dst.contentDeepToString())
                      file.newLine()*/
 
-                    if (dst.size == 5) {
+                    /*if (dst.size == 5) {
                         val frame = JFrame("Visualise the matrix weights on $i epochs")
                         frame.contentPane.add(Conv2dJPanel(dst))
                         frame.setSize(1000, 1000)
                         frame.isVisible = true
                         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
                         frame.isResizable = false
-                    }
+                    }*/
                 }
             }
         }

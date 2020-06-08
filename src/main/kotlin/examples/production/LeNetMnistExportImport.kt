@@ -8,7 +8,7 @@ import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
-private const val EPOCHS = 1
+private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
@@ -36,6 +36,8 @@ fun main() {
         ::extractLabels
     )
 
+    val (newTrain, validation) = train.split(0.95)
+
     val imageId1 = 0
     val imageId2 = 1
     val imageId3 = 2
@@ -43,7 +45,14 @@ fun main() {
     lenet5.use {
         it.compile(optimizer = SGD(LEARNING_SCHEDULE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(
+            trainingDataset = newTrain,
+            validationDataset = validation,
+            epochs = EPOCHS,
+            trainBatchSize = TRAINING_BATCH_SIZE,
+            validationBatchSize = TEST_BATCH_SIZE,
+            verbose = true
+        )
 
         println(it.kGraph)
 

@@ -36,10 +36,21 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
         verbose: Boolean
     ): TrainingHistory
 
+
+    abstract fun fit(
+        trainingDataset: ImageDataset,
+        validationDataset: ImageDataset,
+        epochs: Int = 10,
+        trainBatchSize: Int = 32,
+        validationBatchSize: Int = 256,
+        validationMetric: Metrics = Metrics.ACCURACY,
+        verbose: Boolean
+    ): TrainingHistory
+
     abstract fun evaluate(
         dataset: ImageDataset,
-        metric: Metrics,
-        batchSize: Int
+        metric: Metrics = Metrics.ACCURACY,
+        batchSize: Int = 256
     ): Double
 
     abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
