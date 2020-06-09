@@ -14,7 +14,7 @@ import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
 private const val LEARNING_RATE = 0.1f
@@ -89,7 +89,7 @@ fun main() {
         ::extractLabels
     )
 
-    lenet5Classic.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    lenet5Classic.compile(optimizer = Adam(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
     lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

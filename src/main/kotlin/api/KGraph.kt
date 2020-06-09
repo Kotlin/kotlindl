@@ -2,11 +2,16 @@ package api
 
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
+import org.tensorflow.op.core.Assign
 
 class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     constructor(graphDef: ByteArray) : this(graphDef, "")
 
     var tfGraph: Graph = Graph()
+
+    /** A list of initializer to initialize the trainableVariables. */
+    var optimizerInitializers: List<Assign<*>> = listOf()
+
 
     init {
         if (prefix.isEmpty()) {

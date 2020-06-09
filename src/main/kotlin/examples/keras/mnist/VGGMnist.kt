@@ -29,6 +29,8 @@ private const val SEED = 12L
  * Kotlin implementation of VGG'11 on Keras.
  * Make accuracy ~ 0.9 on Mnist Test dataset
  * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
+ *
+ * P.S. SGD optimizer is better than Adam, for example
  */
 private val vgg11 = Sequential.of<Float>(
     Input(

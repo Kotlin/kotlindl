@@ -180,8 +180,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         initializeGraphVariables()
 
+        val targets = optimizer.prepareTargets(kGraph, tf, lossOp, trainableVars)
+
+        initializeOptimizerVariables()
+
         for (i in 1..epochs) {
-            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
+
 
             if (verbose) {
                 debugSequentialTraining(i)
@@ -270,10 +274,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         initializeGraphVariables()
 
+        val targets = optimizer.prepareTargets(kGraph, tf, lossOp, trainableVars)
+
+        initializeOptimizerVariables()
+
         for (i in 1..epochs) {
-
-            val targets = optimizer.prepareTargets(tf, lossOp, trainableVars, i)
-
             if (verbose) {
                 debugSequentialTraining(i)
             }
@@ -315,6 +320,18 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         runner.run()
     }
+
+    private fun initializeOptimizerVariables() {
+        if (kGraph.optimizerInitializers.isNotEmpty()) {
+            val runner = session.runner()
+
+            kGraph.optimizerInitializers.forEach {
+                runner.addTarget(it as Operand<*>)
+            }
+            runner.run()
+        }
+    }
+
 
     /**
      * Returns the loss value and metric value on train batch.
