@@ -4,7 +4,7 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
 import api.keras.initializers.Constant
-import api.keras.initializers.TruncatedNormal
+import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -40,7 +40,7 @@ private val model = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -53,7 +53,7 @@ private val model = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -65,13 +65,13 @@ private val model = Sequential.of<Float>(
     Dense(
         outputSize = 512,
         activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
 )

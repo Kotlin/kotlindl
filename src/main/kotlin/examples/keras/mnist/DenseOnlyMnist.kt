@@ -3,7 +3,7 @@ package examples.keras.mnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
-import api.keras.initializers.TruncatedNormal
+import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Input
@@ -12,13 +12,19 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
 
+private const val SEED = 12L
+private const val TEST_BATCH_SIZE = 1000
+private const val LEARNING_RATE = 0.1f
+private const val EPOCHS = 5
+private const val TRAINING_BATCH_SIZE = 500
+
 private val model = Sequential.of<Float>(
     Input(784),
-    Dense(1024, Activations.Relu, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
-    Dense(1024, Activations.Relu, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
-    Dense(1024, Activations.Relu, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
-    Dense(128, Activations.Relu, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros()),
-    Dense(10, Activations.Softmax, kernelInitializer = TruncatedNormal(123L), biasInitializer = Zeros())
+    Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
+    Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
+    Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
+    Dense(128, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
+    Dense(10, Activations.Softmax, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
 fun main() {
@@ -32,11 +38,11 @@ fun main() {
         ::extractLabels
     )
 
-    model.compile(optimizer = SGD(0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    model.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    model.fit(dataset = train, epochs = 10, batchSize = 100, verbose = true)
+    model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = model.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+    val accuracy = model.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
     model.close()
 

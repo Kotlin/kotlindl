@@ -3,6 +3,7 @@ package examples.keras.cifar10
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
+import api.keras.initializers.HeNormal
 import api.keras.initializers.YetAnotherXavier
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
@@ -40,8 +41,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,8 +54,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -66,8 +67,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -75,8 +76,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -88,8 +89,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -97,8 +98,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(12L),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -110,8 +111,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -119,8 +120,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     /*MaxPool2D(

@@ -64,3 +64,18 @@ fun main() {
     }
 }
 ```
+
+**Work on GPU**
+
+To enable the training and inference on GPU developer should read this document https://www.tensorflow.org/install/gpu and install the CUDA framework to bring the calculations on GPU device.
+
+First of all, it's possible for NVIDIA devices only.
+
+After that, you need to build with the next dependencies
+
+* _compile 'org.tensorflow:libtensorflow:1.15.0'_
+
+* _compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
+
+For TF 1.15 (the TF version is under the hood) the next bunch of versions is required
+  * Windows:  CUDA cuda_10.0.130_411.31_win10 and cudnn-10.0 (https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip) and C++ redistributable parts (2015, https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
