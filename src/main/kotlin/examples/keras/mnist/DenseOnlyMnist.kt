@@ -9,13 +9,12 @@ import api.keras.layers.Dense
 import api.keras.layers.Input
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
-private const val LEARNING_RATE = 0.1f
-private const val EPOCHS = 5
+private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 500
 
 private val model = Sequential.of<Float>(
@@ -38,7 +37,7 @@ fun main() {
         ::extractLabels
     )
 
-    model.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    model.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
     model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

@@ -14,8 +14,6 @@ import java.util.*
 const val FIRST_MOMENT = "m"
 const val SECOND_MOMENT = "v"
 
-// TODO: https://github.com/tensorflow/tensorflow/blob/v2.1.0/tensorflow/python/training/adam.py#L32-L235
-// TODO: copy the optimizer from here https://github.com/tensorflow/java/blob/master/tensorflow-training/src/main/java/org/tensorflow/training/optimizers/Adam.java
 class Adam<T : Number>(
     private val learningRate: Float = 0.001f,
     private val beta1: Float = 0.9f,

@@ -358,11 +358,17 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             .fetch(TRAINING_LOSS)
             .fetch(metricOp) // TODO: comment to measure
 
-        val tensorList = runner.run()
-        val lossValue = tensorList[0].floatValue()
-        val metricValue = tensorList[1].floatValue()
+        try {
+            val tensorList = runner.run()
+            val lossValue = tensorList[0].floatValue()
+            val metricValue = tensorList[1].floatValue()
 
-        return Pair(lossValue, metricValue)
+            return Pair(lossValue, metricValue)
+        } catch (e: TensorFlowException) {
+            e.printStackTrace()
+            throw RuntimeException(e.message)
+        }
+
     }
 
     /**

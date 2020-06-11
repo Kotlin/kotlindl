@@ -13,11 +13,10 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
-private const val LEARNING_RATE = 0.01f
-private const val EPOCHS = 10
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 200
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
@@ -29,8 +28,6 @@ private const val SEED = 12L
  * Kotlin implementation of VGG'11 on Keras.
  * Make accuracy ~ 0.9 on Mnist Test dataset
  * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
- *
- * P.S. SGD optimizer is better than Adam, for example
  */
 private val vgg11 = Sequential.of<Float>(
     Input(
@@ -169,7 +166,7 @@ fun main() {
     )
 
     vgg11.use {
-        it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

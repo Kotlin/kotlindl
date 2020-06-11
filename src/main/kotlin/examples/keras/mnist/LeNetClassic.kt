@@ -4,7 +4,7 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
 import api.keras.initializers.Constant
-import api.keras.initializers.TruncatedNormal
+import api.keras.initializers.GlorotNormal
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -17,8 +17,7 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
-private const val LEARNING_RATE = 0.1f
-private const val EPOCHS = 20
+private const val EPOCHS = 50
 private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -36,7 +35,7 @@ private val lenet5Classic = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -49,7 +48,7 @@ private val lenet5Classic = Sequential.of<Float>(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -61,19 +60,19 @@ private val lenet5Classic = Sequential.of<Float>(
     Dense(
         outputSize = 120,
         activation = Activations.Tanh,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
         outputSize = 84,
         activation = Activations.Tanh,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
 )
@@ -89,7 +88,7 @@ fun main() {
         ::extractLabels
     )
 
-    lenet5Classic.compile(optimizer = Adam(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    lenet5Classic.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
     lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

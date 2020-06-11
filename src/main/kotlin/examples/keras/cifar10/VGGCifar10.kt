@@ -20,6 +20,7 @@ import examples.keras.cifar10.util.LABELS_ARCHIVE
 import examples.keras.cifar10.util.extractCifar10Images
 import examples.keras.cifar10.util.extractCifar10Labels
 
+private const val PATH_TO_MODEL = "savedmodels/vgg11"
 private const val LEARNING_RATE = 0.1f
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
@@ -171,7 +172,7 @@ fun main() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        it.save("vgg11")
+        it.save(PATH_TO_MODEL)
 
         val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 

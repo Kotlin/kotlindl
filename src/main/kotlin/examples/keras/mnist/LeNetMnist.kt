@@ -14,11 +14,10 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.Adam
+import api.keras.optimizers.Momentum
 import examples.keras.mnist.util.*
 
-private const val LEARNING_RATE = 0.05f
-private const val EPOCHS = 2
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
@@ -88,7 +87,7 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = Adam(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Momentum(momentum = 0.99f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         println(it.kGraph)
 

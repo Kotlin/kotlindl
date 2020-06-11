@@ -13,12 +13,12 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.fashionmnist.util.*
 
-private const val LEARNING_RATE = 0.01f
-private const val EPOCHS = 10
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 100
+private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -166,11 +166,11 @@ fun main() {
     )
 
     vgg11.use {
-        it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = -1)
+        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy: $accuracy")
     }

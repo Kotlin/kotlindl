@@ -3,7 +3,7 @@ package examples.production
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.NUM_LABELS
 
@@ -11,7 +11,7 @@ private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
-private val learningSchedule = mapOf(
+/*private val learningSchedule = mapOf(
     1 to 0.1f,
     2 to 0.05f,
     3 to 0.025f,
@@ -19,7 +19,7 @@ private val learningSchedule = mapOf(
     5 to 0.005f,
     6 to 0.0025f,
     7 to 0.001f
-)
+)*/
 
 private val fashionMnistLabelEncoding = mapOf(
     0 to "T-shirt/top",
@@ -45,12 +45,21 @@ fun main() {
         ::extractFashionLabels
     )
 
+    val (newTrain, validation) = train.split(0.95)
+
     val imageId = 0
 
     lenet5.use {
-        it.compile(optimizer = SGD(learningSchedule), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(
+            trainingDataset = newTrain,
+            validationDataset = validation,
+            epochs = EPOCHS,
+            trainBatchSize = TRAINING_BATCH_SIZE,
+            validationBatchSize = TEST_BATCH_SIZE,
+            verbose = true
+        )
 
         val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
