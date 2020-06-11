@@ -330,6 +330,19 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             }
             runner.run()
         }
+
+        runAssignAddOpsForOptimizers()
+    }
+
+    private fun runAssignAddOpsForOptimizers() {
+        if (kGraph.optimizerAssignAddInitializers.isNotEmpty()) {
+            val runner = session.runner()
+
+            kGraph.optimizerAssignAddInitializers.forEach {
+                runner.addTarget(it as Operand<*>)
+            }
+            runner.run()
+        }
     }
 
 

@@ -7,18 +7,15 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
-import org.tensorflow.op.train.ApplyMomentum
 import java.util.*
 
-const val MOMENTUM = "momentum"
+private const val ACCUMULATOR = "accumulator"
 
-class Momentum<T : Number>(
-    private val learningRate: Float = 0.001f,
-    private val momentum: Float = 0.99f,
-    private val useNesterov: Boolean = true
+class AdaGrad<T : Number>(
+    private val learningRate: Float = 0.1f,
+    private val initialAccumulatorValue: Float = 0.01f
 ) : Optimizer<T>() {
-
-    private lateinit var momentumConst: Constant<T>
+    private lateinit var initialAccumulatorValueConstant: Constant<T>
     private lateinit var learningRateConst: Constant<T>
 
     override fun applyGradients(
@@ -30,40 +27,42 @@ class Momentum<T : Number>(
         val targets: MutableList<Operand<T>> =
             ArrayList()
 
+        initialAccumulatorValueConstant = tf.constant(initialAccumulatorValue, getDType())
         learningRateConst = tf.constant(learningRate, getDType())
-        momentumConst = tf.constant(momentum, getDType())
 
         for (i in weights.indices) {
             val variable = weights[i]
+            val varName = variable.ref().op().name()
 
-            val slot = getSlot(variable.ref().op().name(), MOMENTUM)
+            val slot: Variable<T> = getSlot(varName, ACCUMULATOR)
 
             targets.add(
-                tf.train.applyMomentum(
-                    variable,
-                    slot,
+                tf.train.applyAdagrad(
+                    variable, slot,
                     learningRateConst,
-                    gradients.dy(i),
-                    momentumConst,
-                    ApplyMomentum.useNesterov(useNesterov)
+                    gradients.dy(i)
                 )
             )
+
         }
         return targets
     }
 
-    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
-        val initializer: Operand<T> = tf.fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
+    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+        val initializer: Operand<T> = tf.fill(
+            tf.shape(v),
+            tf.dtypes.cast(tf.constant(initialAccumulatorValue), getDType())
+        )
+        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 
     override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
-            createMomentumSlot(graph, tf, v.asOutput())
+            createAdaGradSlot(graph, tf, v.asOutput())
         }
     }
 
     override fun getOptimizerName(): String {
-        return "Momentum"
+        return "Adagrad"
     }
 }

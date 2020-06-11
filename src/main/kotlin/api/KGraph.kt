@@ -3,6 +3,7 @@ package api
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
 import org.tensorflow.op.core.Assign
+import org.tensorflow.op.core.AssignAdd
 
 class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     constructor(graphDef: ByteArray) : this(graphDef, "")
@@ -11,6 +12,9 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
 
     /** A list of initializer to initialize the trainableVariables. */
     var optimizerInitializers: List<Assign<*>> = listOf()
+
+    /** A list of initializer to initialize the trainableVariables. */
+    var optimizerAssignAddInitializers: List<AssignAdd<*>> = listOf()
 
 
     init {
