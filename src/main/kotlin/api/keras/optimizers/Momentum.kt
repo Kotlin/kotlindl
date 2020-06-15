@@ -10,7 +10,7 @@ import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyMomentum
 import java.util.*
 
-const val MOMENTUM = "momentum"
+private const val MOMENTUM = "momentum"
 
 class Momentum<T : Number>(
     private val learningRate: Float = 0.001f,

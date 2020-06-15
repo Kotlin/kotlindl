@@ -28,7 +28,7 @@ dependencies {
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
     // to run on GPU (if CUDA is updated and machine with NVIDIA onboard)
-   /* compile 'org.tensorflow:libtensorflow:1.15.0'
+    /*compile 'org.tensorflow:libtensorflow:1.15.0'
     compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'*/
 }
 

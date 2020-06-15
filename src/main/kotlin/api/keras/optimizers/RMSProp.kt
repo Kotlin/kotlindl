@@ -9,8 +9,9 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import java.util.*
 
-const val RMS = "rms"
-const val MG = "mg"
+private const val RMS = "rms"
+private const val MG = "mg"
+private const val MOMENTUM = "momentum"
 
 class RMSProp<T : Number>(
     private val learningRate: Float = 0.001f,

@@ -180,13 +180,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         initializeGraphVariables()
 
+
         val targets = optimizer.prepareTargets(kGraph, tf, lossOp, trainableVars)
 
         initializeOptimizerVariables()
 
+
+
         for (i in 1..epochs) {
-
-
             if (verbose) {
                 debugSequentialTraining(i)
             }
@@ -278,6 +279,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         initializeOptimizerVariables()
 
+
         for (i in 1..epochs) {
             if (verbose) {
                 debugSequentialTraining(i)
@@ -323,12 +325,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     private fun initializeOptimizerVariables() {
         if (kGraph.optimizerInitializers.isNotEmpty()) {
-            val runner = session.runner()
 
+            // TODO: need to optimize the initialization to do it together (but some initializers depedends on another in Adam/Adamax optimizers
             kGraph.optimizerInitializers.forEach {
+                val runner = session.runner()
                 runner.addTarget(it as Operand<*>)
+                runner.run()
             }
-            runner.run()
+
         }
 
         runAssignAddOpsForOptimizers()
