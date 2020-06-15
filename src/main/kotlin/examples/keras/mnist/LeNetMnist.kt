@@ -14,7 +14,7 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.AdaGradDA
+import api.keras.optimizers.RMSProp
 import examples.keras.mnist.util.*
 
 private const val EPOCHS = 5
@@ -87,7 +87,7 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = AdaGradDA(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = RMSProp(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         println(it.kGraph)
 

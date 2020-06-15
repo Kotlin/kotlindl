@@ -2,16 +2,17 @@ package api.keras.activations
 
 import org.junit.jupiter.api.Test
 
-internal class ReluActivationTest : ActivationTest() {
+internal class TanhActivationTest : ActivationTest() {
+
     @Test
     fun apply() {
         val input = floatArrayOf(-100f, -10f, -1f, 0f, 1f, 10f, 100f)
         val actual = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f)
         val expected = floatArrayOf(
-            0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            10f, 100f
+            -1.0f, -1.0f, -0.7615942f, 0.0f, 0.7615942f,
+            1.0f, 1.0f
         )
 
-        assertActivationFunction(ReluActivation(), input, actual, expected)
+        assertActivationFunction(TanhActivation(), input, actual, expected)
     }
 }
