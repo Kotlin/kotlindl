@@ -25,7 +25,6 @@ class RMSProp<T : Number>(
     private lateinit var learningRateConst: Constant<T>
     private lateinit var decayConst: Constant<T>
     private lateinit var momentumConst: Constant<T>
-    private lateinit var centeredConst: Constant<T>
 
     override fun applyGradients(
         graph: KGraph,

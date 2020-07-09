@@ -7,7 +7,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
-import java.util.*
 
 abstract class Optimizer<T : Number> {
     private lateinit var dtype: Class<T>
@@ -78,7 +77,7 @@ abstract class Optimizer<T : Number> {
      * @param slotName    The name of the slot.
      * @param initializer The initializer for the slot.
      * @param <T>         The type of the variable.
-    </T> */
+     */
     protected open fun createSlot(
         graph: KGraph,
         tf: Ops,
@@ -103,7 +102,7 @@ abstract class Optimizer<T : Number> {
      *
      * @param varName  The variable to lookup.
      * @param slotName The slot name.
-     * @return The slot or [Optional.empty].
+     * @return The slot.
      */
     protected fun getSlot(
         varName: String,

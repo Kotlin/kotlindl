@@ -28,7 +28,6 @@ class Adam<T : Number>(
     private lateinit var betaOnePower: Variable<T>
     private lateinit var betaTwoPower: Variable<T>
 
-
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,

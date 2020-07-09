@@ -31,8 +31,6 @@ class Ftrl<T : Number>(
     private lateinit var l1RegularizationStrengthConst: Constant<T>
     private lateinit var l2RegularizationStrengthConst: Constant<T>
     private lateinit var l2ShrinkageRegularizationStrengthConst: Constant<T>
-    private lateinit var betaOnePower: Variable<T>
-    private lateinit var betaTwoPower: Variable<T>
 
     override fun applyGradients(
         graph: KGraph,
