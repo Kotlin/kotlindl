@@ -1,27 +1,16 @@
 package examples.production
 
+import api.keras.Sequential
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
+import javax.swing.JFrame
 
-private const val EPOCHS = 5
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
-
-/*private val learningSchedule = mapOf(
-    1 to 0.1f,
-    2 to 0.05f,
-    3 to 0.025f,
-    4 to 0.01f,
-    5 to 0.005f,
-    6 to 0.0025f,
-    7 to 0.001f,
-    8 to 0.001f,
-    9 to 0.001f,
-    10 to 0.0005f
-)*/
 
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
@@ -49,13 +38,21 @@ fun main() {
             verbose = true
         )
 
+        println(it)
+
+        val weights = (it as Sequential).getLayer("1").getWeights()
+
+        drawFilters(weights[0])
+
         val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
 
         println("Accuracy $accuracy")
 
-        val prediction = it.predict(train.getImage(imageId), visualizationIsEnabled = true)
+        val (prediction, activations) = it.predictAndGetActivations(train.getImage(imageId))
 
         println("Prediction: $prediction")
+
+        drawActivations(activations)
 
         val trainImageLabel = train.getImageLabel(imageId)
 
@@ -63,4 +60,29 @@ fun main() {
 
         println("Ground Truth: $maxIdx")
     }
+}
+
+fun drawActivations(activations: List<*>) {
+    val frame = JFrame("Visualise the matrix weights on Relu")
+    frame.contentPane.add(ReluGraphics(activations[0] as Array<Array<Array<FloatArray>>>))
+    frame.setSize(1500, 1500)
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
+
+    val frame2 = JFrame("Visualise the matrix weights on Relu_1")
+    frame2.contentPane.add(ReluGraphics2(activations[1] as Array<Array<Array<FloatArray>>>))
+    frame2.setSize(1500, 1500)
+    frame2.isVisible = true
+    frame2.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame2.isResizable = false
+}
+
+fun drawFilters(filters: Array<*>) {
+    val frame = JFrame("Filters")
+    frame.contentPane.add(Conv2dJPanel(filters as Array<Array<Array<FloatArray>>>))
+    frame.setSize(1000, 1000)
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
 }

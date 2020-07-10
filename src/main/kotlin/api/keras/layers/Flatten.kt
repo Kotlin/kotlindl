@@ -26,6 +26,14 @@ class Flatten<T : Number> : Layer<T>() {
     }
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
-       return tf.reshape(input, units)
+        return tf.reshape(input, units)
+    }
+
+    override fun getWeights(): List<Array<*>> {
+        return emptyList()
+    }
+
+    override fun hasActivation(): Boolean {
+        return false
     }
 }

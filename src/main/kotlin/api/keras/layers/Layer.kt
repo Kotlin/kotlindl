@@ -1,5 +1,6 @@
 package api.keras.layers
 
+import api.TrainableTFModel
 import api.keras.initializers.Initializer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -9,6 +10,8 @@ import org.tensorflow.op.core.Variable
 
 abstract class Layer<T : Number> {
     var name: String = ""
+
+    lateinit var parentModel: TrainableTFModel<T>
 
     protected var dtype: Class<T> = getDType()
 
@@ -50,4 +53,8 @@ abstract class Layer<T : Number> {
         initializers = initializers + Pair(name, initializer.apply(fanIn, fanOut, tf, variable, dtype, name))
         return variable
     }
+
+    abstract fun getWeights(): List<Array<*>>
+
+    abstract fun hasActivation(): Boolean
 }

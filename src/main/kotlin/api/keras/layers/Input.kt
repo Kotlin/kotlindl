@@ -33,4 +33,12 @@ class Input<T : Number>(vararg dims: Long) : Layer<T>() {
     override fun computeOutputShape(inputShape: Shape): Shape {
         TODO("Not yet implemented")
     }
+
+    override fun getWeights(): List<Array<*>> {
+        return emptyList()
+    }
+
+    override fun hasActivation(): Boolean {
+        return false
+    }
 }

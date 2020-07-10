@@ -20,7 +20,7 @@ open class InferenceModel() : AutoCloseable {
     protected lateinit var tf: Ops
 
     /** TensorFlow session. */
-    protected lateinit var session: Session
+    lateinit var session: Session
 
     /** TensorFlow wrapped computational graph. */
     lateinit var kGraph: KGraph
@@ -65,7 +65,6 @@ open class InferenceModel() : AutoCloseable {
     fun predict(inputData: List<DoubleArray>): List<Double> {
         return listOf()
     }
-
 
     override fun toString(): String {
         return "Model contains $kGraph"
@@ -126,13 +125,9 @@ open class InferenceModel() : AutoCloseable {
                                 println(dst[0][0][0][0])*/
                 }
             }
-
             logger.debug { "The model loading is ended." }
         }
-
-
     }
-
 
     private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {
         when (shape.numDimensions()) {

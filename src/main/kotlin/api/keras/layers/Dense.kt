@@ -68,6 +68,14 @@ class Dense<T : Number>(
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
         val signal: Operand<T> = tf.math.add(tf.linalg.matMul(input, kernel), bias)
-        return Activations.convert<T>(activation).apply(tf, signal)
+        return Activations.convert<T>(activation).apply(tf, signal, name)
+    }
+
+    override fun getWeights(): List<Array<*>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun hasActivation(): Boolean {
+        return false
     }
 }

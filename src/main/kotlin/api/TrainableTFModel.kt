@@ -56,9 +56,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
     abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
 
     // TODO: up from sequential common implementations
-    abstract fun predict(image: FloatArray, visualizationIsEnabled: Boolean = false): Int
-
-    abstract fun predictSoftly(image: FloatArray, visualizationIsEnabled: Boolean = false): FloatArray
+    abstract override fun predict(image: FloatArray): Int
 
     /**
      * Saves the model as graph and weights.
@@ -69,4 +67,13 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
     fun getDType(): Class<T> {
         return Float::class.javaObjectType as Class<T>
     }
+
+    abstract fun predictAndGetActivations(image: FloatArray): Pair<Int, List<*>>
+
+    abstract fun predictSoftly(image: FloatArray): FloatArray
+
+    abstract fun predictSoftlyAndGetActivations(
+        image: FloatArray,
+        visualizationIsEnabled: Boolean
+    ): Pair<FloatArray, List<*>>
 }

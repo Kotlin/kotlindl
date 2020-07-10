@@ -4,6 +4,7 @@ import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
 import api.keras.shape.TensorShape
+import api.keras.shape.convertTensorToMultiDimArray
 import api.keras.shape.shapeFromDims
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -94,6 +95,34 @@ class Conv2D<T : Number>(
         }
 
         val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding), bias)
-        return Activations.convert<T>(activation).apply(tf, signal)
+        return Activations.convert<T>(activation).apply(tf, signal, name)
+    }
+
+    override fun getWeights(): List<Array<*>> {
+        val result = mutableListOf<Array<*>>()
+
+        val session = parentModel.session
+
+        val runner = session.runner()
+            .fetch("${name}_$KERNEL")
+            .fetch("${name}_$BIAS")
+
+        val tensorList = runner.run()
+        val filtersTensor = tensorList[0]
+        val biasTensor = tensorList[1]
+
+        val dstData =
+            convertTensorToMultiDimArray(filtersTensor) // Array(1) { Array(28) { Array(28) { FloatArray(32) } } }
+        result.add(dstData)
+
+        val dstData2 =
+            convertTensorToMultiDimArray(biasTensor) //Array(1) { Array(14) { Array(14) { FloatArray(64) } } }
+        result.add(dstData2)
+
+        return result.toList()
+    }
+
+    override fun hasActivation(): Boolean {
+        return true
     }
 }

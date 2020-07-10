@@ -44,67 +44,95 @@ enum class Activations {
 
 
 class LinearActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         return features
     }
 }
 
 class SigmoidActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.math.sigmoid(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.math.sigmoid(features)
+        } else {
+            tf.withName("Activation_$name").math.sigmoid(features)
+        }
     }
 }
 
 class ReluActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.nn.relu(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isEmpty()) {
+            tf.nn.relu(features)
+        } else {
+            tf.withName("Activation_$name").nn.relu(features)
+        }
     }
 }
 
 class Relu6Activation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.nn.relu6(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.nn.relu6(features)
+        } else {
+            tf.withName("Activation_$name").nn.relu6(features)
+        }
     }
 }
 
 class TanhActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.math.tanh(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.math.tanh(features)
+        } else {
+            tf.withName("Activation_$name").math.tanh(features)
+        }
     }
 }
 
 class EluActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.nn.elu(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.nn.elu(features)
+        } else {
+            tf.withName("Activation_$name").nn.elu(features)
+        }
     }
 }
 
 class SeluActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.nn.selu(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.nn.selu(features)
+        } else {
+            tf.withName("Activation_$name").nn.selu(features)
+        }
     }
 }
 
 class SoftmaxActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
-        return tf.nn.softmax(features)
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
+        return if (name.isNotEmpty()) {
+            tf.nn.softmax(features)
+        } else {
+            tf.withName("Activation_$name").nn.softmax(features)
+        }
     }
 }
 
 class LogSoftmaxActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         return tf.nn.logSoftmax(features)
     }
 }
 
 class ExponentialActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         return tf.math.exp(features)
     }
 }
 
 class SoftPlusActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         val one: Operand<T> = tf.dtypes.cast(tf.constant(1), getDType())
 
         return tf.math.log(tf.math.add(tf.math.exp(features), one))
@@ -112,13 +140,13 @@ class SoftPlusActivation<T : Number>() : Activation<T> {
 }
 
 class SoftSignActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         return tf.nn.softsign(features)
     }
 }
 
 class HardSigmoidActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         val point2: Operand<T> = tf.dtypes.cast(tf.constant(0.2), getDType())
         val point5: Operand<T> = tf.dtypes.cast(tf.constant(0.5), getDType())
 
@@ -127,7 +155,7 @@ class HardSigmoidActivation<T : Number>() : Activation<T> {
 }
 
 class SwishActivation<T : Number>() : Activation<T> {
-    override fun apply(tf: Ops, features: Operand<T>): Operand<T> {
+    override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
         return tf.math.mul(features, tf.math.sigmoid(features))
     }
 }

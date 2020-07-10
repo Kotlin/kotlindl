@@ -42,4 +42,12 @@ class MaxPool2D<T : Number>(
             PADDING_TYPE
         )
     }
+
+    override fun getWeights(): List<Array<*>> {
+        return emptyList()
+    }
+
+    override fun hasActivation(): Boolean {
+        return false
+    }
 }

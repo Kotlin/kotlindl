@@ -35,4 +35,12 @@ class Dropout<T : Number>(
 
         return tf.math.div(tf.math.mul(input, mask), probability)
     }
+
+    override fun getWeights(): List<Array<*>> {
+        return emptyList()
+    }
+
+    override fun hasActivation(): Boolean {
+        return false
+    }
 }

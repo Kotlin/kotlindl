@@ -11,16 +11,6 @@ private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
-/*private val learningSchedule = mapOf(
-    1 to 0.1f,
-    2 to 0.05f,
-    3 to 0.025f,
-    4 to 0.01f,
-    5 to 0.005f,
-    6 to 0.0025f,
-    7 to 0.001f
-)*/
-
 private val fashionMnistLabelEncoding = mapOf(
     0 to "T-shirt/top",
     1 to "Trouser",
@@ -67,7 +57,7 @@ fun main() {
 
         println("Ground Truth: ${fashionMnistLabelEncoding[getLabel(train, imageId)]}")
 
-        val prediction = it.predict(train.getImage(imageId), visualizationIsEnabled = true)
+        val prediction = it.predict(train.getImage(imageId))
 
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
 

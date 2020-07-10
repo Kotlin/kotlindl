@@ -58,15 +58,15 @@ fun main() {
 
         it.save(PATH_TO_MODEL)
 
-        val prediction = it.predict(train.getImage(imageId1), visualizationIsEnabled = true)
+        val prediction = it.predict(train.getImage(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
 
-        val prediction2 = it.predict(train.getImage(imageId2), visualizationIsEnabled = true)
+        val prediction2 = it.predict(train.getImage(imageId2))
 
         println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val prediction3 = it.predict(train.getImage(imageId3), visualizationIsEnabled = true)
+        val prediction3 = it.predict(train.getImage(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
 
