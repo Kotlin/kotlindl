@@ -3,7 +3,6 @@ package examples.production
 import api.keras.Sequential
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 import javax.swing.JFrame
@@ -23,28 +22,27 @@ fun main() {
         ::extractLabels
     )
 
-    val (newTrain, validation) = train.split(0.95)
-
     val imageId = 0
+
     lenet5.use {
         it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(
-            trainingDataset = newTrain,
-            validationDataset = validation,
+            dataset = train,
+            validationRate = 0.1,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
             validationBatchSize = TEST_BATCH_SIZE,
             verbose = true
         )
 
-        println(it)
+        //println(it)
 
         val weights = (it as Sequential).getLayer("1").getWeights()
 
         drawFilters(weights[0])
 
-        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
 
         println("Accuracy $accuracy")
 

@@ -43,15 +43,21 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
         epochs: Int = 10,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
-        validationMetric: Metrics = Metrics.ACCURACY,
         verbose: Boolean
     ): TrainingHistory
 
+    /**
+     * Returns the metrics and loss values for the model in test (evaluation) mode.
+     *
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [batchSize] Number of samples per batch of computation.
+     *
+     * @return Value of calculated metric and loss values.
+     */
     abstract fun evaluate(
         dataset: ImageDataset,
-        metric: Metrics = Metrics.ACCURACY,
         batchSize: Int = 256
-    ): Double
+    ): Pair<Double, Double>
 
     abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
 
@@ -76,4 +82,18 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
         image: FloatArray,
         visualizationIsEnabled: Boolean
     ): Pair<FloatArray, List<*>>
+
+    fun fit(
+        dataset: ImageDataset,
+        validationRate: Double,
+        epochs: Int,
+        trainBatchSize: Int,
+        validationBatchSize: Int,
+        verbose: Boolean
+    ): TrainingHistory {
+        assert(validationRate > 0.0 && validationRate < 1.0)
+        val (validation, train) = dataset.split(validationRate)
+
+        return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose)
+    }
 }

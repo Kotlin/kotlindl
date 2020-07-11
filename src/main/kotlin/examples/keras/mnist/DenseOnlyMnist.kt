@@ -8,7 +8,6 @@ import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Input
 import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
@@ -41,7 +40,7 @@ fun main() {
 
     model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = model.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+    val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
 
     model.close()
 

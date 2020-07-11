@@ -40,7 +40,6 @@ private val logger = KotlinLogging.logger {}
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
  */
-
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
     /** Input layer. */
     private val firstLayer: Input<T> = input
@@ -173,81 +172,17 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
-        validationMetric: Metrics,
         verbose: Boolean
     ): TrainingHistory {
-        val validationIsEnbaled = true
-
-        val trainingHistory = TrainingHistory()
-
-        this.isDebugMode = verbose
-        if (!isDebugMode) {
-            logger.level = Level.INFO
-        }
-
-        xOp = firstLayer.input
-        yOp = tf.placeholder(getDType()) as Operand<T>
-
-        yPred = transformInputWithNNModel(xOp)
-
-        val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
-
-        val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
-
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-
-        val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yOp, getDType())
-
-        logger.debug { "Initialization of TensorFlow Graph variables" }
-
-        initializeGraphVariables()
-
-        val targets = optimizer.prepareTargets(kGraph, tf, lossOp, trainableVars)
-
-        initializeOptimizerVariables()
-
-        for (i in 1..epochs) {
-            val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
-                trainBatchSize
-            )
-
-            var batchCounter = 0
-            var averageTrainingMetricAccum = 0.0f
-            var averageTrainingLossAccum = 0.0f
-
-
-            while (batchIter.hasNext()) {
-                val batch: ImageBatch = batchIter.next()
-
-                Tensor.create(
-                    xBatchShape,
-                    batch.images()
-                ).use { batchImages ->
-                    Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
-                        val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
-
-                        averageTrainingLossAccum += lossValue
-                        averageTrainingMetricAccum += metricValue
-                        trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
-
-                        //logger.debug { "epochs: $i lossValue: $lossValue metricValue: $metricValue" }
-                    }
-                }
-                batchCounter++
-            }
-
-            val avgTrainingMetricValue = (averageTrainingMetricAccum / batchCounter)
-            val avgLossValue = (averageTrainingLossAccum / batchCounter)
-
-            if (validationIsEnbaled) {
-                val validationMetricValue = evaluate(validationDataset, validationMetric, validationBatchSize)
-                logger.debug { "epochs: $i avgLossValue: $avgLossValue avgTrainingMetricValue: $avgTrainingMetricValue validationMetricValue: $validationMetricValue" }
-            } else {
-                logger.debug { "epochs: $i avgLossValue: $avgLossValue avgTrainingMetricValue: $avgTrainingMetricValue" }
-            }
-        }
-
-        return trainingHistory
+        return internalFit(
+            verbose,
+            trainBatchSize,
+            epochs,
+            trainingDataset,
+            true,
+            validationDataset,
+            validationBatchSize
+        )
     }
 
     /**
@@ -266,6 +201,26 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         batchSize: Int,
         verbose: Boolean
     ): TrainingHistory {
+        return internalFit(
+            verbose,
+            batchSize,
+            epochs,
+            dataset,
+            false,
+            null,
+            null
+        )
+    }
+
+    private fun internalFit(
+        verbose: Boolean,
+        trainBatchSize: Int,
+        epochs: Int,
+        trainingDataset: ImageDataset,
+        validationIsEnabled: Boolean,
+        validationDataset: ImageDataset?,
+        validationBatchSize: Int?
+    ): TrainingHistory {
         val trainingHistory = TrainingHistory()
 
         this.isDebugMode = verbose
@@ -278,13 +233,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         yPred = transformInputWithNNModel(xOp)
 
-        val (xBatchShape, yBatchShape) = calculateXYShapes(batchSize)
+        val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
 
         val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
-        val metricOp = Metrics.convert<T>(Metrics.ACCURACY).apply(tf, prediction, yOp, getDType())
+        val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
 
         logger.debug { "Initialization of TensorFlow Graph variables" }
 
@@ -294,13 +249,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         initializeOptimizerVariables()
 
-
         for (i in 1..epochs) {
-            val batchIter: ImageDataset.ImageBatchIterator = dataset.batchIterator(
-                batchSize
+            val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
+                trainBatchSize
             )
 
             var batchCounter = 0
+            var averageTrainingMetricAccum = 0.0f
+            var averageTrainingLossAccum = 0.0f
 
             while (batchIter.hasNext()) {
                 val batch: ImageBatch = batchIter.next()
@@ -310,17 +266,28 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                     batch.images()
                 ).use { batchImages ->
                     Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
-                        val (lossValue, metricValue) = trainOnEpoch(targets, batchImages, batchLabels, metricOp)
+                        val (lossValue, metricValue) = trainOnBatch(targets, batchImages, batchLabels, metricOp)
 
+                        averageTrainingLossAccum += lossValue
+                        averageTrainingMetricAccum += metricValue
                         trainingHistory.append(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
 
-                        logger.debug { "epochs: $i lossValue: $lossValue metricValue: $metricValue" }
+                        logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
                     }
                 }
                 batchCounter++
             }
-        }
 
+            val avgTrainingMetricValue = (averageTrainingMetricAccum / batchCounter)
+            val avgLossValue = (averageTrainingLossAccum / batchCounter)
+
+            if (validationIsEnabled) {
+                val (validationMetricValue, validationLossValue) = evaluate(validationDataset!!, validationBatchSize!!)
+                logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metric: $validationMetricValue" }
+            } else {
+                logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue" }
+            }
+        }
         return trainingHistory
     }
 
@@ -360,13 +327,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
     }
 
-
     /**
      * Returns the loss value and metric value on train batch.
      *
      * TODO: disable the metric value calculation to speed up the training (measure that)
      */
-    private fun trainOnEpoch(
+    private fun trainOnBatch(
         targets: List<Operand<T>>,
         batchImages: Tensor<Float>,
         batchLabels: Tensor<Float>,
@@ -384,7 +350,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         runner
             .fetch(TRAINING_LOSS)
-            .fetch(metricOp) // TODO: comment to measure
+            .fetch(metricOp)
 
         try {
             val tensorList = runner.run()
@@ -399,20 +365,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     }
 
-    /**
-     * Returns the loss value & metrics values for the model in test (evaluation) mode.
-     *
-     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
-     * @param [batchSize] Number of samples per batch of computation.
-     * @param [metric] Metric to evaluate during test phase.
-     *
-     * @return Value of calculated metric.
-     */
-    override fun evaluate(
-        dataset: ImageDataset,
-        metric: Metrics,
-        batchSize: Int
-    ): Double {
+    override fun evaluate(dataset: ImageDataset, batchSize: Int): Pair<Double, Double> {
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
@@ -424,6 +377,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         )
 
         var averageMetricAccum = 0.0f
+        var averageLossAccum = 0.0f
         var amountOfBatches = 0
 
         while (batchIter.hasNext()) {
@@ -435,19 +389,26 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 batch.images()
             ).use { testImages ->
                 Tensor.create(labelShape, batch.labels()).use { testLabels ->
-                    val metricValue = session.runner()
+                    val lossAndMetrics = session.runner()
                         .fetch(metricOp)
+                        .fetch(TRAINING_LOSS)
                         .feed(xOp.asOutput(), testImages)
                         .feed(yOp.asOutput(), testLabels)
-                        .run()[0]
+                        .run()
 
-                    // logger.debug { "test batch acc: ${metricValue.floatValue()}" }
+                    val metricValue = lossAndMetrics[0]
+                    val lossValue = lossAndMetrics[1]
 
                     averageMetricAccum += metricValue.floatValue()
+                    averageLossAccum += lossValue.floatValue()
                 }
             }
         }
-        return (averageMetricAccum / amountOfBatches).toDouble()
+
+        val avgMetricValue = (averageMetricAccum / amountOfBatches).toDouble()
+        val avgLossValue = (averageLossAccum / amountOfBatches).toDouble()
+
+        return Pair(avgMetricValue, avgLossValue)
     }
 
     /**

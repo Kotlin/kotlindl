@@ -13,7 +13,6 @@ import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
 import api.keras.optimizers.Ftrl
 import examples.keras.mnist.util.*
 
@@ -93,7 +92,7 @@ fun main() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val accuracy = it.evaluate(dataset = test, metric = Metrics.ACCURACY, batchSize = TEST_BATCH_SIZE)
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
 
         println("Accuracy: $accuracy")
     }

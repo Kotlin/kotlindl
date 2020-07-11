@@ -54,11 +54,11 @@ class ImageDataset internal constructor(
         return ImageBatchIterator(batchSize, images, labels)
     }
 
-    fun split(validationRate: Double): Pair<ImageDataset, ImageDataset> {
+    fun split(splitRatio: Double): Pair<ImageDataset, ImageDataset> {
         // TODO: convert to exception
-        assert(validationRate in 0.0..1.0)
+        assert(splitRatio in 0.0..1.0)
 
-        val trainDatasetLastIndex = truncate(images.size * validationRate).toInt()
+        val trainDatasetLastIndex = truncate(images.size * splitRatio).toInt()
 
         return Pair(
             ImageDataset(
