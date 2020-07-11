@@ -3,6 +3,8 @@ package api.keras.layers
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.shape.TensorShape
+import api.keras.shape.numElementsInShape
+import api.keras.shape.shapeToLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -17,6 +19,9 @@ class Dense<T : Number>(
     private val biasInitializer: Initializer<T>,
     name: String = ""
 ) : Layer<T>() {
+    private lateinit var kernelShape: Shape
+    private lateinit var biasShape: Shape
+
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
@@ -32,8 +37,8 @@ class Dense<T : Number>(
 
     override fun defineVariables(tf: Ops, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
-        val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
-        val biasShape = Shape.make(outputSize.toLong())
+        kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
+        biasShape = Shape.make(outputSize.toLong())
 
         // TODO: refactor to logging
         println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
@@ -77,5 +82,9 @@ class Dense<T : Number>(
 
     override fun hasActivation(): Boolean {
         return false
+    }
+
+    override fun getParams(): Int {
+        return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
     }
 }

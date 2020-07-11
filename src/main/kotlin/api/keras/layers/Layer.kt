@@ -11,6 +11,8 @@ import org.tensorflow.op.core.Variable
 abstract class Layer<T : Number> {
     var name: String = ""
 
+    lateinit var outputShape: LongArray
+
     lateinit var parentModel: TrainableTFModel<T>
 
     protected var dtype: Class<T> = getDType()
@@ -57,4 +59,6 @@ abstract class Layer<T : Number> {
     abstract fun getWeights(): List<Array<*>>
 
     abstract fun hasActivation(): Boolean
+
+    abstract fun getParams(): Int
 }

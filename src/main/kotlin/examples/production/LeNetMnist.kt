@@ -27,6 +27,8 @@ fun main() {
     lenet5.use {
         it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
+        (it as Sequential).summary()
+
         it.fit(
             dataset = train,
             validationRate = 0.1,

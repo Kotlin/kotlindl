@@ -158,11 +158,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             trainableVars.addAll(it.variables.values)  // TODO: keep here and variable names too (if it exist)
             initializers = initializers + it.initializers
 
-            logger.debug { it.toString() + " " + TensorShape(inputShape).dims().contentToString() }
+            //logger.debug { it.toString() + " " + TensorShape(inputShape).dims().contentToString() }
 
             inputShape = it.computeOutputShape(inputShape)
+            val dims = TensorShape(inputShape).dims()
+            it.outputShape = dims
 
-            logger.debug { it.toString() + " " + TensorShape(inputShape).dims().contentToString() }
+            logger.debug { it.toString() + " " + dims.contentToString() }
         }
     }
 
@@ -612,5 +614,22 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     infix fun getLayer(layerName: String): Layer<T> {
         return layersByName[layerName]!!
+    }
+
+    fun summary() {
+        logger.info("Model: Sequential")
+        logger.info("_________________________________________________________________")
+        logger.info("Layer (type)                 Output Shape              Param #   ")
+        logger.info("=================================================================")
+
+        var totalParams = 0
+        for (l in layers) {
+            totalParams += l.getParams()
+            logger.info("${l.name}(${l::class.simpleName})    ${l.outputShape.contentToString()}      ${l.getParams()}")
+            logger.info("_________________________________________________________________")
+        }
+
+        logger.info("=================================================================")
+        logger.info("Total params: $totalParams")
     }
 }

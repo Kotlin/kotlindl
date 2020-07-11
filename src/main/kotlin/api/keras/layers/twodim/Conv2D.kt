@@ -3,9 +3,7 @@ package api.keras.layers.twodim
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
-import api.keras.shape.TensorShape
-import api.keras.shape.convertTensorToMultiDimArray
-import api.keras.shape.shapeFromDims
+import api.keras.shape.*
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -28,10 +26,13 @@ class Conv2D<T : Number>(
     private val padding: ConvPadding,
     name: String = ""
 ) : Layer<T>() {
-
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
+
+    // weight tensor shapes
+    private lateinit var biasShape: Shape
+    private lateinit var kernelShape: Shape
 
     private val KERNEL = "conv2d_kernel"
     private val KERNEL_INIT = "conv2d_kernelInit"
@@ -47,8 +48,8 @@ class Conv2D<T : Number>(
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        val kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
-        val biasShape = Shape.make(filters)
+        kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
+        biasShape = Shape.make(filters)
 
         // TODO: refactor to logging
         println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
@@ -112,11 +113,11 @@ class Conv2D<T : Number>(
         val biasTensor = tensorList[1]
 
         val dstData =
-            convertTensorToMultiDimArray(filtersTensor) // Array(1) { Array(28) { Array(28) { FloatArray(32) } } }
+            convertTensorToMultiDimArray(filtersTensor)
         result.add(dstData)
 
         val dstData2 =
-            convertTensorToMultiDimArray(biasTensor) //Array(1) { Array(14) { Array(14) { FloatArray(64) } } }
+            convertTensorToMultiDimArray(biasTensor)
         result.add(dstData2)
 
         return result.toList()
@@ -124,5 +125,9 @@ class Conv2D<T : Number>(
 
     override fun hasActivation(): Boolean {
         return true
+    }
+
+    override fun getParams(): Int {
+        return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
     }
 }

@@ -50,4 +50,8 @@ class MaxPool2D<T : Number>(
     override fun hasActivation(): Boolean {
         return false
     }
+
+    override fun getParams(): Int {
+        return 0
+    }
 }
