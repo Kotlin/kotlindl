@@ -13,6 +13,7 @@ import api.keras.layers.twodim.AvgPool2D
 import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
@@ -91,7 +92,7 @@ fun main() {
 
     lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = lenet5Classic.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
+    val accuracy = lenet5Classic.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
     lenet5Classic.close()
 

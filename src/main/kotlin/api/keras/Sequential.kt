@@ -5,6 +5,7 @@ import api.TrainableTFModel
 import api.TrainingHistory
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
+import api.keras.exceptions.RepeatableLayerName
 import api.keras.layers.Dense
 import api.keras.layers.Input
 import api.keras.layers.Layer
@@ -284,7 +285,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             val avgLossValue = (averageTrainingLossAccum / batchCounter)
 
             if (validationIsEnabled) {
-                val (validationMetricValue, validationLossValue) = evaluate(validationDataset!!, validationBatchSize!!)
+                val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!)
+                val validationMetricValue = evaluationResult.metrics[metric]
+                val validationLossValue = evaluationResult.lossValue
+
                 logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metric: $validationMetricValue" }
             } else {
                 logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue" }
@@ -367,7 +371,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     }
 
-    override fun evaluate(dataset: ImageDataset, batchSize: Int): Pair<Double, Double> {
+    override fun evaluate(dataset: ImageDataset, batchSize: Int): EvaluationResult {
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
@@ -410,8 +414,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val avgMetricValue = (averageMetricAccum / amountOfBatches).toDouble()
         val avgLossValue = (averageLossAccum / amountOfBatches).toDouble()
 
-        return Pair(avgMetricValue, avgLossValue)
+        return EvaluationResult(avgLossValue, mapOf(metric to avgMetricValue))
     }
+
 
     /**
      * Generates output predictions for the input samples.
@@ -616,7 +621,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return layersByName[layerName]!!
     }
 
-    fun summary() {
+    fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26) {
+        logger.info("=================================================================")
         logger.info("Model: Sequential")
         logger.info("_________________________________________________________________")
         logger.info("Layer (type)                 Output Shape              Param #   ")
@@ -625,11 +631,37 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         var totalParams = 0
         for (l in layers) {
             totalParams += l.getParams()
-            logger.info("${l.name}(${l::class.simpleName})    ${l.outputShape.contentToString()}      ${l.getParams()}")
+            logger.info(createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize))
             logger.info("_________________________________________________________________")
         }
 
         logger.info("=================================================================")
         logger.info("Total params: $totalParams")
+        logger.info("=================================================================")
+    }
+
+    private fun createLayerDescription(
+        l: Layer<T>,
+        stringLayerNameTypeSize: Int,
+        stringOutputShapeSize: Int
+    ): String {
+        val firstPart = "${l.name}(${l::class.simpleName})"
+
+        val stringBuilder = StringBuilder(firstPart)
+        for (i in 1 until stringLayerNameTypeSize - firstPart.length) {
+            stringBuilder.append(" ")
+        }
+
+        val secondPart = l.outputShape.contentToString()
+
+        stringBuilder.append(secondPart)
+
+        for (i in 1 until stringOutputShapeSize - secondPart.length) {
+            stringBuilder.append(" ")
+        }
+
+        stringBuilder.append(l.getParams())
+
+        return stringBuilder.toString()
     }
 }

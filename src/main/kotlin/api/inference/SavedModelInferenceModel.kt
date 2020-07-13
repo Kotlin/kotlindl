@@ -1,8 +1,6 @@
 package api.inference
 
 import api.KGraph
-import api.keras.Input
-import api.keras.Output
 import api.keras.metric.Metrics
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor

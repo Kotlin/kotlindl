@@ -1,8 +1,8 @@
 package examples.inference
 
+import api.inference.Input
+import api.inference.Output
 import api.inference.SavedModelInferenceModel
-import api.keras.Input
-import api.keras.Output
 import api.keras.metric.Metrics
 import org.tensorflow.Tensor
 import util.MnistUtils

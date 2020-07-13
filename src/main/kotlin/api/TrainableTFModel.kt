@@ -1,6 +1,7 @@
 package api
 
 import api.inference.InferenceModel
+import api.keras.EvaluationResult
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -57,7 +58,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel() {
     abstract fun evaluate(
         dataset: ImageDataset,
         batchSize: Int = 256
-    ): Pair<Double, Double>
+    ): EvaluationResult
 
     abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
 

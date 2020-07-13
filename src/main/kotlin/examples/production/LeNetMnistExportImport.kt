@@ -3,6 +3,7 @@ package examples.production
 import api.inference.InferenceModel
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
 import examples.keras.mnist.util.*
 
@@ -69,7 +70,7 @@ fun main() {
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
     }
 

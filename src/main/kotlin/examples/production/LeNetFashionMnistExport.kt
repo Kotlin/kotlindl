@@ -2,6 +2,7 @@ package examples.production
 
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
+import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.NUM_LABELS
@@ -50,7 +51,7 @@ fun main() {
             verbose = true
         )
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).second
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy $accuracy")
 
