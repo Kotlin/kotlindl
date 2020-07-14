@@ -20,7 +20,7 @@ class ParametrizedRandomNormal<T : Number>(
         dtype: Class<T>,
         name: String
     ): Operand<T> {
-        assert(p1 < p2)
+        require(p1 < p2) { "The p1 parameter value must be less than p2 parameter value." }
 
         return tf.withName(name).random.parameterizedTruncatedNormal(
             shape,

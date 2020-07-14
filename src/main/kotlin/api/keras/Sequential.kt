@@ -347,7 +347,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * Computation is done in batches.
      */
     override fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray {
-        assert(dataset.imagesSize() % batchSize == 0)
+        require(dataset.imagesSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 

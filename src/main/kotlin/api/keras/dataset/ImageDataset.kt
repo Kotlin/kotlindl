@@ -55,8 +55,7 @@ class ImageDataset internal constructor(
     }
 
     fun split(splitRatio: Double): Pair<ImageDataset, ImageDataset> {
-        // TODO: convert to exception
-        assert(splitRatio in 0.0..1.0)
+        require(splitRatio in 0.0..1.0) { "'Split ratio' argument value must be in range [0.0; 1.0]." }
 
         val trainDatasetLastIndex = truncate(images.size * splitRatio).toInt()
 
@@ -146,8 +145,8 @@ class ImageDataset internal constructor(
                         labelsPath,
                         numClasses
                     )
-                // TODO: convert to exception
-                assert(images.size == labels.size)
+
+                check(images.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
                 ImageDataset(images, labels)
             } catch (e: IOException) {

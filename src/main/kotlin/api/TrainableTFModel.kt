@@ -88,7 +88,6 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
 
     abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
 
-    // TODO: up from sequential common implementations
     abstract override fun predict(image: FloatArray): Int
 
     /**
@@ -118,7 +117,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         validationBatchSize: Int,
         verbose: Boolean
     ): TrainingHistory {
-        assert(validationRate > 0.0 && validationRate < 1.0)
+        require(validationRate > 0.0 && validationRate < 1.0) { "Validation rate should be more than 0.0 and less than 1.0. The passed rare is: ${validationRate}" }
         val (validation, train) = dataset.split(validationRate)
 
         return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose)

@@ -3,8 +3,6 @@ package api.keras.metric
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-
-// TODO: add more metrics from here https://github.com/tensorflow/tensorflow/blob/v2.2.0/tensorflow/python/ops/metrics_impl.py#L862-L920
 enum class Metrics {
     ACCURACY, MAE, MSE;
 

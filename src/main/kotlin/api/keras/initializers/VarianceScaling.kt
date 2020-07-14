@@ -46,7 +46,7 @@ open class VarianceScaling<T : Number>(
         dtype: Class<T>,
         name: String
     ): Operand<T> {
-        assert(scale > 0.0)
+        require(scale > 0.0) { "The 'scale' parameter value must be more than 0.0." }
         var lscale = scale
 
         // TODO: need to decide - extract from shape or pass as parameters from each layer (where it should be defined)
