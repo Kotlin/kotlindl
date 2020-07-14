@@ -1,5 +1,6 @@
 package api.keras.layers
 
+import api.KGraph
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -10,12 +11,12 @@ class Input<T : Number>(vararg dims: Long) : Layer<T>() {
 
     private val packedDims: LongArray = dims
 
-    override fun defineVariables(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         TODO()
     }
 
     fun defineVariables(tf: Ops) {
-        input = tf.withName("x").placeholder(
+        input = tf.withName("x").placeholder( // TODO: move 'x' to shared Tensor names constants or enum
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))
         )

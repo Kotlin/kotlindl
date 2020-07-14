@@ -27,7 +27,7 @@ class RMSProp<T : Number>(
     private lateinit var momentumConst: Constant<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -77,7 +77,7 @@ class RMSProp<T : Number>(
         return targets
     }
 
-    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createRMSPropSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val rmsInitializer: Operand<T> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
@@ -94,7 +94,7 @@ class RMSProp<T : Number>(
         }
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createRMSPropSlot(graph, tf, v.asOutput())
         }

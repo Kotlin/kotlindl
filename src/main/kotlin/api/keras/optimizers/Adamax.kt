@@ -32,7 +32,7 @@ class Adamax<T : Number>(
     private lateinit var betaOnePower: Variable<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -69,12 +69,12 @@ class Adamax<T : Number>(
 
         val betaOnePowerInit2 = tf.assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
 
-        graph.optimizerInitializers += betaOnePowerInit2
+        graph.addOptimizerVariableInitializer(betaOnePowerInit2)
 
         return targets
     }
 
-    private fun createAdamaxSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createAdamaxSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val firstMomentInitializer = tf.fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
 
@@ -82,14 +82,14 @@ class Adamax<T : Number>(
         createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createAdamaxSlot(graph, tf, v.asOutput())
         }
         betaOnePower = tf.withName("beta1_power").variable(Shape.scalar(), getDType())
         val betaOnePowerInit: Assign<T> = tf
             .assign(betaOnePower, tf.constant(beta1, getDType()))
-        graph.optimizerInitializers += betaOnePowerInit
+        graph.addOptimizerVariableInitializer(betaOnePowerInit)
     }
 
     override fun getOptimizerName(): String {

@@ -17,11 +17,12 @@ abstract class Optimizer<T : Number> {
     private lateinit var slots: MutableMap<String, MutableMap<String, Variable<out T>>>
 
     fun prepareTargets(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
-        loss: Operand<T>,
-        weights: List<Variable<T>>
+        loss: Operand<T>
     ): List<Operand<T>> {
+        val weights = graph.variables()
+
         slots = mutableMapOf()
 
         val gradients: Gradients = computeGradients(tf, loss, weights)
@@ -43,7 +44,7 @@ abstract class Optimizer<T : Number> {
     }
 
     protected abstract fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -62,7 +63,7 @@ abstract class Optimizer<T : Number> {
      *
      * @param variables The variables to create slots for.
      */
-    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    protected open fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
 
     }
 
@@ -79,7 +80,7 @@ abstract class Optimizer<T : Number> {
      * @param <T>         The type of the variable.
      */
     protected open fun createSlot(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         variable: Output<out T>,
         slotName: String,
@@ -89,7 +90,7 @@ abstract class Optimizer<T : Number> {
         val slot: Variable<T> = tf.withName(createName).variable(variable.shape(), getDType())
         val slotInit: Assign<T> = tf.assign(slot, initializer)
 
-        graph.optimizerInitializers += slotInit
+        graph.addOptimizerVariableInitializer(slotInit)
 
         val varName = variable.op().name()
 

@@ -2,7 +2,6 @@ package api.keras.loss
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 
 private const val TRAINING_LOSS = "training_loss"
@@ -13,7 +12,8 @@ enum class LossFunctions {
     ABSOLUTE_DIFFERENCE,
     HINGE_LOSS,
     HUBER_LOSS,
-    LOG_LOSS;
+    LOG_LOSS,
+    MAE;
 
     companion object {
         fun <T : Number> convert(lossFunctionType: LossFunctions): LossFunction<T> {
@@ -22,8 +22,9 @@ enum class LossFunctions {
                 ABSOLUTE_DIFFERENCE -> AbsoluteDifference()
                 SPARSE_CATEGORICAL_CROSS_ENTROPY -> TODO()
                 HINGE_LOSS -> HingeLoss()
-                HUBER_LOSS -> TODO()
+                HUBER_LOSS -> HuberLoss(0.1f)
                 LOG_LOSS -> LogLoss()
+                MAE -> MAE()
             }
         }
     }
@@ -39,16 +40,24 @@ class SoftmaxCrossEntropyWithLogits<T : Number> : LossFunction<T> {
 
 class AbsoluteDifference<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        val losses = tf.math.abs(tf.math.sub(actual, labels))
+        throw UnsupportedOperationException()
+        /*val losses = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(losses, tf.constant(0)), tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(losses, tf.constant(0)), tf.constant(0))*/
+    }
+}
+
+class MAE<T : Number> : LossFunction<T> {
+    override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
+        throw UnsupportedOperationException()
+        /*return tf.withName(TRAINING_LOSS).identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));*/
     }
 }
 
 class HingeLoss<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-
-        // We first need to convert binary labels to -1/1 labels (as floats).
+        throw UnsupportedOperationException()
+        /* // We first need to convert binary labels to -1/1 labels (as floats).
         val allOnes: Variable<T> = tf.variable(labels.asOutput().shape(), dtype)
         // TODO: add assign operators
         val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2f) as Operand<T>, labels), allOnes)
@@ -61,26 +70,52 @@ class HingeLoss<T : Number> : LossFunction<T> {
                 ), tf.constant(0)
             )
             , tf.constant(0)
-        )
+        )*/
+    }
+}
+
+class HuberLoss<T : Number>(val delta: Float) : LossFunction<T> {
+    override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
+        throw UnsupportedOperationException()
+
+        /*val error = tf.math.sub(actual, labels)
+
+    val deltaConst: Operand<T> = tf.dtypes.cast(tf.constant(delta), getDType()) // to actual.asOutput().dataType() in TF 2.x
+    val point5: Operand<T> = tf.dtypes.cast(tf.constant(0.5), getDType())
+
+    val abs_error: Operand<T> = tf.math.abs(error)
+    val quadratic: Operand<T> = tf.math.minimum(abs_error, deltaConst)
+    val linear: Operand<T> = tf.math.sub(abs_error, quadratic)
+
+    val q2Point5: Operand<T> =
+        tf.math.mul(point5, tf.math.mul(quadratic, quadratic))
+
+    val deltaLinear: Operand<T> = tf.math.mul(deltaConst, linear)
+    val loss: Operand<T> = tf.math.add(q2Point5, deltaLinear)
+
+    val result: Operand<T> = Kmean(tf, loss, tf.constant(-1))
+    return tf.withName(TRAINING_LOSS).identity(result)*/
     }
 }
 
 class LogLoss<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        val epsilon = 1e-5f
+        throw UnsupportedOperationException()
 
-        val oneOp = tf.constant(1.0f) as Operand<T>
-        val minusOneOp = tf.constant(-1.0f) as Operand<T>
-        val epsilonOp = tf.constant(epsilon) as Operand<T>
+        /* val epsilon = 1e-5f
 
-        val right = tf.math.mul(labels, tf.math.log(tf.math.add(actual, epsilonOp)))
-        val left =
-            tf.math.mul(tf.math.log(tf.math.add(tf.math.sub(oneOp, actual), epsilonOp)), tf.math.sub(oneOp, labels))
+         val oneOp = tf.constant(1.0f) as Operand<T>
+         val minusOneOp = tf.constant(-1.0f) as Operand<T>
+         val epsilonOp = tf.constant(epsilon) as Operand<T>
 
-        val sum = tf.math.add(right, left)
-        return tf.withName(TRAINING_LOSS).math.mean(
-            tf.reduceSum(tf.math.mul(minusOneOp, sum), tf.constant(0)),
-            tf.constant(0)
-        )
+         val right = tf.math.mul(labels, tf.math.log(tf.math.add(actual, epsilonOp)))
+         val left =
+             tf.math.mul(tf.math.log(tf.math.add(tf.math.sub(oneOp, actual), epsilonOp)), tf.math.sub(oneOp, labels))
+
+         val sum = tf.math.add(right, left)
+         return tf.withName(TRAINING_LOSS).math.mean(
+             tf.reduceSum(tf.math.mul(minusOneOp, sum), tf.constant(0)),
+             tf.constant(0)
+         )*/
     }
 }

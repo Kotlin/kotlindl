@@ -29,7 +29,7 @@ class Adam<T : Number>(
     private lateinit var betaTwoPower: Variable<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -66,13 +66,13 @@ class Adam<T : Number>(
         val betaOnePowerInit2 = tf.assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
         val betaTwoPowerInit2 = tf.assign(betaTwoPower, tf.math.mul(betaTwoPower, betaTwoConst))
 
-        graph.optimizerInitializers += betaOnePowerInit2
-        graph.optimizerInitializers += betaTwoPowerInit2
+        graph.addOptimizerVariableInitializer(betaOnePowerInit2)
+        graph.addOptimizerVariableInitializer(betaTwoPowerInit2)
 
         return targets
     }
 
-    private fun createAdamSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createAdamSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val firstMomentInitializer = tf.fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
 
@@ -80,18 +80,18 @@ class Adam<T : Number>(
         createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createAdamSlot(graph, tf, v.asOutput())
         }
         betaOnePower = tf.withName("beta1_power").variable(Shape.scalar(), getDType())
         val betaOnePowerInit: Assign<T> = tf
             .assign(betaOnePower, tf.constant(beta1, getDType()))
-        graph.optimizerInitializers += betaOnePowerInit
+        graph.addOptimizerVariableInitializer(betaOnePowerInit)
         betaTwoPower = tf.withName("beta2_power").variable(Shape.scalar(), getDType())
         val betaTwoPowerInit: Assign<T> = tf
             .assign(betaTwoPower, tf.constant(beta2, getDType()))
-        graph.optimizerInitializers += betaTwoPowerInit
+        graph.addOptimizerVariableInitializer(betaTwoPowerInit)
     }
 
     override fun getOptimizerName(): String {

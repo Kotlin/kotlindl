@@ -12,7 +12,6 @@ import api.keras.layers.Layer
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Optimizer
-import api.keras.optimizers.SGD
 import api.keras.shape.TensorShape
 import api.keras.shape.convertTensorToFlattenFloatArray
 import api.keras.shape.convertTensorToMultiDimArray
@@ -21,8 +20,6 @@ import ch.qos.logback.classic.Level
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Assign
-import org.tensorflow.op.core.Variable
 import org.tensorflow.op.nn.Softmax
 import java.io.File
 
@@ -50,36 +47,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     /** The bunch of layers. */
     private var layersByName: Map<String, Layer<T>> = mapOf()
-
-    /** A list of variables to train. */
-    private var trainableVars: MutableList<Variable<T>> = mutableListOf()
-
-    /** A list of initializer to initialize the trainableVariables. */
-    private var initializers: Map<String, Assign<T>> = mapOf()
-
-    /** Optimizer. Approach how aggressively to update the weights. */
-    private var optimizer: Optimizer<T> = SGD(0.2f)
-
-    /** Loss function. */
-    private var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
-
-    /** Metric on validation dataset for training phase. */
-    private var metric: Metrics = Metrics.ACCURACY
-
-    /** List of metrics for evaluation phase. */
-    private var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
-
-    /** TensorFlow operand for prediction phase. */
-    private lateinit var yPred: Operand<T>
-
-    /** TensorFlow operand for X data. */
-    private lateinit var xOp: Operand<T>
-
-    /** TensorFlow operand for Y data. */
-    private lateinit var yOp: Operand<T>
-
-    /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
-    private var amountOfClasses: Long = -1
 
     init {
         for (layer in layers) {
@@ -123,8 +90,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                     layer.name = "layer_$cnt"
                     cnt++
                 }
-
-
             }
         }
 
@@ -154,12 +119,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         var inputShape: Shape = firstLayer.computeOutputShape()
 
         layers.forEach {
-            it.defineVariables(tf, inputShape = inputShape)
-
-            trainableVars.addAll(it.variables.values)  // TODO: keep here and variable names too (if it exist)
-            initializers = initializers + it.initializers
-
-            //logger.debug { it.toString() + " " + TensorShape(inputShape).dims().contentToString() }
+            it.defineVariables(tf, kGraph, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
             val dims = TensorShape(inputShape).dims()
@@ -246,11 +206,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         logger.debug { "Initialization of TensorFlow Graph variables" }
 
-        initializeGraphVariables()
+        kGraph.initializeGraphVariables(session)
 
-        val targets = optimizer.prepareTargets(kGraph, tf, lossOp, trainableVars)
+        val targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
-        initializeOptimizerVariables()
+        kGraph.initializeOptimizerVariables(session)
 
         for (i in 1..epochs) {
             val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
@@ -295,42 +255,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             }
         }
         return trainingHistory
-    }
-
-    private fun initializeGraphVariables() {
-        val runner = session.runner()
-
-        initializers.forEach {
-            runner.addTarget(it.value as Operand<T>)
-        }
-
-        runner.run()
-    }
-
-    private fun initializeOptimizerVariables() {
-        if (kGraph.optimizerInitializers.isNotEmpty()) {
-
-            // TODO: need to optimize the initialization to do it together (but some initializers depedends on another in Adam/Adamax optimizers
-            kGraph.optimizerInitializers.forEach {
-                val runner = session.runner()
-                runner.addTarget(it as Operand<*>)
-                runner.run()
-            }
-
-        }
-
-        runAssignAddOpsForOptimizers()
-    }
-
-    private fun runAssignAddOpsForOptimizers() {
-        if (kGraph.optimizerAssignAddInitializers.isNotEmpty()) {
-            val runner = session.runner()
-
-            kGraph.optimizerAssignAddInitializers.forEach {
-                runner.addTarget(it as Operand<*>)
-            }
-            runner.run()
-        }
     }
 
     /**
@@ -574,7 +498,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         session.close()
     }
 
-    fun getGraph(): KGraph {
+    fun getGraph(): KGraph<T> {
         return kGraph
     }
 
@@ -588,7 +512,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val modelWeightsExtractorRunner = session.runner()
 
-        trainableVars.forEach {
+        val trainableVariables = kGraph.variables()
+
+        trainableVariables.forEach {
             modelWeightsExtractorRunner.fetch(it)
         }
 
@@ -596,7 +522,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         File("$pathToModelDirectory/variableNames.txt").bufferedWriter().use { variableNamesFile ->
             for (modelWeight in modelWeights.withIndex()) {
-                val variableName = trainableVars[modelWeight.index].asOutput().op().name()
+                val variableName = trainableVariables[modelWeight.index].asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
 

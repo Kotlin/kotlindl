@@ -6,9 +6,35 @@ import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Optimizer
+import api.keras.optimizers.SGD
+import org.tensorflow.Operand
 
-abstract class TrainableTFModel<T : Number> : InferenceModel() {
+abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     protected var isDebugMode = false
+
+    /** Optimizer. Approach how aggressively to update the weights. */
+    protected var optimizer: Optimizer<T> = SGD(0.2f)
+
+    /** Loss function. */
+    protected var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
+
+    /** Metric on validation dataset for training phase. */
+    protected var metric: Metrics = Metrics.ACCURACY
+
+    /** List of metrics for evaluation phase. */
+    protected var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
+
+    /** TensorFlow operand for prediction phase. */
+    protected lateinit var yPred: Operand<T>
+
+    /** TensorFlow operand for X data. */
+    protected lateinit var xOp: Operand<T>
+
+    /** TensorFlow operand for Y data. */
+    protected lateinit var yOp: Operand<T>
+
+    /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
+    protected var amountOfClasses: Long = -1
 
     /**
      * Configures the model for training.

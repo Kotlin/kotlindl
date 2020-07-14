@@ -22,7 +22,7 @@ class AdaDelta<T : Number>(
     private lateinit var rhoConst: Constant<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -55,7 +55,7 @@ class AdaDelta<T : Number>(
         return targets
     }
 
-    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createAdaDeltaSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val accumulatorInitializer = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
@@ -64,7 +64,7 @@ class AdaDelta<T : Number>(
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createAdaDeltaSlot(graph, tf, v.asOutput())
         }

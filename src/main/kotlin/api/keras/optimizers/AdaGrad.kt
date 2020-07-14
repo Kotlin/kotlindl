@@ -19,7 +19,7 @@ class AdaGrad<T : Number>(
     private lateinit var learningRateConst: Constant<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -48,7 +48,7 @@ class AdaGrad<T : Number>(
         return targets
     }
 
-    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createAdaGradSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val initializer: Operand<T> = tf.fill(
             tf.shape(v),
             tf.dtypes.cast(tf.constant(initialAccumulatorValue), getDType())
@@ -56,7 +56,7 @@ class AdaGrad<T : Number>(
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createAdaGradSlot(graph, tf, v.asOutput())
         }

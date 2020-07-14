@@ -1,5 +1,6 @@
 package api.keras.layers
 
+import api.KGraph
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.shape.TensorShape
@@ -9,6 +10,11 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
+
+private const val KERNEL = "dense_kernel"
+private const val KERNEL_INIT = "dense_kernelInit"
+private const val BIAS = "dense_bias"
+private const val BIAS_INIT = "dense_biasInit"
 
 class Dense<T : Number>(
     val outputSize: Int,
@@ -20,22 +26,19 @@ class Dense<T : Number>(
     name: String = ""
 ) : Layer<T>() {
     private lateinit var kernelShape: Shape
+
     private lateinit var biasShape: Shape
 
     // weight tensors
     private lateinit var kernel: Variable<T>
-    private lateinit var bias: Variable<T>
 
-    private val KERNEL = "dense_kernel"
-    private val KERNEL_INIT = "dense_kernelInit"
-    private val BIAS = "dense_bias"
-    private val BIAS_INIT = "dense_biasInit"
+    private lateinit var bias: Variable<T>
 
     init {
         this.name = name
     }
 
-    override fun defineVariables(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         biasShape = Shape.make(outputSize.toLong())
@@ -56,13 +59,13 @@ class Dense<T : Number>(
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
             bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-            kernel = addWeight(tf, kernelVariableName, kernel, kernelInitName, kernelInitializer)
-            bias = addWeight(tf, biasVariableName, bias, biasInitName, biasInitializer)
+            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitName, kernelInitializer)
+            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitName, biasInitializer)
         } else {
             kernel = tf.variable(kernelShape, getDType())
             bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
-            bias = addWeight(tf, BIAS, bias, BIAS_INIT, biasInitializer)
+            kernel = addWeight(tf, kGraph, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
+            bias = addWeight(tf, kGraph, BIAS, bias, BIAS_INIT, biasInitializer)
         }
     }
 

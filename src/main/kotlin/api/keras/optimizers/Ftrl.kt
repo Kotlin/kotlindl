@@ -33,7 +33,7 @@ class Ftrl<T : Number>(
     private lateinit var l2ShrinkageRegularizationStrengthConst: Constant<T>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -75,7 +75,7 @@ class Ftrl<T : Number>(
         return targets
     }
 
-    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createFtrlSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val accumInitializer = tf.fill(tf.shape(v), tf.constant(initialAccumulatorValue, getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
 
@@ -83,7 +83,7 @@ class Ftrl<T : Number>(
         createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createFtrlSlot(graph, tf, v.asOutput())
         }

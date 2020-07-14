@@ -15,7 +15,7 @@ class SGD<T : Number>(private val learningRateSchedule: Map<Int, Float>) : Optim
     }
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients

@@ -15,7 +15,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-open class InferenceModel() : AutoCloseable {
+open class InferenceModel<T : Number>() : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -23,7 +23,7 @@ open class InferenceModel() : AutoCloseable {
     lateinit var session: Session
 
     /** TensorFlow wrapped computational graph. */
-    lateinit var kGraph: KGraph
+    lateinit var kGraph: KGraph<T>
 
     protected var mu.KLogger.level: Level
         get() = (logger.underlyingLogger as Logger).level

@@ -1,5 +1,6 @@
 package api.keras.layers.twodim
 
+import api.KGraph
 import api.keras.layers.Layer
 import examples.util.PADDING_TYPE
 import org.tensorflow.Operand
@@ -10,7 +11,7 @@ class MaxPool2D<T : Number>(
     private val poolSize: IntArray,
     private val strides: IntArray
 ) : Layer<T>() {
-    override fun defineVariables(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         // Empty method
     }
 

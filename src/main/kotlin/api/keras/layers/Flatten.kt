@@ -1,5 +1,6 @@
 package api.keras.layers
 
+import api.KGraph
 import api.keras.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -11,7 +12,7 @@ import kotlin.math.abs
 class Flatten<T : Number> : Layer<T>() {
     private lateinit var units: Constant<Int>
 
-    override fun defineVariables(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))

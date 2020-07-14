@@ -21,7 +21,7 @@ fun main() {
     val imageId2 = 1
     val imageId3 = 2
 
-    InferenceModel().use {
+    InferenceModel<Float>().use {
         it.load(PATH_TO_MODEL)
 
         val prediction = it.predict(train.getImage(imageId1))

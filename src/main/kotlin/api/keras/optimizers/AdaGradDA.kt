@@ -26,7 +26,7 @@ class AdaGradDA<T : Number>(
     private lateinit var globalStep: Variable<Long>
 
     override fun applyGradients(
-        graph: KGraph,
+        graph: KGraph<T>,
         tf: Ops,
         weights: List<Variable<T>>,
         gradients: Gradients
@@ -38,7 +38,7 @@ class AdaGradDA<T : Number>(
         l2StrengthConst = tf.constant(l2Strength, getDType())
 
         val globalStepInitFinish1 = tf.assignAdd(globalStep, tf.constant(1L))
-        graph.optimizerAssignAddInitializers += globalStepInitFinish1
+        graph.addOptimizerVariableAssignAddInitializer(globalStepInitFinish1)
 
         for (i in weights.indices) {
             val variable = weights[i]
@@ -60,12 +60,12 @@ class AdaGradDA<T : Number>(
         }
 
         val globalStepInitFinish = tf.assignAdd(globalStep, tf.constant(1L))
-        graph.optimizerAssignAddInitializers += globalStepInitFinish
+        graph.addOptimizerVariableAssignAddInitializer(globalStepInitFinish)
 
         return targets
     }
 
-    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<out T>) {
+    private fun createAdaGradDASlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
         val initializer: Operand<T> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
@@ -76,13 +76,13 @@ class AdaGradDA<T : Number>(
         createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
         for (v in variables) {
             createAdaGradDASlot(graph, tf, v.asOutput())
         }
         globalStep = tf.withName("adagrad-da-global-step").variable(Shape.scalar(), getLongType())
         val globalStepInit: Assign<Long> = tf.assign(globalStep, tf.constant(0L, getLongType()))
-        graph.optimizerInitializers += globalStepInit
+        graph.addOptimizerVariableInitializer(globalStepInit)
     }
 
     override fun getOptimizerName(): String {

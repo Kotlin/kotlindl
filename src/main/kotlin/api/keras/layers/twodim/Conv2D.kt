@@ -1,5 +1,6 @@
 package api.keras.layers.twodim
 
+import api.KGraph
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
@@ -43,7 +44,7 @@ class Conv2D<T : Number>(
         this.name = name
     }
 
-    override fun defineVariables(tf: Ops, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -73,13 +74,13 @@ class Conv2D<T : Number>(
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
             bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-            kernel = addWeight(tf, kernelVariableName, kernel, kernelInitName, kernelInitializer)
-            bias = addWeight(tf, biasVariableName, bias, biasInitName, biasInitializer)
+            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitName, kernelInitializer)
+            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitName, biasInitializer)
         } else {
             kernel = tf.variable(kernelShape, getDType())
             bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
-            bias = addWeight(tf, BIAS, bias, BIAS_INIT, biasInitializer)
+            kernel = addWeight(tf, kGraph, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
+            bias = addWeight(tf, kGraph, BIAS, bias, BIAS_INIT, biasInitializer)
         }
     }
 

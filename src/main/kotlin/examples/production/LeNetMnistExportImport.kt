@@ -74,7 +74,7 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    InferenceModel().use {
+    InferenceModel<Float>().use {
         it.load(PATH_TO_MODEL)
 
         val prediction = it.predict(train.getImage(imageId1))
