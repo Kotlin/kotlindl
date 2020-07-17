@@ -34,7 +34,6 @@ class KTensor() : AutoCloseable {
                     .feed(bOps.asOutput(), otherTensor)
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
-                println(addTensor)
 
                 val res = KTensor()
                 res.tensor = addTensor
@@ -81,7 +80,6 @@ class KTensor() : AutoCloseable {
                     .feed(bOps.asOutput(), otherTensor)
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
-                println(addTensor)
 
                 val res = KTensor()
                 res.tensor = addTensor
@@ -114,7 +112,6 @@ class KTensor() : AutoCloseable {
                     .feed(bOps.asOutput(), otherTensor)
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
-                println(addTensor)
 
                 val res = KTensor()
                 res.tensor = addTensor

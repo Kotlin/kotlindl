@@ -27,6 +27,8 @@ open class InferenceModel<T : Number>() : AutoCloseable {
     /** TensorFlow wrapped computational graph. */
     lateinit var kGraph: KGraph<T>
 
+    private val logger = KotlinLogging.logger {}
+
     protected var mu.KLogger.level: Level
         get() = (logger.underlyingLogger as Logger).level
         set(value) {
@@ -173,7 +175,7 @@ open class InferenceModel<T : Number>() : AutoCloseable {
                             result[i][j][k][m] = weight
                             cnt++
                         } else {
-                            println(cnt)
+                            logger.debug { cnt }
                         }
                     }
                 }

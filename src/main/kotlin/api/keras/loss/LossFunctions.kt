@@ -36,17 +36,28 @@ class SoftmaxCrossEntropyWithLogits<T : Number> : LossFunction<T> {
 
 class AbsoluteDifference<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        throw UnsupportedOperationException()
-        /*val losses = tf.math.abs(tf.math.sub(actual, labels))
+        val losses = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(losses, tf.constant(0)), tf.constant(0))*/
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(losses, tf.constant(0)), tf.constant(0))
     }
 }
 
 class MAE<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        throw UnsupportedOperationException()
+        val absoluteErrors = tf.math.abs(tf.math.sub(actual, labels))
+
+        return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))
         /*return tf.withName(TRAINING_LOSS).identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));*/
+    }
+}
+
+class MSE<T : Number> : LossFunction<T> {
+    override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
+        val predicted: Operand<Long> = tf.math.argMax(actual, tf.constant(1))
+        val expected: Operand<Long> = tf.math.argMax(labels, tf.constant(1))
+
+        val squaredError = tf.math.squaredDifference(predicted, expected)
+        return tf.withName(TRAINING_LOSS).math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0))
     }
 }
 

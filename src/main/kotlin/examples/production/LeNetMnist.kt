@@ -26,7 +26,7 @@ fun main() {
     val imageId = 0
 
     lenet5.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = LossFunctions.MAE, metric = Metrics.MAE)
 
         (it as Sequential).summary()
 

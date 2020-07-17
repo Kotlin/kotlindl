@@ -22,9 +22,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Softmax
 import java.io.File
 
-
-private val logger = KotlinLogging.logger {}
-
 /**
  * Sequential groups a linear stack of layers into a TFModel.
  * Also, it provides training and inference features on this model.
@@ -45,6 +42,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private var layersByName: Map<String, Layer<T>> = mapOf()
 
     private var isModelCompiled: Boolean = false
+
+    private val logger = KotlinLogging.logger {}
 
     init {
         for (layer in layers) {
@@ -108,6 +107,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         amountOfClasses = (layers.last() as Dense).outputSize.toLong()
 
         this.loss = loss
+        this.metric = metric
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
 
@@ -128,7 +128,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     private fun validateModelArchitecture(): Unit {
-        require(layers.first() is Input) { "DL architectures are not started with Input layer are not supported yet!" }
         require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         require(!layers.last().hasActivation()) { "Last layer must have an activation function." }
         require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Sigmoid activation, alternative activations are not supported yet!" }
