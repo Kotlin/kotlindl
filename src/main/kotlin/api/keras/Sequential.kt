@@ -1,11 +1,9 @@
 package api.keras
 
-import api.KGraph
-import api.TrainableTFModel
-import api.TrainingHistory
+import api.*
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
-import api.keras.exceptions.RepeatableLayerName
+import api.keras.exceptions.RepeatableLayerNameException
 import api.keras.layers.Dense
 import api.keras.layers.Input
 import api.keras.layers.Layer
@@ -23,9 +21,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Softmax
 import java.io.File
 
-private const val TRAINING_LOSS = "training_loss"
 
-private const val OUTPUT_NAME = "output"
 
 private val logger = KotlinLogging.logger {}
 
@@ -51,7 +47,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     init {
         for (layer in layers) {
             if (layersByName.containsKey(layer.name)) {
-                throw RepeatableLayerName(layer.name)
+                throw RepeatableLayerNameException(layer.name)
             } else {
                 layersByName = layersByName + (layer.name to layer)
             }
@@ -87,7 +83,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
-                    layer.name = "layer_$cnt"
+                    layer.name = defaultLayerName(cnt)
                     cnt++
                 }
             }
@@ -456,12 +452,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
-                if (layer.hasActivation()) runner.fetch("Activation_${layer.name}")
+                if (layer.hasActivation()) runner.fetch(defaultActivationName(layer))
             }
         }
 
         return runner.run()
     }
+
 
     private fun calculateXYShapes(batchSize: Int): Pair<LongArray, LongArray> {
         val xBatchShape = calculateXShape(batchSize)
@@ -529,14 +526,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 File("$pathToModelDirectory/$variableName.txt").bufferedWriter().use { file ->
                     val tensorForCopying = modelWeight.value
 
-                    val reshaped = convertTensorToFlattenFloatArray(tensorForCopying)
+                    tensorForCopying.use {
+                        val reshaped = convertTensorToFlattenFloatArray(tensorForCopying)
 
-                    for (i in 0..reshaped.size - 2) {
-                        file.write(reshaped[i].toString() + " ")
+                        for (i in 0..reshaped.size - 2) {
+                            file.write(reshaped[i].toString() + " ")
+                        }
+
+                        file.write(reshaped[reshaped.size - 1].toString())
+                        file.flush()
                     }
-
-                    file.write(reshaped[reshaped.size - 1].toString())
-                    file.flush()
                 }
                 variableNamesFile.flush()
             }

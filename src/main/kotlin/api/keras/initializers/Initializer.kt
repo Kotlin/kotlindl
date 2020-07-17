@@ -1,5 +1,7 @@
 package api.keras.initializers
 
+import api.defaultAssignOpName
+import api.defaultInitializerOpName
 import api.keras.shape.shapeOperand
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
@@ -22,13 +24,14 @@ abstract class Initializer<T : Number> {
         dtype: Class<T>,
         name: String
     ): Assign<T> {
-        return tf.withName("Assign_$name").assign(
+        return tf.withName(defaultAssignOpName(name)).assign(
             input, initialize(
                 funIn, funOut, tf,
-                shapeOperand(tf, input.asOutput().shape()), dtype, "Init_$name"
+                shapeOperand(tf, input.asOutput().shape()), dtype, defaultInitializerOpName(name)
             )
         )
     }
+
 
     /**
      * Returns a Tensor object initialized as

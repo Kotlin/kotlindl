@@ -4,7 +4,6 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
 import api.keras.initializers.HeNormal
-import api.keras.initializers.YetAnotherXavier
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -145,13 +144,13 @@ private val vgg11 = Sequential.of<Float>(
     Dense(
         outputSize = 1000,
         activation = Activations.Elu,
-        kernelInitializer = YetAnotherXavier(12L),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Zeros()
     ),
     Dense(
         outputSize = NUM_LABELS, // changed due to 10 classes instead of
         activation = Activations.Linear,
-        kernelInitializer = Zeros(),
+        kernelInitializer = HeNormal(SEED),
         biasInitializer = Zeros()
     )
 )

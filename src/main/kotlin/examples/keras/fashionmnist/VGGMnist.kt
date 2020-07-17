@@ -3,8 +3,7 @@ package examples.keras.fashionmnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
-import api.keras.initializers.YetAnotherXavier
-import api.keras.initializers.Zeros
+import api.keras.initializers.HeNormal
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
 import api.keras.layers.Input
@@ -24,9 +23,10 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
+val heNormal = HeNormal<Float>(SEED)
+
 /**
  * Kotlin implementation of VGG'11 on Keras.
- * Make accuracy ~ 0.929 on Mnist Test dataset
  * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
  */
 private val vgg11 = Sequential.of<Float>(
@@ -40,8 +40,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,8 +53,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -66,8 +66,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -75,8 +75,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -88,8 +88,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -97,8 +97,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -110,8 +110,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -119,8 +119,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -128,29 +128,23 @@ private val vgg11 = Sequential.of<Float>(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Flatten(),
-    /*Dense(
-        outputSize = 4096,
-        activation = Activations.Relu,
-        kernelInitializer = Zeros(),
-        biasInitializer = Zeros()
-    ),*/
     Dense(
         outputSize = 2048,
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     ),
     Dense(
         outputSize = 1000,
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     ),
     Dense(
         outputSize = NUM_LABELS, // changed due to 10 classes instead of
         activation = Activations.Linear,
-        kernelInitializer = Zeros(),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     )
 )
 
@@ -160,7 +154,7 @@ fun main() {
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
-        examples.keras.mnist.util.NUM_LABELS,
+        examples.keras.mnist.util.AMOUNT_OF_CLASSES,
         ::extractFashionImages,
         ::extractFashionLabels
     )

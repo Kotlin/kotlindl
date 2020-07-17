@@ -55,6 +55,7 @@ class KTensor() : AutoCloseable {
 
     override fun close() {
         session.close()
+        tensor.close()
     }
 
     operator fun minus(kTensor: KTensor): KTensor {

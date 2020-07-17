@@ -1,10 +1,8 @@
 package api.keras.loss
 
+import api.TRAINING_LOSS
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-
-
-private const val TRAINING_LOSS = "training_loss"
 
 enum class LossFunctions {
     SPARSE_CATEGORICAL_CROSS_ENTROPY,

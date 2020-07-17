@@ -1,6 +1,8 @@
 package api.inference
 
 import api.KGraph
+import api.defaultAssignOpName
+import api.defaultInitializerOpName
 import api.keras.shape.TensorShape
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -98,7 +100,7 @@ open class InferenceModel<T : Number>() : AutoCloseable {
                     val tensorShape = TensorShape(shape)
 
                     logger.debug { "Loading the variable $variableName data" }
-                    logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}"}
+                    logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
                     logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
 
                     /* // limited by 2GB files
@@ -106,23 +108,11 @@ open class InferenceModel<T : Number>() : AutoCloseable {
                     val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
                     scanner.useLocale(Locale.US)
 
-                    // TODO: describe this convention about naming
-                    val initializerName = "Init_$variableName"
-                    val assignOpName = "Assign_$variableName"
+                    val initializerName = defaultInitializerOpName(variableName)
+                    val assignOpName = defaultAssignOpName(variableName)
 
                     val source = createFloatArrayFromScanner(shape, scanner)
                     populateVariable(initializerName, source, assignOpName)
-
-                    // Extract variable
-                    /* val variableExtractor = session.runner()
-                                val variableTensors = variableExtractor
-                                    .fetch(variableName)
-                                    .run();
-
-                                val dst = create4DimFloatArray(shape, 0.0f)
-
-                                variableTensors[0].copyTo(dst)
-                                println(dst[0][0][0][0])*/
                 }
             }
             logger.debug { "The model loading is ended." }
@@ -144,7 +134,7 @@ open class InferenceModel<T : Number>() : AutoCloseable {
                 return create4DimFloatArray(shape, scanner)
             }
             else -> {
-                throw RuntimeException("The loading of tensors with 5 and more dimenstions is not supported yet")
+                throw RuntimeException("The loading of tensors with 5 and more dimensions is not supported yet")
             }
         }
     }
@@ -206,10 +196,8 @@ open class InferenceModel<T : Number>() : AutoCloseable {
         for (i in result.indices) {
             for (j in result[i].indices) {
                 for (k in result[i][j].indices) {
-
                     val weight = scanner.nextFloat()
                     result[i][j][k] = weight
-
                 }
             }
         }
@@ -229,8 +217,6 @@ open class InferenceModel<T : Number>() : AutoCloseable {
             for (j in result[i].indices) {
                 val weight = scanner.nextFloat()
                 result[i][j] = weight
-
-
             }
         }
 
@@ -244,10 +230,8 @@ open class InferenceModel<T : Number>() : AutoCloseable {
         val result = FloatArray(shape.size(0).toInt()) { 0.0f }
 
         for (i in result.indices) {
-
             val weight = scanner.nextFloat()
             result[i] = weight
-
         }
 
         return result

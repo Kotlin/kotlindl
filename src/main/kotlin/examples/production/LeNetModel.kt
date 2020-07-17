@@ -3,15 +3,15 @@ package examples.production
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
+import api.keras.initializers.GlorotNormal
 import api.keras.initializers.HeNormal
-import api.keras.initializers.YetAnotherXavier
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
 import api.keras.layers.Input
 import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
-import examples.keras.mnist.util.NUM_LABELS
+import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -19,7 +19,7 @@ private const val SEED = 12L
 
 private val kernelInitializer = HeNormal<Float>(SEED)
 
-private val biasInitializer = YetAnotherXavier<Float>(SEED)
+private val biasInitializer = GlorotNormal<Float>(SEED)
 
 val lenet5 = Sequential.of<Float>(
     Input(
@@ -71,7 +71,7 @@ val lenet5 = Sequential.of<Float>(
         name = "4"
     ),
     Dense(
-        outputSize = NUM_LABELS,
+        outputSize = AMOUNT_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,

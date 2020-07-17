@@ -5,7 +5,7 @@ import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.fashionmnist.util.*
-import examples.keras.mnist.util.NUM_LABELS
+import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 
 private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 500
@@ -30,7 +30,7 @@ fun main() {
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
-        NUM_LABELS,
+        AMOUNT_OF_CLASSES,
         ::extractFashionImages,
         ::extractFashionLabels
     )

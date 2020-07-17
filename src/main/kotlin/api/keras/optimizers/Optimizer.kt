@@ -8,6 +8,7 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 
+/** Base class for all optimizers. */
 abstract class Optimizer<T : Number> {
     private lateinit var dtype: Class<T>
 

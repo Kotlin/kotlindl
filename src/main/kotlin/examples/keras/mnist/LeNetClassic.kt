@@ -70,7 +70,7 @@ private val lenet5Classic = Sequential.of<Float>(
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = NUM_LABELS,
+        outputSize = AMOUNT_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
@@ -83,7 +83,7 @@ fun main() {
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        NUM_LABELS,
+        AMOUNT_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )

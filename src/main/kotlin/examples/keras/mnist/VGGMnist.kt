@@ -3,8 +3,7 @@ package examples.keras.mnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
-import api.keras.initializers.YetAnotherXavier
-import api.keras.initializers.Zeros
+import api.keras.initializers.HeNormal
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
 import api.keras.layers.Input
@@ -24,6 +23,8 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
+val heNormal = HeNormal<Float>(SEED)
+
 /**
  * Kotlin implementation of VGG'11 on Keras.
  * Make accuracy ~ 0.9 on Mnist Test dataset
@@ -40,8 +41,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,8 +54,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -66,8 +67,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -75,8 +76,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -88,8 +89,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -97,8 +98,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -110,8 +111,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -119,8 +120,8 @@ private val vgg11 = Sequential.of<Float>(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(SEED),
-        biasInitializer = YetAnotherXavier(SEED),
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -137,20 +138,20 @@ private val vgg11 = Sequential.of<Float>(
     Dense(
         outputSize = 2048,
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     ),
     Dense(
         outputSize = 1000,
         activation = Activations.Relu,
-        kernelInitializer = YetAnotherXavier(12L),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
-        kernelInitializer = Zeros(),
-        biasInitializer = Zeros()
+        kernelInitializer = heNormal,
+        biasInitializer = heNormal
     )
 )
 

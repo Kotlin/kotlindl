@@ -1,5 +1,6 @@
 package api.keras.layers
 
+import api.DATA_PLACEHOLDER
 import api.KGraph
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -14,7 +15,7 @@ class Input<T : Number>(vararg dims: Long) : Layer<T>() {
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
 
     fun defineVariables(tf: Ops) {
-        input = tf.withName("x").placeholder( // TODO: move 'x' to shared Tensor names constants or enum
+        input = tf.withName(DATA_PLACEHOLDER).placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))
         )

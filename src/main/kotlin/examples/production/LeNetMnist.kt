@@ -18,7 +18,7 @@ fun main() {
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        NUM_LABELS,
+        AMOUNT_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
@@ -39,9 +39,7 @@ fun main() {
             verbose = true
         )
 
-        //println(it)
-
-        val weights = (it as Sequential).getLayer("1").getWeights()
+        val weights = it.getLayer("1").getWeights()
 
         drawFilters(weights[0])
 

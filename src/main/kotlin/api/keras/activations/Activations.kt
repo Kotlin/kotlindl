@@ -45,7 +45,11 @@ enum class Activations {
 
 class LinearActivation<T : Number>() : Activation<T> {
     override fun apply(tf: Ops, features: Operand<T>, name: String): Operand<T> {
-        return features
+        return if (name.isNotEmpty()) {
+            features
+        } else {
+            tf.withName("Activation_$name").identity(features)
+        }
     }
 }
 
