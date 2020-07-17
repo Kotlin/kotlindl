@@ -5,7 +5,6 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 enum class LossFunctions {
-    SPARSE_CATEGORICAL_CROSS_ENTROPY,
     SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
     ABSOLUTE_DIFFERENCE,
     HINGE_LOSS,
@@ -18,7 +17,6 @@ enum class LossFunctions {
             return when (lossFunctionType) {
                 SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits()
                 ABSOLUTE_DIFFERENCE -> AbsoluteDifference()
-                SPARSE_CATEGORICAL_CROSS_ENTROPY -> TODO()
                 HINGE_LOSS -> HingeLoss()
                 HUBER_LOSS -> HuberLoss(0.1f)
                 LOG_LOSS -> LogLoss()
@@ -57,7 +55,7 @@ class HingeLoss<T : Number> : LossFunction<T> {
         throw UnsupportedOperationException()
         /* // We first need to convert binary labels to -1/1 labels (as floats).
         val allOnes: Variable<T> = tf.variable(labels.asOutput().shape(), dtype)
-        // TODO: add assign operators
+
         val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2f) as Operand<T>, labels), allOnes)
 
 

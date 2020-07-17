@@ -1,6 +1,7 @@
 package api.keras
 
 import api.*
+import api.keras.activations.Activations
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
 import api.keras.exceptions.RepeatableLayerNameException
@@ -11,16 +12,15 @@ import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Optimizer
 import api.keras.shape.TensorShape
-import api.keras.shape.convertTensorToFlattenFloatArray
-import api.keras.shape.convertTensorToMultiDimArray
 import api.keras.shape.tail
+import api.tensor.convertTensorToFlattenFloatArray
+import api.tensor.convertTensorToMultiDimArray
 import ch.qos.logback.classic.Level
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Softmax
 import java.io.File
-
 
 
 private val logger = KotlinLogging.logger {}
@@ -44,6 +44,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     /** The bunch of layers. */
     private var layersByName: Map<String, Layer<T>> = mapOf()
 
+    private var isModelCompiled: Boolean = false
+
     init {
         for (layer in layers) {
             if (layersByName.containsKey(layer.name)) {
@@ -56,11 +58,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         kGraph = KGraph(Graph().toGraphDef())
         tf = Ops.create(kGraph.tfGraph)
         session = Session(kGraph.tfGraph)
-
-        // TODO: think about different logic for different architectures and regression and unsupervised tasks
-        if (layers.last() is Dense) {
-            amountOfClasses = (layers.last() as Dense).outputSize.toLong()
-        }
     }
 
     companion object {
@@ -107,6 +104,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * @param [metric] Metric to evaluate during training.
      */
     override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metrics) {
+        validateModelArchitecture()
+        amountOfClasses = (layers.last() as Dense).outputSize.toLong()
+
         this.loss = loss
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
@@ -123,6 +123,15 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
             logger.debug { it.toString() + " " + dims.contentToString() }
         }
+
+        isModelCompiled = true
+    }
+
+    private fun validateModelArchitecture(): Unit {
+        require(layers.first() is Input) { "DL architectures are not started with Input layer are not supported yet!" }
+        require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
+        require(!layers.last().hasActivation()) { "Last layer must have an activation function." }
+        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Sigmoid activation, alternative activations are not supported yet!" }
     }
 
     override fun fit(
@@ -180,6 +189,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         validationDataset: ImageDataset?,
         validationBatchSize: Int?
     ): TrainingHistory {
+        check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
+
         val trainingHistory = TrainingHistory()
 
         this.isDebugMode = verbose
@@ -256,7 +267,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     /**
      * Returns the loss value and metric value on train batch.
      *
-     * TODO: disable the metric value calculation to speed up the training (measure that)
      */
     private fun trainOnBatch(
         targets: List<Operand<T>>,
@@ -433,7 +443,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             val activations = mutableListOf<Any>()
             if (formActivationData && tensors.size > 1) {
                 for (i in 1 until tensors.size) {
-                    activations.add(convertTensorToMultiDimArray(tensors[i]))
+                    activations.add(tensors[i].convertTensorToMultiDimArray())
                 }
             }
             return Pair(dst[0], activations.toList())
@@ -499,7 +509,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return kGraph
     }
 
-    // TODO: refactor to special module of extension functions or method of Writable/Readable interface
     override fun save(pathToModelDirectory: String) {
         val directory = File(pathToModelDirectory)
         if (!directory.exists()) {
@@ -527,7 +536,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                     val tensorForCopying = modelWeight.value
 
                     tensorForCopying.use {
-                        val reshaped = convertTensorToFlattenFloatArray(tensorForCopying)
+                        val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")

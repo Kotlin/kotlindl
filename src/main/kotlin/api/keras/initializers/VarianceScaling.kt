@@ -49,10 +49,6 @@ open class VarianceScaling<T : Number>(
         require(scale > 0.0) { "The 'scale' parameter value must be more than 0.0." }
         var lscale = scale
 
-        // TODO: need to decide - extract from shape or pass as parameters from each layer (where it should be defined)
-        //val (fanIn, fanOut) = computeInOut(shape.asOutput().shape())
-        //println(" $fanIn $fanOut")
-
         val fanIn = funIn.toDouble()
         val fanOut = funOut.toDouble()
 

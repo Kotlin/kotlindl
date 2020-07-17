@@ -45,7 +45,7 @@ class ImageDataset internal constructor(
         }
 
         override fun remove() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            throw UnsupportedOperationException("The removal operation is not supported!")
         }
 
     }

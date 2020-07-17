@@ -25,13 +25,12 @@ class Input<T : Number>(vararg dims: Long) : Layer<T>() {
         return input.asOutput().shape()
     }
 
-
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
         return input
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        TODO("Not yet implemented")
+        return inputShape
     }
 
     override fun getWeights(): List<Array<*>> {

@@ -2,7 +2,6 @@ package api.keras.shape
 
 import org.tensorflow.Operand
 import org.tensorflow.Shape
-import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 import kotlin.math.abs
 
@@ -119,99 +118,3 @@ fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
     }
     return result
 }
-
-// TODO: to extension function
-fun convertTensorToFlattenFloatArray(
-    tensorForCopying: Tensor<*>
-): FloatArray {
-    val shape = tensorForCopying.shape()
-    val reshaped: FloatArray
-    return when (shape.size) {
-        1 -> {
-            reshaped = FloatArray(shape[0].toInt()) { 0.0f }
-            tensorForCopying.copyTo(reshaped)
-            reshaped
-        }
-        2 -> {
-            val dst =
-                Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape2DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        3 -> {
-            val dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    FloatArray(shape[2].toInt())
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape3DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        4 -> {
-            val dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    Array(shape[2].toInt()) {
-                        FloatArray(shape[3].toInt())
-                    }
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape4DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        else -> {
-            throw UnsupportedOperationException("Parsing for ${shape.size} dimensions is not supported yet!")
-        }
-    }
-    return reshaped
-}
-
-// TODO: to extension function
-fun convertTensorToMultiDimArray(
-    tensorForCopying: Tensor<*>
-): Array<*> {
-    val shape = tensorForCopying.shape()
-    val dst: Array<*>
-
-    return when (shape.size) {
-        1 -> {
-            val oneDimDst = FloatArray(shape[0].toInt()) { 0.0f }
-            tensorForCopying.copyTo(oneDimDst)
-            dst = Array(oneDimDst.size) { 0.0f }
-            for (i in oneDimDst.indices) dst[i] = oneDimDst[i]
-            dst
-        }
-        2 -> {
-            dst = Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
-
-            tensorForCopying.copyTo(dst)
-            dst
-        }
-        3 -> {
-            dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    FloatArray(shape[2].toInt())
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            dst
-        }
-        4 -> {
-            dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    Array(shape[2].toInt()) {
-                        FloatArray(shape[3].toInt())
-                    }
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            dst
-        }
-        else -> {
-            throw UnsupportedOperationException("Parsing for ${shape.size} dimensions is not supported yet!")
-        }
-    }
-}
-

@@ -16,8 +16,9 @@ import java.util.*
 private const val FIRST_MOMENT = "m"
 private const val SECOND_MOMENT = "v"
 
-
-// TODO: known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+/**
+ * Note: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ */
 class Adamax<T : Number>(
     private val learningRate: Float = 0.001f,
     private val beta1: Float = 0.9f,

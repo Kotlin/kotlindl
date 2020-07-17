@@ -45,7 +45,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
      */
     abstract fun compile(
         optimizer: Optimizer<T>,
-        loss: LossFunctions = LossFunctions.SPARSE_CATEGORICAL_CROSS_ENTROPY,
+        loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric: Metrics = Metrics.ACCURACY
     )
 
@@ -62,7 +62,6 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         batchSize: Int = 32,
         verbose: Boolean
     ): TrainingHistory
-
 
     abstract fun fit(
         trainingDataset: ImageDataset,

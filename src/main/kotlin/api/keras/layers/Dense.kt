@@ -19,7 +19,7 @@ private const val BIAS_INIT = "dense_biasInit"
 class Dense<T : Number>(
     val outputSize: Int,
     // activation function
-    private val activation: Activations = Activations.Sigmoid,
+    val activation: Activations = Activations.Sigmoid,
     // initializers
     private val kernelInitializer: Initializer<T>,
     private val biasInitializer: Initializer<T>,
@@ -42,10 +42,6 @@ class Dense<T : Number>(
         // Compute shapes of kernel and bias matrices
         kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         biasShape = Shape.make(outputSize.toLong())
-
-        // TODO: refactor to logging
-        println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
-        println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize

@@ -4,7 +4,10 @@ import api.KGraph
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
-import api.keras.shape.*
+import api.keras.shape.numElementsInShape
+import api.keras.shape.shapeFromDims
+import api.keras.shape.shapeToLongArray
+import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -51,10 +54,6 @@ class Conv2D<T : Number>(
         // Compute shapes of kernel and bias matrices
         kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
         biasShape = Shape.make(filters)
-
-        // TODO: refactor to logging
-        println("kernelShape" + TensorShape(kernelShape).dims().contentToString())
-        println("biasShape" + TensorShape(biasShape).dims().contentToString())
 
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
@@ -113,12 +112,10 @@ class Conv2D<T : Number>(
         val filtersTensor = tensorList[0]
         val biasTensor = tensorList[1]
 
-        val dstData =
-            convertTensorToMultiDimArray(filtersTensor)
+        val dstData = filtersTensor.convertTensorToMultiDimArray()
         result.add(dstData)
 
-        val dstData2 =
-            convertTensorToMultiDimArray(biasTensor)
+        val dstData2 = biasTensor.convertTensorToMultiDimArray()
         result.add(dstData2)
 
         return result.toList()

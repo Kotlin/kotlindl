@@ -18,10 +18,10 @@ abstract class Layer<T : Number> {
     protected var dtype: Class<T> = getDType()
 
     /** Returns number of input parameters. */
-    protected var fanIn: Int = 100
+    protected var fanIn: Int = Int.MIN_VALUE
 
     /** Returns number of output parameters. */
-    protected var fanOut: Int = 100
+    protected var fanOut: Int = Int.MIN_VALUE
 
     abstract fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape)
 
@@ -48,8 +48,12 @@ abstract class Layer<T : Number> {
         initializerName: String,
         initializer: Initializer<T>
     ): Variable<T> {
-        kGraph.addVariable(variable)      // TODO: add variable name as value?
-        kGraph.addInitializer(name, initializer.apply(fanIn, fanOut, tf, variable, dtype, name))
+        require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
+        require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
+
+        val initOp = initializer.apply(fanIn, fanOut, tf, variable, dtype, name)
+        kGraph.addVariable(variable)
+        kGraph.addInitializer(name, initOp)
         return variable
     }
 
