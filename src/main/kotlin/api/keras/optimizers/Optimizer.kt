@@ -22,7 +22,7 @@ abstract class Optimizer<T : Number> {
         tf: Ops,
         loss: Operand<T>
     ): List<Operand<T>> {
-        val weights = graph.variables()
+        val weights = graph.trainableVariables()
 
         slots = mutableMapOf()
 

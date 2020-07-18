@@ -68,7 +68,7 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         optimizerAssignAddInitializers += initializer
     }
 
-    fun variables(): List<Variable<T>> {
+    fun trainableVariables(): List<Variable<T>> {
         return trainableVars
     }
 

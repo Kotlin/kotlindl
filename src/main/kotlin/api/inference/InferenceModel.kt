@@ -141,7 +141,7 @@ open class InferenceModel<T : Number>() : AutoCloseable {
         }
     }
 
-    private fun populateVariable(
+    fun populateVariable(
         initializerName: String,
         org: Any,
         assignOpName: String

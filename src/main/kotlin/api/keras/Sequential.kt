@@ -32,11 +32,13 @@ import java.io.File
  * @constructor Creates a Sequential group with [input] and [layers].
  */
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
+    private lateinit var lossOp: Operand<T>
+
     /** Input layer. */
     private val firstLayer: Input<T> = input
 
     /** The bunch of layers. */
-    private val layers: List<Layer<T>> = listOf(*layers)
+    val layers: List<Layer<T>> = listOf(*layers)
 
     /** The bunch of layers. */
     private var layersByName: Map<String, Layer<T>> = mapOf()
@@ -68,10 +70,25 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): TrainableTFModel<T> {
+        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): Sequential<T> {
             preProcessLayerNames(layers)
             val seqModel = Sequential(input, *layers)
             postProcessLayerNames(layers, seqModel)
+            return seqModel
+        }
+
+        /**
+         * Creates the [Sequential] model.
+         *
+         * @param [T] The type of data elements in Tensors.
+         * @property [input] The input layer with initial shapes.
+         * @property [layers] The layers to describe the model design.
+         * @return the [Sequential] model.
+         */
+        fun <T : Number> of(input: Input<T>, layers: List<Layer<T>>): Sequential<T> {
+            preProcessLayerNames(layers.toTypedArray())
+            val seqModel = Sequential(input, *layers.toTypedArray())
+            postProcessLayerNames(layers.toTypedArray(), seqModel)
             return seqModel
         }
 
@@ -103,6 +120,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * @param [metric] Metric to evaluate during training.
      */
     override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metrics) {
+        if (isModelCompiled) logger.info { "Model was recompiled." }
+
         validateModelArchitecture()
         amountOfClasses = (layers.last() as Dense).outputSize.toLong()
 
@@ -123,6 +142,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
             logger.debug { it.toString() + " " + dims.contentToString() }
         }
+
+
+
+        xOp = firstLayer.input
+        yOp = tf.placeholder(getDType()) as Operand<T>
+
+        yPred = transformInputWithNNModel(xOp)
+
+        lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+
 
         isModelCompiled = true
     }
@@ -197,14 +226,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             logger.level = Level.INFO
         }
 
-        xOp = firstLayer.input
-        yOp = tf.placeholder(getDType()) as Operand<T>
-
-        yPred = transformInputWithNNModel(xOp)
 
         val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
-
-        val lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
@@ -517,7 +540,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val modelWeightsExtractorRunner = session.runner()
 
-        val trainableVariables = kGraph.variables()
+        val trainableVariables = kGraph.trainableVariables()
 
         trainableVariables.forEach {
             modelWeightsExtractorRunner.fetch(it)
@@ -555,6 +578,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26) {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+
         logger.info("=================================================================")
         logger.info("Model: Sequential")
         logger.info("_________________________________________________________________")

@@ -13,6 +13,7 @@ apply plugin: "maven"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -22,6 +23,7 @@ dependencies {
     implementation 'io.github.microutils:kotlin-logging:1.7.9' // for logging
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
+    implementation 'com.beust:klaxon:5.0.1'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'
@@ -45,7 +47,7 @@ test {
 
 //artifactoryPublish.skip = true
 
-artifactory {
+/*artifactory {
     contextUrl = "https://repo.labs.intellij.net"
     publish {
         repository {
@@ -67,4 +69,4 @@ artifactory {
             password = "${artifactory_api_key}"
         }
     }
-}
+}*/
