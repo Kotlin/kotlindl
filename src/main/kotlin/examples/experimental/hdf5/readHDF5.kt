@@ -70,6 +70,14 @@ fun main() {
 
     loadWeightsToModel(model, hdfFile)
 
+
+    val pathToWeightsForPython = "savedmodels/mnist_weights_only.h5"
+    val file2 = File(pathToWeightsForPython)
+    val hdfFile2 = HdfFile(file2)
+
+    saveModelWeights(model, hdfFile2)
+
+
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
@@ -100,6 +108,32 @@ fun main() {
 
 }
 
+fun saveModelWeights(model: Sequential<Float>, hdfFile: HdfFile) {
+    model.layers.forEach {
+        run {
+            when (it::class) {
+                Dense::class -> writeDenseVariables(it.name, hdfFile, model)
+                Conv2D::class -> writeConv2DVariables(it.name, hdfFile, model)
+                else -> println("No weights loading for ${it.name}")
+            }
+
+        }
+    }
+}
+
+fun writeConv2DVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
+    TODO("Not yet implemented")
+}
+
+fun writeDenseVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
+    val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
+
+    val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
+
+    val kernelVariableName = name + "_" + "dense_kernel" // TODO: to conventions
+    val biasVariableName = name + "_" + "dense_bias" // TODO: to conventions
+}
+
 fun saveSequentialModelToJSONConfig(model: Sequential<Float>, jsonConfigFile: File) {
     val kerasLayers = mutableListOf<KerasLayer>()
     model.layers.forEach {
@@ -113,7 +147,7 @@ fun saveSequentialModelToJSONConfig(model: Sequential<Float>, jsonConfigFile: Fi
     (kerasLayers.first().config as ConfigX).batch_input_shape =
         listOf(null, inputShape[0], inputShape[1], inputShape[2])
 
-    val config = Config(name = "Model from Kotlin DL", layers = kerasLayers)
+    val config = Config(name = "", layers = kerasLayers)
     val sequentialConfig = SequentialConfig(config = config)
 
     val jsonString2 = Klaxon().toJsonString(sequentialConfig)
