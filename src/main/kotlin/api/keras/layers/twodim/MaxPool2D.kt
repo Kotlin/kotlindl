@@ -9,8 +9,8 @@ import org.tensorflow.op.Ops
 private const val PADDING_TYPE = "SAME"
 
 class MaxPool2D<T : Number>(
-    private val poolSize: IntArray,
-    private val strides: IntArray
+    val poolSize: IntArray,
+    val strides: IntArray
 ) : Layer<T>() {
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
 

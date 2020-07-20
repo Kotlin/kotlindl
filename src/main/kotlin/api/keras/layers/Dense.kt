@@ -21,8 +21,8 @@ class Dense<T : Number>(
     // activation function
     val activation: Activations = Activations.Sigmoid,
     // initializers
-    private val kernelInitializer: Initializer<T>,
-    private val biasInitializer: Initializer<T>,
+    val kernelInitializer: Initializer<T>,
+    val biasInitializer: Initializer<T>,
     name: String = ""
 ) : Layer<T>() {
     private lateinit var kernelShape: Shape

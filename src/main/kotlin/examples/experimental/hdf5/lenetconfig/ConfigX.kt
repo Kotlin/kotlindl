@@ -3,7 +3,7 @@ package examples.experimental.hdf5.lenetconfig
 data class ConfigX(
     val activation: String? = null,
     val activity_regularizer: ActivityRegularizer? = null,
-    val batch_input_shape: List<Any>? = null,
+    var batch_input_shape: List<Int?>? = null,
     val bias_constraint: Any? = null,
     val bias_initializer: BiasInitializer? = null,
     val bias_regularizer: BiasRegularizer? = null,
@@ -19,7 +19,7 @@ data class ConfigX(
     val padding: String? = null,
     val pool_size: List<Int>? = null,
     val strides: List<Int>? = null,
-    val trainable: Boolean? = null,
+    val trainable: Boolean? = true,
     val units: Int? = null,
     val use_bias: Boolean? = null
 )

@@ -35,7 +35,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private lateinit var lossOp: Operand<T>
 
     /** Input layer. */
-    private val firstLayer: Input<T> = input
+    val firstLayer: Input<T> = input
 
     /** The bunch of layers. */
     val layers: List<Layer<T>> = listOf(*layers)

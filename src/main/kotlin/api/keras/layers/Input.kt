@@ -10,7 +10,7 @@ import org.tensorflow.op.core.Placeholder
 class Input<T : Number>(vararg dims: Long) : Layer<T>() {
     lateinit var input: Placeholder<T>
 
-    private val packedDims: LongArray = dims
+    val packedDims: LongArray = dims
 
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
 

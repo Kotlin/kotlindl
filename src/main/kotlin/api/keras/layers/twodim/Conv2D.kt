@@ -21,13 +21,13 @@ enum class ConvPadding {
 }
 
 class Conv2D<T : Number>(
-    private val filters: Long,
-    private val kernelSize: LongArray,
-    private val strides: LongArray,
-    private val activation: Activations = Activations.Relu,
-    private val kernelInitializer: Initializer<T>,
-    private val biasInitializer: Initializer<T>,
-    private val padding: ConvPadding,
+    val filters: Long,
+    val kernelSize: LongArray,
+    val strides: LongArray,
+    val activation: Activations = Activations.Relu,
+    val kernelInitializer: Initializer<T>,
+    val biasInitializer: Initializer<T>,
+    val padding: ConvPadding,
     name: String = ""
 ) : Layer<T>() {
     // weight tensors
