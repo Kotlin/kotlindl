@@ -6,6 +6,7 @@ import api.keras.initializers.Initializer
 import api.keras.shape.TensorShape
 import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeToLongArray
+import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -76,7 +77,25 @@ class Dense<T : Number>(
     }
 
     override fun getWeights(): List<Array<*>> {
-        TODO("Not yet implemented")
+        val result = mutableListOf<Array<*>>()
+
+        val session = parentModel.session
+
+        val runner = session.runner()
+            .fetch("${name}_$KERNEL")
+            .fetch("${name}_$BIAS")
+
+        val tensorList = runner.run()
+        val filtersTensor = tensorList[0]
+        val biasTensor = tensorList[1]
+
+        val dstData = filtersTensor.convertTensorToMultiDimArray()
+        result.add(dstData)
+
+        val dstData2 = biasTensor.convertTensorToMultiDimArray()
+        result.add(dstData2)
+
+        return result.toList()
     }
 
     override fun hasActivation(): Boolean {

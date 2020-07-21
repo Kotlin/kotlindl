@@ -1,5 +1,6 @@
 package examples.production
 
+import api.inference.InferenceModel
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -7,7 +8,8 @@ import api.keras.optimizers.Adam
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 
-private const val EPOCHS = 2
+private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
@@ -37,8 +39,6 @@ fun main() {
 
     val (newTrain, validation) = train.split(0.95)
 
-    val imageId = 0
-
     lenet5.use {
         it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
@@ -51,16 +51,30 @@ fun main() {
             verbose = true
         )
 
+        var weights = it.layers[0].getWeights() // first conv2d layer
+
+        drawFilters(weights[0])
+
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy $accuracy")
 
-        println("Ground Truth: ${fashionMnistLabelEncoding[getLabel(train, imageId)]}")
+        it.save(PATH_TO_MODEL)
+    }
 
-        val prediction = it.predict(train.getImage(imageId))
+    InferenceModel<Float>().use {
+        it.load(PATH_TO_MODEL)
 
-        println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
+        var accuracy = 0.0
+        val amountOfTestSet = 10000
+        for (imageId in 0..amountOfTestSet) {
+            val prediction = it.predict(train.getImage(imageId))
 
-        it.save("savedmodels/fashionLenet")
+            if (prediction == getLabel(train, imageId))
+                accuracy += (1.0 / amountOfTestSet)
+
+            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
+        }
+        println("Accuracy: $accuracy")
     }
 }

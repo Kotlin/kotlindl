@@ -6,7 +6,45 @@ import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
-class Conv2dJPanel(val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
+class Conv2dJPanel(
+    val dst: Array<Array<Array<FloatArray>>>,
+    val colorCoefficient: Double = 2.0
+) : JPanel() {
+    override fun paint(g: Graphics) {
+
+        for (k in 0 until 32) {
+            for (i in dst.indices) {
+                for (j in dst[i].indices) {
+                    val width = 15
+                    val height = 15
+                    var x = 10 + i * width
+                    val y = 10 + j * height + k % 8 * 150
+                    when (k) {
+                        in 8..15 -> {
+                            x += 150
+                        }
+                        in 16..23 -> {
+                            x += 150 * 2
+                        }
+                        in 24..31 -> {
+                            x += 150 * 3
+                        }
+                    }
+
+                    val float = dst[i][j][0][k]
+                    val grey = (min(1.0f, max(float * colorCoefficient.toFloat(), 0.0f)) * 255).toInt()
+                    val color = Color(grey, grey, grey)
+                    g.color = color;
+                    g.fillRect(y, x, width, height)
+                    g.color = Color.BLACK;
+                    g.drawRect(y, x, width, height)
+                }
+            }
+        }
+    }
+}
+
+class Conv2dJPanel1(val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
     override fun paint(g: Graphics) {
 
         for (k in 0 until 32) {

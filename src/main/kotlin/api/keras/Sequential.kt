@@ -19,7 +19,6 @@ import ch.qos.logback.classic.Level
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
-import org.tensorflow.op.nn.Softmax
 import java.io.File
 
 /**
@@ -44,6 +43,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private var layersByName: Map<String, Layer<T>> = mapOf()
 
     private var isModelCompiled: Boolean = false
+
+    private var isModelInitialized: Boolean = false
 
     private val logger = KotlinLogging.logger {}
 
@@ -208,6 +209,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         )
     }
 
+    fun init() {
+        logger.debug { "Initialization of TensorFlow Graph variables" }
+        kGraph.initializeGraphVariables(session)
+        isModelInitialized = true
+    }
+
     private fun internalFit(
         verbose: Boolean,
         trainBatchSize: Int,
@@ -223,6 +230,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         if (isWeightsInitRequired) {
             logger.debug { "Initialization of TensorFlow Graph variables" }
             kGraph.initializeGraphVariables(session)
+            isModelInitialized = true
         }
 
         val trainingHistory = TrainingHistory()
@@ -234,7 +242,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
 
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
 
@@ -325,9 +334,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     override fun evaluate(dataset: ImageDataset, batchSize: Int): EvaluationResult {
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-
-        val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
+        //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
+        val metricOp = Metrics.convert<T>(metric).apply(tf, yPred, yOp, getDType())
 
         val (imageShape, labelShape) = calculateXYShapes(batchSize)
 
@@ -446,7 +455,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
         val imageShape = calculateXShape(1)
 
@@ -455,7 +466,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             ImageDataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(prediction, testImages, formActivationData)
+                formPredictionAndActivationsTensors(yPred, testImages, formActivationData)
 
             val predictionsTensor = tensors[0]
 
@@ -474,13 +485,17 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     private fun formPredictionAndActivationsTensors(
-        prediction: Softmax<T>,
+        prediction: Operand<T>,
         testImages: Tensor<Float>,
         visualizationIsEnabled: Boolean
     ): List<Tensor<*>> {
         val runner = session
             .runner()
             .fetch(prediction)
+            .fetch("Activation_conv2d_32")
+            .fetch("Activation_conv2d_33")
+            .fetch("Activation_dense_48")
+            .fetch("Activation_dense_49")
             .feed(xOp.asOutput(), testImages)
 
         if (visualizationIsEnabled) {
@@ -491,7 +506,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         return runner.run()
     }
-
 
     private fun calculateXYShapes(batchSize: Int): Pair<LongArray, LongArray> {
         val xBatchShape = calculateXShape(batchSize)

@@ -10,7 +10,8 @@ private const val PADDING_TYPE = "SAME"
 
 class MaxPool2D<T : Number>(
     val poolSize: IntArray,
-    val strides: IntArray
+    val strides: IntArray,
+    val padding: String = PADDING_TYPE
 ) : Layer<T>() {
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
 

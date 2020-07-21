@@ -26,7 +26,11 @@ fun main() {
     val imageId = 0
 
     lenet5.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.MAE, metric = Metrics.MAE)
+        it.compile(
+            optimizer = Adam(),
+            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
 
         (it as Sequential).summary()
 
@@ -39,7 +43,7 @@ fun main() {
             verbose = true
         )
 
-        val weights = it.getLayer("1").getWeights()
+        var weights = it.layers[0].getWeights() // first conv2d layer
 
         drawFilters(weights[0])
 
@@ -52,6 +56,7 @@ fun main() {
         println("Prediction: $prediction")
 
         drawActivations(activations)
+
 
         val trainImageLabel = train.getImageLabel(imageId)
 
@@ -77,9 +82,9 @@ fun drawActivations(activations: List<*>) {
     frame2.isResizable = false
 }
 
-fun drawFilters(filters: Array<*>) {
+fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
     val frame = JFrame("Filters")
-    frame.contentPane.add(Conv2dJPanel(filters as Array<Array<Array<FloatArray>>>))
+    frame.contentPane.add(Conv2dJPanel(filters as Array<Array<Array<FloatArray>>>, colorCoefficient))
     frame.setSize(1000, 1000)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

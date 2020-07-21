@@ -17,23 +17,19 @@ fun main() {
         ::extractLabels
     )
 
-    val imageId1 = 0
-    val imageId2 = 1
-    val imageId3 = 2
-
     InferenceModel<Float>().use {
         it.load(PATH_TO_MODEL)
 
-        val prediction = it.predict(train.getImage(imageId1))
+        var accuracy = 0.0
+        val amountOfTestSet = 10000
+        for (imageId in 0..amountOfTestSet) {
+            val prediction = it.predict(train.getImage(imageId))
 
-        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
+            if (prediction == getLabel(train, imageId))
+                accuracy += (1.0 / amountOfTestSet)
 
-        val prediction2 = it.predict(train.getImage(imageId2))
-
-        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
-
-        val prediction3 = it.predict(train.getImage(imageId3))
-
-        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
+        }
+        println("Accuracy: $accuracy")
     }
 }

@@ -4,26 +4,13 @@ import api.inference.InferenceModel
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
-private const val EPOCHS = 10
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
-
-private val LEARNING_SCHEDULE = mapOf(
-    1 to 0.1f,
-    2 to 0.05f,
-    3 to 0.025f,
-    4 to 0.01f,
-    5 to 0.005f,
-    6 to 0.0025f,
-    7 to 0.001f,
-    8 to 0.001f,
-    9 to 0.001f,
-    10 to 0.0005f
-)
 
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
@@ -43,7 +30,7 @@ fun main() {
     val imageId3 = 2
 
     lenet5.use {
-        it.compile(optimizer = SGD(LEARNING_SCHEDULE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.fit(
             trainingDataset = newTrain,
@@ -88,5 +75,17 @@ fun main() {
         val prediction3 = it.predict(train.getImage(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+
+        var accuracy = 0.0
+        val amountOfTestSet = 10000
+        for (imageId in 0..amountOfTestSet) {
+            val prediction = it.predict(train.getImage(imageId))
+
+            if (prediction == getLabel(train, imageId))
+                accuracy += (1.0 / amountOfTestSet)
+
+            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
+        }
+        println("Accuracy: $accuracy")
     }
 }

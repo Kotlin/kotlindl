@@ -2,39 +2,41 @@ package examples.production
 
 import api.inference.InferenceModel
 import api.keras.dataset.ImageDataset
-import examples.keras.mnist.util.*
+import examples.keras.fashionmnist.util.FASHION_TEST_IMAGES_ARCHIVE
+import examples.keras.fashionmnist.util.FASHION_TEST_LABELS_ARCHIVE
+import examples.keras.fashionmnist.util.FASHION_TRAIN_IMAGES_ARCHIVE
+import examples.keras.fashionmnist.util.FASHION_TRAIN_LABELS_ARCHIVE
+import examples.keras.mnist.util.AMOUNT_OF_CLASSES
+import examples.keras.mnist.util.extractImages
+import examples.keras.mnist.util.extractLabels
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
+        FASHION_TRAIN_IMAGES_ARCHIVE,
+        FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE,
+        FASHION_TEST_LABELS_ARCHIVE,
         AMOUNT_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
 
-    val imageId1 = 0
-    val imageId2 = 1
-    val imageId3 = 2
-
     InferenceModel<Float>().use {
         it.load(PATH_TO_MODEL)
 
-        val prediction = it.predict(train.getImage(imageId1))
+        var accuracy = 0.0
+        val amountOfTestSet = 10000
+        for (imageId in 0..amountOfTestSet) {
+            val prediction = it.predict(train.getImage(imageId))
 
-        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
+            if (prediction == getLabel(train, imageId))
+                accuracy += (1.0 / amountOfTestSet)
 
-        val prediction2 = it.predict(train.getImage(imageId2))
-
-        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
-
-        val prediction3 = it.predict(train.getImage(imageId3))
-
-        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
+        }
+        println("Accuracy: $accuracy")
 
         val amountOfOps = 1000
         val start = System.currentTimeMillis()

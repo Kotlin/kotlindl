@@ -1,8 +1,6 @@
 package api.inference
 
-import api.KGraph
-import api.defaultAssignOpName
-import api.defaultInitializerOpName
+import api.*
 import api.keras.shape.TensorShape
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -45,17 +43,17 @@ open class InferenceModel<T : Number>() : AutoCloseable {
         }
 
         val runner1 = session.runner()
-        val result1 = runner1.feed("x", reshape2(image))
-            .fetch("output")
+        val result1 = runner1.feed(DATA_PLACEHOLDER, reshape2(image))
+            .fetch(OUTPUT_NAME)
             .run()[0]
 
         val arr = Array(1) { FloatArray(10) { 0.0f } }
         result1.copyTo(arr)
 
-        logger.debug { arr.contentDeepToString() }
+        // logger.debug { arr.contentDeepToString() }
 
         val runner = session.runner()
-        val result = runner.feed("x", reshape2(image))
+        val result = runner.feed(DATA_PLACEHOLDER, reshape2(image))
             .fetch("ArgMax")
             .run()[0]
 

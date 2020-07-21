@@ -80,6 +80,6 @@ val lenet5 = Sequential.of<Float>(
 )
 
 fun getLabel(dataset: ImageDataset, imageId: Int): Int {
-    val trainImageLabel = dataset.getImageLabel(imageId)
-    return trainImageLabel.indexOf(trainImageLabel.max()!!)
+    val imageLabel = dataset.getImageLabel(imageId)
+    return imageLabel.indexOf(imageLabel.max()!!)
 }
