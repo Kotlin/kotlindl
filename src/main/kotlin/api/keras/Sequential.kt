@@ -143,15 +143,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             logger.debug { it.toString() + " " + dims.contentToString() }
         }
 
-
-
         xOp = firstLayer.input
         yOp = tf.placeholder(getDType()) as Operand<T>
 
         yPred = transformInputWithNNModel(xOp)
-
         lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
-
 
         isModelCompiled = true
     }
@@ -168,7 +164,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
-        verbose: Boolean
+        verbose: Boolean,
+        isWeightsInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -177,7 +174,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             trainingDataset,
             true,
             validationDataset,
-            validationBatchSize
+            validationBatchSize,
+            isWeightsInitRequired
         )
     }
 
@@ -195,7 +193,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         dataset: ImageDataset,
         epochs: Int,
         batchSize: Int,
-        verbose: Boolean
+        verbose: Boolean,
+        isWeightsInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -204,7 +203,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             dataset,
             false,
             null,
-            null
+            null,
+            isWeightsInitRequired
         )
     }
 
@@ -215,9 +215,15 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         trainingDataset: ImageDataset,
         validationIsEnabled: Boolean,
         validationDataset: ImageDataset?,
-        validationBatchSize: Int?
+        validationBatchSize: Int?,
+        isWeightsInitRequired: Boolean = true
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
+
+        if (isWeightsInitRequired) {
+            logger.debug { "Initialization of TensorFlow Graph variables" }
+            kGraph.initializeGraphVariables(session)
+        }
 
         val trainingHistory = TrainingHistory()
 
@@ -226,16 +232,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             logger.level = Level.INFO
         }
 
-
         val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
 
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
-
-        logger.debug { "Initialization of TensorFlow Graph variables" }
-
-        kGraph.initializeGraphVariables(session)
 
         val targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
@@ -540,9 +541,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val modelWeightsExtractorRunner = session.runner()
 
-        val trainableVariables = kGraph.trainableVariables()
+        val variables = kGraph.variables()
 
-        trainableVariables.forEach {
+        variables.forEach {
             modelWeightsExtractorRunner.fetch(it)
         }
 
@@ -550,7 +551,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         File("$pathToModelDirectory/variableNames.txt").bufferedWriter().use { variableNamesFile ->
             for (modelWeight in modelWeights.withIndex()) {
-                val variableName = trainableVariables[modelWeight.index].asOutput().op().name()
+                val variableName = variables[modelWeight.index].asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
 

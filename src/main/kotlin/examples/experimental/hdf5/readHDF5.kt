@@ -20,7 +20,6 @@ import api.keras.optimizers.Adam
 import com.beust.klaxon.Klaxon
 import examples.experimental.hdf5.lenetconfig.*
 import examples.keras.mnist.util.*
-import examples.production.getLabel
 import io.jhdf.HdfFile
 import io.jhdf.api.Group
 import java.io.File
@@ -71,11 +70,11 @@ fun main() {
     loadWeightsToModel(model, hdfFile)
 
 
-    val pathToWeightsForPython = "savedmodels/mnist_weights_only.h5"
+    /*val pathToWeightsForPython = "savedmodels/mnist_weights_only.h5"
     val file2 = File(pathToWeightsForPython)
     val hdfFile2 = HdfFile(file2)
 
-    saveModelWeights(model, hdfFile2)
+    saveModelWeights(model, hdfFile2)*/
 
 
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
@@ -88,22 +87,10 @@ fun main() {
         ::extractLabels
     )
 
-    val imageId1 = 0
-    val imageId2 = 1
-    val imageId3 = 2
-
     model.use {
-        val prediction = it.predict(train.getImage(imageId1))
+        val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
-
-        val prediction2 = it.predict(train.getImage(imageId2))
-
-        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
-
-        val prediction3 = it.predict(train.getImage(imageId3))
-
-        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+        println("Accuracy before training $accuracyBefore")
     }
 
 }

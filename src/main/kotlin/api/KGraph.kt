@@ -20,7 +20,7 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
     private val optimizerAssignAddInitializers: MutableList<AssignAdd<*>> = mutableListOf()
 
     /** A list of variables to train. */
-    private val trainableVars: MutableList<Variable<T>> = mutableListOf()
+    private val variables: MutableMap<Variable<T>, Boolean> = mutableMapOf()
 
     /** A list of initializer to initialize the trainableVariables. */
     private val initializers: MutableMap<String, Assign<T>> = mutableMapOf()
@@ -52,11 +52,13 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         return s
     }
 
-    fun addVariable(variable: Variable<T>) {
-        trainableVars += variable
+    fun addVariable(variable: Variable<T>, isTrainable: Boolean) {
+        check(!variables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
+        variables[variable] = isTrainable
     }
 
     fun addInitializer(variableName: String, initializer: Assign<T>) {
+        check(!initializers.contains(variableName)) { "$variableName has initializer already. Analyze and fix the static graph building process." }
         initializers[variableName] = initializer
     }
 
@@ -69,7 +71,11 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
     }
 
     fun trainableVariables(): List<Variable<T>> {
-        return trainableVars
+        return variables.filter { it.value }.keys.toList()
+    }
+
+    fun variables(): List<Variable<T>> {
+        return variables.keys.toList()
     }
 
     fun initializeGraphVariables(session: Session) {
@@ -104,4 +110,6 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
             runner.run()
         }
     }
+
+
 }

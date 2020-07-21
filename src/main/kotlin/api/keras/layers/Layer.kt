@@ -11,6 +11,8 @@ import org.tensorflow.op.core.Variable
 abstract class Layer<T : Number> {
     var name: String = ""
 
+    var isTrainable = true
+
     lateinit var outputShape: LongArray
 
     lateinit var parentModel: TrainableTFModel<T>
@@ -52,7 +54,7 @@ abstract class Layer<T : Number> {
         require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
 
         val initOp = initializer.apply(fanIn, fanOut, tf, variable, dtype, name)
-        kGraph.addVariable(variable)
+        kGraph.addVariable(variable, isTrainable)
         kGraph.addInitializer(name, initOp)
         return variable
     }

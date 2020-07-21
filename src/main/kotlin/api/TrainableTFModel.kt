@@ -60,7 +60,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         dataset: ImageDataset,
         epochs: Int = 10,
         batchSize: Int = 32,
-        verbose: Boolean
+        verbose: Boolean,
+        isWeightsInitRequired: Boolean = true
     ): TrainingHistory
 
     abstract fun fit(
@@ -69,7 +70,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         epochs: Int = 10,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
-        verbose: Boolean
+        verbose: Boolean,
+        isWeightsInitRequired: Boolean = true
     ): TrainingHistory
 
     /**
@@ -114,11 +116,12 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
-        verbose: Boolean
+        verbose: Boolean,
+        isWeightsInitRequired: Boolean = true
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) { "Validation rate should be more than 0.0 and less than 1.0. The passed rare is: ${validationRate}" }
         val (validation, train) = dataset.split(validationRate)
 
-        return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose)
+        return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose, isWeightsInitRequired)
     }
 }
