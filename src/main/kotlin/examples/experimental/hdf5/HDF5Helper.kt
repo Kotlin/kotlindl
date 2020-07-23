@@ -199,6 +199,7 @@ fun convertToLayer(kerasLayer: KerasLayer): Layer<Float> {
     return when (kerasLayer.class_name) {
         "Conv2D" -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         "Flatten" -> createFlatten(kerasLayer.config!!, kerasLayer.config.name!!)
+        "Reshape" -> createFlatten(kerasLayer.config!!, kerasLayer.config.name!!)
         "MaxPooling2D" -> createMaxPooling2D(kerasLayer.config!!, kerasLayer.config.name!!)
         "Dense" -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")

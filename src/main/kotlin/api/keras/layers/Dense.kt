@@ -99,7 +99,7 @@ class Dense<T : Number>(
     }
 
     override fun hasActivation(): Boolean {
-        return false
+        return true
     }
 
     override fun getParams(): Int {

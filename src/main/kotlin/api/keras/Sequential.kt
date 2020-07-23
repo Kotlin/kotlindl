@@ -155,7 +155,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
     private fun validateModelArchitecture(): Unit {
         require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
-        require(!layers.last().hasActivation()) { "Last layer must have an activation function." }
+        require(layers.last().hasActivation()) { "Last layer must have an activation function." }
         require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Sigmoid activation, alternative activations are not supported yet!" }
     }
 
@@ -455,7 +455,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
-        //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
@@ -466,7 +466,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             ImageDataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(yPred, testImages, formActivationData)
+                formPredictionAndActivationsTensors(prediction, testImages, formActivationData)
 
             val predictionsTensor = tensors[0]
 
@@ -492,15 +492,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val runner = session
             .runner()
             .fetch(prediction)
-            .fetch("Activation_conv2d_32")
-            .fetch("Activation_conv2d_33")
-            .fetch("Activation_dense_48")
-            .fetch("Activation_dense_49")
+            .fetch("MaxPool")
+            .fetch("MaxPool_1")
+            .fetch("Reshape")
+            //.fetch("Activation_dense_48")
+            //.fetch("Activation_dense_49")
             .feed(xOp.asOutput(), testImages)
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
-                if (layer.hasActivation()) runner.fetch(defaultActivationName(layer))
+                if (layer.hasActivation() && layer != layers.last()) runner.fetch(defaultActivationName(layer))
             }
         }
 

@@ -80,7 +80,7 @@ fun main() {
         val amountOfTestSet = 100
 
 
-        val (result, activations) = it.predictAndGetActivations(train.getImage(0))
+        val (result, activations) = it.predictAndGetActivations(train.getImage(11))
         println(activations.toString())
         drawActivations(activations)
 

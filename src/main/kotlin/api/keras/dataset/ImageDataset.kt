@@ -2,7 +2,6 @@ package api.keras.dataset
 
 import java.io.IOException
 import java.nio.FloatBuffer
-import kotlin.experimental.and
 import kotlin.math.min
 import kotlin.math.truncate
 
@@ -74,14 +73,14 @@ class ImageDataset internal constructor(
     companion object {
         fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
             val buf = FloatBuffer.allocate(numClasses)
-            buf.put((label and 0xFF.toByte()).toInt(), 1.0f)
+            buf.put((label.toInt() and 0xFF), 1.0f)
             return buf.array()
         }
 
         fun toNormalizedVector(bytes: ByteArray): FloatArray {
             val floats = FloatArray(bytes.size)
             for (i in bytes.indices) {
-                floats[i] = (bytes[i] and 0xFF.toByte()).toFloat() / 255.0f
+                floats[i] = ((bytes[i].toInt() and 0xFF).toFloat()) / 255.0f
             }
             return floats
         }

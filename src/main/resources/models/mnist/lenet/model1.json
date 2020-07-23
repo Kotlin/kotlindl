@@ -1,12 +1,12 @@
 {
   "class_name": "Sequential",
   "config": {
-    "name": "sequential_17",
+    "name": "sequential_26",
     "layers": [
       {
         "class_name": "Conv2D",
         "config": {
-          "name": "conv2d_32",
+          "name": "conv2d_50",
           "trainable": true,
           "batch_input_shape": [
             null,
@@ -52,7 +52,7 @@
       {
         "class_name": "MaxPooling2D",
         "config": {
-          "name": "max_pooling2d_32",
+          "name": "max_pooling2d_50",
           "trainable": true,
           "dtype": "float32",
           "pool_size": [
@@ -70,7 +70,7 @@
       {
         "class_name": "Conv2D",
         "config": {
-          "name": "conv2d_33",
+          "name": "conv2d_51",
           "trainable": true,
           "dtype": "float32",
           "filters": 64,
@@ -110,7 +110,7 @@
       {
         "class_name": "MaxPooling2D",
         "config": {
-          "name": "max_pooling2d_33",
+          "name": "max_pooling2d_51",
           "trainable": true,
           "dtype": "float32",
           "pool_size": [
@@ -128,7 +128,7 @@
       {
         "class_name": "Flatten",
         "config": {
-          "name": "flatten_16",
+          "name": "flatten_17",
           "trainable": true,
           "dtype": "float32",
           "data_format": "channels_last"
@@ -137,7 +137,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_48",
+          "name": "dense_60",
           "trainable": true,
           "dtype": "float32",
           "units": 256,
@@ -163,7 +163,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_49",
+          "name": "dense_61",
           "trainable": true,
           "dtype": "float32",
           "units": 84,
@@ -189,7 +189,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_50",
+          "name": "dense_62",
           "trainable": true,
           "dtype": "float32",
           "units": 10,
