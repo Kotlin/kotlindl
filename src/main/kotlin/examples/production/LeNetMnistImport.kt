@@ -1,6 +1,6 @@
 package examples.production
 
-import api.inference.InferenceModel
+import api.inference.savedmodel.InferenceModel
 import api.keras.dataset.ImageDataset
 import examples.keras.mnist.util.*
 

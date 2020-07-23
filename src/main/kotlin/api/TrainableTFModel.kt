@@ -1,6 +1,6 @@
 package api
 
-import api.inference.InferenceModel
+import api.inference.savedmodel.InferenceModel
 import api.keras.EvaluationResult
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions

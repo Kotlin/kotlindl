@@ -1,4 +1,4 @@
-package examples.experimental.hdf5.lenetconfig
+package api.inference.keras.config
 
 data class SequentialConfig(
     val backend: String? = "tensorflow",

@@ -1,4 +1,4 @@
-package api.inference
+package api.inference.savedmodel
 
 import api.KGraph
 import api.keras.metric.Metrics

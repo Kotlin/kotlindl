@@ -1,4 +1,4 @@
-package api.inference
+package api.inference.savedmodel
 
 import api.*
 import api.keras.shape.TensorShape

@@ -1,6 +1,6 @@
 package examples.production
 
-import api.inference.InferenceModel
+import api.inference.savedmodel.InferenceModel
 import api.keras.dataset.ImageDataset
 import examples.keras.fashionmnist.util.FASHION_TEST_IMAGES_ARCHIVE
 import examples.keras.fashionmnist.util.FASHION_TEST_LABELS_ARCHIVE

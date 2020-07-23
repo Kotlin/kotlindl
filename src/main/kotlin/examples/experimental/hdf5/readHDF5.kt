@@ -5,8 +5,6 @@ import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import com.beust.klaxon.Klaxon
-import examples.experimental.hdf5.lenetconfig.SequentialConfig
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 import examples.production.drawActivations
@@ -22,20 +20,11 @@ fun main() {
     val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     val jsonConfigFile = File(realPathToConfig)
-    val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-    println(jsonString)
-
-    val sequentialConfig = Klaxon()
-        .parse<SequentialConfig>(jsonString)
-
-    println(sequentialConfig.toString())
-
-
     /* hdfFile.use { hdfFile ->
          recursivePrintGroup(hdfFile, hdfFile, 0)
      }*/
 
-    val model = buildSequentialModelByJSONConfig(sequentialConfig!!)
+    val model = loadConfig(jsonConfigFile)
     model.compile(
         optimizer = Adam<Float>(),
         loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -55,7 +44,7 @@ fun main() {
 
     val hdfFile = HdfFile(file)
 
-    loadWeightsToModel(model, hdfFile)
+    model.loadWeights(hdfFile)
 
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
