@@ -1,11 +1,11 @@
 package examples.inference.keras
 
 
+import api.inference.keras.loadConfig
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.experimental.hdf5.loadConfig
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 import java.io.File

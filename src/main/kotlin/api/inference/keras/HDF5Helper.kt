@@ -18,123 +18,6 @@ import io.jhdf.HdfFile
 import io.jhdf.api.Group
 import java.io.File
 
-fun Sequential<Float>.saveSequentialModelToJSONConfig(jsonConfigFile: File) {
-    val kerasLayers = mutableListOf<KerasLayer>()
-    this.layers.forEach {
-        run {
-            val layer = convertToKerasLayer(it)
-            kerasLayers.add(layer)
-        }
-    }
-
-    val inputShape = this.firstLayer.packedDims.map { it.toInt() }
-    (kerasLayers.first().config as ConfigX).batch_input_shape =
-        listOf(null, inputShape[0], inputShape[1], inputShape[2])
-
-    val config = Config(name = "", layers = kerasLayers)
-    val sequentialConfig = SequentialConfig(config = config)
-
-    val jsonString2 = Klaxon().toJsonString(sequentialConfig)
-
-    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
-}
-
-private fun convertToKerasLayer(layer: Layer<Float>): KerasLayer {
-    return when (layer::class) {
-        Conv2D::class -> createKerasConv2D(layer as Conv2D<Float>)
-        Flatten::class -> createKerasFlatten(layer as Flatten<Float>)
-        MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D<Float>)
-        Dense::class -> createKerasDense(layer as Dense<Float>)
-        else -> throw IllegalStateException("${layer.name} is not supported yet!")
-    }
-}
-
-private fun createKerasDense(layer: Dense<Float>): KerasLayer {
-    val configX = ConfigX(
-        dtype = "float32",
-        units = layer.outputSize,
-        name = layer.name,
-        use_bias = true,
-        activation = convertToKerasActivation(layer.activation),
-        kernel_initializer = convertToKerasKernelInitializer(layer.kernelInitializer),
-        bias_initializer = convertToKerasBiasInitializer(layer.biasInitializer)
-    )
-    return KerasLayer(class_name = "Dense", config = configX)
-}
-
-private fun convertToKerasBiasInitializer(biasInitializer: Initializer<Float>): BiasInitializer? {
-    val className = when (biasInitializer::class) {
-        GlorotUniform::class -> "GlorotUniform"
-        GlorotNormal::class -> "GlorotNormal"
-        Zeros::class -> "Zeros"
-        Ones::class -> "Ones"
-        else -> throw IllegalStateException("${biasInitializer::class.simpleName} is not supported yet!")
-    }
-    val config = ConfigXXX(seed = 12)
-    return BiasInitializer(class_name = className, config = config)
-}
-
-private fun convertToKerasKernelInitializer(kernelInitializer: Initializer<Float>): KernelInitializer? {
-    val className = when (kernelInitializer::class) {
-        GlorotUniform::class -> "GlorotUniform"
-        GlorotNormal::class -> "GlorotNormal"
-        Zeros::class -> "Zeros"
-        Ones::class -> "Ones"
-        else -> throw IllegalStateException("${kernelInitializer::class.simpleName} is not supported yet!")
-    }
-    val config = ConfigXXXXX(seed = 12)
-    return KernelInitializer(class_name = className, config = config)
-}
-
-private fun convertToKerasActivation(activation: Activations): String? {
-    return when (activation) {
-        Activations.Relu -> "relu"
-        Activations.Sigmoid -> "sigmoid"
-        Activations.Softmax -> "softmax"
-        Activations.Linear -> "linear"
-        else -> throw IllegalStateException("$activation is not supported yet!")
-    }
-}
-
-private fun createKerasMaxPooling2D(layer: MaxPool2D<Float>): KerasLayer {
-    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2])
-    val strides = mutableListOf(layer.strides[1], layer.strides[2])
-    val configX = ConfigX(
-        data_format = "channels_last",
-        dtype = "float32",
-        name = layer.name,
-        padding = "same",
-        pool_size = poolSize,
-        strides = strides
-    )
-    return KerasLayer(class_name = "MaxPooling2D", config = configX)
-}
-
-private fun createKerasFlatten(layer: Flatten<Float>): KerasLayer {
-    val configX = ConfigX(
-        data_format = "channels_last",
-        dtype = "float32",
-        name = layer.name
-    )
-    return KerasLayer(class_name = "Flatten", config = configX)
-}
-
-private fun createKerasConv2D(layer: Conv2D<Float>): KerasLayer {
-    val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
-    val configX = ConfigX(
-        filters = layer.filters.toInt(),
-        kernel_size = kernelSize,
-        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
-        activation = convertToKerasActivation(layer.activation),
-        kernel_initializer = convertToKerasKernelInitializer(layer.kernelInitializer),
-        bias_initializer = convertToKerasBiasInitializer(layer.biasInitializer),
-        padding = "same",
-        name = layer.name,
-        use_bias = true
-    )
-    return KerasLayer(class_name = "Conv2D", config = configX)
-}
-
 fun Sequential<Float>.loadWeights(hdfFile: HdfFile) {
     this.layers.forEach {
         run {
@@ -154,7 +37,7 @@ fun loadConfig(
     val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
 
     val sequentialConfig = Klaxon()
-        .parse<SequentialConfig>(jsonString)
+        .parse<KerasSequentialModel>(jsonString)
 
     val layers = mutableListOf<Layer<Float>>()
 
@@ -165,12 +48,134 @@ fun loadConfig(
         }
     }
 
-    val input = Input<Float>(28, 28, 1)
+    val input = Input<Float>(
+        28,
+        28,
+        1
+    )//TODO: it should became a parameter based on data from the first layer (property about init_shape)
 
     return Sequential.of(input, layers.toList())
 }
 
-fun fillConv2DVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
+fun Sequential<Float>.saveConfig(jsonConfigFile: File) {
+    val kerasLayers = mutableListOf<KerasLayer>()
+    this.layers.forEach {
+        run {
+            val layer = convertToKerasLayer(it)
+            kerasLayers.add(layer)
+        }
+    }
+
+    val inputShape = this.firstLayer.packedDims.map { it.toInt() }
+    (kerasLayers.first().config as LayerConfig).batch_input_shape =
+        listOf(null, inputShape[0], inputShape[1], inputShape[2])
+
+    val config = SequentialConfig(name = "", layers = kerasLayers)
+    val sequentialConfig = KerasSequentialModel(config = config)
+
+    val jsonString2 = Klaxon().toJsonString(sequentialConfig)
+
+    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
+}
+
+private fun convertToKerasLayer(layer: Layer<Float>): KerasLayer {
+    return when (layer::class) {
+        Conv2D::class -> createKerasConv2D(layer as Conv2D<Float>)
+        Flatten::class -> createKerasFlatten(layer as Flatten<Float>)
+        MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D<Float>)
+        Dense::class -> createKerasDense(layer as Dense<Float>)
+        else -> throw IllegalStateException("${layer.name} is not supported yet!")
+    }
+}
+
+private fun createKerasDense(layer: Dense<Float>): KerasLayer {
+    val configX = LayerConfig(
+        dtype = "float32",
+        units = layer.outputSize,
+        name = layer.name,
+        use_bias = true,
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasKernelInitializer(layer.kernelInitializer),
+        bias_initializer = convertToKerasBiasInitializer(layer.biasInitializer)
+    )
+    return KerasLayer(class_name = "Dense", config = configX)
+}
+
+private fun convertToKerasBiasInitializer(biasInitializer: Initializer<Float>): KerasInitializer? {
+    val className = when (biasInitializer::class) {
+        GlorotUniform::class -> "GlorotUniform"
+        GlorotNormal::class -> "GlorotNormal"
+        Zeros::class -> "Zeros"
+        Ones::class -> "Ones"
+        else -> throw IllegalStateException("${biasInitializer::class.simpleName} is not supported yet!")
+    }
+    val config = KerasInitializerConfig(seed = 12)
+    return KerasInitializer(class_name = className, config = config)
+}
+
+private fun convertToKerasKernelInitializer(kernelInitializer: Initializer<Float>): KerasInitializer? {
+    val className = when (kernelInitializer::class) {
+        GlorotUniform::class -> "GlorotUniform"
+        GlorotNormal::class -> "GlorotNormal"
+        Zeros::class -> "Zeros"
+        Ones::class -> "Ones"
+        else -> throw IllegalStateException("${kernelInitializer::class.simpleName} is not supported yet!")
+    }
+    val config = KerasInitializerConfig(seed = 12)
+    return KerasInitializer(class_name = className, config = config)
+}
+
+private fun convertToKerasActivation(activation: Activations): String? {
+    return when (activation) {
+        Activations.Relu -> "relu"
+        Activations.Sigmoid -> "sigmoid"
+        Activations.Softmax -> "softmax"
+        Activations.Linear -> "linear"
+        else -> throw IllegalStateException("$activation is not supported yet!")
+    }
+}
+
+private fun createKerasMaxPooling2D(layer: MaxPool2D<Float>): KerasLayer {
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2])
+    val strides = mutableListOf(layer.strides[1], layer.strides[2])
+    val configX = LayerConfig(
+        data_format = "channels_last",
+        dtype = "float32",
+        name = layer.name,
+        padding = "same",
+        pool_size = poolSize,
+        strides = strides
+    )
+    return KerasLayer(class_name = "MaxPooling2D", config = configX)
+}
+
+private fun createKerasFlatten(layer: Flatten<Float>): KerasLayer {
+    val configX = LayerConfig(
+        data_format = "channels_last",
+        dtype = "float32",
+        name = layer.name
+    )
+    return KerasLayer(class_name = "Flatten", config = configX)
+}
+
+private fun createKerasConv2D(layer: Conv2D<Float>): KerasLayer {
+    val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = kernelSize,
+        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasKernelInitializer(layer.kernelInitializer),
+        bias_initializer = convertToKerasBiasInitializer(layer.biasInitializer),
+        padding = "same",
+        name = layer.name,
+        use_bias = true
+    )
+    return KerasLayer(class_name = "Conv2D", config = configX)
+}
+
+
+private fun fillConv2DVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
     val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
     val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
 
@@ -180,7 +185,7 @@ fun fillConv2DVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>
     addInitOpsToGraph(biasVariableName, model, biasData)
 }
 
-fun fillDenseVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
+private fun fillDenseVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
     val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
     val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
 
@@ -202,7 +207,7 @@ private fun addInitOpsToGraph(
 }
 
 
-fun convertToLayer(kerasLayer: KerasLayer): Layer<Float> {
+private fun convertToLayer(kerasLayer: KerasLayer): Layer<Float> {
     return when (kerasLayer.class_name) {
         "Conv2D" -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         "Flatten" -> createFlatten(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -216,7 +221,7 @@ fun convertToLayer(kerasLayer: KerasLayer): Layer<Float> {
     }
 }
 
-fun createDense(config: ConfigX, name: String): Dense<Float> {
+private fun createDense(config: LayerConfig, name: String): Dense<Float> {
     return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -226,7 +231,7 @@ fun createDense(config: ConfigX, name: String): Dense<Float> {
     )
 }
 
-fun convertToBiasInitializer(initializer: BiasInitializer): Initializer<Float> {
+private fun convertToBiasInitializer(initializer: KerasInitializer): Initializer<Float> {
     return when (initializer.class_name!!) {
         "GlorotUniform" -> GlorotUniform(12L)
         "GlorotNormal" -> GlorotNormal(12L)
@@ -237,7 +242,7 @@ fun convertToBiasInitializer(initializer: BiasInitializer): Initializer<Float> {
     }
 }
 
-fun convertToKernelInitializer(initializer: KernelInitializer): Initializer<Float> {
+private fun convertToKernelInitializer(initializer: KerasInitializer): Initializer<Float> {
     return when (initializer.class_name!!) {
         "GlorotUniform" -> GlorotUniform(12L)
         "GlorotNormal" -> GlorotNormal(12L)
@@ -248,7 +253,7 @@ fun convertToKernelInitializer(initializer: KernelInitializer): Initializer<Floa
     }
 }
 
-fun convertToActivation(activation: String): Activations {
+private fun convertToActivation(activation: String): Activations {
     return when (activation) {
         "relu" -> Activations.Relu
         "sigmoid" -> Activations.Sigmoid
@@ -258,7 +263,7 @@ fun convertToActivation(activation: String): Activations {
     }
 }
 
-fun createMaxPooling2D(config: ConfigX, name: String): MaxPool2D<Float> {
+private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D<Float> {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -276,11 +281,11 @@ fun createMaxPooling2D(config: ConfigX, name: String): MaxPool2D<Float> {
     return MaxPool2D<Float>(addedOnesPoolSize, addedOnesStrides, padding = config.padding!!)
 }
 
-fun createFlatten(config: ConfigX, name: String): Flatten<Float> {
+private fun createFlatten(config: LayerConfig, name: String): Flatten<Float> {
     return Flatten()
 }
 
-fun createConv2D(config: ConfigX, name: String): Conv2D<Float> {
+private fun createConv2D(config: LayerConfig, name: String): Conv2D<Float> {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 

@@ -1,19 +1,16 @@
 package examples.inference.keras
 
-
+import api.inference.keras.loadConfig
+import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.experimental.hdf5.loadConfig
-import examples.experimental.hdf5.loadWeights
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
 import io.jhdf.HdfFile
 import java.io.File
-
-private
 
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(

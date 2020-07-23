@@ -1,6 +1,8 @@
 package examples.experimental.hdf5
 
 
+import api.inference.keras.loadConfig
+import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
