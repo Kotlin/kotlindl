@@ -7,13 +7,8 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import com.beust.klaxon.Klaxon
 import examples.experimental.hdf5.lenetconfig.SequentialConfig
-import examples.keras.fashionmnist.util.FASHION_TEST_IMAGES_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TEST_LABELS_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TRAIN_IMAGES_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TRAIN_LABELS_ARCHIVE
+import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
-import examples.keras.mnist.util.extractImages
-import examples.keras.mnist.util.extractLabels
 import examples.production.drawActivations
 import examples.production.drawFilters
 import examples.production.getLabel
@@ -68,8 +63,8 @@ fun main() {
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
         AMOUNT_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
+        ::extractFashionImages,
+        ::extractFashionLabels
     )
 
     model.use {

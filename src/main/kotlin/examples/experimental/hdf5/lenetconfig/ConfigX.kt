@@ -21,5 +21,5 @@ data class ConfigX(
     val strides: List<Int>? = null,
     val trainable: Boolean? = true,
     val units: Int? = null,
-    val use_bias: Boolean? = null
+    val use_bias: Boolean? = true
 )

@@ -10,13 +10,12 @@ import com.beust.klaxon.Klaxon
 import examples.experimental.hdf5.lenetconfig.SequentialConfig
 import examples.keras.fashionmnist.util.*
 import examples.keras.mnist.util.AMOUNT_OF_CLASSES
-import io.jhdf.HdfFile
 import java.io.File
 
 private
 
 fun main() {
-    val pathToConfig = "models/mnist/lenet/lenetMdl.json"
+    val pathToConfig = "models/mnist/lenet/model_with_glorot_normal_init.json"
     val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     val jsonConfigFile = File(realPathToConfig)
@@ -39,16 +38,6 @@ fun main() {
     )
     model.summary()
 
-    val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-    val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
-
-    val file = File(realPathToWeights)
-    println(file.isFile)
-
-    val hdfFile = HdfFile(file)
-
-    loadWeightsToModel(model, hdfFile)
-
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
@@ -60,18 +49,14 @@ fun main() {
     )
 
     model.use {
-        val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-
-        println("Accuracy before training $accuracyBefore")
-
         it.fit(
             dataset = train,
             validationRate = 0.1,
             epochs = 5,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = false,
-            isWeightsInitRequired = false // for transfer learning
+            verbose = true,
+            isWeightsInitRequired = true
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

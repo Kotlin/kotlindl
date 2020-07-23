@@ -33,14 +33,16 @@
           "activation": "relu",
           "use_bias": true,
           "kernel_initializer": {
-            "class_name": "GlorotUniform",
+            "class_name": "GlorotNormal",
             "config": {
               "seed": null
             }
           },
           "bias_initializer": {
-            "class_name": "Zeros",
-            "config": {}
+            "class_name": "GlorotNormal",
+            "config": {
+              "seed": null
+            }
           },
           "kernel_regularizer": null,
           "bias_regularizer": null,
@@ -91,14 +93,16 @@
           "activation": "relu",
           "use_bias": true,
           "kernel_initializer": {
-            "class_name": "GlorotUniform",
+            "class_name": "GlorotNormal",
             "config": {
               "seed": null
             }
           },
           "bias_initializer": {
-            "class_name": "Zeros",
-            "config": {}
+            "class_name": "GlorotNormal",
+            "config": {
+              "seed": null
+            }
           },
           "kernel_regularizer": null,
           "bias_regularizer": null,
@@ -144,14 +148,16 @@
           "activation": "relu",
           "use_bias": true,
           "kernel_initializer": {
-            "class_name": "GlorotUniform",
+            "class_name": "GlorotNormal",
             "config": {
               "seed": null
             }
           },
           "bias_initializer": {
-            "class_name": "Zeros",
-            "config": {}
+            "class_name": "GlorotNormal",
+            "config": {
+              "seed": null
+            }
           },
           "kernel_regularizer": null,
           "bias_regularizer": null,
@@ -170,14 +176,16 @@
           "activation": "relu",
           "use_bias": true,
           "kernel_initializer": {
-            "class_name": "GlorotUniform",
+            "class_name": "GlorotNormal",
             "config": {
               "seed": null
             }
           },
           "bias_initializer": {
-            "class_name": "Zeros",
-            "config": {}
+            "class_name": "GlorotNormal",
+            "config": {
+              "seed": null
+            }
           },
           "kernel_regularizer": null,
           "bias_regularizer": null,
@@ -196,14 +204,16 @@
           "activation": "linear",
           "use_bias": true,
           "kernel_initializer": {
-            "class_name": "GlorotUniform",
+            "class_name": "GlorotNormal",
             "config": {
               "seed": null
             }
           },
           "bias_initializer": {
-            "class_name": "Zeros",
-            "config": {}
+            "class_name": "GlorotNormal",
+            "config": {
+              "seed": null
+            }
           },
           "kernel_regularizer": null,
           "bias_regularizer": null,

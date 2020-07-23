@@ -242,8 +242,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
 
-        //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-        val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
+        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
 
