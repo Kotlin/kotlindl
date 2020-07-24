@@ -67,16 +67,30 @@ fun <T : Number> loadConfig(
 
     sequentialConfig!!.config!!.layers!!.forEach {
         run {
-            val layer = convertToLayer<T>(it)
-            layers.add(layer)
+            if (it.class_name.equals("InputLayer")) {
+
+            } else {
+                val layer = convertToLayer<T>(it)
+                layers.add(layer)
+            }
         }
     }
 
-    val input = Input<T>(
-        28,
-        28,
-        1
-    )//TODO: it should became a parameter based on data from the first layer (property about init_shape)
+    var input: Input<T>
+
+    /* if(sequentialConfig!!.config!!.layers!!.first().class_name == "InputLayer") {
+         input = Input()
+     } else {*/
+    val batchInputShape = sequentialConfig!!.config!!.layers!!.first().config!!.batch_input_shape
+
+    input = Input(
+        batchInputShape!![1]?.toLong()!!,
+        batchInputShape!![2]?.toLong()!!,
+        batchInputShape!![3]?.toLong()!!
+    )
+    /*}*/
+
+
 
     return Sequential.of(input, layers.toList())
 }
@@ -91,6 +105,7 @@ fun <T : Number> Sequential<T>.saveConfig(jsonConfigFile: File) {
     }
 
     val inputShape = this.firstLayer.packedDims.map { it.toInt() }
+
     (kerasLayers.first().config as LayerConfig).batch_input_shape =
         listOf(null, inputShape[0], inputShape[1], inputShape[2])
 
@@ -192,6 +207,9 @@ private fun <T : Number> fillConv2DVariables(name: String, hdfFile: HdfFile, mod
     val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
     val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
 
+    /* val kernelData = hdfFile.getDatasetByPath("/$name/$name" + "_W_1:0").data // TODO: for vgg16
+     val biasData = hdfFile.getDatasetByPath("/$name/$name" + "_b_1:0").data // TODO: for vgg16*/
+
     val kernelVariableName = conv2dKernelVarName(name)
     val biasVariableName = conv2dBiasVarName(name)
     addInitOpsToGraph(kernelVariableName, model, kernelData)
@@ -203,6 +221,8 @@ private fun fillDenseVariables(name: String, hdfFile: HdfFile, model: Sequential
     val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
     val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
 
+    /*val kernelData = hdfFile.getDatasetByPath("/$name/$name" + "_W_1:0").data // TODO: for vgg16
+    val biasData = hdfFile.getDatasetByPath("/$name/$name" + "_b_1:0").data // TODO: for vgg16*/
     val kernelVariableName = denseKernelVarName(name)
     val biasVariableName = denseBiasVarName(name)
     addInitOpsToGraph(kernelVariableName, model, kernelData)
@@ -238,30 +258,23 @@ private fun <T : Number> createDense(config: LayerConfig, name: String): Dense<T
     return Dense<T>(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
-        kernelInitializer = convertToKernelInitializer(config.kernel_initializer!!),
-        biasInitializer = convertToBiasInitializer(config.bias_initializer!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
         name = name
     )
 }
 
-private fun <T : Number> convertToBiasInitializer(initializer: KerasInitializer): Initializer<T> {
+private fun <T : Number> convertToInitializer(initializer: KerasInitializer): Initializer<T> {
     return when (initializer.class_name!!) {
         INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(12L)
         INITIALIZER_GLOROT_NORMAL -> GlorotNormal(12L)
         INITIALIZER_ZEROS -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
         INITIALIZER_ONES -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
         INITIALIZER_RANDOM_NORMAL -> GlorotNormal(seed = 12L)
-        else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
-    }
-}
-
-private fun <T : Number> convertToKernelInitializer(initializer: KerasInitializer): Initializer<T> {
-    return when (initializer.class_name!!) {
-        INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(12L)
-        INITIALIZER_GLOROT_NORMAL -> GlorotNormal(12L)
-        INITIALIZER_ZEROS -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_ONES -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_RANDOM_NORMAL -> GlorotNormal(seed = 12L)
+        "RandomUniform" -> TruncatedNormal(seed = 12L)
+        "TruncatedNormal" -> TruncatedNormal(seed = 12L)
+        "VarianceScaling" -> VarianceScaling(seed = 12L)
+        "Constant" -> Constant(initializer.config!!.value!!)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }
@@ -313,8 +326,8 @@ private fun <T : Number> createConv2D(config: LayerConfig, name: String): Conv2D
         kernelSize = kernelSize,
         strides = addedOnesStrides,
         activation = convertToActivation(config.activation!!),
-        kernelInitializer = convertToKernelInitializer(config.kernel_initializer!!),
-        biasInitializer = convertToBiasInitializer(config.bias_initializer!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
         padding = ConvPadding.SAME,
         name = name
     )

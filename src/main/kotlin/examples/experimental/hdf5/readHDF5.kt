@@ -18,7 +18,7 @@ import java.io.File
 private
 
 fun main() {
-    val pathToConfig = "models/mnist/lenet/model1.json"
+    val pathToConfig = "models/mnist/lenet/model.json"
     val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     val jsonConfigFile = File(realPathToConfig)
