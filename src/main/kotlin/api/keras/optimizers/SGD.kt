@@ -10,7 +10,7 @@ import java.util.*
 class SGD<T : Number>(private val learningRateSchedule: Map<Int, Float>) : Optimizer<T>() {
     private var learningRate: Float = 0.2f
 
-    constructor(learningRate: Float) : this(mapOf()) {
+    constructor(learningRate: Float = 0.2f) : this(mapOf()) {
         this.learningRate = learningRate
     }
 

@@ -1,6 +1,8 @@
 package api.keras
 
 import api.*
+import api.inference.keras.loadConfig
+import api.inference.keras.saveConfig
 import api.keras.activations.Activations
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
@@ -110,6 +112,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             for (layer in layers) {
                 layer.parentModel = seqModel
             }
+        }
+
+        fun <T : Number> load(pathToModelDirectory: String): Sequential<T> {
+            val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+            return loadConfig(jsonConfig)
         }
     }
 
@@ -547,13 +554,43 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return kGraph
     }
 
-    override fun save(pathToModelDirectory: String) {
+    override fun save(pathToModelDirectory: String, modelFormat: ModelFormat) {
         val directory = File(pathToModelDirectory)
         if (!directory.exists()) {
             directory.mkdir()
         }
-        File("$pathToModelDirectory/graph.pb").writeBytes(kGraph.tfGraph.toGraphDef())
 
+        when (modelFormat) {
+            ModelFormat.SIMPLE -> saveInSimpleFormat(pathToModelDirectory)
+            ModelFormat.SAVED_MODEL -> saveInSavedModelFormat(pathToModelDirectory)
+            ModelFormat.KERAS -> saveInKerasFormat(pathToModelDirectory)
+        }
+    }
+
+    private fun saveInKerasFormat(pathToModelDirectory: String) {
+        saveModel(pathToModelDirectory)
+        saveVariables(pathToModelDirectory)
+    }
+
+    private fun saveModel(pathToModelDirectory: String) {
+        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+        this.saveConfig(jsonConfig)
+    }
+
+    private fun saveInSavedModelFormat(pathToModelDirectory: String) {
+        saveGraphDef(pathToModelDirectory)
+    }
+
+    private fun saveInSimpleFormat(pathToModelDirectory: String) {
+        saveGraphDef(pathToModelDirectory)
+        saveVariables(pathToModelDirectory)
+    }
+
+    private fun saveGraphDef(pathToModelDirectory: String) {
+        File("$pathToModelDirectory/graph.pb").writeBytes(kGraph.tfGraph.toGraphDef())
+    }
+
+    private fun saveVariables(pathToModelDirectory: String) {
         val modelWeightsExtractorRunner = session.runner()
 
         val variables = kGraph.variables()

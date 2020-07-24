@@ -27,11 +27,11 @@ fun main() {
     val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
     val jsonConfigFile = File(realPathToConfig)
 
-    val model = loadConfig(jsonConfigFile)
+    val model = loadConfig<Float>(jsonConfigFile)
 
     model.use {
         it.compile(
-            optimizer = Adam<Float>(),
+            optimizer = Adam(),
             loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )

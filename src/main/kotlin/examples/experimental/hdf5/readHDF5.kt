@@ -26,17 +26,14 @@ fun main() {
          recursivePrintGroup(hdfFile, hdfFile, 0)
      }*/
 
-    val model = loadConfig(jsonConfigFile)
+    val model = loadConfig<Float>(jsonConfigFile)
     model.compile(
-        optimizer = Adam<Float>(),
+        optimizer = Adam(),
         loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric = Metrics.ACCURACY
     )
     model.summary()
 
-    /*val jsonConfigFile2 = File("savedmodels/mnisSeq.json")
-
-    saveSequentialModelToJSONConfig(model, jsonConfigFile2)*/
 
     val pathToWeights = "models/mnist/lenet/mnist_weights_only1.h5"
     val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()

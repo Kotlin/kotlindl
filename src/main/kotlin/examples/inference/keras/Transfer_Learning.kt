@@ -33,17 +33,17 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val model = loadConfig(jsonConfigFile)
+    val model = loadConfig<Float>(jsonConfigFile)
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
         for (layer in it.layers) {
             if (layer::class == Conv2D::class)
-                layer.isTrainable = true
+                layer.isTrainable = false
         }
 
         it.compile(
-            optimizer = Adam<Float>(),
+            optimizer = Adam(),
             loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )

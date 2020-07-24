@@ -1,6 +1,7 @@
 package api.inference.savedmodel
 
 import api.*
+import api.keras.ModelFormat
 import api.keras.shape.TensorShape
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
@@ -80,7 +81,7 @@ open class InferenceModel<T : Number>() : AutoCloseable {
     /**
      * Loads model as graph and weights.
      */
-    fun load(pathToModelDirectory: String) {
+    fun load(pathToModelDirectory: String, modelFormat: ModelFormat = ModelFormat.SIMPLE) {
         // Load graph
         val directory = File(pathToModelDirectory);
         if (!directory.exists()) {
@@ -88,35 +89,57 @@ open class InferenceModel<T : Number>() : AutoCloseable {
         } else {
             logger.debug { "The model loading is started." }
 
-            kGraph = KGraph(File("$pathToModelDirectory/graph.pb").readBytes())
-            tf = Ops.create(kGraph.tfGraph)
-            session = Session(kGraph.tfGraph)
-
-            // Load variables names
-            val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
-            if (variableNames.isNotEmpty()) {
-                for (variableName in variableNames) {
-                    val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
-                    val tensorShape = TensorShape(shape)
-
-                    logger.debug { "Loading the variable $variableName data" }
-                    logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-                    logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
-
-                    /* // limited by 2GB files
-                     val tensorData = File("$pathToModelDirectory/$variableName.txt").readText()*/
-                    val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
-                    scanner.useLocale(Locale.US)
-
-                    val initializerName = defaultInitializerOpName(variableName)
-                    val assignOpName = defaultAssignOpName(variableName)
-
-                    val source = createFloatArrayFromScanner(shape, scanner)
-                    populateVariable(initializerName, source, assignOpName)
-                }
+            when (modelFormat) {
+                ModelFormat.SIMPLE -> loadModelFromSimpleFormat(pathToModelDirectory)
+                ModelFormat.SAVED_MODEL -> loadModelFromSavedModelFormat(pathToModelDirectory)
+                ModelFormat.KERAS -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
             }
-            logger.debug { "The model loading is ended." }
+
+            logger.debug { "The model loading is finished." }
         }
+    }
+
+    fun loadVariablesFromTxtFiles(pathToModelDirectory: String) {
+        // Load variables names
+        val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
+        if (variableNames.isNotEmpty()) {
+            for (variableName in variableNames) {
+                val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
+                val tensorShape = TensorShape(shape)
+
+                logger.debug { "Loading the variable $variableName data" }
+                logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
+                logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+
+                /* // limited by 2GB files
+                 val tensorData = File("$pathToModelDirectory/$variableName.txt").readText()*/
+                val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
+                scanner.useLocale(Locale.US)
+
+                val initializerName = defaultInitializerOpName(variableName)
+                val assignOpName = defaultAssignOpName(variableName)
+
+                val source = createFloatArrayFromScanner(shape, scanner)
+                populateVariable(initializerName, source, assignOpName)
+            }
+        }
+
+    }
+
+    private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
+        TODO("Not yet implemented")
+    }
+
+    private fun loadModelFromSimpleFormat(pathToModelDirectory: String) {
+        inferenceGraphInitialization(pathToModelDirectory)
+        loadVariablesFromTxtFiles(pathToModelDirectory)
+    }
+
+
+    private fun inferenceGraphInitialization(pathToModelDirectory: String) {
+        kGraph = KGraph(File("$pathToModelDirectory/graph.pb").readBytes())
+        tf = Ops.create(kGraph.tfGraph)
+        session = Session(kGraph.tfGraph)
     }
 
     private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {

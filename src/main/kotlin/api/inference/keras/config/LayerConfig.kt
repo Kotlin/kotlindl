@@ -21,5 +21,5 @@ data class LayerConfig(
     val strides: List<Int>? = null,
     val trainable: Boolean? = true,
     val units: Int? = null,
-    val use_bias: Boolean? = true
+    val use_bias: Boolean? = null
 )

@@ -2,6 +2,7 @@ package api
 
 import api.inference.savedmodel.InferenceModel
 import api.keras.EvaluationResult
+import api.keras.ModelFormat
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -94,7 +95,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     /**
      * Saves the model as graph and weights.
      */
-    abstract fun save(pathToModelDirectory: String)
+    abstract fun save(pathToModelDirectory: String, modelFormat: ModelFormat = ModelFormat.SIMPLE)
 
 
     fun getDType(): Class<T> {
