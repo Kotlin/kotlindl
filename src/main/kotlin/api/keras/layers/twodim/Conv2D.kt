@@ -1,6 +1,8 @@
 package api.keras.layers.twodim
 
 import api.KGraph
+import api.conv2dBiasVarName
+import api.conv2dKernelVarName
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
@@ -39,9 +41,7 @@ class Conv2D<T : Number>(
     private lateinit var kernelShape: Shape
 
     private val KERNEL = "conv2d_kernel"
-    private val KERNEL_INIT = "conv2d_kernelInit"
     private val BIAS = "conv2d_bias"
-    private val BIAS_INIT = "conv2d_biasInit"
 
     init {
         this.name = name
@@ -63,23 +63,20 @@ class Conv2D<T : Number>(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        // TODO: refactor to remove duplicated code
         if (name.isNotEmpty()) {
-            val kernelVariableName = name + "_" + KERNEL
-            val biasVariableName = name + "_" + BIAS
-            val kernelInitName = name + "_" + KERNEL_INIT
-            val biasInitName = name + "_" + BIAS_INIT
+            val kernelVariableName = conv2dKernelVarName(name)
+            val biasVariableName = conv2dBiasVarName(name)
 
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
             bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitName, kernelInitializer)
-            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitName, biasInitializer)
+            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
+            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
         } else {
             kernel = tf.variable(kernelShape, getDType())
             bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, kGraph, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
-            bias = addWeight(tf, kGraph, BIAS, bias, BIAS_INIT, biasInitializer)
+            kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
+            bias = addWeight(tf, kGraph, BIAS, bias, biasInitializer)
         }
     }
 
@@ -105,8 +102,8 @@ class Conv2D<T : Number>(
         val session = parentModel.session
 
         val runner = session.runner()
-            .fetch("${name}_$KERNEL")
-            .fetch("${name}_$BIAS")
+            .fetch(conv2dKernelVarName(name))
+            .fetch(conv2dBiasVarName(name))
 
         val tensorList = runner.run()
         val filtersTensor = tensorList[0]

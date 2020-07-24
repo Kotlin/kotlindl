@@ -47,7 +47,6 @@ abstract class Layer<T : Number> {
         kGraph: KGraph<T>,
         name: String,
         variable: Variable<T>,
-        initializerName: String,
         initializer: Initializer<T>
     ): Variable<T> {
         require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }

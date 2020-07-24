@@ -1,6 +1,8 @@
 package api.keras.layers
 
 import api.KGraph
+import api.denseBiasVarName
+import api.denseKernelVarName
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.shape.TensorShape
@@ -13,9 +15,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
 private const val KERNEL = "dense_kernel"
-private const val KERNEL_INIT = "dense_kernelInit"
 private const val BIAS = "dense_bias"
-private const val BIAS_INIT = "dense_biasInit"
 
 class Dense<T : Number>(
     val outputSize: Int,
@@ -48,21 +48,19 @@ class Dense<T : Number>(
         fanOut = outputSize
 
         if (name.isNotEmpty()) {
-            val kernelVariableName = name + "_" + KERNEL
-            val biasVariableName = name + "_" + BIAS
-            val kernelInitName = name + "_" + KERNEL_INIT
-            val biasInitName = name + "_" + BIAS_INIT
+            val kernelVariableName = denseKernelVarName(name)
+            val biasVariableName = denseBiasVarName(name)
 
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
             bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitName, kernelInitializer)
-            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitName, biasInitializer)
+            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
+            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
         } else {
             kernel = tf.variable(kernelShape, getDType())
             bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, kGraph, KERNEL, kernel, KERNEL_INIT, kernelInitializer)
-            bias = addWeight(tf, kGraph, BIAS, bias, BIAS_INIT, biasInitializer)
+            kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
+            bias = addWeight(tf, kGraph, BIAS, bias, biasInitializer)
         }
     }
 
@@ -82,8 +80,8 @@ class Dense<T : Number>(
         val session = parentModel.session
 
         val runner = session.runner()
-            .fetch("${name}_$KERNEL")
-            .fetch("${name}_$BIAS")
+            .fetch(denseKernelVarName(name))
+            .fetch(denseBiasVarName(name))
 
         val tensorList = runner.run()
         val filtersTensor = tensorList[0]

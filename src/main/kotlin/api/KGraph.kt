@@ -110,6 +110,4 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
             runner.run()
         }
     }
-
-
 }
