@@ -33,7 +33,8 @@ import java.io.File
  * @constructor Creates a Sequential group with [input] and [layers].
  */
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
-    private lateinit var lossOp: Operand<T>
+    /** Logger for Sequential model. */
+    private val logger = KotlinLogging.logger {}
 
     /** Input layer. */
     val firstLayer: Input<T> = input
@@ -41,14 +42,17 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     /** The bunch of layers. */
     val layers: List<Layer<T>> = listOf(*layers)
 
-    /** The bunch of layers. */
+    /** Layers indexed by name. */
     private var layersByName: Map<String, Layer<T>> = mapOf()
 
+    /** Is true when model is compiled. */
     private var isModelCompiled: Boolean = false
 
+    /** Is true when model is initialized. */
     private var isModelInitialized: Boolean = false
 
-    private val logger = KotlinLogging.logger {}
+    /** Main loss operand. */
+    private lateinit var lossOp: Operand<T>
 
     init {
         for (layer in layers) {
@@ -99,7 +103,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
-                    layer.name = defaultLayerName(cnt)
+                    val generatedLayerName = layer::class.simpleName!!.toLowerCase() + "_" + cnt
+                    layer.name = generatedLayerName
                     cnt++
                 }
             }

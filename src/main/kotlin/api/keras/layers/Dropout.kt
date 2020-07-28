@@ -6,8 +6,9 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 class Dropout<T : Number>(
-    private val keepProbability: Float
-) : Layer<T>() {
+    private val keepProbability: Float,
+    name: String = ""
+) : Layer<T>(name) {
 
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         //left empty

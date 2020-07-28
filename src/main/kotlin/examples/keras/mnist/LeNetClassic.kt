@@ -17,7 +17,7 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
-private const val EPOCHS = 5
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -89,6 +89,8 @@ fun main() {
     )
 
     lenet5Classic.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+
+    lenet5Classic.summary()
 
     lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

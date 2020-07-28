@@ -7,7 +7,7 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 
-class Input<T : Number>(vararg dims: Long) : Layer<T>() {
+class Input<T : Number>(vararg dims: Long, name: String = "") : Layer<T>(name) {
     lateinit var input: Placeholder<T>
 
     val packedDims: LongArray = dims

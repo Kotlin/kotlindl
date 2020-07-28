@@ -24,7 +24,8 @@ val lenet5 = Sequential.of<Float>(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
-        NUM_CHANNELS
+        NUM_CHANNELS,
+        name = "input_0"
     ),
     Conv2D(
         filters = 32,
@@ -34,11 +35,12 @@ val lenet5 = Sequential.of<Float>(
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
         padding = ConvPadding.SAME,
-        name = "1"
+        name = "conv2d_1"
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        name = "maxPool_2"
     ),
     Conv2D(
         filters = 64,
@@ -48,33 +50,34 @@ val lenet5 = Sequential.of<Float>(
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
         padding = ConvPadding.SAME,
-        name = "2"
+        name = "conv2d_3"
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        name = "maxPool_4"
     ),
-    Flatten(), // 3136
+    Flatten(name = "flatten_5"), // 3136
     Dense(
         outputSize = 120,
         activation = Activations.Relu,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
-        name = "3"
+        name = "dense_6"
     ),
     Dense(
         outputSize = 84,
         activation = Activations.Relu,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
-        name = "4"
+        name = "dense_7"
     ),
     Dense(
         outputSize = AMOUNT_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
-        name = "5"
+        name = "dense_8"
     )
 )
 

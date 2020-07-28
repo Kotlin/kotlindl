@@ -19,13 +19,11 @@ private const val BIAS = "dense_bias"
 
 class Dense<T : Number>(
     val outputSize: Int,
-    // activation function
     val activation: Activations = Activations.Sigmoid,
-    // initializers
     val kernelInitializer: Initializer<T>,
     val biasInitializer: Initializer<T>,
     name: String = ""
-) : Layer<T>() {
+) : Layer<T>(name) {
     private lateinit var kernelShape: Shape
 
     private lateinit var biasShape: Shape
@@ -34,10 +32,6 @@ class Dense<T : Number>(
     private lateinit var kernel: Variable<T>
 
     private lateinit var bias: Variable<T>
-
-    init {
-        this.name = name
-    }
 
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices

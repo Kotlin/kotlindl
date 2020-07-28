@@ -9,7 +9,7 @@ import org.tensorflow.op.core.Constant
 import kotlin.math.abs
 
 
-class Flatten<T : Number> : Layer<T>() {
+class Flatten<T : Number>(name: String = "") : Layer<T>(name) {
     private lateinit var units: Constant<Int>
 
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {

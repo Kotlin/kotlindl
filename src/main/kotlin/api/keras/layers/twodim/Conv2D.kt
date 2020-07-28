@@ -31,7 +31,7 @@ class Conv2D<T : Number>(
     val biasInitializer: Initializer<T>,
     val padding: ConvPadding,
     name: String = ""
-) : Layer<T>() {
+) : Layer<T>(name) {
     // weight tensors
     private lateinit var kernel: Variable<T>
     private lateinit var bias: Variable<T>
@@ -42,10 +42,6 @@ class Conv2D<T : Number>(
 
     private val KERNEL = "conv2d_kernel"
     private val BIAS = "conv2d_bias"
-
-    init {
-        this.name = name
-    }
 
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)

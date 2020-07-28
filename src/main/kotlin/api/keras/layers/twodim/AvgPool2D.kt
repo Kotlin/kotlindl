@@ -10,8 +10,9 @@ private const val PADDING_TYPE = "SAME"
 
 class AvgPool2D<T : Number>(
     private val poolSize: IntArray,
-    private val strides: IntArray
-) : Layer<T>() {
+    private val strides: IntArray,
+    name: String = ""
+) : Layer<T>(name) {
     override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {

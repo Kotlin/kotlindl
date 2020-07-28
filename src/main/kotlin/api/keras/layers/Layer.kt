@@ -8,9 +8,7 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
-abstract class Layer<T : Number> {
-    var name: String = ""
-
+abstract class Layer<T : Number>(var name: String) {
     var isTrainable = true
 
     lateinit var outputShape: LongArray
