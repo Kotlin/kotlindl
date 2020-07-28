@@ -43,10 +43,10 @@ fun main() {
 }
 
 @Throws(IOException::class)
-fun getImage(inputStream: InputStream): Pair<ByteArray, BufferedImage> {
+fun getImage(inputStream: InputStream, imageType: String = "png"): Pair<ByteArray, BufferedImage> {
     val image = ImageIO.read(inputStream)
     val baos = ByteArrayOutputStream()
-    ImageIO.write(image, "png", baos)
+    ImageIO.write(image, imageType, baos)
     return Pair(baos.toByteArray(), image)
 }
 

@@ -17,7 +17,7 @@ import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 
-private const val EPOCHS = 50
+private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L

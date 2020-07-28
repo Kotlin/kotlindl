@@ -85,6 +85,14 @@ class ImageDataset internal constructor(
             return floats
         }
 
+        fun toRawVector(bytes: ByteArray): FloatArray {
+            val floats = FloatArray(bytes.size)
+            for (i in bytes.indices) {
+                floats[i] = ((bytes[i].toInt() and 0xFF).toFloat())
+            }
+            return floats
+        }
+
         fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
             val buffer = FloatBuffer.allocate(length * src[0].size)
             for (i in start until start + length) {

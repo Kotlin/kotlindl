@@ -443,13 +443,18 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return softPrediction.indexOf(softPrediction.max()!!)
     }
 
-    override fun predictAndGetActivations(image: FloatArray): Pair<Int, List<*>> {
-        val (softPrediction, activations) = predictSoftlyAndGetActivations(image, true)
+    override fun predict(image: FloatArray, predictionTensorName: String): Int {
+        val softPrediction = predictSoftly(image, predictionTensorName)
+        return softPrediction.indexOf(softPrediction.max()!!)
+    }
+
+    override fun predictAndGetActivations(image: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
+        val (softPrediction, activations) = predictSoftlyAndGetActivations(image, true, predictionTensorName)
         return Pair(softPrediction.indexOf(softPrediction.max()!!), activations)
     }
 
-    override fun predictSoftly(image: FloatArray): FloatArray {
-        val (softPrediction, _) = predictSoftlyAndGetActivations(image, false)
+    override fun predictSoftly(image: FloatArray, predictionTensorName: String): FloatArray {
+        val (softPrediction, _) = predictSoftlyAndGetActivations(image, false, predictionTensorName)
         return softPrediction
     }
 
@@ -458,11 +463,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      */
     override fun predictSoftlyAndGetActivations(
         image: FloatArray,
-        formActivationData: Boolean
+        formActivationData: Boolean,
+        predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+        //val prediction = tf.withName(predictionTensorName).nn.softmax(yPred)
 
         //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
@@ -473,7 +479,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             ImageDataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(prediction, testImages, formActivationData)
+                formPredictionAndActivationsTensors(yPred, testImages, formActivationData)
 
             val predictionsTensor = tensors[0]
 
@@ -499,9 +505,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val runner = session
             .runner()
             .fetch(prediction)
-            .fetch("MaxPool")
-            .fetch("MaxPool_1")
-            .fetch("Reshape")
+            //.fetch("MaxPool")
+            //.fetch("MaxPool_1")
+            //.fetch("Reshape")
             //.fetch("Activation_dense_48")
             //.fetch("Activation_dense_49")
             .feed(xOp.asOutput(), testImages)
@@ -675,4 +681,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         return stringBuilder.toString()
     }
+
+
 }

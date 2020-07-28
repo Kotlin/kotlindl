@@ -92,6 +92,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
 
     abstract override fun predict(image: FloatArray): Int
 
+    abstract fun predict(image: FloatArray, predictionTensorName: String): Int
+
     /**
      * Saves the model as graph and weights.
      */
@@ -102,13 +104,17 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
         return Float::class.javaObjectType as Class<T>
     }
 
-    abstract fun predictAndGetActivations(image: FloatArray): Pair<Int, List<*>>
+    abstract fun predictAndGetActivations(
+        image: FloatArray,
+        predictionTensorName: String = OUTPUT_NAME
+    ): Pair<Int, List<*>>
 
-    abstract fun predictSoftly(image: FloatArray): FloatArray
+    abstract fun predictSoftly(image: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray
 
     abstract fun predictSoftlyAndGetActivations(
         image: FloatArray,
-        visualizationIsEnabled: Boolean
+        visualizationIsEnabled: Boolean,
+        predictionTensorName: String = OUTPUT_NAME
     ): Pair<FloatArray, List<*>>
 
     fun fit(
@@ -125,4 +131,6 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
 
         return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose, isWeightsInitRequired)
     }
+
+
 }
