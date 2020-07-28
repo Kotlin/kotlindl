@@ -304,7 +304,16 @@ private fun <T : Number> createMaxPooling2D(config: LayerConfig, name: String): 
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = config.padding!!)
+    return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!))
+}
+
+fun convertPadding(padding: String): ConvPadding {
+    return when (padding) {
+        "same" -> ConvPadding.SAME
+        "valid" -> ConvPadding.VALID
+        "full" -> ConvPadding.FULL
+        else -> throw UnsupportedOperationException("The $padding is not supported!")
+    }
 }
 
 private fun <T : Number> createFlatten(config: LayerConfig, name: String): Flatten<T> {

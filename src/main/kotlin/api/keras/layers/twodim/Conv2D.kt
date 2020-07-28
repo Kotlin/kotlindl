@@ -6,6 +6,7 @@ import api.conv2dKernelVarName
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
+import api.keras.shape.convOutputLength
 import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeFromDims
 import api.keras.shape.shapeToLongArray
@@ -19,7 +20,8 @@ import kotlin.math.roundToInt
 
 enum class ConvPadding {
     SAME,
-    VALID
+    VALID,
+    FULL
 }
 
 class Conv2D<T : Number>(
@@ -29,7 +31,7 @@ class Conv2D<T : Number>(
     val activation: Activations = Activations.Relu,
     val kernelInitializer: Initializer<T>,
     val biasInitializer: Initializer<T>,
-    val padding: ConvPadding,
+    val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
 ) : Layer<T>(name) {
     // weight tensors
@@ -77,15 +79,25 @@ class Conv2D<T : Number>(
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        //TODO: outputShape calculation depending on padding type https://github.com/keras-team/keras/blob/master/keras/utils/conv_utils.py
+        var rows = inputShape.size(1)
+        var cols = inputShape.size(2)
+        rows = convOutputLength(
+            rows, kernelSize[0].toInt(), padding,
+            strides[1].toInt()
+        )
+        cols = convOutputLength(
+            cols, kernelSize[1].toInt(), padding,
+            strides[2].toInt()
+        )
 
-        return Shape.make(inputShape.size(0), inputShape.size(1), inputShape.size(2), filters)
+        return Shape.make(inputShape.size(0), rows, cols, filters)
     }
 
     override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
         val tfPadding = when (padding) {
             ConvPadding.SAME -> "SAME"
             ConvPadding.VALID -> "VALID"
+            ConvPadding.FULL -> "FULL"
         }
 
         val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding), bias)

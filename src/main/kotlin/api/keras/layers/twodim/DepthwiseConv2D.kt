@@ -80,6 +80,7 @@ class DepthwiseConv2D<T : Number>(
         val tfPadding = when (padding) {
             ConvPadding.SAME -> "SAME"
             ConvPadding.VALID -> "VALID"
+            ConvPadding.FULL -> TODO()
         }
 
         val signal = tf.nn.biasAdd(tf.nn.depthwiseConv2dNative(input, kernel, strides.toMutableList(), tfPadding), bias)

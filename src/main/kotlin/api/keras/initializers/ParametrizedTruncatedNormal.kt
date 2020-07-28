@@ -4,7 +4,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.random.ParameterizedTruncatedNormal
 
-class ParametrizedRandomNormal<T : Number>(
+class ParametrizedTruncatedNormal<T : Number>(
     private val mean: Float,
     private val stdev: Float,
     private val p1: Float, // low level edge

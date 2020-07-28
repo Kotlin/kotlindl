@@ -41,7 +41,8 @@ private val lenet5Classic = Sequential.of<Float>(
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.VALID
     ),
     Conv2D(
         filters = 16,
@@ -54,7 +55,8 @@ private val lenet5Classic = Sequential.of<Float>(
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.VALID
     ),
     Flatten(), // 3136
     Dense(

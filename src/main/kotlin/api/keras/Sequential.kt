@@ -650,15 +650,18 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         logger.info("Layer (type)                 Output Shape              Param #   ")
         logger.info("=================================================================")
 
-        var totalParams = 0
+        var totalTrainableParams = 0
+        var totalFrozenParams = 0
         for (l in layers) {
-            totalParams += l.getParams()
+            if (l.isTrainable) totalTrainableParams += l.getParams() else totalFrozenParams += l.getParams()
             logger.info(createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize))
             logger.info("_________________________________________________________________")
         }
 
         logger.info("=================================================================")
-        logger.info("Total params: $totalParams")
+        logger.info("Total trainable params: $totalTrainableParams")
+        logger.info("Total frozen params: $totalFrozenParams")
+        logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
         logger.info("=================================================================")
     }
 
@@ -678,7 +681,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         stringBuilder.append(secondPart)
 
-        for (i in 1 until stringOutputShapeSize - secondPart.length) {
+        for (i in 0 until stringOutputShapeSize - secondPart.length) {
             stringBuilder.append(" ")
         }
 
@@ -686,6 +689,4 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         return stringBuilder.toString()
     }
-
-
 }
