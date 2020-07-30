@@ -34,7 +34,7 @@ import java.io.File
  */
 class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
     /** Logger for Sequential model. */
-    private val logger = KotlinLogging.logger {}
+    val logger = KotlinLogging.logger {}
 
     /** Input layer. */
     val firstLayer: Input<T> = input
@@ -510,11 +510,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val runner = session
             .runner()
             .fetch(prediction)
-            //.fetch("MaxPool")
-            //.fetch("MaxPool_1")
-            //.fetch("Reshape")
-            //.fetch("Activation_dense_48")
-            //.fetch("Activation_dense_49")
             .feed(xOp.asOutput(), testImages)
 
         if (visualizationIsEnabled) {
@@ -689,4 +684,6 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         return stringBuilder.toString()
     }
+
+
 }

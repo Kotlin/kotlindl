@@ -44,6 +44,7 @@ private val CHANNELS_LAST = "channels_last"
 private val PADDING_SAME = "same"
 
 fun Sequential<Float>.loadWeights(hdfFile: HdfFile) {
+    this.logger.debug { "Starting weights loading.." }
     this.layers.forEach {
         run {
             when (it::class) {
@@ -51,8 +52,64 @@ fun Sequential<Float>.loadWeights(hdfFile: HdfFile) {
                 Conv2D::class -> fillConv2DVariables(it.name, hdfFile, this)
                 else -> println("No weights loading for ${it.name}")
             }
+            this.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
         }
     }
+    this.logger.info { "Weights are loaded." }
+}
+
+/**
+ * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
+ */
+fun <T : Number> Sequential<T>.loadWeights(hdfFile: HdfFile, layerList: MutableList<Layer<T>>) {
+    this.logger.info { "Starting weights loading.." }
+    this.layers.forEach {
+        run {
+            if (layerList.contains(it)) {
+                when (it::class) {
+                    Dense::class -> fillDenseVariables(it.name, hdfFile, this)
+                    Conv2D::class -> fillConv2DVariables(it.name, hdfFile, this)
+                    else -> println("No weights loading for ${it.name}")
+                }
+                this.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+            } else {
+                when (it::class) {
+                    Dense::class -> initDenseVariablesByDefaultInitializer(it.name, this)
+                    Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, this)
+                    else -> println("No default initialization handled for ${it.name}")
+                }
+                this.logger.info { " Weights initialized for ${it.name}. ${it.getParams()} parameters are initialized. " }
+            }
+        }
+    }
+    this.logger.info { "Weights are loaded." }
+}
+
+private fun <T : Number> initConv2DVariablesByDefaultInitializer(name: String, model: Sequential<T>) {
+    val kernelVariableName = conv2dKernelVarName(name)
+    val biasVariableName = conv2dBiasVarName(name)
+    runInitOps(kernelVariableName, model)
+    runInitOps(biasVariableName, model)
+}
+
+
+private fun <T : Number> initDenseVariablesByDefaultInitializer(name: String, model: Sequential<T>) {
+    val kernelVariableName = denseKernelVarName(name)
+    val biasVariableName = denseBiasVarName(name)
+    runInitOps(kernelVariableName, model)
+    runInitOps(biasVariableName, model)
+}
+
+// TODO: move to inference class
+private fun <T : Number> runInitOps(
+    variableName: String,
+    model: Sequential<T>
+) {
+    val assignOpName = defaultAssignOpName(variableName)
+
+    model.session.runner()
+        .addTarget(assignOpName)
+        .run()
 }
 
 fun <T : Number> loadConfig(
@@ -78,9 +135,6 @@ fun <T : Number> loadConfig(
 
     var input: Input<T>
 
-    /* if(sequentialConfig!!.config!!.layers!!.first().class_name == "InputLayer") {
-         input = Input()
-     } else {*/
     val batchInputShape = sequentialConfig!!.config!!.layers!!.first().config!!.batch_input_shape
 
     input = Input(
@@ -88,9 +142,6 @@ fun <T : Number> loadConfig(
         batchInputShape!![2]?.toLong()!!,
         batchInputShape!![3]?.toLong()!!
     )
-    /*}*/
-
-
 
     return Sequential.of(input, layers.toList())
 }
@@ -217,7 +268,7 @@ private fun <T : Number> fillConv2DVariables(name: String, hdfFile: HdfFile, mod
 }
 
 
-private fun fillDenseVariables(name: String, hdfFile: HdfFile, model: Sequential<Float>) {
+private fun <T : Number> fillDenseVariables(name: String, hdfFile: HdfFile, model: Sequential<T>) {
     val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data
     val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data
 
