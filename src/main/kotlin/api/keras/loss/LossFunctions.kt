@@ -4,13 +4,15 @@ import api.TRAINING_LOSS
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+//https://github.com/tensorflow/tfjs/blob/master/tfjs-layers/src/losses.ts
 enum class LossFunctions {
     SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
     ABSOLUTE_DIFFERENCE,
     HINGE_LOSS,
     HUBER_LOSS,
     LOG_LOSS,
-    MAE;
+    MAE,
+    MSE;
 
     companion object {
         fun <T : Number> convert(lossFunctionType: LossFunctions): LossFunction<T> {
@@ -21,6 +23,7 @@ enum class LossFunctions {
                 HUBER_LOSS -> HuberLoss(0.1f)
                 LOG_LOSS -> LogLoss()
                 MAE -> MAE()
+                MSE -> MSE()
             }
         }
     }
@@ -44,26 +47,26 @@ class AbsoluteDifference<T : Number> : LossFunction<T> {
 
 class MAE<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
+        // tfc.mean(tfc.abs(tfc.sub(yPred, yTrue)), -1))
         val absoluteErrors = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(-1))
         /*return tf.withName(TRAINING_LOSS).identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));*/
     }
 }
 
 class MSE<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        val predicted: Operand<Long> = tf.math.argMax(actual, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(labels, tf.constant(1))
-
-        val squaredError = tf.math.squaredDifference(predicted, expected)
-        return tf.withName(TRAINING_LOSS).math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0))
+        val squaredError = tf.math.squaredDifference(actual, labels)
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(-1))
     }
 }
 
 class HingeLoss<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
-        throw UnsupportedOperationException()
+        val sub = tf.math.sub(tf.constant(1f) as Operand<T>, tf.math.mul(actual, labels))
+        val maxResult = tf.math.maximum(tf.constant(0f) as Operand<T>, sub) as Operand<T>
+        return tf.withName(TRAINING_LOSS).math.mean(tf.math.mean(maxResult, tf.constant(-1)), tf.constant(-1))
         /* // We first need to convert binary labels to -1/1 labels (as floats).
         val allOnes: Variable<T> = tf.variable(labels.asOutput().shape(), dtype)
 

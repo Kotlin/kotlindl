@@ -3,6 +3,8 @@ package api.keras.metric
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+
+// TODO: https://github.com/tensorflow/tfjs/blob/master/tfjs-layers/src/metrics.ts
 enum class Metrics {
     ACCURACY, MAE, MSE;
 

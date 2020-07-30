@@ -8,7 +8,7 @@ import api.keras.optimizers.Adam
 import examples.keras.mnist.util.*
 import javax.swing.JFrame
 
-private const val EPOCHS = 1
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
@@ -28,8 +28,8 @@ fun main() {
     lenet5.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Metrics.ACCURACY
+            loss = LossFunctions.MAE,
+            metric = Metrics.MAE
         )
 
         (it as Sequential).summary()
