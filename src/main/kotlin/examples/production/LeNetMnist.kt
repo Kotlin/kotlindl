@@ -9,7 +9,7 @@ import examples.keras.mnist.util.*
 import javax.swing.JFrame
 
 private const val EPOCHS = 3
-private const val TRAINING_BATCH_SIZE = 500
+private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 
 fun main() {
@@ -28,8 +28,8 @@ fun main() {
     lenet5.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.MAE,
-            metric = Metrics.MAE
+            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.MAPE
         )
 
         (it as Sequential).summary()
@@ -47,9 +47,7 @@ fun main() {
 
         drawFilters(weights[0])
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-        println("Accuracy $accuracy")
+        println(it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics.toString())
 
         val (prediction, activations) = it.predictAndGetActivations(train.getImage(imageId))
 

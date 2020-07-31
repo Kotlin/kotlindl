@@ -3,7 +3,6 @@ package api.keras
 import api.*
 import api.inference.keras.loadConfig
 import api.inference.keras.saveConfig
-import api.keras.activations.Activations
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
 import api.keras.exceptions.RepeatableLayerNameException
@@ -21,6 +20,7 @@ import ch.qos.logback.classic.Level
 import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 
 /**
@@ -157,7 +157,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
 
         xOp = firstLayer.input
-        yOp = tf.placeholder(getDType()) as Operand<T>
+        yOp = tf.placeholder(getDType(), Placeholder.shape(Shape.make(-1L, amountOfClasses))) as Operand<T>
 
         yPred = transformInputWithNNModel(xOp)
         lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
@@ -168,7 +168,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private fun validateModelArchitecture(): Unit {
         require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         require(layers.last().hasActivation()) { "Last layer must have an activation function." }
-        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Sigmoid activation, alternative activations are not supported yet!" }
+//        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Sigmoid activation, alternative activations are not supported yet!" }
     }
 
     override fun fit(
@@ -254,8 +254,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
 
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-        //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
+        val prediction: Operand<T> = when (loss) {
+            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            else -> tf.withName(OUTPUT_NAME).identity(yPred)
+        }
 
         val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
 

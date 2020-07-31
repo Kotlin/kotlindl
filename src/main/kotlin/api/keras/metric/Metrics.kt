@@ -1,12 +1,15 @@
 package api.keras.metric
 
+import api.keras.Kmean
+import api.keras.computeWeightedMetric
+import api.keras.squeezeOrExpandDimensions
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 
 // TODO: https://github.com/tensorflow/tfjs/blob/master/tfjs-layers/src/metrics.ts
 enum class Metrics {
-    ACCURACY, MAE, MSE;
+    ACCURACY, MAE, MSE, MAPE, RMSE;
 
     companion object {
         fun <T : Number> convert(metricType: Metrics): Metric<T> {
@@ -14,6 +17,8 @@ enum class Metrics {
                 ACCURACY -> Accuracy()
                 MAE -> MAE()
                 MSE -> MSE()
+                MAPE -> MAPE()
+                RMSE -> RMSE()
             }
         }
     }
@@ -29,24 +34,43 @@ class Accuracy<T : Number>() : Metric<T> {
 }
 
 class MAE<T : Number>() : Metric<T> {
-    override fun apply(tf: Ops, output: Operand<T>, label: Operand<T>, dtype: Class<T>): Operand<T> {
-        val predicted: Operand<Long> = tf.math.argMax(output, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(label, tf.constant(1))
+    override fun apply(tf: Ops, yPred: Operand<T>, yTrue: Operand<T>, dtype: Class<T>): Operand<T> {
+        val triada = squeezeOrExpandDimensions(tf, yTrue, yPred, null)
+        val _yTrue = triada.labels
+        val _yPred = triada.predictions
+        val _losses = triada.losses
 
-        val absoluteErrors = tf.math.abs(tf.math.sub(predicted, expected))
-
-        return tf.math.mean(tf.dtypes.cast(absoluteErrors, dtype), tf.constant(0))
+        val losses = Kmean(tf, tf.math.abs(tf.math.sub(_yPred, _yTrue)), tf.constant(-1))
+        return computeWeightedMetric(tf, losses)
     }
 }
 
 class MSE<T : Number>() : Metric<T> {
-    override fun apply(tf: Ops, output: Operand<T>, label: Operand<T>, dtype: Class<T>): Operand<T> {
-        val predicted: Operand<Long> = tf.math.argMax(output, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(label, tf.constant(1))
+    override fun apply(tf: Ops, yPred: Operand<T>, yTrue: Operand<T>, dtype: Class<T>): Operand<T> {
+        val triada = squeezeOrExpandDimensions(tf, yTrue, yPred, null)
+        val _yTrue = triada.labels
+        val _yPred = triada.predictions
+        val _losses = triada.losses
 
-        val squaredError = tf.math.squaredDifference(predicted, expected)
-
-        return tf.math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0))
+        val losses = Kmean(tf, tf.math.squaredDifference(_yPred, _yTrue), tf.constant(-1))
+        return computeWeightedMetric(tf, losses)
     }
 }
 
+class RMSE<T : Number>() : Metric<T> {
+    override fun apply(tf: Ops, yPred: Operand<T>, yTrue: Operand<T>, dtype: Class<T>): Operand<T> {
+        val triada = squeezeOrExpandDimensions(tf, yTrue, yPred, null)
+        val _yTrue = triada.labels
+        val _yPred = triada.predictions
+        val _losses = triada.losses
+
+        val losses = Kmean(tf, tf.math.squaredDifference(_yPred, _yTrue), tf.constant(-1))
+        return computeWeightedMetric(tf, losses)
+    }
+}
+
+class MAPE<T : Number> : Metric<T> {
+    override fun apply(tf: Ops, yPred: Operand<T>, yTrue: Operand<T>, dtype: Class<T>): Operand<T> {
+        throw UnsupportedOperationException()
+    }
+}
