@@ -6,7 +6,7 @@ import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
 
 open class ActivationTest {
-    val EPS = 1e-7f
+    val EPS = 1e-2f
 
     protected fun assertActivationFunction(
         instance: Activation<Float>,

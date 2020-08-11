@@ -21,10 +21,10 @@ internal class ParametrizedRandomNormalTest {
     fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }
         val expected = Array(2) { FloatArray(2) { 0f } }
-        expected[0][0] = 2.892295f
-        expected[0][1] = 2.0599146f
-        expected[1][0] = -1.6870136f
-        expected[1][1] = -1.1708088f
+        expected[0][0] = -1.366183f
+        expected[0][1] = 1.152605f
+        expected[1][0] = 2.1622126f
+        expected[1][1] = 3.8308368f
 
         val shape = Shape.make(2, 2)
 

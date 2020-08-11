@@ -1,6 +1,7 @@
 package api.keras.dataset
 
 import java.io.IOException
+import java.nio.Buffer
 import java.nio.FloatBuffer
 import kotlin.math.min
 import kotlin.math.truncate
@@ -98,7 +99,7 @@ class ImageDataset internal constructor(
             for (i in start until start + length) {
                 buffer.put(src[i])
             }
-            return buffer.rewind() as FloatBuffer
+            return (buffer as Buffer).rewind() as FloatBuffer
         }
 
         fun createTrainAndTestDatasets(
