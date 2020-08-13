@@ -6,59 +6,80 @@ in https://github.com/dhruvrajan/tensorflow-keras-java and https://github.com/dh
 Classic LeNet-5 with minor changes looks so Keras, isn't it?
 
 ```kotlin
-private val model = Sequential.of<Float>(
-    Input(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS),
+private val lenet5Classic = Sequential.of<Float>(
+    Input(
+        IMAGE_SIZE,
+        IMAGE_SIZE,
+        NUM_CHANNELS
+    ),
     Conv2D(
-        filters = 32,
+        filters = 6,
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        activation = Activations.Tanh,
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.VALID
     ),
     Conv2D(
-        filters = 64,
+        filters = 16,
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        activation = Activations.Tanh,
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
     AvgPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.VALID
     ),
     Flatten(), // 3136
     Dense(
-        outputSize = 512,
-        activation = Activations.Relu,
-        kernelInitializer = TruncatedNormal(SEED),
+        outputSize = 120,
+        activation = Activations.Tanh,
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = NUM_LABELS,
+        outputSize = 84,
+        activation = Activations.Tanh,
+        kernelInitializer = GlorotNormal(SEED),
+        biasInitializer = Constant(0.1f)
+    ),
+    Dense(
+        outputSize = AMOUNT_OF_CLASSES,
         activation = Activations.Linear,
-        kernelInitializer = TruncatedNormal(SEED),
+        kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
 )
 
 fun main() {
-    val dataset = ImageDataset.create(VALIDATION_SIZE)
-    val (train, test) = dataset.split(0.75)
+    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        TRAIN_IMAGES_ARCHIVE,
+        TRAIN_LABELS_ARCHIVE,
+        TEST_IMAGES_ARCHIVE,
+        TEST_LABELS_ARCHIVE,
+        AMOUNT_OF_CLASSES,
+        ::extractImages,
+        ::extractLabels
+    )
 
-    model.use {
-        it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    lenet5Classic.use {
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-        it.fit(trainDataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, isDebugMode = true)
+        it.summary()
 
-        val accuracy = it.evaluate(testDataset = test, metric = Metrics.ACCURACY)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
     }

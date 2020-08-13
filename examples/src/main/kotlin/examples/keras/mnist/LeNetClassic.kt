@@ -90,15 +90,15 @@ fun main() {
         ::extractLabels
     )
 
-    lenet5Classic.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    lenet5Classic.use {
+        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
-    lenet5Classic.summary()
+        it.summary()
 
-    lenet5Classic.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = lenet5Classic.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
-    lenet5Classic.close()
-
-    println("Accuracy: $accuracy")
+        println("Accuracy: $accuracy")
+    }
 }

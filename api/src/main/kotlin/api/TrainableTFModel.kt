@@ -131,6 +131,4 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
 
         return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose, isWeightsInitRequired)
     }
-
-
 }

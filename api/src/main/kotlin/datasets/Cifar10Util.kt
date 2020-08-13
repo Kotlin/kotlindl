@@ -2,7 +2,7 @@ package datasets
 
 import api.keras.dataset.ImageDataset
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import examples.util.getImage
+import datasets.util.getImage
 import java.awt.image.DataBufferByte
 import java.io.IOException
 import java.util.zip.ZipEntry
