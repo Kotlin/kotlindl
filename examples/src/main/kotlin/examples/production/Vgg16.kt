@@ -2,19 +2,18 @@ package examples.production
 
 
 import api.inference.keras.loadConfig
-import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.util.getImage
-import io.jhdf.HdfFile
+import datasets.util.getImage
 import java.awt.image.DataBufferByte
 import java.io.File
 import java.io.InputStream
 
 fun main() {
-    val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg19\\modelConfig.json"
+    val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
+    //val jsonConfigRightPath = ImageDataset::class.java.classLoader.getResource(jsonConfigFilePath).path.toString()
 
     val jsonConfigFile = File(jsonConfigFilePath)
 
@@ -29,12 +28,8 @@ fun main() {
 
         it.summary()
         println(it.kGraph)
-        val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg19\\hdf5\\weights.h5"
-        val file = File(pathToWeights)
-        val hdfFile = HdfFile(file)
-        it.loadWeights(hdfFile)
         //it.init()
-        //it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg19\\")
+        it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg\\")
 
         for (i in 1..8) {
             val inputStream = ImageDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")

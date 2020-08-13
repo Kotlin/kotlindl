@@ -1,4 +1,4 @@
-package examples.util
+package datasets.util
 
 import api.keras.dataset.ImageDataset
 import java.awt.image.BufferedImage

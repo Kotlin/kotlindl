@@ -1,4 +1,4 @@
-package examples.util
+package datasets.util
 
 private const val LEARNING_RATE = 0.2f
 private const val EPOCHS = 10

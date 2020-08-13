@@ -27,7 +27,7 @@ fun main() {
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 
-        val prediction = it.predict(images[0])
+        val prediction = it.predict(images[0] as util.MnistUtils.Image)
         println("Predicted Label is: " + prediction[0].toInt())
         println("Correct Label is: " + images[0].label)
 

@@ -1,2 +1,5 @@
 rootProject.name = 'kotlin-dl'
+include("api")
+include("examples")
+
 
