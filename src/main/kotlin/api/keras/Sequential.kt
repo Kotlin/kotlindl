@@ -633,10 +633,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     infix fun getLayer(layerName: String): Layer<T> {
-        return layersByName[layerName]!!
+        return layersByName[layerName] ?: error("No such layer $layerName in the model.")
     }
 
-    fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26) {
+    /**
+     * @return list of layer descriptions.
+     */
+    fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("=================================================================")
@@ -647,9 +650,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         var totalTrainableParams = 0
         var totalFrozenParams = 0
+
+        val layerDescriptions = mutableListOf<String>()
+
         for (l in layers) {
             if (l.isTrainable) totalTrainableParams += l.getParams() else totalFrozenParams += l.getParams()
-            logger.info(createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize))
+            val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
+            layerDescriptions.add(layerDescription)
+            logger.info(layerDescription)
             logger.info("_________________________________________________________________")
         }
 
@@ -658,6 +666,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         logger.info("Total frozen params: $totalFrozenParams")
         logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
         logger.info("=================================================================")
+
+        return layerDescriptions
     }
 
     private fun createLayerDescription(
@@ -684,6 +694,4 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         return stringBuilder.toString()
     }
-
-
 }

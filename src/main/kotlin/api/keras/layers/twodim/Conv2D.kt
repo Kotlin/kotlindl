@@ -17,12 +17,11 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 import kotlin.math.roundToInt
 
-
-enum class ConvPadding {
-    SAME,
-    VALID,
-    FULL
-}
+ enum class ConvPadding {
+     SAME,
+     VALID,
+     FULL
+ }
 
 class Conv2D<T : Number>(
     val filters: Long,

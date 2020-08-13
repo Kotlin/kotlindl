@@ -1,4 +1,4 @@
-package examples.keras.cifar10.util
+package datasets
 
 import api.keras.dataset.ImageDataset
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
@@ -10,14 +10,22 @@ import java.util.zip.ZipFile
 
 const val IMAGES_ARCHIVE = "cifar10/data"
 const val LABELS_ARCHIVE = "cifar10/trainLabels.csv"
-const val DATASET_SIZE = 50000
+private const val DATASET_SIZE = 50000
 
 @Throws(IOException::class)
 fun extractCifar10Images(archiveName: String): Array<FloatArray> {
     val numOfPixels: Int = 32 * 32 * 3
 
-    val images1Batch = loadImagesFromZipArchive(numOfPixels, DATASET_SIZE / 2, "$archiveName/images1.zip")
-    val images2Batch = loadImagesFromZipArchive(numOfPixels, DATASET_SIZE / 2, "$archiveName/images2.zip")
+    val images1Batch = loadImagesFromZipArchive(
+        numOfPixels,
+        DATASET_SIZE / 2,
+        "$archiveName/images1.zip"
+    )
+    val images2Batch = loadImagesFromZipArchive(
+        numOfPixels,
+        DATASET_SIZE / 2,
+        "$archiveName/images2.zip"
+    )
 
     return images1Batch + images2Batch
 }

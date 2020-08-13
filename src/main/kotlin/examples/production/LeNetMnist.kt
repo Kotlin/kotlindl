@@ -5,7 +5,7 @@ import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.mnist.util.*
+import datasets.*
 import javax.swing.JFrame
 
 private const val EPOCHS = 1

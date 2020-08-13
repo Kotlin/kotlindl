@@ -7,8 +7,7 @@ import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.fashionmnist.util.*
-import examples.keras.mnist.util.AMOUNT_OF_CLASSES
+import datasets.*
 import examples.production.drawActivations
 import examples.production.drawFilters
 import examples.production.getLabel

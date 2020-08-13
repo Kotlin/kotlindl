@@ -15,7 +15,7 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.mnist.util.*
+import datasets.*
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000

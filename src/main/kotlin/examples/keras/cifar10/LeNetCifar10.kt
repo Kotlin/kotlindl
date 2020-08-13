@@ -15,10 +15,10 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
-import examples.keras.cifar10.util.IMAGES_ARCHIVE
-import examples.keras.cifar10.util.LABELS_ARCHIVE
-import examples.keras.cifar10.util.extractCifar10Images
-import examples.keras.cifar10.util.extractCifar10Labels
+import datasets.IMAGES_ARCHIVE
+import datasets.LABELS_ARCHIVE
+import datasets.extractCifar10Images
+import datasets.extractCifar10Labels
 
 private const val LEARNING_RATE = 0.1f
 private const val EPOCHS = 20

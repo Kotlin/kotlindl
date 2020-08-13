@@ -5,7 +5,7 @@ import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.mnist.util.*
+import datasets.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 private const val EPOCHS = 3

@@ -8,7 +8,7 @@ import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.RMSProp
 import api.keras.optimizers.SGD
-import examples.keras.mnist.util.*
+import datasets.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
 private const val EPOCHS = 1

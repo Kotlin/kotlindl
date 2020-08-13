@@ -2,13 +2,7 @@ package examples.production
 
 import api.inference.savedmodel.InferenceModel
 import api.keras.dataset.ImageDataset
-import examples.keras.fashionmnist.util.FASHION_TEST_IMAGES_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TEST_LABELS_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TRAIN_IMAGES_ARCHIVE
-import examples.keras.fashionmnist.util.FASHION_TRAIN_LABELS_ARCHIVE
-import examples.keras.mnist.util.AMOUNT_OF_CLASSES
-import examples.keras.mnist.util.extractImages
-import examples.keras.mnist.util.extractLabels
+import datasets.*
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 

@@ -11,7 +11,7 @@ import api.keras.layers.Input
 import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
-import examples.keras.mnist.util.AMOUNT_OF_CLASSES
+import datasets.AMOUNT_OF_CLASSES
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L

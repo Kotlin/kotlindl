@@ -13,7 +13,7 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.fashionmnist.util.*
+import datasets.*
 
 private const val EPOCHS = 5
 private const val TRAINING_BATCH_SIZE = 100
@@ -154,7 +154,7 @@ fun main() {
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
-        examples.keras.mnist.util.AMOUNT_OF_CLASSES,
+        AMOUNT_OF_CLASSES,
         ::extractFashionImages,
         ::extractFashionLabels
     )

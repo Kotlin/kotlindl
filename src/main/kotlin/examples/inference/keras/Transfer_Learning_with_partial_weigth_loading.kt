@@ -8,8 +8,7 @@ import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import examples.keras.fashionmnist.util.*
-import examples.keras.mnist.util.AMOUNT_OF_CLASSES
+import datasets.*
 import io.jhdf.HdfFile
 import java.io.File
 
