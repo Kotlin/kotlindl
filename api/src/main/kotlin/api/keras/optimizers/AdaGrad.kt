@@ -13,8 +13,9 @@ private const val ACCUMULATOR = "accumulator"
 
 class AdaGrad<T : Number>(
     private val learningRate: Float = 0.1f,
-    private val initialAccumulatorValue: Float = 0.01f
-) : Optimizer<T>() {
+    private val initialAccumulatorValue: Float = 0.01f,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
     private lateinit var initialAccumulatorValueConstant: Constant<T>
     private lateinit var learningRateConst: Constant<T>
 
@@ -40,7 +41,7 @@ class AdaGrad<T : Number>(
                 tf.train.applyAdagrad(
                     variable, slot,
                     learningRateConst,
-                    gradients.dy(i)
+                    clipGradient.clipGradient(tf, gradients.dy(i))
                 )
             )
 

@@ -18,8 +18,9 @@ class RMSProp<T : Number>(
     private val decay: Float = 0.9f,
     private val momentum: Float = 0.0f,
     private val epsilon: Float = 1e-10f,
-    private val centered: Boolean = false
-) : Optimizer<T>() {
+    private val centered: Boolean = false,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
 
     private lateinit var epsilonConstant: Constant<T>
     private lateinit var learningRateConst: Constant<T>
@@ -56,7 +57,7 @@ class RMSProp<T : Number>(
                         decayConst,
                         momentumConst,
                         epsilonConstant,
-                        gradients.dy(i)
+                        clipGradient.clipGradient(tf, gradients.dy(i))
                     )
                 )
             } else {

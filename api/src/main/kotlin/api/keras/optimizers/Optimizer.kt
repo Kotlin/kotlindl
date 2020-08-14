@@ -9,7 +9,7 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 
 /** Base class for all optimizers. */
-abstract class Optimizer<T : Number> {
+abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
     private lateinit var dtype: Class<T>
 
     /**

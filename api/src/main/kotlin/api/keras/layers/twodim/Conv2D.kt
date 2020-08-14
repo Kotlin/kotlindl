@@ -15,6 +15,8 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.nn.Conv2d
+import org.tensorflow.op.nn.Conv2d.dilations
 import kotlin.math.roundToInt
 
  enum class ConvPadding {
@@ -27,6 +29,7 @@ class Conv2D<T : Number>(
     val filters: Long,
     val kernelSize: LongArray,
     val strides: LongArray,
+    val dilations: LongArray = longArrayOf(1, 1, 1, 1),
     val activation: Activations = Activations.Relu,
     val kernelInitializer: Initializer<T>,
     val biasInitializer: Initializer<T>,
@@ -100,7 +103,8 @@ class Conv2D<T : Number>(
             ConvPadding.FULL -> "FULL"
         }
 
-        val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding), bias)
+        val options: Conv2d.Options = dilations(dilations.toList()).dataFormat("NHWC")
+        val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options), bias)
         return Activations.convert<T>(activation).apply(tf, signal, name)
     }
 

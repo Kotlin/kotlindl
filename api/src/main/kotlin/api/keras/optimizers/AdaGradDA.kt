@@ -18,8 +18,9 @@ class AdaGradDA<T : Number>(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,
     private val l1Strength: Float = 0.01f,
-    private val l2Strength: Float = 0.01f
-) : Optimizer<T>() {
+    private val l2Strength: Float = 0.01f,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
     private lateinit var learningRateConst: Constant<T>
     private lateinit var l1StrengthConst: Constant<T>
     private lateinit var l2StrengthConst: Constant<T>
@@ -50,7 +51,7 @@ class AdaGradDA<T : Number>(
             targets.add(
                 tf.train.applyAdagradDa(
                     variable, gradSlot, gradSquaredSlot,
-                    gradients.dy(i),
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
                     learningRateConst,
                     l1StrengthConst,
                     l2StrengthConst,

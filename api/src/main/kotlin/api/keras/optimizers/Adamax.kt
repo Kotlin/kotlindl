@@ -23,8 +23,9 @@ class Adamax<T : Number>(
     private val learningRate: Float = 0.001f,
     private val beta1: Float = 0.9f,
     private val beta2: Float = 0.999f,
-    private val epsilon: Float = 1e-07f
-) : Optimizer<T>() {
+    private val epsilon: Float = 1e-07f,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
 
     private lateinit var epsilonConstant: Constant<T>
     private lateinit var learningRateConst: Constant<T>
@@ -63,7 +64,7 @@ class Adamax<T : Number>(
                     betaOneConst,
                     betaTwoConst,
                     epsilonConstant,
-                    gradients.dy(i)
+                    clipGradient.clipGradient(tf, gradients.dy(i))
                 )
             )
         }

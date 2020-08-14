@@ -13,7 +13,7 @@ class KTensor() : AutoCloseable {
 
     operator fun plus(kTensor: KTensor): KTensor {
         val otherTensor = kTensor.tensor
-        require(!tensor.shape()!!.contentEquals(otherTensor.shape())) {
+        require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
             "The left tensor shape ${tensor.shape()!!
                 .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
                 .contentToString()}."
@@ -59,7 +59,7 @@ class KTensor() : AutoCloseable {
 
     operator fun minus(kTensor: KTensor): KTensor {
         val otherTensor = kTensor.tensor
-        require(!tensor.shape()!!.contentEquals(otherTensor.shape())) {
+        require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
             "The left tensor shape ${tensor.shape()!!
                 .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
                 .contentToString()}."
@@ -91,7 +91,7 @@ class KTensor() : AutoCloseable {
 
     operator fun times(kTensor: KTensor): KTensor {
         val otherTensor = kTensor.tensor
-        require(!tensor.shape()!!.contentEquals(otherTensor.shape())) {
+        require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
             "The left tensor shape ${tensor.shape()!!
                 .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
                 .contentToString()}."

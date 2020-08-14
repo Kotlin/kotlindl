@@ -22,8 +22,9 @@ class Ftrl<T : Number>(
     private val l1RegularizationStrength: Float = 0.0f,
     private val l2RegularizationStrength: Float = 0.0f,
     private val learningRatePower: Float = -0.5f,
-    private val l2ShrinkageRegularizationStrength: Float = 0.0f
-) : Optimizer<T>() {
+    private val l2ShrinkageRegularizationStrength: Float = 0.0f,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
 
     private var initialAccumulatorValue = 0.0f
     private lateinit var learningRatePowerConst: Constant<T>
@@ -61,7 +62,7 @@ class Ftrl<T : Number>(
                     variable,
                     accumSlot,
                     linearSlot,
-                    gradients.dy(i),
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
                     learningRateConst,
                     l1RegularizationStrengthConst,
                     l2RegularizationStrengthConst,

@@ -15,8 +15,9 @@ private const val ACCUMULATOR_UPDATE = "accum_update"
 class AdaDelta<T : Number>(
     private val learningRate: Float = 0.1f,
     private val rho: Float = 0.95f,
-    private val epsilon: Float = 1e-8f
-) : Optimizer<T>() {
+    private val epsilon: Float = 1e-8f,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
     private lateinit var epsilonConstant: Constant<T>
     private lateinit var learningRateConst: Constant<T>
     private lateinit var rhoConst: Constant<T>
@@ -47,7 +48,7 @@ class AdaDelta<T : Number>(
                     learningRateConst,
                     rhoConst,
                     epsilonConstant,
-                    gradients.dy(i)
+                    clipGradient.clipGradient(tf, gradients.dy(i))
                 )
             )
 

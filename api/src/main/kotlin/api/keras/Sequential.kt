@@ -46,10 +46,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     private var layersByName: Map<String, Layer<T>> = mapOf()
 
     /** Is true when model is compiled. */
-    private var isModelCompiled: Boolean = false
+    var isModelCompiled: Boolean = false
+        private set
 
     /** Is true when model is initialized. */
-    private var isModelInitialized: Boolean = false
+    var isModelInitialized: Boolean = false
+        private set
 
     /** Main loss operand. */
     private lateinit var lossOp: Operand<T>
@@ -222,6 +224,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     fun init() {
+        require(!isModelInitialized) { "Model is initialized already!" }
         logger.debug { "Initialization of TensorFlow Graph variables" }
         kGraph.initializeGraphVariables(session)
         isModelInitialized = true

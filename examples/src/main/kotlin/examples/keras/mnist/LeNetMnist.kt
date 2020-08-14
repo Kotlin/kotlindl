@@ -14,10 +14,10 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.Ftrl
+import api.keras.optimizers.SGD
 import datasets.*
 
-private const val EPOCHS = 5
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
@@ -87,7 +87,7 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = Ftrl(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = SGD(learningRate = 0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         println(it.kGraph)
 

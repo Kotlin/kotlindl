@@ -243,6 +243,7 @@ private fun <T : Number> createKerasConv2D(layer: Conv2D<T>): KerasLayer {
         filters = layer.filters.toInt(),
         kernel_size = kernelSize,
         strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer),
@@ -355,7 +356,7 @@ private fun <T : Number> createMaxPooling2D(config: LayerConfig, name: String): 
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!))
+    return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
 fun convertPadding(padding: String): ConvPadding {
@@ -368,7 +369,7 @@ fun convertPadding(padding: String): ConvPadding {
 }
 
 private fun <T : Number> createFlatten(config: LayerConfig, name: String): Flatten<T> {
-    return Flatten()
+    return Flatten(name = name)
 }
 
 private fun <T : Number> createConv2D(config: LayerConfig, name: String): Conv2D<T> {
@@ -381,10 +382,18 @@ private fun <T : Number> createConv2D(config: LayerConfig, name: String): Conv2D
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
+    val dilations = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilations = LongArray(4)
+    addedOnesDilations[0] = 1
+    addedOnesDilations[1] = dilations[0]
+    addedOnesDilations[2] = dilations[1]
+    addedOnesDilations[3] = 1
+
     return Conv2D(
         filters = config.filters!!.toLong(),
         kernelSize = kernelSize,
         strides = addedOnesStrides,
+        dilations = addedOnesDilations,
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),

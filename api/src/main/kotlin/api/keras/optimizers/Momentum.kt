@@ -15,9 +15,9 @@ private const val MOMENTUM = "momentum"
 class Momentum<T : Number>(
     private val learningRate: Float = 0.001f,
     private val momentum: Float = 0.99f,
-    private val useNesterov: Boolean = true
-) : Optimizer<T>() {
-
+    private val useNesterov: Boolean = true,
+    clipGradient: ClipGradientAction<T> = NoClipGradient()
+) : Optimizer<T>(clipGradient) {
     private lateinit var momentumConst: Constant<T>
     private lateinit var learningRateConst: Constant<T>
 
@@ -43,7 +43,7 @@ class Momentum<T : Number>(
                     variable,
                     slot,
                     learningRateConst,
-                    gradients.dy(i),
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
                     momentumConst,
                     ApplyMomentum.useNesterov(useNesterov)
                 )

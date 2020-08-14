@@ -16,7 +16,7 @@ import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import datasets.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class CnnTest : IntegrationTest() {
@@ -72,28 +72,6 @@ internal class CnnTest : IntegrationTest() {
             name = "dense_2"
         )
     )
-
-
-    @Test
-    fun buildModel() {
-        assertEquals(testModel.layers.size, 7)
-        assertTrue(testModel.getLayer("conv2d_1") is Conv2D)
-        assertTrue(testModel.getLayer("conv2d_2") is Conv2D)
-        assertTrue(testModel.getLayer("conv2d_1").isTrainable)
-        assertTrue(testModel.getLayer("conv2d_1").hasActivation())
-        assertTrue(testModel.getLayer("flatten_1").isTrainable)
-        assertFalse(testModel.getLayer("flatten_1").hasActivation())
-        assertArrayEquals(testModel.firstLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
-    }
-
-    @Test
-    fun summary() {
-        testModel.use {
-            it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
-            val layerDescriptions = testModel.summary()
-            assertTrue(layerDescriptions[0].contentEquals("conv2d_1(Conv2D)             [-1, 28, 28, 32]          832"))
-        }
-    }
 
     @Test
     fun mnistDatasetCreation() {
