@@ -2,7 +2,6 @@ package datasets
 
 import api.keras.dataset.ImageDataset
 import java.io.DataInputStream
-import java.io.IOException
 import java.util.zip.GZIPInputStream
 
 private const val IMAGE_ARCHIVE_MAGIC = 2051
@@ -14,7 +13,6 @@ const val TEST_IMAGES_ARCHIVE = "t10k-images-idx3-ubyte.gz"
 const val TEST_LABELS_ARCHIVE = "t10k-labels-idx1-ubyte.gz"
 const val AMOUNT_OF_CLASSES = 10
 
-@Throws(IOException::class)
 fun extractImages(archiveName: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
@@ -48,7 +46,6 @@ fun extractImages(archiveName: String): Array<FloatArray> {
     return images
 }
 
-@Throws(IOException::class)
 fun extractLabels(archiveName: String, numClasses: Int): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(

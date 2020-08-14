@@ -36,9 +36,6 @@ artifacts {
     archives sourcesJar
 }
 
-group 'org.jetbrains.kotlin.kotlin-dl'
-version '0.0.1'
-
 publishing {
     publications {
         maven(MavenPublication) {

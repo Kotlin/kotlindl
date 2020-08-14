@@ -15,6 +15,7 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
+import api.keras.optimizers.ClipGradientByValue
 import datasets.*
 
 private const val EPOCHS = 3
@@ -91,7 +92,10 @@ fun main() {
     )
 
     lenet5Classic.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(
+            optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
+        )
 
         it.summary()
 

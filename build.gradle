@@ -7,12 +7,18 @@ plugins {
 
 allprojects {
     group = 'org.jetbrains.kotlin.kotlin-dl'
-    version = '0.0.1'
+    version = '0.0.2.1'
 
     apply plugin: "com.jfrog.bintray"
     apply plugin: "maven-publish"
     apply plugin: "maven"
     apply plugin: "kotlin"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
 }
 
 subprojects {
