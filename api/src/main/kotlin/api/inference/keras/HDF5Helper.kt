@@ -18,30 +18,30 @@ import io.jhdf.api.Group
 import java.io.File
 
 // Keras layers
-private val LAYER_CONV2D = "Conv2D"
-private val LAYER_DENSE = "Dense"
-private val LAYER_MAX_POOLING_2D = "MaxPooling2D"
-private val LAYER_FLATTEN = "Flatten"
+private const val LAYER_CONV2D = "Conv2D"
+private const val LAYER_DENSE = "Dense"
+private const val LAYER_MAX_POOLING_2D = "MaxPooling2D"
+private const val LAYER_FLATTEN = "Flatten"
 
 // Keras data types
-private val DATATYPE_FLOAT32 = "float32"
+private const val DATATYPE_FLOAT32 = "float32"
 
 // Keras Initializers
-private val INITIALIZER_GLOROT_UNIFORM = "GlorotUniform"
-private val INITIALIZER_GLOROT_NORMAL = "GlorotNormal"
-private val INITIALIZER_ZEROS = "Zeros"
-private val INITIALIZER_ONES = "Ones"
-private val INITIALIZER_RANDOM_NORMAL = "RandomNormal"
+private const val INITIALIZER_GLOROT_UNIFORM = "GlorotUniform"
+private const val INITIALIZER_GLOROT_NORMAL = "GlorotNormal"
+private const val INITIALIZER_ZEROS = "Zeros"
+private const val INITIALIZER_ONES = "Ones"
+private const val INITIALIZER_RANDOM_NORMAL = "RandomNormal"
 
 // Keras activations
-private val ACTIVATION_RELU = "relu"
-private val ACTIVATION_SIGMOID = "sigmoid"
-private val ACTIVATION_SOFTMAX = "softmax"
-private val LINEAR = "linear"
+private const val ACTIVATION_RELU = "relu"
+private const val ACTIVATION_SIGMOID = "sigmoid"
+private const val ACTIVATION_SOFTMAX = "softmax"
+private const val LINEAR = "linear"
 
 // Layer settings
-private val CHANNELS_LAST = "channels_last"
-private val PADDING_SAME = "same"
+private const val CHANNELS_LAST = "channels_last"
+private const val PADDING_SAME = "same"
 
 fun Sequential<Float>.loadWeights(hdfFile: HdfFile) {
     this.logger.debug { "Starting weights loading.." }
@@ -307,7 +307,7 @@ private fun <T : Number> convertToLayer(kerasLayer: KerasLayer): Layer<T> {
 }
 
 private fun <T : Number> createDense(config: LayerConfig, name: String): Dense<T> {
-    return Dense<T>(
+    return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
@@ -382,18 +382,18 @@ private fun <T : Number> createConv2D(config: LayerConfig, name: String): Conv2D
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    val dilations = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilations = LongArray(4)
-    addedOnesDilations[0] = 1
-    addedOnesDilations[1] = dilations[0]
-    addedOnesDilations[2] = dilations[1]
-    addedOnesDilations[3] = 1
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(4)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = dilation[1]
+    addedOnesDilation[3] = 1
 
     return Conv2D(
         filters = config.filters!!.toLong(),
         kernelSize = kernelSize,
         strides = addedOnesStrides,
-        dilations = addedOnesDilations,
+        dilations = addedOnesDilation,
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
