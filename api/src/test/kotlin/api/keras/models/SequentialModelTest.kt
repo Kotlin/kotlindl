@@ -204,6 +204,6 @@ internal class SequentialModelTest {
         assertEquals(model.layers[0].name, "conv2d_1")
         assertEquals(model.layers[1].name, "maxpool2d_2")
         assertEquals(model.layers[2].name, "flatten_3")
-        assertEquals(model.layers[4].name, "dense_4")
+        assertEquals(model.layers[3].name, "dense_4")
     }
 }
