@@ -1,24 +1,21 @@
-package examples.production
+package examples.inference.keras.vgg
 
 
-import api.inference.keras.loadConfig
+import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.util.getImage
 import io.jhdf.HdfFile
-import java.awt.image.DataBufferByte
 import java.io.File
-import java.io.InputStream
 
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg19\\modelConfig.json"
 
     val jsonConfigFile = File(jsonConfigFilePath)
 
-    val model = loadConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
 
     model.use {
         it.compile(
@@ -32,11 +29,11 @@ fun main() {
         val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg19\\hdf5\\weights.h5"
         val file = File(pathToWeights)
         val hdfFile = HdfFile(file)
+
         it.loadWeights(hdfFile)
-        //it.init()
-        //it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg19\\")
 
         for (i in 1..8) {
+            println("image$i")
             val inputStream = ImageDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
@@ -44,17 +41,18 @@ fun main() {
 
             val (res, activations) = it.predictAndGetActivations(floatArray, "Softmax")
             println(res)
-            drawActivations(activations)
+            //drawActivations(activations)
 
             val predictionVector = it.predictSoftly(floatArray, "Softmax").toMutableList()
             val predictionVector2 = it.predictSoftly(floatArray, "Softmax").toMutableList()
 
 
             val top5: MutableMap<Int, Int> = mutableMapOf()
-            for (i in 1..5) {
-                val max = predictionVector2.max()
+            for (j in 1..5) {
+
+                val max = predictionVector2.maxOrNull()
                 val indexOfElem = predictionVector.indexOf(max!!)
-                top5[i] = indexOfElem
+                top5[j] = indexOfElem
                 predictionVector2.remove(max)
             }
 
@@ -72,18 +70,6 @@ fun main() {
 
         drawFilters(weights4[0])*/
     }
-}
-
-private fun loadImageAndConvertToFloatArray(inputStream: InputStream): FloatArray {
-    val (imageByteArrays, image) = getImage(inputStream, imageType = "jpg")
-
-    val pixels = (image.raster.dataBuffer as DataBufferByte).data
-
-    val floatArray =
-        ImageDataset.toRawVector(
-            pixels
-        )
-    return floatArray
 }
 
 

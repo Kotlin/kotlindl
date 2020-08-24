@@ -1,10 +1,17 @@
 package examples.inference.keras
 
-import api.inference.keras.buildModelByJSONConfig
-import api.inference.keras.loadWeights
+import LeNetClassic.SEED
+import api.inference.keras.buildLayersByKerasJSONConfig
+import api.inference.keras.loadWeightsForFrozenLayers
+import api.keras.Sequential
+import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
+import api.keras.initializers.HeNormal
+import api.keras.layers.Dense
+import api.keras.layers.Flatten
 import api.keras.layers.Layer
 import api.keras.layers.twodim.Conv2D
+import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -36,19 +43,56 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val (otherLayers, input) = buildLayersByKerasJSONConfig<Float>(jsonConfigFile)
+
+    val layers = mutableListOf<Layer<Float>>()
+    for (layer in otherLayers) {
+        if (layer::class == Conv2D::class || layer::class == MaxPool2D::class) {
+            layer.isTrainable = false
+            layers.add(layer)
+        }
+    }
+
+    layers.add(Flatten("new_flatten"))
+    layers.add(
+        Dense(
+            name = "new_dense_1",
+            kernelInitializer = HeNormal(SEED),
+            biasInitializer = HeNormal(SEED),
+            outputSize = 256,
+            activation = Activations.Relu
+        )
+    )
+    layers.add(
+        Dense(
+            name = "new_dense_2",
+            kernelInitializer = HeNormal(SEED),
+            biasInitializer = HeNormal(SEED),
+            outputSize = 128,
+            activation = Activations.Relu
+        )
+    )
+    layers.add(
+        Dense(
+            name = "new_dense_3",
+            kernelInitializer = HeNormal(SEED),
+            biasInitializer = HeNormal(SEED),
+            outputSize = 64,
+            activation = Activations.Relu
+        )
+    )
+    layers.add(
+        Dense(
+            name = "new_dense_4",
+            kernelInitializer = HeNormal(SEED),
+            biasInitializer = HeNormal(SEED),
+            outputSize = 10,
+            activation = Activations.Linear
+        )
+    )
+    val model = Sequential.of(input, layers)
 
     model.use {
-        // Freeze conv2d layers, keep dense layers trainable
-        val layerList = mutableListOf<Layer<Float>>()
-
-        for (layer in it.layers) {
-            if (layer::class == Conv2D::class) {
-                layer.isTrainable = false
-                layerList.add(layer)
-            }
-        }
-
         it.compile(
             optimizer = Adam(),
             loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -56,7 +100,7 @@ fun main() {
         )
         it.summary()
 
-        it.loadWeights(hdfFile, layerList)
+        it.loadWeightsForFrozenLayers(hdfFile)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

@@ -1,6 +1,6 @@
 package examples.inference.keras
 
-import api.inference.keras.loadConfig
+import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
 import api.keras.layers.twodim.Conv2D
@@ -11,6 +11,7 @@ import datasets.*
 import io.jhdf.HdfFile
 import java.io.File
 
+/** All weigths are loaded, Conv2D layers are freezed, Dense weights could be changed during the training. */
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -32,7 +33,7 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val model = loadConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable

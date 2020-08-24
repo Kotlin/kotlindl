@@ -1,6 +1,6 @@
 package api.keras.integration
 
-import api.inference.keras.loadConfig
+import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
 import api.keras.activations.Activations
 import api.keras.dataset.ImageDataset
@@ -25,7 +25,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         assertEquals(testModel.layers.size, 8)
         assertTrue(testModel.getLayer("conv2d_14") is Conv2D)
@@ -47,7 +47,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val (train, test) = ImageDataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -90,7 +90,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
 
         assertEquals(testModel.layers.size, 8)
@@ -114,7 +114,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val (train, test) = ImageDataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -172,7 +172,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -200,7 +200,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -254,7 +254,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -329,7 +329,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()

@@ -1,20 +1,14 @@
-package examples.inference.keras
+package examples.inference.keras.demo
 
 import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
 import api.keras.dataset.ImageDataset
-import api.keras.layers.Layer
-import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import datasets.*
-import io.jhdf.HdfFile
-import java.io.File
 
-/**
- * Conv2D layers' weights are loaded from ImageNet, Dense weights are initialized by loaded initializers.
- */
+/** All weigths are loaded, the model just evaluated */
 fun main() {
     val (train, test) = ImageDataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -26,40 +20,23 @@ fun main() {
         ::extractFashionLabels
     )
 
-    val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-    val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
-    val file = File(realPathToWeights)
-    val hdfFile = HdfFile(file)
 
-    val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-    val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
-
-    val jsonConfigFile = File(realPathToConfig)
-
+    val jsonConfigFile = getJSONConfigFile()
     val model = buildModelByJSONConfig<Float>(jsonConfigFile)
 
     model.use {
-        // Freeze conv2d layers, keep dense layers trainable
-        val layerList = mutableListOf<Layer<Float>>()
-
-        for (layer in it.layers) {
-            if (layer::class == Conv2D::class) {
-                layer.isTrainable = false
-                layerList.add(layer)
-            }
-        }
-
         it.compile(
             optimizer = Adam(),
             loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+
         it.summary()
 
-        it.loadWeights(hdfFile, layerList)
+        val hdfFile = getWeightsFile()
+        it.loadWeights(hdfFile)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-
         println("Accuracy before training $accuracyBefore")
 
         it.fit(
@@ -68,7 +45,7 @@ fun main() {
             epochs = 5,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = false,
+            verbose = true,
             isWeightsInitRequired = false // for transfer learning
         )
 
@@ -77,6 +54,7 @@ fun main() {
         println("Accuracy after training $accuracyAfterTraining")
     }
 }
+
 
 
 

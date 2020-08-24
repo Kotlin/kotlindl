@@ -1,23 +1,23 @@
-package examples.production
+package examples.inference.keras.vgg
 
 
-import api.inference.keras.loadConfig
+import api.inference.keras.buildModelByJSONConfig
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import datasets.util.getImage
+import examples.production.drawActivations
 import java.awt.image.DataBufferByte
 import java.io.File
 import java.io.InputStream
 
+/** Loads weights from .txt files especially prepared. */
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
-    //val jsonConfigRightPath = ImageDataset::class.java.classLoader.getResource(jsonConfigFilePath).path.toString()
-
     val jsonConfigFile = File(jsonConfigFilePath)
 
-    val model = loadConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
 
     model.use {
         it.compile(
@@ -28,7 +28,6 @@ fun main() {
 
         it.summary()
         println(it.kGraph)
-        //it.init()
         it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg\\")
 
         for (i in 1..8) {
@@ -36,7 +35,6 @@ fun main() {
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
-
             val (res, activations) = it.predictAndGetActivations(floatArray, "Softmax")
             println(res)
             drawActivations(activations)
@@ -46,10 +44,10 @@ fun main() {
 
 
             val top5: MutableMap<Int, Int> = mutableMapOf()
-            for (i in 1..5) {
-                val max = predictionVector2.max()
+            for (j in 1..5) {
+                val max = predictionVector2.maxOrNull()
                 val indexOfElem = predictionVector.indexOf(max!!)
-                top5[i] = indexOfElem
+                top5[j] = indexOfElem
                 predictionVector2.remove(max)
             }
 
@@ -69,7 +67,7 @@ fun main() {
     }
 }
 
-private fun loadImageAndConvertToFloatArray(inputStream: InputStream): FloatArray {
+fun loadImageAndConvertToFloatArray(inputStream: InputStream): FloatArray {
     val (imageByteArrays, image) = getImage(inputStream, imageType = "jpg")
 
     val pixels = (image.raster.dataBuffer as DataBufferByte).data

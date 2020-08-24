@@ -1,7 +1,7 @@
 package api.keras
 
 import api.*
-import api.inference.keras.loadConfig
+import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.saveConfig
 import api.keras.activations.Activations
 import api.keras.dataset.ImageBatch
@@ -123,7 +123,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         fun <T : Number> load(pathToModelDirectory: String): Sequential<T> {
             val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-            return loadConfig(jsonConfig)
+            return buildModelByJSONConfig(jsonConfig)
         }
     }
 
