@@ -28,7 +28,7 @@ fun main() {
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
         for (layer in it.layers) {
-            if (layer::class == Conv2D::class)
+            if (layer is Conv2D)
                 layer.isTrainable = false
         }
 
@@ -49,7 +49,7 @@ fun main() {
         it.fit(
             dataset = train,
             validationRate = 0.1,
-            epochs = 5,
+            epochs = 3,
             trainBatchSize = 1000,
             validationBatchSize = 100,
             verbose = true,

@@ -35,8 +35,8 @@ fun main() {
 
     val layers = mutableListOf<Layer<Float>>()
     for (layer in otherLayers) {
-        if (layer::class == Conv2D::class || layer::class == MaxPool2D::class) {
-            layer.isTrainable = false
+        if (layer::class == Conv2D::class || layer::class == MaxPool2D::class) { // TODO
+            layer.isTrainable = false // TODO: change for lambda
             layers.add(layer)
         }
     }
