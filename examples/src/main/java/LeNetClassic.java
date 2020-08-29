@@ -1,5 +1,6 @@
 import api.keras.Sequential;
 import api.keras.activations.Activations;
+import api.keras.callbacks.Callback;
 import api.keras.dataset.ImageDataset;
 import api.keras.initializers.Constant;
 import api.keras.initializers.GlorotNormal;
@@ -56,7 +57,7 @@ public class LeNetClassic {
         var adam = new Adam<Float>(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
 
         try (lenet5Classic) {
-            lenet5Classic.compile(adam, LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY);
+            lenet5Classic.compile(adam, LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY, new Callback<>());
             lenet5Classic.summary(30, 26);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true, true);
 

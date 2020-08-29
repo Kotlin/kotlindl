@@ -3,6 +3,7 @@ package api
 import api.inference.savedmodel.InferenceModel
 import api.keras.EvaluationResult
 import api.keras.ModelFormat
+import api.keras.callbacks.Callback
 import api.keras.dataset.ImageDataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -18,6 +19,9 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
 
     /** Loss function. */
     protected var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
+
+    /** Callback. */
+    protected var callback: Callback<T> = Callback()
 
     /** Metric on validation dataset for training phase. */
     protected var metric: Metrics = Metrics.ACCURACY
@@ -47,7 +51,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     abstract fun compile(
         optimizer: Optimizer<T>,
         loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-        metric: Metrics = Metrics.ACCURACY
+        metric: Metrics = Metrics.ACCURACY,
+        callback: Callback<T> = Callback()
     )
 
     /**

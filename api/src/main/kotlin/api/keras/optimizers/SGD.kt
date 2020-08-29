@@ -13,7 +13,7 @@ class SGD<T : Number>(
 ) : Optimizer<T>(clipGradient) {
     private var learningRate: Float = 0.2f
 
-    constructor(learningRate: Float = 0.2f) : this(mapOf()) {
+    constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction<T> = NoClipGradient()) : this(mapOf()) {
         this.learningRate = learningRate
     }
 
