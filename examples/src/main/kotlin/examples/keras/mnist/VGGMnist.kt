@@ -2,7 +2,7 @@ package examples.keras.mnist
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.HeNormal
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -156,7 +156,7 @@ private val vgg11 = Sequential.of<Float>(
 )
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,

@@ -3,7 +3,7 @@ package examples.experimental.hdf5
 
 import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -18,7 +18,7 @@ private
 
 fun main() {
     val pathToConfig = "models/mnist/lenet/model.json"
-    val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     val jsonConfigFile = File(realPathToConfig)
     /* hdfFile.use { hdfFile ->
@@ -35,7 +35,7 @@ fun main() {
 
 
     val pathToWeights = "models/mnist/lenet/mnist_weights_only1.h5"
-    val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
 
     val file = File(realPathToWeights)
     println(file.isFile)
@@ -44,7 +44,7 @@ fun main() {
 
     model.loadWeights(hdfFile)
 
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
@@ -62,12 +62,12 @@ fun main() {
         val amountOfTestSet = 100
 
 
-        val (result, activations) = it.predictAndGetActivations(train.getImage(11))
+        val (result, activations) = it.predictAndGetActivations(train.getX(11))
         println(activations.toString())
         drawActivations(activations)
 
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getImage(imageId))
+            val prediction = it.predict(train.getX(imageId))
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)

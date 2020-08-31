@@ -1,6 +1,6 @@
 package datasets
 
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import datasets.util.getImage
 import java.awt.image.DataBufferByte
@@ -37,7 +37,7 @@ private fun loadImagesFromZipArchive(
 ): Array<FloatArray> {
     val images = Array(subDatasetSize) { FloatArray(numOfPixels) }
 
-    val fullPathToImages = ImageDataset::class.java.classLoader.getResource(archiveName)?.path.toString()
+    val fullPathToImages = Dataset::class.java.classLoader.getResource(archiveName)?.path.toString()
     val zipFile = ZipFile(fullPathToImages)
     val entries = zipFile.entries()
 
@@ -50,7 +50,7 @@ private fun loadImagesFromZipArchive(
         val pixels = (image.raster.dataBuffer as DataBufferByte).data
 
         images[cnt] =
-            ImageDataset.toNormalizedVector(
+            Dataset.toNormalizedVector(
                 pixels
             )
         cnt++
@@ -62,7 +62,7 @@ private fun loadImagesFromZipArchive(
 
 @Throws(IOException::class)
 fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArray> {
-    val realPathToLabels = ImageDataset::class.java.classLoader.getResource(pathToLabels)?.path.toString()
+    val realPathToLabels = Dataset::class.java.classLoader.getResource(pathToLabels)?.path.toString()
 
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, realPathToLabels))
@@ -88,7 +88,7 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
 
     for (i in 0 until labelCount) {
         floats[i] =
-            ImageDataset.toOneHotVector(
+            Dataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

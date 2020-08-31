@@ -4,7 +4,7 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.callbacks.EarlyStopping
 import api.keras.callbacks.Mode
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.Zeros
@@ -84,7 +84,7 @@ private val lenet5Classic = Sequential.of<Float>(
 
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,

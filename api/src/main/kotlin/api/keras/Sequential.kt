@@ -5,8 +5,8 @@ import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.saveConfig
 import api.keras.activations.Activations
 import api.keras.callbacks.Callback
-import api.keras.dataset.ImageBatch
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.DataBatch
+import api.keras.dataset.Dataset
 import api.keras.exceptions.RepeatableLayerNameException
 import api.keras.history.*
 import api.keras.layers.Dense
@@ -181,8 +181,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     override fun fit(
-        trainingDataset: ImageDataset,
-        validationDataset: ImageDataset,
+        trainingDataset: Dataset,
+        validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
@@ -212,7 +212,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     override fun fit(
-        dataset: ImageDataset,
+        dataset: Dataset,
         epochs: Int,
         batchSize: Int,
         verbose: Boolean,
@@ -241,9 +241,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         verbose: Boolean,
         trainBatchSize: Int,
         epochs: Int,
-        trainingDataset: ImageDataset,
+        trainingDataset: Dataset,
         validationIsEnabled: Boolean,
-        validationDataset: ImageDataset?,
+        validationDataset: Dataset?,
         validationBatchSize: Int?,
         isWeightsInitRequired: Boolean = true
     ): TrainingHistory {
@@ -278,7 +278,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         for (i in 1..epochs) {
             if (!stopTraining) {
                 callback.onEpochBegin(i, trainingHistory)
-                val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
+                val batchIter: Dataset.BatchIterator = trainingDataset.batchIterator(
                     trainBatchSize
                 )
 
@@ -288,13 +288,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
                     callback.onTrainBatchBegin(batchCounter, trainingHistory)
-                    val batch: ImageBatch = batchIter.next()
+                    val batch: DataBatch = batchIter.next()
 
                     Tensor.create(
                         xBatchShape,
-                        batch.images()
+                        batch.x()
                     ).use { batchImages ->
-                        Tensor.create(yBatchShape, batch.labels()).use { batchLabels ->
+                        Tensor.create(yBatchShape, batch.y()).use { batchLabels ->
                             val (lossValue, metricValue) = trainOnBatch(targets, batchImages, batchLabels, metricOp)
 
                             averageTrainingLossAccum += lossValue
@@ -374,7 +374,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
     }
 
-    override fun evaluate(dataset: ImageDataset, batchSize: Int): EvaluationResult {
+    override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
         val evaluationHistory = History()
 
         callback.onTestBegin()
@@ -384,7 +384,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         val (imageShape, labelShape) = calculateXYShapes(batchSize)
 
-        val batchIter: ImageDataset.ImageBatchIterator = dataset.batchIterator(
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -394,13 +394,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         while (batchIter.hasNext()) {
             callback.onTestBatchBegin(batchCounter, evaluationHistory)
-            val batch: ImageBatch = batchIter.next()
+            val batch: DataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
-                batch.images()
+                batch.x()
             ).use { testImages ->
-                Tensor.create(labelShape, batch.labels()).use { testLabels ->
+                Tensor.create(labelShape, batch.y()).use { testLabels ->
                     val lossAndMetrics = session.runner()
                         .fetch(metricOp)
                         .fetch(TRAINING_LOSS)
@@ -436,16 +436,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * Generates output predictions for the input samples.
      * Computation is done in batches.
      */
-    override fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray {
-        require(dataset.imagesSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
+    override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
+        require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         callback.onPredictBegin()
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         val imageShape = calculateXShape(batchSize)
 
-        val predictions = IntArray(dataset.imagesSize()) { Int.MIN_VALUE }
+        val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
 
-        val batchIter: ImageDataset.ImageBatchIterator = dataset.batchIterator(
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -454,11 +454,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         while (batchIter.hasNext()) {
             callback.onPredictBatchBegin(batchCounter)
 
-            val batch: ImageBatch = batchIter.next()
+            val batch: DataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
-                batch.images()
+                batch.x()
             ).use { testImages ->
                 val predictionsTensor = session.runner()
                     .fetch(prediction)
@@ -525,7 +525,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         Tensor.create(
             imageShape,
-            ImageDataset.serializeToBuffer(predictionData, 0, 1)
+            Dataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
                 formPredictionAndActivationsTensors(yPred, testImages, formActivationData)

@@ -2,7 +2,7 @@ package examples.production
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.GlorotUniform
 import api.keras.layers.Dense
@@ -81,7 +81,7 @@ val lenet5 = Sequential.of<Float>(
     )
 )
 
-fun getLabel(dataset: ImageDataset, imageId: Int): Int {
-    val imageLabel = dataset.getImageLabel(imageId)
+fun getLabel(dataset: Dataset, imageId: Int): Int {
+    val imageLabel = dataset.getY(imageId)
     return imageLabel.indexOf(imageLabel.max()!!)
 }

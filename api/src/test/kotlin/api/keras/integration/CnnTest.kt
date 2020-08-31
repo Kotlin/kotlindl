@@ -2,7 +2,7 @@ package api.keras.integration
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
@@ -75,7 +75,7 @@ internal class CnnTest : IntegrationTest() {
 
     @Test
     fun mnistDatasetCreation() {
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             TRAIN_IMAGES_ARCHIVE,
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
@@ -85,14 +85,14 @@ internal class CnnTest : IntegrationTest() {
             ::extractLabels
         )
 
-        assertEquals(train.imagesSize(), 60000)
-        assertEquals(test.imagesSize(), 10000)
+        assertEquals(train.xSize(), 60000)
+        assertEquals(test.xSize(), 10000)
     }
 
 
     @Test
     fun trainingLeNetModel() {
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             TRAIN_IMAGES_ARCHIVE,
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,

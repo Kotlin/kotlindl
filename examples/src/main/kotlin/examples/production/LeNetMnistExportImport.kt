@@ -1,7 +1,7 @@
 package examples.production
 
 import api.inference.savedmodel.InferenceModel
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -13,7 +13,7 @@ private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -45,15 +45,15 @@ fun main() {
 
         it.save(PATH_TO_MODEL)
 
-        val prediction = it.predict(train.getImage(imageId1))
+        val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
 
-        val prediction2 = it.predict(train.getImage(imageId2))
+        val prediction2 = it.predict(train.getX(imageId2))
 
         println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val prediction3 = it.predict(train.getImage(imageId3))
+        val prediction3 = it.predict(train.getX(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
 
@@ -64,22 +64,22 @@ fun main() {
     InferenceModel<Float>().use {
         it.load(PATH_TO_MODEL)
 
-        val prediction = it.predict(train.getImage(imageId1))
+        val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
 
-        val prediction2 = it.predict(train.getImage(imageId2))
+        val prediction2 = it.predict(train.getX(imageId2))
 
         println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
 
-        val prediction3 = it.predict(train.getImage(imageId3))
+        val prediction3 = it.predict(train.getX(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
 
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getImage(imageId))
+            val prediction = it.predict(train.getX(imageId))
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)

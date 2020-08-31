@@ -2,7 +2,7 @@ package examples.inference.keras
 
 import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.layers.Layer
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
@@ -16,7 +16,7 @@ import java.io.File
  * Conv2D layers' weights are loaded from ImageNet, Dense weights are initialized by loaded initializers.
  */
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
@@ -27,12 +27,12 @@ fun main() {
     )
 
     val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-    val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
     val file = File(realPathToWeights)
     val hdfFile = HdfFile(file)
 
     val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-    val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     val jsonConfigFile = File(realPathToConfig)
 

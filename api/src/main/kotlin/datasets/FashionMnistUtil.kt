@@ -1,6 +1,6 @@
 package datasets
 
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import java.io.DataInputStream
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -18,7 +18,7 @@ const val FASHION_TEST_LABELS_ARCHIVE = "fashionmnist/t10k-labels-idx1-ubyte.gz"
 fun extractFashionImages(archiveName: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            ImageDataset::class.java.classLoader.getResourceAsStream(archiveName)
+            Dataset::class.java.classLoader.getResourceAsStream(archiveName)
         )
     )
     val magic = archiveStream.readInt()
@@ -41,7 +41,7 @@ fun extractFashionImages(archiveName: String): Array<FloatArray> {
     for (i in 0 until imageCount) {
         archiveStream.readFully(imageBuffer)
         images[i] =
-            ImageDataset.toNormalizedVector(
+            Dataset.toNormalizedVector(
                 imageBuffer
             )
     }
@@ -52,7 +52,7 @@ fun extractFashionImages(archiveName: String): Array<FloatArray> {
 fun extractFashionLabels(archiveName: String, numClasses: Int): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            ImageDataset::class.java.classLoader.getResourceAsStream(archiveName)
+            Dataset::class.java.classLoader.getResourceAsStream(archiveName)
         )
     )
     val magic = archiveStream.readInt()
@@ -65,7 +65,7 @@ fun extractFashionLabels(archiveName: String, numClasses: Int): Array<FloatArray
         Array(labelCount) { FloatArray(numClasses) }
     for (i in 0 until labelCount) {
         floats[i] =
-            ImageDataset.toOneHotVector(
+            Dataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

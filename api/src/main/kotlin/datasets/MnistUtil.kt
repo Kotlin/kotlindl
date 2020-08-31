@@ -1,6 +1,6 @@
 package datasets
 
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import java.io.DataInputStream
 import java.util.zip.GZIPInputStream
 
@@ -16,7 +16,7 @@ const val AMOUNT_OF_CLASSES = 10
 fun extractImages(archiveName: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            ImageDataset::class.java.classLoader.getResourceAsStream(archiveName)
+            Dataset::class.java.classLoader.getResourceAsStream(archiveName)
         )
     )
     val magic = archiveStream.readInt()
@@ -39,7 +39,7 @@ fun extractImages(archiveName: String): Array<FloatArray> {
     for (i in 0 until imageCount) {
         archiveStream.readFully(imageBuffer)
         images[i] =
-            ImageDataset.toNormalizedVector(
+            Dataset.toNormalizedVector(
                 imageBuffer
             )
     }
@@ -49,7 +49,7 @@ fun extractImages(archiveName: String): Array<FloatArray> {
 fun extractLabels(archiveName: String, numClasses: Int): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            ImageDataset::class.java.classLoader.getResourceAsStream(archiveName)
+            Dataset::class.java.classLoader.getResourceAsStream(archiveName)
         )
     )
     val magic = archiveStream.readInt()
@@ -62,7 +62,7 @@ fun extractLabels(archiveName: String, numClasses: Int): Array<FloatArray> {
         Array(labelCount) { FloatArray(numClasses) }
     for (i in 0 until labelCount) {
         floats[i] =
-            ImageDataset.toOneHotVector(
+            Dataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

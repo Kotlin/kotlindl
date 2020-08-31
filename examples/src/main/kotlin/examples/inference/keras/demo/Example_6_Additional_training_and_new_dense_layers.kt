@@ -5,7 +5,7 @@ import api.inference.keras.buildLayersByKerasJSONConfig
 import api.inference.keras.loadWeightsForFrozenLayers
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.HeNormal
 import api.keras.layers.Dense
 import api.keras.layers.Flatten
@@ -19,7 +19,7 @@ import datasets.*
 
 /** All weigths are loaded, the model just evaluated */
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,

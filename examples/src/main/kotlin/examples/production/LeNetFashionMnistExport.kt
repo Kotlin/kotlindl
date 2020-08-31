@@ -1,7 +1,7 @@
 package examples.production
 
 import api.inference.savedmodel.InferenceModel
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -26,7 +26,7 @@ private val fashionMnistLabelEncoding = mapOf(
 )
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
@@ -67,7 +67,7 @@ fun main() {
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getImage(imageId))
+            val prediction = it.predict(train.getX(imageId))
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)

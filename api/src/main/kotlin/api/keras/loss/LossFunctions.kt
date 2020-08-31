@@ -1,6 +1,7 @@
 package api.keras.loss
 
 import api.TRAINING_LOSS
+import api.keras.Kmean
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -46,8 +47,9 @@ class MAE<T : Number> : LossFunction<T> {
     override fun apply(tf: Ops, actual: Operand<T>, labels: Operand<T>, dtype: Class<T>): Operand<T> {
         val absoluteErrors = tf.math.abs(tf.math.sub(actual, labels))
 
-        return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))
-        /*return tf.withName(TRAINING_LOSS).identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));*/
+        /*return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))*/
+        return tf.withName(TRAINING_LOSS)
+            .identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));
     }
 }
 

@@ -1,6 +1,6 @@
 package datasets.util
 
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayOutputStream
@@ -16,7 +16,7 @@ private const val MILLS_IN_DAY = 86400000L
 @Throws(IOException::class)
 fun main() {
     val pathToLabels = "cifar10/images.zip"
-    val realPathToLabels = ImageDataset::class.java.classLoader.getResource(pathToLabels)?.path.toString()
+    val realPathToLabels = Dataset::class.java.classLoader.getResource(pathToLabels)?.path.toString()
     val zipFile = ZipFile(realPathToLabels)
     val entries = zipFile.entries()
 
@@ -33,7 +33,7 @@ fun main() {
         val pixels = (image.raster.dataBuffer as DataBufferByte).data
 
         images[cnt] =
-            ImageDataset.toNormalizedVector(
+            Dataset.toNormalizedVector(
                 pixels
             )
         cnt++

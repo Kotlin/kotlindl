@@ -6,30 +6,30 @@ import java.nio.FloatBuffer
 import kotlin.math.min
 import kotlin.math.truncate
 
-class ImageDataset internal constructor(
-    private val images: Array<FloatArray>,
-    private val labels: Array<FloatArray>
+class Dataset internal constructor(
+    private val x: Array<FloatArray>,
+    private val y: Array<FloatArray>
 ) {
-    inner class ImageBatchIterator internal constructor(
+    inner class BatchIterator internal constructor(
         private val batchSize: Int,
-        private val images: Array<FloatArray>,
-        private val labels: Array<FloatArray>
+        private val batchX: Array<FloatArray>,
+        private val batchY: Array<FloatArray>
     ) :
-        MutableIterator<ImageBatch?> {
+        MutableIterator<DataBatch?> {
         override fun hasNext(): Boolean {
             return batchStart < totalSize()
         }
 
-        override fun next(): ImageBatch {
-            val size = min(batchSize, images.size - batchStart)
-            val batch = ImageBatch(
+        override fun next(): DataBatch {
+            val size = min(batchSize, batchX.size - batchStart)
+            val batch = DataBatch(
                 serializeToBuffer(
-                    images,
+                    batchX,
                     batchStart,
                     size
                 ),
                 serializeToBuffer(
-                    labels,
+                    batchY,
                     batchStart,
                     size
                 ),
@@ -41,7 +41,7 @@ class ImageDataset internal constructor(
 
         private var batchStart = 0
         private fun totalSize(): Int {
-            return images.size
+            return batchX.size
         }
 
         override fun remove() {
@@ -50,23 +50,23 @@ class ImageDataset internal constructor(
 
     }
 
-    fun batchIterator(batchSize: Int): ImageBatchIterator {
-        return ImageBatchIterator(batchSize, images, labels)
+    fun batchIterator(batchSize: Int): BatchIterator {
+        return BatchIterator(batchSize, x, y)
     }
 
-    fun split(splitRatio: Double): Pair<ImageDataset, ImageDataset> {
+    fun split(splitRatio: Double): Pair<Dataset, Dataset> {
         require(splitRatio in 0.0..1.0) { "'Split ratio' argument value must be in range [0.0; 1.0]." }
 
-        val trainDatasetLastIndex = truncate(images.size * splitRatio).toInt()
+        val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         return Pair(
-            ImageDataset(
-                images.copyOfRange(0, trainDatasetLastIndex),
-                labels.copyOfRange(0, trainDatasetLastIndex)
+            Dataset(
+                x.copyOfRange(0, trainDatasetLastIndex),
+                y.copyOfRange(0, trainDatasetLastIndex)
             ),
-            ImageDataset(
-                images.copyOfRange(trainDatasetLastIndex, images.size),
-                labels.copyOfRange(trainDatasetLastIndex, labels.size)
+            Dataset(
+                x.copyOfRange(trainDatasetLastIndex, x.size),
+                y.copyOfRange(trainDatasetLastIndex, y.size)
             )
         )
     }
@@ -103,50 +103,50 @@ class ImageDataset internal constructor(
         }
 
         fun createTrainAndTestDatasets(
-            trainImagesPath: String,
+            trainFeaturesPath: String,
             trainLabelsPath: String,
-            testImagesPath: String,
+            testFeaturesPath: String,
             testLabelsPath: String,
             numClasses: Int,
-            imageExtractor: (String) -> Array<FloatArray>,
+            featuresExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
-        ): Pair<ImageDataset, ImageDataset> {
+        ): Pair<Dataset, Dataset> {
             return try {
-                val trainImages =
-                    imageExtractor.invoke(
-                        trainImagesPath
+                val xTrain =
+                    featuresExtractor.invoke(
+                        trainFeaturesPath
                     )
-                val trainLabels =
+                val yTrain =
                     labelExtractor.invoke(
                         trainLabelsPath,
                         numClasses
                     )
-                val testImages =
-                    imageExtractor.invoke(
-                        testImagesPath
+                val xTest =
+                    featuresExtractor.invoke(
+                        testFeaturesPath
                     )
-                val testLabels =
+                val yTest =
                     labelExtractor.invoke(
                         testLabelsPath,
                         numClasses
                     )
-                Pair(ImageDataset(trainImages, trainLabels), ImageDataset(testImages, testLabels))
+                Pair(Dataset(xTrain, yTrain), Dataset(xTest, yTest))
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
 
         fun create(
-            imagesPath: String,
+            featuresPath: String,
             labelsPath: String,
             numClasses: Int,
-            imageExtractor: (String) -> Array<FloatArray>,
+            featuresExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> Array<FloatArray>
-        ): ImageDataset {
+        ): Dataset {
             return try {
-                val images =
-                    imageExtractor.invoke(
-                        imagesPath
+                val features =
+                    featuresExtractor.invoke(
+                        featuresPath
                     )
                 val labels =
                     labelExtractor.invoke(
@@ -154,24 +154,40 @@ class ImageDataset internal constructor(
                         numClasses
                     )
 
-                check(images.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
-                ImageDataset(images, labels)
+                Dataset(features, labels)
+            } catch (e: IOException) {
+                throw AssertionError(e)
+            }
+        }
+
+        fun create(
+            featuresConsumer: () -> Array<FloatArray>,
+            labelConsumer: () -> Array<FloatArray>
+        ): Dataset {
+            return try {
+                val features = featuresConsumer.invoke()
+                val labels = labelConsumer.invoke()
+
+                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+
+                Dataset(features, labels)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
     }
 
-    fun imagesSize(): Int {
-        return images.size
+    fun xSize(): Int {
+        return x.size
     }
 
-    fun getImage(idx: Int): FloatArray {
-        return images[idx]
+    fun getX(idx: Int): FloatArray {
+        return x[idx]
     }
 
-    fun getImageLabel(idx: Int): FloatArray {
-        return labels[idx]
+    fun getY(idx: Int): FloatArray {
+        return y[idx]
     }
 }

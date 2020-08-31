@@ -2,7 +2,7 @@ package examples.inference.keras.vgg
 
 
 import api.inference.keras.buildModelByJSONConfig
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -31,7 +31,7 @@ fun main() {
         it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg\\")
 
         for (i in 1..8) {
-            val inputStream = ImageDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
+            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
@@ -73,7 +73,7 @@ fun loadImageAndConvertToFloatArray(inputStream: InputStream): FloatArray {
     val pixels = (image.raster.dataBuffer as DataBufferByte).data
 
     val floatArray =
-        ImageDataset.toRawVector(
+        Dataset.toRawVector(
             pixels
         )
     return floatArray

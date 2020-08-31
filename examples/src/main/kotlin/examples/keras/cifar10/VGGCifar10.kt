@@ -2,7 +2,7 @@ package examples.keras.cifar10
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
@@ -156,7 +156,7 @@ private val vgg11 = Sequential.of<Float>(
 )
 
 fun main() {
-    val dataset = ImageDataset.create(
+    val dataset = Dataset.create(
         IMAGES_ARCHIVE,
         LABELS_ARCHIVE,
         NUM_LABELS,

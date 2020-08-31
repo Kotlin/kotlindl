@@ -3,7 +3,7 @@ package api.keras.integration
 import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.GlorotUniform
 import api.keras.layers.Layer
@@ -22,7 +22,7 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadSequentialJSONConfig() {
         val pathToConfig = "models/mnist/lenet/model_with_glorot_normal_init.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
@@ -45,12 +45,12 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadSequentialJSONConfigAndTrain() {
         val pathToConfig = "models/mnist/lenet/model_with_glorot_normal_init.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
@@ -88,7 +88,7 @@ class TransferLearningTest : IntegrationTest() {
     // TODO: Re-run LeNet in Python with best initializers and remove Sequential tests above
     fun loadLeNetJSONConfig() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
@@ -112,12 +112,12 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadLeNetJSONConfigAndTrain() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
@@ -153,7 +153,7 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadWeights() {
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-        val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+        val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
         assertEquals(hdfFile.size(), 3400872L)
@@ -170,13 +170,13 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadWeightsAndJSONConfig() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-        val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+        val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
@@ -198,17 +198,17 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning without freezing
     fun loadWeightsAndJSONConfigAndTrain() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-        val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+        val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
@@ -252,17 +252,17 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning with Conv2D layers weights freezing
     fun loadWeightsAndJSONConfigAndTrainDenseLayers() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-        val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+        val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
@@ -327,17 +327,17 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning with loading and freezing Conv2D weights, Dense weights are initialized and trained from zero to hero
     fun loadWeightsPartiallyAndJSONConfigAndTrainDenseLayers() {
         val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-        val realPathToConfig = ImageDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+        val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-        val realPathToWeights = ImageDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+        val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = ImageDataset.createTrainAndTestDatasets(
+        val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,

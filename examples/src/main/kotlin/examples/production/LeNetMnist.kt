@@ -1,7 +1,7 @@
 package examples.production
 
 import api.keras.Sequential
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -13,7 +13,7 @@ private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
@@ -51,14 +51,14 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        val (prediction, activations) = it.predictAndGetActivations(train.getImage(imageId))
+        val (prediction, activations) = it.predictAndGetActivations(train.getX(imageId))
 
         println("Prediction: $prediction")
 
         drawActivations(activations)
 
 
-        val trainImageLabel = train.getImageLabel(imageId)
+        val trainImageLabel = train.getY(imageId)
 
         val maxIdx = trainImageLabel.indexOf(trainImageLabel.max()!!)
 

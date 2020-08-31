@@ -2,7 +2,7 @@ package examples.keras.mnist
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
@@ -18,7 +18,7 @@ import api.keras.optimizers.SGD
 import datasets.*
 
 private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 500
+private const val TRAINING_BATCH_SIZE = 2777
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -76,7 +76,7 @@ private val model = Sequential.of<Float>(
 )
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,

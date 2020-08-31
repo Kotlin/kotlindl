@@ -1,7 +1,7 @@
 import api.keras.Sequential;
 import api.keras.activations.Activations;
 import api.keras.callbacks.Callback;
-import api.keras.dataset.ImageDataset;
+import api.keras.dataset.Dataset;
 import api.keras.initializers.Constant;
 import api.keras.initializers.GlorotNormal;
 import api.keras.initializers.Zeros;
@@ -41,7 +41,7 @@ public class LeNetClassic {
 
 
     public static void main(String[] args) {
-        var result = ImageDataset.Companion.createTrainAndTestDatasets(
+        var result = Dataset.Companion.createTrainAndTestDatasets(
                 TRAIN_IMAGES_ARCHIVE,
                 TRAIN_LABELS_ARCHIVE,
                 TEST_IMAGES_ARCHIVE,

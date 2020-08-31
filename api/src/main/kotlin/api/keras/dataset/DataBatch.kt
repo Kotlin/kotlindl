@@ -2,17 +2,17 @@ package api.keras.dataset
 
 import java.nio.FloatBuffer
 
-class ImageBatch internal constructor(
-    private val images: FloatBuffer,
-    private val labels: FloatBuffer,
+class DataBatch internal constructor(
+    private val x: FloatBuffer,
+    private val y: FloatBuffer,
     private val numElements: Int
 ) {
-    fun images(): FloatBuffer {
-        return images
+    fun x(): FloatBuffer {
+        return x
     }
 
-    fun labels(): FloatBuffer {
-        return labels
+    fun y(): FloatBuffer {
+        return y
     }
 
     fun shape(elementSize: Int): LongArray {

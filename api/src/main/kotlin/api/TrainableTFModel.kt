@@ -4,7 +4,7 @@ import api.inference.savedmodel.InferenceModel
 import api.keras.EvaluationResult
 import api.keras.ModelFormat
 import api.keras.callbacks.Callback
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.history.TrainingHistory
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -64,7 +64,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
      * @verbose - Verbosity mode. Silent, one line per batch or one line per epoch.
      */
     abstract fun fit(
-        dataset: ImageDataset,
+        dataset: Dataset,
         epochs: Int = 10,
         batchSize: Int = 32,
         verbose: Boolean,
@@ -72,8 +72,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     ): TrainingHistory
 
     abstract fun fit(
-        trainingDataset: ImageDataset,
-        validationDataset: ImageDataset,
+        trainingDataset: Dataset,
+        validationDataset: Dataset,
         epochs: Int = 10,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
@@ -90,11 +90,11 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
      * @return Value of calculated metric and loss values.
      */
     abstract fun evaluate(
-        dataset: ImageDataset,
+        dataset: Dataset,
         batchSize: Int = 256
     ): EvaluationResult
 
-    abstract fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray
+    abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 
     abstract override fun predict(image: FloatArray): Int
 
@@ -124,7 +124,7 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     ): Pair<FloatArray, List<*>>
 
     fun fit(
-        dataset: ImageDataset,
+        dataset: Dataset,
         validationRate: Double,
         epochs: Int,
         trainBatchSize: Int,

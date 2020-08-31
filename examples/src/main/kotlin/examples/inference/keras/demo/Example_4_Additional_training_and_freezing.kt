@@ -2,7 +2,7 @@ package examples.inference.keras.demo
 
 import api.inference.keras.buildModelByJSONConfig
 import api.inference.keras.loadWeights
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -11,7 +11,7 @@ import datasets.*
 
 /** All weigths are loaded, the model just evaluated */
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,

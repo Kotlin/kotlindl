@@ -2,7 +2,7 @@ package examples.production
 
 import api.keras.ModelFormat
 import api.keras.Sequential
-import api.keras.dataset.ImageDataset
+import api.keras.dataset.Dataset
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -16,7 +16,7 @@ private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
