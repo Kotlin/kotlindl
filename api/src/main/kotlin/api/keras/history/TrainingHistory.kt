@@ -71,7 +71,11 @@ class TrainingHistory {
     }
 }
 
-class BatchTrainingEvent(val epoch: Int, val batch: Int, val lossValue: Double, val metricValue: Double)
+class BatchTrainingEvent(val epoch: Int, val batch: Int, val lossValue: Double, val metricValue: Double) {
+    override fun toString(): String {
+        return "BatchTrainingEvent(epoch=$epoch, batch=$batch, lossValue=$lossValue, metricValue=$metricValue)"
+    }
+}
 
 class EpochTrainingEvent(
     val epoch: Int,
@@ -79,4 +83,9 @@ class EpochTrainingEvent(
     val metricValue: Double,
     var valLossValue: Double?,
     var valMetricValue: Double?
-)
+
+) {
+    override fun toString(): String {
+        return "EpochTrainingEvent(epoch=$epoch, lossValue=$lossValue, metricValue=$metricValue, valLossValue=$valLossValue, valMetricValue=$valMetricValue)"
+    }
+}

@@ -27,4 +27,8 @@ class History {
     }
 }
 
-class BatchEvent(val batch: Int, val lossValue: Double, val metricValue: Double)
+class BatchEvent(val batch: Int, val lossValue: Double, val metricValue: Double) {
+    override fun toString(): String {
+        return "BatchEvent(batch=$batch, lossValue=$lossValue, metricValue=$metricValue)"
+    }
+}

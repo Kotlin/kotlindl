@@ -154,25 +154,20 @@ class EarlyStopping<T : Number> : Callback<T>() {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     override fun onTrainEnd(trainingHistory: TrainingHistory) {
         if (stoppedEpoch > 0 && verbose) {
-            Logger.getLogger(EarlyStopping::class.java.name)
-                .log(Level.INFO, String.format("Epoch %05d: early stopping: ", stoppedEpoch + 1))
+            this.model.logger.info {
+                "Epoch ${stoppedEpoch + 1}: early stopping event! "
+            }
         }
     }
 
     private fun getMonitorValue(logs: EpochTrainingEvent, monitor: String): Number? {
         val monitorValue = logs!!.lossValue // TODO: extract specific monitor metric instead default
-        if (monitorValue != null) {
-            Logger.getLogger(EarlyStopping::class.java.name).log(
-                Level.WARNING, String.format(
-                    "Early stopping conditioned on metric `%s` which is not available. Available metrics are: %s",
-                    monitor, java.lang.String.join(",", logs.toString())
-                )
-            )
+        if (monitorValue == null) {
+            this.model.logger.warn {
+                "Early stopping conditioned on metric $monitor which is not available. Available metrics are: $logs"
+            }
         }
         return monitorValue
     }
