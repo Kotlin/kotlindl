@@ -28,6 +28,8 @@ class TransferLearningTest : IntegrationTest() {
         val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
 
         assertEquals(testModel.layers.size, 8)
+        assertTrue(testModel.getLayer("flatten_7").isTrainable)
+        assertFalse(testModel.getLayer("flatten_7").hasActivation())
         assertTrue(testModel.getLayer("conv2d_14") is Conv2D)
         assertTrue((testModel.getLayer("conv2d_14") as Conv2D).kernelInitializer is GlorotNormal)
         assertTrue((testModel.getLayer("conv2d_14") as Conv2D).biasInitializer is GlorotNormal)
@@ -36,8 +38,7 @@ class TransferLearningTest : IntegrationTest() {
         assertTrue(testModel.getLayer("conv2d_15") is Conv2D)
         assertTrue(testModel.getLayer("conv2d_14").isTrainable)
         assertTrue(testModel.getLayer("conv2d_15").hasActivation())
-        assertTrue(testModel.getLayer("flatten_7").isTrainable)
-        assertFalse(testModel.getLayer("flatten_7").hasActivation())
+
         assertArrayEquals(testModel.firstLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 
@@ -78,7 +79,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracy = it.evaluate(dataset = test, batchSize = VALIDATION_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracy!!, 0.10000000149011612, EPS)
+            assertEquals(0.788399875164032, accuracy!!, EPS)
         }
     }
 
@@ -145,7 +146,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracy = it.evaluate(dataset = test, batchSize = VALIDATION_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracy!!, 0.10000000149011612, EPS)
+            assertEquals(0.10000000149011612, accuracy!!, EPS)
         }
     }
 
@@ -162,8 +163,8 @@ class TransferLearningTest : IntegrationTest() {
         val kernelData = hdfFile.getDatasetByPath("/$name/$name/kernel:0").data as Array<Array<Array<FloatArray>>>
         val biasData = hdfFile.getDatasetByPath("/$name/$name/bias:0").data as FloatArray
 
-        assertEquals(kernelData[0][0][0][0], 0.06366586f)
-        assertEquals(biasData[15], 0.0022679337f)
+        assertEquals(0.06366586f, kernelData[0][0][0][0])
+        assertEquals(0.0022679337f, biasData[15])
     }
 
     @Test
@@ -189,7 +190,7 @@ class TransferLearningTest : IntegrationTest() {
             it.loadWeights(hdfFile)
 
             val conv2DKernelWeigths = it.getLayer("conv2d_8").getWeights()[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(conv2DKernelWeigths[0][0][0][0], 0.06366586f)
+            assertEquals(0.06366586f, conv2DKernelWeigths[0][0][0][0])
         }
     }
 
@@ -242,7 +243,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracyAfterTraining!!, 0.8796000480651855, EPS)
+            assertEquals(0.8796000480651855, accuracyAfterTraining!!, EPS)
         }
 
     }
@@ -287,7 +288,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracyBefore!!, 0.8286998271942139, EPS)
+            assertEquals(0.8286998271942139, accuracyBefore!!, EPS)
 
             val conv2DKernelWeigthsBeforeTraining =
                 it.getLayer("conv2d_8").getWeights()[0] as Array<Array<Array<FloatArray>>>
@@ -317,7 +318,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracyAfterTraining!!, 0.869799792766571, EPS)
+            assertEquals(0.869799792766571, accuracyAfterTraining!!, EPS)
         }
     }
 
@@ -366,7 +367,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracyBefore!!, 0.10000000149011612, EPS) // Dense layers has no meaningful weights
+            assertEquals(0.10000000149011612, accuracyBefore!!, EPS) // Dense layers has no meaningful weights
 
             val conv2DKernelWeigthsBeforeTraining =
                 it.getLayer("conv2d_8").getWeights()[0] as Array<Array<Array<FloatArray>>>
@@ -386,7 +387,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val conv2DKernelWeigthsAfterTraining =
                 it.getLayer("conv2d_8").getWeights()[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(conv2DKernelWeigthsAfterTraining[0][0][0][0], 0.06366586f)
+            assertEquals(0.06366586f, conv2DKernelWeigthsAfterTraining[0][0][0][0])
             assertArrayEquals(conv2DKernelWeigthsBeforeTraining, conv2DKernelWeigthsAfterTraining)
 
             val denseDKernelWeigthsAfterTraining = it.getLayer("dense_12").getWeights()[0] as Array<FloatArray>
@@ -396,7 +397,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(accuracyAfterTraining!!, 0.5030999779701233, EPS)
+            assertEquals(0.6868999600410461, accuracyAfterTraining!!, EPS)
         }
     }
 }

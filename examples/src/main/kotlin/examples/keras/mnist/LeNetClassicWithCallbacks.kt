@@ -96,7 +96,7 @@ fun main() {
 
     lenet5Classic.use {
         val earlyStopping = EarlyStopping<Float>().setUp(
-            monitor = "training_loss",
+            monitor = "valLoss", // TODO: could be complex dsl with a few fields of EpochTrainingEvent
             minDelta = 0.0, patience = 2, verbose = true, mode = Mode.AUTO,
             baseline = 0.1, restoreBestWeights = false
         )

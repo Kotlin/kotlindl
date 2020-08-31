@@ -1,6 +1,7 @@
 package api.keras.callbacks
 
-import api.TrainingEvent
+import api.keras.history.EpochTrainingEvent
+import api.keras.history.TrainingHistory
 import java.util.function.BiFunction
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -120,14 +121,14 @@ class EarlyStopping<T : Number> : Callback<T>() {
         return this
     }
 
-    override fun onTrainBegin(logs: TrainingEvent?) {
+    override fun onTrainBegin() {
         wait = 0
         stoppedEpoch = 0
         best =
             if (baseline != null) baseline!! else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
     }
 
-    override fun onEpochEnd(epoch: Int, logs: TrainingEvent?) {
+    override fun onEpochEnd(epoch: Int, logs: EpochTrainingEvent) {
         val current: Number = getMonitorValue(logs, monitor) ?: return
         if (monitor_op!!.apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()
@@ -156,14 +157,14 @@ class EarlyStopping<T : Number> : Callback<T>() {
     /**
      * {@inheritDoc}
      */
-    override fun onTrainEnd(logs: Map<String, Number>) {
+    override fun onTrainEnd(trainingHistory: TrainingHistory) {
         if (stoppedEpoch > 0 && verbose) {
             Logger.getLogger(EarlyStopping::class.java.name)
                 .log(Level.INFO, String.format("Epoch %05d: early stopping: ", stoppedEpoch + 1))
         }
     }
 
-    protected fun getMonitorValue(logs: TrainingEvent?, monitor: String): Number? {
+    private fun getMonitorValue(logs: EpochTrainingEvent, monitor: String): Number? {
         val monitorValue = logs!!.lossValue // TODO: extract specific monitor metric instead default
         if (monitorValue != null) {
             Logger.getLogger(EarlyStopping::class.java.name).log(

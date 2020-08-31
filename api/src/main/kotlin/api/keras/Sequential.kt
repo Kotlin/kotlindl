@@ -8,6 +8,7 @@ import api.keras.callbacks.Callback
 import api.keras.dataset.ImageBatch
 import api.keras.dataset.ImageDataset
 import api.keras.exceptions.RepeatableLayerNameException
+import api.keras.history.*
 import api.keras.layers.Dense
 import api.keras.layers.Input
 import api.keras.layers.Layer
@@ -272,11 +273,11 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
         kGraph.initializeOptimizerVariables(session)
 
-        callback.onTrainBegin(null)
+        callback.onTrainBegin()
 
         for (i in 1..epochs) {
             if (!stopTraining) {
-                callback.onEpochBegin(i, null)
+                callback.onEpochBegin(i, trainingHistory)
                 val batchIter: ImageDataset.ImageBatchIterator = trainingDataset.batchIterator(
                     trainBatchSize
                 )
@@ -284,11 +285,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 var batchCounter = 0
                 var averageTrainingMetricAccum = 0.0f
                 var averageTrainingLossAccum = 0.0f
-                var trainingEvent: TrainingEvent? = null
-
 
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
-                    callback.onTrainBatchBegin(batchCounter, null)
+                    callback.onTrainBatchBegin(batchCounter, trainingHistory)
                     val batch: ImageBatch = batchIter.next()
 
                     Tensor.create(
@@ -300,13 +299,13 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
 
                             averageTrainingLossAccum += lossValue
                             averageTrainingMetricAccum += metricValue
-                            trainingEvent =
-                                TrainingEvent(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
-                            trainingHistory.append(trainingEvent!!)
+                            val batchTrainingEvent =
+                                BatchTrainingEvent(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
+                            trainingHistory.appendBatch(batchTrainingEvent)
 
                             logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
 
-                            callback.onTrainBatchEnd(batchCounter, trainingEvent)
+                            callback.onTrainBatchEnd(batchCounter, batchTrainingEvent, trainingHistory)
                         }
                     }
                     batchCounter++
@@ -315,18 +314,27 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                 val avgTrainingMetricValue = (averageTrainingMetricAccum / batchCounter)
                 val avgLossValue = (averageTrainingLossAccum / batchCounter)
 
+                val epochTrainingEvent = EpochTrainingEvent(
+                    i,
+                    avgLossValue.toDouble(), avgTrainingMetricValue.toDouble(), Double.NaN, Double.NaN
+                )
+
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!)
                     val validationMetricValue = evaluationResult.metrics[metric]
                     val validationLossValue = evaluationResult.lossValue
-
+                    epochTrainingEvent.valLossValue = validationLossValue
+                    epochTrainingEvent.valMetricValue = validationMetricValue!!
                     logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metric: $validationMetricValue" }
                 } else {
                     logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue" }
+
                 }
-                callback.onEpochEnd(i, trainingEvent)
+                trainingHistory.appendEpoch(epochTrainingEvent)
+                callback.onEpochEnd(i, epochTrainingEvent)
             }
         }
+        callback.onTrainEnd(trainingHistory)
         return trainingHistory
     }
 
@@ -364,11 +372,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             e.printStackTrace()
             throw RuntimeException(e.message)
         }
-
     }
 
     override fun evaluate(dataset: ImageDataset, batchSize: Int): EvaluationResult {
-        callback.onTestBegin(mapOf())
+        val evaluationHistory = History()
+
+        callback.onTestBegin()
         //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
         //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
         val metricOp = Metrics.convert<T>(metric).apply(tf, yPred, yOp, getDType())
@@ -384,9 +393,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onTestBatchBegin(batchCounter, mapOf())
+            callback.onTestBatchBegin(batchCounter, evaluationHistory)
             val batch: ImageBatch = batchIter.next()
-
 
             Tensor.create(
                 imageShape,
@@ -400,13 +408,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                         .feed(yOp.asOutput(), testLabels)
                         .run()
 
-                    val metricValue = lossAndMetrics[0]
-                    val lossValue = lossAndMetrics[1]
+                    val metricValue = lossAndMetrics[0].floatValue()
+                    val lossValue = lossAndMetrics[1].floatValue()
 
-                    averageMetricAccum += metricValue.floatValue()
-                    averageLossAccum += lossValue.floatValue()
+                    averageMetricAccum += metricValue
+                    averageLossAccum += lossValue
 
-                    callback.onTestBatchEnd(batchCounter, mapOf())
+                    val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
+                    evaluationHistory.appendBatch(batchEvent)
+
+                    callback.onTestBatchEnd(batchCounter, batchEvent, evaluationHistory)
                 }
             }
 
@@ -416,7 +427,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val avgMetricValue = (averageMetricAccum / batchCounter).toDouble()
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 
-        callback.onTestEnd(mapOf())
+        callback.onTestEnd(evaluationHistory)
         return EvaluationResult(avgLossValue, mapOf(metric to avgMetricValue))
     }
 
@@ -427,8 +438,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      */
     override fun predictAll(dataset: ImageDataset, batchSize: Int): IntArray {
         require(dataset.imagesSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
-
-        callback.onPredictBegin(mapOf())
+        callback.onPredictBegin()
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
 
         val imageShape = calculateXShape(batchSize)
@@ -442,10 +452,9 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onPredictBatchBegin(batchCounter, mapOf())
+            callback.onPredictBatchBegin(batchCounter)
 
             val batch: ImageBatch = batchIter.next()
-
 
             Tensor.create(
                 imageShape,
@@ -466,12 +475,12 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
                     argMaxBatchPrediction[index] = element.indexOf(element.max()!!)
                 }
 
-                callback.onPredictBatchEnd(batchCounter, mapOf())
+                callback.onPredictBatchEnd(batchCounter)
                 batchCounter++
                 argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
             }
         }
-        callback.onPredictEnd(mapOf())
+        callback.onPredictEnd()
         return predictions
     }
 

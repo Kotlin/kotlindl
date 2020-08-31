@@ -5,6 +5,7 @@ import api.keras.EvaluationResult
 import api.keras.ModelFormat
 import api.keras.callbacks.Callback
 import api.keras.dataset.ImageDataset
+import api.keras.history.TrainingHistory
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Optimizer
