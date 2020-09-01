@@ -11,7 +11,8 @@ enum class LossFunctions {
     HINGE_LOSS,
     HUBER_LOSS,
     LOG_LOSS,
-    MAE;
+    MAE,
+    MSE;
 
     companion object {
         fun <T : Number> convert(lossFunctionType: LossFunctions): LossFunction<T> {
@@ -22,6 +23,7 @@ enum class LossFunctions {
                 HUBER_LOSS -> HuberLoss(0.1f)
                 LOG_LOSS -> LogLoss()
                 MAE -> MAE()
+                MSE -> MSE()
             }
         }
     }
@@ -49,7 +51,7 @@ class MAE<T : Number> : LossFunction<T> {
 
         /*return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))*/
         return tf.withName(TRAINING_LOSS)
-            .identity(Kmean(tf, tf.math.abs(tf.math.sub(actual, labels)), tf.constant(-1)));
+            .identity(Kmean(tf, absoluteErrors, tf.constant(-1)));
     }
 }
 
@@ -59,7 +61,7 @@ class MSE<T : Number> : LossFunction<T> {
         val expected: Operand<Long> = tf.math.argMax(labels, tf.constant(1))
 
         val squaredError = tf.math.squaredDifference(predicted, expected)
-        return tf.withName(TRAINING_LOSS).math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0))
+        return tf.withName(TRAINING_LOSS).math.mean(squaredError as Operand<T>, tf.constant(0))
     }
 }
 

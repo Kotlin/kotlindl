@@ -28,23 +28,18 @@ class Accuracy<T : Number>() : Metric<T> {
 
 class MAE<T : Number>() : Metric<T> {
     override fun apply(tf: Ops, output: Operand<T>, label: Operand<T>, dtype: Class<T>): Operand<T> {
-        val predicted: Operand<Long> = tf.math.argMax(output, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(label, tf.constant(1))
+        val absoluteErrors = tf.math.abs(tf.math.sub(output, label))
 
-        val absoluteErrors = tf.math.abs(tf.math.sub(predicted, expected))
-
-        return tf.math.mean(tf.dtypes.cast(absoluteErrors, dtype), tf.constant(0))
+        return tf.math.mean(tf.math.mean(tf.dtypes.cast(absoluteErrors, dtype), tf.constant(0)), tf.constant(0))
     }
 }
 
 class MSE<T : Number>() : Metric<T> {
     override fun apply(tf: Ops, output: Operand<T>, label: Operand<T>, dtype: Class<T>): Operand<T> {
-        val predicted: Operand<Long> = tf.math.argMax(output, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(label, tf.constant(1))
 
-        val squaredError = tf.math.squaredDifference(predicted, expected)
+        val squaredError = tf.math.squaredDifference(output, label)
 
-        return tf.math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0))
+        return tf.math.mean(tf.math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0)), tf.constant(0))
     }
 }
 
