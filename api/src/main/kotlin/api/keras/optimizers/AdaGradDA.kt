@@ -14,25 +14,25 @@ import java.util.*
 private const val ACCUMULATOR = "gradient_accumulator"
 private const val SQUARED_ACCUMULATOR = "gradient_squared_accumulator"
 
-class AdaGradDA<T : Number>(
+class AdaGradDA(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,
     private val l1Strength: Float = 0.01f,
     private val l2Strength: Float = 0.01f,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
-    private lateinit var learningRateConst: Constant<T>
-    private lateinit var l1StrengthConst: Constant<T>
-    private lateinit var l2StrengthConst: Constant<T>
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
+    private lateinit var learningRateConst: Constant<Float>
+    private lateinit var l1StrengthConst: Constant<Float>
+    private lateinit var l2StrengthConst: Constant<Float>
     private lateinit var globalStep: Variable<Long>
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
         learningRateConst = tf.constant(learningRate, getDType())
         l1StrengthConst = tf.constant(l1Strength, getDType())
@@ -45,8 +45,8 @@ class AdaGradDA<T : Number>(
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val gradSlot: Variable<T> = getSlot(varName, ACCUMULATOR)
-            val gradSquaredSlot: Variable<T> = getSlot(varName, SQUARED_ACCUMULATOR)
+            val gradSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
+            val gradSquaredSlot: Variable<Float> = getSlot(varName, SQUARED_ACCUMULATOR)
 
             targets.add(
                 tf.train.applyAdagradDa(
@@ -66,18 +66,18 @@ class AdaGradDA<T : Number>(
         return targets
     }
 
-    private fun createAdaGradDASlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
-        val initializer: Operand<T> = tf
+    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+        val initializer: Operand<Float> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
-        val sqInitializer: Operand<T> = tf.fill(
+        val sqInitializer: Operand<Float> = tf.fill(
             tf.shape(v),
             tf.dtypes.cast(tf.constant(initialAccumulatorValue, getDType()), getDType())
         )
         createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
     }
 
-    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
         for (v in variables) {
             createAdaGradDASlot(graph, tf, v.asOutput())
         }

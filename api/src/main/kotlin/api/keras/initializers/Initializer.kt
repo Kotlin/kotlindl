@@ -7,7 +7,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
 
-abstract class Initializer<T : Number> {
+abstract class Initializer {
     /**
      * Adds an `Assign` Op to the graph to initialize
      * a tensorflow variable as specified by the initializer.
@@ -20,10 +20,10 @@ abstract class Initializer<T : Number> {
         funIn: Int,
         funOut: Int,
         tf: Ops,
-        input: Operand<T>,
-        dtype: Class<T>,
+        input: Operand<Float>,
+        dtype: Class<Float>,
         name: String
-    ): Assign<T> {
+    ): Assign<Float> {
         return tf.withName(defaultAssignOpName(name)).assign(
             input, initialize(
                 funIn, funOut, tf,
@@ -45,7 +45,7 @@ abstract class Initializer<T : Number> {
         fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<T>,
+        dtype: Class<Float>,
         name: String
-    ): Operand<T>
+    ): Operand<Float>
 }

@@ -13,27 +13,27 @@ private const val RMS = "rms"
 private const val MG = "mg"
 private const val MOMENTUM = "momentum"
 
-class RMSProp<T : Number>(
+class RMSProp(
     private val learningRate: Float = 0.001f,
     private val decay: Float = 0.9f,
     private val momentum: Float = 0.0f,
     private val epsilon: Float = 1e-10f,
     private val centered: Boolean = false,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
 
-    private lateinit var epsilonConstant: Constant<T>
-    private lateinit var learningRateConst: Constant<T>
-    private lateinit var decayConst: Constant<T>
-    private lateinit var momentumConst: Constant<T>
+    private lateinit var epsilonConstant: Constant<Float>
+    private lateinit var learningRateConst: Constant<Float>
+    private lateinit var decayConst: Constant<Float>
+    private lateinit var momentumConst: Constant<Float>
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
 
         decayConst = tf.constant(decay, getDType())
@@ -45,11 +45,11 @@ class RMSProp<T : Number>(
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val rmsSlot: Variable<T> = getSlot(varName, RMS)
-            val momentumSlot: Variable<T> = getSlot(varName, MOMENTUM)
+            val rmsSlot: Variable<Float> = getSlot(varName, RMS)
+            val momentumSlot: Variable<Float> = getSlot(varName, MOMENTUM)
 
             if (centered) {
-                val mgSlot: Variable<T> = getSlot(varName, MG)
+                val mgSlot: Variable<Float> = getSlot(varName, MG)
                 targets.add(
                     tf.train.applyCenteredRmsProp(
                         variable, mgSlot, rmsSlot, momentumSlot,
@@ -78,15 +78,15 @@ class RMSProp<T : Number>(
         return targets
     }
 
-    private fun createRMSPropSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
-        val rmsInitializer: Operand<T> = tf
+    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+        val rmsInitializer: Operand<Float> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
-        val momentumInitializer: Operand<T> = tf
+        val momentumInitializer: Operand<Float> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
         if (centered) {
-            val mgInitializer: Operand<T> = tf
+            val mgInitializer: Operand<Float> = tf
                 .fill(
                     tf.shape(v),
                     tf.dtypes.cast(tf.constant(0.0f), getDType())
@@ -95,7 +95,7 @@ class RMSProp<T : Number>(
         }
     }
 
-    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
         for (v in variables) {
             createRMSPropSlot(graph, tf, v.asOutput())
         }

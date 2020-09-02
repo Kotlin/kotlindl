@@ -4,28 +4,28 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.math.Mean
 
-fun <T : Number> Kmean(tf: Ops, x: Operand<T>): Operand<T> {
+fun Kmean(tf: Ops, x: Operand<Float>): Operand<Float> {
     return Kmean(tf, x, null, false)
 }
 
-fun <T : Number> Kmean(
+fun Kmean(
     tf: Ops,
-    x: Operand<T>,
+    x: Operand<Float>,
     axis: Operand<Int>
-): Operand<T> {
+): Operand<Float> {
     return Kmean(tf, x, axis, false)
 }
 
-fun <T : Number> Kmean(tf: Ops, x: Operand<T>, keepDims: Boolean): Operand<T> {
+fun Kmean(tf: Ops, x: Operand<Float>, keepDims: Boolean): Operand<Float> {
     return Kmean(tf, x, null, keepDims)
 }
 
-fun <T : Number> Kmean(
+fun Kmean(
     tf: Ops,
-    x: Operand<T>,
+    x: Operand<Float>,
     axis: Operand<Int>?,
     keepDims: Boolean
-): Operand<T> {
+): Operand<Float> {
     var localAxis = axis
 
     if (localAxis == null) {

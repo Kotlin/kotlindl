@@ -17,7 +17,7 @@ fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
 
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     model.use {
         it.compile(

@@ -9,10 +9,10 @@ import org.tensorflow.op.core.Constant
 import kotlin.math.abs
 
 
-class Flatten<T : Number>(name: String = "") : Layer<T>(name) {
+class Flatten(name: String = "") : Layer(name) {
     private lateinit var units: Constant<Int>
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))
@@ -26,7 +26,7 @@ class Flatten<T : Number>(name: String = "") : Layer<T>(name) {
         return Shape.make(TensorShape(inputShape).numElements());
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
         return tf.reshape(input, units)
     }
 

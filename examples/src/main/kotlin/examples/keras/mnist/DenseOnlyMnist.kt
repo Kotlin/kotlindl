@@ -17,7 +17,7 @@ private const val TEST_BATCH_SIZE = 1000
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 500
 
-private val model = Sequential.of<Float>(
+private val model = Sequential.of(
     Input(784),
     Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
     Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),

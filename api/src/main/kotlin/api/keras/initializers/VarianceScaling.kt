@@ -7,45 +7,45 @@ import org.tensorflow.op.Ops
 import kotlin.math.max
 import kotlin.math.sqrt
 
-class GlorotNormal<T : Number>(
+class GlorotNormal(
     private val seed: Long
-) : VarianceScaling<T>(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
 
-class GlorotUniform<T : Number>(
+class GlorotUniform(
     private val seed: Long
-) : VarianceScaling<T>(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed)
 
-class HeNormal<T : Number>(
+class HeNormal(
     private val seed: Long
-) : VarianceScaling<T>(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
 
-class HeUniform<T : Number>(
+class HeUniform(
     private val seed: Long
-) : VarianceScaling<T>(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
 
-class LeCunNormal<T : Number>(
+class LeCunNormal(
     private val seed: Long
-) : VarianceScaling<T>(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
 
-class LeCunUniform<T : Number>(
+class LeCunUniform(
     private val seed: Long
-) : VarianceScaling<T>(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
 
-open class VarianceScaling<T : Number>(
+open class VarianceScaling(
     private val scale: Double = 1.0,
     private val mode: Mode = Mode.FAN_IN,
     private val distribution: Distribution = Distribution.TRUNCATED_NORMAL,
     private val seed: Long
 ) :
-    Initializer<T>() {
+    Initializer() {
     override fun initialize(
         funIn: Int,
         funOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<T>,
+        dtype: Class<Float>,
         name: String
-    ): Operand<T> {
+    ): Operand<Float> {
         require(scale > 0.0) { "The 'scale' parameter value must be more than 0.0." }
         var lscale = scale
 
@@ -58,8 +58,8 @@ open class VarianceScaling<T : Number>(
             Mode.FAN_AVG -> max(1.0, (fanIn + fanOut) / 2.0)
         }
 
-        val distOp: Operand<T>
-        val mulOp: Operand<T>
+        val distOp: Operand<Float>
+        val mulOp: Operand<Float>
         val stddev: Double
         val seeds = longArrayOf(seed, 0L)
         when (distribution) {

@@ -18,7 +18,7 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 
@@ -55,7 +55,7 @@ fun main() {
 }
 
 fun predictTop5Labels(
-    it: Sequential<Float>,
+    it: Sequential,
     floatArray: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>
 ): MutableMap<Int, Pair<String, Float>> {

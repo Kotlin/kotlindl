@@ -9,19 +9,19 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 
 /** Base class for all optimizers. */
-abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
-    private lateinit var dtype: Class<T>
+abstract class Optimizer(val clipGradient: ClipGradientAction) {
+    private lateinit var dtype: Class<Float>
 
     /**
      * Top level map key is the variable name, lower level map key is the slot name.
      */
-    private lateinit var slots: MutableMap<String, MutableMap<String, Variable<out T>>>
+    private lateinit var slots: MutableMap<String, MutableMap<String, Variable<Float>>>
 
     fun prepareTargets(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        loss: Operand<T>
-    ): List<Operand<T>> {
+        loss: Operand<Float>
+    ): List<Operand<Float>> {
         val weights = graph.trainableVariables()
 
         slots = mutableMapOf()
@@ -35,8 +35,8 @@ abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
         return applyGradients(graph, tf, weights, gradients)
     }
 
-    private fun variablesToOutputs(variables: List<Variable<T>>): List<Output<out T>> {
-        val variableOutputs: MutableList<Output<out T>> = mutableListOf()
+    private fun variablesToOutputs(variables: List<Variable<Float>>): List<Output<Float>> {
+        val variableOutputs: MutableList<Output<Float>> = mutableListOf()
         for (i in variables.indices) {
             variableOutputs.add(i, variables[i].asOutput())
         }
@@ -45,16 +45,16 @@ abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
     }
 
     protected abstract fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>>
+    ): List<Operand<Float>>
 
     private fun computeGradients(
         tf: Ops,
-        loss: Operand<T>,
-        weights: List<Variable<T>>
+        loss: Operand<Float>,
+        weights: List<Variable<Float>>
     ): Gradients {
         return tf.gradients(loss, weights)
     }
@@ -64,7 +64,7 @@ abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
      *
      * @param variables The variables to create slots for.
      */
-    protected open fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
 
     }
 
@@ -78,24 +78,24 @@ abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
      * @param variable    The variable to create the slot for.
      * @param slotName    The name of the slot.
      * @param initializer The initializer for the slot.
-     * @param <T>         The type of the variable.
+     * @param          The type of the variable.
      */
     protected open fun createSlot(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        variable: Output<out T>,
+        variable: Output<Float>,
         slotName: String,
-        initializer: Operand<T>
+        initializer: Operand<Float>
     ) {
         val createName: String = createName(variable, slotName)
-        val slot: Variable<T> = tf.withName(createName).variable(variable.shape(), getDType())
-        val slotInit: Assign<T> = tf.assign(slot, initializer)
+        val slot: Variable<Float> = tf.withName(createName).variable(variable.shape(), getDType())
+        val slotInit: Assign<Float> = tf.assign(slot, initializer)
 
         graph.addOptimizerVariableInitializer(slotInit)
 
         val varName = variable.op().name()
 
-        val variables: MutableMap<String, Variable<out T>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
+        val variables: MutableMap<String, Variable<Float>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
         variables[varName] = slot
     }
 
@@ -109,16 +109,16 @@ abstract class Optimizer<T : Number>(val clipGradient: ClipGradientAction<T>) {
     protected fun getSlot(
         varName: String,
         slotName: String
-    ): Variable<T> {
-        val variables: MutableMap<String, Variable<out T>> = slots[slotName]!!
-        return variables[varName]!! as Variable<T>
+    ): Variable<Float> {
+        val variables: MutableMap<String, Variable<Float>> = slots[slotName]!!
+        return variables[varName]!!
     }
 
-    fun getDType(): Class<T> {
-        return Float::class.javaObjectType as Class<T>
+    fun getDType(): Class<Float> {
+        return Float::class.javaObjectType
     }
 
-    open fun createName(variable: Output<out T>, slotName: String): String {
+    open fun createName(variable: Output<Float>, slotName: String): String {
         return variable.op().name() + "-" + slotName
     }
 }

@@ -33,7 +33,7 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable

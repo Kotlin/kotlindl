@@ -46,7 +46,7 @@ private const val PADDING_SAME = "same"
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
 
-fun Sequential<Float>.loadWeights(
+fun Sequential.loadWeights(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
@@ -74,9 +74,9 @@ fun Sequential<Float>.loadWeights(
 /**
  * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
  */
-fun <T : Number> Sequential<T>.loadWeights(
+fun Sequential.loadWeights(
     hdfFile: HdfFile,
-    layerList: MutableList<Layer<T>>,
+    layerList: MutableList<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
@@ -118,7 +118,7 @@ fun <T : Number> Sequential<T>.loadWeights(
 /**
  * Weights for other layers will be initialized by initializer later.
  */
-fun <T : Number> Sequential<T>.loadWeightsForFrozenLayers(
+fun Sequential.loadWeightsForFrozenLayers(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
@@ -158,7 +158,7 @@ fun <T : Number> Sequential<T>.loadWeightsForFrozenLayers(
     this.logger.info { "Weights are loaded." }
 }
 
-private fun <T : Number> initConv2DVariablesByDefaultInitializer(name: String, model: Sequential<T>) {
+private fun initConv2DVariablesByDefaultInitializer(name: String, model: Sequential) {
     val kernelVariableName = conv2dKernelVarName(name)
     val biasVariableName = conv2dBiasVarName(name)
     runInitOps(kernelVariableName, model)
@@ -166,7 +166,7 @@ private fun <T : Number> initConv2DVariablesByDefaultInitializer(name: String, m
 }
 
 
-private fun <T : Number> initDenseVariablesByDefaultInitializer(name: String, model: Sequential<T>) {
+private fun initDenseVariablesByDefaultInitializer(name: String, model: Sequential) {
     val kernelVariableName = denseKernelVarName(name)
     val biasVariableName = denseBiasVarName(name)
     runInitOps(kernelVariableName, model)
@@ -174,9 +174,9 @@ private fun <T : Number> initDenseVariablesByDefaultInitializer(name: String, mo
 }
 
 // TODO: move to inference class
-private fun <T : Number> runInitOps(
+private fun runInitOps(
     variableName: String,
-    model: Sequential<T>
+    model: Sequential
 ) {
     val assignOpName = defaultAssignOpName(variableName)
 
@@ -185,36 +185,36 @@ private fun <T : Number> runInitOps(
         .run()
 }
 
-fun <T : Number> buildModelByJSONConfig(
+fun buildModelByJSONConfig(
     jsonConfigFile: File
-): Sequential<T> {
-    val pair = buildLayersByKerasJSONConfig<T>(jsonConfigFile)
+): Sequential {
+    val pair = buildLayersByKerasJSONConfig(jsonConfigFile)
     val layers = pair.first
-    val input: Input<T> = pair.second
+    val input: Input = pair.second
 
     return Sequential.of(input, layers.toList())
 }
 
-fun <T : Number> buildLayersByKerasJSONConfig(jsonConfigFile: File): Pair<MutableList<Layer<T>>, Input<T>> {
+fun buildLayersByKerasJSONConfig(jsonConfigFile: File): Pair<MutableList<Layer>, Input> {
     val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
 
     val sequentialConfig = Klaxon()
         .parse<KerasSequentialModel>(jsonString)
 
-    val layers = mutableListOf<Layer<T>>()
+    val layers = mutableListOf<Layer>()
 
     sequentialConfig!!.config!!.layers!!.forEach {
         run {
             if (it.class_name.equals("InputLayer")) {
 
             } else {
-                val layer = convertToLayer<T>(it)
+                val layer = convertToLayer(it)
                 layers.add(layer)
             }
         }
     }
 
-    val input: Input<T>
+    val input: Input
 
     val batchInputShape = sequentialConfig!!.config!!.layers!!.first().config!!.batch_input_shape
 
@@ -226,7 +226,7 @@ fun <T : Number> buildLayersByKerasJSONConfig(jsonConfigFile: File): Pair<Mutabl
     return Pair(layers, input)
 }
 
-fun <T : Number> Sequential<T>.saveConfig(jsonConfigFile: File) {
+fun Sequential.saveConfig(jsonConfigFile: File) {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {
         run {
@@ -248,17 +248,17 @@ fun <T : Number> Sequential<T>.saveConfig(jsonConfigFile: File) {
     jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
 }
 
-private fun <T : Number> convertToKerasLayer(layer: Layer<T>): KerasLayer {
+private fun convertToKerasLayer(layer: Layer): KerasLayer {
     return when (layer::class) {
-        Conv2D::class -> createKerasConv2D(layer as Conv2D<T>)
-        Flatten::class -> createKerasFlatten(layer as Flatten<T>)
-        MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D<T>)
-        Dense::class -> createKerasDense(layer as Dense<T>)
+        Conv2D::class -> createKerasConv2D(layer as Conv2D)
+        Flatten::class -> createKerasFlatten(layer as Flatten)
+        MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
+        Dense::class -> createKerasDense(layer as Dense)
         else -> throw IllegalStateException("${layer.name} is not supported yet!")
     }
 }
 
-private fun <T : Number> createKerasDense(layer: Dense<T>): KerasLayer {
+private fun createKerasDense(layer: Dense): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         units = layer.outputSize,
@@ -272,7 +272,7 @@ private fun <T : Number> createKerasDense(layer: Dense<T>): KerasLayer {
 }
 
 // TODO: create separate configs for different initializers
-private fun <T : Number> convertToKerasInitializer(initializer: Initializer<T>): KerasInitializer? {
+private fun convertToKerasInitializer(initializer: Initializer): KerasInitializer? {
     val className = when (initializer::class) {
         GlorotUniform::class -> INITIALIZER_GLOROT_UNIFORM
         GlorotNormal::class -> INITIALIZER_GLOROT_NORMAL
@@ -294,7 +294,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
     }
 }
 
-private fun <T : Number> createKerasMaxPooling2D(layer: MaxPool2D<T>): KerasLayer {
+private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
     val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2])
     val strides = mutableListOf(layer.strides[1], layer.strides[2])
     val configX = LayerConfig(
@@ -308,7 +308,7 @@ private fun <T : Number> createKerasMaxPooling2D(layer: MaxPool2D<T>): KerasLaye
     return KerasLayer(class_name = LAYER_MAX_POOLING_2D, config = configX)
 }
 
-private fun <T : Number> createKerasFlatten(layer: Flatten<T>): KerasLayer {
+private fun createKerasFlatten(layer: Flatten): KerasLayer {
     val configX = LayerConfig(
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
@@ -317,7 +317,7 @@ private fun <T : Number> createKerasFlatten(layer: Flatten<T>): KerasLayer {
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
 }
 
-private fun <T : Number> createKerasConv2D(layer: Conv2D<T>): KerasLayer {
+private fun createKerasConv2D(layer: Conv2D): KerasLayer {
     val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
     val configX = LayerConfig(
         filters = layer.filters.toInt(),
@@ -335,10 +335,10 @@ private fun <T : Number> createKerasConv2D(layer: Conv2D<T>): KerasLayer {
 }
 
 
-private fun <T : Number> fillConv2DVariables(
+private fun fillConv2DVariables(
     name: String,
     hdfFile: HdfFile,
-    model: Sequential<T>,
+    model: Sequential,
     kernelDataPathTemplate: String,
     biasDataPathTemplate: String
 ) {
@@ -352,10 +352,10 @@ private fun <T : Number> fillConv2DVariables(
 }
 
 
-private fun <T : Number> fillDenseVariables(
+private fun fillDenseVariables(
     name: String,
     hdfFile: HdfFile,
-    model: Sequential<T>,
+    model: Sequential,
     kernelDataPathTemplate: String,
     biasDataPathTemplate: String
 ) {
@@ -369,9 +369,9 @@ private fun <T : Number> fillDenseVariables(
     addInitOpsToGraph(biasVariableName, model, biasData)
 }
 
-private fun <T : Number> addInitOpsToGraph(
+private fun addInitOpsToGraph(
     variableName: String,
-    model: Sequential<T>,
+    model: Sequential,
     kernelData: Any
 ) {
     val initializerName = defaultInitializerOpName(variableName)
@@ -381,7 +381,7 @@ private fun <T : Number> addInitOpsToGraph(
 }
 
 
-private fun <T : Number> convertToLayer(kerasLayer: KerasLayer): Layer<T> {
+private fun convertToLayer(kerasLayer: KerasLayer): Layer {
     return when (kerasLayer.class_name) {
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -394,7 +394,7 @@ private fun <T : Number> convertToLayer(kerasLayer: KerasLayer): Layer<T> {
     }
 }
 
-private fun <T : Number> createDense(config: LayerConfig, name: String): Dense<T> {
+private fun createDense(config: LayerConfig, name: String): Dense {
     return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -404,7 +404,7 @@ private fun <T : Number> createDense(config: LayerConfig, name: String): Dense<T
     )
 }
 
-private fun <T : Number> convertToInitializer(initializer: KerasInitializer): Initializer<T> {
+private fun convertToInitializer(initializer: KerasInitializer): Initializer {
     return when (initializer.class_name!!) {
         INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(12L)
         INITIALIZER_GLOROT_NORMAL -> GlorotNormal(12L)
@@ -429,7 +429,7 @@ private fun convertToActivation(activation: String): Activations {
     }
 }
 
-private fun <T : Number> createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D<T> {
+private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -456,11 +456,11 @@ fun convertPadding(padding: String): ConvPadding {
     }
 }
 
-private fun <T : Number> createFlatten(config: LayerConfig, name: String): Flatten<T> {
+private fun createFlatten(config: LayerConfig, name: String): Flatten {
     return Flatten(name = name)
 }
 
-private fun <T : Number> createConv2D(config: LayerConfig, name: String): Conv2D<T> {
+private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 

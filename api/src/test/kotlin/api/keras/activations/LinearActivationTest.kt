@@ -9,7 +9,7 @@ open class ActivationTest {
     val EPS = 1e-2f
 
     protected fun assertActivationFunction(
-        instance: Activation<Float>,
+        instance: Activation,
         input: FloatArray,
         actual: FloatArray,
         expected: FloatArray

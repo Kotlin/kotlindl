@@ -25,20 +25,20 @@ import kotlin.math.roundToInt
      FULL
  }
 
-class Conv2D<T : Number>(
+class Conv2D(
     val filters: Long,
     val kernelSize: LongArray,
     val strides: LongArray,
     val dilations: LongArray = longArrayOf(1, 1, 1, 1),
     val activation: Activations = Activations.Relu,
-    val kernelInitializer: Initializer<T>,
-    val biasInitializer: Initializer<T>,
+    val kernelInitializer: Initializer,
+    val biasInitializer: Initializer,
     val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
-) : Layer<T>(name) {
+) : Layer(name) {
     // weight tensors
-    private lateinit var kernel: Variable<T>
-    private lateinit var bias: Variable<T>
+    private lateinit var kernel: Variable<Float>
+    private lateinit var bias: Variable<Float>
 
     // weight tensor shapes
     private lateinit var biasShape: Shape
@@ -47,7 +47,7 @@ class Conv2D<T : Number>(
     private val KERNEL = "conv2d_kernel"
     private val BIAS = "conv2d_bias"
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -96,7 +96,7 @@ class Conv2D<T : Number>(
         return Shape.make(inputShape.size(0), rows, cols, filters)
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
         val tfPadding = when (padding) {
             ConvPadding.SAME -> "SAME"
             ConvPadding.VALID -> "VALID"
@@ -105,7 +105,7 @@ class Conv2D<T : Number>(
 
         val options: Conv2d.Options = dilations(dilations.toList()).dataFormat("NHWC")
         val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options), bias)
-        return Activations.convert<T>(activation).apply(tf, signal, name)
+        return Activations.convert(activation).apply(tf, signal, name)
     }
 
     override fun getWeights(): List<Array<*>> {

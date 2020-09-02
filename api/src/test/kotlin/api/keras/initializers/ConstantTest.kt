@@ -22,7 +22,7 @@ internal class ConstantTest {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = Constant<Float>(42.2f)
+            val instance = Constant(42.2f)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), "default_name")
             operand.asOutput().tensor().copyTo(actual)
 

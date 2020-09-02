@@ -16,7 +16,7 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 

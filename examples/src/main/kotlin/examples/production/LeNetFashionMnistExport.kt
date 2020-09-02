@@ -61,7 +61,7 @@ fun main() {
         it.save(PATH_TO_MODEL)
     }
 
-    InferenceModel<Float>().use {
+    InferenceModel().use {
         it.load(PATH_TO_MODEL)
 
         var accuracy = 0.0

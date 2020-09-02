@@ -5,12 +5,12 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-class Dropout<T : Number>(
+class Dropout(
     private val keepProbability: Float,
     name: String = ""
-) : Layer<T>(name) {
+) : Layer(name) {
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         //left empty
     }
 
@@ -18,7 +18,7 @@ class Dropout<T : Number>(
         return inputShape
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
         val trainingFactor = tf.placeholderWithDefault(tf.constant(0.0f), Shape.scalar())
 
         val probability = tf.math.add(
@@ -33,7 +33,7 @@ class Dropout<T : Number>(
 
         val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType())
 
-        val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<T>))
+        val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<Float>))
 
         return tf.math.div(tf.math.mul(input, mask), probability)
     }

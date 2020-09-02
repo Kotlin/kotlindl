@@ -30,7 +30,7 @@ private const val SEED = 12L
  * Kotlin implementation of LeNet on Keras.
  * Architecture could be copied here: https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
  */
-private val model = Sequential.of<Float>(
+private val model = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
@@ -105,7 +105,7 @@ fun main() {
     }
 }
 
-class CustomCallback : Callback<Float>() {
+class CustomCallback : Callback() {
     override fun onEpochBegin(epoch: Int, trainingHistory: TrainingHistory) {
         println("Epoch $epoch begins.")
     }

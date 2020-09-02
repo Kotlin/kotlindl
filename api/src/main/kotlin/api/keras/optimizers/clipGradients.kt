@@ -3,26 +3,26 @@ package api.keras.optimizers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-class NoClipGradient<T : Number>() : ClipGradientAction<T>() {
-    override fun clipGradient(tf: Ops, gradient: Operand<T>): Operand<T> {
+class NoClipGradient() : ClipGradientAction() {
+    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
         return gradient
     }
 }
 
-class ClipGradientByValue<T : Number>(private val clipValue: Float) : ClipGradientAction<T>() {
-    override fun clipGradient(tf: Ops, gradient: Operand<T>): Operand<T> {
-        return tf.clipByValue(gradient, tf.constant(-clipValue) as Operand<T>, tf.constant(clipValue) as Operand<T>)
+class ClipGradientByValue(private val clipValue: Float) : ClipGradientAction() {
+    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
+        return tf.clipByValue(gradient, tf.constant(-clipValue) as Operand<Float>, tf.constant(clipValue))
     }
 
 }
 
-class ClipGradientByNorm<T : Number>(private val clipNormValue: Float) : ClipGradientAction<T>() {
-    override fun clipGradient(tf: Ops, gradient: Operand<T>): Operand<T> {
+class ClipGradientByNorm(private val clipNormValue: Float) : ClipGradientAction() {
+    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
         TODO("Is not implemented yet")
     }
 
 }
 
-abstract class ClipGradientAction<T : Number> {
-    abstract fun clipGradient(tf: Ops, gradient: Operand<T>): Operand<T>
+abstract class ClipGradientAction {
+    abstract fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float>
 }

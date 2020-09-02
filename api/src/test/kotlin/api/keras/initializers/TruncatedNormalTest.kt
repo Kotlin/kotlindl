@@ -26,7 +26,7 @@ internal class TruncatedNormalTest {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = TruncatedNormal<Float>(12L)
+            val instance = TruncatedNormal(12L)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), "default_name")
             operand.asOutput().tensor().copyTo(actual)
 

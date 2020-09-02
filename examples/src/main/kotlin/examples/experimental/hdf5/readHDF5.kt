@@ -25,7 +25,7 @@ fun main() {
          recursivePrintGroup(hdfFile, hdfFile, 0)
      }*/
 
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
     model.compile(
         optimizer = Adam(),
         loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

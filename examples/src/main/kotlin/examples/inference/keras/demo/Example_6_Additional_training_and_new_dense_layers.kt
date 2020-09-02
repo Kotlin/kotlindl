@@ -31,9 +31,9 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val (otherLayers, input) = buildLayersByKerasJSONConfig<Float>(jsonConfigFile)
+    val (otherLayers, input) = buildLayersByKerasJSONConfig(jsonConfigFile)
 
-    val layers = mutableListOf<Layer<Float>>()
+    val layers = mutableListOf<Layer>()
     for (layer in otherLayers) {
         if (layer::class == Conv2D::class || layer::class == MaxPool2D::class) { // TODO
             layer.isTrainable = false // TODO: change for lambda

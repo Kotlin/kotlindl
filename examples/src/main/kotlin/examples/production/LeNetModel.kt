@@ -17,10 +17,10 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
-private val kernelInitializer = GlorotNormal<Float>(SEED)
-private val biasInitializer = GlorotUniform<Float>(SEED)
+private val kernelInitializer = GlorotNormal(SEED)
+private val biasInitializer = GlorotUniform(SEED)
 
-val lenet5 = Sequential.of<Float>(
+val lenet5 = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,

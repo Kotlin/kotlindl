@@ -7,23 +7,23 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import java.util.*
 
-class SGD<T : Number>(
+class SGD(
     private val learningRateSchedule: Map<Int, Float>,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
     private var learningRate: Float = 0.2f
 
-    constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction<T> = NoClipGradient()) : this(mapOf()) {
+    constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction = NoClipGradient()) : this(mapOf()) {
         this.learningRate = learningRate
     }
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
 
         /*  if (learningRateSchedule.isNotEmpty()) {
@@ -34,7 +34,7 @@ class SGD<T : Number>(
                           tf.train.applyGradientDescent(
                               weights[i],
                               tf.constant(currentEpochLearningRate, getDType()),
-                              gradients.dy<T>(i)
+                              gradients.dy(i)
                           )
                       )
                   }

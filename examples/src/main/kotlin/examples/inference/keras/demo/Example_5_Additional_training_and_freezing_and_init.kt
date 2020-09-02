@@ -24,10 +24,10 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     model.use {
-        val layerList = mutableListOf<Layer<Float>>()
+        val layerList = mutableListOf<Layer>()
         // Freeze conv2d layers, keep dense layers trainable
         for (layer in it.layers) {
             if (layer::class == Conv2D::class) {

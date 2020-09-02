@@ -34,18 +34,18 @@ import java.io.File
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
  */
-class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : TrainableTFModel<T>() {
+class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     /** Logger for Sequential model. */
     val logger = KotlinLogging.logger {}
 
     /** Input layer. */
-    val firstLayer: Input<T> = input
+    val firstLayer: Input = input
 
     /** The bunch of layers. */
-    val layers: List<Layer<T>> = listOf(*layers)
+    val layers: List<Layer> = listOf(*layers)
 
     /** Layers indexed by name. */
-    private var layersByName: Map<String, Layer<T>> = mapOf()
+    private var layersByName: Map<String, Layer> = mapOf()
 
     /** Is true when model is compiled. */
     var isModelCompiled: Boolean = false
@@ -59,7 +59,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     var stopTraining: Boolean = false
 
     /** Main loss operand. */
-    private lateinit var lossOp: Operand<T>
+    private lateinit var lossOp: Operand<Float>
 
     init {
         for (layer in layers) {
@@ -84,7 +84,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun <T : Number> of(input: Input<T>, vararg layers: Layer<T>): Sequential<T> {
+        fun of(input: Input, vararg layers: Layer): Sequential {
             preProcessLayerNames(layers)
             val seqModel = Sequential(input, *layers)
             postProcessLayerNames(layers, seqModel)
@@ -99,14 +99,14 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun <T : Number> of(input: Input<T>, layers: List<Layer<T>>): Sequential<T> {
+        fun of(input: Input, layers: List<Layer>): Sequential {
             preProcessLayerNames(layers.toTypedArray())
             val seqModel = Sequential(input, *layers.toTypedArray())
             postProcessLayerNames(layers.toTypedArray(), seqModel)
             return seqModel
         }
 
-        private fun <T : Number> preProcessLayerNames(layers: Array<out Layer<T>>) {
+        private fun preProcessLayerNames(layers: Array<out Layer>) {
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
@@ -117,16 +117,16 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
             }
         }
 
-        private fun <T : Number> postProcessLayerNames(
-            layers: Array<out Layer<T>>,
-            seqModel: Sequential<T>
+        private fun postProcessLayerNames(
+            layers: Array<out Layer>,
+            seqModel: Sequential
         ) {
             for (layer in layers) {
                 layer.parentModel = seqModel
             }
         }
 
-        fun <T : Number> load(pathToModelDirectory: String): Sequential<T> {
+        fun load(pathToModelDirectory: String): Sequential {
             val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
             return buildModelByJSONConfig(jsonConfig)
         }
@@ -139,7 +139,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      * @param [loss] Loss function.
      * @param [metric] Metric to evaluate during training.
      */
-    override fun compile(optimizer: Optimizer<T>, loss: LossFunctions, metric: Metrics, callback: Callback<T>) {
+    override fun compile(optimizer: Optimizer, loss: LossFunctions, metric: Metrics, callback: Callback) {
         if (isModelCompiled) logger.info { "Model was recompiled." }
 
         validateModelArchitecture()
@@ -166,10 +166,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
 
         xOp = firstLayer.input
-        yOp = tf.placeholder(getDType()) as Operand<T>
+        yOp = tf.placeholder(getDType()) as Operand<Float>
 
         yPred = transformInputWithNNModel(xOp)
-        lossOp = LossFunctions.convert<T>(loss).apply(tf, yPred, yOp, getDType())
+        lossOp = LossFunctions.convert(loss).apply(tf, yPred, yOp, getDType())
 
         isModelCompiled = true
     }
@@ -267,7 +267,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
         //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
 
-        val metricOp = Metrics.convert<T>(metric).apply(tf, prediction, yOp, getDType())
+        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp, getDType())
 
         val targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
@@ -343,10 +343,10 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
      *
      */
     private fun trainOnBatch(
-        targets: List<Operand<T>>,
+        targets: List<Operand<Float>>,
         batchImages: Tensor<Float>,
         batchLabels: Tensor<Float>,
-        metricOp: Operand<T>
+        metricOp: Operand<Float>
     ): Pair<Float, Float> {
         val runner = session.runner()
 
@@ -380,7 +380,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         callback.onTestBegin()
         //val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
         //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
-        val metricOp = Metrics.convert<T>(metric).apply(tf, yPred, yOp, getDType())
+        val metricOp = Metrics.convert(metric).apply(tf, yPred, yOp, getDType())
 
         val (imageShape, labelShape) = calculateXYShapes(batchSize)
 
@@ -547,7 +547,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     private fun formPredictionAndActivationsTensors(
-        prediction: Operand<T>,
+        prediction: Operand<Float>,
         testImages: Tensor<Float>,
         visualizationIsEnabled: Boolean
     ): List<Tensor<*>> {
@@ -575,8 +575,8 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         return Pair(xBatchShape, yBatchShape)
     }
 
-    private fun transformInputWithNNModel(input: Operand<T>): Operand<T> {
-        var out: Operand<T> = input
+    private fun transformInputWithNNModel(input: Operand<Float>): Operand<Float> {
+        var out: Operand<Float> = input
         for (layer in layers) {
             out = layer.transformInput(tf, out)
         }
@@ -600,7 +600,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         session.close()
     }
 
-    fun getGraph(): KGraph<T> {
+    fun getGraph(): KGraph {
         return kGraph
     }
 
@@ -676,7 +676,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
         }
     }
 
-    infix fun getLayer(layerName: String): Layer<T> {
+    infix fun getLayer(layerName: String): Layer {
         return layersByName[layerName] ?: error("No such layer $layerName in the model.")
     }
 
@@ -715,7 +715,7 @@ class Sequential<T : Number>(input: Input<T>, vararg layers: Layer<T>) : Trainab
     }
 
     private fun createLayerDescription(
-        l: Layer<T>,
+        l: Layer,
         stringLayerNameTypeSize: Int,
         stringOutputShapeSize: Int
     ): String {

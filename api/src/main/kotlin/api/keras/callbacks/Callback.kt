@@ -3,8 +3,8 @@ package api.keras.callbacks
 import api.keras.Sequential
 import api.keras.history.*
 
-open class Callback<T : Number> {
-    lateinit var model: Sequential<T>
+open class Callback {
+    lateinit var model: Sequential
 
     /**
      * Called at the start of an epoch. This method should only be called during

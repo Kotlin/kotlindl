@@ -25,7 +25,7 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
 
-private val lenet5Classic = Sequential.of<Float>(
+private val lenet5Classic = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,

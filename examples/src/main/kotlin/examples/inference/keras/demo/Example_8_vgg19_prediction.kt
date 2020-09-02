@@ -14,7 +14,7 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg19\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 

@@ -12,17 +12,17 @@ import api.keras.optimizers.Optimizer
 import api.keras.optimizers.SGD
 import org.tensorflow.Operand
 
-abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
+abstract class TrainableTFModel : InferenceModel() {
     protected var isDebugMode = false
 
     /** Optimizer. Approach how aggressively to update the weights. */
-    protected var optimizer: Optimizer<T> = SGD(0.2f)
+    protected var optimizer: Optimizer = SGD(0.2f)
 
     /** Loss function. */
     protected var loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS
 
     /** Callback. */
-    protected var callback: Callback<T> = Callback()
+    protected var callback: Callback = Callback()
 
     /** Metric on validation dataset for training phase. */
     protected var metric: Metrics = Metrics.ACCURACY
@@ -31,13 +31,13 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     protected var metrics: List<Metrics> = listOf(Metrics.ACCURACY)
 
     /** TensorFlow operand for prediction phase. */
-    protected lateinit var yPred: Operand<T>
+    protected lateinit var yPred: Operand<Float>
 
     /** TensorFlow operand for X data. */
-    protected lateinit var xOp: Operand<T>
+    protected lateinit var xOp: Operand<Float>
 
     /** TensorFlow operand for Y data. */
-    protected lateinit var yOp: Operand<T>
+    protected lateinit var yOp: Operand<Float>
 
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     protected var amountOfClasses: Long = -1
@@ -50,10 +50,10 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
      * @metric — Used to monitor the training and testing steps.
      */
     abstract fun compile(
-        optimizer: Optimizer<T>,
+        optimizer: Optimizer,
         loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric: Metrics = Metrics.ACCURACY,
-        callback: Callback<T> = Callback()
+        callback: Callback = Callback()
     )
 
     /**
@@ -106,8 +106,8 @@ abstract class TrainableTFModel<T : Number> : InferenceModel<T>() {
     abstract fun save(pathToModelDirectory: String, modelFormat: ModelFormat = ModelFormat.SIMPLE)
 
 
-    fun getDType(): Class<T> {
-        return Float::class.javaObjectType as Class<T>
+    fun getDType(): Class<Float> {
+        return Float::class.javaObjectType
     }
 
     abstract fun predictAndGetActivations(

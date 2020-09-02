@@ -24,7 +24,7 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val model = buildModelByJSONConfig<Float>(jsonConfigFile)
+    val model = buildModelByJSONConfig(jsonConfigFile)
 
     model.use {
         it.compile(

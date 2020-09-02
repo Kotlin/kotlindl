@@ -30,7 +30,7 @@ internal class ParametrizedRandomNormalTest {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = ParametrizedTruncatedNormal<Float>(MEAN, STD_DEV, P1, P2, 12L)
+            val instance = ParametrizedTruncatedNormal(MEAN, STD_DEV, P1, P2, 12L)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), "default_name")
             operand.asOutput().tensor().copyTo(actual)
 

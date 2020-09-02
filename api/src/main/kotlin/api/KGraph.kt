@@ -8,7 +8,7 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.AssignAdd
 import org.tensorflow.op.core.Variable
 
-class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
+class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     constructor(graphDef: ByteArray) : this(graphDef, "")
 
     var tfGraph: Graph = Graph()
@@ -20,10 +20,10 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
     private val optimizerAssignAddInitializers: MutableList<AssignAdd<*>> = mutableListOf()
 
     /** A list of variables to train. */
-    private val variables: MutableMap<Variable<T>, Boolean> = mutableMapOf()
+    private val variables: MutableMap<Variable<Float>, Boolean> = mutableMapOf()
 
     /** A list of initializer to initialize the trainableVariables. */
-    private val initializers: MutableMap<String, Assign<T>> = mutableMapOf()
+    private val initializers: MutableMap<String, Assign<Float>> = mutableMapOf()
 
     init {
         if (prefix.isEmpty()) {
@@ -52,12 +52,12 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         return s
     }
 
-    fun addVariable(variable: Variable<T>, isTrainable: Boolean) {
+    fun addVariable(variable: Variable<Float>, isTrainable: Boolean) {
         check(!variables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
         variables[variable] = isTrainable
     }
 
-    fun addInitializer(variableName: String, initializer: Assign<T>) {
+    fun addInitializer(variableName: String, initializer: Assign<Float>) {
         check(!initializers.contains(variableName)) { "$variableName has initializer already. Analyze and fix the static graph building process." }
         initializers[variableName] = initializer
     }
@@ -66,15 +66,15 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         optimizerInitializers += initializer
     }
 
-    fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<*>) {
+    fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<Long>) {
         optimizerAssignAddInitializers += initializer
     }
 
-    fun trainableVariables(): List<Variable<T>> {
+    fun trainableVariables(): List<Variable<Float>> {
         return variables.filter { it.value }.keys.toList()
     }
 
-    fun variables(): List<Variable<T>> {
+    fun variables(): List<Variable<Float>> {
         return variables.keys.toList()
     }
 
@@ -82,7 +82,7 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         val runner = session.runner()
 
         initializers.forEach {
-            runner.addTarget(it.value as Operand<T>)
+            runner.addTarget(it.value as Operand<Float>)
         }
 
         runner.run()
@@ -92,7 +92,7 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
         if (optimizerInitializers.isNotEmpty()) {
             optimizerInitializers.forEach {
                 val runner = session.runner()
-                runner.addTarget(it as Operand<*>)
+                runner.addTarget(it as Operand<Float>)
                 runner.run()
             }
 
@@ -105,7 +105,7 @@ class KGraph<T : Number>(graphDef: ByteArray, prefix: String) : AutoCloseable {
             val runner = session.runner()
 
             optimizerAssignAddInitializers.forEach {
-                runner.addTarget(it as Operand<*>)
+                runner.addTarget(it as Operand<Float>)
             }
             runner.run()
         }

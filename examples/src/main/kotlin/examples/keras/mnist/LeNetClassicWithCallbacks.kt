@@ -27,7 +27,7 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
 
-private val lenet5Classic = Sequential.of<Float>(
+private val lenet5Classic = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
@@ -95,7 +95,7 @@ fun main() {
     )
 
     lenet5Classic.use {
-        val earlyStopping = EarlyStopping<Float>().setUp(
+        val earlyStopping = EarlyStopping().setUp(
             monitor = "valLoss", // TODO: could be complex dsl with a few fields of EpochTrainingEvent
             minDelta = 0.0, patience = 2, verbose = true, mode = Mode.AUTO,
             baseline = 0.1, restoreBestWeights = false

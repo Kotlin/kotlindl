@@ -28,7 +28,7 @@ internal class VarianceScalingTest {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = VarianceScaling<Float>(seed = SEED)
+            val instance = VarianceScaling(seed = SEED)
             val operand =
                 instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), DEFAULT_LAYER_NAME)
             operand.asOutput().tensor().copyTo(actual)

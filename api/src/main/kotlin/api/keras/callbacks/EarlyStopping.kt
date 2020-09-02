@@ -7,7 +7,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.math.abs
 
-class EarlyStopping<T : Number> : Callback<T>() {
+class EarlyStopping : Callback() {
     private var wait = 0
     private var stoppedEpoch = 0
 
@@ -87,7 +87,7 @@ class EarlyStopping<T : Number> : Callback<T>() {
         monitor: String,
         minDelta: Double, patience: Int, verbose: Boolean, mode: Mode,
         baseline: Double, restoreBestWeights: Boolean
-    ): EarlyStopping<T> {
+    ): EarlyStopping {
         this.monitor = monitor
         this.minDelta = abs(minDelta)
         this.patience = patience

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class CnnTest : IntegrationTest() {
-    private val testModel = Sequential.of<Float>(
+    private val testModel = Sequential.of(
         Input(
             IMAGE_SIZE,
             IMAGE_SIZE,

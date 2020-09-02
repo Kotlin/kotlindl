@@ -22,7 +22,7 @@ internal class OnesTest {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = Ones<Float>()
+            val instance = Ones()
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), "default_name")
             operand.asOutput().tensor().copyTo(actual)
 

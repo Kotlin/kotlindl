@@ -25,7 +25,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         assertEquals(testModel.layers.size, 8)
         assertTrue(testModel.getLayer("flatten_7").isTrainable)
@@ -48,7 +48,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -91,7 +91,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
 
         assertEquals(testModel.layers.size, 8)
@@ -115,7 +115,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -173,7 +173,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -201,7 +201,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -255,7 +255,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -330,7 +330,7 @@ class TransferLearningTest : IntegrationTest() {
         val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = buildModelByJSONConfig<Float>(jsonConfigFile)
+        val testModel = buildModelByJSONConfig(jsonConfigFile)
 
         val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
         val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
@@ -348,7 +348,7 @@ class TransferLearningTest : IntegrationTest() {
         )
 
         testModel.use {
-            val layerList = mutableListOf<Layer<Float>>()
+            val layerList = mutableListOf<Layer>()
 
             for (layer in it.layers) {
                 if (layer is Conv2D) {
@@ -397,7 +397,7 @@ class TransferLearningTest : IntegrationTest() {
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
-            assertEquals(0.6868999600410461, accuracyAfterTraining!!, EPS)
+            assertEquals(0.5108000040054321, accuracyAfterTraining!!, EPS)
         }
     }
 }

@@ -12,23 +12,23 @@ import java.util.*
 private const val ACCUMULATOR = "accum"
 private const val ACCUMULATOR_UPDATE = "accum_update"
 
-class AdaDelta<T : Number>(
+class AdaDelta(
     private val learningRate: Float = 0.1f,
     private val rho: Float = 0.95f,
     private val epsilon: Float = 1e-8f,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
-    private lateinit var epsilonConstant: Constant<T>
-    private lateinit var learningRateConst: Constant<T>
-    private lateinit var rhoConst: Constant<T>
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
+    private lateinit var epsilonConstant: Constant<Float>
+    private lateinit var learningRateConst: Constant<Float>
+    private lateinit var rhoConst: Constant<Float>
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
 
         rhoConst = tf.constant(rho, getDType())
@@ -39,8 +39,8 @@ class AdaDelta<T : Number>(
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val accumSlot: Variable<T> = getSlot(varName, ACCUMULATOR)
-            val accumUpdateSlot: Variable<T> = getSlot(varName, ACCUMULATOR_UPDATE)
+            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
+            val accumUpdateSlot: Variable<Float> = getSlot(varName, ACCUMULATOR_UPDATE)
 
             targets.add(
                 tf.train.applyAdadelta(
@@ -56,16 +56,16 @@ class AdaDelta<T : Number>(
         return targets
     }
 
-    private fun createAdaDeltaSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
+    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
         val accumulatorInitializer = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
-        val updateInitializer: Operand<T> = tf
+        val updateInitializer: Operand<Float> = tf
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
     }
 
-    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
         for (v in variables) {
             createAdaDeltaSlot(graph, tf, v.asOutput())
         }

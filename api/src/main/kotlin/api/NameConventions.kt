@@ -2,7 +2,7 @@ package api
 
 import api.keras.layers.Layer
 
-fun <T : Number> defaultActivationName(layer: Layer<T>) = "Activation_${layer.name}"
+fun defaultActivationName(layer: Layer) = "Activation_${layer.name}"
 
 fun defaultAssignOpName(name: String) = "Assign_$name"
 

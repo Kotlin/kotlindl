@@ -30,7 +30,7 @@ private const val IMAGE_SIZE = 32L
 private const val VALIDATION_RATE = 0.75
 private const val SEED = 12L
 
-private val model = Sequential.of<Float>(
+private val model = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,

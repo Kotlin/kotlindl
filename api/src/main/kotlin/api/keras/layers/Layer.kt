@@ -8,14 +8,14 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
-abstract class Layer<T : Number>(var name: String) {
+abstract class Layer(var name: String) {
     var isTrainable = true
 
     lateinit var outputShape: LongArray
 
-    lateinit var parentModel: TrainableTFModel<T>
+    lateinit var parentModel: TrainableTFModel
 
-    protected var dtype: Class<T> = getDType()
+    protected var dtype: Class<Float> = getDType()
 
     /** Returns number of input parameters. */
     protected var fanIn: Int = Int.MIN_VALUE
@@ -23,14 +23,14 @@ abstract class Layer<T : Number>(var name: String) {
     /** Returns number of output parameters. */
     protected var fanOut: Int = Int.MIN_VALUE
 
-    abstract fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape)
+    abstract fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape)
 
     abstract fun computeOutputShape(inputShape: Shape): Shape
 
-    abstract fun transformInput(tf: Ops, input: Operand<T>): Operand<T>
+    abstract fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float>
 
-    fun getDType(): Class<T> {
-        return Float::class.javaObjectType as Class<T>
+    fun getDType(): Class<Float> {
+        return Float::class.javaObjectType
     }
 
     /**
@@ -42,11 +42,11 @@ abstract class Layer<T : Number>(var name: String) {
      */
     protected fun addWeight(
         tf: Ops,
-        kGraph: KGraph<T>,
+        kGraph: KGraph,
         name: String,
-        variable: Variable<T>,
-        initializer: Initializer<T>
-    ): Variable<T> {
+        variable: Variable<Float>,
+        initializer: Initializer
+    ): Variable<Float> {
         require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
         require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
 

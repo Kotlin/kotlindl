@@ -9,13 +9,13 @@ import org.tensorflow.op.Ops
 
 private const val PADDING_TYPE = "SAME"
 
-class AvgPool2D<T : Number>(
+class AvgPool2D(
     val poolSize: IntArray,
     val strides: IntArray,
     val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
-) : Layer<T>(name) {
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
+) : Layer(name) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var rows = inputShape.size(1)
@@ -32,7 +32,7 @@ class AvgPool2D<T : Number>(
         return Shape.make(inputShape.size(0), rows, cols, inputShape.size(3))
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
         // data conversion due to different signatures of nn.avgPool and nn.maxPool
         val poolSizeLongList: MutableList<Long> = mutableListOf()
         poolSize.forEach {

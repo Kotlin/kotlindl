@@ -11,21 +11,21 @@ import java.util.*
 
 private const val ACCUMULATOR = "accumulator"
 
-class AdaGrad<T : Number>(
+class AdaGrad(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
-    private lateinit var initialAccumulatorValueConstant: Constant<T>
-    private lateinit var learningRateConst: Constant<T>
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
+    private lateinit var initialAccumulatorValueConstant: Constant<Float>
+    private lateinit var learningRateConst: Constant<Float>
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
 
         initialAccumulatorValueConstant = tf.constant(initialAccumulatorValue, getDType())
@@ -35,7 +35,7 @@ class AdaGrad<T : Number>(
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val slot: Variable<T> = getSlot(varName, ACCUMULATOR)
+            val slot: Variable<Float> = getSlot(varName, ACCUMULATOR)
 
             targets.add(
                 tf.train.applyAdagrad(
@@ -49,15 +49,15 @@ class AdaGrad<T : Number>(
         return targets
     }
 
-    private fun createAdaGradSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
-        val initializer: Operand<T> = tf.fill(
+    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+        val initializer: Operand<Float> = tf.fill(
             tf.shape(v),
             tf.dtypes.cast(tf.constant(initialAccumulatorValue), getDType())
         )
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 
-    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
         for (v in variables) {
             createAdaGradSlot(graph, tf, v.asOutput())
         }

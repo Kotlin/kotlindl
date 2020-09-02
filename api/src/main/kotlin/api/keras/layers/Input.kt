@@ -7,12 +7,12 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 
-class Input<T : Number>(vararg dims: Long, name: String = "") : Layer<T>(name) {
-    lateinit var input: Placeholder<T>
+class Input(vararg dims: Long, name: String = "") : Layer(name) {
+    lateinit var input: Placeholder<Float>
 
     val packedDims: LongArray = dims
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {}
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     fun defineVariables(tf: Ops) {
         input = tf.withName(DATA_PLACEHOLDER).placeholder(
@@ -25,7 +25,7 @@ class Input<T : Number>(vararg dims: Long, name: String = "") : Layer<T>(name) {
         return input.asOutput().shape()
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
         return input
     }
 

@@ -23,14 +23,14 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
-val heNormal = HeNormal<Float>(SEED)
+val heNormal = HeNormal(SEED)
 
 /**
  * Kotlin implementation of VGG'11 on Keras.
  * Make accuracy ~ 0.9 on Mnist Test dataset
  * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
  */
-private val vgg11 = Sequential.of<Float>(
+private val vgg11 = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,

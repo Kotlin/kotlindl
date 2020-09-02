@@ -23,7 +23,7 @@ private val IMAGE_SIZE = 28L
 private val SEED = 12L
 
 internal class SequentialModelTest {
-    private val correctTestModel = Sequential.of<Float>(
+    private val correctTestModel = Sequential.of(
         Input(
             IMAGE_SIZE,
             IMAGE_SIZE,
@@ -134,7 +134,7 @@ internal class SequentialModelTest {
     @Test
     fun repeatableNamesFails() {
         val exception = assertThrows(RepeatableLayerNameException::class.java) {
-            Sequential.of<Float>(
+            Sequential.of(
                 Input(
                     IMAGE_SIZE,
                     IMAGE_SIZE,
@@ -172,7 +172,7 @@ internal class SequentialModelTest {
     @Test
     fun namesGeneration() {
 
-        val model = Sequential.of<Float>(
+        val model = Sequential.of(
             Input(
                 IMAGE_SIZE,
                 IMAGE_SIZE,

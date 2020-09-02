@@ -12,22 +12,22 @@ import java.util.*
 
 private const val MOMENTUM = "momentum"
 
-class Momentum<T : Number>(
+class Momentum(
     private val learningRate: Float = 0.001f,
     private val momentum: Float = 0.99f,
     private val useNesterov: Boolean = true,
-    clipGradient: ClipGradientAction<T> = NoClipGradient()
-) : Optimizer<T>(clipGradient) {
-    private lateinit var momentumConst: Constant<T>
-    private lateinit var learningRateConst: Constant<T>
+    clipGradient: ClipGradientAction = NoClipGradient()
+) : Optimizer(clipGradient) {
+    private lateinit var momentumConst: Constant<Float>
+    private lateinit var learningRateConst: Constant<Float>
 
     override fun applyGradients(
-        graph: KGraph<T>,
+        graph: KGraph,
         tf: Ops,
-        weights: List<Variable<T>>,
+        weights: List<Variable<Float>>,
         gradients: Gradients
-    ): List<Operand<T>> {
-        val targets: MutableList<Operand<T>> =
+    ): List<Operand<Float>> {
+        val targets: MutableList<Operand<Float>> =
             ArrayList()
 
         learningRateConst = tf.constant(learningRate, getDType())
@@ -52,12 +52,12 @@ class Momentum<T : Number>(
         return targets
     }
 
-    private fun createMomentumSlot(graph: KGraph<T>, tf: Ops, v: Output<out T>) {
-        val initializer: Operand<T> = tf.fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
+    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+        val initializer: Operand<Float> = tf.fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
     }
 
-    override fun createSlots(graph: KGraph<T>, tf: Ops, variables: List<Output<out T>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
         for (v in variables) {
             createMomentumSlot(graph, tf, v.asOutput())
         }

@@ -27,7 +27,7 @@ public class LeNetClassic {
     public static final Long SEED = 12L;
     public static final Integer TEST_BATCH_SIZE = 1000;
 
-    public static final Sequential<Float> lenet5Classic = Sequential.Companion.of(
+    public static final Sequential lenet5Classic = Sequential.Companion.of(
             new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
             new Conv2D(6, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_1"),
             new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),
@@ -54,10 +54,10 @@ public class LeNetClassic {
         var train = result.component1();
         var test = result.component2();
 
-        var adam = new Adam<Float>(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
+        var adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
 
         try (lenet5Classic) {
-            lenet5Classic.compile(adam, LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY, new Callback<>());
+            lenet5Classic.compile(adam, LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY, new Callback());
             lenet5Classic.summary(30, 26);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true, true);
 

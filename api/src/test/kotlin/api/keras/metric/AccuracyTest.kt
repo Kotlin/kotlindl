@@ -21,7 +21,7 @@ internal class AccuracyTest : ActivationTest() {
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance: SigmoidActivation<Float> = SigmoidActivation()
+            val instance: SigmoidActivation = SigmoidActivation()
             val operand: Operand<Float> = instance.apply(tf, tf.constant(input))
             operand.asOutput().tensor().copyTo(actual)
 

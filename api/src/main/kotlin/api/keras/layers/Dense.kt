@@ -17,23 +17,23 @@ import org.tensorflow.op.core.Variable
 private const val KERNEL = "dense_kernel"
 private const val BIAS = "dense_bias"
 
-class Dense<T : Number>(
+class Dense(
     val outputSize: Int,
     val activation: Activations = Activations.Sigmoid,
-    val kernelInitializer: Initializer<T>,
-    val biasInitializer: Initializer<T>,
+    val kernelInitializer: Initializer,
+    val biasInitializer: Initializer,
     name: String = ""
-) : Layer<T>(name) {
+) : Layer(name) {
     private lateinit var kernelShape: Shape
 
     private lateinit var biasShape: Shape
 
     // weight tensors
-    private lateinit var kernel: Variable<T>
+    private lateinit var kernel: Variable<Float>
 
-    private lateinit var bias: Variable<T>
+    private lateinit var bias: Variable<Float>
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph<T>, inputShape: Shape) {
+    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         biasShape = Shape.make(outputSize.toLong())
@@ -63,9 +63,9 @@ class Dense<T : Number>(
         return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
     }
 
-    override fun transformInput(tf: Ops, input: Operand<T>): Operand<T> {
-        val signal: Operand<T> = tf.math.add(tf.linalg.matMul(input, kernel), bias)
-        return Activations.convert<T>(activation).apply(tf, signal, name)
+    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+        val signal: Operand<Float> = tf.math.add(tf.linalg.matMul(input, kernel), bias)
+        return Activations.convert(activation).apply(tf, signal, name)
     }
 
     override fun getWeights(): List<Array<*>> {
