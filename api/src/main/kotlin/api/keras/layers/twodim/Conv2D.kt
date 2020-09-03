@@ -19,11 +19,11 @@ import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.Conv2d.dilations
 import kotlin.math.roundToInt
 
- enum class ConvPadding {
-     SAME,
-     VALID,
-     FULL
- }
+enum class ConvPadding {
+    SAME,
+    VALID,
+    FULL
+}
 
 class Conv2D(
     val filters: Long,

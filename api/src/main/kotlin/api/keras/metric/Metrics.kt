@@ -29,17 +29,14 @@ class Accuracy() : Metric {
 class MAE() : Metric {
     override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val absoluteErrors = tf.math.abs(tf.math.sub(output, label))
-
-        return tf.math.mean(tf.math.mean(tf.dtypes.cast(absoluteErrors, dtype), tf.constant(0)), tf.constant(0))
+        return tf.reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
     }
 }
 
 class MSE() : Metric {
     override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
-
         val squaredError = tf.math.squaredDifference(output, label)
-
-        return tf.math.mean(tf.math.mean(tf.dtypes.cast(squaredError, dtype), tf.constant(0)), tf.constant(0))
+        return tf.reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
     }
 }
 

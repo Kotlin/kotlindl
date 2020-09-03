@@ -414,7 +414,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         "RandomUniform" -> TruncatedNormal(seed = 12L)
         "TruncatedNormal" -> TruncatedNormal(seed = 12L)
         "VarianceScaling" -> VarianceScaling(seed = 12L)
-        "Constant" -> Constant(initializer.config!!.value!!)
+        "Constant" -> Constant(initializer.config!!.value!!.toFloat())
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }

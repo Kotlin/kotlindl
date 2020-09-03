@@ -13,7 +13,7 @@ import api.keras.optimizers.SGD
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 5
-private const val EPOCHS = 50
+private const val EPOCHS = 100
 private const val TRAINING_BATCH_SIZE = 5
 
 private val model = Sequential.of(

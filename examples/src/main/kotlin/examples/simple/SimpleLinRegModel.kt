@@ -13,9 +13,9 @@ import api.keras.optimizers.SGD
 import kotlin.random.Random
 
 private const val SEED = 12L
-private const val TEST_BATCH_SIZE = 5
+private const val TEST_BATCH_SIZE = 100
 private const val EPOCHS = 30
-private const val TRAINING_BATCH_SIZE = 5
+private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
     Input(4),
@@ -69,12 +69,12 @@ fun main() {
 
     model.compile(
         optimizer = SGD(learningRate = 0.001f),
-        loss = LossFunctions.ABSOLUTE_DIFFERENCE,
+        loss = LossFunctions.MSE,
         metric = Metrics.MSE
     )
 
     model.summary()
-    model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
+    model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
     val mse = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
     println(model.getLayer("dense_1").getWeights()[0].contentDeepToString())
