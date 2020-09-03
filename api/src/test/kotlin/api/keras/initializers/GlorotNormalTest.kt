@@ -1,6 +1,5 @@
 package api.keras.initializers
 
-import api.getDType
 import api.keras.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
@@ -30,7 +29,7 @@ internal class GlorotNormalTest {
             val tf = Ops.create(session)
             val instance = GlorotNormal(seed = SEED)
             val operand =
-                instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), getDType(), DEFAULT_LAYER_NAME)
+                instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), DEFAULT_LAYER_NAME)
             operand.asOutput().tensor().copyTo(actual)
 
             assertArrayEquals(

@@ -13,21 +13,20 @@ class ParametrizedTruncatedNormal(
 ) :
     Initializer() {
     override fun initialize(
-        funIn: Int,
-        funOut: Int,
+        fanIn: Int,
+        fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<Float>,
         name: String
     ): Operand<Float> {
         require(p1 < p2) { "The p1 parameter value must be less than p2 parameter value." }
 
         return tf.withName(name).random.parameterizedTruncatedNormal(
             shape,
-            tf.constant(mean, dtype),
-            tf.constant(stdev, dtype),
-            tf.constant(p1, dtype),
-            tf.constant(p2, dtype),
+            tf.constant(mean),
+            tf.constant(stdev),
+            tf.constant(p1),
+            tf.constant(p2),
             ParameterizedTruncatedNormal.seed(seed)
         )
     }

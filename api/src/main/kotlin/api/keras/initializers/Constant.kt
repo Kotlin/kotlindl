@@ -3,15 +3,14 @@ package api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-class Constant(private val constantValue: Any) : Initializer() {
+class Constant(private val constantValue: Float) : Initializer() {
     override fun initialize(
-        funIn: Int,
-        funOut: Int,
+        fanIn: Int,
+        fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<Float>,
         name: String
     ): Operand<Float> {
-        return tf.withName(name).fill(shape, tf.constant(constantValue, dtype))
+        return tf.withName(name).fill(shape, tf.constant(constantValue))
     }
 }

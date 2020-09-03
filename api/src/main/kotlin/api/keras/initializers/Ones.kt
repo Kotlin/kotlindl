@@ -9,9 +9,8 @@ class Ones : Initializer() {
         funOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<Float>,
         name: String
     ): Operand<Float> {
-        return tf.withName(name).fill(shape, tf.constant(1.0f, dtype))
+        return tf.withName(name).fill(shape, tf.constant(1.0f))
     }
 }

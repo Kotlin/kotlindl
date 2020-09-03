@@ -21,13 +21,12 @@ abstract class Initializer {
         funOut: Int,
         tf: Ops,
         input: Operand<Float>,
-        dtype: Class<Float>,
         name: String
     ): Assign<Float> {
         return tf.withName(defaultAssignOpName(name)).assign(
             input, initialize(
                 funIn, funOut, tf,
-                shapeOperand(tf, input.asOutput().shape()), dtype, defaultInitializerOpName(name)
+                shapeOperand(tf, input.asOutput().shape()), defaultInitializerOpName(name)
             )
         )
     }
@@ -45,7 +44,6 @@ abstract class Initializer {
         fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<Float>,
         name: String
     ): Operand<Float>
 }

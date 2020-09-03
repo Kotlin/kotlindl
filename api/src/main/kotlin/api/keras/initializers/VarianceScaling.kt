@@ -1,5 +1,6 @@
 package api.keras.initializers
 
+import api.getDType
 import api.keras.shape.shapeToLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -39,23 +40,19 @@ open class VarianceScaling(
 ) :
     Initializer() {
     override fun initialize(
-        funIn: Int,
-        funOut: Int,
+        fanIn: Int,
+        fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
-        dtype: Class<Float>,
         name: String
     ): Operand<Float> {
         require(scale > 0.0) { "The 'scale' parameter value must be more than 0.0." }
         var lscale = scale
 
-        val fanIn = funIn.toDouble()
-        val fanOut = funOut.toDouble()
-
         lscale /= when (mode) {
-            Mode.FAN_IN -> max(1.0, fanIn)
-            Mode.FAN_OUT -> max(1.0, fanOut)
-            Mode.FAN_AVG -> max(1.0, (fanIn + fanOut) / 2.0)
+            Mode.FAN_IN -> max(1.0, fanIn.toDouble())
+            Mode.FAN_OUT -> max(1.0, fanOut.toDouble())
+            Mode.FAN_AVG -> max(1.0, (fanIn + fanOut).toDouble() / 2.0)
         }
 
         val distOp: Operand<Float>
@@ -64,19 +61,19 @@ open class VarianceScaling(
         val seeds = longArrayOf(seed, 0L)
         when (distribution) {
             Distribution.TRUNCATED_NORMAL -> {
-                distOp = tf.random.statelessTruncatedNormal(shape, tf.constant(seeds), dtype)
+                distOp = tf.random.statelessTruncatedNormal(shape, tf.constant(seeds), getDType())
                 stddev = sqrt(lscale) / .87962566103423978
-                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), dtype))
+                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), getDType()))
             }
-            Distribution.UNTRANCATED_NORMAL -> {
-                distOp = tf.random.statelessRandomNormal(shape, tf.constant(seeds), dtype)
+            Distribution.UNTRUNCATED_NORMAL -> {
+                distOp = tf.random.statelessRandomNormal(shape, tf.constant(seeds), getDType())
                 stddev = sqrt(lscale)
-                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), dtype))
+                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), getDType()))
             }
             Distribution.UNIFORM -> {
-                distOp = tf.random.statelessRandomUniform(shape, tf.constant(seeds), dtype)
+                distOp = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())
                 stddev = sqrt(3.0 * lscale)
-                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), dtype))
+                mulOp = tf.withName(name).math.mul(distOp, tf.dtypes.cast(tf.constant(stddev), getDType()))
             }
         }
         return mulOp
@@ -121,5 +118,5 @@ enum class Mode {
 }
 
 enum class Distribution {
-    TRUNCATED_NORMAL, UNTRANCATED_NORMAL, UNIFORM
+    TRUNCATED_NORMAL, UNTRUNCATED_NORMAL, UNIFORM
 }
