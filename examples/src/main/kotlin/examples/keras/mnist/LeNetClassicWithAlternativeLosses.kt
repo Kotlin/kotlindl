@@ -3,6 +3,7 @@ package examples.keras.mnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.dataset.Dataset
+import api.keras.history.EpochTrainingEvent
 import api.keras.initializers.Constant
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.Zeros
@@ -102,7 +103,7 @@ fun main() {
 
         it.summary()
 
-        it.fit(
+        val history = it.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
             validationBatchSize = TRAINING_BATCH_SIZE,
@@ -114,5 +115,8 @@ fun main() {
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
+
+        val accuracyByEpoch = history[EpochTrainingEvent::metricValue]
+        println(accuracyByEpoch.contentToString())
     }
 }

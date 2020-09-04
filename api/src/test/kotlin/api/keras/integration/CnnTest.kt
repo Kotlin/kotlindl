@@ -108,11 +108,11 @@ internal class CnnTest : IntegrationTest() {
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
 
-            assertEquals(trainingHistory.history.size, 60)
-            assertEquals(trainingHistory.history[0].epoch, 1)
-            assertEquals(trainingHistory.history[0].batch, 0)
-            assertEquals(trainingHistory.history[0].lossValue, 2.9598662853240967, EPS)
-            assertEquals(trainingHistory.history[0].metricValue, 0.09799999743700027, EPS)
+            assertEquals(trainingHistory.batchHistory.size, 60)
+            assertEquals(trainingHistory.batchHistory[0].epoch, 1)
+            assertEquals(trainingHistory.batchHistory[0].batch, 0)
+            assertEquals(trainingHistory.batchHistory[0].lossValue, 2.9598662853240967, EPS)
+            assertEquals(trainingHistory.batchHistory[0].metricValue, 0.09799999743700027, EPS)
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

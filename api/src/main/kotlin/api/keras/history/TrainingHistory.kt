@@ -1,21 +1,22 @@
 package api.keras.history
 
 import java.util.*
+import kotlin.reflect.KProperty1
 
 class TrainingHistory {
-    private val _history: MutableList<BatchTrainingEvent> = mutableListOf()
+    private val _batchHistory: MutableList<BatchTrainingEvent> = mutableListOf()
 
-    val history: List<BatchTrainingEvent>
-        get() = Collections.unmodifiableList(_history)
+    val batchHistory: List<BatchTrainingEvent>
+        get() = Collections.unmodifiableList(_batchHistory)
 
     private val historyByEpochAndBatch: TreeMap<Int, TreeMap<Int, BatchTrainingEvent>?> = TreeMap()
 
-    private val historyInEpochs: MutableList<EpochTrainingEvent> = mutableListOf()
+    private val _epochHistory: MutableList<EpochTrainingEvent> = mutableListOf()
 
     private val _historyByEpoch: TreeMap<Int, EpochTrainingEvent> = TreeMap()
 
-    val historyByEpoch: Map<Int, EpochTrainingEvent>
-        get() = Collections.unmodifiableMap(_historyByEpoch)
+    val epochHistory: List<EpochTrainingEvent>
+        get() = Collections.unmodifiableList(_epochHistory)
 
     fun appendBatch(epoch: Int, batch: Int, lossValue: Double, metricValue: Double) {
         val newEvent = BatchTrainingEvent(epoch, batch, lossValue, metricValue)
@@ -42,7 +43,7 @@ class TrainingHistory {
     }
 
     private fun addNewBatchEvent(newEventBatch: BatchTrainingEvent, epoch: Int, batch: Int) {
-        _history.add(newEventBatch)
+        _batchHistory.add(newEventBatch)
         if (historyByEpochAndBatch.containsKey(epoch)) {
             val historyByEpoch = historyByEpochAndBatch[epoch]
             historyByEpoch!![batch] = newEventBatch
@@ -54,7 +55,7 @@ class TrainingHistory {
     }
 
     private fun addNewEpochEvent(newEventEpoch: EpochTrainingEvent, epoch: Int) {
-        historyInEpochs.add(newEventEpoch)
+        _epochHistory.add(newEventEpoch)
         _historyByEpoch[epoch] = newEventEpoch
     }
 
@@ -68,6 +69,14 @@ class TrainingHistory {
 
     fun eventsByEpoch(epoch: Int): TreeMap<Int, BatchTrainingEvent>? {
         return historyByEpochAndBatch[epoch]
+    }
+
+    operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
+        val result = DoubleArray(_epochHistory.size)
+        for (i in 0 until _epochHistory.size) {
+            result[i] = desiredField.invoke(_epochHistory[i]!!)
+        }
+        return result
     }
 }
 
