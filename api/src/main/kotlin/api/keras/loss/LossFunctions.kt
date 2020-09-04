@@ -13,7 +13,8 @@ enum class LossFunctions {
     HUBER_LOSS,
     LOG_LOSS,
     MAE,
-    MSE;
+    MSE,
+    RMSE;
 
     companion object {
         fun convert(lossFunctionType: LossFunctions): LossFunction {
@@ -25,6 +26,7 @@ enum class LossFunctions {
                 LOG_LOSS -> LogLoss()
                 MAE -> MAE()
                 MSE -> MSE()
+                RMSE -> RMSE()
             }
         }
     }
@@ -62,6 +64,13 @@ class MSE : LossFunction {
     override fun apply(tf: Ops, actual: Operand<Float>, labels: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val squaredError = tf.math.squaredDifference(actual, labels)
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
+    }
+}
+
+class RMSE : LossFunction {
+    override fun apply(tf: Ops, actual: Operand<Float>, labels: Operand<Float>, dtype: Class<Float>): Operand<Float> {
+        val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(actual, labels))
+        return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
     }
 }
 

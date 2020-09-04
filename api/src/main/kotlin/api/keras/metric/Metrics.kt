@@ -4,7 +4,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 enum class Metrics {
-    ACCURACY, MAE, MSE;
+    ACCURACY, MAE, MSE, RMSE;
 
     companion object {
         fun convert(metricType: Metrics): Metric {
@@ -12,12 +12,13 @@ enum class Metrics {
                 ACCURACY -> Accuracy()
                 MAE -> MAE()
                 MSE -> MSE()
+                RMSE -> RMSE()
             }
         }
     }
 }
 
-class Accuracy() : Metric {
+class Accuracy : Metric {
     override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val predicted: Operand<Long> = tf.math.argMax(output, tf.constant(1))
         val expected: Operand<Long> = tf.math.argMax(label, tf.constant(1))
@@ -26,17 +27,24 @@ class Accuracy() : Metric {
     }
 }
 
-class MAE() : Metric {
+class MAE : Metric {
     override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val absoluteErrors = tf.math.abs(tf.math.sub(output, label))
         return tf.reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
     }
 }
 
-class MSE() : Metric {
+class MSE : Metric {
     override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val squaredError = tf.math.squaredDifference(output, label)
         return tf.reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
+    }
+}
+
+class RMSE : Metric {
+    override fun apply(tf: Ops, output: Operand<Float>, label: Operand<Float>, dtype: Class<Float>): Operand<Float> {
+        val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(output, label))
+        return tf.reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
     }
 }
 

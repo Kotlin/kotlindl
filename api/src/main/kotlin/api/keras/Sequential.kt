@@ -261,8 +261,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             logger.level = Level.INFO
         }
 
-        val (xBatchShape, yBatchShape) = calculateXYShapes(trainBatchSize)
-
         val prediction = when (loss) {
             LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
@@ -290,6 +288,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
                     callback.onTrainBatchBegin(batchCounter, trainingHistory)
                     val batch: DataBatch = batchIter.next()
+
+                    val (xBatchShape, yBatchShape) = calculateXYShapes(batch.size())
 
                     Tensor.create(
                         xBatchShape,
@@ -387,8 +387,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
         val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp, getDType())
 
-        val (imageShape, labelShape) = calculateXYShapes(batchSize)
-
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
@@ -400,6 +398,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         while (batchIter.hasNext()) {
             callback.onTestBatchBegin(batchCounter, evaluationHistory)
             val batch: DataBatch = batchIter.next()
+            val (imageShape, labelShape) = calculateXYShapes(batch.size())
 
             Tensor.create(
                 imageShape,

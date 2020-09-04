@@ -19,7 +19,7 @@ import api.keras.optimizers.ClipGradientByValue
 import datasets.*
 
 private const val EPOCHS = 3
-private const val TRAINING_BATCH_SIZE = 1000
+private const val TRAINING_BATCH_SIZE = 2000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
@@ -96,7 +96,7 @@ fun main() {
     lenet5Classic.use {
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.5f)),
-            loss = LossFunctions.LOG_LOSS,
+            loss = LossFunctions.RMSE,
             metric = Metrics.ACCURACY
         )
 
@@ -105,7 +105,7 @@ fun main() {
         it.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
-            validationBatchSize = TEST_BATCH_SIZE,
+            validationBatchSize = TRAINING_BATCH_SIZE,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
             verbose = true
