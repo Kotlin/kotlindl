@@ -20,7 +20,10 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     private val optimizerAssignAddInitializers: MutableList<AssignAdd<*>> = mutableListOf()
 
     /** A list of variables to train. */
-    private val variables: MutableMap<Variable<Float>, Boolean> = mutableMapOf()
+    private val layerVariables: MutableMap<Variable<Float>, Boolean> = mutableMapOf()
+
+    /** A list of optimizers' variables. */
+    private val optimizerVariables: MutableList<Variable<Float>> = mutableListOf()
 
     /** A list of initializer to initialize the trainableVariables. */
     private val initializers: MutableMap<String, Assign<Float>> = mutableMapOf()
@@ -52,9 +55,14 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         return s
     }
 
-    fun addVariable(variable: Variable<Float>, isTrainable: Boolean) {
-        check(!variables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
-        variables[variable] = isTrainable
+    fun addLayerVariable(variable: Variable<Float>, isTrainable: Boolean) {
+        check(!layerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
+        layerVariables[variable] = isTrainable
+    }
+
+    fun addOptimizerVariable(variable: Variable<Float>) {
+        check(!optimizerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
+        optimizerVariables.add(variable)
     }
 
     fun addInitializer(variableName: String, initializer: Assign<Float>) {
@@ -70,12 +78,16 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         optimizerAssignAddInitializers += initializer
     }
 
-    fun trainableVariables(): List<Variable<Float>> {
-        return variables.filter { it.value }.keys.toList()
+    fun trainableLayerVariables(): List<Variable<Float>> {
+        return layerVariables.filter { it.value }.keys.toList()
     }
 
-    fun variables(): List<Variable<Float>> {
-        return variables.keys.toList()
+    fun layerVariables(): List<Variable<Float>> {
+        return layerVariables.keys.toList()
+    }
+
+    fun optimizerVariables(): List<Variable<Float>> {
+        return optimizerVariables.toList()
     }
 
     fun initializeGraphVariables(session: Session) {

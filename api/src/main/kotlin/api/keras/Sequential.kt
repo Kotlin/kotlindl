@@ -28,7 +28,6 @@ import java.io.File
  * Sequential groups a linear stack of layers into a TFModel.
  * Also, it provides training and inference features on this model.
  *
- * @param T the type of data elements in Tensors.
  * @property [input] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
@@ -604,26 +603,26 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         session.close()
     }
 
-    fun getGraph(): KGraph {
+    fun kGraph(): KGraph {
         return kGraph
     }
 
-    override fun save(pathToModelDirectory: String, modelFormat: ModelFormat) {
+    override fun save(pathToModelDirectory: String, modelFormat: ModelFormat, saveOptimizerState: Boolean) {
         val directory = File(pathToModelDirectory)
         if (!directory.exists()) {
             directory.mkdir()
         }
 
         when (modelFormat) {
-            ModelFormat.SIMPLE -> saveInSimpleFormat(pathToModelDirectory)
+            ModelFormat.SIMPLE -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
             ModelFormat.SAVED_MODEL -> saveInSavedModelFormat(pathToModelDirectory)
-            ModelFormat.KERAS -> saveInKerasFormat(pathToModelDirectory)
+            ModelFormat.KERAS -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
         }
     }
 
-    private fun saveInKerasFormat(pathToModelDirectory: String) {
+    private fun saveInKerasFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
         saveModel(pathToModelDirectory)
-        saveVariables(pathToModelDirectory)
+        saveVariables(pathToModelDirectory, saveOptimizerState)
     }
 
     private fun saveModel(pathToModelDirectory: String) {
@@ -635,19 +634,23 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         saveGraphDef(pathToModelDirectory)
     }
 
-    private fun saveInSimpleFormat(pathToModelDirectory: String) {
+    private fun saveInSimpleFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
         saveGraphDef(pathToModelDirectory)
-        saveVariables(pathToModelDirectory)
+        saveVariables(pathToModelDirectory, saveOptimizerState)
     }
 
     private fun saveGraphDef(pathToModelDirectory: String) {
         File("$pathToModelDirectory/graph.pb").writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
-    private fun saveVariables(pathToModelDirectory: String) {
+    private fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
         val modelWeightsExtractorRunner = session.runner()
 
-        val variables = kGraph.variables()
+        var variables = kGraph.layerVariables()
+
+        if (saveOptimizerState) {
+            variables = variables + kGraph.optimizerVariables()
+        }
 
         variables.forEach {
             modelWeightsExtractorRunner.fetch(it)
@@ -666,6 +669,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
                     tensorForCopying.use {
                         val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
+
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")

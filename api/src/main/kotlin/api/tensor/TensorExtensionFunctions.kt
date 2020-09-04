@@ -12,6 +12,9 @@ fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
     val shape = tensorForCopying.shape()
     val reshaped: FloatArray
     return when (shape.size) {
+        0 -> {
+            floatArrayOf(tensorForCopying.floatValue())
+        }
         1 -> {
             reshaped = FloatArray(shape[0].toInt()) { 0.0f }
             tensorForCopying.copyTo(reshaped)
@@ -59,6 +62,7 @@ fun Tensor<*>.convertTensorToMultiDimArray(): Array<*> {
     val dst: Array<*>
 
     return when (shape.size) {
+
         1 -> {
             val oneDimDst = FloatArray(shape[0].toInt()) { 0.0f }
             tensorForCopying.copyTo(oneDimDst)

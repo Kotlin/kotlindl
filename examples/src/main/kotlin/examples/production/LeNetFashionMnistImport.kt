@@ -18,7 +18,7 @@ fun main() {
     )
 
     InferenceModel().use {
-        it.load(PATH_TO_MODEL)
+        it.load(PATH_TO_MODEL, loadOptimizerState = true)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

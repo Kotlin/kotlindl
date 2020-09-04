@@ -81,7 +81,11 @@ open class InferenceModel() : AutoCloseable {
     /**
      * Loads model as graph and weights.
      */
-    fun load(pathToModelDirectory: String, modelFormat: ModelFormat = ModelFormat.SIMPLE) {
+    fun load(
+        pathToModelDirectory: String,
+        modelFormat: ModelFormat = ModelFormat.SIMPLE,
+        loadOptimizerState: Boolean = false
+    ) {
         // Load graph
         val directory = File(pathToModelDirectory);
         if (!directory.exists()) {
@@ -90,7 +94,7 @@ open class InferenceModel() : AutoCloseable {
             logger.debug { "The model loading is started." }
 
             when (modelFormat) {
-                ModelFormat.SIMPLE -> loadModelFromSimpleFormat(pathToModelDirectory)
+                ModelFormat.SIMPLE -> loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
                 ModelFormat.SAVED_MODEL -> loadModelFromSavedModelFormat(pathToModelDirectory)
                 ModelFormat.KERAS -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
             }
@@ -99,11 +103,14 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
-    fun loadVariablesFromTxtFiles(pathToModelDirectory: String) {
+    fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean = false) {
         // Load variables names
         val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
+                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
+                    continue
+
                 val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
                 val tensorShape = TensorShape(shape)
 
@@ -111,8 +118,6 @@ open class InferenceModel() : AutoCloseable {
                 logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
                 logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
 
-                /* // limited by 2GB files
-                 val tensorData = File("$pathToModelDirectory/$variableName.txt").readText()*/
                 val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
                 scanner.useLocale(Locale.US)
 
@@ -130,9 +135,9 @@ open class InferenceModel() : AutoCloseable {
         TODO("Not yet implemented")
     }
 
-    private fun loadModelFromSimpleFormat(pathToModelDirectory: String) {
+    private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         inferenceGraphInitialization(pathToModelDirectory)
-        loadVariablesFromTxtFiles(pathToModelDirectory)
+        loadVariablesFromTxtFiles(pathToModelDirectory, loadOptimizerState)
     }
 
 
@@ -144,6 +149,9 @@ open class InferenceModel() : AutoCloseable {
 
     private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {
         when (shape.numDimensions()) {
+            0 -> {
+                return scanner.nextFloat()
+            }
             1 -> {
                 return create1DimFloatArray(shape, scanner)
             }

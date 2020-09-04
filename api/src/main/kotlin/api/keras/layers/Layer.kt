@@ -51,7 +51,7 @@ abstract class Layer(var name: String) {
         require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
 
         val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
-        kGraph.addVariable(variable, isTrainable)
+        kGraph.addLayerVariable(variable, isTrainable)
         kGraph.addInitializer(name, initOp)
         return variable
     }

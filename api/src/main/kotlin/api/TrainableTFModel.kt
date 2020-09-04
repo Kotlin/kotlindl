@@ -103,7 +103,11 @@ abstract class TrainableTFModel : InferenceModel() {
     /**
      * Saves the model as graph and weights.
      */
-    abstract fun save(pathToModelDirectory: String, modelFormat: ModelFormat = ModelFormat.SIMPLE)
+    abstract fun save(
+        pathToModelDirectory: String,
+        modelFormat: ModelFormat = ModelFormat.SIMPLE,
+        saveOptimizerState: Boolean = false
+    )
 
 
     fun getDType(): Class<Float> {

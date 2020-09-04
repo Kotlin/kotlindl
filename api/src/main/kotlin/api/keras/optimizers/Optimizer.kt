@@ -22,7 +22,7 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
         tf: Ops,
         loss: Operand<Float>
     ): List<Operand<Float>> {
-        val weights = graph.trainableVariables()
+        val weights = graph.trainableLayerVariables()
 
         slots = mutableMapOf()
 

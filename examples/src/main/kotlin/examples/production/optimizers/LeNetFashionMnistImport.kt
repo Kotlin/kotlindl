@@ -1,24 +1,25 @@
-package examples.production
+package examples.production.optimizers
 
 import api.inference.savedmodel.InferenceModel
 import api.keras.dataset.Dataset
 import datasets.*
+import examples.production.getLabel
 
-private const val PATH_TO_MODEL = "savedmodels/lenet5"
+private const val PATH_TO_MODEL = "savedmodels/fashionLenetWithOptimizers"
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
+        FASHION_TRAIN_IMAGES_ARCHIVE,
+        FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE,
+        FASHION_TEST_LABELS_ARCHIVE,
         AMOUNT_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
 
     InferenceModel().use {
-        it.load(PATH_TO_MODEL, loadOptimizerState = true)
+        it.load(PATH_TO_MODEL, loadOptimizerState = false)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000
@@ -31,5 +32,13 @@ fun main() {
             //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
         }
         println("Accuracy: $accuracy")
+
+        val amountOfOps = 1000
+        val start = System.currentTimeMillis()
+        for (i in 0..amountOfOps) {
+            it.predict(train.getX(i % 50000))
+        }
+        println("Time, s: ${(System.currentTimeMillis() - start) / 1000f}")
+        println("Throughput, op/s: ${amountOfOps / ((System.currentTimeMillis() - start) / 1000f)}")
     }
 }
