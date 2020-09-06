@@ -59,6 +59,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     /** Main loss operand. */
     private lateinit var lossOp: Operand<Float>
 
+    private lateinit var targets: List<Operand<Float>>
+
     init {
         for (layer in layers) {
             if (layersByName.containsKey(layer.name)) {
@@ -169,6 +171,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         yPred = transformInputWithNNModel(xOp)
         lossOp = LossFunctions.convert(loss).apply(tf, yPred, yOp, getDType())
 
+        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+
         isModelCompiled = true
     }
 
@@ -185,7 +189,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         trainBatchSize: Int,
         validationBatchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean
+        isWeightsInitRequired: Boolean,
+        isOptimizerInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -195,7 +200,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             true,
             validationDataset,
             validationBatchSize,
-            isWeightsInitRequired
+            isWeightsInitRequired,
+            isOptimizerInitRequired
         )
     }
 
@@ -214,7 +220,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         epochs: Int,
         batchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean
+        isWeightsInitRequired: Boolean,
+        isOptimizerInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -224,7 +231,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             false,
             null,
             null,
-            isWeightsInitRequired
+            isWeightsInitRequired,
+            isOptimizerInitRequired
         )
     }
 
@@ -243,7 +251,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
         validationBatchSize: Int?,
-        isWeightsInitRequired: Boolean = true
+        isWeightsInitRequired: Boolean = true,
+        isOptimizerInitRequired: Boolean = true
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
 
@@ -267,9 +276,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
         val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp, getDType())
 
-        val targets = optimizer.prepareTargets(kGraph, tf, lossOp)
-
-        kGraph.initializeOptimizerVariables(session)
+        if (isOptimizerInitRequired) kGraph.initializeOptimizerVariables(session)
 
         callback.onTrainBegin()
 
@@ -288,7 +295,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                     callback.onTrainBatchBegin(batchCounter, trainingHistory)
                     val batch: DataBatch = batchIter.next()
 
-                    val (xBatchShape, yBatchShape) = calculateXYShapes(batch.size())
+                    val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
 
                     Tensor.create(
                         xBatchShape,
@@ -336,6 +343,27 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         }
         callback.onTrainEnd(trainingHistory)
         return trainingHistory
+    }
+
+    private fun batchValidation(
+        batch: DataBatch,
+        xBatchShape: LongArray,
+        yBatchShape: LongArray
+    ) {
+        check(TensorShape(xBatchShape).numElements().toInt() == batch.x().capacity())
+        {
+            "The calculated [from the Sequential model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
+                batch.x().capacity()
+            }. Please, check input data."
+        }
+        check(TensorShape(yBatchShape).numElements().toInt() == batch.y().capacity())
+        {
+            "The calculated [from the Sequential model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
+                batch.y().capacity()
+            }. " +
+                    "\nPlease, check the input label data or correct amount of classes [amount of neurons] in last Dense layer, if you have a classification problem." +
+                    "\nHighly likely, you have different amount of classes presented in data and described in model as desired output."
+        }
     }
 
     /**
@@ -397,7 +425,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         while (batchIter.hasNext()) {
             callback.onTestBatchBegin(batchCounter, evaluationHistory)
             val batch: DataBatch = batchIter.next()
-            val (imageShape, labelShape) = calculateXYShapes(batch.size())
+            val (imageShape, labelShape) = calculateXYShapes(batch)
 
             Tensor.create(
                 imageShape,
@@ -515,7 +543,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
      */
     override fun predictSoftlyAndGetActivations(
         image: FloatArray,
-        formActivationData: Boolean,
+        visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(image)
@@ -531,7 +559,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             Dataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(yPred, testImages, formActivationData)
+                formPredictionAndActivationsTensors(yPred, testImages, visualizationIsEnabled)
 
             val predictionsTensor = tensors[0]
 
@@ -540,7 +568,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             predictionsTensor.copyTo(dst)
 
             val activations = mutableListOf<Any>()
-            if (formActivationData && tensors.size > 1) {
+            if (visualizationIsEnabled && tensors.size > 1) {
                 for (i in 1 until tensors.size) {
                     activations.add(tensors[i].convertTensorToMultiDimArray())
                 }
@@ -568,13 +596,18 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         return runner.run()
     }
 
-    private fun calculateXYShapes(batchSize: Int): Pair<LongArray, LongArray> {
+    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
+        val batchSize = batch.size()
+
         val xBatchShape = calculateXShape(batchSize)
 
         val yBatchShape = longArrayOf(
             batchSize.toLong(),
             amountOfClasses
         )
+
+        batchValidation(batch, xBatchShape, yBatchShape)
+
         return Pair(xBatchShape, yBatchShape)
     }
 
@@ -607,16 +640,36 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         return kGraph
     }
 
-    override fun save(pathToModelDirectory: String, modelFormat: ModelFormat, saveOptimizerState: Boolean) {
+    override fun save(
+        pathToModelDirectory: String,
+        modelFormat: ModelFormat,
+        saveOptimizerState: Boolean,
+        modelWritingMode: ModelWritingMode
+    ) {
         val directory = File(pathToModelDirectory)
-        if (!directory.exists()) {
-            directory.mkdir()
+
+        when (modelWritingMode) {
+            ModelWritingMode.FAIL_IF_EXISTS -> {
+                check(!directory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
+                directory.mkdir()
+            }
+            ModelWritingMode.OVERRIDE -> {
+                if (directory.exists()) {
+                    directory.deleteRecursively()
+                }
+                directory.mkdir()
+            }
+            ModelWritingMode.APPEND -> {
+                if (!directory.exists()) {
+                    directory.mkdir()
+                }
+            }
         }
 
         when (modelFormat) {
-            ModelFormat.SIMPLE -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
-            ModelFormat.SAVED_MODEL -> saveInSavedModelFormat(pathToModelDirectory)
-            ModelFormat.KERAS -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
+            ModelFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
+            ModelFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
+            ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
         }
     }
 

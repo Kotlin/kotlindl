@@ -14,13 +14,14 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.optimizers.Adam
-import datasets.AMOUNT_OF_CLASSES
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-private val NUM_CHANNELS = 1L
-private val IMAGE_SIZE = 28L
-private val SEED = 12L
+private const val NUM_CHANNELS = 1L
+private const val IMAGE_SIZE = 28L
+private const val SEED = 12L
+private const val AMOUNT_OF_CLASSES = 10
+
 
 internal class SequentialModelTest {
     private val correctTestModel = Sequential.of(
@@ -171,7 +172,6 @@ internal class SequentialModelTest {
 
     @Test
     fun namesGeneration() {
-
         val model = Sequential.of(
             Input(
                 IMAGE_SIZE,

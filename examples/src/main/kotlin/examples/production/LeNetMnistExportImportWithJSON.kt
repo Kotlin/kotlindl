@@ -42,7 +42,7 @@ fun main() {
             verbose = true
         )
 
-        it.save(PATH_TO_MODEL, ModelFormat.KERAS)
+        it.save(PATH_TO_MODEL, ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")

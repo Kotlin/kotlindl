@@ -1,5 +1,6 @@
 package examples.production.optimizers
 
+import api.ModelWritingMode
 import api.inference.savedmodel.InferenceModel
 import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
@@ -48,7 +49,7 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(PATH_TO_MODEL, saveOptimizerState = true)
+        it.save(PATH_TO_MODEL, saveOptimizerState = true, modelWritingMode = ModelWritingMode.OVERRIDE)
     }
 
     InferenceModel().use {

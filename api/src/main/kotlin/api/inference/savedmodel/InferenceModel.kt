@@ -83,7 +83,7 @@ open class InferenceModel() : AutoCloseable {
      */
     fun load(
         pathToModelDirectory: String,
-        modelFormat: ModelFormat = ModelFormat.SIMPLE,
+        modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
         loadOptimizerState: Boolean = false
     ) {
         // Load graph
@@ -94,9 +94,12 @@ open class InferenceModel() : AutoCloseable {
             logger.debug { "The model loading is started." }
 
             when (modelFormat) {
-                ModelFormat.SIMPLE -> loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
-                ModelFormat.SAVED_MODEL -> loadModelFromSavedModelFormat(pathToModelDirectory)
-                ModelFormat.KERAS -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
+                ModelFormat.TF_GRAPH_CUSTOM_VARIABLES -> loadModelFromSimpleFormat(
+                    pathToModelDirectory,
+                    loadOptimizerState
+                )
+                ModelFormat.TF_GRAPH -> loadModelFromSavedModelFormat(pathToModelDirectory)
+                ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
             }
 
             logger.debug { "The model loading is finished." }
@@ -139,7 +142,6 @@ open class InferenceModel() : AutoCloseable {
         inferenceGraphInitialization(pathToModelDirectory)
         loadVariablesFromTxtFiles(pathToModelDirectory, loadOptimizerState)
     }
-
 
     private fun inferenceGraphInitialization(pathToModelDirectory: String) {
         kGraph = KGraph(File("$pathToModelDirectory/graph.pb").readBytes())

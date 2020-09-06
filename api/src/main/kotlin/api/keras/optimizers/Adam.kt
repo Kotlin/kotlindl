@@ -16,8 +16,8 @@ import java.util.*
 
 private const val FIRST_MOMENT = "m"
 private const val SECOND_MOMENT = "v"
-private val FIRST_VARIABLE_NAME = defaultOptimizerVariableName("optimizer_beta1_power")
-private val SECOND_VARIABLE_NAME = defaultOptimizerVariableName("optimizer_beta1_power")
+private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
+private val SECOND_BETA_POWER_NAME = defaultOptimizerVariableName("beta2_power")
 
 class Adam(
     private val learningRate: Float = 0.001f,
@@ -70,10 +70,12 @@ class Adam(
         }
 
 
-        val betaOnePowerInit2 = tf.assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
-        val betaTwoPowerInit2 = tf.assign(betaTwoPower, tf.math.mul(betaTwoPower, betaTwoConst))
+        val betaOnePowerInit1 = tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME))
+            .assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
+        val betaTwoPowerInit2 = tf.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME))
+            .assign(betaTwoPower, tf.math.mul(betaTwoPower, betaTwoConst))
 
-        graph.addOptimizerVariableInitializer(betaOnePowerInit2)
+        graph.addOptimizerVariableInitializer(betaOnePowerInit1)
         graph.addOptimizerVariableInitializer(betaTwoPowerInit2)
         graph.addOptimizerVariable(betaOnePower)
         graph.addOptimizerVariable(betaTwoPower)
@@ -82,12 +84,12 @@ class Adam(
     }
 
     private fun createAdamSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val firstMomentInitializerName = defaultInitializerOpName(FIRST_VARIABLE_NAME)
+        val firstMomentInitializerName = defaultInitializerOpName(createName(v, FIRST_MOMENT))
         val firstMomentInitializer =
             tf.withName(firstMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
 
-        val secondMomentInitializerName = defaultInitializerOpName(SECOND_VARIABLE_NAME)
+        val secondMomentInitializerName = defaultInitializerOpName(createName(v, SECOND_MOMENT))
         val secondMomentInitializer =
             tf.withName(secondMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
@@ -97,17 +99,17 @@ class Adam(
         for (v in variables) {
             createAdamSlot(graph, tf, v.asOutput())
         }
-        betaOnePower = tf.withName(FIRST_VARIABLE_NAME).variable(Shape.scalar(), getDType())
+        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
 
-        val firstMomentAssignName = defaultAssignOpName(FIRST_VARIABLE_NAME)
+        val firstMomentAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
         val betaOnePowerInit: Assign<*> = tf.withName(firstMomentAssignName)
             .assign(betaOnePower, tf.constant(beta1, getDType()))
         graph.addOptimizerVariableInitializer(betaOnePowerInit)
 
 
-        betaTwoPower = tf.withName(SECOND_VARIABLE_NAME).variable(Shape.scalar(), getDType())
+        betaTwoPower = tf.withName(SECOND_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
 
-        val secondMomentAssignName = defaultAssignOpName(SECOND_VARIABLE_NAME)
+        val secondMomentAssignName = defaultAssignOpName(SECOND_BETA_POWER_NAME)
         val betaTwoPowerInit: Assign<*> = tf.withName(secondMomentAssignName)
             .assign(betaTwoPower, tf.constant(beta2, getDType()))
         graph.addOptimizerVariableInitializer(betaTwoPowerInit)
@@ -118,6 +120,6 @@ class Adam(
     }
 
     fun getVariablesNames(): List<String> {
-        return listOf(FIRST_VARIABLE_NAME, SECOND_VARIABLE_NAME)
+        return listOf(FIRST_BETA_POWER_NAME, SECOND_BETA_POWER_NAME)
     }
 }

@@ -68,7 +68,8 @@ abstract class TrainableTFModel : InferenceModel() {
         epochs: Int = 10,
         batchSize: Int = 32,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean = true
+        isWeightsInitRequired: Boolean = true,
+        isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
 
     abstract fun fit(
@@ -78,7 +79,8 @@ abstract class TrainableTFModel : InferenceModel() {
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean = true
+        isWeightsInitRequired: Boolean = true,
+        isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
 
     /**
@@ -105,8 +107,9 @@ abstract class TrainableTFModel : InferenceModel() {
      */
     abstract fun save(
         pathToModelDirectory: String,
-        modelFormat: ModelFormat = ModelFormat.SIMPLE,
-        saveOptimizerState: Boolean = false
+        modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
+        saveOptimizerState: Boolean = false,
+        modelWritingMode: ModelWritingMode = ModelWritingMode.FAIL_IF_EXISTS
     )
 
 
@@ -134,11 +137,21 @@ abstract class TrainableTFModel : InferenceModel() {
         trainBatchSize: Int,
         validationBatchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean = true
+        isWeightsInitRequired: Boolean = true,
+        isOptimizerInitRequired: Boolean = true
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) { "Validation rate should be more than 0.0 and less than 1.0. The passed rare is: ${validationRate}" }
         val (validation, train) = dataset.split(validationRate)
 
-        return fit(train, validation, epochs, trainBatchSize, validationBatchSize, verbose, isWeightsInitRequired)
+        return fit(
+            train,
+            validation,
+            epochs,
+            trainBatchSize,
+            validationBatchSize,
+            verbose,
+            isWeightsInitRequired,
+            isOptimizerInitRequired
+        )
     }
 }

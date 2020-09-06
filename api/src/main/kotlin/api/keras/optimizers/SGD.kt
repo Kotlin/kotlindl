@@ -8,12 +8,11 @@ import org.tensorflow.op.core.Variable
 import java.util.*
 
 class SGD(
-    private val learningRateSchedule: Map<Int, Float>,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     private var learningRate: Float = 0.2f
 
-    constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction = NoClipGradient()) : this(mapOf()) {
+    constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction = NoClipGradient()) : this() {
         this.learningRate = learningRate
     }
 
@@ -26,22 +25,6 @@ class SGD(
         val targets: MutableList<Operand<Float>> =
             ArrayList()
 
-        /*  if (learningRateSchedule.isNotEmpty()) {
-              val currentEpochLearningRate = learningRateSchedule[epochNumber]
-              if (currentEpochLearningRate != null) {
-                  for (i in weights.indices) {
-                      targets.add(
-                          tf.train.applyGradientDescent(
-                              weights[i],
-                              tf.constant(currentEpochLearningRate, getDType()),
-                              gradients.dy(i)
-                          )
-                      )
-                  }
-              } else {
-                  throw Exception("No schedule for the epoch: $epochNumber")
-              }
-          } else {*/
         for (i in weights.indices) {
             targets.add(
                 tf.train.applyGradientDescent(
@@ -51,7 +34,6 @@ class SGD(
                 )
             )
         }
-        /*}*/
 
         return targets
     }

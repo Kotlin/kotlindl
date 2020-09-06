@@ -59,7 +59,7 @@ public class LeNetClassic {
         try (lenet5Classic) {
             lenet5Classic.compile(adam, LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY, new Callback());
             lenet5Classic.summary(30, 26);
-            lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true, true);
+            lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true, true, true);
 
             var accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE).getMetrics().get(Metrics.ACCURACY);
             System.out.println("Accuracy: " + accuracy);

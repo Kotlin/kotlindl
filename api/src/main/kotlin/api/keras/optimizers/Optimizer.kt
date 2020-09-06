@@ -1,6 +1,8 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultAssignOpName
+import api.defaultOptimizerVariableName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -89,9 +91,12 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
     ) {
         val createName: String = createName(variable, slotName)
         val slot: Variable<Float> = tf.withName(createName).variable(variable.shape(), getDType())
-        val slotInit: Assign<Float> = tf.assign(slot, initializer)
+
+        val assignName = defaultAssignOpName(createName(variable, slotName))
+        val slotInit: Assign<Float> = tf.withName(assignName).assign(slot, initializer)
 
         graph.addOptimizerVariableInitializer(slotInit)
+        graph.addOptimizerVariable(slot)
 
         val varName = variable.op().name()
 
@@ -119,6 +124,6 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
     }
 
     open fun createName(variable: Output<Float>, slotName: String): String {
-        return variable.op().name() + "-" + slotName
+        return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
 }

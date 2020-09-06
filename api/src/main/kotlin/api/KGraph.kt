@@ -104,7 +104,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         if (optimizerInitializers.isNotEmpty()) {
             optimizerInitializers.forEach {
                 val runner = session.runner()
-                runner.addTarget(it as Operand<Float>)
+                runner.addTarget(it)
                 runner.run()
             }
 
@@ -117,7 +117,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
             val runner = session.runner()
 
             optimizerAssignAddInitializers.forEach {
-                runner.addTarget(it as Operand<Float>)
+                runner.addTarget(it)
             }
             runner.run()
         }

@@ -13,6 +13,15 @@ class TensorShape() {
     /**
      * Creates a new `TensorShape` with the given dimensions.
      *
+     * @param dims The sizes of the remaining dimensions
+     */
+    constructor(dims: LongArray) : this() {
+        this.dims = dims
+    }
+
+    /**
+     * Creates a new `TensorShape` with the given dimensions.
+     *
      * @param firstDimension The size of the first dimension
      * @param dims The sizes of the remaining dimensions
      */

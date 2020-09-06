@@ -89,8 +89,8 @@ class RMSProp(
             val mgInitializer: Operand<Float> = tf
                 .fill(
                     tf.shape(v),
-                    tf.dtypes.cast(tf.constant(0.0f), getDType())
-                ) // TODO: should have v.getType() call instead getDType
+                    tf.constant(0.0f)
+                )
             createSlot(graph, tf, v.asOutput(), MG, mgInitializer)
         }
     }

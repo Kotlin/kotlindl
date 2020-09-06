@@ -1,7 +1,7 @@
 package api.keras
 
 enum class ModelFormat {
-    SIMPLE,
-    SAVED_MODEL,
-    KERAS
+    TF_GRAPH_CUSTOM_VARIABLES,
+    TF_GRAPH,
+    KERAS_CONFIG_CUSTOM_VARIABLES
 }
