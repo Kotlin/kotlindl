@@ -7,15 +7,15 @@ import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-internal class ParametrizedRandomNormalTest {
-    val EPS = 1e-7f
-    val FAN_IN = 10
-    val FAN_OUT = 20
-    val MEAN = 0.0f
-    val STD_DEV = 3.0f
-    val P1 = -4f
-    val P2 = 4f
+private const val EPS = 1e-7f
+private const val FAN_IN = 10
+private const val FAN_OUT = 20
+private const val MEAN = 0.0f
+private const val STD_DEV = 3.0f
+private const val P1 = -4f
+private const val P2 = 4f
 
+internal class ParametrizedRandomNormalTest {
     @Test
     fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }

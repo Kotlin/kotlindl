@@ -70,7 +70,7 @@ class TensorShape() {
      * @return Whether dimension i is unknown (equal to -1)
      */
     fun isKnown(i: Int): Boolean {
-        return !dims[i].equals(-1)
+        return dims[i] != -1L
     }
 
     /**

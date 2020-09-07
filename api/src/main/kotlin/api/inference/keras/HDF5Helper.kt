@@ -216,12 +216,12 @@ fun buildLayersByKerasJSONConfig(jsonConfigFile: File): Pair<MutableList<Layer>,
 
     val input: Input
 
-    val batchInputShape = sequentialConfig!!.config!!.layers!!.first().config!!.batch_input_shape
+    val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
 
     input = Input(
         batchInputShape!![1]?.toLong()!!,
-        batchInputShape!![2]?.toLong()!!,
-        batchInputShape!![3]?.toLong()!!
+        batchInputShape[2]?.toLong()!!,
+        batchInputShape[3]?.toLong()!!
     )
     return Pair(layers, input)
 }

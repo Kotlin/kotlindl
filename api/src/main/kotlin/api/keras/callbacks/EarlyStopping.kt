@@ -59,13 +59,11 @@ class EarlyStopping : Callback() {
     private var best = 0.0
     private var monitorGreater = false
 
-    private var monitor_op: BiFunction<Number, Number, Boolean>? = null
+    private var monitorOp: BiFunction<Number, Number, Boolean>? = null
 
     /**
      * Create an EarlyStopping Callback
      *
-     * @param params Training parameters
-     * @param model Reference of the model being trained.
      * @param monitor Quantity to be monitored.
      * @param minDelta Minimum change in the monitored quantity to qualify as an
      * improvement, i.e. an absolute change of less than min_delta, will count
@@ -98,21 +96,21 @@ class EarlyStopping : Callback() {
 
         when (mode) {
             Mode.MIN -> {
-                monitor_op = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
+                monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
                 this.minDelta *= -1.0
                 best = Double.MAX_VALUE
             }
             Mode.MAX -> {
-                monitor_op = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
+                monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MIN_VALUE
             }
             else -> if (this.monitor == "acc") {
-                monitor_op = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
+                monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MAX_VALUE
             } else {
-                monitor_op = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
+                monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
                 this.minDelta *= -1.0
                 best = Double.MIN_VALUE
             }
@@ -128,9 +126,9 @@ class EarlyStopping : Callback() {
             if (baseline != null) baseline!! else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
     }
 
-    override fun onEpochEnd(epoch: Int, logs: EpochTrainingEvent) {
-        val current: Number = getMonitorValue(logs, monitor) ?: return
-        if (monitor_op!!.apply(current.toDouble() - minDelta, best)) {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {
+        val current: Number = getMonitorValue(event, monitor) ?: return
+        if (monitorOp!!.apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()
             wait = 0
             if (restoreBestWeights) {
@@ -140,7 +138,7 @@ class EarlyStopping : Callback() {
             wait++
             if (wait > patience) {
                 stoppedEpoch = epoch
-                this.model.stopTraining = true;
+                this.model.stopTraining = true
                 if (restoreBestWeights) {
                     if (verbose) {
                         Logger.getLogger(EarlyStopping::class.java.name).log(
@@ -154,7 +152,7 @@ class EarlyStopping : Callback() {
         }
     }
 
-    override fun onTrainEnd(trainingHistory: TrainingHistory) {
+    override fun onTrainEnd(logs: TrainingHistory) {
         if (stoppedEpoch > 0 && verbose) {
             this.model.logger.info {
                 "Epoch ${stoppedEpoch + 1}: early stopping event! "
@@ -163,7 +161,7 @@ class EarlyStopping : Callback() {
     }
 
     private fun getMonitorValue(logs: EpochTrainingEvent, monitor: String): Number? {
-        val monitorValue = logs!!.lossValue // TODO: extract specific monitor metric instead default
+        val monitorValue = logs.lossValue // TODO: extract specific monitor metric instead default
         if (monitorValue == null) {
             this.model.logger.warn {
                 "Early stopping conditioned on metric $monitor which is not available. Available metrics are: $logs"

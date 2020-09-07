@@ -98,9 +98,9 @@ class HuberLoss(val delta: Float) : LossFunction {
             tf.dtypes.cast(tf.constant(delta), getDType()) // to actual.asOutput().dataType() in TF 2.x
         val point5: Operand<Float> = tf.dtypes.cast(tf.constant(0.5), getDType())
 
-        val abs_error: Operand<Float> = tf.math.abs(error)
-        val quadratic: Operand<Float> = tf.math.minimum(abs_error, deltaConst)
-        val linear: Operand<Float> = tf.math.sub(abs_error, quadratic)
+        val absError: Operand<Float> = tf.math.abs(error)
+        val quadratic: Operand<Float> = tf.math.minimum(absError, deltaConst)
+        val linear: Operand<Float> = tf.math.sub(absError, quadratic)
 
         val q2Point5: Operand<Float> =
             tf.math.mul(point5, tf.math.mul(quadratic, quadratic))

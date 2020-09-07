@@ -79,7 +79,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         /**
          * Creates the [Sequential] model.
          *
-         * @param [T] The type of data elements in Tensors.
          * @property [input] The input layer with initial shapes.
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
@@ -176,7 +175,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         isModelCompiled = true
     }
 
-    private fun validateModelArchitecture(): Unit {
+    private fun validateModelArchitecture() {
         require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         require(layers.last().hasActivation()) { "Last layer must have an activation function." }
 //        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }

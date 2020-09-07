@@ -143,7 +143,10 @@ abstract class TrainableTFModel : InferenceModel() {
         isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory {
-        require(validationRate > 0.0 && validationRate < 1.0) { "Validation rate should be more than 0.0 and less than 1.0. The passed rare is: ${validationRate}" }
+        require(validationRate > 0.0 && validationRate < 1.0) {
+            "Validation rate should be more than 0.0 and less than 1.0. " +
+                    "The passed rare is: $validationRate"
+        }
         val (validation, train) = dataset.split(validationRate)
 
         return fit(

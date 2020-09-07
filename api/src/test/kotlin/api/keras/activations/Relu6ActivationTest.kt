@@ -3,7 +3,6 @@ package api.keras.activations
 import org.junit.jupiter.api.Test
 
 internal class Relu6ActivationTest : ActivationTest() {
-
     @Test
     fun apply() {
         val input = floatArrayOf(-100f, -10f, -1f, 0f, 1f, 10f, 100f)

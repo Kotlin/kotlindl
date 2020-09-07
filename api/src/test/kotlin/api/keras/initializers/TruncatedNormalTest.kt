@@ -7,11 +7,11 @@ import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-internal class TruncatedNormalTest {
-    val EPS = 1e-7f
-    val FAN_IN = 10
-    val FAN_OUT = 20
+private const val EPS = 1e-7f
+private const val FAN_IN = 10
+private const val FAN_OUT = 20
 
+internal class TruncatedNormalTest {
     @Test
     fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }

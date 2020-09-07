@@ -14,6 +14,4 @@ internal class ExponentialActivationTest : ActivationTest() {
 
         assertActivationFunction(ExponentialActivation(), input, actual, expected)
     }
-
-
 }

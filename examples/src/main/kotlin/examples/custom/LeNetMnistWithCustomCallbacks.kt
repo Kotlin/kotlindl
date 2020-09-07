@@ -110,7 +110,7 @@ class CustomCallback : Callback() {
         println("Epoch $epoch begins.")
     }
 
-    override fun onEpochEnd(epoch: Int, logs: EpochTrainingEvent) {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {
         println("Epoch $epoch ends.")
     }
 
@@ -118,32 +118,32 @@ class CustomCallback : Callback() {
         println("Training batch $batch begins.")
     }
 
-    override fun onTrainBatchEnd(batch: Int, logs: BatchTrainingEvent?, trainingHistory: TrainingHistory) {
-        println("Training batch $batch ends with loss ${logs!!.lossValue}.")
+    override fun onTrainBatchEnd(batch: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {
+        println("Training batch $batch ends with loss ${event!!.lossValue}.")
     }
 
     override fun onTrainBegin() {
         println("Train begins")
     }
 
-    override fun onTrainEnd(trainingHistory: TrainingHistory) {
-        println("Train ends with last loss ${trainingHistory.lastBatchEvent().lossValue}")
+    override fun onTrainEnd(logs: TrainingHistory) {
+        println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
 
     override fun onTestBatchBegin(batch: Int, logs: History) {
         println("Test batch $batch begins.")
     }
 
-    override fun onTestBatchEnd(batch: Int, logs: BatchEvent?, testHistory: History) {
-        println("Test batch $batch ends with loss ${logs!!.lossValue}..")
+    override fun onTestBatchEnd(batch: Int, event: BatchEvent?, logs: History) {
+        println("Test batch $batch ends with loss ${event!!.lossValue}..")
     }
 
     override fun onTestBegin() {
         println("Test begins")
     }
 
-    override fun onTestEnd(testHistory: History) {
-        println("Train ends with last loss ${testHistory.lastBatchEvent().lossValue}")
+    override fun onTestEnd(logs: History) {
+        println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
 
     override fun onPredictBatchBegin(batch: Int) {

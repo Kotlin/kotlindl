@@ -6,7 +6,7 @@ import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 import util.MnistUtils
 
-open class SavedModelInferenceModel() : InferenceModel() {
+open class SavedModelInferenceModel : InferenceModel() {
     private lateinit var bundle: SavedModelBundle // extract for inference with SavedModelBundle and move this property to this
     private lateinit var reshape: (DoubleArray) -> Tensor<*>?
     private lateinit var input: Input

@@ -74,7 +74,7 @@ class TrainingHistory {
     operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
         val result = DoubleArray(_epochHistory.size)
         for (i in 0 until _epochHistory.size) {
-            result[i] = desiredField.invoke(_epochHistory[i]!!)
+            result[i] = desiredField.invoke(_epochHistory[i])
         }
         return result
     }

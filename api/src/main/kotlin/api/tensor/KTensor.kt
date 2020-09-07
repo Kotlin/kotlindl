@@ -6,7 +6,7 @@ import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 
 
-class KTensor() : AutoCloseable {
+class KTensor : AutoCloseable {
     private lateinit var session: Session
 
     lateinit var tensor: Tensor<Int>
@@ -14,9 +14,13 @@ class KTensor() : AutoCloseable {
     operator fun plus(kTensor: KTensor): KTensor {
         val otherTensor = kTensor.tensor
         require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
-            "The left tensor shape ${tensor.shape()!!
-                .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
-                .contentToString()}."
+            "The left tensor shape ${
+                tensor.shape()!!
+                    .contentToString()
+            } must be equal the right tensor shape ${
+                otherTensor.shape()!!
+                    .contentToString()
+            }."
         }
 
         var addTensor: Tensor<Int>

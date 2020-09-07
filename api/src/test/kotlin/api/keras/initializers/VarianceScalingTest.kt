@@ -7,13 +7,13 @@ import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-internal class VarianceScalingTest {
-    private val EPS = 1e-5f
-    private val FAN_IN = 2
-    private val FAN_OUT = 2
-    private val SEED = 12L
-    private val DEFAULT_LAYER_NAME = "default_name"
+private const val EPS = 1e-5f
+private const val FAN_IN = 2
+private const val FAN_OUT = 2
+private const val SEED = 12L
+private const val DEFAULT_LAYER_NAME = "default_name"
 
+internal class VarianceScalingTest {
     @Test
     fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }

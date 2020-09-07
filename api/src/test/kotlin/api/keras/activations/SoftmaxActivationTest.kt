@@ -3,7 +3,6 @@ package api.keras.activations
 import org.junit.jupiter.api.Test
 
 internal class SoftmaxActivationTest : ActivationTest() {
-
     @Test
     fun apply() {
         val input = floatArrayOf(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f)

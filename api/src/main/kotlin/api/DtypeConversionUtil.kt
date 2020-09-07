@@ -1,5 +1,5 @@
 package api
 
 fun getDType(): Class<Float> {
-    return Float::class.javaObjectType as Class
+    return Float::class.javaObjectType
 }

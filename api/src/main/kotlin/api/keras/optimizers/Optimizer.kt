@@ -12,8 +12,6 @@ import org.tensorflow.op.core.Variable
 
 /** Base class for all optimizers. */
 abstract class Optimizer(val clipGradient: ClipGradientAction) {
-    private lateinit var dtype: Class<Float>
-
     /**
      * Top level map key is the variable name, lower level map key is the slot name.
      */
@@ -75,12 +73,11 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
 
     /**
      * Creates a slot in the graph for the specified variable with the specified name. Adds the slot's
-     * initializer to the graph's initializers, and the slot to the Optimizer's slot map.
+     * initializer to the graph's initializers, and the slot to the optimiser's slot map.
      *
      * @param variable    The variable to create the slot for.
      * @param slotName    The name of the slot.
      * @param initializer The initializer for the slot.
-     * @param          The type of the variable.
      */
     protected open fun createSlot(
         graph: KGraph,

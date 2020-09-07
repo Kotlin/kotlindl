@@ -25,6 +25,9 @@ enum class ConvPadding {
     FULL
 }
 
+private const val KERNEL = "conv2d_kernel"
+private const val BIAS = "conv2d_bias"
+
 class Conv2D(
     val filters: Long,
     val kernelSize: LongArray,
@@ -43,9 +46,6 @@ class Conv2D(
     // weight tensor shapes
     private lateinit var biasShape: Shape
     private lateinit var kernelShape: Shape
-
-    private val KERNEL = "conv2d_kernel"
-    private val BIAS = "conv2d_bias"
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)

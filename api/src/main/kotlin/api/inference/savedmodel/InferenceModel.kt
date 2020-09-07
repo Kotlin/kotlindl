@@ -14,9 +14,7 @@ import java.io.File
 import java.nio.file.NotDirectoryException
 import java.util.*
 
-private val logger = KotlinLogging.logger {}
-
-open class InferenceModel() : AutoCloseable {
+open class InferenceModel : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -87,7 +85,7 @@ open class InferenceModel() : AutoCloseable {
         loadOptimizerState: Boolean = false
     ) {
         // Load graph
-        val directory = File(pathToModelDirectory);
+        val directory = File(pathToModelDirectory)
         if (!directory.exists()) {
             throw NotDirectoryException(pathToModelDirectory)
         } else {
@@ -188,7 +186,7 @@ open class InferenceModel() : AutoCloseable {
         session.runner()
             .feed(initializerName, Tensor.create(org))
             .addTarget(assignOpName)
-            .run();
+            .run()
     }
 
     private fun create4DimFloatArray(

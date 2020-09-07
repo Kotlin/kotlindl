@@ -7,12 +7,13 @@ import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+private const val EPS = 1e-5f
+private const val FAN_IN = 2
+private const val FAN_OUT = 4
+private const val SEED = 12L
+private const val DEFAULT_LAYER_NAME = "default_name"
+
 internal class HeNormalTest {
-    private val EPS = 1e-5f
-    private val FAN_IN = 2
-    private val FAN_OUT = 4
-    private val SEED = 12L
-    private val DEFAULT_LAYER_NAME = "default_name"
 
     @Test
     fun initialize() {
