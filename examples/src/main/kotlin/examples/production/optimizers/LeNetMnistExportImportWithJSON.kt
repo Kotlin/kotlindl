@@ -4,6 +4,7 @@ import api.ModelWritingMode
 import api.keras.ModelFormat
 import api.keras.Sequential
 import api.keras.dataset.Dataset
+import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
@@ -60,11 +61,11 @@ fun main() {
     val model = Sequential.load(PATH_TO_MODEL)
 
     model.use {
-        /* // Freeze conv2d layers, keep dense layers trainable
+        // Freeze conv2d layers, keep dense layers trainable
          for (layer in it.layers) {
              if (layer::class == Conv2D::class)
                  layer.isTrainable = false
-         }*/ // Didn't find variables from frozen variables
+         }
 
         it.compile(
             optimizer = optimizer,

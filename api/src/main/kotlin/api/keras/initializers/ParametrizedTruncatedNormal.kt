@@ -30,4 +30,8 @@ class ParametrizedTruncatedNormal(
             ParameterizedTruncatedNormal.seed(seed)
         )
     }
+
+    override fun toString(): String {
+        return "ParametrizedTruncatedNormal(mean=$mean, stdev=$stdev, p1=$p1, p2=$p2, seed=$seed)"
+    }
 }

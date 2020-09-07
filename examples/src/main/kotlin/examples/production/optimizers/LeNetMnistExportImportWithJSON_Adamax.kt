@@ -58,12 +58,6 @@ fun main() {
     val model = Sequential.load(PATH_TO_MODEL)
 
     model.use {
-        /* // Freeze conv2d layers, keep dense layers trainable
-         for (layer in it.layers) {
-             if (layer::class == Conv2D::class)
-                 layer.isTrainable = false
-         }*/ // Didn't find variables from frozen variables
-
         it.compile(
             optimizer = optimizer,
             loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

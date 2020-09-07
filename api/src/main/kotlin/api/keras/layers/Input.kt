@@ -44,4 +44,10 @@ class Input(vararg dims: Long, name: String = "") : Layer(name) {
     override fun getParams(): Int {
         return 0
     }
+
+    override fun toString(): String {
+        return "Input(shape=${packedDims.contentToString()})"
+    }
+
+
 }

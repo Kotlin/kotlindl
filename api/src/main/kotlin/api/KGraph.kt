@@ -25,9 +25,6 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /** A list of optimizers' variables. */
     private val optimizerVariables: MutableList<Variable<Float>> = mutableListOf()
 
-    /** A list of additional optimizers' variables. */
-    private val optimizerVariablesForAssignAddInitializers: MutableList<Variable<Float>> = mutableListOf()
-
     /** A list of initializer to initialize the trainableVariables. */
     private val initializers: MutableMap<String, Assign<Float>> = mutableMapOf()
 
@@ -85,6 +82,17 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         return layerVariables.filter { it.value }.keys.toList()
     }
 
+    fun isVariableTrainable(variableName: String): Boolean {
+        return layerVariables
+            .filter { it.value } // only trainable
+            .map { it.key.ref().op().name() } // extract names
+            .any { it.contains(variableName) }
+    }
+
+    fun frozenLayerVariables(): List<Variable<Float>> {
+        return layerVariables.filterNot { it.value }.keys.toList()
+    }
+
     fun layerVariables(): List<Variable<Float>> {
         return layerVariables.keys.toList()
     }
@@ -130,8 +138,5 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         }
     }
 
-    fun addOptimizerVariableForAssignAddInitializer(variable: Variable<Float>) {
-        check(!optimizerVariablesForAssignAddInitializers.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
-        optimizerVariablesForAssignAddInitializers += variable
-    }
+
 }

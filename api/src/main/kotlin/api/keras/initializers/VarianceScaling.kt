@@ -10,27 +10,51 @@ import kotlin.math.sqrt
 
 class GlorotNormal(
     private val seed: Long
-) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
+    override fun toString(): String {
+        return "GlorotNormal(seed=$seed) ${super.toString()}"
+    }
+}
 
 class GlorotUniform(
     private val seed: Long
-) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed) {
+    override fun toString(): String {
+        return "GlorotUniform(seed=$seed) ${super.toString()}"
+    }
+}
 
 class HeNormal(
     private val seed: Long
-) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
+    override fun toString(): String {
+        return "HeNormal(seed=$seed) ${super.toString()}"
+    }
+}
 
 class HeUniform(
     private val seed: Long
-) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
+    override fun toString(): String {
+        return "HeUniform(seed=$seed) ${super.toString()}"
+    }
+}
 
 class LeCunNormal(
     private val seed: Long
-) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
+    override fun toString(): String {
+        return "LeCunNormal(seed=$seed) ${super.toString()}"
+    }
+}
 
 class LeCunUniform(
     private val seed: Long
-) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed)
+) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
+    override fun toString(): String {
+        return "LeCunUniform(seed=$seed) ${super.toString()}"
+    }
+}
 
 open class VarianceScaling(
     private val scale: Double = 1.0,
@@ -78,6 +102,10 @@ open class VarianceScaling(
         }
         return mulOp
 
+    }
+
+    override fun toString(): String {
+        return "VarianceScaling(scale=$scale, mode=$mode, distribution=$distribution, seed=$seed)"
     }
 }
 

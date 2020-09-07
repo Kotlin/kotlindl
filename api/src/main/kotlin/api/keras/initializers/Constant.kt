@@ -13,4 +13,8 @@ class Constant(private val constantValue: Float) : Initializer() {
     ): Operand<Float> {
         return tf.withName(name).fill(shape, tf.constant(constantValue))
     }
+
+    override fun toString(): String {
+        return "Constant(constantValue=$constantValue)"
+    }
 }

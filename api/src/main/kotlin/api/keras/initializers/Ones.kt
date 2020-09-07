@@ -13,4 +13,8 @@ class Ones : Initializer() {
     ): Operand<Float> {
         return tf.withName(name).fill(shape, tf.constant(1.0f))
     }
+
+    override fun toString(): String {
+        return "Ones()"
+    }
 }

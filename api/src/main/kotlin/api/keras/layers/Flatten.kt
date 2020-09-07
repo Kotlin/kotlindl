@@ -41,4 +41,10 @@ class Flatten(name: String = "") : Layer(name) {
     override fun getParams(): Int {
         return 0
     }
+
+    override fun toString(): String {
+        return "Flatten"
+    }
+
+
 }

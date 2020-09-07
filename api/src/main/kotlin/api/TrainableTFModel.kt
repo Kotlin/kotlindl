@@ -112,6 +112,9 @@ abstract class TrainableTFModel : InferenceModel() {
         modelWritingMode: ModelWritingMode = ModelWritingMode.FAIL_IF_EXISTS
     )
 
+    override fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+
+    }
 
     fun getDType(): Class<Float> {
         return Float::class.javaObjectType

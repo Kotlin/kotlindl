@@ -162,7 +162,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             val dims = TensorShape(inputShape).dims()
             it.outputShape = dims
 
-            logger.debug { it.toString() + " " + dims.contentToString() }
+            logger.debug { it.toString() + "; outputShape: " + dims.contentToString() }
         }
 
         xOp = firstLayer.input
@@ -735,6 +735,26 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                 variableNamesFile.flush()
             }
         }
+    }
+
+    override fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+        // Load variables names
+        val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
+        if (variableNames.isNotEmpty()) {
+            for (variableName in variableNames) {
+                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
+                    continue
+                else if (loadOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
+                    continue
+                else loadVariable(variableName, pathToModelDirectory)
+            }
+        }
+    }
+
+    private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
+        return variableName.startsWith("optimizer") && kGraph().frozenLayerVariables()
+            .map { it.ref().op().name() } // extract names
+            .any { variableName.contains(it) }
     }
 
     infix fun getLayer(layerName: String): Layer {

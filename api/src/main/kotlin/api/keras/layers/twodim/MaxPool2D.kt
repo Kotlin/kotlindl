@@ -56,4 +56,8 @@ class MaxPool2D(
     override fun getParams(): Int {
         return 0
     }
+
+    override fun toString(): String {
+        return "MaxPool2D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+    }
 }

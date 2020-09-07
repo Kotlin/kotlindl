@@ -20,4 +20,8 @@ class TruncatedNormal(private val seed: Long) :
             TruncatedNormal.seed(seed)
         )
     }
+
+    override fun toString(): String {
+        return "TruncatedNormal(seed=$seed)"
+    }
 }

@@ -1,5 +1,6 @@
 package examples.production
 
+import api.ModelWritingMode
 import api.keras.ModelFormat
 import api.keras.Sequential
 import api.keras.dataset.Dataset
@@ -42,7 +43,10 @@ fun main() {
             verbose = true
         )
 
-        it.save(PATH_TO_MODEL, ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES)
+        it.save(
+            PATH_TO_MODEL, ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
+            modelWritingMode = ModelWritingMode.OVERRIDE
+        )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")

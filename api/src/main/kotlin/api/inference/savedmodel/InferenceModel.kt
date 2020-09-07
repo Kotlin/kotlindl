@@ -106,32 +106,40 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
-    fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean = false) {
+    open fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean = false) {
+        loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
+    }
+
+    protected fun loadVariablesFromTxt(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         // Load variables names
         val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
                     continue
-
-                val shape = kGraph.tfGraph.operation(variableName).output<Float>(0).shape()
-                val tensorShape = TensorShape(shape)
-
-                logger.debug { "Loading the variable $variableName data" }
-                logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-                logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
-
-                val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
-                scanner.useLocale(Locale.US)
-
-                val initializerName = defaultInitializerOpName(variableName)
-                val assignOpName = defaultAssignOpName(variableName)
-
-                val source = createFloatArrayFromScanner(shape, scanner)
-                populateVariable(initializerName, source, assignOpName)
+                loadVariable(variableName, pathToModelDirectory)
             }
         }
+    }
 
+    protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
+        val operation = kGraph.tfGraph.operation(variableName)
+        check(operation != null) { "Operation $variableName is not found in static graph." }
+        val shape = operation.output<Float>(0).shape()
+        val tensorShape = TensorShape(shape)
+
+        logger.debug { "Loading the variable $variableName data" }
+        logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
+        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+
+        val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
+        scanner.useLocale(Locale.US)
+
+        val initializerName = defaultInitializerOpName(variableName)
+        val assignOpName = defaultAssignOpName(variableName)
+
+        val source = createFloatArrayFromScanner(shape, scanner)
+        populateVariable(initializerName, source, assignOpName)
     }
 
     private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
