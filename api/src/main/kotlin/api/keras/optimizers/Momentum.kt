@@ -1,6 +1,7 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -30,8 +31,8 @@ class Momentum(
         val targets: MutableList<Operand<Float>> =
             ArrayList()
 
-        learningRateConst = tf.constant(learningRate, getDType())
-        momentumConst = tf.constant(momentum, getDType())
+        learningRateConst = tf.constant(learningRate)
+        momentumConst = tf.constant(momentum)
 
         for (i in weights.indices) {
             val variable = weights[i]
@@ -53,7 +54,9 @@ class Momentum(
     }
 
     private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val initializer: Operand<Float> = tf.fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
+        val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
+        val initializer: Operand<Float> = tf.withName(momentumInitializerName)
+            .fill(tf.shape(v), tf.constant(0.0f))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
     }
 

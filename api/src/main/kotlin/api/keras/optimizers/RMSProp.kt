@@ -1,6 +1,7 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -52,7 +53,10 @@ class RMSProp(
                 val mgSlot: Variable<Float> = getSlot(varName, MG)
                 targets.add(
                     tf.train.applyCenteredRmsProp(
-                        variable, mgSlot, rmsSlot, momentumSlot,
+                        variable,
+                        mgSlot,
+                        rmsSlot,
+                        momentumSlot,
                         learningRateConst,
                         decayConst,
                         momentumConst,
@@ -63,7 +67,9 @@ class RMSProp(
             } else {
                 targets.add(
                     tf.train.applyRmsProp(
-                        variable, rmsSlot, momentumSlot,
+                        variable,
+                        rmsSlot,
+                        momentumSlot,
                         learningRateConst,
                         decayConst,
                         momentumConst,
@@ -73,20 +79,24 @@ class RMSProp(
                 )
             }
         }
-
-
         return targets
     }
 
     private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val rmsInitializer: Operand<Float> = tf
+        val rmsInitializerName = defaultInitializerOpName(createName(v, RMS))
+
+        val rmsInitializer: Operand<Float> = tf.withName(rmsInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
-        val momentumInitializer: Operand<Float> = tf
+
+        val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
+        val momentumInitializer: Operand<Float> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
+
         if (centered) {
-            val mgInitializer: Operand<Float> = tf
+            val mgInitializerName = defaultInitializerOpName(createName(v, MG))
+            val mgInitializer: Operand<Float> = tf.withName(mgInitializerName)
                 .fill(
                     tf.shape(v),
                     tf.constant(0.0f)

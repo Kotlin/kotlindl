@@ -6,7 +6,7 @@ import api.keras.Sequential
 import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
-import api.keras.optimizers.Adam
+import api.keras.optimizers.AdaDelta
 import datasets.*
 import examples.production.lenet5
 
@@ -28,14 +28,12 @@ fun main() {
 
     val (newTrain, validation) = train.split(0.95)
 
-    val optimizer = Adam()
+    val optimizer = AdaDelta()
 
     lenet5.use {
         it.compile(optimizer = optimizer, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         it.summary()
-
-        print(it.kGraph())
 
         it.fit(
             trainingDataset = newTrain,
@@ -72,7 +70,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
         it.summary()
-        print(it.kGraph())
+
         it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = true)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -104,6 +102,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
         it.summary()
+
         it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = false)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

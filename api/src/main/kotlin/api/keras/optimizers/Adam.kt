@@ -50,12 +50,15 @@ class Adam(
 
         for (i in weights.indices) {
 
-            val firstMomentSlot: Variable<Float> = getSlot(weights[i].ref().op().name(), FIRST_MOMENT)
-            val secondMomentSlot: Variable<Float> = getSlot(weights[i].ref().op().name(), SECOND_MOMENT)
+            val variable = weights[i]
+            val varName = variable.ref().op().name()
+
+            val firstMomentSlot: Variable<Float> = getSlot(varName, FIRST_MOMENT)
+            val secondMomentSlot: Variable<Float> = getSlot(varName, SECOND_MOMENT)
 
             targets.add(
                 tf.train.applyAdam(
-                    weights[i],
+                    variable,
                     firstMomentSlot,
                     secondMomentSlot,
                     betaOnePower,
@@ -69,10 +72,11 @@ class Adam(
             )
         }
 
-
-        val betaOnePowerInit1 = tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME))
+        val betaOnePowerInit1 = tf
+            //.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME))
             .assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
-        val betaTwoPowerInit2 = tf.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME))
+        val betaTwoPowerInit2 = tf
+            //.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME))
             .assign(betaTwoPower, tf.math.mul(betaTwoPower, betaTwoConst))
 
         graph.addOptimizerVariableInitializer(betaOnePowerInit1)
@@ -101,25 +105,27 @@ class Adam(
         }
         betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
 
-        val firstMomentAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
-        val betaOnePowerInit: Assign<*> = tf.withName(firstMomentAssignName)
-            .assign(betaOnePower, tf.constant(beta1, getDType()))
+        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
+        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
+            .assign(
+                betaOnePower,
+                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
+            )
         graph.addOptimizerVariableInitializer(betaOnePowerInit)
 
 
         betaTwoPower = tf.withName(SECOND_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
 
-        val secondMomentAssignName = defaultAssignOpName(SECOND_BETA_POWER_NAME)
-        val betaTwoPowerInit: Assign<*> = tf.withName(secondMomentAssignName)
-            .assign(betaTwoPower, tf.constant(beta2, getDType()))
+        val betaTwoPowerAssignName = defaultAssignOpName(SECOND_BETA_POWER_NAME)
+        val betaTwoPowerInit: Assign<*> = tf.withName(betaTwoPowerAssignName)
+            .assign(
+                betaTwoPower,
+                tf.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME)).constant(beta2, getDType())
+            )
         graph.addOptimizerVariableInitializer(betaTwoPowerInit)
     }
 
     override fun getOptimizerName(): String {
         return "Adam"
-    }
-
-    fun getVariablesNames(): List<String> {
-        return listOf(FIRST_BETA_POWER_NAME, SECOND_BETA_POWER_NAME)
     }
 }

@@ -39,7 +39,8 @@ class AdaGrad(
 
             targets.add(
                 tf.train.applyAdagrad(
-                    variable, slot,
+                    variable,
+                    slot,
                     learningRateConst,
                     clipGradient.clipGradient(tf, gradients.dy(i))
                 )
@@ -52,7 +53,7 @@ class AdaGrad(
     private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
         val initializer: Operand<Float> = tf.fill(
             tf.shape(v),
-            tf.dtypes.cast(tf.constant(initialAccumulatorValue), getDType())
+            tf.constant(initialAccumulatorValue)
         )
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }

@@ -1,6 +1,7 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -77,10 +78,14 @@ class Ftrl(
     }
 
     private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val accumInitializer = tf.fill(tf.shape(v), tf.constant(initialAccumulatorValue, getDType()))
+        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
+        val accumInitializer = tf.withName(accumInitializerName)
+            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
 
-        val linearAccumInitializer = tf.fill(tf.shape(v), tf.constant(0.0f, getDType()))
+        val linearAccumInitializerName = defaultInitializerOpName(createName(v, LINEAR_ACCUMULATOR))
+        val linearAccumInitializer = tf.withName(linearAccumInitializerName)
+            .fill(tf.shape(v), tf.constant(0.0f))
         createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
     }
 

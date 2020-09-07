@@ -1,6 +1,7 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -57,10 +58,13 @@ class AdaDelta(
     }
 
     private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val accumulatorInitializer = tf
+        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
+        val accumulatorInitializer = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
-        val updateInitializer: Operand<Float> = tf
+
+        val accumUpdateInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR_UPDATE))
+        val updateInitializer: Operand<Float> = tf.withName(accumUpdateInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
     }

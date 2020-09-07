@@ -1,6 +1,9 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultAssignOpName
+import api.defaultInitializerOpName
+import api.defaultOptimizerVariableName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.Shape
@@ -15,6 +18,7 @@ import java.util.*
 
 private const val FIRST_MOMENT = "m"
 private const val SECOND_MOMENT = "v"
+private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
 
 /**
  * Note: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
@@ -50,13 +54,16 @@ class Adamax(
         val scope = Scope(graph.tfGraph)
 
         for (i in weights.indices) {
-            val firstMomentSlot: Variable<Float> = getSlot(weights[i].ref().op().name(), FIRST_MOMENT)
-            val secondMomentSlot: Variable<Float> = getSlot(weights[i].ref().op().name(), SECOND_MOMENT)
+            val variable = weights[i]
+            val varName = variable.ref().op().name()
+
+            val firstMomentSlot: Variable<Float> = getSlot(varName, FIRST_MOMENT)
+            val secondMomentSlot: Variable<Float> = getSlot(varName, SECOND_MOMENT)
 
             targets.add(
                 ApplyAdaMax.create(
                     scope,
-                    weights[i],
+                    variable,
                     firstMomentSlot,
                     secondMomentSlot,
                     betaOnePower,
@@ -69,18 +76,24 @@ class Adamax(
             )
         }
 
-        val betaOnePowerInit2 = tf.assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
+        val betaOnePowerInit = tf
+            .assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
 
-        graph.addOptimizerVariableInitializer(betaOnePowerInit2)
+        graph.addOptimizerVariableInitializer(betaOnePowerInit)
+        graph.addOptimizerVariable(betaOnePower)
 
         return targets
     }
 
     private fun createAdamaxSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val firstMomentInitializer = tf.fill(tf.shape(v), tf.constant(0.0f, getDType()))
+        val firstMomentInitializerName = defaultInitializerOpName(createName(v, FIRST_MOMENT))
+        val firstMomentInitializer =
+            tf.withName(firstMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
 
-        val secondMomentInitializer = tf.fill(tf.shape(v), tf.constant(0.0f, getDType()))
+        val secondMomentInitializerName = defaultInitializerOpName(createName(v, SECOND_MOMENT))
+        val secondMomentInitializer = tf.withName(secondMomentInitializerName)
+            .fill(tf.shape(v), tf.constant(0.0f, getDType()))
         createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
     }
 
@@ -88,9 +101,14 @@ class Adamax(
         for (v in variables) {
             createAdamaxSlot(graph, tf, v.asOutput())
         }
-        betaOnePower = tf.withName("beta1_power").variable(Shape.scalar(), getDType())
-        val betaOnePowerInit: Assign<*> = tf
-            .assign(betaOnePower, tf.constant(beta1, getDType()))
+        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
+        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
+
+        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
+            .assign(
+                betaOnePower,
+                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
+            )
         graph.addOptimizerVariableInitializer(betaOnePowerInit)
     }
 
