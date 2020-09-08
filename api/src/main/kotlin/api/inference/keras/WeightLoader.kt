@@ -9,6 +9,7 @@ import api.keras.layers.Dense
 import api.keras.layers.Flatten
 import api.keras.layers.Input
 import api.keras.layers.Layer
+import api.keras.layers.twodim.AvgPool2D
 import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
@@ -21,6 +22,7 @@ import java.io.File
 private const val LAYER_CONV2D = "Conv2D"
 private const val LAYER_DENSE = "Dense"
 private const val LAYER_MAX_POOLING_2D = "MaxPooling2D"
+private const val LAYER_AVG_POOLING_2D = "AvgPooling2D"
 private const val LAYER_FLATTEN = "Flatten"
 
 // Keras data types
@@ -32,6 +34,10 @@ private const val INITIALIZER_GLOROT_NORMAL = "GlorotNormal"
 private const val INITIALIZER_ZEROS = "Zeros"
 private const val INITIALIZER_ONES = "Ones"
 private const val INITIALIZER_RANDOM_NORMAL = "RandomNormal"
+private const val INITIALIZER_RANDOM_UNIFORM = "RandomUniform"
+private const val INITIALIZER_TRUNCATED_NORMAL = "TruncatedNormal"
+private const val INITIALIZER_CONSTANT = "Constant"
+private const val INITIALIZER_VARIANCE_SCALING = "VarianceScaling"
 
 // Keras activations
 private const val ACTIVATION_RELU = "relu"
@@ -205,9 +211,7 @@ fun buildLayersByKerasJSONConfig(jsonConfigFile: File): Pair<MutableList<Layer>,
 
     sequentialConfig!!.config!!.layers!!.forEach {
         run {
-            if (it.class_name.equals("InputLayer")) {
-
-            } else {
+            if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it)
                 layers.add(layer)
             }
@@ -389,6 +393,10 @@ private fun convertToLayer(kerasLayer: KerasLayer): Layer {
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")
     }
@@ -405,17 +413,89 @@ private fun createDense(config: LayerConfig, name: String): Dense {
 }
 
 private fun convertToInitializer(initializer: KerasInitializer): Initializer {
+    val seed = if (initializer.config!!.seed != null) {
+        initializer.config.seed!!.toLong()
+    } else 12L
+
     return when (initializer.class_name!!) {
-        INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(12L)
-        INITIALIZER_GLOROT_NORMAL -> GlorotNormal(12L)
-        INITIALIZER_ZEROS -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_ONES -> GlorotNormal(12L) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_RANDOM_NORMAL -> GlorotNormal(seed = 12L)
-        "RandomUniform" -> TruncatedNormal(seed = 12L)
-        "TruncatedNormal" -> TruncatedNormal(seed = 12L)
-        "VarianceScaling" -> VarianceScaling(seed = 12L)
-        "Constant" -> Constant(initializer.config!!.value!!.toFloat())
+        INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(seed = seed)
+        INITIALIZER_GLOROT_NORMAL -> GlorotNormal(seed = seed)
+        INITIALIZER_ZEROS -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
+        INITIALIZER_ONES -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
+        INITIALIZER_RANDOM_NORMAL -> RandomNormal(
+            seed = seed,
+            mean = initializer.config.mean!!.toFloat(),
+            stdev = initializer.config.stddev!!.toFloat()
+        )
+        INITIALIZER_RANDOM_UNIFORM -> RandomUniform(
+            seed = seed,
+            minVal = initializer.config.minval!!.toFloat(),
+            maxVal = initializer.config.maxval!!.toFloat()
+        )
+        INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
+        INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
+        INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
+    }
+}
+
+fun convertVarianceScaling(initializer: KerasInitializer): Initializer {
+    val seed = if (initializer.config!!.seed != null) {
+        initializer.config.seed!!.toLong()
+    } else 12L
+
+    val config = initializer.config
+    val scale = config!!.scale!!
+    val mode: Mode = convertMode(config.mode!!)
+    val distribution: Distribution = convertDistribution(config.distribution!!)
+    return if (scale == 2.0 && mode == Mode.FAN_IN) {
+        when (distribution) {
+            Distribution.UNIFORM -> HeUniform(seed)
+            Distribution.TRUNCATED_NORMAL -> {
+                HeNormal(seed)
+            }
+            else -> VarianceScaling(scale, mode, distribution, seed)
+        }
+    } else {
+        when (mode) {
+            Mode.FAN_IN -> {
+                when (distribution) {
+                    Distribution.UNIFORM -> LeCunUniform(seed)
+                    Distribution.TRUNCATED_NORMAL -> {
+                        LeCunNormal(seed)
+                    }
+                    else -> VarianceScaling(scale, mode, distribution, seed)
+                }
+            }
+            Mode.FAN_AVG -> {
+                when (distribution) {
+                    Distribution.UNIFORM -> GlorotUniform(seed)
+                    Distribution.TRUNCATED_NORMAL -> {
+                        GlorotNormal(seed)
+                    }
+                    else -> VarianceScaling(scale, mode, distribution, seed)
+                }
+            }
+            else -> VarianceScaling(scale, mode, distribution, seed)
+        }
+    }
+}
+
+fun convertDistribution(distribution: String): Distribution {
+    return when (distribution) {
+        "truncated_normal" -> Distribution.TRUNCATED_NORMAL
+        "uniform" -> Distribution.UNIFORM
+        "untruncated_normal" -> Distribution.UNTRUNCATED_NORMAL
+        else -> Distribution.TRUNCATED_NORMAL
+    }
+}
+
+fun convertMode(mode: String): Mode {
+    return when (mode) {
+        "fan_in" -> Mode.FAN_IN
+        "fan_out" -> Mode.FAN_OUT
+        "fan_avg" -> Mode.FAN_AVG
+        else -> Mode.FAN_AVG
     }
 }
 
@@ -445,6 +525,24 @@ private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     addedOnesStrides[3] = 1
 
     return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+}
+
+private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
+    val poolSize = config.pool_size!!.toIntArray()
+    val addedOnesPoolSize = IntArray(4)
+    addedOnesPoolSize[0] = 1
+    addedOnesPoolSize[1] = poolSize[0]
+    addedOnesPoolSize[2] = poolSize[1]
+    addedOnesPoolSize[3] = 1
+
+    val strides = config.strides!!.toIntArray()
+    val addedOnesStrides = IntArray(4)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = 1
+
+    return AvgPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
 fun convertPadding(padding: String): ConvPadding {
@@ -518,19 +616,19 @@ fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
             when (dataset.dimensions.size) {
                 4 -> {
                     val data = dataset.data as Array<Array<Array<FloatArray>>>
-                    //println(data.contentDeepToString())
+                    println(data.contentDeepToString())
                 }
                 3 -> {
                     val data = dataset.data as Array<Array<FloatArray>>
-                    //println(data.contentDeepToString())
+                    println(data.contentDeepToString())
                 }
                 2 -> {
                     val data = dataset.data as Array<FloatArray>
-                    //println(data.contentDeepToString())
+                    println(data.contentDeepToString())
                 }
                 1 -> {
                     val data = dataset.data as FloatArray
-                    //println(data.contentToString())
+                    println(data.contentToString())
                 }
             }
         }

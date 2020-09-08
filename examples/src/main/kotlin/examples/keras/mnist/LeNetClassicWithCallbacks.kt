@@ -3,7 +3,7 @@ package examples.keras.mnist
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.callbacks.EarlyStopping
-import api.keras.callbacks.Mode
+import api.keras.callbacks.EarlyStoppingMode
 import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.GlorotNormal
@@ -97,7 +97,7 @@ fun main() {
     lenet5Classic.use {
         val earlyStopping = EarlyStopping().setUp(
             monitor = "valLoss", // TODO: could be complex dsl with a few fields of EpochTrainingEvent
-            minDelta = 0.0, patience = 2, verbose = true, mode = Mode.AUTO,
+            minDelta = 0.0, patience = 2, verbose = true, mode = EarlyStoppingMode.AUTO,
             baseline = 0.1, restoreBestWeights = false
         )
         it.compile(

@@ -5,8 +5,8 @@ import org.tensorflow.op.Ops
 
 class Ones : Initializer() {
     override fun initialize(
-        funIn: Int,
-        funOut: Int,
+        fanIn: Int,
+        fanOut: Int,
         tf: Ops,
         shape: Operand<Int>,
         name: String

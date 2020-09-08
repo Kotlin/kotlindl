@@ -7,6 +7,10 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.math.abs
 
+enum class EarlyStoppingMode {
+    AUTO, MIN, MAX
+}
+
 class EarlyStopping : Callback() {
     private var wait = 0
     private var stoppedEpoch = 0
@@ -41,7 +45,7 @@ class EarlyStopping : Callback() {
      * direction is automatically inferred from the name of the monitored
      * quantity. Default is Mode.auto.
      */
-    private var mode: Mode = Mode.AUTO
+    private var mode: EarlyStoppingMode = EarlyStoppingMode.AUTO
 
     /**
      * Baseline value for the monitored quantity. Training will stop if the
@@ -83,7 +87,7 @@ class EarlyStopping : Callback() {
      */
     fun setUp(
         monitor: String,
-        minDelta: Double, patience: Int, verbose: Boolean, mode: Mode,
+        minDelta: Double, patience: Int, verbose: Boolean, mode: EarlyStoppingMode,
         baseline: Double, restoreBestWeights: Boolean
     ): EarlyStopping {
         this.monitor = monitor
@@ -95,12 +99,12 @@ class EarlyStopping : Callback() {
         this.restoreBestWeights = restoreBestWeights
 
         when (mode) {
-            Mode.MIN -> {
+            EarlyStoppingMode.MIN -> {
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
                 this.minDelta *= -1.0
                 best = Double.MAX_VALUE
             }
-            Mode.MAX -> {
+            EarlyStoppingMode.MAX -> {
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MIN_VALUE
