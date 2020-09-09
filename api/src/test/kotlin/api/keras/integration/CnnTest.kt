@@ -2,7 +2,6 @@ package api.keras.integration
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
@@ -15,7 +14,8 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

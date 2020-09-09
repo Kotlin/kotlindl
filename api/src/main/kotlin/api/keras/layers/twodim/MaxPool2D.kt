@@ -1,6 +1,6 @@
 package api.keras.layers.twodim
 
-import api.KGraph
+import api.core.KGraph
 import api.keras.layers.Layer
 import api.keras.shape.convOutputLength
 import org.tensorflow.Operand

@@ -1,6 +1,7 @@
 package api.inference.savedmodel
 
-import api.KGraph
+import api.core.KGraph
+import api.inference.InferenceModel
 import api.keras.metric.Metrics
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
@@ -8,9 +9,7 @@ import util.MnistUtils
 
 open class SavedModelInferenceModel : InferenceModel() {
     private lateinit var bundle: SavedModelBundle // extract for inference with SavedModelBundle and move this property to this
-    private lateinit var reshape: (DoubleArray) -> Tensor<*>?
-    private lateinit var input: Input
-    private lateinit var output: Output
+    private lateinit var reshape2: (DoubleArray) -> Tensor<*>?
 
     fun predict(image: MnistUtils.Image): LongArray {
         return predictOnImage(image)
@@ -20,7 +19,7 @@ open class SavedModelInferenceModel : InferenceModel() {
         image: MnistUtils.Image
     ): LongArray {
         val runner = session.runner()
-        return runner.feed(input.tfName, reshape(image.pixels))
+        return runner.feed(input.tfName, reshape2(image.pixels))
             .fetch(output.tfName)
             .run()[0]
             .copyTo(LongArray(1))
@@ -71,17 +70,8 @@ open class SavedModelInferenceModel : InferenceModel() {
         kGraph.close()
     }
 
-    fun input(inputOp: Input) {
-        input = inputOp
-
-    }
-
-    fun output(outputOp: Output) {
-        output = outputOp
-    }
-
-    fun reshape(function: (DoubleArray) -> Tensor<*>?) {
-        reshape = function
+    fun reshape2(function: (DoubleArray) -> Tensor<*>?) {
+        reshape2 = function
     }
 }
 

@@ -2,7 +2,6 @@ package examples.production
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.GlorotUniform
 import api.keras.layers.Dense
@@ -11,7 +10,9 @@ import api.keras.layers.Input
 import api.keras.layers.twodim.Conv2D
 import api.keras.layers.twodim.ConvPadding
 import api.keras.layers.twodim.MaxPool2D
-import datasets.AMOUNT_OF_CLASSES
+import datasets.Dataset
+import datasets.handlers.AMOUNT_OF_CLASSES
+import org.tensorflow.Tensor
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -84,4 +85,12 @@ val lenet5 = Sequential.of(
 fun getLabel(dataset: Dataset, imageId: Int): Int {
     val imageLabel = dataset.getY(imageId)
     return imageLabel.indexOf(imageLabel.max()!!)
+}
+
+fun mnistReshape(image: FloatArray): Tensor<*>? {
+    val reshaped = Array(
+        1
+    ) { Array(28) { Array(28) { FloatArray(1) } } }
+    for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
+    return Tensor.create(reshaped)
 }

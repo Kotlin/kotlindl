@@ -2,7 +2,6 @@ package examples.keras.mnist
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
 import api.keras.layers.Dense
@@ -10,7 +9,8 @@ import api.keras.layers.Input
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000

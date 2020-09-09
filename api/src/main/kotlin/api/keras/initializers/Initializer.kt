@@ -1,8 +1,8 @@
 package api.keras.initializers
 
-import api.defaultAssignOpName
-import api.defaultInitializerOpName
 import api.keras.shape.shapeOperand
+import api.keras.util.defaultAssignOpName
+import api.keras.util.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign

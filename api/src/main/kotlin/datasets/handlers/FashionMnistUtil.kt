@@ -1,6 +1,6 @@
-package datasets
+package datasets.handlers
 
-import api.keras.dataset.Dataset
+import datasets.Dataset
 import java.io.DataInputStream
 import java.io.IOException
 import java.util.zip.GZIPInputStream

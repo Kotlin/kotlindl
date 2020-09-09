@@ -3,7 +3,6 @@ package api.keras.integration
 import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.*
 import api.keras.layers.Dense
 import api.keras.layers.Layer
@@ -12,7 +11,8 @@ import api.keras.layers.twodim.ConvPadding
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 import io.jhdf.HdfFile
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -153,7 +153,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.AMOUNT_OF_CLASSES,
+            datasets.handlers.AMOUNT_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )
@@ -202,7 +202,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.AMOUNT_OF_CLASSES,
+            datasets.handlers.AMOUNT_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )
@@ -272,7 +272,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.AMOUNT_OF_CLASSES,
+            datasets.handlers.AMOUNT_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )

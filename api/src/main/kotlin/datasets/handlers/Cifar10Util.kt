@@ -1,7 +1,7 @@
-package datasets
+package datasets.handlers
 
-import api.keras.dataset.Dataset
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import datasets.Dataset
 import datasets.util.getImage
 import java.awt.image.DataBufferByte
 import java.io.IOException

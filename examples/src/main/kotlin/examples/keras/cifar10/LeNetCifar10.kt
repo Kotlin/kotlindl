@@ -2,7 +2,6 @@ package examples.keras.cifar10
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
@@ -15,10 +14,11 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
-import datasets.IMAGES_ARCHIVE
-import datasets.LABELS_ARCHIVE
-import datasets.extractCifar10Images
-import datasets.extractCifar10Labels
+import datasets.Dataset
+import datasets.handlers.IMAGES_ARCHIVE
+import datasets.handlers.LABELS_ARCHIVE
+import datasets.handlers.extractCifar10Images
+import datasets.handlers.extractCifar10Labels
 
 private const val LEARNING_RATE = 0.1f
 private const val EPOCHS = 20

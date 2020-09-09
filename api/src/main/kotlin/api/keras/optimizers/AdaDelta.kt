@@ -1,7 +1,7 @@
 package api.keras.optimizers
 
-import api.KGraph
-import api.defaultInitializerOpName
+import api.core.KGraph
+import api.keras.util.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops

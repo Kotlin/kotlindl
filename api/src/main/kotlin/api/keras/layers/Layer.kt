@@ -1,7 +1,7 @@
 package api.keras.layers
 
-import api.KGraph
-import api.TrainableTFModel
+import api.core.KGraph
+import api.keras.TrainableTFModel
 import api.keras.initializers.Initializer
 import org.tensorflow.Operand
 import org.tensorflow.Shape

@@ -1,4 +1,4 @@
-package api
+package api.keras.util
 
 import api.keras.layers.Layer
 

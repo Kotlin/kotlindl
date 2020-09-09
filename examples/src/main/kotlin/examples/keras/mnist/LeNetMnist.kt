@@ -2,7 +2,6 @@ package examples.keras.mnist
 
 import api.keras.Sequential
 import api.keras.activations.Activations
-import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
 import api.keras.initializers.Zeros
@@ -15,7 +14,8 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 2777

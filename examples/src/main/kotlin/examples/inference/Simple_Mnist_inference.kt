@@ -23,7 +23,7 @@ fun main() {
         it.loadModel(PATH_TO_MODEL)
         println(it)
 
-        it.reshape(::reshape)
+        it.reshape2(::reshape)
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 
@@ -35,7 +35,6 @@ fun main() {
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(images, Metrics.ACCURACY)}")
-
     }
 }
 

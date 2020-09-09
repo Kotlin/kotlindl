@@ -1,13 +1,13 @@
 package api.keras.layers
 
-import api.KGraph
-import api.denseBiasVarName
-import api.denseKernelVarName
+import api.core.KGraph
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.shape.TensorShape
 import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeToLongArray
+import api.keras.util.denseBiasVarName
+import api.keras.util.denseKernelVarName
 import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -25,12 +25,9 @@ class Dense(
     name: String = ""
 ) : Layer(name) {
     private lateinit var kernelShape: Shape
-
     private lateinit var biasShape: Shape
-
     // weight tensors
     private lateinit var kernel: Variable<Float>
-
     private lateinit var bias: Variable<Float>
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {

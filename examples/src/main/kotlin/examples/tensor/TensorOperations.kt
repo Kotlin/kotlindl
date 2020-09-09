@@ -1,6 +1,6 @@
 package examples.tensor
 
-import api.tensor.KTensor
+import api.tensor.KTensorInt32
 
 
 fun main() {
@@ -8,8 +8,8 @@ fun main() {
     val vector1 = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     val vector2 = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
-    val t1 = KTensor.create(vector1)
-    val t2 = KTensor.create(vector2)
+    val t1 = KTensorInt32.create(vector1)
+    val t2 = KTensorInt32.create(vector2)
 
     val addTensor = t1 + t2
 

@@ -59,10 +59,8 @@ class EarlyStopping : Callback() {
      * weights obtained at the last step of training are used.
      */
     private var restoreBestWeights = false
-
     private var best = 0.0
     private var monitorGreater = false
-
     private var monitorOp: BiFunction<Number, Number, Boolean>? = null
 
     /**

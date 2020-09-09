@@ -1,6 +1,6 @@
 package datasets.util
 
-import api.keras.dataset.Dataset
+import datasets.Dataset
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayOutputStream

@@ -1,8 +1,8 @@
 package api.keras.loss
 
-import api.TRAINING_LOSS
-import api.getDType
-import api.keras.Kmean
+import api.keras.util.Kmean
+import api.keras.util.TRAINING_LOSS
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -51,11 +51,6 @@ class AbsoluteDifference : LossFunction {
 class MAE : LossFunction {
     override fun apply(tf: Ops, actual: Operand<Float>, labels: Operand<Float>, dtype: Class<Float>): Operand<Float> {
         val absoluteErrors = tf.math.abs(tf.math.sub(actual, labels))
-
-        /*return tf.withName(TRAINING_LOSS).math.mean(absoluteErrors, tf.constant(0))*/
-        /*return tf.withName(TRAINING_LOSS)
-            .identity(Kmean(tf, absoluteErrors, tf.constant(-1)))*/
-
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
     }
 }

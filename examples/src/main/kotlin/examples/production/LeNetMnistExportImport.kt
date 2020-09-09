@@ -1,11 +1,11 @@
 package examples.production
 
-import api.inference.savedmodel.InferenceModel
-import api.keras.dataset.Dataset
+import api.inference.InferenceModel
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 private const val EPOCHS = 3
@@ -62,6 +62,7 @@ fun main() {
     }
 
     InferenceModel().use {
+        it.reshape (::mnistReshape)
         it.load(PATH_TO_MODEL, loadOptimizerState = true)
 
         val prediction = it.predict(train.getX(imageId1))
@@ -79,12 +80,10 @@ fun main() {
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getX(imageId))
+            val pred = it.predict(train.getX(imageId))
 
-            if (prediction == getLabel(train, imageId))
+            if (pred == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)
-
-            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
         }
         println("Accuracy: $accuracy")
     }

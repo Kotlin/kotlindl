@@ -1,11 +1,10 @@
 package examples.production
 
-import api.keras.Sequential
-import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 import javax.swing.JFrame
 
 private const val EPOCHS = 1
@@ -32,7 +31,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        (it as Sequential).summary()
+        it.summary()
 
         it.fit(
             dataset = train,
@@ -43,7 +42,7 @@ fun main() {
             verbose = true
         )
 
-        var weights = it.layers[0].getWeights() // first conv2d layer
+        val weights = it.layers[0].getWeights() // first conv2d layer
 
         drawFilters(weights[0])
 
@@ -56,7 +55,6 @@ fun main() {
         println("Prediction: $prediction")
 
         drawActivations(activations)
-
 
         val trainImageLabel = train.getY(imageId)
 

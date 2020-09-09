@@ -1,4 +1,4 @@
-package api.keras.dataset
+package datasets
 
 import java.nio.FloatBuffer
 

@@ -1,8 +1,6 @@
 package api.keras.layers.twodim
 
-import api.KGraph
-import api.conv2dBiasVarName
-import api.conv2dKernelVarName
+import api.core.KGraph
 import api.keras.activations.Activations
 import api.keras.initializers.Initializer
 import api.keras.layers.Layer
@@ -10,6 +8,8 @@ import api.keras.shape.convOutputLength
 import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeFromDims
 import api.keras.shape.shapeToLongArray
+import api.keras.util.conv2dBiasVarName
+import api.keras.util.conv2dKernelVarName
 import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -42,7 +42,6 @@ class Conv2D(
     // weight tensors
     private lateinit var kernel: Variable<Float>
     private lateinit var bias: Variable<Float>
-
     // weight tensor shapes
     private lateinit var biasShape: Shape
     private lateinit var kernelShape: Shape
@@ -141,6 +140,4 @@ class Conv2D(
     override fun toString(): String {
         return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"
     }
-
-
 }

@@ -1,6 +1,6 @@
 package api.keras.activations
 
-import api.getDType
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -41,7 +41,6 @@ enum class Activations {
         }
     }
 }
-
 
 class LinearActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>, name: String): Operand<Float> {

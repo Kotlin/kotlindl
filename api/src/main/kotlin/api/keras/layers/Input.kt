@@ -1,7 +1,7 @@
 package api.keras.layers
 
-import api.DATA_PLACEHOLDER
-import api.KGraph
+import api.core.KGraph
+import api.keras.util.DATA_PLACEHOLDER
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -48,6 +48,4 @@ class Input(vararg dims: Long, name: String = "") : Layer(name) {
     override fun toString(): String {
         return "Input(shape=${packedDims.contentToString()})"
     }
-
-
 }

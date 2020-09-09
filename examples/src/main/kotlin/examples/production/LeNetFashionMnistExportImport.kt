@@ -1,11 +1,12 @@
 package examples.production
 
-import api.inference.savedmodel.InferenceModel
-import api.keras.dataset.Dataset
+import api.inference.InferenceModel
+import api.keras.ModelWritingMode
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 private const val EPOCHS = 5
@@ -58,10 +59,11 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(PATH_TO_MODEL)
+        it.save(PATH_TO_MODEL, modelWritingMode = ModelWritingMode.OVERRIDE)
     }
 
     InferenceModel().use {
+        it.reshape (::mnistReshape)
         it.load(PATH_TO_MODEL, loadOptimizerState = true)
 
         var accuracy = 0.0
@@ -71,8 +73,6 @@ fun main() {
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)
-
-            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
         }
         println("Accuracy: $accuracy")
     }

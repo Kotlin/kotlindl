@@ -1,6 +1,6 @@
 package api.keras.optimizers
 
-import api.KGraph
+import api.core.KGraph
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Gradients

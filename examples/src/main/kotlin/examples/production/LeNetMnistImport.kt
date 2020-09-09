@@ -1,8 +1,8 @@
 package examples.production
 
-import api.inference.savedmodel.InferenceModel
-import api.keras.dataset.Dataset
-import datasets.*
+import api.inference.InferenceModel
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 
@@ -18,6 +18,7 @@ fun main() {
     )
 
     InferenceModel().use {
+        it.reshape (::mnistReshape)
         it.load(PATH_TO_MODEL, loadOptimizerState = true)
 
         var accuracy = 0.0

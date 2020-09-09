@@ -1,4 +1,4 @@
-package api.keras
+package api.keras.util
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops

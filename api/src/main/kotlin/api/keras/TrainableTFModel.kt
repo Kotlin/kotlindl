@@ -1,15 +1,15 @@
-package api
+package api.keras
 
-import api.inference.savedmodel.InferenceModel
-import api.keras.EvaluationResult
-import api.keras.ModelFormat
+import api.inference.InferenceModel
 import api.keras.callbacks.Callback
-import api.keras.dataset.Dataset
 import api.keras.history.TrainingHistory
 import api.keras.loss.LossFunctions
+import api.keras.metric.EvaluationResult
 import api.keras.metric.Metrics
 import api.keras.optimizers.Optimizer
 import api.keras.optimizers.SGD
+import api.keras.util.OUTPUT_NAME
+import datasets.Dataset
 import org.tensorflow.Operand
 
 abstract class TrainableTFModel : InferenceModel() {
@@ -124,8 +124,6 @@ abstract class TrainableTFModel : InferenceModel() {
         image: FloatArray,
         predictionTensorName: String = OUTPUT_NAME
     ): Pair<Int, List<*>>
-
-    abstract fun predictSoftly(image: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray
 
     abstract fun predictSoftlyAndGetActivations(
         image: FloatArray,

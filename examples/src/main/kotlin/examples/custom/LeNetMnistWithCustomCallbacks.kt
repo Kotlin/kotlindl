@@ -3,7 +3,6 @@ package examples.custom
 import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.callbacks.Callback
-import api.keras.dataset.Dataset
 import api.keras.history.*
 import api.keras.initializers.Constant
 import api.keras.initializers.HeNormal
@@ -17,7 +16,8 @@ import api.keras.layers.twodim.MaxPool2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.SGD
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500

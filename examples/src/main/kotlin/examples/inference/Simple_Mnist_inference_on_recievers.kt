@@ -20,7 +20,7 @@ fun main() {
 
     val mnistModel = prepareModelForInference {
         loadModel(PATH_TO_MODEL)
-        reshape(::reshape)
+        reshape2(::reshape)
         input(Input.PLACEHOLDER)
         output(Output.ARGMAX)
     }

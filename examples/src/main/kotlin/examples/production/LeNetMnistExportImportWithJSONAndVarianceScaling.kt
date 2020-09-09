@@ -1,15 +1,15 @@
 package examples.production
 
-import api.ModelWritingMode
 import api.keras.ModelFormat
+import api.keras.ModelWritingMode
 import api.keras.Sequential
-import api.keras.dataset.Dataset
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.RMSProp
 import api.keras.optimizers.SGD
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
 private const val EPOCHS = 1

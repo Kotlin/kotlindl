@@ -5,13 +5,13 @@ import org.tensorflow.Session
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 
-
-class KTensor : AutoCloseable {
+/** Experimental Tensor wrapper on Kotlin. */
+class KTensorInt32 : AutoCloseable {
     private lateinit var session: Session
 
     lateinit var tensor: Tensor<Int>
 
-    operator fun plus(kTensor: KTensor): KTensor {
+    operator fun plus(kTensor: KTensorInt32): KTensorInt32 {
         val otherTensor = kTensor.tensor
         require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
             "The left tensor shape ${
@@ -39,7 +39,7 @@ class KTensor : AutoCloseable {
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
 
-                val res = KTensor()
+                val res = KTensorInt32()
                 res.tensor = addTensor
 
                 return res
@@ -48,8 +48,8 @@ class KTensor : AutoCloseable {
     }
 
     companion object {
-        fun create(vector: IntArray): KTensor {
-            val res = KTensor()
+        fun create(vector: IntArray): KTensorInt32 {
+            val res = KTensorInt32()
             res.tensor = Tensor.create(vector, Int::class.javaObjectType)
 
             return res
@@ -61,12 +61,16 @@ class KTensor : AutoCloseable {
         tensor.close()
     }
 
-    operator fun minus(kTensor: KTensor): KTensor {
+    operator fun minus(kTensor: KTensorInt32): KTensorInt32 {
         val otherTensor = kTensor.tensor
         require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
-            "The left tensor shape ${tensor.shape()!!
-                .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
-                .contentToString()}."
+            "The left tensor shape ${
+                tensor.shape()!!
+                    .contentToString()
+            } must be equal the right tensor shape ${
+                otherTensor.shape()!!
+                    .contentToString()
+            }."
         }
 
         var addTensor: Tensor<Int>
@@ -85,7 +89,7 @@ class KTensor : AutoCloseable {
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
 
-                val res = KTensor()
+                val res = KTensorInt32()
                 res.tensor = addTensor
 
                 return res
@@ -93,12 +97,16 @@ class KTensor : AutoCloseable {
         }
     }
 
-    operator fun times(kTensor: KTensor): KTensor {
+    operator fun times(kTensor: KTensorInt32): KTensorInt32 {
         val otherTensor = kTensor.tensor
         require(tensor.shape()!!.contentEquals(otherTensor.shape())) {
-            "The left tensor shape ${tensor.shape()!!
-                .contentToString()} must be equal the right tensor shape ${otherTensor.shape()!!
-                .contentToString()}."
+            "The left tensor shape ${
+                tensor.shape()!!
+                    .contentToString()
+            } must be equal the right tensor shape ${
+                otherTensor.shape()!!
+                    .contentToString()
+            }."
         }
 
         var addTensor: Tensor<Int>
@@ -117,7 +125,7 @@ class KTensor : AutoCloseable {
                     .fetch(addOps)
                     .run()[0] as Tensor<Int>
 
-                val res = KTensor()
+                val res = KTensorInt32()
                 res.tensor = addTensor
 
                 return res

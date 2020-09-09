@@ -2,10 +2,10 @@ package examples.inference.keras.vgg
 
 
 import api.inference.keras.loadKerasModel
-import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
+import datasets.Dataset
 import datasets.util.getImage
 import examples.production.drawActivations
 import java.awt.image.DataBufferByte

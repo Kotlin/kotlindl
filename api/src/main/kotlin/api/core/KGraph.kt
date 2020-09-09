@@ -1,4 +1,4 @@
-package api
+package api.core
 
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
@@ -137,6 +137,4 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
             runner.run()
         }
     }
-
-
 }

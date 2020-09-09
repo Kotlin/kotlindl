@@ -61,7 +61,6 @@ fun shapeFromDims(vararg dims: Long): Shape {
     return Shape.make(head(*dims), *tail(*dims))
 }
 
-
 fun numElementsInShape(shape: LongArray): Long {
     var prod = 1L
     for (i in shape.indices) {

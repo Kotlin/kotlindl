@@ -4,7 +4,6 @@ import api.keras.Sequential
 import api.keras.activations.Activations
 import api.keras.callbacks.EarlyStopping
 import api.keras.callbacks.EarlyStoppingMode
-import api.keras.dataset.Dataset
 import api.keras.initializers.Constant
 import api.keras.initializers.GlorotNormal
 import api.keras.initializers.Zeros
@@ -18,7 +17,8 @@ import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
 import api.keras.optimizers.ClipGradientByValue
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 1000

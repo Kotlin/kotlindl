@@ -2,11 +2,11 @@ package examples.inference.keras.demo
 
 import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
-import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 
 /** All weigths are loaded, the model just evaluated */
 fun main() {

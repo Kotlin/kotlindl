@@ -1,8 +1,8 @@
 package api.keras.optimizers
 
-import api.KGraph
-import api.defaultAssignOpName
-import api.defaultOptimizerVariableName
+import api.core.KGraph
+import api.keras.util.defaultAssignOpName
+import api.keras.util.defaultOptimizerVariableName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops

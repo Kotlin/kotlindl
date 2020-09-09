@@ -1,7 +1,6 @@
 import api.keras.Sequential;
 import api.keras.activations.Activations;
 import api.keras.callbacks.Callback;
-import api.keras.dataset.Dataset;
 import api.keras.initializers.Constant;
 import api.keras.initializers.GlorotNormal;
 import api.keras.initializers.Zeros;
@@ -15,9 +14,8 @@ import api.keras.loss.LossFunctions;
 import api.keras.metric.Metrics;
 import api.keras.optimizers.Adam;
 import api.keras.optimizers.NoClipGradient;
-import datasets.MnistUtilKt;
-
-import static datasets.MnistUtilKt.*;
+import datasets.Dataset;
+import datasets.handlers.MnistUtilKt;
 
 public class LeNetClassic {
     public static final Integer EPOCHS = 3;
@@ -36,17 +34,17 @@ public class LeNetClassic {
             new Flatten(), // 3136
             new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
             new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
-            new Dense(AMOUNT_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
+            new Dense(datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
     );
 
 
     public static void main(String[] args) {
         var result = Dataset.Companion.createTrainAndTestDatasets(
-                TRAIN_IMAGES_ARCHIVE,
-                TRAIN_LABELS_ARCHIVE,
-                TEST_IMAGES_ARCHIVE,
-                TEST_LABELS_ARCHIVE,
-                AMOUNT_OF_CLASSES,
+                datasets.handlers.MnistUtilKt.TRAIN_IMAGES_ARCHIVE,
+                datasets.handlers.MnistUtilKt.TRAIN_LABELS_ARCHIVE,
+                datasets.handlers.MnistUtilKt.TEST_IMAGES_ARCHIVE,
+                datasets.handlers.MnistUtilKt.TEST_LABELS_ARCHIVE,
+                datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES,
                 MnistUtilKt::extractImages,
                 MnistUtilKt::extractLabels
         );

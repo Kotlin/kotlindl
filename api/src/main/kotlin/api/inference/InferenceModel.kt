@@ -1,8 +1,14 @@
-package api.inference.savedmodel
+package api.inference
 
-import api.*
+import api.core.KGraph
+import api.inference.savedmodel.Input
+import api.inference.savedmodel.Output
 import api.keras.ModelFormat
 import api.keras.shape.TensorShape
+import api.keras.util.DATA_PLACEHOLDER
+import api.keras.util.OUTPUT_NAME
+import api.keras.util.defaultAssignOpName
+import api.keras.util.defaultInitializerOpName
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import mu.KotlinLogging
@@ -14,7 +20,7 @@ import java.io.File
 import java.nio.file.NotDirectoryException
 import java.util.*
 
-open class InferenceModel : AutoCloseable {
+open class InferenceModel() : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -26,6 +32,12 @@ open class InferenceModel : AutoCloseable {
 
     private val logger = KotlinLogging.logger {}
 
+    protected var input: Input = Input.PLACEHOLDER
+
+    protected var output: Output = Output.ARGMAX
+
+    private lateinit var reshape: (FloatArray) -> Tensor<*>?
+
     protected var mu.KLogger.level: Level
         get() = (logger.underlyingLogger as Logger).level
         set(value) {
@@ -33,38 +45,42 @@ open class InferenceModel : AutoCloseable {
         }
 
     open fun predict(image: FloatArray): Int {
-        fun reshape2(image: FloatArray): Tensor<*>? {
-            val reshaped = Array(
-                1
-            ) { Array(28) { Array(28) { FloatArray(1) } } }
-            for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
-            return Tensor.create(reshaped)
+        reshape(image).use { tensor ->
+            val runner = session.runner()
+
+            val result = runner.feed(DATA_PLACEHOLDER, tensor)
+                .fetch(output.tfName)
+                .run()[0]
+
+            return result.copyTo(LongArray(1))[0].toInt()
+
         }
-
-        val runner1 = session.runner()
-        val result1 = runner1.feed(DATA_PLACEHOLDER, reshape2(image))
-            .fetch(OUTPUT_NAME)
-            .run()[0]
-
-        val arr = Array(1) { FloatArray(10) { 0.0f } }
-        result1.copyTo(arr)
-
-        // logger.debug { arr.contentDeepToString() }
-
-        val runner = session.runner()
-        val result = runner.feed(DATA_PLACEHOLDER, reshape2(image))
-            .fetch("ArgMax")
-            .run()[0]
-
-        return result.copyTo(LongArray(1))[0].toInt()
     }
 
-    fun predict(inputData: DoubleArray): Double {
-        return 0.0
+    open fun predictSoftly(image: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray {
+        reshape(image).use { tensor ->
+            val runner1 = session.runner()
+            val result1 = runner1.feed(DATA_PLACEHOLDER, tensor)
+                .fetch(OUTPUT_NAME)
+                .run()[0]
+
+            val arr = Array(1) { FloatArray(10) { 0.0f } }
+            result1.copyTo(arr)
+
+            return arr[0]
+        }
     }
 
-    fun predict(inputData: List<DoubleArray>): List<Double> {
-        return listOf()
+    fun input(inputOp: Input) {
+        input = inputOp
+    }
+
+    fun output(outputOp: Output) {
+        output = outputOp
+    }
+
+    fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>?) {
+        reshape = reshapeFunction
     }
 
     override fun toString(): String {
@@ -166,7 +182,7 @@ open class InferenceModel : AutoCloseable {
     }
 
     private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Model loading from saved ")
     }
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {

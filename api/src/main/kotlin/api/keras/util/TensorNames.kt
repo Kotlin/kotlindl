@@ -1,8 +1,10 @@
-package api
+package api.keras.util
 
 const val TRAINING_LOSS = "default_training_loss"
 
 const val OUTPUT_NAME = "default_output"
+
+const val OUTPUT_ARG_MAX = "ArgMax"
 
 const val DATA_PLACEHOLDER = "default_data_placeholder"
 

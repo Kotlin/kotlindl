@@ -1,14 +1,14 @@
 package examples.production.optimizers
 
-import api.ModelWritingMode
 import api.keras.ModelFormat
+import api.keras.ModelWritingMode
 import api.keras.Sequential
-import api.keras.dataset.Dataset
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 import examples.production.lenet5
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5KerasWithOptimizers"

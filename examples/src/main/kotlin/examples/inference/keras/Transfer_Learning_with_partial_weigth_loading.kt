@@ -2,13 +2,13 @@ package examples.inference.keras
 
 import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
-import api.keras.dataset.Dataset
 import api.keras.layers.Layer
 import api.keras.layers.twodim.Conv2D
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
 import api.keras.optimizers.Adam
-import datasets.*
+import datasets.Dataset
+import datasets.handlers.*
 import io.jhdf.HdfFile
 import java.io.File
 
