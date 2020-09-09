@@ -1,7 +1,7 @@
 package examples.inference.keras.demo
 
 
-import api.inference.keras.buildModelByJSONConfig
+import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import api.keras.Sequential
 import api.keras.dataset.Dataset
@@ -18,7 +18,7 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = buildModelByJSONConfig(jsonConfigFile)
+    val model = loadKerasModel(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 

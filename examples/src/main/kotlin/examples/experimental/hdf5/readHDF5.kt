@@ -1,7 +1,7 @@
 package examples.experimental.hdf5
 
 
-import api.inference.keras.buildModelByJSONConfig
+import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
@@ -25,7 +25,7 @@ fun main() {
          recursivePrintGroup(hdfFile, hdfFile, 0)
      }*/
 
-    val model = buildModelByJSONConfig(jsonConfigFile)
+    val model = loadKerasModel(jsonConfigFile)
     model.compile(
         optimizer = Adam(),
         loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

@@ -1,6 +1,7 @@
 package api.keras.optimizers
 
 import api.KGraph
+import api.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -45,16 +46,15 @@ class AdaGrad(
                     clipGradient.clipGradient(tf, gradients.dy(i))
                 )
             )
-
         }
         return targets
     }
 
     private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val initializer: Operand<Float> = tf.fill(
-            tf.shape(v),
-            tf.constant(initialAccumulatorValue)
-        )
+        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
+
+        val initializer: Operand<Float> = tf.withName(accumInitializerName)
+            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 

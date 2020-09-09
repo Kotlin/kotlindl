@@ -1,6 +1,6 @@
 package examples.inference.keras.demo
 
-import api.inference.keras.buildModelByJSONConfig
+import api.inference.keras.loadKerasModel
 import api.keras.dataset.Dataset
 import api.keras.loss.LossFunctions
 import api.keras.metric.Metrics
@@ -21,7 +21,7 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val model = buildModelByJSONConfig(jsonConfigFile)
+    val model = loadKerasModel(jsonConfigFile)
 
     model.use {
         it.compile(

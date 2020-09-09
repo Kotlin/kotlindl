@@ -1,7 +1,7 @@
 package api.keras
 
 import api.*
-import api.inference.keras.buildModelByJSONConfig
+import api.inference.keras.loadKerasModel
 import api.inference.keras.saveConfig
 import api.keras.callbacks.Callback
 import api.keras.dataset.DataBatch
@@ -92,6 +92,24 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
         /**
          * Creates the [Sequential] model.
+         * @property [layers] The layers to describe the model design.
+         * NOTE: First layer should be input layer.
+         * @return the [Sequential] model.
+         */
+        fun of(layers: List<Layer>): Sequential {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+
+            val otherLayers = layers.subList(1, layers.size)
+            preProcessLayerNames(otherLayers.toTypedArray())
+            val seqModel = Sequential(input, *otherLayers.toTypedArray())
+            postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
+            return seqModel
+        }
+
+        /**
+         * Creates the [Sequential] model.
          *
          * @param [T] The type of data elements in Tensors.
          * @property [input] The input layer with initial shapes.
@@ -127,7 +145,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
         fun load(pathToModelDirectory: String): Sequential {
             val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-            return buildModelByJSONConfig(jsonConfig)
+            return loadKerasModel(jsonConfig)
         }
     }
 
@@ -469,7 +487,11 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         callback.onPredictBegin()
-        val prediction = tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+
+        val prediction = when (loss) {
+            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            else -> tf.withName(OUTPUT_NAME).identity(yPred)
+        }
 
         val imageShape = calculateXShape(batchSize)
 
@@ -547,9 +569,10 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(image)
 
-        //val prediction = tf.withName(predictionTensorName).nn.softmax(yPred)
-
-        //val prediction = tf.withName(OUTPUT_NAME).identity(yPred)
+        val prediction = when (loss) {
+            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            else -> tf.withName(OUTPUT_NAME).identity(yPred)
+        }
 
         val imageShape = calculateXShape(1)
 
@@ -558,7 +581,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             Dataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(yPred, testImages, visualizationIsEnabled)
+                formPredictionAndActivationsTensors(prediction, testImages, visualizationIsEnabled)
 
             val predictionsTensor = tensors[0]
 

@@ -1,7 +1,7 @@
 package examples.inference.keras
 
 import LeNetClassic.SEED
-import api.inference.keras.buildLayersByKerasJSONConfig
+import api.inference.keras.loadKerasLayers
 import api.inference.keras.loadWeightsForFrozenLayers
 import api.keras.Sequential
 import api.keras.activations.Activations
@@ -43,7 +43,7 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val (otherLayers, input) = buildLayersByKerasJSONConfig(jsonConfigFile)
+    val (otherLayers, input) = loadKerasLayers(jsonConfigFile)
 
     val layers = mutableListOf<Layer>()
     for (layer in otherLayers) {

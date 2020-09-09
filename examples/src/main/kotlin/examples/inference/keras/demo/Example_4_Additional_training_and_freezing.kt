@@ -1,6 +1,6 @@
 package examples.inference.keras.demo
 
-import api.inference.keras.buildModelByJSONConfig
+import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import api.keras.dataset.Dataset
 import api.keras.layers.twodim.Conv2D
@@ -23,7 +23,7 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val model = buildModelByJSONConfig(jsonConfigFile)
+    val model = loadKerasModel(jsonConfigFile)
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable

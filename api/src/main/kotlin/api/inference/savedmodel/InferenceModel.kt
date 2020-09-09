@@ -76,6 +76,26 @@ open class InferenceModel : AutoCloseable {
         kGraph.close()
     }
 
+    fun runAssignOpByVarName(
+        variableName: String
+    ) {
+        val assignOpName = defaultAssignOpName(variableName)
+
+        session.runner()
+            .addTarget(assignOpName)
+            .run()
+    }
+
+    fun addInitOpsToGraph(
+        variableName: String,
+        kernelData: Any
+    ) {
+        val initializerName = defaultInitializerOpName(variableName)
+        val assignOpName = defaultAssignOpName(variableName)
+
+        populateVariable(initializerName, kernelData, assignOpName)
+    }
+
     /**
      * Loads model as graph and weights.
      */
@@ -123,21 +143,26 @@ open class InferenceModel : AutoCloseable {
     protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
-        val shape = operation.output<Float>(0).shape()
-        val tensorShape = TensorShape(shape)
-
-        logger.debug { "Loading the variable $variableName data" }
-        logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
-
         val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
-        scanner.useLocale(Locale.US)
+        try {
+            scanner.useLocale(Locale.US)
+            val initializerName = defaultInitializerOpName(variableName)
+            val assignOpName = defaultAssignOpName(variableName)
 
-        val initializerName = defaultInitializerOpName(variableName)
-        val assignOpName = defaultAssignOpName(variableName)
+            val shape = operation.output<Float>(0).shape()
+            val tensorShape = TensorShape(shape)
 
-        val source = createFloatArrayFromScanner(shape, scanner)
-        populateVariable(initializerName, source, assignOpName)
+            val source = createFloatArrayFromScanner(shape, scanner)
+            populateVariable(initializerName, source, assignOpName)
+
+            logger.debug { "Loading the variable $variableName data" }
+            logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
+            logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+        } catch (ex: Exception) {
+            logger.error { ex.message }
+        } finally {
+            scanner.close()
+        }
     }
 
     private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
@@ -178,15 +203,18 @@ open class InferenceModel : AutoCloseable {
         }
     }
 
-    fun populateVariable(
+    private fun populateVariable(
         initializerName: String,
-        org: Any,
+        data: Any,
         assignOpName: String
     ) {
-        session.runner()
-            .feed(initializerName, Tensor.create(org))
-            .addTarget(assignOpName)
-            .run()
+        Tensor.create(data).use { tensor ->
+            session.runner()
+                .feed(initializerName, tensor)
+                .addTarget(assignOpName)
+                .run()
+
+        }
     }
 
     private fun create4DimFloatArray(
