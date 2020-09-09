@@ -35,8 +35,8 @@ fun main() {
 
     val layers = mutableListOf<Layer>()
     for (layer in otherLayers) {
-        if (layer::class == Conv2D::class || layer::class == MaxPool2D::class) { // TODO
-            layer.isTrainable = false // TODO: change for lambda
+        if (layer is Conv2D || layer is MaxPool2D) {
+            layer.isTrainable = false
             layers.add(layer)
         }
     }
