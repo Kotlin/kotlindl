@@ -20,32 +20,50 @@ import java.io.File
 import java.nio.file.NotDirectoryException
 import java.util.*
 
+/**
+ * Basic class for model inference.
+ *
+ * Provides functionality to make predictions and model loading.
+ */
 open class InferenceModel() : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
     /** TensorFlow session. */
     lateinit var session: Session
+        protected set
 
     /** TensorFlow wrapped computational graph. */
     lateinit var kGraph: KGraph
+        protected set
 
-    private val logger = KotlinLogging.logger {}
-
+    /** Input operand. */
     protected var input: Input = Input.PLACEHOLDER
 
+    /** Output operand. */
     protected var output: Output = Output.ARGMAX
 
+    /** Function for conversion from flat float array to input tensor. */
     private lateinit var reshape: (FloatArray) -> Tensor<*>?
 
+    /** Logger. */
+    private val logger = KotlinLogging.logger {}
+
+    /** Logging level. */
     protected var mu.KLogger.level: Level
         get() = (logger.underlyingLogger as Logger).level
         set(value) {
             (underlyingLogger as Logger).level = value
         }
 
-    open fun predict(image: FloatArray): Int {
-        reshape(image).use { tensor ->
+    /**
+     * Predicts the class of [inputData].
+     *
+     * @param [inputData] The single example (or observation) with unknown label.
+     * @return Predicted class index.
+     */
+    open fun predict(inputData: FloatArray): Int {
+        reshape(inputData).use { tensor ->
             val runner = session.runner()
 
             val result = runner.feed(DATA_PLACEHOLDER, tensor)
@@ -57,8 +75,15 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
-    open fun predictSoftly(image: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray {
-        reshape(image).use { tensor ->
+    /**
+     * Predicts vector of probabilities instead of specific class in [predict] method.
+     *
+     * @param [inputData] The single example (or observation) with unknown vector of probabilities.
+     * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from intermediate parts of the TensorFlow graphs.
+     * @return Vector that represents the probability distributions of a list of potential outcomes
+     */
+    open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray {
+        reshape(inputData).use { tensor ->
             val runner1 = session.runner()
             val result1 = runner1.feed(DATA_PLACEHOLDER, tensor)
                 .fetch(OUTPUT_NAME)
@@ -71,14 +96,25 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
+    /**
+     * Chain-like setter to set up [inputOp].
+     */
     fun input(inputOp: Input) {
         input = inputOp
     }
 
+    /**
+     * Chain-like setter to set up [outputOp].
+     */
     fun output(outputOp: Output) {
         output = outputOp
     }
 
+    /**
+     * Chain-like setter to set up [reshape] function.
+     *
+     * @param reshapeFunction The approach to convert raw input data to Tensor.
+     */
     fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>?) {
         reshape = reshapeFunction
     }
@@ -92,6 +128,11 @@ open class InferenceModel() : AutoCloseable {
         kGraph.close()
     }
 
+    /**
+     * Executes pre-defined Assign TensorFlow operand.
+     *
+     * @param [variableName] Name of variable to be assigned.
+     */
     fun runAssignOpByVarName(
         variableName: String
     ) {
@@ -102,7 +143,13 @@ open class InferenceModel() : AutoCloseable {
             .run()
     }
 
-    fun addInitOpsToGraph(
+    /**
+     * Fills variable with the given data in appropriate form (shape).
+     *
+     * @param variableName Name of variable to be filled.
+     * @param kernelData Data for variable filling, should have correct shape and type.
+     */
+    fun fillVariable(
         variableName: String,
         kernelData: Any
     ) {

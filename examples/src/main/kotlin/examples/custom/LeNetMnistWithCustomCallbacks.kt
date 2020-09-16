@@ -106,7 +106,7 @@ fun main() {
 }
 
 class CustomCallback : Callback() {
-    override fun onEpochBegin(epoch: Int, trainingHistory: TrainingHistory) {
+    override fun onEpochBegin(epoch: Int, logs: TrainingHistory) {
         println("Epoch $epoch begins.")
     }
 

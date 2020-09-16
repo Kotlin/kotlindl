@@ -7,10 +7,19 @@ import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 import util.MnistUtils
 
+/**
+ * Inference model built on SavedModelBundle format to predict on images.
+ */
 open class SavedModelInferenceModel : InferenceModel() {
-    private lateinit var bundle: SavedModelBundle // extract for inference with SavedModelBundle and move this property to this
+    /** SavedModelBundle.*/
+    private lateinit var bundle: SavedModelBundle
+
+    /** Reshape function. */
     private lateinit var reshape2: (DoubleArray) -> Tensor<*>?
 
+    /**
+     * Predicts the probabilities to be from known class for multi-classification task.
+     */
     fun predict(image: MnistUtils.Image): LongArray {
         return predictOnImage(image)
     }
@@ -25,6 +34,11 @@ open class SavedModelInferenceModel : InferenceModel() {
             .copyTo(LongArray(1))
     }
 
+    /**
+     * Predicts labels for all [images].
+     *
+     * @param [images] Given list of images.
+     */
     fun predictAll(images: List<MnistUtils.Image>): List<Double> {
         val predictedLabels: MutableList<Double> = mutableListOf()
 
@@ -36,6 +50,9 @@ open class SavedModelInferenceModel : InferenceModel() {
         return predictedLabels
     }
 
+    /**
+     * Evaluates [testImages] via [metric].
+     */
     fun evaluate(
         testImages: MutableList<MnistUtils.LabeledImage>,
         metric: Metrics
@@ -55,6 +72,9 @@ open class SavedModelInferenceModel : InferenceModel() {
         }
     }
 
+    /**
+     * Loads model from SavedModelBundle format.
+     */
     fun loadModel(pathToModel: String): SavedModelInferenceModel {
         bundle = SavedModelBundle.load(pathToModel, "serve")
         session = bundle.session()

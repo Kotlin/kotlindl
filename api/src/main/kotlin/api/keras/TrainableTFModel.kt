@@ -98,7 +98,7 @@ abstract class TrainableTFModel : InferenceModel() {
 
     abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 
-    abstract override fun predict(image: FloatArray): Int
+    abstract override fun predict(inputData: FloatArray): Int
 
     abstract fun predict(image: FloatArray, predictionTensorName: String): Int
 

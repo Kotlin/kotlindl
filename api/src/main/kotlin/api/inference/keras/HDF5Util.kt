@@ -3,6 +3,9 @@ package api.inference.keras
 import io.jhdf.HdfFile
 import io.jhdf.api.Group
 
+/**
+ * Helper function to print out file in hdf5 format for debugging purposes.
+ */
 fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
     var level = level
     level++

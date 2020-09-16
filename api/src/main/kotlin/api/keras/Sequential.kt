@@ -543,8 +543,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     /**
      * Predicts the unknown class for the given image.
      */
-    override fun predict(image: FloatArray): Int {
-        val softPrediction = predictSoftly(image)
+    override fun predict(inputData: FloatArray): Int {
+        val softPrediction = predictSoftly(inputData)
         return softPrediction.indexOf(softPrediction.max()!!)
     }
 
@@ -558,8 +558,8 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         return Pair(softPrediction.indexOf(softPrediction.max()!!), activations)
     }
 
-    override fun predictSoftly(image: FloatArray, predictionTensorName: String): FloatArray {
-        val (softPrediction, _) = predictSoftlyAndGetActivations(image, false, predictionTensorName)
+    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+        val (softPrediction, _) = predictSoftlyAndGetActivations(inputData, false, predictionTensorName)
         return softPrediction
     }
 
