@@ -160,7 +160,11 @@ open class InferenceModel() : AutoCloseable {
     }
 
     /**
-     * Loads model as graph and weights.
+     * Loads tensorflow graphs and variable data (if required).
+     *
+     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [modelFormat] Loading strategy. By default, it loads graph from .pb file format and variable data from .txt files.
+     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     fun load(
         pathToModelDirectory: String,
@@ -187,7 +191,16 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
-    open fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean = false) {
+    /**
+     * Loads variable data from .txt files.
+     *
+     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+     */
+    open fun loadVariablesFromTxtFiles(
+        pathToModelDirectory: String,
+        loadOptimizerState: Boolean = false
+    ) {
         loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
     }
 

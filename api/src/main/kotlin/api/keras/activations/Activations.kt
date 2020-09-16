@@ -10,6 +10,8 @@ enum class Activations {
     Tanh,
     Relu,
     Relu6,
+
+    /** Exponential Linear Unit. */
     Elu,
     Selu,
     Softmax,
@@ -92,6 +94,9 @@ class TanhActivation : Activation {
     }
 }
 
+/**
+ * Exponential Linear Unit.
+ */
 class EluActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>, name: String): Operand<Float> {
         return if (name.isNotEmpty()) {
@@ -112,6 +117,11 @@ class SeluActivation : Activation {
     }
 }
 
+/**
+ * Softmax converts a real vector to a vector of categorical probabilities.
+ *
+ * The elements of the output vector are in range (0, 1) and sum to 1.
+ */
 class SoftmaxActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>, name: String): Operand<Float> {
         return if (name.isNotEmpty()) {
