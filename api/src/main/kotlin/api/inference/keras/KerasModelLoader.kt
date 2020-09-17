@@ -131,7 +131,7 @@ private fun convertVarianceScaling(initializer: KerasInitializer): Initializer {
     } else 12L
 
     val config = initializer.config
-    val scale = config!!.scale!!
+    val scale = config.scale!!
     val mode: Mode = convertMode(config.mode!!)
     val distribution: Distribution = convertDistribution(config.distribution!!)
     return if (scale == 2.0 && mode == Mode.FAN_IN) {

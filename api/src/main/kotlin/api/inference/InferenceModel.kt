@@ -25,7 +25,7 @@ import java.util.*
  *
  * Provides functionality to make predictions and model loading.
  */
-open class InferenceModel() : AutoCloseable {
+open class InferenceModel : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -123,6 +123,7 @@ open class InferenceModel() : AutoCloseable {
         return "Model contains $kGraph"
     }
 
+    /** Closes internal resources: session and kGraph. */
     override fun close() {
         session.close()
         kGraph.close()
@@ -204,6 +205,12 @@ open class InferenceModel() : AutoCloseable {
         loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
     }
 
+    /**
+     * Loads variable data from .txt files.
+     *
+     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+     */
     protected fun loadVariablesFromTxt(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         // Load variables names
         val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
@@ -216,6 +223,12 @@ open class InferenceModel() : AutoCloseable {
         }
     }
 
+    /**
+     * Loads variable data from .txt file.
+     *
+     * @param [variableName] Name of variable to load state.
+     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     */
     protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
@@ -242,7 +255,7 @@ open class InferenceModel() : AutoCloseable {
     }
 
     private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
-        throw UnsupportedOperationException("Model loading from saved ")
+        throw UnsupportedOperationException("Model loading from $pathToModelDirectory is not supported yet for SavedModelBundle! ")
     }
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {

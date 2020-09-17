@@ -29,7 +29,7 @@ import org.tensorflow.op.Ops
 import java.io.File
 
 /**
- * Sequential groups a linear stack of layers into a TFModel.
+ * Sequential model groups a linear stack of layers into a TensorFlow Model.
  * Also, it provides training and inference features on this model.
  *
  * @property [input] the input layer with initial shapes.
@@ -49,20 +49,10 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     /** Layers indexed by name. */
     private var layersByName: Map<String, Layer> = mapOf()
 
-    /** Is true when model is compiled. */
-    var isModelCompiled: Boolean = false
-        private set
-
-    /** Is true when model is initialized. */
-    var isModelInitialized: Boolean = false
-        private set
-
-    /** Special flag for callbacks. */
-    var stopTraining: Boolean = false
-
     /** Main loss operand. */
     private lateinit var lossOp: Operand<Float>
 
+    /** A list of targets to be optimized. */
     private lateinit var targets: List<Operand<Float>>
 
     init {
@@ -147,19 +137,19 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             }
         }
 
+        // TODO: change signature - File with config instead of path to directory
+        /**
+         * Loads a Sequential model from json file with model configuration.
+         *
+         * @param [pathToModelDirectory] Directory, containing file 'modelConfig.json'.
+         * @return Non-compiled and non-trained Sequential model.
+         */
         fun load(pathToModelDirectory: String): Sequential {
             val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
             return loadKerasModel(jsonConfig)
         }
     }
 
-    /**
-     * Configures the model for training.
-     *
-     * @param [optimizer] Optimizer instance.
-     * @param [loss] Loss function.
-     * @param [metric] Metric to evaluate during training.
-     */
     override fun compile(optimizer: Optimizer, loss: LossFunctions, metric: Metrics, callback: Callback) {
         if (isModelCompiled) logger.info { "Model was recompiled." }
 
@@ -226,16 +216,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         )
     }
 
-    /**
-     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
-     *
-     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
-     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
-     * @param [batchSize] Number of samples per gradient update.
-     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     *
-     * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
-     */
     override fun fit(
         dataset: Dataset,
         epochs: Int,
@@ -257,6 +237,11 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         )
     }
 
+    /**
+     * Initializes kGraph variables.
+     *
+     * NOTE: Model becomes initialized after this method call. (Flag [isModelInitialized] = true)
+     */
     fun init() {
         require(!isModelInitialized) { "Model is initialized already!" }
         logger.debug { "Initialization of TensorFlow Graph variables" }
@@ -313,7 +298,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                 var averageTrainingLossAccum = 0.0f
 
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
-                    callback.onTrainBatchBegin(batchCounter, trainingHistory)
+                    callback.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)
                     val batch: DataBatch = batchIter.next()
 
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
@@ -333,7 +318,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
                             logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
 
-                            callback.onTrainBatchEnd(batchCounter, batchTrainingEvent, trainingHistory)
+                            callback.onTrainBatchEnd(batchCounter, trainBatchSize, batchTrainingEvent, trainingHistory)
                         }
                     }
                     batchCounter++
@@ -359,7 +344,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
                 }
                 trainingHistory.appendEpoch(epochTrainingEvent)
-                callback.onEpochEnd(i, epochTrainingEvent)
+                callback.onEpochEnd(i, epochTrainingEvent, trainingHistory)
             }
         }
         callback.onTrainEnd(trainingHistory)
@@ -444,7 +429,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onTestBatchBegin(batchCounter, evaluationHistory)
+            callback.onTestBatchBegin(batchCounter, batchSize, evaluationHistory)
             val batch: DataBatch = batchIter.next()
             val (imageShape, labelShape) = calculateXYShapes(batch)
 
@@ -469,7 +454,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                     val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
                     evaluationHistory.appendBatch(batchEvent)
 
-                    callback.onTestBatchEnd(batchCounter, batchEvent, evaluationHistory)
+                    callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
                 }
             }
 
@@ -484,10 +469,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
     }
 
 
-    /**
-     * Generates output predictions for the input samples.
-     * Computation is done in batches.
-     */
     override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         callback.onPredictBegin()
@@ -508,7 +489,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onPredictBatchBegin(batchCounter)
+            callback.onPredictBatchBegin(batchCounter, batchSize)
 
             val batch: DataBatch = batchIter.next()
 
@@ -531,7 +512,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
                     argMaxBatchPrediction[index] = element.indexOf(element.max()!!)
                 }
 
-                callback.onPredictBatchEnd(batchCounter)
+                callback.onPredictBatchEnd(batchCounter, batchSize)
                 batchCounter++
                 argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
             }
@@ -662,6 +643,11 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         session.close()
     }
 
+    /**
+     * Returns KGraph.
+     *
+     * NOTE: Be careful, this is a direct access to the model graph, not a copy.
+     */
     fun kGraph(): KGraph {
         return kGraph
     }

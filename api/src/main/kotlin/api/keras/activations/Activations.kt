@@ -4,6 +4,9 @@ import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Neural network hyper-parameter, activation function of a node defines the output of that node given an input or set of inputs.
+ */
 enum class Activations {
     Linear,
     Sigmoid,

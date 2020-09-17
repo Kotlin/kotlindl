@@ -16,7 +16,6 @@ class History {
         addNewEpochEvent(batchEvent, batchEvent.batch)
     }
 
-
     private fun addNewEpochEvent(batchEvent: BatchEvent, batch: Int) {
         history.add(batchEvent)
         historyByBatch[batch] = batchEvent

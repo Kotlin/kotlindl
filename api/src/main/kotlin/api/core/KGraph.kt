@@ -44,6 +44,9 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         }
     }
 
+    /**
+     * Closes internal TensorFlow graph.
+     */
     override fun close() {
         tfGraph.close()
     }

@@ -128,7 +128,7 @@ class EarlyStopping : Callback() {
             if (baseline != null) baseline!! else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
     }
 
-    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {
         val current: Number = getMonitorValue(event, monitor) ?: return
         if (monitorOp!!.apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()

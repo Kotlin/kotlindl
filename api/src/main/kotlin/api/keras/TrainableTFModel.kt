@@ -42,12 +42,26 @@ abstract class TrainableTFModel : InferenceModel() {
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     protected var amountOfClasses: Long = -1
 
+    /** Is true when model is compiled. */
+    var isModelCompiled: Boolean = false
+        protected set
+
+    /** Is true when model is initialized. */
+    var isModelInitialized: Boolean = false
+        protected set
+
+    /** Special flag for callbacks. */
+    var stopTraining: Boolean = false
+
     /**
      * Configures the model for training.
      *
-     * @optimizer — This is how the model is updated based on the data it sees and its loss function.
-     * @loss — This measures how accurate the model is during training.
-     * @metric — Used to monitor the training and testing steps.
+     * NOTE: Set up [isModelCompiled] to True.
+     *
+     * @param [optimizer] Optimizer instance.
+     * @param [loss] Loss function.
+     * @param [metric] Metric to evaluate during training.
+     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     abstract fun compile(
         optimizer: Optimizer,
@@ -57,11 +71,20 @@ abstract class TrainableTFModel : InferenceModel() {
     )
 
     /**
-     * Trains the model for a fixed number of epochs (iterations on a dataset).
+     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
      *
-     * @batchSize - Number of samples per gradient update. If unspecified, batch_size will default to 32.
-     * @epochs - Number of epochs to train the model. An epoch is an iteration over the entire x and y (or whole dataset) data provided.
-     * @verbose - Verbosity mode. Silent, one line per batch or one line per epoch.
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [batchSize] Number of samples per gradient update.
+     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
+     * @param [isWeightsInitRequired] Layer variables initialization mode.
+     * True (default) = layer variables are initialized at the beginning of the training phase.
+     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
+     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
+     * True (default) = optimizer variables are initialized at the beginning of the training phase.
+     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
+     *
+     * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     abstract fun fit(
         dataset: Dataset,
@@ -72,6 +95,24 @@ abstract class TrainableTFModel : InferenceModel() {
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
 
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     *
+     * @param [trainingDataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [validationDataset] The validation dataset that combines input data (X) and target data (Y).
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [trainBatchSize] Number of samples per gradient update.
+     * @param [validationBatchSize] Number of samples per validation batch.
+     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
+     * @param [isWeightsInitRequired] Layer variables initialization mode.
+     * True (default) = layer variables are initialized at the beginning of the training phase.
+     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
+     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
+     * True (default) = optimizer variables are initialized at the beginning of the training phase.
+     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
+     *
+     * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
+     */
     abstract fun fit(
         trainingDataset: Dataset,
         validationDataset: Dataset,
@@ -96,8 +137,20 @@ abstract class TrainableTFModel : InferenceModel() {
         batchSize: Int = 256
     ): EvaluationResult
 
+    /**
+     * Generates output predictions for the input samples.
+     *
+     * @param [dataset] Data to predict on.
+     * @param [batchSize] Number of samples per batch of computation.
+     * @return Array of labels. The length is equal to the amount of observations on the [dataset].
+     */
     abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 
+    /**
+     * Generates output prediction for the input sample.
+     *
+     * @param [inputData]
+     */
     abstract override fun predict(inputData: FloatArray): Int
 
     abstract fun predict(image: FloatArray, predictionTensorName: String): Int
@@ -116,6 +169,9 @@ abstract class TrainableTFModel : InferenceModel() {
 
     }
 
+    /**
+     * Returns DType FLOAT for compatibility (with TensorFlow Java API 1.15) needs.
+     */
     fun getDType(): Class<Float> {
         return Float::class.javaObjectType
     }

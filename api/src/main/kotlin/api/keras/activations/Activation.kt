@@ -3,7 +3,9 @@ package api.keras.activations
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-
+/**
+ * Basic interface for all activation functions.
+ */
 interface Activation {
     /**
      * Applies the activation functions to the input [features] to produce the output.
