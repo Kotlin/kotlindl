@@ -12,7 +12,11 @@ import api.keras.util.OUTPUT_NAME
 import datasets.Dataset
 import org.tensorflow.Operand
 
-abstract class TrainableTFModel : InferenceModel() {
+/**
+ * Base abstract class for all trainable models.
+ */
+abstract class TrainableModel : InferenceModel() {
+    /** Controls level of verbosity. */
     protected var isDebugMode = false
 
     /** Optimizer. Approach how aggressively to update the weights. */
@@ -149,14 +153,25 @@ abstract class TrainableTFModel : InferenceModel() {
     /**
      * Generates output prediction for the input sample.
      *
-     * @param [inputData]
+     * @param [inputData] Unlabeled input data to define label.
      */
     abstract override fun predict(inputData: FloatArray): Int
 
-    abstract fun predict(image: FloatArray, predictionTensorName: String): Int
+    /**
+     * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.
+     *
+     * @param [inputData] Unlabeled input data to define label.
+     * @param [predictionTensorName] Name of output tensor to make prediction.
+     */
+    abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
 
     /**
      * Saves the model as graph and weights.
+     *
+     * @param [pathToModelDirectory] Path to model directory.
+     * @param [modelFormat] One of approaches to store model configurations and weights.
+     * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
+     * @param [modelWritingMode] Default behaviour of handling different edge cases with existing directory before model saving.
      */
     abstract fun save(
         pathToModelDirectory: String,
@@ -176,17 +191,51 @@ abstract class TrainableTFModel : InferenceModel() {
         return Float::class.javaObjectType
     }
 
+    /**
+     * Predicts and returns not only prediction but list of activations values from intermediate model layers
+     * (for visualisation or debugging purposes).
+     *
+     * @param [inputData] Unlabeled input data to define label.
+     * @param [predictionTensorName] Name of output tensor to make prediction.
+     * @return Label (class index) and list of activations from intermediate model layers.
+     */
     abstract fun predictAndGetActivations(
-        image: FloatArray,
+        inputData: FloatArray,
         predictionTensorName: String = OUTPUT_NAME
     ): Pair<Int, List<*>>
 
-    abstract fun predictSoftlyAndGetActivations(
-        image: FloatArray,
+    /**
+     * Predicts and returns not only prediction but list of activations values from intermediate model layers
+     * (for visualisation or debugging purposes).
+     *
+     * @param [inputData] Unlabeled input data to define label.
+     * @param [predictionTensorName] Name of output tensor to make prediction.
+     * @return Label (class index) and list of activations from intermediate model layers.
+     */
+    protected abstract fun predictSoftlyAndGetActivations(
+        inputData: FloatArray,
         visualizationIsEnabled: Boolean,
         predictionTensorName: String = OUTPUT_NAME
     ): Pair<FloatArray, List<*>>
 
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     *
+     * @param [dataset] The dataset that combines input data (X) and target data (Y). It will be split on train and validation sub-datasets.
+     * @param [validationRate] Number between 0.0 and 1.0. The proportion of validation data from initially passed [dataset].
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [trainBatchSize] Number of samples per gradient update.
+     * @param [validationBatchSize] Number of samples per validation batch.
+     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
+     * @param [isWeightsInitRequired] Layer variables initialization mode.
+     * True (default) = layer variables are initialized at the beginning of the training phase.
+     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
+     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
+     * True (default) = optimizer variables are initialized at the beginning of the training phase.
+     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
+     *
+     * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
+     */
     fun fit(
         dataset: Dataset,
         validationRate: Double,

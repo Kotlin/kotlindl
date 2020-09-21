@@ -1,7 +1,7 @@
 package api.keras.layers
 
 import api.core.KGraph
-import api.keras.TrainableTFModel
+import api.keras.TrainableModel
 import api.keras.initializers.Initializer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -13,7 +13,7 @@ abstract class Layer(var name: String) {
 
     lateinit var outputShape: LongArray
 
-    lateinit var parentModel: TrainableTFModel
+    lateinit var parentModel: TrainableModel
 
     protected var dtype: Class<Float> = getDType()
 

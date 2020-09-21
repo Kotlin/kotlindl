@@ -36,7 +36,7 @@ import java.io.File
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
  */
-class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
+class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
     val logger = KotlinLogging.logger {}
 
@@ -374,7 +374,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
 
     /**
      * Returns the loss value and metric value on train batch.
-     *
      */
     private fun trainOnBatch(
         targets: List<Operand<Float>>,
@@ -529,13 +528,13 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
         return softPrediction.indexOf(softPrediction.max()!!)
     }
 
-    override fun predict(image: FloatArray, predictionTensorName: String): Int {
-        val softPrediction = predictSoftly(image, predictionTensorName)
+    override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
+        val softPrediction = predictSoftly(inputData, predictionTensorName)
         return softPrediction.indexOf(softPrediction.max()!!)
     }
 
-    override fun predictAndGetActivations(image: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
-        val (softPrediction, activations) = predictSoftlyAndGetActivations(image, true, predictionTensorName)
+    override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
+        val (softPrediction, activations) = predictSoftlyAndGetActivations(inputData, true, predictionTensorName)
         return Pair(softPrediction.indexOf(softPrediction.max()!!), activations)
     }
 
@@ -548,11 +547,11 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
      * Predicts the probability distribution for all classes for the given image.
      */
     override fun predictSoftlyAndGetActivations(
-        image: FloatArray,
+        inputData: FloatArray,
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        val predictionData: Array<FloatArray> = arrayOf(image)
+        val predictionData: Array<FloatArray> = arrayOf(inputData)
 
         val prediction = when (loss) {
             LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -769,11 +768,18 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableTFModel() {
             .any { variableName.contains(it) }
     }
 
+    /**
+     * Return layer by [layerName].
+     *
+     * @param [layerName] Should be existing layer name. Throws an error otherwise.
+     */
     infix fun getLayer(layerName: String): Layer {
         return layersByName[layerName] ?: error("No such layer $layerName in the model.")
     }
 
     /**
+     * Formats and builds the model description.
+     *
      * @return list of layer descriptions.
      */
     fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
