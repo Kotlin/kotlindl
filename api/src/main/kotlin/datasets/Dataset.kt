@@ -1,108 +1,71 @@
 package datasets
 
 import java.io.IOException
-import java.nio.Buffer
 import java.nio.FloatBuffer
 import kotlin.math.min
 import kotlin.math.truncate
 
-class Dataset internal constructor(
-    private val x: Array<FloatArray>,
-    private val y: Array<FloatArray>
-) {
-    inner class BatchIterator internal constructor(
-        private val batchSize: Int,
-        private val batchX: Array<FloatArray>,
-        private val batchY: Array<FloatArray>
-    ) :
-        MutableIterator<DataBatch?> {
-        override fun hasNext(): Boolean {
-            return batchStart < totalSize()
-        }
+public class Dataset internal constructor(private val x: Array<FloatArray>, private val y: Array<FloatArray>) {
+
+    public inner class BatchIterator internal constructor(
+        private val batchSize: Int, private val batchX: Array<FloatArray>, private val batchY: Array<FloatArray>
+    ) : Iterator<DataBatch?> {
+
+        private var batchStart = 0
+
+        override fun hasNext(): Boolean = batchStart < batchX.size
 
         override fun next(): DataBatch {
             val size = min(batchSize, batchX.size - batchStart)
             val batch = DataBatch(
-                serializeToBuffer(
-                    batchX,
-                    batchStart,
-                    size
-                ),
-                serializeToBuffer(
-                    batchY,
-                    batchStart,
-                    size
-                ),
+                serializeToBuffer(batchX, batchStart, size),
+                serializeToBuffer(batchY, batchStart, size),
                 size
             )
             batchStart += batchSize
             return batch
         }
-
-        private var batchStart = 0
-        private fun totalSize(): Int {
-            return batchX.size
-        }
-
-        override fun remove() {
-            throw UnsupportedOperationException("The removal operation is not supported!")
-        }
-
     }
 
-    fun batchIterator(batchSize: Int): BatchIterator {
+    public fun batchIterator(batchSize: Int): BatchIterator {
         return BatchIterator(batchSize, x, y)
     }
 
-    fun split(splitRatio: Double): Pair<Dataset, Dataset> {
+    public fun split(splitRatio: Double): Pair<Dataset, Dataset> {
         require(splitRatio in 0.0..1.0) { "'Split ratio' argument value must be in range [0.0; 1.0]." }
 
         val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         return Pair(
-            Dataset(
-                x.copyOfRange(0, trainDatasetLastIndex),
-                y.copyOfRange(0, trainDatasetLastIndex)
-            ),
-            Dataset(
-                x.copyOfRange(trainDatasetLastIndex, x.size),
-                y.copyOfRange(trainDatasetLastIndex, y.size)
-            )
+            Dataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex)),
+            Dataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size))
         )
     }
 
-    companion object {
-        fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
-            val buf = FloatBuffer.allocate(numClasses)
-            buf.put((label.toInt() and 0xFF), 1.0f)
-            return buf.array()
+    public companion object {
+        public fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
+            val ret = FloatArray(numClasses)
+            ret[label.toInt() and 0xFF] = 1f
+            return ret
         }
 
-        fun toNormalizedVector(bytes: ByteArray): FloatArray {
-            val floats = FloatArray(bytes.size)
-            for (i in bytes.indices) {
-                floats[i] = ((bytes[i].toInt() and 0xFF).toFloat()) / 255.0f
-            }
-            return floats
+        public fun toNormalizedVector(bytes: ByteArray): FloatArray {
+            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)) / 255f }
         }
 
-        fun toRawVector(bytes: ByteArray): FloatArray {
-            val floats = FloatArray(bytes.size)
-            for (i in bytes.indices) {
-                floats[i] = ((bytes[i].toInt() and 0xFF).toFloat())
-            }
-            return floats
+        public fun toRawVector(bytes: ByteArray): FloatArray {
+            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF).toFloat()) }
         }
 
-        fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
+        public fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
             val buffer = FloatBuffer.allocate(length * src[0].size)
             for (i in start until start + length) {
                 buffer.put(src[i])
             }
-            return (buffer as Buffer).rewind() as FloatBuffer
+            return buffer.rewind() as FloatBuffer // for JDK 8: buffer.rewind() as FloatBuffer
         }
 
-        fun createTrainAndTestDatasets(
+        public fun createTrainAndTestDatasets(
             trainFeaturesPath: String,
             trainLabelsPath: String,
             testFeaturesPath: String,
@@ -112,31 +75,17 @@ class Dataset internal constructor(
             labelExtractor: (String, Int) -> Array<FloatArray>
         ): Pair<Dataset, Dataset> {
             return try {
-                val xTrain =
-                    featuresExtractor.invoke(
-                        trainFeaturesPath
-                    )
-                val yTrain =
-                    labelExtractor.invoke(
-                        trainLabelsPath,
-                        numClasses
-                    )
-                val xTest =
-                    featuresExtractor.invoke(
-                        testFeaturesPath
-                    )
-                val yTest =
-                    labelExtractor.invoke(
-                        testLabelsPath,
-                        numClasses
-                    )
+                val xTrain = featuresExtractor(trainFeaturesPath)
+                val yTrain = labelExtractor(trainLabelsPath, numClasses)
+                val xTest = featuresExtractor(testFeaturesPath)
+                val yTest = labelExtractor(testLabelsPath, numClasses)
                 Pair(Dataset(xTrain, yTrain), Dataset(xTest, yTest))
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
 
-        fun create(
+        public fun create(
             featuresPath: String,
             labelsPath: String,
             numClasses: Int,
@@ -144,15 +93,8 @@ class Dataset internal constructor(
             labelExtractor: (String, Int) -> Array<FloatArray>
         ): Dataset {
             return try {
-                val features =
-                    featuresExtractor.invoke(
-                        featuresPath
-                    )
-                val labels =
-                    labelExtractor.invoke(
-                        labelsPath,
-                        numClasses
-                    )
+                val features = featuresExtractor(featuresPath)
+                val labels = labelExtractor(labelsPath, numClasses)
 
                 check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
@@ -162,13 +104,13 @@ class Dataset internal constructor(
             }
         }
 
-        fun create(
+        public fun create(
             featuresConsumer: () -> Array<FloatArray>,
             labelConsumer: () -> Array<FloatArray>
         ): Dataset {
             return try {
-                val features = featuresConsumer.invoke()
-                val labels = labelConsumer.invoke()
+                val features = featuresConsumer()
+                val labels = labelConsumer()
 
                 check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
@@ -179,15 +121,15 @@ class Dataset internal constructor(
         }
     }
 
-    fun xSize(): Int {
+    public fun xSize(): Int {
         return x.size
     }
 
-    fun getX(idx: Int): FloatArray {
+    public fun getX(idx: Int): FloatArray {
         return x[idx]
     }
 
-    fun getY(idx: Int): FloatArray {
+    public fun getY(idx: Int): FloatArray {
         return y[idx]
     }
 }
