@@ -105,20 +105,23 @@ fun main() {
     }
 }
 
+/**
+ *
+ */
 class CustomCallback : Callback() {
     override fun onEpochBegin(epoch: Int, logs: TrainingHistory) {
         println("Epoch $epoch begins.")
     }
 
-    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {
         println("Epoch $epoch ends.")
     }
 
-    override fun onTrainBatchBegin(batch: Int, trainingHistory: TrainingHistory) {
+    override fun onTrainBatchBegin(batch: Int, batchSize: Int, logs: TrainingHistory) {
         println("Training batch $batch begins.")
     }
 
-    override fun onTrainBatchEnd(batch: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {
+    override fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {
         println("Training batch $batch ends with loss ${event!!.lossValue}.")
     }
 
@@ -130,11 +133,11 @@ class CustomCallback : Callback() {
         println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
 
-    override fun onTestBatchBegin(batch: Int, logs: History) {
+    override fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {
         println("Test batch $batch begins.")
     }
 
-    override fun onTestBatchEnd(batch: Int, event: BatchEvent?, logs: History) {
+    override fun onTestBatchEnd(batch: Int, batchSize: Int, event: BatchEvent?, logs: History) {
         println("Test batch $batch ends with loss ${event!!.lossValue}..")
     }
 
@@ -146,11 +149,11 @@ class CustomCallback : Callback() {
         println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
 
-    override fun onPredictBatchBegin(batch: Int) {
+    override fun onPredictBatchBegin(batch: Int, batchSize: Int) {
         println("Prediction batch $batch begins.")
     }
 
-    override fun onPredictBatchEnd(batch: Int) {
+    override fun onPredictBatchEnd(batch: Int, batchSize: Int) {
         println("Prediction batch $batch ends.")
     }
 

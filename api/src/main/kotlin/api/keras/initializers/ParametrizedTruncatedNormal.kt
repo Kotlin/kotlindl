@@ -4,6 +4,9 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.random.ParameterizedTruncatedNormal
 
+/**
+ *
+ */
 class ParametrizedTruncatedNormal(
     private val mean: Float,
     private val stdev: Float,

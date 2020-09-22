@@ -3,6 +3,9 @@ package api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Initializer that generates tensors initialized to 1.
+ */
 class Ones : Initializer() {
     override fun initialize(
         fanIn: Int,

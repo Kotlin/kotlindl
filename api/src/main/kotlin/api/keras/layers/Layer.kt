@@ -8,13 +8,25 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
+/**
+ * Base abstract class for all layers.
+ *
+ * @param [name] Layer name. Would be changed if empty during model compilation.
+ */
 abstract class Layer(var name: String) {
+    /**
+     * True, if layer's weights could be changed during training.
+     * If false, layer's weights are frozen and could be changed during the training.
+     */
     var isTrainable = true
 
+    /** Output data tensor shape. */
     lateinit var outputShape: LongArray
 
+    /** Model where this layer is used. */
     lateinit var parentModel: TrainableModel
 
+    /** Basic DType for TensorFlow compatibility purposes. */
     protected var dtype: Class<Float> = getDType()
 
     /** Returns number of input parameters. */

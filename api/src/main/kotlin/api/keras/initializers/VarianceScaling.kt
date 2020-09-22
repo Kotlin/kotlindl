@@ -1,13 +1,24 @@
 package api.keras.initializers
 
-import api.keras.shape.shapeToLongArray
 import api.keras.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import kotlin.math.max
 import kotlin.math.sqrt
 
+/**
+ * The Glorot normal initializer, also called Xavier normal initializer.
+ *
+ * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / (fan_in + fan_out))`
+ * where `fan_in` is the number of input units in
+ * the weight tensor and `fan_out` is the number of output units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [GlorotNormal] initializer.
+ *
+ * @see <a href="http://proceedings.mlr.press/v9/glorot10a.html">
+ *     Glorot et al., 2010</a>
+ */
 class GlorotNormal(
     private val seed: Long
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
@@ -16,6 +27,19 @@ class GlorotNormal(
     }
 }
 
+/**
+ * The Glorot uniform initializer, also called Xavier uniform initializer.
+ *
+ * Draws samples from a uniform distribution within `[-limit, limit]` where `limit`
+ * is `sqrt(6 / (fan_in + fan_out))` where `fan_in` is the number of input units
+ * in the weight tensor and `fan_out` is the number of output units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [GlorotUniform] initializer.
+ *
+ * @see <a href="http://proceedings.mlr.press/v9/glorot10a.html">
+ *     Glorot et al., 2010</a>
+ */
 class GlorotUniform(
     private val seed: Long
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed) {
@@ -24,6 +48,18 @@ class GlorotUniform(
     }
 }
 
+/**
+ * He normal initializer.
+ *
+ * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / fan_in)`
+ * where `fan_in` is the number of input units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [HeNormal] initializer.
+ *
+ * @see <a href="https://www.cv-foundation.org/openaccess/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">
+ *     He et al., 2015</a>
+ */
 class HeNormal(
     private val seed: Long
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
@@ -32,6 +68,18 @@ class HeNormal(
     }
 }
 
+/**
+ * He uniform variance scaling initializer.
+ *
+ * Draws samples from a uniform distribution within `[-limit, limit]` where `limit`
+ * is `sqrt(6 / fan_in)` where `fan_in` is the number of input units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [HeUniform] initializer.
+ *
+ * @see <a href="https://www.cv-foundation.org/openaccess/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">
+ *     He et al., 2015</a>
+ */
 class HeUniform(
     private val seed: Long
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
@@ -40,6 +88,20 @@ class HeUniform(
     }
 }
 
+/**
+ * LeCun normal initializer.
+ *
+ * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(1 / fan_in)`
+ * where `fan_in` is the number of input units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [LeCunNormal] initializer.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf">
+ *     Self-Normalizing Neural Networks, [Klambauer et al., 2017]</a>
+ * @see <a href="https://papers.nips.cc/paper/6698-self-normalizing-neural-networks.pdf">
+ *     Efficient Backprop, [Lecun et al., 1998]</a>
+ */
 class LeCunNormal(
     private val seed: Long
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
@@ -48,6 +110,20 @@ class LeCunNormal(
     }
 }
 
+/**
+ * LeCun uniform initializer.
+ *
+ * Draws samples from a uniform distribution within [-limit, limit] where `limit` is `sqrt(3 / fan_in)`
+ * where `fan_in` is the number of input units in the weight tensor.
+ *
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [LeCunUniform] initializer.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf">
+ *     Self-Normalizing Neural Networks, [Klambauer et al., 2017]</a>
+ * @see <a href="https://papers.nips.cc/paper/6698-self-normalizing-neural-networks.pdf">
+ *     Efficient Backprop, [Lecun et al., 1998]</a>
+ */
 class LeCunUniform(
     private val seed: Long
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
@@ -56,11 +132,31 @@ class LeCunUniform(
     }
 }
 
+/**
+ * Initializer capable of adapting its scale to the shape of weights tensors.
+ *
+ * With `distribution="truncated_normal" or "untruncated_normal"`, samples are
+ * drawn from a truncated/untruncated normal distribution with a mean of zero and
+ * a standard deviation (after truncation, if used) `stddev = sqrt(scale / n)`
+ * where n is:
+ * - number of input units in the weight tensor, if mode = "fan_in"
+ * - number of output units, if mode = "fan_out"
+ * - average of the numbers of input and output units, if mode = "fan_avg"
+ *
+ * With `distribution="uniform"`, samples are drawn from a uniform distribution
+ * within [-limit, limit], with `limit = sqrt(3 * scale / n)`.
+ *
+ * @property [scale] Scaling factor (should be positive).
+ * @property [mode] One of "fan_in", "fan_out", "fan_avg".
+ * @property [distribution] Random distribution to use. One of "truncated_normal", "untruncated_normal" and  "uniform".
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates [VarianceScaling] initializer.
+ */
 open class VarianceScaling(
     private val scale: Double = 1.0,
     private val mode: Mode = Mode.FAN_IN,
     private val distribution: Distribution = Distribution.TRUNCATED_NORMAL,
-    private val seed: Long
+    private val seed: Long = 12L
 ) :
     Initializer() {
     override fun initialize(
@@ -109,40 +205,30 @@ open class VarianceScaling(
     }
 }
 
-private fun computeInOut(shape: Shape): Pair<Double, Double> {
-    val fanIn: Double
-    val fanOut: Double
-
-    val dims: LongArray = shapeToLongArray(shape)
-    when {
-        dims.isEmpty() -> {
-            fanOut = 1.0
-            fanIn = fanOut
-        }
-        dims.size == 1 -> {
-            fanOut = dims[0].toDouble()
-            fanIn = fanOut
-        }
-        dims.size == 2 -> {
-            fanIn = dims[0].toDouble()
-            fanOut = dims[1].toDouble()
-        }
-        else -> {
-            var receptiveFieldSize = 1.0
-            for (i in dims.size - 2 downTo 0) {
-                receptiveFieldSize *= dims[i]
-            }
-            fanIn = dims[dims.size - 2] * receptiveFieldSize
-            fanOut = dims[dims.size - 1] * receptiveFieldSize
-        }
-    }
-    return Pair(fanIn, fanOut)
-}
-
+/**
+ * Mode.
+ */
 enum class Mode {
-    FAN_IN, FAN_OUT, FAN_AVG
+    /** */
+    FAN_IN,
+
+    /** */
+    FAN_OUT,
+
+    /** */
+    FAN_AVG
 }
 
+/**
+ * Distribution.
+ */
 enum class Distribution {
-    TRUNCATED_NORMAL, UNTRUNCATED_NORMAL, UNIFORM
+    /** */
+    TRUNCATED_NORMAL,
+
+    /** */
+    UNTRUNCATED_NORMAL,
+
+    /** */
+    UNIFORM
 }

@@ -4,6 +4,14 @@ import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Initializer that generates tensors with a uniform distribution.
+ *
+ * @property [maxVal] Lower bound of the range of random values to generate (inclusive).
+ * @property [minVal] Upper bound of the range of random values to generate (exclusive).
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates a [RandomUniform] initializer.
+ */
 class RandomUniform(
     private val maxVal: Float,
     private val minVal: Float,

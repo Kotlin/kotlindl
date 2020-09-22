@@ -7,6 +7,18 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Average pooling layer for 2D inputs (e.g. images).
+ *
+ * NOTE: Works with tensors which must have rank 4 (batch, height, width, channels).
+ *
+ * @constructor Creates [AvgPool2D] object.
+ * @param [poolSize] The size of the sliding window for each dimension of input tensor (pool batch, pool height, pool width, pool channels).
+ * Usually, pool batch and pool channels are equal to 1.
+ * @param [strides] Strides of the pooling operation for each dimension of input tensor.
+ * @param [padding] The padding method, either 'valid' or 'same' or 'full'.
+ * @param [name] Custom layer name.
+ */
 class AvgPool2D(
     val poolSize: IntArray,
     val strides: IntArray,
