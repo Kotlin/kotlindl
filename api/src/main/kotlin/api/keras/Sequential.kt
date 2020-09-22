@@ -105,7 +105,6 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         /**
          * Creates the [Sequential] model.
          *
-         * @param [T] The type of data elements in Tensors.
          * @property [input] The input layer with initial shapes.
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.

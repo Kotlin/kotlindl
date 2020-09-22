@@ -2,6 +2,7 @@ package api.keras.layers
 
 import api.core.KGraph
 import api.keras.util.DATA_PLACEHOLDER
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops

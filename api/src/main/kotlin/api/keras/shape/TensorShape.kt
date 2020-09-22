@@ -31,7 +31,7 @@ class TensorShape() {
         System.arraycopy(dims, 0, this.dims, 1, dims.size)
     }
 
-    fun numDimensions(): Int {
+    private fun numDimensions(): Int {
         return dims.size
     }
 
@@ -69,7 +69,7 @@ class TensorShape() {
      * @param i Target dimension to test
      * @return Whether dimension i is unknown (equal to -1)
      */
-    fun isKnown(i: Int): Boolean {
+    private fun isKnown(i: Int): Boolean {
         return dims[i] != -1L
     }
 

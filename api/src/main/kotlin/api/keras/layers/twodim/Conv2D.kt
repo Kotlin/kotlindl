@@ -10,6 +10,7 @@ import api.keras.shape.shapeFromDims
 import api.keras.shape.shapeToLongArray
 import api.keras.util.conv2dBiasVarName
 import api.keras.util.conv2dKernelVarName
+import api.keras.util.getDType
 import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -19,8 +20,14 @@ import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.Conv2d.dilations
 import kotlin.math.roundToInt
 
+/**
+ * Type of padding.
+ */
 enum class ConvPadding {
+
     SAME,
+
+    /** No padding. */
     VALID,
     FULL
 }
@@ -28,6 +35,25 @@ enum class ConvPadding {
 private const val KERNEL = "conv2d_kernel"
 private const val BIAS = "conv2d_bias"
 
+/**
+ * 2D convolution layer (e.g. spatial convolution over images).
+ *
+ * This layer creates a convolution kernel that is convolved (actually cross-correlated)
+ * with the layer input to produce a tensor of outputs.
+ * Finally, if `activation` is applied to the outputs as well.
+ *
+ * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
+ * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
+ * @property [strides] Strides of the pooling operation for each dimension of input tensor.
+ * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
+ * @property [dilations]
+ * @property [activation]
+ * @property [kernelInitializer]
+ * @property [biasInitializer]
+ * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
+ * @property [name] Custom layer name.
+ * @constructor Creates [Conv2D] object.
+ */
 class Conv2D(
     val filters: Long,
     val kernelSize: LongArray,
@@ -42,6 +68,7 @@ class Conv2D(
     // weight tensors
     private lateinit var kernel: Variable<Float>
     private lateinit var bias: Variable<Float>
+
     // weight tensor shapes
     private lateinit var biasShape: Shape
     private lateinit var kernelShape: Shape

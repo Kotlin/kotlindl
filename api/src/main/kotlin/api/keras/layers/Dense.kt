@@ -8,6 +8,7 @@ import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeToLongArray
 import api.keras.util.denseBiasVarName
 import api.keras.util.denseKernelVarName
+import api.keras.util.getDType
 import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
