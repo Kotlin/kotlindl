@@ -2,7 +2,7 @@ package examples.inference
 
 import api.inference.savedmodel.Input
 import api.inference.savedmodel.Output
-import api.inference.savedmodel.SavedModelInferenceModel
+import api.inference.savedmodel.SavedModel
 import api.keras.metric.Metrics
 import org.tensorflow.Tensor
 import util.MnistUtils
@@ -19,7 +19,7 @@ fun main() {
         LABEL_PATH, Random(0), 10000
     )
 
-    SavedModelInferenceModel().use {
+    SavedModel().use {
         it.loadModel(PATH_TO_MODEL)
         println(it)
 

@@ -10,7 +10,7 @@ import util.MnistUtils
 /**
  * Inference model built on SavedModelBundle format to predict on images.
  */
-open class SavedModelInferenceModel : InferenceModel() {
+open class SavedModel : InferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 
@@ -75,7 +75,7 @@ open class SavedModelInferenceModel : InferenceModel() {
     /**
      * Loads model from SavedModelBundle format.
      */
-    fun loadModel(pathToModel: String): SavedModelInferenceModel {
+    fun loadModel(pathToModel: String): SavedModel {
         bundle = SavedModelBundle.load(pathToModel, "serve")
         session = bundle.session()
         val graph = bundle.graph()
@@ -90,11 +90,13 @@ open class SavedModelInferenceModel : InferenceModel() {
         kGraph.close()
     }
 
+    /** Reshapes [DoubleArray] to [Tensor]. */
     fun reshape2(function: (DoubleArray) -> Tensor<*>?) {
         reshape2 = function
     }
 }
 
-fun prepareModelForInference(init: SavedModelInferenceModel.() -> Unit): SavedModelInferenceModel =
-    SavedModelInferenceModel()
+/** Defines receiver for [SavedModel]. */
+fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
+    SavedModel()
         .apply(init)
