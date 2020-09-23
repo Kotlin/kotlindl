@@ -4,6 +4,7 @@ import api.core.KGraph
 import api.keras.util.defaultAssignOpName
 import api.keras.util.defaultInitializerOpName
 import api.keras.util.defaultOptimizerVariableName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.Shape
@@ -19,6 +20,25 @@ private const val SECOND_MOMENT = "v"
 private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
 private val SECOND_BETA_POWER_NAME = defaultOptimizerVariableName("beta2_power")
 
+/**
+ * Adam optimizer.
+ *
+ * Updates variable according next formula:
+ * ```
+ * lr_t := learning_rate * sqrt{1 - beta_2^t} / (1 - beta_1^t)
+ * m_t := beta_1 * m_{t-1} + (1 - beta_1) * g
+ * v_t := beta_2 * v_{t-1} + (1 - beta_2) * g * g
+ * variable := variable - lr_t * m_t / sqrt{v_t} + epsilon)
+ * ```
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [beta1] 0 < beta < 1. Generally close to 1.
+ * @property [beta2] 0 < beta < 1. Generally close to 1.
+ * @property [epsilon] Float >= 0. Fuzz factor.
+ */
 class Adam(
     private val learningRate: Float = 0.001f,
     private val beta1: Float = 0.9f,

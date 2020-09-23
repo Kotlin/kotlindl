@@ -6,6 +6,18 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Applies Dropout to the input.
+ *
+ * Dropout consists in randomly setting a fraction `rate` of input units to 0
+ * at each update during training time, which helps prevent overfitting.
+ * The units that are kept are scaled by `1 / (1 - rate)`, so that their
+ * sum is unchanged at training time and inference time.
+ *
+ * @property keepProbability The dropout rate, between 0 and 1. E.g. `rate=0.1` would drop out 10% of input units.
+ * @property [name] Custom layer name.
+ * @constructor Creates [Dropout] object.
+ */
 class Dropout(
     private val keepProbability: Float,
     name: String = ""

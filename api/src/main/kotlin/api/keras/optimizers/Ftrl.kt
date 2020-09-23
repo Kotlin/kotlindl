@@ -2,6 +2,7 @@ package api.keras.optimizers
 
 import api.core.KGraph
 import api.keras.util.defaultInitializerOpName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -14,9 +15,34 @@ import java.util.*
 private const val ACCUMULATOR = "gradient_accumulator"
 private const val LINEAR_ACCUMULATOR = "linear_accumulator"
 
-
 /**
- * ApplyFtrlV2 is supported for CPU only (Exception in thread "main" java.lang.IllegalArgumentException on GPU)
+ * Optimizer that implements the FTRL algorithm.
+ *
+ * Updates variable according next formula:
+ * ```
+ * m_t <- beta1 * m_{t-1} + (1 - beta1) * g
+ * v_t <- max(beta2 * v_{t-1}, abs(g))
+ * variable <- variable - learning_rate / (1 - beta1^t) * m_t / (v_t + epsilon)
+ * ```
+ * This version has support for both online L2 (the L2 penalty given in the paper above)
+ * and shrinkage-type L2 (which is the addition of an L2 penalty to the loss function).
+ *
+ * Check the documentation for the [l2ShrinkageRegularizationStrength]
+ * parameter for more details when shrinkage is enabled, in which case gradient is replaced with gradient_with_shrinkage.
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ * @see <a href="https://research.google.com/pubs/archive/41159.pdf">
+ *     See Algorithm 1 of this paper.</a>
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [l1RegularizationStrength] A float value, must be greater than or equal to zero.
+ * @property [l2RegularizationStrength] A float value, must be greater than or equal to zero.
+ * @property [learningRatePower] A float value, must be less or equal to zero.
+ * Controls how the learning rate decreases during training. Use zero for a fixed learning rate.
+ * @property [l2ShrinkageRegularizationStrength] A float value, must be greater than or equal to zero.
+ * This differs from L2 above in that the L2 above is a stabilization penalty, whereas this L2 shrinkage is a magnitude penalty.
+ * When input is sparse shrinkage will only happen on the active weights.
  */
 class Ftrl(
     private val learningRate: Float = 0.001f,
@@ -27,7 +53,9 @@ class Ftrl(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
-    private var initialAccumulatorValue = 0.0f
+    /** The starting value for accumulators.
+    Only zero or positive values are allowed. */
+    private var initialAccumulatorValue = 0.0f // TODO: move to parameters.
     private lateinit var learningRatePowerConst: Constant<Float>
     private lateinit var learningRateConst: Constant<Float>
     private lateinit var l1RegularizationStrengthConst: Constant<Float>

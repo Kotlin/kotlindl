@@ -7,6 +7,18 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Max pooling layer for 2D inputs (e.g. images).
+ *
+ * NOTE: Works with tensors which must have rank 4 (batch, height, width, channels).
+ *
+ * @property [poolSize] The size of the sliding window for each dimension of input tensor (pool batch, pool height, pool width, pool channels).
+ * Usually, pool batch and pool channels are equal to 1.
+ * @property [strides] Strides of the pooling operation for each dimension of input tensor.
+ * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
+ * @property [name] Custom layer name.
+ * @constructor Creates [MaxPool2D] object.
+ */
 class MaxPool2D(
     val poolSize: IntArray,
     val strides: IntArray,

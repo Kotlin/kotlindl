@@ -24,11 +24,16 @@ import kotlin.math.roundToInt
  * Type of padding.
  */
 enum class ConvPadding {
-
+    /**
+     * Results in padding evenly to the left/right or up/down of the input such that output has the same
+     * height/width dimension as the input.
+     */
     SAME,
 
     /** No padding. */
     VALID,
+
+    /** Full padding. For Keras compatibility goals. */
     FULL
 }
 
@@ -46,10 +51,10 @@ private const val BIAS = "conv2d_bias"
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
- * @property [dilations]
- * @property [activation]
- * @property [kernelInitializer]
- * @property [biasInitializer]
+ * @property [dilations] Four numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
+ * @property [activation] Activation function.
+ * @property [kernelInitializer] An initializer for the convolution kernel
+ * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
  * @constructor Creates [Conv2D] object.

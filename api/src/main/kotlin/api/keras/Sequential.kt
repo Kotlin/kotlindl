@@ -179,7 +179,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         yOp = tf.placeholder(getDType()) as Operand<Float>
 
         yPred = transformInputWithNNModel(xOp)
-        lossOp = LossFunctions.convert(loss).apply(tf, yPred, yOp, getDType())
+        lossOp = LossFunctions.convert(loss).apply(tf, yPred, yOp)
 
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
@@ -279,7 +279,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp, getDType())
+        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp)
 
         if (isOptimizerInitRequired) kGraph.initializeOptimizerVariables(session)
 
@@ -416,7 +416,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp, getDType())
+        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp)
 
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
