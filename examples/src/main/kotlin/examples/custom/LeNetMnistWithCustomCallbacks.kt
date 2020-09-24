@@ -1,21 +1,21 @@
 package examples.custom
 
-import api.keras.Sequential
-import api.keras.activations.Activations
-import api.keras.callbacks.Callback
-import api.keras.history.*
-import api.keras.initializers.Constant
-import api.keras.initializers.HeNormal
-import api.keras.initializers.Zeros
-import api.keras.layers.Dense
-import api.keras.layers.Flatten
-import api.keras.layers.Input
-import api.keras.layers.twodim.Conv2D
-import api.keras.layers.twodim.ConvPadding
-import api.keras.layers.twodim.MaxPool2D
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.core.Sequential
+import api.core.activation.Activations
+import api.core.callback.Callback
+import api.core.history.*
+import api.core.initializer.Constant
+import api.core.initializer.HeNormal
+import api.core.initializer.Zeros
+import api.core.layer.Dense
+import api.core.layer.Flatten
+import api.core.layer.Input
+import api.core.layer.twodim.Conv2D
+import api.core.layer.twodim.ConvPadding
+import api.core.layer.twodim.MaxPool2D
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
 

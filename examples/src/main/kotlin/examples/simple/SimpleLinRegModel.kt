@@ -1,14 +1,14 @@
 package examples.simple
 
-import api.keras.Sequential
-import api.keras.activations.Activations
-import api.keras.initializers.HeNormal
-import api.keras.initializers.Zeros
-import api.keras.layers.Dense
-import api.keras.layers.Input
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.SGD
+import api.core.Sequential
+import api.core.activation.Activations
+import api.core.initializer.HeNormal
+import api.core.initializer.Zeros
+import api.core.layer.Dense
+import api.core.layer.Input
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.SGD
 import datasets.Dataset
 import kotlin.random.Random
 
@@ -19,7 +19,6 @@ private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
     Input(4),
-    //Dense(4, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
     Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 

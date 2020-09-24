@@ -1,12 +1,12 @@
 package examples.inference.keras.demo
 
 
+import api.core.Sequential
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.Adam
 import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
-import api.keras.Sequential
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.Adam
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser

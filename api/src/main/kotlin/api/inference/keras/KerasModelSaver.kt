@@ -1,14 +1,14 @@
 package api.inference.keras
 
+import api.core.Sequential
+import api.core.activation.Activations
+import api.core.initializer.*
+import api.core.layer.Dense
+import api.core.layer.Flatten
+import api.core.layer.Layer
+import api.core.layer.twodim.Conv2D
+import api.core.layer.twodim.MaxPool2D
 import api.inference.keras.config.*
-import api.keras.Sequential
-import api.keras.activations.Activations
-import api.keras.initializers.*
-import api.keras.layers.Dense
-import api.keras.layers.Flatten
-import api.keras.layers.Layer
-import api.keras.layers.twodim.Conv2D
-import api.keras.layers.twodim.MaxPool2D
 import com.beust.klaxon.Klaxon
 import java.io.File
 

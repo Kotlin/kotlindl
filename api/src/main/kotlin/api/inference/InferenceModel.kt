@@ -1,14 +1,14 @@
 package api.inference
 
 import api.core.KGraph
+import api.core.ModelFormat
+import api.core.shape.TensorShape
+import api.core.util.DATA_PLACEHOLDER
+import api.core.util.OUTPUT_NAME
+import api.core.util.defaultAssignOpName
+import api.core.util.defaultInitializerOpName
 import api.inference.savedmodel.Input
 import api.inference.savedmodel.Output
-import api.keras.ModelFormat
-import api.keras.shape.TensorShape
-import api.keras.util.DATA_PLACEHOLDER
-import api.keras.util.OUTPUT_NAME
-import api.keras.util.defaultAssignOpName
-import api.keras.util.defaultInitializerOpName
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import mu.KotlinLogging

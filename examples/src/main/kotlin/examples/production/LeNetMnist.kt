@@ -1,8 +1,8 @@
 package examples.production
 
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.Adam
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.Adam
 import datasets.Dataset
 import datasets.handlers.*
 import javax.swing.JFrame

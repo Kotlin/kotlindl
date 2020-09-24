@@ -1,10 +1,10 @@
 package examples.inference.keras.demo
 
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.Adam
 import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.Adam
 import datasets.Dataset
 import datasets.handlers.*
 

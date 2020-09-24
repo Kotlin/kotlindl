@@ -1,13 +1,13 @@
 package examples.production
 
-import api.keras.ModelFormat
-import api.keras.ModelWritingMode
-import api.keras.Sequential
-import api.keras.layers.twodim.Conv2D
-import api.keras.loss.LossFunctions
-import api.keras.metric.Metrics
-import api.keras.optimizers.RMSProp
-import api.keras.optimizers.SGD
+import api.core.ModelFormat
+import api.core.ModelWritingMode
+import api.core.Sequential
+import api.core.layer.twodim.Conv2D
+import api.core.loss.LossFunctions
+import api.core.metric.Metrics
+import api.core.optimizer.RMSProp
+import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
 

@@ -1,13 +1,13 @@
 package api.inference.keras
 
-import api.keras.Sequential
-import api.keras.layers.Dense
-import api.keras.layers.Layer
-import api.keras.layers.twodim.Conv2D
-import api.keras.util.conv2dBiasVarName
-import api.keras.util.conv2dKernelVarName
-import api.keras.util.denseBiasVarName
-import api.keras.util.denseKernelVarName
+import api.core.Sequential
+import api.core.layer.Dense
+import api.core.layer.Layer
+import api.core.layer.twodim.Conv2D
+import api.core.util.conv2dBiasVarName
+import api.core.util.conv2dKernelVarName
+import api.core.util.denseBiasVarName
+import api.core.util.denseKernelVarName
 import io.jhdf.HdfFile
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"

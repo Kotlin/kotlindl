@@ -1,15 +1,15 @@
 package examples.production
 
-import api.keras.Sequential
-import api.keras.activations.Activations
-import api.keras.initializers.GlorotNormal
-import api.keras.initializers.GlorotUniform
-import api.keras.layers.Dense
-import api.keras.layers.Flatten
-import api.keras.layers.Input
-import api.keras.layers.twodim.Conv2D
-import api.keras.layers.twodim.ConvPadding
-import api.keras.layers.twodim.MaxPool2D
+import api.core.Sequential
+import api.core.activation.Activations
+import api.core.initializer.GlorotNormal
+import api.core.initializer.GlorotUniform
+import api.core.layer.Dense
+import api.core.layer.Flatten
+import api.core.layer.Input
+import api.core.layer.twodim.Conv2D
+import api.core.layer.twodim.ConvPadding
+import api.core.layer.twodim.MaxPool2D
 import datasets.Dataset
 import datasets.handlers.AMOUNT_OF_CLASSES
 import org.tensorflow.Tensor

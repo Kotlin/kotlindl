@@ -1,9 +1,9 @@
 package examples.inference
 
+import api.core.metric.Metrics
 import api.inference.savedmodel.Input
 import api.inference.savedmodel.Output
 import api.inference.savedmodel.SavedModel
-import api.keras.metric.Metrics
 import org.tensorflow.Tensor
 import util.MnistUtils
 import java.util.*

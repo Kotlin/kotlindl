@@ -1,8 +1,8 @@
 package api.inference.savedmodel
 
 import api.core.KGraph
+import api.core.metric.Metrics
 import api.inference.InferenceModel
-import api.keras.metric.Metrics
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 import util.MnistUtils
