@@ -5,6 +5,7 @@ import api.core.history.TrainingHistory
 import api.core.loss.LossFunctions
 import api.core.metric.EvaluationResult
 import api.core.metric.Metrics
+import api.core.optimizer.Adam
 import api.core.optimizer.Optimizer
 import api.core.optimizer.SGD
 import api.core.util.OUTPUT_NAME
@@ -68,7 +69,7 @@ abstract class TrainableModel : InferenceModel() {
      * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     abstract fun compile(
-        optimizer: Optimizer,
+        optimizer: Optimizer = Adam(),
         loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric: Metrics = Metrics.ACCURACY,
         callback: Callback = Callback()
@@ -92,9 +93,9 @@ abstract class TrainableModel : InferenceModel() {
      */
     abstract fun fit(
         dataset: Dataset,
-        epochs: Int = 10,
+        epochs: Int = 5,
         batchSize: Int = 32,
-        verbose: Boolean,
+        verbose: Boolean = true,
         isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
@@ -120,10 +121,10 @@ abstract class TrainableModel : InferenceModel() {
     abstract fun fit(
         trainingDataset: Dataset,
         validationDataset: Dataset,
-        epochs: Int = 10,
+        epochs: Int = 5,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
-        verbose: Boolean,
+        verbose: Boolean = true,
         isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory

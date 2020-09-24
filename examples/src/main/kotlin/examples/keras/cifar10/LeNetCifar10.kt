@@ -15,10 +15,6 @@ import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.SGD
 import datasets.Dataset
-import datasets.handlers.IMAGES_ARCHIVE
-import datasets.handlers.LABELS_ARCHIVE
-import datasets.handlers.extractCifar10Images
-import datasets.handlers.extractCifar10Labels
 
 private const val LEARNING_RATE = 0.1f
 private const val EPOCHS = 20
@@ -89,7 +85,11 @@ fun main() {
     val (train, test) = dataset.split(VALIDATION_RATE)
 
     model.use {
-        it.compile(optimizer = SGD(LEARNING_RATE), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(
+            optimizer = SGD(LEARNING_RATE),
+            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

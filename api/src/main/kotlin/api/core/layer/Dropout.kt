@@ -19,7 +19,7 @@ import org.tensorflow.op.Ops
  * @constructor Creates [Dropout] object.
  */
 class Dropout(
-    private val keepProbability: Float,
+    private val keepProbability: Float = 0.1f,
     name: String = ""
 ) : Layer(name) {
 

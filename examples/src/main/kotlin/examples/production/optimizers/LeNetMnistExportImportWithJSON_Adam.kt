@@ -62,10 +62,10 @@ fun main() {
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
-         for (layer in it.layers) {
-             if (layer::class == Conv2D::class)
-                 layer.isTrainable = false
-         }
+        for (layer in it.layers) {
+            if (layer::class == Conv2D::class)
+                layer.isTrainable = false
+        }
 
         it.compile(
             optimizer = optimizer,

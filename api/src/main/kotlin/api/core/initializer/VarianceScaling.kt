@@ -20,7 +20,7 @@ import kotlin.math.sqrt
  *     Glorot et al., 2010</a>
  */
 class GlorotNormal(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
         return "GlorotNormal(seed=$seed) ${super.toString()}"
@@ -41,7 +41,7 @@ class GlorotNormal(
  *     Glorot et al., 2010</a>
  */
 class GlorotUniform(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
         return "GlorotUniform(seed=$seed) ${super.toString()}"
@@ -61,7 +61,7 @@ class GlorotUniform(
  *     He et al., 2015</a>
  */
 class HeNormal(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
         return "HeNormal(seed=$seed) ${super.toString()}"
@@ -81,7 +81,7 @@ class HeNormal(
  *     He et al., 2015</a>
  */
 class HeUniform(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
         return "HeUniform(seed=$seed) ${super.toString()}"
@@ -103,7 +103,7 @@ class HeUniform(
  *     Efficient Backprop, [Lecun et al., 1998]</a>
  */
 class LeCunNormal(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
         return "LeCunNormal(seed=$seed) ${super.toString()}"
@@ -125,7 +125,7 @@ class LeCunNormal(
  *     Efficient Backprop, [Lecun et al., 1998]</a>
  */
 class LeCunUniform(
-    private val seed: Long
+    private val seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
         return "LeCunUniform(seed=$seed) ${super.toString()}"
