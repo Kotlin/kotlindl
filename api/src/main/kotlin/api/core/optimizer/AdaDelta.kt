@@ -50,6 +50,12 @@ class AdaDelta(
     private lateinit var learningRateConst: Constant<Float>
     private lateinit var rhoConst: Constant<Float>
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(rho >= 0.0f) { "Rho $rho should be >= 0.0." }
+        require(epsilon >= 0.0f) { "Epsilon $epsilon should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -58,7 +64,6 @@ class AdaDelta(
     ): List<Operand<Float>> {
         val targets: MutableList<Operand<Float>> =
             ArrayList()
-
         rhoConst = tf.constant(rho, getDType())
         learningRateConst = tf.constant(learningRate, getDType())
         epsilonConstant = tf.constant(epsilon, getDType())
@@ -105,4 +110,6 @@ class AdaDelta(
     override fun getOptimizerName(): String {
         return "Adadelta"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }

@@ -132,7 +132,7 @@ class ExportImportModelTest {
             )
 
             it.save(
-                pathToModelDirectory = tempDir.toString(),
+                modelDirectory = tempDir.toString(),
                 modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
                 modelWritingMode = ModelWritingMode.OVERRIDE
             )
@@ -300,7 +300,7 @@ class ExportImportModelTest {
             )
 
             it.save(
-                pathToModelDirectory = tempDir.toString(),
+                modelDirectory = tempDir.toString(),
                 saveOptimizerState = true,
                 modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
                 modelWritingMode = ModelWritingMode.OVERRIDE

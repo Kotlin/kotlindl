@@ -54,6 +54,13 @@ class Adam(
     private lateinit var betaOnePower: Variable<Float>
     private lateinit var betaTwoPower: Variable<Float>
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(beta1 > 0.0f && beta1 < 1.0f) { "Beta1 $beta1 should be in range (0.0; 1.0)." }
+        require(beta2 > 0.0f && beta2 < 1.0f) { "Beta2 $beta2 should be in range (0.0; 1.0)." }
+        require(epsilon >= 0.0f) { "L2Strength $epsilon should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -148,4 +155,6 @@ class Adam(
     override fun getOptimizerName(): String {
         return "Adam"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }

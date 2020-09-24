@@ -14,6 +14,7 @@ import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.SGD
 import datasets.Dataset
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
 private const val LEARNING_RATE = 0.1f
@@ -171,7 +172,7 @@ fun main() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        it.save(PATH_TO_MODEL)
+        it.save(File(PATH_TO_MODEL))
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

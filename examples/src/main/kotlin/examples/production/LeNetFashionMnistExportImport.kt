@@ -7,6 +7,7 @@ import api.core.optimizer.Adam
 import api.inference.InferenceModel
 import datasets.Dataset
 import datasets.handlers.*
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 private const val EPOCHS = 5
@@ -59,12 +60,12 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(PATH_TO_MODEL, modelWritingMode = ModelWritingMode.OVERRIDE)
+        it.save(File(PATH_TO_MODEL), modelWritingMode = ModelWritingMode.OVERRIDE)
     }
 
     InferenceModel().use {
-        it.reshape (::mnistReshape)
-        it.load(PATH_TO_MODEL, loadOptimizerState = true)
+        it.reshape(::mnistReshape)
+        it.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

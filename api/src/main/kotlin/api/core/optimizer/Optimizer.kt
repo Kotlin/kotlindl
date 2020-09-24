@@ -149,4 +149,7 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
     open fun createName(variable: Output<Float>, slotName: String): String {
         return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
+
+    /** True, if optimizer implemented for GPU. */
+    abstract fun isRunningOnGPU(): Boolean
 }

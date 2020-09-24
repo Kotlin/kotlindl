@@ -10,6 +10,7 @@ import api.core.optimizer.RMSProp
 import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
 private const val EPOCHS = 1
@@ -44,7 +45,8 @@ fun main() {
         )
 
         it.save(
-            PATH_TO_MODEL, ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
+            File(PATH_TO_MODEL),
+            ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
             modelWritingMode = ModelWritingMode.OVERRIDE
         )
 
@@ -68,7 +70,7 @@ fun main() {
         )
         it.summary()
 
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL)
+        it.loadVariablesFromTxtFiles(File(PATH_TO_MODEL))
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

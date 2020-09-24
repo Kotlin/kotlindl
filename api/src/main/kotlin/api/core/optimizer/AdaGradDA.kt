@@ -52,6 +52,13 @@ class AdaGradDA(
     private lateinit var l2StrengthConst: Constant<Float>
     private lateinit var globalStep: Variable<Float>
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(initialAccumulatorValue >= 0.0f) { "Initial accumulator value $initialAccumulatorValue should be >= 0.0." }
+        require(l1Strength >= 0.0f) { "L1Strength $l1Strength should be >= 0.0." }
+        require(l2Strength >= 0.0f) { "L2Strength $l2Strength should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -118,4 +125,6 @@ class AdaGradDA(
     override fun getOptimizerName(): String {
         return "AdaGradDA"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }

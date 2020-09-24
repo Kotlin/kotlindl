@@ -29,6 +29,11 @@ class Momentum(
     private lateinit var momentumConst: Constant<Float>
     private lateinit var learningRateConst: Constant<Float>
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(momentum >= 0.0f) { "Momentum $momentum should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -76,4 +81,6 @@ class Momentum(
     override fun getOptimizerName(): String {
         return "Momentum"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }

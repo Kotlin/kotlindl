@@ -12,6 +12,7 @@ import api.core.util.OUTPUT_NAME
 import api.inference.InferenceModel
 import datasets.Dataset
 import org.tensorflow.Operand
+import java.io.File
 
 /**
  * Base abstract class for all trainable models.
@@ -169,19 +170,19 @@ abstract class TrainableModel : InferenceModel() {
     /**
      * Saves the model as graph and weights.
      *
-     * @param [pathToModelDirectory] Path to model directory.
+     * @param [modelDirectory] Path to model directory.
      * @param [modelFormat] One of approaches to store model configurations and weights.
      * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
      * @param [modelWritingMode] Default behaviour of handling different edge cases with existing directory before model saving.
      */
     abstract fun save(
-        pathToModelDirectory: String,
+        modelDirectory: File,
         modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
         saveOptimizerState: Boolean = false,
         modelWritingMode: ModelWritingMode = ModelWritingMode.FAIL_IF_EXISTS
     )
 
-    override fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+    override fun loadVariablesFromTxtFiles(modelDirectory: File, loadOptimizerState: Boolean) {
 
     }
 

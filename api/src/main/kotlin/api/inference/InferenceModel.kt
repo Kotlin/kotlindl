@@ -163,18 +163,18 @@ open class InferenceModel : AutoCloseable {
     /**
      * Loads tensorflow graphs and variable data (if required).
      *
-     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
      * @param [modelFormat] Loading strategy. By default, it loads graph from .pb file format and variable data from .txt files.
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     fun load(
-        pathToModelDirectory: String,
+        modelDirectory: File,
         modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
         loadOptimizerState: Boolean = false
     ) {
         // Load graph
-        val directory = File(pathToModelDirectory)
-        if (!directory.exists()) {
+        val pathToModelDirectory = modelDirectory.absolutePath
+        if (!modelDirectory.exists()) {
             throw NotDirectoryException(pathToModelDirectory)
         } else {
             logger.debug { "The model loading is started." }
@@ -195,14 +195,14 @@ open class InferenceModel : AutoCloseable {
     /**
      * Loads variable data from .txt files.
      *
-     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     open fun loadVariablesFromTxtFiles(
-        pathToModelDirectory: String,
+        modelDirectory: File,
         loadOptimizerState: Boolean = false
     ) {
-        loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
+        loadVariablesFromTxt(modelDirectory.absolutePath, loadOptimizerState)
     }
 
     /**
@@ -260,7 +260,7 @@ open class InferenceModel : AutoCloseable {
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         inferenceGraphInitialization(pathToModelDirectory)
-        loadVariablesFromTxtFiles(pathToModelDirectory, loadOptimizerState)
+        loadVariablesFromTxtFiles(File(pathToModelDirectory), loadOptimizerState)
     }
 
     private fun inferenceGraphInitialization(pathToModelDirectory: String) {

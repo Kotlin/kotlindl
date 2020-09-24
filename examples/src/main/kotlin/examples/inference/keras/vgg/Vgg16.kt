@@ -28,7 +28,7 @@ fun main() {
 
         it.summary()
         println(it.kGraph)
-        it.loadVariablesFromTxtFiles("C:\\zaleslaw\\home\\models\\vgg\\")
+        it.loadVariablesFromTxtFiles(File("C:\\zaleslaw\\home\\models\\vgg\\"))
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")

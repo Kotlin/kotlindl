@@ -10,6 +10,7 @@ import api.core.optimizer.Adam
 import datasets.Dataset
 import datasets.handlers.*
 import examples.production.lenet5
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5KerasWithOptimizers"
 private const val EPOCHS = 1
@@ -48,7 +49,7 @@ fun main() {
         )
 
         it.save(
-            pathToModelDirectory = PATH_TO_MODEL,
+            modelDirectory = File(PATH_TO_MODEL),
             saveOptimizerState = true,
             modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
             modelWritingMode = ModelWritingMode.OVERRIDE
@@ -74,7 +75,7 @@ fun main() {
         )
         it.summary()
         print(it.kGraph())
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = true)
+        it.loadVariablesFromTxtFiles(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
@@ -105,7 +106,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
         it.summary()
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = false)
+        it.loadVariablesFromTxtFiles(File(PATH_TO_MODEL), loadOptimizerState = false)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

@@ -6,6 +6,7 @@ import api.core.optimizer.Adam
 import api.inference.InferenceModel
 import datasets.Dataset
 import datasets.handlers.*
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 private const val EPOCHS = 3
@@ -43,7 +44,7 @@ fun main() {
 
         println(it.kGraph)
 
-        it.save(PATH_TO_MODEL)
+        it.save(File(PATH_TO_MODEL))
 
         val prediction = it.predict(train.getX(imageId1))
 
@@ -62,8 +63,8 @@ fun main() {
     }
 
     InferenceModel().use {
-        it.reshape (::mnistReshape)
-        it.load(PATH_TO_MODEL, loadOptimizerState = true)
+        it.reshape(::mnistReshape)
+        it.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         val prediction = it.predict(train.getX(imageId1))
 

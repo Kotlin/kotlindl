@@ -650,27 +650,26 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     override fun save(
-        pathToModelDirectory: String,
+        modelDirectory: File,
         modelFormat: ModelFormat,
         saveOptimizerState: Boolean,
         modelWritingMode: ModelWritingMode
     ) {
-        val directory = File(pathToModelDirectory)
-
+        val pathToModelDirectory = modelDirectory.absolutePath
         when (modelWritingMode) {
             ModelWritingMode.FAIL_IF_EXISTS -> {
-                check(!directory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
-                directory.mkdir()
+                check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
+                modelDirectory.mkdir()
             }
             ModelWritingMode.OVERRIDE -> {
-                if (directory.exists()) {
-                    directory.deleteRecursively()
+                if (modelDirectory.exists()) {
+                    modelDirectory.deleteRecursively()
                 }
-                directory.mkdir()
+                modelDirectory.mkdir()
             }
             ModelWritingMode.APPEND -> {
-                if (!directory.exists()) {
-                    directory.mkdir()
+                if (!modelDirectory.exists()) {
+                    modelDirectory.mkdir()
                 }
             }
         }
@@ -746,16 +745,16 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
     }
 
-    override fun loadVariablesFromTxtFiles(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+    override fun loadVariablesFromTxtFiles(modelDirectory: File, loadOptimizerState: Boolean) {
         // Load variables names
-        val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
+        val variableNames = File("${modelDirectory.absolutePath}/variableNames.txt").readLines()
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
                     continue
                 else if (loadOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
                     continue
-                else loadVariable(variableName, pathToModelDirectory)
+                else loadVariable(variableName, modelDirectory.absolutePath)
             }
         }
     }
