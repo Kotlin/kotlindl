@@ -59,7 +59,7 @@ open class InferenceModel : AutoCloseable {
     /**
      * Predicts the class of [inputData].
      *
-     * @param [inputData] The single example (or observation) with unknown label.
+     * @param [inputData] The single example with unknown label.
      * @return Predicted class index.
      */
     open fun predict(inputData: FloatArray): Int {
@@ -78,7 +78,7 @@ open class InferenceModel : AutoCloseable {
     /**
      * Predicts vector of probabilities instead of specific class in [predict] method.
      *
-     * @param [inputData] The single example (or observation) with unknown vector of probabilities.
+     * @param [inputData] The single example with unknown vector of probabilities.
      * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from intermediate parts of the TensorFlow graphs.
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */

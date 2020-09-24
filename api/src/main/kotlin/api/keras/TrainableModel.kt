@@ -19,7 +19,7 @@ abstract class TrainableModel : InferenceModel() {
     /** Controls level of verbosity. */
     protected var isDebugMode = false
 
-    /** Optimizer. Approach how aggressively to update the weights. */
+    /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
     /** Loss function. */
@@ -75,15 +75,15 @@ abstract class TrainableModel : InferenceModel() {
     )
 
     /**
-     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     * Trains the model for a fixed number of [epochs] (iterations over a dataset).
      *
      * @param [dataset] The train dataset that combines input data (X) and target data (Y).
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [batchSize] Number of samples per gradient update.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isWeightsInitRequired] Layer variables initialization mode.
-     * True (default) = layer variables are initialized at the beginning of the training phase.
-     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
+     * @param [isWeightsInitRequired] Weights initialization mode.
+     * True (default) = Weights are initialized at the beginning of the training phase.
+     * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
@@ -100,7 +100,7 @@ abstract class TrainableModel : InferenceModel() {
     ): TrainingHistory
 
     /**
-     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     * Trains the model for a fixed number of [epochs] (iterations over a dataset).
      *
      * @param [trainingDataset] The train dataset that combines input data (X) and target data (Y).
      * @param [validationDataset] The validation dataset that combines input data (X) and target data (Y).
@@ -108,9 +108,9 @@ abstract class TrainableModel : InferenceModel() {
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isWeightsInitRequired] Layer variables initialization mode.
-     * True (default) = layer variables are initialized at the beginning of the training phase.
-     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
+     * @param [isWeightsInitRequired] Weights initialization mode.
+     * True (default) = Weights are initialized at the beginning of the training phase.
+     * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
@@ -146,7 +146,7 @@ abstract class TrainableModel : InferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
-     * @return Array of labels. The length is equal to the amount of observations on the [dataset].
+     * @return Array of labels. The length is equal to the Number of sampless on the [dataset].
      */
     abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 

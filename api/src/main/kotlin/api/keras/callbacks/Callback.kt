@@ -8,7 +8,7 @@ import api.keras.history.*
  *
  * NOTE: This class contains empty methods, inherit it and override if you need functionality.
  *
- * Callback methods are calling during training, evaluation, prediction phases on each batch, epoch, start and end of the specific phase.
+ * Callback methods are called during training, evaluation, prediction phases on each batch, epoch, start and end of the specific phase.
  */
 open class Callback {
     /** Sequential model, accessible inside callback methods. */
@@ -36,7 +36,7 @@ open class Callback {
      * Called at the beginning of a batch during training phase.
      *
      * @param [batch] the batch index.
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
     open fun onTrainBatchBegin(batch: Int, batchSize: Int, logs: TrainingHistory) {}
@@ -45,7 +45,7 @@ open class Callback {
      * Called at the end of a batch during training phase.
      *
      * @param [batch] index of batch within the current epoch.
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      * @param [event] Metric and loss values for this batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
@@ -70,7 +70,7 @@ open class Callback {
      * data is provided.
      *
      * @param [batch] the batch number
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
     open fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {}
@@ -81,7 +81,7 @@ open class Callback {
      * provided.
      *
      * @param [batch] the batch number
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      * @param [event] Metric and loss values for this batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
@@ -103,7 +103,7 @@ open class Callback {
      * Called at the beginning of a batch during prediction phase.
      *
      * @param [batch] index of batch.
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      */
     open fun onPredictBatchBegin(batch: Int, batchSize: Int) {}
 
@@ -111,7 +111,7 @@ open class Callback {
      * Called at the end of a batch during prediction phase.
      *
      * @param [batch] index of batch within the current epoch.
-     * @param [batchSize] Amount of observation in the current batch.
+     * @param [batchSize] Number of samples in the current batch.
      */
     open fun onPredictBatchEnd(batch: Int, batchSize: Int) {}
 

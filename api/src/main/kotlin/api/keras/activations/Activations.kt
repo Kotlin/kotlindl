@@ -5,7 +5,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /**
- * Neural network hyper-parameter, activation function of a node defines the output of that node given an input or set of inputs.
+ * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
  */
 enum class Activations {
     /**
@@ -78,7 +78,7 @@ enum class Activations {
      *
      * For this implementations alpha is equal to 1.0.
      *
-     * The ELU hyper-parameter `alpha` controls the value to which an
+     * The ELU hyperparameter `alpha` controls the value to which an
      * ELU saturates for negative net inputs. ELUs diminish the
      * vanishing gradient effect.
      *
