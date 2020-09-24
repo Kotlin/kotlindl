@@ -304,9 +304,9 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
                     Tensor.create(
                         xBatchShape,
-                        batch.x()
+                        batch.x
                     ).use { batchImages ->
-                        Tensor.create(yBatchShape, batch.y()).use { batchLabels ->
+                        Tensor.create(yBatchShape, batch.y).use { batchLabels ->
                             val (lossValue, metricValue) = trainOnBatch(targets, batchImages, batchLabels, metricOp)
 
                             averageTrainingLossAccum += lossValue
@@ -355,16 +355,16 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         xBatchShape: LongArray,
         yBatchShape: LongArray
     ) {
-        check(TensorShape(xBatchShape).numElements().toInt() == batch.x().capacity())
+        check(TensorShape(xBatchShape).numElements().toInt() == batch.x.capacity())
         {
             "The calculated [from the Sequential model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.x().capacity()
+                batch.x.capacity()
             }. Please, check input data."
         }
-        check(TensorShape(yBatchShape).numElements().toInt() == batch.y().capacity())
+        check(TensorShape(yBatchShape).numElements().toInt() == batch.y.capacity())
         {
             "The calculated [from the Sequential model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.y().capacity()
+                batch.y.capacity()
             }. " +
                     "\nPlease, check the input label data or correct amount of classes [amount of neurons] in last Dense layer, if you have a classification problem." +
                     "\nHighly likely, you have different amount of classes presented in data and described in model as desired output."
@@ -433,9 +433,9 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
             Tensor.create(
                 imageShape,
-                batch.x()
+                batch.x
             ).use { testImages ->
-                Tensor.create(labelShape, batch.y()).use { testLabels ->
+                Tensor.create(labelShape, batch.y).use { testLabels ->
                     val lossAndMetrics = session.runner()
                         .fetch(metricOp)
                         .fetch(TRAINING_LOSS)
@@ -493,7 +493,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
             Tensor.create(
                 imageShape,
-                batch.x()
+                batch.x
             ).use { testImages ->
                 val predictionsTensor = session.runner()
                     .fetch(prediction)
@@ -602,7 +602,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
-        val batchSize = batch.size()
+        val batchSize = batch.size
 
         val xBatchShape = calculateXShape(batchSize)
 
