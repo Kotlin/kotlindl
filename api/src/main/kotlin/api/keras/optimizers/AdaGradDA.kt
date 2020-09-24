@@ -4,6 +4,7 @@ import api.core.KGraph
 import api.keras.util.defaultAssignOpName
 import api.keras.util.defaultInitializerOpName
 import api.keras.util.defaultOptimizerVariableName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.Shape
@@ -18,6 +19,27 @@ private val GLOBAL_STEP = defaultOptimizerVariableName("adagrad-da-global-step")
 private const val ACCUMULATOR = "gradient_accumulator"
 private const val SQUARED_ACCUMULATOR = "gradient_squared_accumulator"
 
+/**
+ * Adagrad Dual Averaging algorithm for sparse linear models.
+ *
+ * This optimizer takes care of regularization of unseen features in a mini batch
+ * by updating them when they are seen with a closed form update rule that is equivalent to having updated them on every mini-batch.
+ *
+ * AdagradDA is typically used when there is a need for large sparsity in the trained model.
+ * This optimizer only guarantees sparsity for linear models.
+ * Be careful when using AdagradDA for deep networks
+ * as it will require careful initialization of the gradient accumulators for it to train.
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ * @see <a href="http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf">
+ *     Adaptive Subgradient Methods for Online Learning and Stochastic Optimization:[Duchi et al., 2011]</a>
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [initialAccumulatorValue] Float >= 0. Starting value for the accumulators, must be positive.
+ * @property [l1Strength] A float value, must be greater than or equal to zero.
+ * @property [l2Strength] A float value, must be greater than or equal to zero.
+ */
 class AdaGradDA(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,

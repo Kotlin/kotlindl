@@ -3,6 +3,12 @@ package api.keras.shape
 import org.tensorflow.Shape
 import kotlin.math.abs
 
+/**
+ * Helper wrapper of [Shape] class with helper methods.
+ *
+ * NOTE: Developer API.
+ * TODO: Create extension functions for [Shape] object.
+ */
 class TensorShape() {
     private lateinit var dims: LongArray
 
@@ -31,10 +37,11 @@ class TensorShape() {
         System.arraycopy(dims, 0, this.dims, 1, dims.size)
     }
 
-    fun numDimensions(): Int {
+    private fun numDimensions(): Int {
         return dims.size
     }
 
+    /** Returns amount of elements in Tensor with the given shape. */
     fun numElements(): Long {
         var prod = 1L
         for (i in 0 until numDimensions()) {
@@ -69,7 +76,7 @@ class TensorShape() {
      * @param i Target dimension to test
      * @return Whether dimension i is unknown (equal to -1)
      */
-    fun isKnown(i: Int): Boolean {
+    private fun isKnown(i: Int): Boolean {
         return dims[i] != -1L
     }
 
@@ -151,14 +158,17 @@ class TensorShape() {
         return dims
     }
 
+    /** Returns first dimension from all dimensions [dims]. */
     fun head(vararg dims: Long): Long {
         return dims[0]
     }
 
+    /** Returns last dimensions (except first) from [dims]. */
     fun tail(vararg dims: Long): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
 
+    /** Converts to [Shape] object. */
     fun toShape(): Shape {
         return Shape.make(head(*dims), *tail(*dims))
     }

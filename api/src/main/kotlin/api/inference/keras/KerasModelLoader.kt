@@ -18,6 +18,12 @@ import api.keras.layers.twodim.MaxPool2D
 import com.beust.klaxon.Klaxon
 import java.io.File
 
+/**
+ * Loads a Keras model from json file with model configuration.
+ *
+ * @param [jsonConfigFile] File containing model configuration.
+ * @return Non-compiled and non-trained Sequential model.
+ */
 fun loadKerasModel(
     jsonConfigFile: File
 ): Sequential {
@@ -28,6 +34,14 @@ fun loadKerasModel(
     return Sequential.of(input, layers.toList())
 }
 
+/**
+ * Loads a Keras model layers from json file with model configuration.
+ *
+ * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
+ *
+ * @param jsonConfigFile File containing model configuration.
+ * @return Pair of <list of layers; input layer>.
+ */
 fun loadKerasLayers(jsonConfigFile: File): Pair<MutableList<Layer>, Input> {
     val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
 
@@ -117,7 +131,7 @@ private fun convertVarianceScaling(initializer: KerasInitializer): Initializer {
     } else 12L
 
     val config = initializer.config
-    val scale = config!!.scale!!
+    val scale = config.scale!!
     val mode: Mode = convertMode(config.mode!!)
     val distribution: Distribution = convertDistribution(config.distribution!!)
     return if (scale == 2.0 && mode == Mode.FAN_IN) {

@@ -112,8 +112,8 @@ internal class CnnTest : IntegrationTest() {
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
 
             assertEquals(trainingHistory.batchHistory.size, 60)
-            assertEquals(trainingHistory.batchHistory[0].epoch, 1)
-            assertEquals(trainingHistory.batchHistory[0].batch, 0)
+            assertEquals(trainingHistory.batchHistory[0].epochIndex, 1)
+            assertEquals(trainingHistory.batchHistory[0].batchIndex, 0)
             assertEquals(trainingHistory.batchHistory[0].lossValue, 2.9598662853240967, EPS)
             assertEquals(trainingHistory.batchHistory[0].metricValue, 0.09799999743700027, EPS)
 

@@ -12,6 +12,11 @@ import api.keras.layers.twodim.MaxPool2D
 import com.beust.klaxon.Klaxon
 import java.io.File
 
+/**
+ * Saves model description as json configuration file fully compatible with the Keras TensorFlow framework.
+ *
+ * @param jsonConfigFile File to write model configuration.
+ */
 fun Sequential.saveConfig(jsonConfigFile: File) {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {

@@ -3,6 +3,14 @@ package api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Initializer that generates tensors with a normal distribution.
+ *
+ * @property [mean] Mean of the random values to generate.
+ * @property [stdev] Standard deviation of the random values to generate.
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates a [RandomNormal] initializer.
+ */
 class RandomNormal(
     private val mean: Float,
     private val stdev: Float,

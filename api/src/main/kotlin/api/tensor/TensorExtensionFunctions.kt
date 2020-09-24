@@ -6,6 +6,7 @@ import api.keras.shape.reshape3DTo1D
 import api.keras.shape.reshape4DTo1D
 import org.tensorflow.Tensor
 
+/** Copies tensor data to float array. */
 fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
     val tensorForCopying = this
 
@@ -55,6 +56,7 @@ fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
     }
 }
 
+/** Copies tensor to multi-dimensional float array. Array rank is equal to tensor rank. */
 fun Tensor<*>.convertTensorToMultiDimArray(): Array<*> {
     val tensorForCopying = this
 

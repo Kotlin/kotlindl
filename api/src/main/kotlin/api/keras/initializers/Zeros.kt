@@ -4,6 +4,9 @@ import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Initializer that generates tensors initialized to 0.
+ */
 class Zeros : Initializer() {
     override fun initialize(
         fanIn: Int,

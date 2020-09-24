@@ -4,10 +4,12 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.math.Mean
 
+/** */
 fun Kmean(tf: Ops, x: Operand<Float>): Operand<Float> {
     return Kmean(tf, x, null, false)
 }
 
+/** */
 fun Kmean(
     tf: Ops,
     x: Operand<Float>,
@@ -16,10 +18,12 @@ fun Kmean(
     return Kmean(tf, x, axis, false)
 }
 
+/** */
 fun Kmean(tf: Ops, x: Operand<Float>, keepDims: Boolean): Operand<Float> {
     return Kmean(tf, x, null, keepDims)
 }
 
+/** */
 fun Kmean(
     tf: Ops,
     x: Operand<Float>,

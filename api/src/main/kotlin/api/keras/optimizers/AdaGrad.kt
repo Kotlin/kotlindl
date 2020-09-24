@@ -2,6 +2,7 @@ package api.keras.optimizers
 
 import api.core.KGraph
 import api.keras.util.defaultInitializerOpName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -12,6 +13,27 @@ import java.util.*
 
 private const val ACCUMULATOR = "accumulator"
 
+/**
+ * Adagrad optimizer.
+ *
+ * Updates variable according next formula:
+ * ```
+ * accum += grad * grad
+ * var -= lr * grad * (1 / sqrt(accum))
+ * ```
+ *
+ * Adagrad is an optimizer with parameter-specific learning rates,
+ * which are adapted relative to how frequently a parameter gets
+ * updated during training. The more updates a parameter receives, the smaller the updates.
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ * @see <a href="http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf">
+ *     Adaptive Subgradient Methods for Online Learning and Stochastic Optimization</a>
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [initialAccumulatorValue] Decay: Float >= 0. Learning rate decay over each update.
+ */
 class AdaGrad(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,

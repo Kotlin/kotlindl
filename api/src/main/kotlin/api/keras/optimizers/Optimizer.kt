@@ -3,6 +3,7 @@ package api.keras.optimizers
 import api.core.KGraph
 import api.keras.util.defaultAssignOpName
 import api.keras.util.defaultOptimizerVariableName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -10,13 +11,27 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 
-/** Base class for all optimizers. */
+/**
+ * Base class for all optimizers.
+ *
+ * @property [clipGradient] Strategy of gradient clipping as sub-class of [ClipGradientAction].
+ */
 abstract class Optimizer(val clipGradient: ClipGradientAction) {
     /**
      * Top level map key is the variable name, lower level map key is the slot name.
      */
     private lateinit var slots: MutableMap<String, MutableMap<String, Variable<Float>>>
 
+    /**
+     * Prepares targets for optimization process.
+     *
+     * NOTE: Developer API.
+     *
+     * @param [graph] KGraph to be updated.
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [loss] Loss function.
+     * @return List of optimizer operands to update variables.
+     */
     fun prepareTargets(
         graph: KGraph,
         tf: Ops,
@@ -44,6 +59,16 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
         return variableOutputs
     }
 
+    /**
+     * Applies gradients to weights.
+     *
+     * NOTE: Developer API. Override this method in each optimizer.
+     *
+     * @param [graph] KGraph to be updated.
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [weights] Variables to update in optimizer.
+     * @param [gradients] See [Gradients] for more information.
+     */
     protected abstract fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -68,16 +93,18 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
 
     }
 
+    /** Returns optimizer name. */
     abstract fun getOptimizerName(): String
-
 
     /**
      * Creates a slot in the graph for the specified variable with the specified name. Adds the slot's
      * initializer to the graph's initializers, and the slot to the optimiser's slot map.
      *
-     * @param variable    The variable to create the slot for.
-     * @param slotName    The name of the slot.
-     * @param initializer The initializer for the slot.
+     * @param [graph] KGraph to be updated.
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [variable]    The variable to create the slot for.
+     * @param [slotName]    The name of the slot.
+     * @param [initializer] The initializer for the slot.
      */
     protected open fun createSlot(
         graph: KGraph,
@@ -104,8 +131,8 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
     /**
      * Gets the slot associated with the specified variable and slot name.
      *
-     * @param varName  The variable to lookup.
-     * @param slotName The slot name.
+     * @param [varName]  The variable to lookup.
+     * @param [slotName] The slot name.
      * @return The slot.
      */
     protected fun getSlot(
@@ -116,10 +143,9 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
         return variables[varName]!!
     }
 
-    fun getDType(): Class<Float> {
-        return Float::class.javaObjectType
-    }
-
+    /**
+     * Creates name for [variable] used in slot with name [slotName].
+     */
     open fun createName(variable: Output<Float>, slotName: String): String {
         return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }

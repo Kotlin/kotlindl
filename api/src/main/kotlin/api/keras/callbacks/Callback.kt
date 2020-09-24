@@ -3,51 +3,56 @@ package api.keras.callbacks
 import api.keras.Sequential
 import api.keras.history.*
 
+/**
+ * Base class used to build new callbacks.
+ *
+ * NOTE: This class contains empty methods, inherit it and override if you need functionality.
+ *
+ * Callback methods are called during training, evaluation, prediction phases on each batch, epoch, start and end of the specific phase.
+ */
 open class Callback {
+    /** Sequential model, accessible inside callback methods. */
     lateinit var model: Sequential
 
     /**
-     * Called at the start of an epoch. This method should only be called during
-     * TRAIN mode. This method is empty. Extend this class to handle this event.
+     * Called at the start of an epoch during training phase.
      *
-     * @param epoch index of epoch.
-     * @param logs metric results
+     * @param [epoch] index of epoch.
+     * @param [logs] training history, containing full information about previous epochs.
      */
     open fun onEpochBegin(epoch: Int, logs: TrainingHistory) {}
 
     /**
-     * Called at the end of an epoch.This method should only be called during
-     * TRAIN mode. This method is empty. Extend this class to handle this event.
+     * Called at the end of an epoch during training phase.
      *
-     * @param epoch index of epoch.
-     * @param event metric results for this training epoch, and for the
-     * validation epoch if validation is performed. Validation result keys are
-     * prefixed with `val_`.
+     * @param [epoch] index of epoch.
+     * @param [event] metric results for this training epoch, and for the
+     * validation epoch if validation is performed.
+     * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {}
+    open fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {}
 
     /**
-     * Called at the beginning of a training batch in `fit` methods. This method
-     * is empty. Extend this class to handle this event.
+     * Called at the beginning of a batch during training phase.
      *
-     * @param batch the batch index
-     * @param logs Has keys `batch` and `size` representing the current batch
-     * number and the size of the batch.
+     * @param [batch] the batch index.
+     * @param [batchSize] Number of samples in the current batch.
+     * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTrainBatchBegin(batch: Int, logs: TrainingHistory) {}
+    open fun onTrainBatchBegin(batch: Int, batchSize: Int, logs: TrainingHistory) {}
 
     /**
-     * Called at the end of a training batch in `fit` methods. This method is
-     * empty. Extend this class to handle this event.
+     * Called at the end of a batch during training phase.
      *
-     * @param batch index of batch within the current epoch.
-     * @param event Metric results for this batch.
+     * @param [batch] index of batch within the current epoch.
+     * @param [batchSize] Number of samples in the current batch.
+     * @param [event] Metric and loss values for this batch.
+     * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTrainBatchEnd(batch: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {}
+    open fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {}
 
     /**
-     * Called at the beginning of training. This method is empty. Extend this
-     * class to handle this event.
+     * Called at the beginning of training.
      */
     open fun onTrainBegin() {}
 
@@ -55,76 +60,68 @@ open class Callback {
      * Called at the end of training. This method is empty. Extend this class to
      * handle this event.
      *
-     * @param logs metric results
+     * @param [logs] training history, containing full information about previous epochs.
      */
     open fun onTrainEnd(logs: TrainingHistory) {}
 
     /**
-     * Called at the beginning of a batch in `evaluate` methods. Also called at
-     * the beginning of a validation batch in the `fit` methods, if validation
-     * data is provided. This method is empty. Extend this class to handle this
-     * event.
+     * Called at the beginning of a batch during evaluation phase. Also called at
+     * the beginning of a validation batch during validation phase, if validation
+     * data is provided.
      *
-     * @param batch the batch number
-     * @param logs Has keys `batch` and `size` representing the current batch
-     * number and the size of the batch.
+     * @param [batch] the batch number
+     * @param [batchSize] Number of samples in the current batch.
+     * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTestBatchBegin(batch: Int, logs: History) {}
+    open fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {}
 
     /**
-     * Called at the end of a batch in `evaluate` methods. Also called at the
-     * end of a validation batch in the `fit` methods, if validation data is
+     * Called at the end of a batch during evaluation phase. Also called at the
+     * end of a validation batch during validation phase, if validation data is
      * provided.
      *
-     * This method is empty. Extend this class to handle this event.
-     *
-     * @param batch the batch number
-     * @param event Metric results for this batch.
-     * @param logs Has keys `batch` and `size` representing the current batch
-     * number and the size of the batch.
+     * @param [batch] the batch number
+     * @param [batchSize] Number of samples in the current batch.
+     * @param [event] Metric and loss values for this batch.
+     * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTestBatchEnd(batch: Int, event: BatchEvent?, logs: History) {}
+    open fun onTestBatchEnd(batch: Int, batchSize: Int, event: BatchEvent?, logs: History) {}
 
     /**
-     * Called at the beginning of evaluation or validation. This method is
-     * empty. Extend this class to handle this event.
+     * Called at the beginning of evaluation or validation.
      */
     open fun onTestBegin() {}
 
     /**
-     * Called at the end of evaluation or validation. This method is empty.
-     * Extend this class to handle this event.
+     * Called at the end of evaluation or validation.
      *
-     * @param logs metric results
+     * @param [logs] evaluation history, containing full information about previous batches.
      */
     open fun onTestEnd(logs: History) {}
 
     /**
-     * Called at the beginning of a batch in `predict` methods. This method is
-     * empty. Extend this class to handle this event.
+     * Called at the beginning of a batch during prediction phase.
      *
-     * @param batch index of batch within the current epoch.
-     * number and the size of the batch.
+     * @param [batch] index of batch.
+     * @param [batchSize] Number of samples in the current batch.
      */
-    open fun onPredictBatchBegin(batch: Int) {}
+    open fun onPredictBatchBegin(batch: Int, batchSize: Int) {}
 
     /**
-     * Called at the end of a batch in `predict` methods. This method is empty.
-     * Extend this class to handle this event.
+     * Called at the end of a batch during prediction phase.
      *
-     * @param batch index of batch within the current epoch.
+     * @param [batch] index of batch within the current epoch.
+     * @param [batchSize] Number of samples in the current batch.
      */
-    open fun onPredictBatchEnd(batch: Int) {}
+    open fun onPredictBatchEnd(batch: Int, batchSize: Int) {}
 
     /**
-     * Called at the beginning of prediction. This method is empty. Extend this
-     * class to handle this event.
+     * Called at the beginning of prediction.
      */
     open fun onPredictBegin() {}
 
     /**
-     * Called at the end of prediction. This method is empty. Extend this class
-     * to handle this event.
+     * Called at the end of prediction.
      */
     open fun onPredictEnd() {}
 }

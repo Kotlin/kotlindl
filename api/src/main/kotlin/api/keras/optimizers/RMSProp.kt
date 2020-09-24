@@ -2,6 +2,7 @@ package api.keras.optimizers
 
 import api.core.KGraph
 import api.keras.util.defaultInitializerOpName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -14,6 +15,15 @@ private const val RMS = "rms"
 private const val MG = "mg"
 private const val MOMENTUM = "momentum"
 
+/**
+ * RMSProp optimizer.
+ *
+ * @property [learningRate] Float >= 0. Learning rate.
+ * @property [decay] Float >= 0. Learning rate decay over each update.
+ * @property [momentum] Float >= 0. Parameter that accelerates RMSProp in the relevant direction and dampens oscillations.
+ * @property [epsilon] Float >= 0. Fuzz factor.
+ * @property [centered] Centered or not.
+ */
 class RMSProp(
     private val learningRate: Float = 0.001f,
     private val decay: Float = 0.9f,

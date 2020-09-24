@@ -7,10 +7,42 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.math.abs
 
+/**
+ * This enum describes a few strategies of training stopping.
+ */
 enum class EarlyStoppingMode {
-    AUTO, MIN, MAX
+    /**
+     * In this mode the direction is
+     * automatically inferred from the name of the monitored quantity.
+     */
+    AUTO,
+
+    /**
+     * In this mode, training will stop when the quantity monitored
+     * has stopped decreasing.
+     */
+    MIN,
+
+    /**
+     * In this mode, training will stop when the quantity
+     * monitored has stopped increasing.
+     */
+    MAX
 }
 
+/**
+ * This callback stops training when a monitored metric has stopped improving.
+ *
+ * Assuming the goal of a training is to minimize the loss. With this, the
+ * metric to be monitored would be `'loss'`, and mode would be `'min'`. A
+ * `model.fit()` training loop will check at end of every epoch whether
+ * the loss is no longer decreasing, considering the `min_delta` and
+ * `patience` if applicable. Once it's found no longer decreasing,
+ * `model.stop_training` is marked True and the training terminates.
+ *
+ * The quantity to be monitored needs to be available in `logs`.
+ * To make it so, pass the loss or metrics at `model.compile()`.
+ */
 class EarlyStopping : Callback() {
     private var wait = 0
     private var stoppedEpoch = 0
@@ -128,7 +160,7 @@ class EarlyStopping : Callback() {
             if (baseline != null) baseline!! else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
     }
 
-    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent) {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {
         val current: Number = getMonitorValue(event, monitor) ?: return
         if (monitorOp!!.apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()

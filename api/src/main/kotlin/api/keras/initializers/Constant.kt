@@ -3,6 +3,12 @@ package api.keras.initializers
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Initializer that generates tensors with constant values.
+ *
+ * @property constantValue Constant value to fill the tensor.
+ * @constructor Creates a [Constant] initializer with a given [constantValue].
+ */
 class Constant(private val constantValue: Float) : Initializer() {
     override fun initialize(
         fanIn: Int,

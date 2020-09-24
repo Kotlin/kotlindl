@@ -7,10 +7,19 @@ import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 import util.MnistUtils
 
-open class SavedModelInferenceModel : InferenceModel() {
-    private lateinit var bundle: SavedModelBundle // extract for inference with SavedModelBundle and move this property to this
+/**
+ * Inference model built on SavedModelBundle format to predict on images.
+ */
+open class SavedModel : InferenceModel() {
+    /** SavedModelBundle.*/
+    private lateinit var bundle: SavedModelBundle
+
+    /** Reshape function. */
     private lateinit var reshape2: (DoubleArray) -> Tensor<*>?
 
+    /**
+     * Predicts the probabilities to be from known class for multi-classification task.
+     */
     fun predict(image: MnistUtils.Image): LongArray {
         return predictOnImage(image)
     }
@@ -25,6 +34,11 @@ open class SavedModelInferenceModel : InferenceModel() {
             .copyTo(LongArray(1))
     }
 
+    /**
+     * Predicts labels for all [images].
+     *
+     * @param [images] Given list of images.
+     */
     fun predictAll(images: List<MnistUtils.Image>): List<Double> {
         val predictedLabels: MutableList<Double> = mutableListOf()
 
@@ -36,6 +50,9 @@ open class SavedModelInferenceModel : InferenceModel() {
         return predictedLabels
     }
 
+    /**
+     * Evaluates [testImages] via [metric].
+     */
     fun evaluate(
         testImages: MutableList<MnistUtils.LabeledImage>,
         metric: Metrics
@@ -55,7 +72,10 @@ open class SavedModelInferenceModel : InferenceModel() {
         }
     }
 
-    fun loadModel(pathToModel: String): SavedModelInferenceModel {
+    /**
+     * Loads model from SavedModelBundle format.
+     */
+    fun loadModel(pathToModel: String): SavedModel {
         bundle = SavedModelBundle.load(pathToModel, "serve")
         session = bundle.session()
         val graph = bundle.graph()
@@ -70,11 +90,13 @@ open class SavedModelInferenceModel : InferenceModel() {
         kGraph.close()
     }
 
+    /** Reshapes [DoubleArray] to [Tensor]. */
     fun reshape2(function: (DoubleArray) -> Tensor<*>?) {
         reshape2 = function
     }
 }
 
-fun prepareModelForInference(init: SavedModelInferenceModel.() -> Unit): SavedModelInferenceModel =
-    SavedModelInferenceModel()
+/** Defines receiver for [SavedModel]. */
+fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
+    SavedModel()
         .apply(init)

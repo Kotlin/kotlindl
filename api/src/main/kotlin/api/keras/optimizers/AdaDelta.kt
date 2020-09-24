@@ -2,6 +2,7 @@ package api.keras.optimizers
 
 import api.core.KGraph
 import api.keras.util.defaultInitializerOpName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
@@ -13,6 +14,32 @@ import java.util.*
 private const val ACCUMULATOR = "accum"
 private const val ACCUMULATOR_UPDATE = "accum_update"
 
+/**
+ * Adadelta optimizer.
+ *
+ * Updates variable according next formula:
+ * ```
+ * accum = rho() * accum + (1 - rho()) * grad.square();
+ * update = (update_accum + epsilon).sqrt() * (accum + epsilon()).rsqrt() * grad;
+ * update_accum = rho() * update_accum + (1 - rho()) * update.square();
+ * var -= update;
+ * ```
+ *
+ * Adadelta is a more robust extension of Adagrad that adapts learning rates based on a moving window of gradient updates,
+ * instead of accumulating all past gradients.
+ * This way, Adadelta continues learning even when many updates have been done.
+ * Compared to Adagrad, in the original version of Adadelta you don't have to set an initial learning rate.
+ * In this version, initial learning rate and decay factor can be set, as in most other Keras optimizers.
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ * @see <a href="http://arxiv.org/abs/1212.5701">
+ *     Adadelta - an adaptive learning rate method</a>
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [rho] Float >= 0. Adadelta decay factor, corresponding to fraction of gradient to keep at each time step.
+ * @property [epsilon] Float >= 0. Fuzz factor.
+ */
 class AdaDelta(
     private val learningRate: Float = 0.1f,
     private val rho: Float = 0.95f,

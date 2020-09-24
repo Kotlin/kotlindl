@@ -13,6 +13,13 @@ import io.jhdf.HdfFile
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
 
+/**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework.
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
+ */
 fun Sequential.loadWeights(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
@@ -39,7 +46,14 @@ fun Sequential.loadWeights(
 }
 
 /**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
+ *
+ * NOTE: Weights for another layers will not be loaded (should be initialized manually).
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
  * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
 fun Sequential.loadWeights(
     hdfFile: HdfFile,
@@ -83,7 +97,13 @@ fun Sequential.loadWeights(
 }
 
 /**
- * Weights for other layers will be initialized by initializer later.
+ * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
+ *
+ * NOTE: Weights for another layers will not be loaded (should be initialized manually or loaded separately).
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
 fun Sequential.loadWeightsForFrozenLayers(
     hdfFile: HdfFile,
@@ -151,10 +171,9 @@ private fun fillConv2DVariables(
 
     val kernelVariableName = conv2dKernelVarName(name)
     val biasVariableName = conv2dBiasVarName(name)
-    model.addInitOpsToGraph(kernelVariableName, kernelData)
-    model.addInitOpsToGraph(biasVariableName, biasData)
+    model.fillVariable(kernelVariableName, kernelData)
+    model.fillVariable(biasVariableName, biasData)
 }
-
 
 private fun fillDenseVariables(
     name: String,
@@ -169,8 +188,6 @@ private fun fillDenseVariables(
     val kernelVariableName = denseKernelVarName(name)
     val biasVariableName = denseBiasVarName(name)
 
-    model.addInitOpsToGraph(kernelVariableName, kernelData)
-    model.addInitOpsToGraph(biasVariableName, biasData)
+    model.fillVariable(kernelVariableName, kernelData)
+    model.fillVariable(biasVariableName, biasData)
 }
-
-

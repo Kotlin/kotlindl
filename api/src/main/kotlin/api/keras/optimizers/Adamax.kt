@@ -4,6 +4,7 @@ import api.core.KGraph
 import api.keras.util.defaultAssignOpName
 import api.keras.util.defaultInitializerOpName
 import api.keras.util.defaultOptimizerVariableName
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.Shape
@@ -21,7 +22,24 @@ private const val SECOND_MOMENT = "v"
 private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
 
 /**
- * Note: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ * Adamax optimizer from Adam paper's Section 7.
+ *
+ * Updates variable according next formula:
+ * ```
+ * m_t <- beta1 * m_{t-1} + (1 - beta1) * g
+ * v_t <- max(beta2 * v_{t-1}, abs(g))
+ * variable <- variable - learning_rate / (1 - beta1^t) * m_t / (v_t + epsilon)
+ * ```
+ * It is a variant of Adam based on the infinity norm. Default parameters follow those provided in the paper.
+ *
+ * NOTE: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ *
+ * It is recommended to leave the parameters of this optimizer at their default values.
+ *
+ * @property [learningRate] Float >= 0. Initial learning rate.
+ * @property [beta1] 0 < beta < 1. Generally close to 1.
+ * @property [beta2] 0 < beta < 1. Generally close to 1.
+ * @property [epsilon] Float >= 0. Fuzz factor.
  */
 class Adamax(
     private val learningRate: Float = 0.001f,

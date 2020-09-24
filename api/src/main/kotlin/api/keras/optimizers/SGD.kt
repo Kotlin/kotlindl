@@ -1,12 +1,18 @@
 package api.keras.optimizers
 
 import api.core.KGraph
+import api.keras.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import java.util.*
 
+/**
+ * Stochastic gradient descent optimizer.
+ *
+ * NOTE: It's not an equivalent for keras.sgd, it's pure SGD with simple 'variable' update by subtracting 'alpha' * 'delta' from it.
+ */
 class SGD(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {

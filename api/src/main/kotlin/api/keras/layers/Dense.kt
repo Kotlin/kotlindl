@@ -8,6 +8,7 @@ import api.keras.shape.numElementsInShape
 import api.keras.shape.shapeToLongArray
 import api.keras.util.denseBiasVarName
 import api.keras.util.denseKernelVarName
+import api.keras.util.getDType
 import api.tensor.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -17,6 +18,19 @@ import org.tensorflow.op.core.Variable
 private const val KERNEL = "dense_kernel"
 private const val BIAS = "dense_bias"
 
+/**
+ * Densely-connected (fully-connected) layer class.
+ *
+ * This layer implements the operation:
+ * `outputs = activation(inputs * kernel + bias)`
+ *
+ * @property [outputSize] Dimensionality of the output space.
+ * @property [activation] Activation function.
+ * @property [kernelInitializer] Initializer function for the weight matrix.
+ * @property [biasInitializer] Initializer function for the bias.
+ * @property [name] Custom layer name.
+ * @constructor Creates [Dense] object.
+ */
 class Dense(
     val outputSize: Int,
     val activation: Activations = Activations.Sigmoid,
@@ -26,6 +40,7 @@ class Dense(
 ) : Layer(name) {
     private lateinit var kernelShape: Shape
     private lateinit var biasShape: Shape
+
     // weight tensors
     private lateinit var kernel: Variable<Float>
     private lateinit var bias: Variable<Float>
@@ -98,6 +113,4 @@ class Dense(
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"
     }
-
-
 }
