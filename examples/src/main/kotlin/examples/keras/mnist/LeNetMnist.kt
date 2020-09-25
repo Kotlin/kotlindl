@@ -17,8 +17,8 @@ import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
 
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 2777
+private const val EPOCHS = 2
+private const val TRAINING_BATCH_SIZE = 2000
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L

@@ -13,9 +13,9 @@ import org.tensorflow.op.Ops
  * @constructor Creates a [RandomUniform] initializer.
  */
 class RandomUniform(
-    private val maxVal: Float,
-    private val minVal: Float,
-    private val seed: Long
+    private val maxVal: Float = 1.0f,
+    private val minVal: Float = 0.0f,
+    private val seed: Long = 12L
 ) :
     Initializer() {
     override fun initialize(

@@ -106,6 +106,10 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
     return when (initializer.class_name!!) {
         INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(seed = seed)
         INITIALIZER_GLOROT_NORMAL -> GlorotNormal(seed = seed)
+        INITIALIZER_HE_NORMAL -> HeNormal(seed = seed)
+        INITIALIZER_HE_UNIFORM -> HeUniform(seed = seed)
+        INITIALIZER_LECUN_NORMAL -> LeCunNormal(seed = seed)
+        INITIALIZER_LECUN_UNIFORM -> LeCunUniform(seed = seed)
         INITIALIZER_ZEROS -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
         INITIALIZER_ONES -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
         INITIALIZER_RANDOM_NORMAL -> RandomNormal(

@@ -5,6 +5,7 @@ import api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.op.random.RandomUniform
 
 /**
  * Applies Dropout to the input.
@@ -20,6 +21,7 @@ import org.tensorflow.op.Ops
  */
 class Dropout(
     private val keepProbability: Float = 0.1f,
+    private val seed: Long = 12L,
     name: String = ""
 ) : Layer(name) {
 
@@ -44,7 +46,8 @@ class Dropout(
         for (i in 1 until inputShape.numDimensions()) // skip first dimension
             dims.add(inputShape.size(i))
 
-        val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType())
+        val options = RandomUniform.seed(seed).seed2(seed + 1)
+        val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType(), options)
 
         val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<Float>))
 

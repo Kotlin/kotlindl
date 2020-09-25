@@ -66,6 +66,10 @@ private fun convertToKerasInitializer(initializer: Initializer): KerasInitialize
     val className = when (initializer::class) {
         GlorotUniform::class -> INITIALIZER_GLOROT_UNIFORM
         GlorotNormal::class -> INITIALIZER_GLOROT_NORMAL
+        HeNormal::class -> INITIALIZER_HE_NORMAL
+        HeUniform::class -> INITIALIZER_HE_UNIFORM
+        LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
+        LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
         Zeros::class -> INITIALIZER_ZEROS
         Ones::class -> INITIALIZER_ONES
         else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")

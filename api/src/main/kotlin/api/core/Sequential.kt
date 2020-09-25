@@ -135,15 +135,14 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             }
         }
 
-        // TODO: change signature - File with config instead of path to directory
         /**
          * Loads a Sequential model from json file with model configuration.
          *
-         * @param [pathToModelDirectory] Directory, containing file 'modelConfig.json'.
+         * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @return Non-compiled and non-trained Sequential model.
          */
-        fun load(pathToModelDirectory: String): Sequential {
-            val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+        fun load(modelDirectory: File): Sequential {
+            val jsonConfig = File("${modelDirectory.absolutePath}/modelConfig.json")
             return loadKerasModel(jsonConfig)
         }
     }

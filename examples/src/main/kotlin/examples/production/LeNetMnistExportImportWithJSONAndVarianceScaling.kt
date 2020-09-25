@@ -54,7 +54,7 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    val model = Sequential.load(PATH_TO_MODEL)
+    val model = Sequential.load(File(PATH_TO_MODEL))
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
