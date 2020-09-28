@@ -1,7 +1,7 @@
 package api.core
 
 /** Model saving format. */
-enum class ModelFormat {
+public enum class ModelFormat {
     /** Saves model as graph in .pb file format and variables in .txt file format. */
     TF_GRAPH_CUSTOM_VARIABLES,
 

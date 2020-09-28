@@ -15,11 +15,11 @@ import org.tensorflow.op.core.Variable
  *
  * @constructor Creates KGraph by serialized representation of the graph.
  */
-class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
-    constructor(graphDef: ByteArray) : this(graphDef, "")
+public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
+    public constructor(graphDef: ByteArray) : this(graphDef, "")
 
     /** Internal static TensorFlow graph. */
-    var tfGraph: Graph = Graph()
+    public var tfGraph: Graph = Graph()
 
     /** A list of initializer to initialize the trainableVariables. */
     private val optimizerInitializers: MutableList<Assign<*>> = mutableListOf()
@@ -72,7 +72,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      * @param variable Variable to track in KGraph.
      * @param isTrainable When passed isTrainable = true, the KGraph automatically adds new variables to the tracked collection of graph variables.
      */
-    fun addLayerVariable(variable: Variable<Float>, isTrainable: Boolean) {
+    public fun addLayerVariable(variable: Variable<Float>, isTrainable: Boolean) {
         check(!layerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
         layerVariables[variable] = isTrainable
     }
@@ -82,7 +82,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      *
      * @param variable Optimizer variable to track in KGraph.
      */
-    fun addOptimizerVariable(variable: Variable<Float>) {
+    public fun addOptimizerVariable(variable: Variable<Float>) {
         check(!optimizerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
         optimizerVariables.add(variable)
     }
@@ -93,7 +93,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      * @param variableName Variable name to bind the variable and initializer.
      * @param initializer Assign TensorFlow operand to initialize variable with name: [variableName].
      */
-    fun addInitializer(variableName: String, initializer: Assign<Float>) {
+    public fun addInitializer(variableName: String, initializer: Assign<Float>) {
         check(!initializers.contains(variableName)) { "$variableName has initializer already. Analyze and fix the static graph building process." }
         initializers[variableName] = initializer
     }
@@ -103,7 +103,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      *
      * @param initializer Assign TensorFlow operand to initialize optimizer variable.
      */
-    fun addOptimizerVariableInitializer(initializer: Assign<*>) {
+    public fun addOptimizerVariableInitializer(initializer: Assign<*>) {
         optimizerInitializers += initializer
     }
 
@@ -112,14 +112,14 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      *
      * @param initializer AssignAdd TensorFlow operand to initialize and increase optimizer variable.
      */
-    fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<Float>) {
+    public fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<Float>) {
         optimizerAssignAddInitializers += initializer
     }
 
     /**
      * Returns a list of trainable variables used in layers.
      */
-    fun trainableLayerVariables(): List<Variable<Float>> {
+    public fun trainableLayerVariables(): List<Variable<Float>> {
         return layerVariables.filter { it.value }.keys.toList()
     }
 
@@ -128,7 +128,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      *
      * @param variableName Variable name.
      */
-    fun isVariableTrainable(variableName: String): Boolean {
+    public fun isVariableTrainable(variableName: String): Boolean {
         return layerVariables
             .filter { it.value } // only trainable
             .map { it.key.ref().op().name() } // extract names
@@ -138,35 +138,35 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /**
      * Returns a list of non-trainable, 'frozen' variables used in layers.
      */
-    fun frozenLayerVariables(): List<Variable<Float>> {
+    public fun frozenLayerVariables(): List<Variable<Float>> {
         return layerVariables.filterNot { it.value }.keys.toList()
     }
 
     /**
      * Returns all variables used in all model layers.
      */
-    fun layerVariables(): List<Variable<Float>> {
+    public fun layerVariables(): List<Variable<Float>> {
         return layerVariables.keys.toList()
     }
 
     /**
      * Returns all variables used in optimizer and initialized by Assign TensorFlow operand.
      */
-    fun optimizerVariables(): List<Variable<Float>> {
+    public fun optimizerVariables(): List<Variable<Float>> {
         return optimizerVariables.toList()
     }
 
     /**
      * Returns all variables used in optimizer and initialized by AssignAdd TensorFlow operand.
      */
-    fun optimizerVariablesForAssignAddInitializer(): List<Variable<Long>> {
+    public fun optimizerVariablesForAssignAddInitializer(): List<Variable<Long>> {
         return optimizerVariablesForAssignAddInitializer().toList()
     }
 
     /**
      * Initializes TensorFlow graph variables used in model layers.
      */
-    fun initializeGraphVariables(session: Session) {
+    public fun initializeGraphVariables(session: Session) {
         val runner = session.runner()
 
         initializers.forEach {
@@ -179,7 +179,7 @@ class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /**
      * Initializes TensorFlow graph variables used in optimizer.
      */
-    fun initializeOptimizerVariables(session: Session) {
+    public fun initializeOptimizerVariables(session: Session) {
         if (optimizerInitializers.isNotEmpty()) {
             optimizerInitializers.forEach {
                 val runner = session.runner()

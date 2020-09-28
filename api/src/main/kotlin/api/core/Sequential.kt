@@ -35,7 +35,7 @@ import java.io.File
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [input] and [layers].
  */
-class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
+public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
     val logger = KotlinLogging.logger {}
 
@@ -68,7 +68,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         session = Session(kGraph.tfGraph)
     }
 
-    companion object {
+    public companion object {
         /**
          * Creates the [Sequential] model.
          *
@@ -76,7 +76,7 @@ class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun of(input: Input, vararg layers: Layer): Sequential {
+        public fun of(input: Input, vararg layers: Layer): Sequential {
             preProcessLayerNames(layers)
             val seqModel = Sequential(input, *layers)
             postProcessLayerNames(layers, seqModel)
