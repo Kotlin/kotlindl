@@ -8,7 +8,6 @@ import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.core.optimizer.Optimizer
 import api.core.optimizer.SGD
-import api.core.util.OUTPUT_NAME
 import api.inference.InferenceModel
 import datasets.Dataset
 import org.tensorflow.Operand
@@ -203,7 +202,7 @@ abstract class TrainableModel : InferenceModel() {
      */
     abstract fun predictAndGetActivations(
         inputData: FloatArray,
-        predictionTensorName: String = OUTPUT_NAME
+        predictionTensorName: String = ""
     ): Pair<Int, List<*>>
 
     /**
@@ -217,7 +216,7 @@ abstract class TrainableModel : InferenceModel() {
     protected abstract fun predictSoftlyAndGetActivations(
         inputData: FloatArray,
         visualizationIsEnabled: Boolean,
-        predictionTensorName: String = OUTPUT_NAME
+        predictionTensorName: String
     ): Pair<FloatArray, List<*>>
 
     /**

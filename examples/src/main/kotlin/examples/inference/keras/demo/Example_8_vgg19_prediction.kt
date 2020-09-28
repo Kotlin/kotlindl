@@ -21,7 +21,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = LossFunctions.MAE,
             metric = Metrics.ACCURACY
         )
 
@@ -37,7 +37,7 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
-            val (res, _) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, _) = it.predictAndGetActivations(floatArray)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)

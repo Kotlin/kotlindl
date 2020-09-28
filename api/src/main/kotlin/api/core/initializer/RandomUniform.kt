@@ -25,7 +25,7 @@ class RandomUniform(
         shape: Operand<Int>,
         name: String
     ): Operand<Float> {
-        require(minVal < maxVal) { "The minVal parameter value must be less than maxVal parameter value." }
+        require(minVal <= maxVal) { "The minVal parameter value must be less or equal than maxVal parameter value." }
 
         val seeds = longArrayOf(seed, 0L)
         var distOp: Operand<Float> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())

@@ -35,12 +35,12 @@ fun main() {
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
-            val (res, activations) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, activations) = it.predictAndGetActivations(floatArray)
             println(res)
             drawActivations(activations)
 
-            val predictionVector = it.predictSoftly(floatArray, "Softmax").toMutableList()
-            val predictionVector2 = it.predictSoftly(floatArray, "Softmax").toMutableList()
+            val predictionVector = it.predictSoftly(floatArray).toMutableList()
+            val predictionVector2 = it.predictSoftly(floatArray).toMutableList()
 
 
             val top5: MutableMap<Int, Int> = mutableMapOf()

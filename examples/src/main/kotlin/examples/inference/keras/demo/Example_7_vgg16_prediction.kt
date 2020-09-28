@@ -25,7 +25,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = LossFunctions.MAE,
             metric = Metrics.ACCURACY
         )
         println(it.kGraph)
@@ -44,7 +44,7 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
-            val (res, _) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, _) = it.predictAndGetActivations(floatArray, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)
@@ -59,8 +59,8 @@ fun predictTop5Labels(
     floatArray: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>
 ): MutableMap<Int, Pair<String, Float>> {
-    val predictionVector = it.predictSoftly(floatArray, "Softmax").toMutableList()
-    val predictionVector2 = it.predictSoftly(floatArray, "Softmax").toMutableList() // get copy of previous vector
+    val predictionVector = it.predictSoftly(floatArray).toMutableList()
+    val predictionVector2 = it.predictSoftly(floatArray).toMutableList() // get copy of previous vector
 
     val top5: MutableMap<Int, Pair<String, Float>> = mutableMapOf()
     for (j in 1..5) {

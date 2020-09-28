@@ -81,11 +81,15 @@ open class InferenceModel : AutoCloseable {
      * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from intermediate parts of the TensorFlow graphs.
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
-    open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray {
+    open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
+        val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
+
+        require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
+
         reshapeFunction(inputData).use { tensor ->
             val runner1 = session.runner()
             val result1 = runner1.feed(DATA_PLACEHOLDER, tensor)
-                .fetch(OUTPUT_NAME)
+                .fetch(fetchTensorName)
                 .run()[0]
 
             val arr = Array(1) { FloatArray(10) { 0.0f } }

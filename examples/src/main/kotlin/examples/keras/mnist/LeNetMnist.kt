@@ -87,7 +87,7 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = SGD(learningRate = 0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = SGD(learningRate = 0.1f), loss = LossFunctions.POISSON)
 
         println(it.kGraph)
 

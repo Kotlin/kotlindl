@@ -59,7 +59,7 @@ fun main() {
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
 
-            val (res, activations) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, activations) = it.predictAndGetActivations(floatArray)
             println("Predicted object for image$i.jpg is ${imageNetClassIndices[res]}")
             //drawActivations(activations)
 

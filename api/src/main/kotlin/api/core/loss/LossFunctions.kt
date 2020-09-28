@@ -63,7 +63,28 @@ enum class LossFunctions {
      *
      * `loss = root(square(y_true - y_pred))`
      */
-    RMSE;
+    RMSE,
+
+    /**
+     * Computes the mean absolute percentage error between `y_true` and `y_pred`.
+     *
+     * `loss = 100 * abs(y_true - y_pred) / y_true`
+     */
+    MAPE,
+
+    /**
+     * Computes the mean squared logarithmic error between `y_true` and `y_pred`.
+     *
+     * `loss = square(log(y_true + 1.) - log(y_pred + 1.))`
+     */
+    MLSE,
+
+    /**
+     * Computes the Poisson loss between `y_true` and `y_pred`.
+     *
+     * `loss = y_pred - y_true * log(y_pred)`
+     */
+    POISSON;
 
     companion object {
         /** Converts enum value to sub-class of [LossFunction]. */
@@ -76,6 +97,9 @@ enum class LossFunctions {
                 MAE -> MAE()
                 MSE -> MSE()
                 RMSE -> RMSE()
+                MAPE -> MAPE()
+                MLSE -> MLSE()
+                POISSON -> Poisson()
             }
         }
     }
@@ -109,6 +133,56 @@ class MSE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
+    }
+}
+
+/**
+ * @see [LossFunctions.MAPE]
+ */
+class MAPE : LossFunction {
+    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+        val epsilon = 1e-5f
+
+        val diff = tf.math.abs(
+            tf.math.div(
+                tf.math.sub(yTrue, yPred),
+                tf.math.maximum(tf.math.abs(yTrue), tf.constant(epsilon))
+            )
+        )
+
+        return tf.withName(TRAINING_LOSS).math.mul(
+            tf.constant(100f),
+            tf.reduceSum(tf.math.mean(diff, tf.constant(-1)), tf.constant(0))
+        )
+    }
+}
+
+/**
+ * @see [LossFunctions.MLSE]
+ */
+class MLSE : LossFunction {
+    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+        val epsilon = 1e-5f
+
+        val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
+        val secondLog = tf.math.log(tf.math.add(tf.math.maximum(yTrue, tf.constant(epsilon)), tf.constant(1.0f)))
+
+        return tf.withName(TRAINING_LOSS)
+            .reduceSum(tf.math.mean(tf.math.squaredDifference(firstLog, secondLog), tf.constant(-1)), tf.constant(0))
+    }
+}
+
+
+/**
+ * @see [LossFunctions.POISSON]
+ */
+class Poisson : LossFunction {
+    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+        val epsilon = 1e-5f
+        val sub = tf.math.sub(yPred, tf.math.mul(yTrue, tf.math.log(tf.math.add(yPred, tf.constant(epsilon)))))
+
+        return tf.withName(TRAINING_LOSS)
+            .reduceSum(tf.math.mean(sub, tf.constant(-1)), tf.constant(0))
     }
 }
 

@@ -550,11 +550,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     ): Pair<FloatArray, List<*>> {
         val predictionData: Array<FloatArray> = arrayOf(inputData)
 
-        val prediction = when (loss) {
-            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
-
         val imageShape = calculateXShape(1)
 
         Tensor.create(
@@ -562,7 +557,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             Dataset.serializeToBuffer(predictionData, 0, 1)
         ).use { testImages ->
             val tensors =
-                formPredictionAndActivationsTensors(prediction, testImages, visualizationIsEnabled)
+                formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
 
             val predictionsTensor = tensors[0]
 
@@ -581,21 +576,36 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun formPredictionAndActivationsTensors(
-        prediction: Operand<Float>,
+        predictionTensorName: String,
         testImages: Tensor<Float>,
         visualizationIsEnabled: Boolean
     ): List<Tensor<*>> {
         val runner = session
             .runner()
-            .fetch(prediction)
-            .feed(xOp.asOutput(), testImages)
+
+        if (predictionTensorName.isEmpty()) {
+            val prediction = when (loss) {
+                LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+                else -> tf.withName(OUTPUT_NAME).identity(yPred)
+            }
+
+            runner
+                .fetch(prediction)
+                .feed(xOp.asOutput(), testImages)
+
+        } else {
+            require(kGraph().tfGraph.operation(predictionTensorName) != null) { "No such tensor output named [$predictionTensorName] in the TensorFlow graph!" }
+
+            runner
+                .fetch(predictionTensorName)
+                .feed(xOp.asOutput(), testImages)
+        }
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
                 if (layer.hasActivation() && layer != layers.last()) runner.fetch(defaultActivationName(layer))
             }
         }
-
         return runner.run()
     }
 
