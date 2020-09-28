@@ -23,6 +23,16 @@ open class SavedModel : InferenceModel() {
         }
     }
 
+    fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
+        reshapeFunction(inputData).use { tensor ->
+            val runner = session.runner()
+            return runner.feed(inputTensorName, tensor)
+                .fetch(outputTensorName)
+                .run()[0]
+                .copyTo(LongArray(1))[0].toInt()
+        }
+    }
+
     /**
      * Predicts labels for all [images].
      *

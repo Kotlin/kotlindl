@@ -1,5 +1,6 @@
 package examples.production
 
+import api.core.ModelWritingMode
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
@@ -44,7 +45,7 @@ fun main() {
 
         println(it.kGraph)
 
-        it.save(File(PATH_TO_MODEL))
+        it.save(File(PATH_TO_MODEL), modelWritingMode = ModelWritingMode.OVERRIDE)
 
         val prediction = it.predict(train.getX(imageId1))
 
