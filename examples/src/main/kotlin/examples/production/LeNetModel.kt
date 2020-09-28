@@ -87,7 +87,7 @@ fun getLabel(dataset: Dataset, imageId: Int): Int {
     return imageLabel.indexOf(imageLabel.max()!!)
 }
 
-fun mnistReshape(image: FloatArray): Tensor<*>? {
+fun mnistReshape(image: FloatArray): Tensor<*> {
     val reshaped = Array(
         1
     ) { Array(28) { Array(28) { FloatArray(1) } } }

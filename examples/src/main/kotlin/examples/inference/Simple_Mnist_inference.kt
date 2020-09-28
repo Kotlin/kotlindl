@@ -4,44 +4,47 @@ import api.core.metric.Metrics
 import api.inference.savedmodel.Input
 import api.inference.savedmodel.Output
 import api.inference.savedmodel.SavedModel
+import datasets.Dataset
+import datasets.handlers.*
 import org.tensorflow.Tensor
-import util.MnistUtils
-import java.util.*
 
-
-private const val PATH_TO_MODEL = "src/main/resources/model1"
-private const val IMAGE_PATH = "src/main/resources/datasets/test/t10k-images-idx3-ubyte"
-private const val LABEL_PATH = "src/main/resources/datasets/test/t10k-labels-idx1-ubyte"
+private const val PATH_TO_MODEL = "examples/src/main/resources/savedmodel"
 
 fun main() {
-    val images = MnistUtils.mnistAsList(
-        IMAGE_PATH,
-        LABEL_PATH, Random(0), 10000
+    val (train, test) = Dataset.createTrainAndTestDatasets(
+        TRAIN_IMAGES_ARCHIVE,
+        TRAIN_LABELS_ARCHIVE,
+        TEST_IMAGES_ARCHIVE,
+        TEST_LABELS_ARCHIVE,
+        AMOUNT_OF_CLASSES,
+        ::extractImages,
+        ::extractLabels
     )
 
     SavedModel().use {
         it.loadModel(PATH_TO_MODEL)
         println(it)
 
-        it.reshape2(::reshape)
+        it.reshape(::reshapeInput)
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 
-        val prediction = it.predict(images[0] as util.MnistUtils.Image)
-        println("Predicted Label is: " + prediction[0].toInt())
-        println("Correct Label is: " + images[0].label)
+        val prediction = it.predict(train.getX(0))
 
-        val predictions = it.predictAll(images)
+        println("Predicted Label is: $prediction")
+        println("Correct Label is: " + train.getLabel(0))
+
+        val predictions = it.predictAll(test)
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluate(images, Metrics.ACCURACY)}")
+        println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")
     }
 }
 
-private fun reshape(doubles: DoubleArray): Tensor<*>? {
+fun reshapeInput(inputData: FloatArray): Tensor<*> {
     val reshaped = Array(
         1
     ) { Array(28) { FloatArray(28) } }
-    for (i in doubles.indices) reshaped[0][i / 28][i % 28] = doubles[i].toFloat()
+    for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
     return Tensor.create(reshaped)
 }

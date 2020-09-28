@@ -3,9 +3,8 @@ package api.inference.savedmodel
 import api.core.KGraph
 import api.core.metric.Metrics
 import api.inference.InferenceModel
+import datasets.Dataset
 import org.tensorflow.SavedModelBundle
-import org.tensorflow.Tensor
-import util.MnistUtils
 
 /**
  * Inference model built on SavedModelBundle format to predict on images.
@@ -14,59 +13,53 @@ open class SavedModel : InferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 
-    /** Reshape function. */
-    private lateinit var reshape2: (DoubleArray) -> Tensor<*>?
-
-    /**
-     * Predicts the probabilities to be from known class for multi-classification task.
-     */
-    fun predict(image: MnistUtils.Image): LongArray {
-        return predictOnImage(image)
-    }
-
-    private fun predictOnImage(
-        image: MnistUtils.Image
-    ): LongArray {
-        val runner = session.runner()
-        return runner.feed(input.tfName, reshape2(image.pixels))
-            .fetch(output.tfName)
-            .run()[0]
-            .copyTo(LongArray(1))
+    override fun predict(inputData: FloatArray): Int {
+        reshapeFunction(inputData).use { tensor ->
+            val runner = session.runner()
+            return runner.feed(input.tfName, tensor)
+                .fetch(output.tfName)
+                .run()[0]
+                .copyTo(LongArray(1))[0].toInt()
+        }
     }
 
     /**
      * Predicts labels for all [images].
      *
-     * @param [images] Given list of images.
+     * NOTE: Slow method, executed on client side, not in TensorFlow.
+     *
+     * @param [dataset] Dataset.
      */
-    fun predictAll(images: List<MnistUtils.Image>): List<Double> {
-        val predictedLabels: MutableList<Double> = mutableListOf()
+    fun predictAll(dataset: Dataset): List<Int> {
+        val predictedLabels: MutableList<Int> = mutableListOf()
 
-        for (image in images) {
-            val predictedLabel = predictOnImage(image)
-            predictedLabels.add(predictedLabel[0].toDouble())
+        for (i in 0 until dataset.xSize()) {
+            val predictedLabel = predict(dataset.getX(i))
+            predictedLabels.add(predictedLabel)
         }
 
         return predictedLabels
     }
 
     /**
-     * Evaluates [testImages] via [metric].
+     * Evaluates [dataset] via [metric].
+     *
+     * NOTE: Slow method, executed on client side, not in TensorFlow.
      */
     fun evaluate(
-        testImages: MutableList<MnistUtils.LabeledImage>,
+        dataset: Dataset,
         metric: Metrics
     ): Double {
 
         return if (metric == Metrics.ACCURACY) {
             var counter = 0
-            for (image in testImages) {
-                val result = predictOnImage(image)
-                if (result[0].toInt() == image.label)
+            for (i in 0 until dataset.xSize()) {
+                val predictedLabel = predict(dataset.getX(i))
+                if (predictedLabel == dataset.getLabel(i))
                     counter++
             }
 
-            (counter.toDouble() / testImages.size)
+            (counter.toDouble() / dataset.xSize())
         } else {
             Double.NaN
         }
@@ -88,11 +81,6 @@ open class SavedModel : InferenceModel() {
         session.close()
         bundle.close()
         kGraph.close()
-    }
-
-    /** Reshapes [DoubleArray] to [Tensor]. */
-    fun reshape2(function: (DoubleArray) -> Tensor<*>?) {
-        reshape2 = function
     }
 }
 

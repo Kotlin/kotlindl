@@ -44,7 +44,7 @@ open class InferenceModel : AutoCloseable {
     protected var output: Output = Output.ARGMAX
 
     /** Function for conversion from flat float array to input tensor. */
-    private lateinit var reshape: (FloatArray) -> Tensor<*>?
+    protected lateinit var reshapeFunction: (FloatArray) -> Tensor<*>
 
     /** Logger. */
     private val logger = KotlinLogging.logger {}
@@ -63,7 +63,7 @@ open class InferenceModel : AutoCloseable {
      * @return Predicted class index.
      */
     open fun predict(inputData: FloatArray): Int {
-        reshape(inputData).use { tensor ->
+        reshapeFunction(inputData).use { tensor ->
             val runner = session.runner()
 
             val result = runner.feed(DATA_PLACEHOLDER, tensor)
@@ -71,7 +71,6 @@ open class InferenceModel : AutoCloseable {
                 .run()[0]
 
             return result.copyTo(LongArray(1))[0].toInt()
-
         }
     }
 
@@ -83,7 +82,7 @@ open class InferenceModel : AutoCloseable {
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = OUTPUT_NAME): FloatArray {
-        reshape(inputData).use { tensor ->
+        reshapeFunction(inputData).use { tensor ->
             val runner1 = session.runner()
             val result1 = runner1.feed(DATA_PLACEHOLDER, tensor)
                 .fetch(OUTPUT_NAME)
@@ -111,12 +110,12 @@ open class InferenceModel : AutoCloseable {
     }
 
     /**
-     * Chain-like setter to set up [reshape] function.
+     * Chain-like setter to set up [reshapeFunction] function.
      *
      * @param reshapeFunction The approach to convert raw input data to Tensor.
      */
-    fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>?) {
-        reshape = reshapeFunction
+    fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>) {
+        this.reshapeFunction = reshapeFunction
     }
 
     override fun toString(): String {
