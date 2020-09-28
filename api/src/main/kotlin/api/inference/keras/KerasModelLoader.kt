@@ -110,8 +110,16 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_HE_UNIFORM -> HeUniform(seed = seed)
         INITIALIZER_LECUN_NORMAL -> LeCunNormal(seed = seed)
         INITIALIZER_LECUN_UNIFORM -> LeCunUniform(seed = seed)
-        INITIALIZER_ZEROS -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_ONES -> GlorotNormal(seed = seed) // instead of real initializers, because it doesn't influence on nothing
+        INITIALIZER_ZEROS -> RandomUniform(
+            seed = seed,
+            minVal = 0.0f,
+            maxVal = 0.0f
+        ) // instead of real initializers, because it doesn't influence on nothing
+        INITIALIZER_ONES -> RandomUniform(
+            seed = seed,
+            minVal = 1.0f,
+            maxVal = 1.0f
+        ) // instead of real initializers, because it doesn't influence on nothing
         INITIALIZER_RANDOM_NORMAL -> RandomNormal(
             seed = seed,
             mean = initializer.config.mean!!.toFloat(),
@@ -194,7 +202,17 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_RELU -> Activations.Relu
         ACTIVATION_SIGMOID -> Activations.Sigmoid
         ACTIVATION_SOFTMAX -> Activations.Softmax
-        LINEAR -> Activations.Linear
+        ACTIVATION_LINEAR -> Activations.Linear
+        ACTIVATION_TANH -> Activations.Tanh
+        ACTIVATION_RELU6 -> Activations.Relu6
+        ACTIVATION_ELU -> Activations.Elu
+        ACTIVATION_SELU -> Activations.Selu
+        ACTIVATION_LOG_SOFTMAX -> Activations.LogSoftmax
+        ACTIVATION_EXP -> Activations.Exponential
+        ACTIVATION_SOFTPLUS -> Activations.SoftPlus
+        ACTIVATION_SOFTSIGN -> Activations.SoftSign
+        ACTIVATION_HARD_SIGMOID -> Activations.HardSigmoid
+        ACTIVATION_SWISH -> Activations.Swish
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
