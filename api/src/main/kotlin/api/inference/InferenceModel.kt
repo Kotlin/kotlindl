@@ -1,7 +1,7 @@
 package api.inference
 
 import api.core.KGraph
-import api.core.ModelFormat
+import api.core.SavingFormat
 import api.core.shape.TensorShape
 import api.core.util.DATA_PLACEHOLDER
 import api.core.util.OUTPUT_NAME
@@ -25,7 +25,7 @@ import java.util.*
  *
  * Provides functionality to make predictions and model loading.
  */
-open class InferenceModel : AutoCloseable {
+public open class InferenceModel : AutoCloseable {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -56,13 +56,54 @@ open class InferenceModel : AutoCloseable {
             (underlyingLogger as Logger).level = value
         }
 
+    public companion object {
+        /**
+         * Loads tensorflow graphs and variable data (if required).
+         *
+         * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
+         * @param [savingFormat] Loading strategy. By default, it loads graph from .pb file format and variable data from .txt files.
+         * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+         */
+        public fun load(
+            modelDirectory: File,
+            savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+            loadOptimizerState: Boolean = false
+        ): InferenceModel {
+            val model = InferenceModel()
+
+            // Load graph
+            val pathToModelDirectory = modelDirectory.absolutePath
+            if (!modelDirectory.exists()) {
+                throw NotDirectoryException(pathToModelDirectory)
+            } else {
+                model.logger.debug { "The model loading is started." }
+
+                when (savingFormat) {
+                    SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> model.loadModelFromSimpleFormat(
+                        pathToModelDirectory,
+                        loadOptimizerState
+                    )
+                    SavingFormat.TF_GRAPH -> model.loadModelFromSavedModelFormat(pathToModelDirectory)
+                    SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
+                }
+
+                model.logger.debug { "The model loading is finished." }
+            }
+
+            return model
+        }
+    }
+
+
     /**
      * Predicts the class of [inputData].
      *
      * @param [inputData] The single example with unknown label.
      * @return Predicted class index.
      */
-    open fun predict(inputData: FloatArray): Int {
+    public open fun predict(inputData: FloatArray): Int {
+        require(reshapeFunction != null) { "Reshape functions is missed!" }
+
         reshapeFunction(inputData).use { tensor ->
             val runner = session.runner()
 
@@ -81,7 +122,7 @@ open class InferenceModel : AutoCloseable {
      * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from intermediate parts of the TensorFlow graphs.
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
-    open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
+    public open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
         val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
 
         require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
@@ -102,14 +143,14 @@ open class InferenceModel : AutoCloseable {
     /**
      * Chain-like setter to set up [inputOp].
      */
-    fun input(inputOp: Input) {
+    public fun input(inputOp: Input) {
         input = inputOp
     }
 
     /**
      * Chain-like setter to set up [outputOp].
      */
-    fun output(outputOp: Output) {
+    public fun output(outputOp: Output) {
         output = outputOp
     }
 
@@ -118,7 +159,7 @@ open class InferenceModel : AutoCloseable {
      *
      * @param reshapeFunction The approach to convert raw input data to Tensor.
      */
-    fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>) {
+    public fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>) {
         this.reshapeFunction = reshapeFunction
     }
 
@@ -137,7 +178,7 @@ open class InferenceModel : AutoCloseable {
      *
      * @param [variableName] Name of variable to be assigned.
      */
-    fun runAssignOpByVarName(
+    internal fun runAssignOpByVarName(
         variableName: String
     ) {
         val assignOpName = defaultAssignOpName(variableName)
@@ -153,7 +194,7 @@ open class InferenceModel : AutoCloseable {
      * @param variableName Name of variable to be filled.
      * @param kernelData Data for variable filling, should have correct shape and type.
      */
-    fun fillVariable(
+    internal fun fillVariable(
         variableName: String,
         kernelData: Any
     ) {
@@ -164,44 +205,12 @@ open class InferenceModel : AutoCloseable {
     }
 
     /**
-     * Loads tensorflow graphs and variable data (if required).
-     *
-     * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
-     * @param [modelFormat] Loading strategy. By default, it loads graph from .pb file format and variable data from .txt files.
-     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
-     */
-    fun load(
-        modelDirectory: File,
-        modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
-        loadOptimizerState: Boolean = false
-    ) {
-        // Load graph
-        val pathToModelDirectory = modelDirectory.absolutePath
-        if (!modelDirectory.exists()) {
-            throw NotDirectoryException(pathToModelDirectory)
-        } else {
-            logger.debug { "The model loading is started." }
-
-            when (modelFormat) {
-                ModelFormat.TF_GRAPH_CUSTOM_VARIABLES -> loadModelFromSimpleFormat(
-                    pathToModelDirectory,
-                    loadOptimizerState
-                )
-                ModelFormat.TF_GRAPH -> loadModelFromSavedModelFormat(pathToModelDirectory)
-                ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
-            }
-
-            logger.debug { "The model loading is finished." }
-        }
-    }
-
-    /**
      * Loads variable data from .txt files.
      *
      * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
-    open fun loadVariablesFromTxtFiles(
+    public open fun loadWeights(
         modelDirectory: File,
         loadOptimizerState: Boolean = false
     ) {
@@ -263,7 +272,7 @@ open class InferenceModel : AutoCloseable {
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         inferenceGraphInitialization(pathToModelDirectory)
-        loadVariablesFromTxtFiles(File(pathToModelDirectory), loadOptimizerState)
+        loadWeights(File(pathToModelDirectory), loadOptimizerState)
     }
 
     private fun inferenceGraphInitialization(pathToModelDirectory: String) {

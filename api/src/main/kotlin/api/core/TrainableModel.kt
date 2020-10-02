@@ -16,9 +16,9 @@ import java.io.File
 /**
  * Base abstract class for all trainable models.
  */
-abstract class TrainableModel : InferenceModel() {
+public abstract class TrainableModel : InferenceModel() {
     /** Controls level of verbosity. */
-    protected var isDebugMode = false
+    protected var isDebugMode: Boolean = false
 
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
@@ -48,15 +48,15 @@ abstract class TrainableModel : InferenceModel() {
     protected var amountOfClasses: Long = -1
 
     /** Is true when model is compiled. */
-    var isModelCompiled: Boolean = false
+    public var isModelCompiled: Boolean = false
         protected set
 
     /** Is true when model is initialized. */
-    var isModelInitialized: Boolean = false
+    public var isModelInitialized: Boolean = false
         protected set
 
     /** Special flag for callbacks. */
-    var stopTraining: Boolean = false
+    public var stopTraining: Boolean = false
 
     /**
      * Configures the model for training.
@@ -68,7 +68,7 @@ abstract class TrainableModel : InferenceModel() {
      * @param [metric] Metric to evaluate during training.
      * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
-    abstract fun compile(
+    public abstract fun compile(
         optimizer: Optimizer = Adam(),
         loss: LossFunctions = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric: Metrics = Metrics.ACCURACY,
@@ -91,7 +91,7 @@ abstract class TrainableModel : InferenceModel() {
      *
      * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
      */
-    abstract fun fit(
+    public abstract fun fit(
         dataset: Dataset,
         epochs: Int = 5,
         batchSize: Int = 32,
@@ -118,7 +118,7 @@ abstract class TrainableModel : InferenceModel() {
      *
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
-    abstract fun fit(
+    public abstract fun fit(
         trainingDataset: Dataset,
         validationDataset: Dataset,
         epochs: Int = 5,
@@ -137,7 +137,7 @@ abstract class TrainableModel : InferenceModel() {
      *
      * @return Value of calculated metric and loss values.
      */
-    abstract fun evaluate(
+    public abstract fun evaluate(
         dataset: Dataset,
         batchSize: Int = 256
     ): EvaluationResult
@@ -149,14 +149,14 @@ abstract class TrainableModel : InferenceModel() {
      * @param [batchSize] Number of samples per batch of computation.
      * @return Array of labels. The length is equal to the Number of sampless on the [dataset].
      */
-    abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
+    public abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 
     /**
      * Generates output prediction for the input sample.
      *
      * @param [inputData] Unlabeled input data to define label.
      */
-    abstract override fun predict(inputData: FloatArray): Int
+    public abstract override fun predict(inputData: FloatArray): Int
 
     /**
      * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.
@@ -164,33 +164,27 @@ abstract class TrainableModel : InferenceModel() {
      * @param [inputData] Unlabeled input data to define label.
      * @param [predictionTensorName] Name of output tensor to make prediction.
      */
-    abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
+    public abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
 
     /**
      * Saves the model as graph and weights.
      *
      * @param [modelDirectory] Path to model directory.
-     * @param [modelFormat] One of approaches to store model configurations and weights.
+     * @param [savingFormat] One of approaches to store model configurations and weights.
      * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
-     * @param [modelWritingMode] Default behaviour of handling different edge cases with existing directory before model saving.
+     * @param [wrintingMode] Default behaviour of handling different edge cases with existing directory before model saving.
      */
-    abstract fun save(
+    public abstract fun save(
         modelDirectory: File,
-        modelFormat: ModelFormat = ModelFormat.TF_GRAPH_CUSTOM_VARIABLES,
+        savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
         saveOptimizerState: Boolean = false,
-        modelWritingMode: ModelWritingMode = ModelWritingMode.FAIL_IF_EXISTS
+        wrintingMode: WrintingMode = WrintingMode.FAIL_IF_EXISTS
     )
 
-    override fun loadVariablesFromTxtFiles(modelDirectory: File, loadOptimizerState: Boolean) {
+    override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
 
     }
 
-    /**
-     * Returns DType FLOAT for compatibility (with TensorFlow Java API 1.15) needs.
-     */
-    fun getDType(): Class<Float> {
-        return Float::class.javaObjectType
-    }
 
     /**
      * Predicts and returns not only prediction but list of activations values from intermediate model layers
@@ -200,7 +194,7 @@ abstract class TrainableModel : InferenceModel() {
      * @param [predictionTensorName] Name of output tensor to make prediction.
      * @return Label (class index) and list of activations from intermediate model layers.
      */
-    abstract fun predictAndGetActivations(
+    public abstract fun predictAndGetActivations(
         inputData: FloatArray,
         predictionTensorName: String = ""
     ): Pair<Int, List<*>>
@@ -237,7 +231,7 @@ abstract class TrainableModel : InferenceModel() {
      *
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
-    fun fit(
+    public fun fit(
         dataset: Dataset,
         validationRate: Double,
         epochs: Int,

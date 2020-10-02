@@ -1,10 +1,10 @@
 package examples.inference.keras.vgg
 
 
+import api.core.Sequential
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import datasets.Dataset
 import datasets.util.getImage
 import examples.production.drawActivations
@@ -17,7 +17,7 @@ fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
 
-    val model = loadKerasModel(jsonConfigFile)
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
         it.compile(
@@ -28,7 +28,7 @@ fun main() {
 
         it.summary()
         println(it.kGraph)
-        it.loadVariablesFromTxtFiles(File("C:\\zaleslaw\\home\\models\\vgg\\"))
+        it.loadWeights(File("C:\\zaleslaw\\home\\models\\vgg\\"))
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")

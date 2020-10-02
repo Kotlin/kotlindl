@@ -15,10 +15,11 @@ import api.core.shape.tail
 import api.core.util.OUTPUT_NAME
 import api.core.util.TRAINING_LOSS
 import api.core.util.defaultActivationName
+import api.core.util.getDType
 import api.extension.convertTensorToFlattenFloatArray
 import api.extension.convertTensorToMultiDimArray
-import api.inference.keras.loadKerasModel
-import api.inference.keras.saveConfig
+import api.inference.keras.loadModelLayers
+import api.inference.keras.saveModelConfiguration
 import ch.qos.logback.classic.Level
 import datasets.DataBatch
 import datasets.Dataset
@@ -89,7 +90,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * NOTE: First layer should be input layer.
          * @return the [Sequential] model.
          */
-        fun of(layers: List<Layer>): Sequential {
+        public fun of(layers: List<Layer>): Sequential {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
@@ -108,7 +109,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
-        fun of(input: Input, layers: List<Layer>): Sequential {
+        public fun of(input: Input, layers: List<Layer>): Sequential {
             preProcessLayerNames(layers.toTypedArray())
             val seqModel = Sequential(input, *layers.toTypedArray())
             postProcessLayerNames(layers.toTypedArray(), seqModel)
@@ -136,14 +137,45 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         /**
-         * Loads a Sequential model from json file with model configuration.
+         * Loads a [Sequential] model from json file with model configuration.
+         *
+         * @param [configuration] File in .json format, containing the [Sequential] model.
+         * @return Non-compiled and non-trained Sequential model.
+         */
+        public fun loadModelConfiguration(configuration: File): Sequential {
+            return api.inference.keras.loadModelConfiguration(configuration)
+        }
+
+        /**
+         * Loads a [Sequential] model layers from json file with model configuration.
+         *
+         * @param [configuration] File in .json format, containing the [Sequential] model.
+         * @return Pair of <input layer; list of layers>.
+         */
+        public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
+            return loadModelLayers(configuration)
+        }
+
+        /**
+         * Loads a [Sequential] model from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @return Non-compiled and non-trained Sequential model.
          */
-        fun load(modelDirectory: File): Sequential {
-            val jsonConfig = File("${modelDirectory.absolutePath}/modelConfig.json")
-            return loadKerasModel(jsonConfig)
+        public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
+            val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+            return api.inference.keras.loadModelConfiguration(configuration)
+        }
+
+        /**
+         * Loads a [Sequential] model layers from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
+         *
+         * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
+         * @return Pair of <input layer; list of layers>.
+         */
+        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
+            val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+            return loadModelLayers(configuration)
         }
     }
 
@@ -239,7 +271,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
      *
      * NOTE: Model becomes initialized after this method call. (Flag [isModelInitialized] = true)
      */
-    fun init() {
+    public fun init() {
         require(!isModelInitialized) { "Model is initialized already!" }
         logger.debug { "Initialization of TensorFlow Graph variables" }
         kGraph.initializeGraphVariables(session)
@@ -660,33 +692,33 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     override fun save(
         modelDirectory: File,
-        modelFormat: ModelFormat,
+        savingFormat: SavingFormat,
         saveOptimizerState: Boolean,
-        modelWritingMode: ModelWritingMode
+        wrintingMode: WrintingMode
     ) {
         val pathToModelDirectory = modelDirectory.absolutePath
-        when (modelWritingMode) {
-            ModelWritingMode.FAIL_IF_EXISTS -> {
+        when (wrintingMode) {
+            WrintingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
                 modelDirectory.mkdir()
             }
-            ModelWritingMode.OVERRIDE -> {
+            WrintingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
                 modelDirectory.mkdir()
             }
-            ModelWritingMode.APPEND -> {
+            WrintingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
                     modelDirectory.mkdir()
                 }
             }
         }
 
-        when (modelFormat) {
-            ModelFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
-            ModelFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
-            ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
+        when (savingFormat) {
+            SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
+            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
         }
     }
 
@@ -697,7 +729,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        this.saveConfig(jsonConfig)
+        this.saveModelConfiguration(jsonConfig)
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {
@@ -754,7 +786,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
     }
 
-    override fun loadVariablesFromTxtFiles(modelDirectory: File, loadOptimizerState: Boolean) {
+    override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
         // Load variables names
         val variableNames = File("${modelDirectory.absolutePath}/variableNames.txt").readLines()
         if (variableNames.isNotEmpty()) {
@@ -779,7 +811,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
      *
      * @param [layerName] Should be existing layer name. Throws an error otherwise.
      */
-    infix fun getLayer(layerName: String): Layer {
+    public infix fun getLayer(layerName: String): Layer {
         return layersByName[layerName] ?: error("No such layer $layerName in the model.")
     }
 
@@ -788,7 +820,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
      *
      * @return list of layer descriptions.
      */
-    fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
+    public fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("=================================================================")

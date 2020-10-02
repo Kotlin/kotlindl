@@ -1,10 +1,10 @@
 package examples.inference.keras.demo
 
+import api.core.Sequential
 import api.core.layer.twodim.Conv2D
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import datasets.Dataset
 import datasets.handlers.*
@@ -23,7 +23,7 @@ fun main() {
 
 
     val jsonConfigFile = getJSONConfigFile()
-    val model = loadKerasModel(jsonConfigFile)
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable

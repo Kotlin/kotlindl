@@ -9,11 +9,29 @@ import org.tensorflow.SavedModelBundle
 /**
  * Inference model built on SavedModelBundle format to predict on images.
  */
-open class SavedModel : InferenceModel() {
+public open class SavedModel : InferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 
+    public companion object {
+        /**
+         * Loads model from SavedModelBundle format.
+         */
+        public fun load(pathToModel: String): SavedModel {
+            val model = SavedModel()
+
+            model.bundle = SavedModelBundle.load(pathToModel, "serve")
+            model.session = model.bundle.session()
+            val graph = model.bundle.graph()
+            val graphDef = graph.toGraphDef()
+            model.kGraph = KGraph(graphDef)
+            return model
+        }
+    }
+
     override fun predict(inputData: FloatArray): Int {
+        require(reshapeFunction != null) { "Reshape functions is missed!" }
+
         reshapeFunction(inputData).use { tensor ->
             val runner = session.runner()
             return runner.feed(input.tfName, tensor)
@@ -23,7 +41,9 @@ open class SavedModel : InferenceModel() {
         }
     }
 
-    fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
+    public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
+        require(reshapeFunction != null) { "Reshape functions is missed!" }
+
         reshapeFunction(inputData).use { tensor ->
             val runner = session.runner()
             return runner.feed(inputTensorName, tensor)
@@ -40,7 +60,7 @@ open class SavedModel : InferenceModel() {
      *
      * @param [dataset] Dataset.
      */
-    fun predictAll(dataset: Dataset): List<Int> {
+    public fun predictAll(dataset: Dataset): List<Int> {
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
@@ -56,7 +76,7 @@ open class SavedModel : InferenceModel() {
      *
      * NOTE: Slow method, executed on client side, not in TensorFlow.
      */
-    fun evaluate(
+    public fun evaluate(
         dataset: Dataset,
         metric: Metrics
     ): Double {
@@ -75,18 +95,6 @@ open class SavedModel : InferenceModel() {
         }
     }
 
-    /**
-     * Loads model from SavedModelBundle format.
-     */
-    fun loadModel(pathToModel: String): SavedModel {
-        bundle = SavedModelBundle.load(pathToModel, "serve")
-        session = bundle.session()
-        val graph = bundle.graph()
-        val graphDef = graph.toGraphDef()
-        kGraph = KGraph(graphDef)
-        return this
-    }
-
     override fun close() {
         session.close()
         bundle.close()
@@ -95,6 +103,6 @@ open class SavedModel : InferenceModel() {
 }
 
 /** Defines receiver for [SavedModel]. */
-fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
+/*public fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
     SavedModel()
-        .apply(init)
+        .apply(init)*/

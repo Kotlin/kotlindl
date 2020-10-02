@@ -20,7 +20,7 @@ private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-fun Sequential.loadWeights(
+public fun Sequential.loadWeights(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
@@ -55,7 +55,7 @@ fun Sequential.loadWeights(
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-fun Sequential.loadWeights(
+public fun Sequential.loadWeights(
     hdfFile: HdfFile,
     layerList: MutableList<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
@@ -105,7 +105,7 @@ fun Sequential.loadWeights(
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-fun Sequential.loadWeightsForFrozenLayers(
+public fun Sequential.loadWeightsForFrozenLayers(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE

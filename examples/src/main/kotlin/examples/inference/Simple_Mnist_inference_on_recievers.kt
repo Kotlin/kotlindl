@@ -1,9 +1,5 @@
 package examples.inference
 
-import api.core.metric.Metrics
-import api.inference.savedmodel.Input
-import api.inference.savedmodel.Output
-import api.inference.savedmodel.prepareModelForInference
 import datasets.Dataset
 import datasets.handlers.*
 
@@ -20,7 +16,7 @@ fun main() {
         ::extractLabels
     )
 
-    val mnistModel = prepareModelForInference {
+    /*val mnistModel = prepareModelForInference {
         loadModel(PATH_TO_MODEL)
         reshape(::reshapeInput)
         input(Input.PLACEHOLDER)
@@ -37,6 +33,6 @@ fun main() {
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")
-    }
+    }*/
 }
 

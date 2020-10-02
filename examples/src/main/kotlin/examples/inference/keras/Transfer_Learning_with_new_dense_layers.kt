@@ -12,7 +12,6 @@ import api.core.layer.twodim.MaxPool2D
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasLayers
 import api.inference.keras.loadWeightsForFrozenLayers
 import datasets.Dataset
 import datasets.handlers.*
@@ -43,7 +42,7 @@ fun main() {
 
     val jsonConfigFile = File(realPathToConfig)
 
-    val (otherLayers, input) = loadKerasLayers(jsonConfigFile)
+    val (input, otherLayers) = Sequential.loadModelLayersFromConfiguration(jsonConfigFile)
 
     val layers = mutableListOf<Layer>()
     for (layer in otherLayers) {

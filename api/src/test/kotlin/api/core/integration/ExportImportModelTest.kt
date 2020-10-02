@@ -1,8 +1,8 @@
 package api.core.integration
 
-import api.core.ModelFormat
-import api.core.ModelWritingMode
+import api.core.SavingFormat
 import api.core.Sequential
+import api.core.WrintingMode
 import api.core.activation.Activations
 import api.core.initializer.HeNormal
 import api.core.initializer.HeUniform
@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import java.nio.file.Path
 
 private const val EPS = 0.3
@@ -134,12 +135,13 @@ class ExportImportModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-                modelWritingMode = ModelWritingMode.OVERRIDE
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
             )
         }
 
-        val model = Sequential.load(tempDir.toFile())
+        // TODO: refactor to ./modelConfig.json
+        val model = Sequential.loadModelConfiguration(tempDir.toFile())
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
@@ -155,7 +157,7 @@ class ExportImportModelTest {
             )
             it.summary()
 
-            it.loadVariablesFromTxtFiles(tempDir.toFile())
+            it.loadWeights(tempDir.toFile())
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             assertEquals(0.766700029373169, accuracyBefore!!, EPS)
@@ -208,12 +210,12 @@ class ExportImportModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-                modelWritingMode = ModelWritingMode.OVERRIDE
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
             )
         }
 
-        val model = Sequential.load(tempDir.toFile())
+        val model = Sequential.loadModelConfiguration(File(tempDir.toFile().absolutePath + "/modelConfig.json"))
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
@@ -229,7 +231,7 @@ class ExportImportModelTest {
             )
             it.summary()
 
-            it.loadVariablesFromTxtFiles(tempDir.toFile())
+            it.loadWeights(tempDir.toFile())
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             assertEquals(0.6370999813079834, accuracyBefore!!, EPS)
@@ -369,15 +371,16 @@ class ExportImportModelTest {
             it.save(
                 modelDirectory = tempDir!!.toFile(),
                 saveOptimizerState = true,
-                modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-                modelWritingMode = ModelWritingMode.OVERRIDE
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
             testMetrics.put("trainAccuracy", accuracy!!)
         }
 
-        val model = Sequential.load(tempDir!!.toFile())
+        // TODO: refactor to ./modelConfig.json
+        val model = Sequential.loadModelConfiguration(tempDir!!.toFile())
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
@@ -391,7 +394,7 @@ class ExportImportModelTest {
                 loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
-            it.loadVariablesFromTxtFiles(tempDir.toFile(), loadOptimizerState = true)
+            it.loadWeights(tempDir.toFile(), loadOptimizerState = true)
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             testMetrics["beforeAccuracy1"] = accuracyBefore!!
@@ -411,7 +414,8 @@ class ExportImportModelTest {
             testMetrics.put("afterAccuracy1", accuracyAfterTraining!!)
         }
 
-        val model2 = Sequential.load(tempDir.toFile())
+        // TODO: refactor to ./modelConfig.json
+        val model2 = Sequential.loadModelConfiguration(tempDir.toFile())
 
         model2.use {
             it.compile(
@@ -419,7 +423,7 @@ class ExportImportModelTest {
                 loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
-            it.loadVariablesFromTxtFiles(tempDir.toFile(), loadOptimizerState = false)
+            it.loadWeights(tempDir.toFile(), loadOptimizerState = false)
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             testMetrics["beforeAccuracy2"] = accuracyBefore!!

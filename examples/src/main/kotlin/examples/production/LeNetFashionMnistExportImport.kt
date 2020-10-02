@@ -1,6 +1,6 @@
 package examples.production
 
-import api.core.ModelWritingMode
+import api.core.WrintingMode
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
@@ -60,12 +60,13 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(File(PATH_TO_MODEL), modelWritingMode = ModelWritingMode.OVERRIDE)
+        it.save(File(PATH_TO_MODEL), wrintingMode = WrintingMode.OVERRIDE)
     }
 
-    InferenceModel().use {
+    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+
+    inferenceModel.use {
         it.reshape(::mnistReshape)
-        it.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

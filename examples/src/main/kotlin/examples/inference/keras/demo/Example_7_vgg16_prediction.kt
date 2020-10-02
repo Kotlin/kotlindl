@@ -5,7 +5,6 @@ import api.core.Sequential
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
@@ -18,7 +17,7 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = loadKerasModel(jsonConfigFile)
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 

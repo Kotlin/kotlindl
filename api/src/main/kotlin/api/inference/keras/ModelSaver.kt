@@ -18,7 +18,7 @@ import java.io.File
  * @param jsonConfigFile File to write model configuration.
  * @param isKerasFullyCompatible If true, it generates fully Keras-compatible configuration.
  */
-fun Sequential.saveConfig(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
+public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {
         run {

@@ -21,8 +21,7 @@ fun main() {
         ::extractLabels
     )
 
-    SavedModel().use {
-        it.loadModel(PATH_TO_MODEL)
+    SavedModel.load(PATH_TO_MODEL).use {
         println(it)
 
         it.reshape(::reshapeInput)

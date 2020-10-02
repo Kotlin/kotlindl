@@ -18,9 +18,10 @@ fun main() {
         ::extractLabels
     )
 
-    InferenceModel().use {
+    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+
+    inferenceModel.use {
         it.reshape(::mnistReshape)
-        it.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

@@ -1,6 +1,6 @@
 package examples.production
 
-import api.core.ModelWritingMode
+import api.core.WrintingMode
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
@@ -45,7 +45,7 @@ fun main() {
 
         println(it.kGraph)
 
-        it.save(File(PATH_TO_MODEL), modelWritingMode = ModelWritingMode.OVERRIDE)
+        it.save(File(PATH_TO_MODEL), wrintingMode = WrintingMode.OVERRIDE)
 
         val prediction = it.predict(train.getX(imageId1))
 
@@ -63,9 +63,11 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    InferenceModel().use {
+
+    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+
+    inferenceModel.use {
         it.reshape(::mnistReshape)
-        it.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         val prediction = it.predict(train.getX(imageId1))
 

@@ -19,30 +19,30 @@ import com.beust.klaxon.Klaxon
 import java.io.File
 
 /**
- * Loads a Keras model from json file with model configuration.
+ * Loads a [Sequential] model from json file with model configuration.
  *
- * @param [jsonConfigFile] File containing model configuration.
+ * @param [configuration] File containing model configuration.
  * @return Non-compiled and non-trained Sequential model.
  */
-fun loadKerasModel(
-    jsonConfigFile: File
+internal fun loadModelConfiguration(
+    configuration: File
 ): Sequential {
-    val pair = loadKerasLayers(jsonConfigFile)
-    val layers = pair.first
-    val input: Input = pair.second
+    val pair = loadModelLayers(configuration)
+    val input: Input = pair.first
+    val layers = pair.second
 
     return Sequential.of(input, layers.toList())
 }
 
 /**
- * Loads a Keras model layers from json file with model configuration.
+ * Loads a [Sequential] model layers from json file with model configuration.
  *
  * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
  *
  * @param jsonConfigFile File containing model configuration.
- * @return Pair of <list of layers; input layer>.
+ * @return Pair of <input layer; list of layers>.
  */
-fun loadKerasLayers(jsonConfigFile: File): Pair<MutableList<Layer>, Input> {
+internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
     val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
 
     val sequentialConfig = Klaxon()
@@ -68,7 +68,7 @@ fun loadKerasLayers(jsonConfigFile: File): Pair<MutableList<Layer>, Input> {
         batchInputShape[2]?.toLong()!!,
         batchInputShape[3]?.toLong()!!
     )
-    return Pair(layers, input)
+    return Pair(input, layers)
 }
 
 private fun convertToLayer(kerasLayer: KerasLayer): Layer {
