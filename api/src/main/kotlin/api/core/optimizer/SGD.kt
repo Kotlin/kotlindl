@@ -22,6 +22,10 @@ class SGD(
         this.learningRate = learningRate
     }
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -47,4 +51,6 @@ class SGD(
     override fun getOptimizerName(): String {
         return "SGD"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }

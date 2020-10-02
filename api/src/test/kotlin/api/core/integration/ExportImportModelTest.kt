@@ -1,11 +1,11 @@
 package api.core.integration
 
-import api.core.ModelFormat
-import api.core.ModelWritingMode
+import api.core.SavingFormat
 import api.core.Sequential
+import api.core.WrintingMode
 import api.core.activation.Activations
-import api.core.initializer.GlorotNormal
-import api.core.initializer.GlorotUniform
+import api.core.initializer.HeNormal
+import api.core.initializer.HeUniform
 import api.core.layer.Dense
 import api.core.layer.Flatten
 import api.core.layer.Input
@@ -22,20 +22,19 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import java.nio.file.Path
 
-private const val EPS = 0.1
-private const val SEED = 12L
+private const val EPS = 0.3
 private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 1000
+private const val TRAINING_BATCH_SIZE = 2000
 private const val TEST_BATCH_SIZE = 1000
 private const val AMOUNT_OF_CLASSES = 10
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
-private val kernelInitializer = GlorotNormal(SEED)
-
-private val biasInitializer = GlorotUniform(SEED)
+private val kernelInitializer = HeNormal(12L)
+private val biasInitializer = HeUniform(12L)
 
 class ExportImportModelTest {
     private val lenet5Layers = listOf(
@@ -100,7 +99,7 @@ class ExportImportModelTest {
     )
 
     @Test
-    fun exportImport(@TempDir tempDir: Path?) {
+    fun exportImportWithValidation(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
 
         val lenet5 = Sequential.of(lenet5Layers)
@@ -131,17 +130,18 @@ class ExportImportModelTest {
                 verbose = true
             )
 
-            it.save(
-                pathToModelDirectory = tempDir.toString(),
-                modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-                modelWritingMode = ModelWritingMode.OVERRIDE
-            )
-
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-            assertEquals(0.7603000402450562, accuracy!!, EPS)
+            assertEquals(0.766700029373169, accuracy!!, EPS)
+
+            it.save(
+                modelDirectory = tempDir.toFile(),
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
+            )
         }
 
-        val model = Sequential.load(tempDir.toString())
+        // TODO: refactor to ./modelConfig.json
+        val model = Sequential.loadModelConfiguration(tempDir.toFile())
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
@@ -157,10 +157,10 @@ class ExportImportModelTest {
             )
             it.summary()
 
-            it.loadVariablesFromTxtFiles(tempDir.toString())
+            it.loadWeights(tempDir.toFile())
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-            assertEquals(0.7603000402450562, accuracyBefore!!, EPS)
+            assertEquals(0.766700029373169, accuracyBefore!!, EPS)
 
             it.fit(
                 dataset = train,
@@ -173,7 +173,81 @@ class ExportImportModelTest {
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-            assertEquals(0.8234000205993652, accuracyAfterTraining!!, EPS)
+            assertEquals(0.8662000894546509, accuracyAfterTraining!!, EPS)
+        }
+    }
+
+    @Test
+    fun exportImport(@TempDir tempDir: Path?) {
+        assertTrue(tempDir!!.toFile().isDirectory)
+
+        val lenet5 = Sequential.of(lenet5Layers)
+
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            datasets.handlers.AMOUNT_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
+
+        lenet5.use {
+            it.compile(optimizer = SGD(learningRate = 0.05f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+
+            it.summary()
+
+            it.fit(
+                dataset = train,
+                epochs = EPOCHS,
+                batchSize = TRAINING_BATCH_SIZE,
+                verbose = true
+            )
+
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            assertEquals(0.6370999813079834, accuracy!!, EPS)
+
+            it.save(
+                modelDirectory = tempDir.toFile(),
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
+            )
+        }
+
+        val model = Sequential.loadModelConfiguration(File(tempDir.toFile().absolutePath + "/modelConfig.json"))
+
+        model.use {
+            // Freeze conv2d layers, keep dense layers trainable
+            for (layer in it.layers) {
+                if (layer::class == Conv2D::class)
+                    layer.isTrainable = false
+            }
+
+            it.compile(
+                optimizer = RMSProp(),
+                loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+            it.summary()
+
+            it.loadWeights(tempDir.toFile())
+
+            val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
+            assertEquals(0.6370999813079834, accuracyBefore!!, EPS)
+
+            it.fit(
+                dataset = train,
+                validationRate = 0.1,
+                epochs = EPOCHS,
+                trainBatchSize = TRAINING_BATCH_SIZE,
+                validationBatchSize = TEST_BATCH_SIZE,
+                verbose = false,
+                isWeightsInitRequired = false // for transfer learning
+            )
+
+            val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
+            assertEquals(0.8650000691413879, accuracyAfterTraining!!, EPS)
         }
     }
 
@@ -181,22 +255,22 @@ class ExportImportModelTest {
     fun exportImportWithAdamOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(Adam(), tempDir)
-        assertEquals(0.9406000375747681, testMetrics.getValue("trainAccuracy"), EPS)
-        assertEquals(0.9406002759933472, testMetrics.getValue("beforeAccuracy1"), EPS)
-        assertEquals(0.9580999612808228, testMetrics.getValue("afterAccuracy1"), EPS)
-        assertEquals(0.9406002759933472, testMetrics.getValue("beforeAccuracy2"), EPS)
-        assertEquals(0.9708000421524048, testMetrics.getValue("afterAccuracy2"), EPS)
+        assertEquals(0.912600040435791, testMetrics.getValue("trainAccuracy"), EPS)
+        assertEquals(0.9126001596450806, testMetrics.getValue("beforeAccuracy1"), EPS)
+        assertEquals(0.9462999105453491, testMetrics.getValue("afterAccuracy1"), EPS)
+        assertEquals(0.9126001596450806, testMetrics.getValue("beforeAccuracy2"), EPS)
+        assertEquals(0.9514999389648438, testMetrics.getValue("afterAccuracy2"), EPS)
     }
 
     @Test
     fun exportImportWithAdaDeltaOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(AdaDelta(), tempDir)
-        assertEquals(0.6644999980926514, testMetrics.getValue("trainAccuracy"), EPS)
-        assertEquals(0.6645000576972961, testMetrics.getValue("beforeAccuracy1"), EPS)
-        assertEquals(0.7969000935554504, testMetrics.getValue("afterAccuracy1"), EPS)
-        assertEquals(0.6645000576972961, testMetrics.getValue("beforeAccuracy2"), EPS)
-        assertEquals(0.7883001565933228, testMetrics.getValue("afterAccuracy2"), EPS)
+        assertEquals(0.6964999437332153, testMetrics.getValue("trainAccuracy"), EPS)
+        assertEquals(0.6965000033378601, testMetrics.getValue("beforeAccuracy1"), EPS)
+        assertEquals(0.842700183391571, testMetrics.getValue("afterAccuracy1"), EPS)
+        assertEquals(0.6965000033378601, testMetrics.getValue("beforeAccuracy2"), EPS)
+        assertEquals(0.8596002459526062, testMetrics.getValue("afterAccuracy2"), EPS)
     }
 
     @Test
@@ -204,15 +278,14 @@ class ExportImportModelTest {
     fun exportImportWithAdaGradOptimizerInternalState(@TempDir tempDir: Path?) {
         val testMetrics =
             trainingAndInferenceWithSpecificOptimizer(AdaGrad(clipGradient = ClipGradientByValue(0.01f)), tempDir)
-        assertEquals(0.1, testMetrics.getValue("trainAccuracy"), EPS)
-        assertEquals(0.1, testMetrics.getValue("beforeAccuracy1"), EPS)
-        assertEquals(0.1, testMetrics.getValue("afterAccuracy1"), EPS)
-        assertEquals(0.1, testMetrics.getValue("beforeAccuracy2"), EPS)
-        assertEquals(0.1, testMetrics.getValue("afterAccuracy2"), EPS)
+        assertEquals(0.3929999768733978, testMetrics.getValue("trainAccuracy"), EPS)
+        assertEquals(0.3930000960826874, testMetrics.getValue("beforeAccuracy1"), EPS)
+        assertEquals(0.8846998810768127, testMetrics.getValue("afterAccuracy1"), EPS)
+        assertEquals(0.3930000960826874, testMetrics.getValue("beforeAccuracy2"), EPS)
+        assertEquals(0.9439000487327576, testMetrics.getValue("afterAccuracy2"), EPS)
     }
 
     @Test
-    @Ignore
     fun exportImportWithAdaGradDAOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(AdaGradDA(), tempDir)
@@ -224,7 +297,6 @@ class ExportImportModelTest {
     }
 
     @Test
-    @Ignore
     fun exportImportWithAdamaxOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(Adamax(), tempDir)
@@ -236,7 +308,6 @@ class ExportImportModelTest {
     }
 
     @Test
-    @Ignore
     fun exportImportWithFtrlOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(Ftrl(), tempDir)
@@ -248,7 +319,6 @@ class ExportImportModelTest {
     }
 
     @Test
-    @Ignore
     fun exportImportWithMomentumOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(Momentum(), tempDir)
@@ -260,15 +330,14 @@ class ExportImportModelTest {
     }
 
     @Test
-    @Ignore
     fun exportImportWithRMSPropOptimizerInternalState(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(RMSProp(), tempDir)
-        assertEquals(0.1, testMetrics.getValue("trainAccuracy"), EPS)
-        assertEquals(0.1, testMetrics.getValue("beforeAccuracy1"), EPS)
-        assertEquals(0.1, testMetrics.getValue("afterAccuracy1"), EPS)
-        assertEquals(0.1, testMetrics.getValue("beforeAccuracy2"), EPS)
-        assertEquals(0.1, testMetrics.getValue("afterAccuracy2"), EPS)
+        assertEquals(0.6583000421524048, testMetrics.getValue("trainAccuracy"), EPS)
+        assertEquals(0.6582998633384705, testMetrics.getValue("beforeAccuracy1"), EPS)
+        assertEquals(0.5664000511169434, testMetrics.getValue("afterAccuracy1"), EPS)
+        assertEquals(0.6582998633384705, testMetrics.getValue("beforeAccuracy2"), EPS)
+        assertEquals(0.616899847984314, testMetrics.getValue("afterAccuracy2"), EPS)
     }
 
     private fun trainingAndInferenceWithSpecificOptimizer(optimizer: Optimizer, tempDir: Path?): Map<String, Double> {
@@ -300,17 +369,18 @@ class ExportImportModelTest {
             )
 
             it.save(
-                pathToModelDirectory = tempDir.toString(),
+                modelDirectory = tempDir!!.toFile(),
                 saveOptimizerState = true,
-                modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-                modelWritingMode = ModelWritingMode.OVERRIDE
+                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                wrintingMode = WrintingMode.OVERRIDE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
             testMetrics.put("trainAccuracy", accuracy!!)
         }
 
-        val model = Sequential.load(tempDir.toString())
+        // TODO: refactor to ./modelConfig.json
+        val model = Sequential.loadModelConfiguration(tempDir!!.toFile())
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
@@ -324,7 +394,7 @@ class ExportImportModelTest {
                 loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
-            it.loadVariablesFromTxtFiles(tempDir.toString(), loadOptimizerState = true)
+            it.loadWeights(tempDir.toFile(), loadOptimizerState = true)
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             testMetrics["beforeAccuracy1"] = accuracyBefore!!
@@ -344,7 +414,8 @@ class ExportImportModelTest {
             testMetrics.put("afterAccuracy1", accuracyAfterTraining!!)
         }
 
-        val model2 = Sequential.load(tempDir.toString())
+        // TODO: refactor to ./modelConfig.json
+        val model2 = Sequential.loadModelConfiguration(tempDir.toFile())
 
         model2.use {
             it.compile(
@@ -352,7 +423,7 @@ class ExportImportModelTest {
                 loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
-            it.loadVariablesFromTxtFiles(tempDir.toString(), loadOptimizerState = false)
+            it.loadWeights(tempDir.toFile(), loadOptimizerState = false)
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
             testMetrics["beforeAccuracy2"] = accuracyBefore!!

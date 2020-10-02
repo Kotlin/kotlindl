@@ -30,6 +30,8 @@ private const val LINEAR_ACCUMULATOR = "linear_accumulator"
  * Check the documentation for the [l2ShrinkageRegularizationStrength]
  * parameter for more details when shrinkage is enabled, in which case gradient is replaced with gradient_with_shrinkage.
  *
+ * NOTE: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ *
  * It is recommended to leave the parameters of this optimizer at their default values.
  *
  * @see <a href="https://research.google.com/pubs/archive/41159.pdf">
@@ -52,7 +54,6 @@ class Ftrl(
     private val l2ShrinkageRegularizationStrength: Float = 0.0f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-
     /** The starting value for accumulators.
     Only zero or positive values are allowed. */
     private var initialAccumulatorValue = 0.0f // TODO: move to parameters.
@@ -61,6 +62,14 @@ class Ftrl(
     private lateinit var l1RegularizationStrengthConst: Constant<Float>
     private lateinit var l2RegularizationStrengthConst: Constant<Float>
     private lateinit var l2ShrinkageRegularizationStrengthConst: Constant<Float>
+
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(l1RegularizationStrength >= 0.0f) { "L1 Regularization Strength $l1RegularizationStrength should be >= 0.0." }
+        require(l2RegularizationStrength >= 0.0f) { "L2 Regularization Strength $l2RegularizationStrength should be >= 0.0." }
+        require(learningRatePower <= 0.0f) { "Learning rate power $learningRatePower should be <= 0.0." }
+        require(l2ShrinkageRegularizationStrength >= 0.0f) { "L2 Shrinkage Regularization Strength $l2ShrinkageRegularizationStrength should be >= 0.0." }
+    }
 
     override fun applyGradients(
         graph: KGraph,
@@ -126,4 +135,6 @@ class Ftrl(
     override fun getOptimizerName(): String {
         return "Ftrl"
     }
+
+    override fun isRunningOnGPU(): Boolean = false
 }

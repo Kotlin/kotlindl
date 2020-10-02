@@ -4,7 +4,6 @@ import api.core.Sequential
 import api.core.activation.Activations
 import api.core.initializer.Constant
 import api.core.initializer.HeNormal
-import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Flatten
 import api.core.layer.Input
@@ -17,8 +16,8 @@ import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
 
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 2777
+private const val EPOCHS = 2
+private const val TRAINING_BATCH_SIZE = 2000
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -40,7 +39,7 @@ private val model = Sequential.of(
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,7 +52,7 @@ private val model = Sequential.of(
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -74,6 +73,7 @@ private val model = Sequential.of(
         biasInitializer = Constant(0.1f)
     )
 )
+
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(

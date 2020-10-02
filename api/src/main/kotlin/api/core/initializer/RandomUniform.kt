@@ -13,9 +13,9 @@ import org.tensorflow.op.Ops
  * @constructor Creates a [RandomUniform] initializer.
  */
 class RandomUniform(
-    private val maxVal: Float,
-    private val minVal: Float,
-    private val seed: Long
+    private val maxVal: Float = 1.0f,
+    private val minVal: Float = 0.0f,
+    private val seed: Long = 12L
 ) :
     Initializer() {
     override fun initialize(
@@ -25,7 +25,7 @@ class RandomUniform(
         shape: Operand<Int>,
         name: String
     ): Operand<Float> {
-        require(minVal < maxVal) { "The minVal parameter value must be less than maxVal parameter value." }
+        require(minVal <= maxVal) { "The minVal parameter value must be less or equal than maxVal parameter value." }
 
         val seeds = longArrayOf(seed, 0L)
         var distOp: Operand<Float> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())

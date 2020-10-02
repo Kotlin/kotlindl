@@ -1,8 +1,8 @@
 package examples.production.optimizers
 
-import api.core.ModelFormat
-import api.core.ModelWritingMode
+import api.core.SavingFormat
 import api.core.Sequential
+import api.core.WrintingMode
 import api.core.layer.twodim.Conv2D
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
@@ -10,6 +10,7 @@ import api.core.optimizer.Adam
 import datasets.Dataset
 import datasets.handlers.*
 import examples.production.lenet5
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5KerasWithOptimizers"
 private const val EPOCHS = 1
@@ -48,24 +49,24 @@ fun main() {
         )
 
         it.save(
-            pathToModelDirectory = PATH_TO_MODEL,
+            modelDirectory = File(PATH_TO_MODEL),
             saveOptimizerState = true,
-            modelFormat = ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-            modelWritingMode = ModelWritingMode.OVERRIDE
+            savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            wrintingMode = WrintingMode.OVERRIDE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
     }
 
-    val model = Sequential.load(PATH_TO_MODEL)
+    val model = Sequential.loadModelConfiguration(File(PATH_TO_MODEL))
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
-         for (layer in it.layers) {
-             if (layer::class == Conv2D::class)
-                 layer.isTrainable = false
-         }
+        for (layer in it.layers) {
+            if (layer::class == Conv2D::class)
+                layer.isTrainable = false
+        }
 
         it.compile(
             optimizer = optimizer,
@@ -74,7 +75,7 @@ fun main() {
         )
         it.summary()
         print(it.kGraph())
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = true)
+        it.loadWeights(File(PATH_TO_MODEL), loadOptimizerState = true)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
@@ -96,7 +97,7 @@ fun main() {
         println("Accuracy after training with restored optimizer: $accuracyAfterTraining")
     }
 
-    val model2 = Sequential.load(PATH_TO_MODEL)
+    val model2 = Sequential.loadModelConfiguration(File(PATH_TO_MODEL))
 
     model2.use {
         it.compile(
@@ -105,7 +106,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
         it.summary()
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL, loadOptimizerState = false)
+        it.loadWeights(File(PATH_TO_MODEL), loadOptimizerState = false)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

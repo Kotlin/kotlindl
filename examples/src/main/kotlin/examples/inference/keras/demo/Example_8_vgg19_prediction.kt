@@ -1,10 +1,10 @@
 package examples.inference.keras.demo
 
 
+import api.core.Sequential
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import datasets.Dataset
 import examples.inference.keras.vgg.loadImageAndConvertToFloatArray
@@ -14,14 +14,14 @@ import java.io.File
 fun main() {
     val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg19\\modelConfig.json"
     val jsonConfigFile = File(jsonConfigFilePath)
-    val model = loadKerasModel(jsonConfigFile)
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = LossFunctions.MAE,
             metric = Metrics.ACCURACY
         )
 
@@ -37,7 +37,7 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
-            val (res, _) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, _) = it.predictAndGetActivations(floatArray)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)

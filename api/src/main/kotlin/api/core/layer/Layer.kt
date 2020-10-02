@@ -3,7 +3,6 @@ package api.core.layer
 import api.core.KGraph
 import api.core.TrainableModel
 import api.core.initializer.Initializer
-import api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -19,16 +18,13 @@ abstract class Layer(var name: String) {
      * True, if layer's weights could be changed during training.
      * If false, layer's weights are frozen and could be changed during the training.
      */
-    var isTrainable = true
+    var isTrainable: Boolean = true
 
     /** Output data tensor shape. */
     lateinit var outputShape: LongArray
 
     /** Model where this layer is used. */
     lateinit var parentModel: TrainableModel
-
-    /** Basic DType for TensorFlow compatibility purposes. */
-    protected var dtype: Class<Float> = getDType()
 
     /** Returns number of input parameters. */
     protected var fanIn: Int = Int.MIN_VALUE

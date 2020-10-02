@@ -8,10 +8,10 @@ import org.tensorflow.op.random.ParameterizedTruncatedNormal
  *
  */
 class ParametrizedTruncatedNormal(
-    private val mean: Float,
-    private val stdev: Float,
-    private val p1: Float, // low level edge
-    private val p2: Float, // high level edge
+    private val mean: Float = 0.0f,
+    private val stdev: Float = 1.0f,
+    private val p1: Float = -10.0f, // low level edge
+    private val p2: Float = 10.0f, // high level edge
     private val seed: Long
 ) :
     Initializer() {

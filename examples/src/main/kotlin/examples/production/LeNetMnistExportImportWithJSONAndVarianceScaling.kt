@@ -1,8 +1,8 @@
 package examples.production
 
-import api.core.ModelFormat
-import api.core.ModelWritingMode
+import api.core.SavingFormat
 import api.core.Sequential
+import api.core.WrintingMode
 import api.core.layer.twodim.Conv2D
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
@@ -10,6 +10,7 @@ import api.core.optimizer.RMSProp
 import api.core.optimizer.SGD
 import datasets.Dataset
 import datasets.handlers.*
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
 private const val EPOCHS = 1
@@ -44,15 +45,16 @@ fun main() {
         )
 
         it.save(
-            PATH_TO_MODEL, ModelFormat.KERAS_CONFIG_CUSTOM_VARIABLES,
-            modelWritingMode = ModelWritingMode.OVERRIDE
+            File(PATH_TO_MODEL),
+            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            wrintingMode = WrintingMode.OVERRIDE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
     }
 
-    val model = Sequential.load(PATH_TO_MODEL)
+    val model = Sequential.loadModelConfiguration(File(PATH_TO_MODEL))
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
@@ -68,7 +70,7 @@ fun main() {
         )
         it.summary()
 
-        it.loadVariablesFromTxtFiles(PATH_TO_MODEL)
+        it.loadWeights(File(PATH_TO_MODEL))
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

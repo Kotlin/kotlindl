@@ -20,9 +20,9 @@ import org.tensorflow.op.Ops
  * @constructor Creates [MaxPool2D] object.
  */
 class MaxPool2D(
-    val poolSize: IntArray,
-    val strides: IntArray,
-    val padding: ConvPadding = ConvPadding.SAME,
+    val poolSize: IntArray = intArrayOf(1, 2, 2, 1),
+    val strides: IntArray = intArrayOf(1, 2, 2, 1),
+    val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}

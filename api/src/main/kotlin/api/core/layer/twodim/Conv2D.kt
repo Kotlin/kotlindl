@@ -2,7 +2,9 @@ package api.core.layer.twodim
 
 import api.core.KGraph
 import api.core.activation.Activations
+import api.core.initializer.GlorotUniform
 import api.core.initializer.Initializer
+import api.core.initializer.Zeros
 import api.core.layer.Layer
 import api.core.shape.convOutputLength
 import api.core.shape.numElementsInShape
@@ -60,13 +62,13 @@ private const val BIAS = "conv2d_bias"
  * @constructor Creates [Conv2D] object.
  */
 class Conv2D(
-    val filters: Long,
-    val kernelSize: LongArray,
-    val strides: LongArray,
+    val filters: Long = 32,
+    val kernelSize: LongArray = longArrayOf(3, 3),
+    val strides: LongArray = longArrayOf(1, 1, 1, 1),
     val dilations: LongArray = longArrayOf(1, 1, 1, 1),
     val activation: Activations = Activations.Relu,
-    val kernelInitializer: Initializer,
-    val biasInitializer: Initializer,
+    val kernelInitializer: Initializer = GlorotUniform(),
+    val biasInitializer: Initializer = Zeros(),
     val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
 ) : Layer(name) {

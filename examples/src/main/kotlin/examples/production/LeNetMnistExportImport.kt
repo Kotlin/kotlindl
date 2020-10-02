@@ -1,11 +1,13 @@
 package examples.production
 
+import api.core.WrintingMode
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.InferenceModel
 import datasets.Dataset
 import datasets.handlers.*
+import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 private const val EPOCHS = 3
@@ -43,7 +45,7 @@ fun main() {
 
         println(it.kGraph)
 
-        it.save(PATH_TO_MODEL)
+        it.save(File(PATH_TO_MODEL), wrintingMode = WrintingMode.OVERRIDE)
 
         val prediction = it.predict(train.getX(imageId1))
 
@@ -61,9 +63,10 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    InferenceModel().use {
-        it.reshape (::mnistReshape)
-        it.load(PATH_TO_MODEL, loadOptimizerState = true)
+    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+
+    inferenceModel.use {
+        it.reshape(::mnistReshape)
 
         val prediction = it.predict(train.getX(imageId1))
 

@@ -132,4 +132,10 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
     public fun getY(idx: Int): FloatArray {
         return y[idx]
     }
+
+    public fun getLabel(idx: Int): Int {
+        val labelArray = y[idx]
+        return labelArray.indexOf(labelArray.max()!!)
+
+    }
 }

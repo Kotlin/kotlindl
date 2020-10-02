@@ -41,7 +41,7 @@ private val model = Sequential.of(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = HeNormal(SEED),
+        kernelInitializer = HeNormal(),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -54,7 +54,7 @@ private val model = Sequential.of(
         kernelSize = longArrayOf(5, 5),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = HeNormal(SEED),
+        kernelInitializer = HeNormal(),
         biasInitializer = Zeros(),
         padding = ConvPadding.SAME
     ),
@@ -66,13 +66,13 @@ private val model = Sequential.of(
     Dense(
         outputSize = 512,
         activation = Activations.Relu,
-        kernelInitializer = HeNormal(SEED),
+        kernelInitializer = HeNormal(),
         biasInitializer = Constant(0.1f)
     ),
     Dense(
         outputSize = AMOUNT_OF_CLASSES,
         activation = Activations.Linear,
-        kernelInitializer = HeNormal(SEED),
+        kernelInitializer = HeNormal(),
         biasInitializer = Constant(0.1f)
     )
 )

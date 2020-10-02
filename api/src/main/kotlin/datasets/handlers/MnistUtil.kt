@@ -7,10 +7,10 @@ import java.util.zip.GZIPInputStream
 private const val IMAGE_ARCHIVE_MAGIC = 2051
 private const val LABEL_ARCHIVE_MAGIC = 2049
 
-const val TRAIN_IMAGES_ARCHIVE = "train-images-idx3-ubyte.gz"
-const val TRAIN_LABELS_ARCHIVE = "train-labels-idx1-ubyte.gz"
-const val TEST_IMAGES_ARCHIVE = "t10k-images-idx3-ubyte.gz"
-const val TEST_LABELS_ARCHIVE = "t10k-labels-idx1-ubyte.gz"
+const val TRAIN_IMAGES_ARCHIVE = "datasets/mnist/train-images-idx3-ubyte.gz"
+const val TRAIN_LABELS_ARCHIVE = "datasets/mnist/train-labels-idx1-ubyte.gz"
+const val TEST_IMAGES_ARCHIVE = "datasets/mnist/t10k-images-idx3-ubyte.gz"
+const val TEST_LABELS_ARCHIVE = "datasets/mnist/t10k-labels-idx1-ubyte.gz"
 const val AMOUNT_OF_CLASSES = 10
 
 fun extractImages(archiveName: String): Array<FloatArray> {

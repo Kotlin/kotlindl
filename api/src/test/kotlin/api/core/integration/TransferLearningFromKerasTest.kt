@@ -1,5 +1,6 @@
 package api.core.integration
 
+import api.core.Sequential
 import api.core.activation.Activations
 import api.core.initializer.*
 import api.core.layer.Dense
@@ -9,7 +10,6 @@ import api.core.layer.twodim.ConvPadding
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import datasets.Dataset
 import datasets.handlers.*
@@ -28,7 +28,7 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadSequentialJSONConfig() {
         val jsonConfigFile = File(realPathToConfig)
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val flattenLayerName = "flatten"
         val conv2dLayerName = "conv2d"
@@ -65,7 +65,7 @@ class TransferLearningTest : IntegrationTest() {
     fun loadSequentialJSONConfigAndTrain() {
         val jsonConfigFile = File(realPathToConfig)
 
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val (train, test) = Dataset.createTrainAndTestDatasets(
             FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -117,7 +117,7 @@ class TransferLearningTest : IntegrationTest() {
     @Test
     fun loadWeightsAndJSONConfig() {
         val jsonConfigFile = File(realPathToConfig)
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
@@ -143,7 +143,7 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning without freezing
     fun loadWeightsAndJSONConfigAndTrain() {
         val jsonConfigFile = File(realPathToConfig)
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
@@ -192,7 +192,7 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning with Conv2D layers weights freezing
     fun loadWeightsAndJSONConfigAndTrainDenseLayers() {
         val jsonConfigFile = File(realPathToConfig)
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
@@ -262,7 +262,7 @@ class TransferLearningTest : IntegrationTest() {
     // Simplest transfer learning with loading and freezing Conv2D weights, Dense weights are initialized and trained from zero to hero
     fun loadWeightsPartiallyAndJSONConfigAndTrainDenseLayers() {
         val jsonConfigFile = File(realPathToConfig)
-        val testModel = loadKerasModel(jsonConfigFile)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)

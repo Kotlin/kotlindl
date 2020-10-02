@@ -1,10 +1,10 @@
 package examples.inference.keras.vgg
 
 
+import api.core.Sequential
 import api.core.loss.LossFunctions
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
-import api.inference.keras.loadKerasModel
 import api.inference.keras.loadWeights
 import datasets.Dataset
 import io.jhdf.HdfFile
@@ -15,7 +15,7 @@ fun main() {
 
     val jsonConfigFile = File(jsonConfigFilePath)
 
-    val model = loadKerasModel(jsonConfigFile)
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
         it.compile(
@@ -39,12 +39,12 @@ fun main() {
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
 
-            val (res, activations) = it.predictAndGetActivations(floatArray, "Softmax")
+            val (res, activations) = it.predictAndGetActivations(floatArray)
             println(res)
             //drawActivations(activations)
 
-            val predictionVector = it.predictSoftly(floatArray, "Softmax").toMutableList()
-            val predictionVector2 = it.predictSoftly(floatArray, "Softmax").toMutableList()
+            val predictionVector = it.predictSoftly(floatArray).toMutableList()
+            val predictionVector2 = it.predictSoftly(floatArray).toMutableList()
 
 
             val top5: MutableMap<Int, Int> = mutableMapOf()

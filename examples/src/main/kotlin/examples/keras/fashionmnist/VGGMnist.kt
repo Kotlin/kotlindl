@@ -160,7 +160,11 @@ fun main() {
     )
 
     vgg11.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(
+            optimizer = Adam(),
+            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

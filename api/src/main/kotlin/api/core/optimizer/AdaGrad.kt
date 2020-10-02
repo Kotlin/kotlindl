@@ -42,6 +42,11 @@ class AdaGrad(
     private lateinit var initialAccumulatorValueConstant: Constant<Float>
     private lateinit var learningRateConst: Constant<Float>
 
+    init {
+        require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(initialAccumulatorValue >= 0.0f) { "Rho $initialAccumulatorValue should be >= 0.0." }
+    }
+
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
@@ -89,4 +94,6 @@ class AdaGrad(
     override fun getOptimizerName(): String {
         return "Adagrad"
     }
+
+    override fun isRunningOnGPU(): Boolean = true
 }
