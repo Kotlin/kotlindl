@@ -68,7 +68,7 @@ fun main() {
 
     model.compile(
         optimizer = SGD(learningRate = 0.001f),
-        loss = LossFunctions.POISSON,
+        loss = LossFunctions.MSE,
         metric = Metrics.MSE
     )
 

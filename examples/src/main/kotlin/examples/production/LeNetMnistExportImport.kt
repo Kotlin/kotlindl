@@ -63,7 +63,6 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {

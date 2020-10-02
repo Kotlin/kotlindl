@@ -4,7 +4,6 @@ import api.core.Sequential
 import api.core.activation.Activations
 import api.core.initializer.Constant
 import api.core.initializer.HeNormal
-import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Flatten
 import api.core.layer.Input
@@ -40,7 +39,7 @@ private val model = Sequential.of(
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -53,7 +52,7 @@ private val model = Sequential.of(
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -75,6 +74,7 @@ private val model = Sequential.of(
     )
 )
 
+
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
@@ -87,7 +87,7 @@ fun main() {
     )
 
     model.use {
-        it.compile(optimizer = SGD(learningRate = 0.1f), loss = LossFunctions.POISSON)
+        it.compile(optimizer = SGD(learningRate = 0.1f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
         println(it.kGraph)
 
