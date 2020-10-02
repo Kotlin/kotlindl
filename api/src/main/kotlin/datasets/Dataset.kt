@@ -1,6 +1,7 @@
 package datasets
 
 import java.io.IOException
+import java.nio.Buffer
 import java.nio.FloatBuffer
 import kotlin.math.min
 import kotlin.math.truncate
@@ -62,7 +63,7 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
             for (i in start until start + length) {
                 buffer.put(src[i])
             }
-            return buffer.rewind() as FloatBuffer // for JDK 8: buffer.rewind() as FloatBuffer
+            return (buffer as Buffer).rewind() as FloatBuffer
         }
 
         public fun createTrainAndTestDatasets(
