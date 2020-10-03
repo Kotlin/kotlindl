@@ -12,7 +12,7 @@ import api.core.layer.Input
 import api.core.layer.twodim.AvgPool2D
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.core.optimizer.ClipGradientByValue
@@ -97,7 +97,7 @@ fun main() {
     lenet5Classic.use {
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.5f)),
-            loss = LossFunctions.RMSE,
+            loss = Losses.RMSE,
             metric = Metrics.ACCURACY
         )
 

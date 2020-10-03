@@ -9,7 +9,7 @@ import api.core.layer.Flatten
 import api.core.layer.Layer
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.MaxPool2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.keras.loadWeightsForFrozenLayers
@@ -82,7 +82,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 

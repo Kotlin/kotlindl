@@ -6,7 +6,7 @@ import api.core.initializer.HeNormal
 import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Input
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.SGD
 import datasets.Dataset
@@ -66,21 +66,21 @@ fun main() {
 
     val (train, test) = dataset.split(0.9)
 
-    model.compile(
-        optimizer = SGD(learningRate = 0.001f),
-        loss = LossFunctions.MSE,
-        metric = Metrics.MSE
-    )
+    model.use {
+        it.compile(
+            optimizer = SGD(learningRate = 0.001f),
+            loss = Losses.MSE,
+            metric = Metrics.MSE
+        )
 
-    model.summary()
-    model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.summary()
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val mse = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
-    println(model.getLayer("dense_1").getWeights()[0].contentDeepToString())
+        val mse = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
+        println(it.getLayer("dense_1").getWeights()[0].contentDeepToString())
 
-    model.close()
-
-    println("MSE: $mse")
+        println("MSE: $mse")
+    }
 }
 
 

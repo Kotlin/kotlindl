@@ -4,7 +4,7 @@ import api.core.SavingFormat
 import api.core.Sequential
 import api.core.WrintingMode
 import api.core.layer.twodim.Conv2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
@@ -33,7 +33,7 @@ fun main() {
     val optimizer = Adam()
 
     lenet5.use {
-        it.compile(optimizer = optimizer, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
         it.summary()
 
@@ -52,7 +52,7 @@ fun main() {
             modelDirectory = File(PATH_TO_MODEL),
             saveOptimizerState = true,
             savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-            wrintingMode = WrintingMode.OVERRIDE
+            writingMode = WrintingMode.OVERRIDE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -70,7 +70,7 @@ fun main() {
 
         it.compile(
             optimizer = optimizer,
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
         it.summary()
@@ -102,7 +102,7 @@ fun main() {
     model2.use {
         it.compile(
             optimizer = optimizer,
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
         it.summary()

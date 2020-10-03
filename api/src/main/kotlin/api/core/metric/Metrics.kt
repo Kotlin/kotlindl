@@ -46,13 +46,24 @@ enum class Metrics {
                 RMSE -> RMSE()
             }
         }
+
+        /** Converts sub-class of [Metric] to enum value. */
+        fun convertBack(metric: Metric): Metrics {
+            return when (metric) {
+                Accuracy() -> ACCURACY
+                MAE() -> MAE
+                MSE() -> MSE
+                RMSE() -> RMSE
+                else -> ACCURACY
+            }
+        }
     }
 }
 
 /**
  * @see [Metrics.ACCURACY]
  */
-class Accuracy : Metric {
+public class Accuracy : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val predicted: Operand<Long> = tf.math.argMax(yPred, tf.constant(1))
         val expected: Operand<Long> = tf.math.argMax(yTrue, tf.constant(1))
@@ -64,7 +75,7 @@ class Accuracy : Metric {
 /**
  * @see [Metrics.MAE]
  */
-class MAE : Metric {
+public class MAE : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
         return tf.reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
@@ -74,7 +85,7 @@ class MAE : Metric {
 /**
  * @see [Metrics.MSE]
  */
-class MSE : Metric {
+public class MSE : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
         return tf.reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
@@ -84,7 +95,7 @@ class MSE : Metric {
 /**
  * @see [Metrics.RMSE]
  */
-class RMSE : Metric {
+public class RMSE : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(yPred, yTrue))
         return tf.reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))

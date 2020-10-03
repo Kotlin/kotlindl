@@ -11,7 +11,7 @@ import api.core.layer.Input
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.SGD
 import datasets.Dataset
@@ -87,7 +87,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = SGD(LEARNING_RATE),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 

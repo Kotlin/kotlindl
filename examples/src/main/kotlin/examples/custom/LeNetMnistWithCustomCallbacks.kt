@@ -13,7 +13,7 @@ import api.core.layer.Input
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.SGD
 import datasets.Dataset
@@ -91,7 +91,8 @@ fun main() {
     model.use {
         it.compile(
             optimizer = SGD(learningRate = 0.0001f),
-            loss = LossFunctions.MSE,
+            loss = Losses.MSE,
+            metric = Metrics.ACCURACY,
             callback = CustomCallback()
         )
 

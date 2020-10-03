@@ -1,7 +1,7 @@
 package examples.production
 
 import api.core.WrintingMode
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.InferenceModel
@@ -41,7 +41,7 @@ fun main() {
     val (newTrain, validation) = train.split(0.95)
 
     lenet5.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
         it.fit(
             trainingDataset = newTrain,
@@ -52,7 +52,7 @@ fun main() {
             verbose = true
         )
 
-        var weights = it.layers[0].getWeights() // first conv2d layer
+        val weights = it.layers[0].getWeights() // first conv2d layer
 
         drawFilters(weights[0])
 
@@ -60,7 +60,7 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(File(PATH_TO_MODEL), wrintingMode = WrintingMode.OVERRIDE)
+        it.save(File(PATH_TO_MODEL), writingMode = WrintingMode.OVERRIDE)
     }
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)

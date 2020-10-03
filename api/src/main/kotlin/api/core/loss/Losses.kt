@@ -9,7 +9,7 @@ import org.tensorflow.op.Ops
 /**
  * Loss functions.
  */
-enum class LossFunctions {
+enum class Losses {
     /**
      * Computes multi-dimensional sigmoid function (softmax) for outputs with logit operation.
      *
@@ -88,7 +88,7 @@ enum class LossFunctions {
 
     companion object {
         /** Converts enum value to sub-class of [LossFunction]. */
-        fun convert(lossFunctionType: LossFunctions): LossFunction {
+        fun convert(lossFunctionType: Losses): LossFunction {
             return when (lossFunctionType) {
                 SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits()
                 HINGE_LOSS -> HingeLoss()
@@ -106,7 +106,7 @@ enum class LossFunctions {
 }
 
 /**
- * @see [LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS]
+ * @see [Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS]
  */
 class SoftmaxCrossEntropyWithLogits : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -117,7 +117,7 @@ class SoftmaxCrossEntropyWithLogits : LossFunction {
 }
 
 /**
- * @see [LossFunctions.MAE]
+ * @see [Losses.MAE]
  */
 class MAE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -127,7 +127,7 @@ class MAE : LossFunction {
 }
 
 /**
- * @see [LossFunctions.MSE]
+ * @see [Losses.MSE]
  */
 class MSE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -137,7 +137,7 @@ class MSE : LossFunction {
 }
 
 /**
- * @see [LossFunctions.MAPE]
+ * @see [Losses.MAPE]
  */
 class MAPE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -158,7 +158,7 @@ class MAPE : LossFunction {
 }
 
 /**
- * @see [LossFunctions.MLSE]
+ * @see [Losses.MLSE]
  */
 class MLSE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -174,7 +174,7 @@ class MLSE : LossFunction {
 
 
 /**
- * @see [LossFunctions.POISSON]
+ * @see [Losses.POISSON]
  */
 class Poisson : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -187,7 +187,7 @@ class Poisson : LossFunction {
 }
 
 /**
- * @see [LossFunctions.RMSE]
+ * @see [Losses.RMSE]
  */
 class RMSE : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -197,7 +197,7 @@ class RMSE : LossFunction {
 }
 
 /**
- * @see [LossFunctions.HINGE_LOSS]
+ * @see [Losses.HINGE_LOSS]
  */
 class HingeLoss : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
@@ -215,7 +215,7 @@ class HingeLoss : LossFunction {
 }
 
 /**
- * @see [LossFunctions.HUBER_LOSS]
+ * @see [Losses.HUBER_LOSS]
  *
  * @param [delta] Huber loss delta.
  */
@@ -244,7 +244,7 @@ class HuberLoss(val delta: Float) : LossFunction {
 }
 
 /**
- * @see [LossFunctions.LOG_LOSS]
+ * @see [Losses.LOG_LOSS]
  */
 class LogLoss : LossFunction {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {

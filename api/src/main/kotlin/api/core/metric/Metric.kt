@@ -6,7 +6,7 @@ import org.tensorflow.op.Ops
 /**
  * Basic interface for all metric functions.
  */
-interface Metric {
+public interface Metric {
     /**
      * Applies [Metric] to the [yPred] labels predicted by the model and known [yTrue] hidden during training.
      *
@@ -14,5 +14,5 @@ interface Metric {
      * @param yTrue Ground truth values. Shape = `[batch_size, d0, .. dN]`.
      * @param [tf] TensorFlow graph API for building operations.
      */
-    fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
+    public fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
 }

@@ -6,8 +6,11 @@ import api.core.history.*
 import api.core.layer.Dense
 import api.core.layer.Input
 import api.core.layer.Layer
-import api.core.loss.LossFunctions
+import api.core.loss.LossFunction
+import api.core.loss.Losses
+import api.core.loss.SoftmaxCrossEntropyWithLogits
 import api.core.metric.EvaluationResult
+import api.core.metric.Metric
 import api.core.metric.Metrics
 import api.core.optimizer.Optimizer
 import api.core.shape.TensorShape
@@ -179,7 +182,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunctions, metric: Metrics, callback: Callback) {
+    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics, callback: Callback) {
+        compile(optimizer, Losses.convert(loss), Metrics.convert(metric), callback)
+    }
+
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
         if (isModelCompiled) logger.info { "Model was recompiled." }
 
         validateModelArchitecture()
@@ -209,11 +216,19 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         yOp = tf.placeholder(getDType()) as Operand<Float>
 
         yPred = transformInputWithNNModel(xOp)
-        lossOp = LossFunctions.convert(loss).apply(tf, yPred, yOp)
-
+        //lossOp = Losses.convert(loss).apply(tf, yPred, yOp)
+        lossOp = loss.apply(tf, yPred, yOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         isModelCompiled = true
+    }
+
+    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric, callback: Callback) {
+        compile(optimizer, Losses.convert(loss), metric, callback)
+    }
+
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metrics, callback: Callback) {
+        compile(optimizer, loss, Metrics.convert(metric), callback)
     }
 
     private fun validateModelArchitecture() {
@@ -305,11 +320,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         val prediction = when (loss) {
-            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp)
+        val metricOp = metric.apply(tf, prediction, yOp)
 
         if (isOptimizerInitRequired) kGraph.initializeOptimizerVariables(session)
 
@@ -363,7 +378,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!)
-                    val validationMetricValue = evaluationResult.metrics[metric]
+                    val validationMetricValue = evaluationResult.metrics[Metrics.convertBack(metric)]
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
                     epochTrainingEvent.valMetricValue = validationMetricValue!!
@@ -442,11 +457,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         callback.onTestBegin()
 
         val prediction = when (loss) {
-            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = Metrics.convert(metric).apply(tf, prediction, yOp)
+        val metricOp = metric.apply(tf, prediction, yOp)
 
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
@@ -493,7 +508,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 
         callback.onTestEnd(evaluationHistory)
-        return EvaluationResult(avgLossValue, mapOf(metric to avgMetricValue))
+        return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
 
@@ -502,7 +517,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         callback.onPredictBegin()
 
         val prediction = when (loss) {
-            LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
@@ -617,7 +632,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         if (predictionTensorName.isEmpty()) {
             val prediction = when (loss) {
-                LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+                is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
                 else -> tf.withName(OUTPUT_NAME).identity(yPred)
             }
 
@@ -694,10 +709,10 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         modelDirectory: File,
         savingFormat: SavingFormat,
         saveOptimizerState: Boolean,
-        wrintingMode: WrintingMode
+        writingMode: WrintingMode
     ) {
         val pathToModelDirectory = modelDirectory.absolutePath
-        when (wrintingMode) {
+        when (writingMode) {
             WrintingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
                 modelDirectory.mkdir()

@@ -6,7 +6,7 @@ import api.core.initializer.HeNormal
 import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Input
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
@@ -37,13 +37,13 @@ fun main() {
         ::extractLabels
     )
 
-    model.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+    model.use {
+        it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
-    model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-    val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
-    model.close()
-
-    println("Accuracy: $accuracy")
+        println("Accuracy: $accuracy")
+    }
 }

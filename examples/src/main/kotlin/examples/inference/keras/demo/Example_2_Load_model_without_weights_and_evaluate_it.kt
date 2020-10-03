@@ -1,7 +1,7 @@
 package examples.inference.keras.demo
 
 import api.core.Sequential
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
@@ -26,7 +26,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 

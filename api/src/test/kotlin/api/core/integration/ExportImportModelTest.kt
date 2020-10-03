@@ -12,7 +12,7 @@ import api.core.layer.Input
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.*
 import datasets.Dataset
@@ -117,7 +117,7 @@ class ExportImportModelTest {
         val (newTrain, validation) = train.split(0.95)
 
         lenet5.use {
-            it.compile(optimizer = SGD(learningRate = 0.05f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = SGD(learningRate = 0.05f), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
             it.summary()
 
@@ -136,7 +136,7 @@ class ExportImportModelTest {
             it.save(
                 modelDirectory = tempDir.toFile(),
                 savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-                wrintingMode = WrintingMode.OVERRIDE
+                writingMode = WrintingMode.OVERRIDE
             )
         }
 
@@ -152,7 +152,7 @@ class ExportImportModelTest {
 
             it.compile(
                 optimizer = RMSProp(),
-                loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
             it.summary()
@@ -194,7 +194,7 @@ class ExportImportModelTest {
         )
 
         lenet5.use {
-            it.compile(optimizer = SGD(learningRate = 0.05f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = SGD(learningRate = 0.05f), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
             it.summary()
 
@@ -211,7 +211,7 @@ class ExportImportModelTest {
             it.save(
                 modelDirectory = tempDir.toFile(),
                 savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-                wrintingMode = WrintingMode.OVERRIDE
+                writingMode = WrintingMode.OVERRIDE
             )
         }
 
@@ -226,7 +226,7 @@ class ExportImportModelTest {
 
             it.compile(
                 optimizer = RMSProp(),
-                loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
             it.summary()
@@ -357,7 +357,7 @@ class ExportImportModelTest {
 
         val lenet5 = Sequential.of(lenet5Layers)
         lenet5.use {
-            it.compile(optimizer = optimizer, loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
 
             it.fit(
                 trainingDataset = newTrain,
@@ -372,7 +372,7 @@ class ExportImportModelTest {
                 modelDirectory = tempDir!!.toFile(),
                 saveOptimizerState = true,
                 savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-                wrintingMode = WrintingMode.OVERRIDE
+                writingMode = WrintingMode.OVERRIDE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -391,7 +391,7 @@ class ExportImportModelTest {
 
             it.compile(
                 optimizer = optimizer,
-                loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
             it.loadWeights(tempDir.toFile(), loadOptimizerState = true)
@@ -420,7 +420,7 @@ class ExportImportModelTest {
         model2.use {
             it.compile(
                 optimizer = optimizer,
-                loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                 metric = Metrics.ACCURACY
             )
             it.loadWeights(tempDir.toFile(), loadOptimizerState = false)

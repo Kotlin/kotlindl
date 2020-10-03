@@ -4,7 +4,7 @@ import api.core.SavingFormat
 import api.core.Sequential
 import api.core.WrintingMode
 import api.core.layer.twodim.Conv2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.RMSProp
 import api.core.optimizer.SGD
@@ -31,7 +31,11 @@ fun main() {
     val (newTrain, validation) = train.split(0.95)
 
     lenet5.use {
-        it.compile(optimizer = SGD(learningRate = 0.05f), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(
+            optimizer = SGD(learningRate = 0.05f),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
 
         it.summary()
 
@@ -47,7 +51,7 @@ fun main() {
         it.save(
             File(PATH_TO_MODEL),
             SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-            wrintingMode = WrintingMode.OVERRIDE
+            writingMode = WrintingMode.OVERRIDE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -65,7 +69,7 @@ fun main() {
 
         it.compile(
             optimizer = RMSProp(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
         it.summary()

@@ -2,7 +2,7 @@ package examples.inference.keras
 
 import api.core.Sequential
 import api.core.layer.twodim.Conv2D
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.keras.loadWeights
@@ -44,7 +44,7 @@ fun main() {
 
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
         it.summary()

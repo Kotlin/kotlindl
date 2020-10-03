@@ -2,7 +2,7 @@ package examples.inference.keras.demo
 
 
 import api.core.Sequential
-import api.core.loss.LossFunctions
+import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.keras.loadWeights
@@ -21,7 +21,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = LossFunctions.MAE,
+            loss = Losses.MAE,
             metric = Metrics.ACCURACY
         )
 
