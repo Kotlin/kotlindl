@@ -8,7 +8,6 @@ import api.inference.keras.loadWeights
 import datasets.Dataset
 import datasets.handlers.*
 
-/** All weigths are loaded, the model just evaluated */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
