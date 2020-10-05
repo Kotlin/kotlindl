@@ -25,7 +25,7 @@ import kotlin.math.roundToInt
 /**
  * Type of padding.
  */
-enum class ConvPadding {
+public enum class ConvPadding {
     /**
      * Results in padding evenly to the left/right or up/down of the input such that output has the same
      * height/width dimension as the input.
@@ -61,15 +61,15 @@ private const val BIAS = "conv2d_bias"
  * @property [name] Custom layer name.
  * @constructor Creates [Conv2D] object.
  */
-class Conv2D(
-    val filters: Long = 32,
-    val kernelSize: LongArray = longArrayOf(3, 3),
-    val strides: LongArray = longArrayOf(1, 1, 1, 1),
-    val dilations: LongArray = longArrayOf(1, 1, 1, 1),
-    val activation: Activations = Activations.Relu,
-    val kernelInitializer: Initializer = GlorotUniform(),
-    val biasInitializer: Initializer = Zeros(),
-    val padding: ConvPadding = ConvPadding.SAME,
+public class Conv2D(
+    public val filters: Long = 32,
+    public val kernelSize: LongArray = longArrayOf(3, 3),
+    public val strides: LongArray = longArrayOf(1, 1, 1, 1),
+    public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
+    public val activation: Activations = Activations.Relu,
+    public val kernelInitializer: Initializer = GlorotUniform(),
+    public val biasInitializer: Initializer = Zeros(),
+    public val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
 ) : Layer(name) {
     // weight tensors

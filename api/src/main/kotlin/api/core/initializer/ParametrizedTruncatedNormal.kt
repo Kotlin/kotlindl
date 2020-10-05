@@ -7,7 +7,7 @@ import org.tensorflow.op.random.ParameterizedTruncatedNormal
 /**
  *
  */
-class ParametrizedTruncatedNormal(
+public class ParametrizedTruncatedNormal(
     private val mean: Float = 0.0f,
     private val stdev: Float = 1.0f,
     private val p1: Float = -10.0f, // low level edge

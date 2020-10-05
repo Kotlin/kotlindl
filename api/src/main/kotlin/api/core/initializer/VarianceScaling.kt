@@ -18,7 +18,7 @@ import kotlin.math.sqrt
  * @see <a href="http://proceedings.mlr.press/v9/glorot10a.html">
  *     Glorot et al., 2010</a>
  */
-class GlorotNormal(
+public class GlorotNormal(
     seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
@@ -39,7 +39,7 @@ class GlorotNormal(
  * @see <a href="http://proceedings.mlr.press/v9/glorot10a.html">
  *     Glorot et al., 2010</a>
  */
-class GlorotUniform(
+public class GlorotUniform(
     seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_AVG, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
@@ -59,7 +59,7 @@ class GlorotUniform(
  * @see <a href="https://www.cv-foundation.org/openaccess/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">
  *     He et al., 2015</a>
  */
-class HeNormal(
+public class HeNormal(
     seed: Long = 12L
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
@@ -79,7 +79,7 @@ class HeNormal(
  * @see <a href="https://www.cv-foundation.org/openaccess/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">
  *     He et al., 2015</a>
  */
-class HeUniform(
+public class HeUniform(
     seed: Long = 12L
 ) : VarianceScaling(scale = 2.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
@@ -101,7 +101,7 @@ class HeUniform(
  * @see <a href="https://papers.nips.cc/paper/6698-self-normalizing-neural-networks.pdf">
  *     Efficient Backprop, [Lecun et al., 1998]</a>
  */
-class LeCunNormal(
+public class LeCunNormal(
     seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.TRUNCATED_NORMAL, seed = seed) {
     override fun toString(): String {
@@ -123,7 +123,7 @@ class LeCunNormal(
  * @see <a href="https://papers.nips.cc/paper/6698-self-normalizing-neural-networks.pdf">
  *     Efficient Backprop, [Lecun et al., 1998]</a>
  */
-class LeCunUniform(
+public class LeCunUniform(
     seed: Long = 12L
 ) : VarianceScaling(scale = 1.0, mode = Mode.FAN_IN, distribution = Distribution.UNIFORM, seed = seed) {
     override fun toString(): String {
@@ -151,11 +151,11 @@ class LeCunUniform(
  * @property [seed] Used to create random seeds.
  * @constructor Creates [VarianceScaling] initializer.
  */
-open class VarianceScaling(
-    internal val scale: Double = 1.0,
-    internal val mode: Mode = Mode.FAN_IN,
-    internal val distribution: Distribution = Distribution.TRUNCATED_NORMAL,
-    internal val seed: Long = 12L
+public open class VarianceScaling(
+    public val scale: Double = 1.0,
+    public val mode: Mode = Mode.FAN_IN,
+    public val distribution: Distribution = Distribution.TRUNCATED_NORMAL,
+    public val seed: Long = 12L
 ) :
     Initializer() {
     override fun initialize(

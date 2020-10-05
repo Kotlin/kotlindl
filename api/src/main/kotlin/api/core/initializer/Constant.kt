@@ -6,10 +6,12 @@ import org.tensorflow.op.Ops
 /**
  * Initializer that generates tensors with constant values.
  *
+ * NOTE: It does not work properly during model import/export, known issue: https://github.com/zaleslaw/Kotof/issues/4.
+ *
  * @property constantValue Constant value to fill the tensor.
  * @constructor Creates a [Constant] initializer with a given [constantValue].
  */
-class Constant(private val constantValue: Float) : Initializer() {
+public class Constant(private val constantValue: Float) : Initializer() {
     override fun initialize(
         fanIn: Int,
         fanOut: Int,

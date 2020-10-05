@@ -33,11 +33,11 @@ private const val BIAS = "dense_bias"
  * @property [name] Custom layer name.
  * @constructor Creates [Dense] object.
  */
-class Dense(
-    val outputSize: Int = 128,
-    val activation: Activations = Activations.Relu,
-    val kernelInitializer: Initializer = GlorotUniform(),
-    val biasInitializer: Initializer = Zeros(),
+public class Dense(
+    public val outputSize: Int = 128,
+    public val activation: Activations = Activations.Relu,
+    public val kernelInitializer: Initializer = GlorotUniform(),
+    public val biasInitializer: Initializer = Zeros(),
     name: String = ""
 ) : Layer(name) {
     private lateinit var kernelShape: Shape

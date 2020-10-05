@@ -30,25 +30,33 @@ enum class Metrics {
     MSE,
 
     /**
+     * Computes the mean squared logarithmic error between `y_true` and `y_pred`.
+     *
+     * `loss = square(log(y_true + 1.) - log(y_pred + 1.))`
+     */
+    MLSE,
+
+    /**
      * Computes the root of mean of squares of errors between labels and predictions.
      *
      * `metric = root(square(y_true - y_pred))`
      */
     RMSE;
 
-    companion object {
+    public companion object {
         /** Converts enum value to sub-class of [Metric]. */
-        fun convert(metricType: Metrics): Metric {
+        public fun convert(metricType: Metrics): Metric {
             return when (metricType) {
                 ACCURACY -> Accuracy()
                 MAE -> MAE()
                 MSE -> MSE()
                 RMSE -> RMSE()
+                MLSE -> MLSE()
             }
         }
 
         /** Converts sub-class of [Metric] to enum value. */
-        fun convertBack(metric: Metric): Metrics {
+        public fun convertBack(metric: Metric): Metrics {
             return when (metric) {
                 Accuracy() -> ACCURACY
                 MAE() -> MAE
@@ -99,6 +107,22 @@ public class RMSE : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(yPred, yTrue))
         return tf.reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
+    }
+}
+
+/**
+ * @see [Metrics.MLSE]
+ */
+public class MLSE : Metric {
+    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+        val epsilon = 1e-5f
+
+        val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
+        val secondLog = tf.math.log(tf.math.add(tf.math.maximum(yTrue, tf.constant(epsilon)), tf.constant(1.0f)))
+
+        return tf.reduceSum(
+            tf.math.mean(tf.math.squaredDifference(firstLog, secondLog), tf.constant(-1)), tf.constant(0)
+        )
     }
 }
 

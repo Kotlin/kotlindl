@@ -6,5 +6,5 @@ package api.core.metric
  * @property lossValue Value of loss function on test dataset.
  * @property metrics Values of calculated metrics.
  */
-data class EvaluationResult(val lossValue: Double, val metrics: Map<Metrics, Double>)
+public data class EvaluationResult(val lossValue: Double, val metrics: Map<Metrics, Double>)
 

@@ -14,12 +14,12 @@ import org.tensorflow.op.core.Placeholder
  * @property [name] Custom layer name.
  * @constructor Creates [Input] layer from [packedDims] representing [input] data shape.
  */
-class Input(vararg dims: Long, name: String = "") : Layer(name) {
+public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Placeholder for input data. */
-    lateinit var input: Placeholder<Float>
+    public lateinit var input: Placeholder<Float>
 
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
-    val packedDims: LongArray = dims
+    public val packedDims: LongArray = dims
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
@@ -30,7 +30,7 @@ class Input(vararg dims: Long, name: String = "") : Layer(name) {
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    fun defineVariables(tf: Ops) {
+    public fun defineVariables(tf: Ops) {
         input = tf.withName(DATA_PLACEHOLDER).placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))
@@ -42,7 +42,7 @@ class Input(vararg dims: Long, name: String = "") : Layer(name) {
      *
      * NOTE: Called instead of [Layer.computeOutputShape].
      */
-    fun computeOutputShape(): Shape {
+    public fun computeOutputShape(): Shape {
         return input.asOutput().shape()
     }
 

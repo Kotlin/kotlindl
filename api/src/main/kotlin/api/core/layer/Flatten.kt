@@ -14,7 +14,7 @@ import kotlin.math.abs
  * @property [name] Custom layer name.
  * @constructor Creates [Flatten] object.
  */
-class Flatten(name: String = "") : Layer(name) {
+public class Flatten(name: String = "") : Layer(name) {
     private lateinit var units: Constant<Int>
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {

@@ -6,7 +6,7 @@ import org.tensorflow.op.Ops
 /**
  * Basic interface for all loss functions.
  */
-interface LossFunction {
+public interface LossFunction {
     /**
      * Applies [LossFunction] to the [yPred] labels predicted by the model and known [yTrue] hidden during training.
      *
@@ -16,5 +16,5 @@ interface LossFunction {
      * shape = `[batch_size, d0, .. dN-1]`.
      * @param [tf] TensorFlow graph API for building operations.
      */
-    fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
+    public fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
 }

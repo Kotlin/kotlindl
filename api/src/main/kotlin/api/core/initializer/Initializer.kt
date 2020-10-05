@@ -14,7 +14,7 @@ import org.tensorflow.op.core.Assign
  * the Initializer object, without knowing the shape and dtype of the variable
  * being initialized.
  */
-abstract class Initializer {
+public abstract class Initializer {
     /**
      * Adds an `Assign` Op to the graph to initialize
      * a tensorflow variable as specified by the initializer.
@@ -25,7 +25,7 @@ abstract class Initializer {
      * @param [input] Variable to initialize
      * @return Assign operand created.
      */
-    fun apply(
+    public fun apply(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
@@ -50,7 +50,7 @@ abstract class Initializer {
      * @param [shape] Shape of the tensor.
      * @param [name] Initializer name.
      */
-    abstract fun initialize(
+    public abstract fun initialize(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,

@@ -19,10 +19,10 @@ import org.tensorflow.op.Ops
  * @property [name] Custom layer name.
  * @constructor Creates [AvgPool2D] object.
  */
-class AvgPool2D(
-    val poolSize: IntArray = intArrayOf(1, 2, 2, 1),
-    val strides: IntArray = intArrayOf(1, 2, 2, 1),
-    val padding: ConvPadding = ConvPadding.VALID,
+public class AvgPool2D(
+    public val poolSize: IntArray = intArrayOf(1, 2, 2, 1),
+    public val strides: IntArray = intArrayOf(1, 2, 2, 1),
+    public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}

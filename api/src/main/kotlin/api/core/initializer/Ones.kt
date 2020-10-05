@@ -5,8 +5,10 @@ import org.tensorflow.op.Ops
 
 /**
  * Initializer that generates tensors initialized to 1.
+ *
+ * NOTE: It does not work properly during model import/export, known issue: https://github.com/zaleslaw/Kotof/issues/4.
  */
-class Ones : Initializer() {
+public class Ones : Initializer() {
     override fun initialize(
         fanIn: Int,
         fanOut: Int,

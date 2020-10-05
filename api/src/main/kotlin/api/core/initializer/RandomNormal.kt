@@ -11,7 +11,7 @@ import org.tensorflow.op.Ops
  * @property [seed] Used to create random seeds.
  * @constructor Creates a [RandomNormal] initializer.
  */
-class RandomNormal(
+public class RandomNormal(
     private val mean: Float = 0.0f,
     private val stdev: Float = 1.0f,
     private val seed: Long = 12L

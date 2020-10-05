@@ -12,7 +12,7 @@ import org.tensorflow.op.Ops
  * @property [seed] Used to create random seeds.
  * @constructor Creates a [RandomUniform] initializer.
  */
-class RandomUniform(
+public class RandomUniform(
     private val maxVal: Float = 1.0f,
     private val minVal: Float = 0.0f,
     private val seed: Long = 12L

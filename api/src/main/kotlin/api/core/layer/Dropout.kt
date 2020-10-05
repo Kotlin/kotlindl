@@ -19,7 +19,7 @@ import org.tensorflow.op.random.RandomUniform
  * @property [name] Custom layer name.
  * @constructor Creates [Dropout] object.
  */
-class Dropout(
+public class Dropout(
     private val keepProbability: Float = 0.1f,
     private val seed: Long = 12L,
     name: String = ""
