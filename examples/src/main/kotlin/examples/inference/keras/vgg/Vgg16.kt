@@ -6,11 +6,9 @@ import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
-import datasets.util.getImage
+import datasets.image.ImageConverter
 import examples.production.drawActivations
-import java.awt.image.DataBufferByte
 import java.io.File
-import java.io.InputStream
 
 /** Loads weights from .txt files especially prepared. */
 fun main() {
@@ -32,7 +30,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = loadImageAndConvertToFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
             val (res, activations) = it.predictAndGetActivations(floatArray)
@@ -67,17 +65,7 @@ fun main() {
     }
 }
 
-fun loadImageAndConvertToFloatArray(inputStream: InputStream): FloatArray {
-    val (imageByteArrays, image) = getImage(inputStream, imageType = "jpg")
 
-    val pixels = (image.raster.dataBuffer as DataBufferByte).data
-
-    val floatArray =
-        Dataset.toRawVector(
-            pixels
-        )
-    return floatArray
-}
 
 
 

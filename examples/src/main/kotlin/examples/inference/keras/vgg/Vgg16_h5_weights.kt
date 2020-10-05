@@ -10,6 +10,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import datasets.Dataset
+import datasets.image.ImageConverter
 import io.jhdf.HdfFile
 import java.io.File
 
@@ -55,7 +56,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = loadImageAndConvertToFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             // TODO: need to rewrite predict and getactivations method for inference model (predict on image)
 

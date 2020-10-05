@@ -123,6 +123,8 @@ public open class InferenceModel : AutoCloseable {
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     public open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
+        require(reshapeFunction != null) { "Reshape functions is missed!" }
+
         val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
 
         require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }

@@ -7,7 +7,7 @@ import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.keras.loadWeights
 import datasets.Dataset
-import examples.inference.keras.vgg.loadImageAndConvertToFloatArray
+import datasets.image.ImageConverter
 import io.jhdf.HdfFile
 import java.io.File
 
@@ -35,7 +35,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = loadImageAndConvertToFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             val res = it.predict(floatArray)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

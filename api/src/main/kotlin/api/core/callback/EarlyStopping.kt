@@ -10,7 +10,7 @@ import kotlin.math.abs
 /**
  * This enum describes a few strategies of training stopping.
  */
-enum class EarlyStoppingMode {
+public enum class EarlyStoppingMode {
     /**
      * In this mode the direction is
      * automatically inferred from the name of the monitored quantity.
@@ -43,7 +43,7 @@ enum class EarlyStoppingMode {
  * The quantity to be monitored needs to be available in `logs`.
  * To make it so, pass the loss or metrics at `model.compile()`.
  */
-class EarlyStopping : Callback() {
+public class EarlyStopping : Callback() {
     private var wait = 0
     private var stoppedEpoch = 0
 

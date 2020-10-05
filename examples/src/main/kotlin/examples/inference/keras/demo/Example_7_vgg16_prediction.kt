@@ -10,7 +10,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import datasets.Dataset
-import examples.inference.keras.vgg.loadImageAndConvertToFloatArray
+import datasets.image.ImageConverter
 import io.jhdf.HdfFile
 import java.io.File
 
@@ -41,7 +41,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = loadImageAndConvertToFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             val res = it.predict(floatArray, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

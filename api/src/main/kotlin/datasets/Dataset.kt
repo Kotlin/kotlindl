@@ -6,6 +6,11 @@ import java.nio.FloatBuffer
 import kotlin.math.min
 import kotlin.math.truncate
 
+/**
+ * Basic class to handle features [x] and labels [y].
+ *
+ * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
+ */
 public class Dataset internal constructor(private val x: Array<FloatArray>, private val y: Array<FloatArray>) {
 
     public inner class BatchIterator internal constructor(

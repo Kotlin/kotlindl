@@ -8,7 +8,7 @@ import kotlin.reflect.KProperty1
  *
  * NOTE: Used to record [BatchTrainingEvent] and [EpochTrainingEvent] during training phase.
  */
-class TrainingHistory {
+public class TrainingHistory {
     /** Hidden batch history. */
     private val _batchHistory: MutableList<BatchTrainingEvent> = mutableListOf()
 
@@ -17,7 +17,7 @@ class TrainingHistory {
      *
      * @return Unmodifiable list of [BatchTrainingEvent].
      */
-    val batchHistory: List<BatchTrainingEvent>
+    public val batchHistory: List<BatchTrainingEvent>
         get() = Collections.unmodifiableList(_batchHistory)
 
     /** Batch history indexed by batch and epoch indices. */
@@ -34,7 +34,7 @@ class TrainingHistory {
      *
      * @return Unmodifiable list of [EpochTrainingEvent].
      */
-    val epochHistory: List<EpochTrainingEvent>
+    public val epochHistory: List<EpochTrainingEvent>
         get() = Collections.unmodifiableList(_epochHistory)
 
     /**
@@ -45,7 +45,7 @@ class TrainingHistory {
      * @param lossValue Value of loss function on training dataset.
      * @param metricValue Value of metric function on training dataset.
      */
-    fun appendBatch(epochIndex: Int, batchIndex: Int, lossValue: Double, metricValue: Double) {
+    public fun appendBatch(epochIndex: Int, batchIndex: Int, lossValue: Double, metricValue: Double) {
         val newEvent = BatchTrainingEvent(epochIndex, batchIndex, lossValue, metricValue)
         addNewBatchEvent(newEvent, epochIndex, batchIndex)
     }
@@ -53,7 +53,7 @@ class TrainingHistory {
     /**
      * Appends one [BatchTrainingEvent].
      */
-    fun appendBatch(batchTrainingEvent: BatchTrainingEvent) {
+    public fun appendBatch(batchTrainingEvent: BatchTrainingEvent) {
         addNewBatchEvent(batchTrainingEvent, batchTrainingEvent.epochIndex, batchTrainingEvent.batchIndex)
     }
 
@@ -66,7 +66,7 @@ class TrainingHistory {
      * @param valLossValue Value of loss function on validation dataset. Could be null, if validation phase is missed.
      * @param valMetricValue Value of metric function on validation dataset. Could be null, if validation phase is missed.
      */
-    fun appendEpoch(
+    public fun appendEpoch(
         epochIndex: Int,
         lossValue: Double,
         metricValue: Double,
@@ -80,7 +80,7 @@ class TrainingHistory {
     /**
      * Appends one [EpochTrainingEvent].
      */
-    fun appendEpoch(epochTrainingEvent: EpochTrainingEvent) {
+    public fun appendEpoch(epochTrainingEvent: EpochTrainingEvent) {
         addNewEpochEvent(epochTrainingEvent, epochTrainingEvent.epochIndex)
     }
 
@@ -104,14 +104,14 @@ class TrainingHistory {
     /**
      * Returns last [BatchTrainingEvent]
      */
-    fun lastBatchEvent(): BatchTrainingEvent {
+    public fun lastBatchEvent(): BatchTrainingEvent {
         return historyByEpochAndBatch.lastEntry().value!!.lastEntry().value
     }
 
     /**
      * Returns last [EpochTrainingEvent].
      */
-    fun lastEpochEvent(): EpochTrainingEvent {
+    public fun lastEpochEvent(): EpochTrainingEvent {
         return _historyByEpoch.lastEntry().value
     }
 
@@ -121,14 +121,14 @@ class TrainingHistory {
      * @param [epochIndex] Epoch index of the required epoch to return its batch events.
      * @return Indexed and sorted [TreeMap] of [BatchTrainingEvent].
      */
-    fun eventsByEpoch(epochIndex: Int): TreeMap<Int, BatchTrainingEvent>? {
+    public fun eventsByEpoch(epochIndex: Int): TreeMap<Int, BatchTrainingEvent>? {
         return historyByEpochAndBatch[epochIndex]
     }
 
     /**
      * Returns all values of one filed in [EpochTrainingEvent] for all epochs. All [EpochTrainingEvent.metricValue] for example.
      */
-    operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
+    public operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
         val result = DoubleArray(_epochHistory.size)
         for (i in 0 until _epochHistory.size) {
             result[i] = desiredField.invoke(_epochHistory[i])
@@ -146,7 +146,12 @@ class TrainingHistory {
  * @param lossValue Final value of loss function.
  * @param metricValue Final value of chosen metric.
  */
-class BatchTrainingEvent(val epochIndex: Int, val batchIndex: Int, val lossValue: Double, val metricValue: Double) {
+public class BatchTrainingEvent(
+    public val epochIndex: Int,
+    public val batchIndex: Int,
+    public val lossValue: Double,
+    public val metricValue: Double
+) {
     override fun toString(): String {
         return "BatchTrainingEvent(epoch=$epochIndex, batch=$batchIndex, lossValue=$lossValue, metricValue=$metricValue)"
     }
@@ -162,12 +167,12 @@ class BatchTrainingEvent(val epochIndex: Int, val batchIndex: Int, val lossValue
  * @param valLossValue Value of loss function on validation dataset. Could be null, if validation phase is missed.
  * @param valMetricValue Value of metric function on validation dataset. Could be null, if validation phase is missed.
  */
-class EpochTrainingEvent(
-    val epochIndex: Int,
-    val lossValue: Double,
-    val metricValue: Double,
-    var valLossValue: Double?,
-    var valMetricValue: Double?
+public class EpochTrainingEvent(
+    public val epochIndex: Int,
+    public val lossValue: Double,
+    public val metricValue: Double,
+    public var valLossValue: Double?,
+    public var valMetricValue: Double?
 
 ) {
     override fun toString(): String {

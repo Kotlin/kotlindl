@@ -10,9 +10,9 @@ import api.core.history.*
  *
  * Callback methods are called during training, evaluation, prediction phases on each batch, epoch, start and end of the specific phase.
  */
-open class Callback {
+public open class Callback {
     /** Sequential model, accessible inside callback methods. */
-    lateinit var model: Sequential
+    internal lateinit var model: Sequential
 
     /**
      * Called at the start of an epoch during training phase.
@@ -20,7 +20,7 @@ open class Callback {
      * @param [epoch] index of epoch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onEpochBegin(epoch: Int, logs: TrainingHistory) {}
+    public open fun onEpochBegin(epoch: Int, logs: TrainingHistory) {}
 
     /**
      * Called at the end of an epoch during training phase.
@@ -30,7 +30,7 @@ open class Callback {
      * validation epoch if validation is performed.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {}
+    public open fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {}
 
     /**
      * Called at the beginning of a batch during training phase.
@@ -39,7 +39,7 @@ open class Callback {
      * @param [batchSize] Number of samples in the current batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTrainBatchBegin(batch: Int, batchSize: Int, logs: TrainingHistory) {}
+    public open fun onTrainBatchBegin(batch: Int, batchSize: Int, logs: TrainingHistory) {}
 
     /**
      * Called at the end of a batch during training phase.
@@ -49,12 +49,12 @@ open class Callback {
      * @param [event] Metric and loss values for this batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {}
+    public open fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {}
 
     /**
      * Called at the beginning of training.
      */
-    open fun onTrainBegin() {}
+    public open fun onTrainBegin() {}
 
     /**
      * Called at the end of training. This method is empty. Extend this class to
@@ -62,7 +62,7 @@ open class Callback {
      *
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTrainEnd(logs: TrainingHistory) {}
+    public open fun onTrainEnd(logs: TrainingHistory) {}
 
     /**
      * Called at the beginning of a batch during evaluation phase. Also called at
@@ -73,7 +73,7 @@ open class Callback {
      * @param [batchSize] Number of samples in the current batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {}
+    public open fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {}
 
     /**
      * Called at the end of a batch during evaluation phase. Also called at the
@@ -85,19 +85,19 @@ open class Callback {
      * @param [event] Metric and loss values for this batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    open fun onTestBatchEnd(batch: Int, batchSize: Int, event: BatchEvent?, logs: History) {}
+    public open fun onTestBatchEnd(batch: Int, batchSize: Int, event: BatchEvent?, logs: History) {}
 
     /**
      * Called at the beginning of evaluation or validation.
      */
-    open fun onTestBegin() {}
+    public open fun onTestBegin() {}
 
     /**
      * Called at the end of evaluation or validation.
      *
      * @param [logs] evaluation history, containing full information about previous batches.
      */
-    open fun onTestEnd(logs: History) {}
+    public open fun onTestEnd(logs: History) {}
 
     /**
      * Called at the beginning of a batch during prediction phase.
@@ -105,7 +105,7 @@ open class Callback {
      * @param [batch] index of batch.
      * @param [batchSize] Number of samples in the current batch.
      */
-    open fun onPredictBatchBegin(batch: Int, batchSize: Int) {}
+    public open fun onPredictBatchBegin(batch: Int, batchSize: Int) {}
 
     /**
      * Called at the end of a batch during prediction phase.
@@ -113,15 +113,15 @@ open class Callback {
      * @param [batch] index of batch within the current epoch.
      * @param [batchSize] Number of samples in the current batch.
      */
-    open fun onPredictBatchEnd(batch: Int, batchSize: Int) {}
+    public open fun onPredictBatchEnd(batch: Int, batchSize: Int) {}
 
     /**
      * Called at the beginning of prediction.
      */
-    open fun onPredictBegin() {}
+    public open fun onPredictBegin() {}
 
     /**
      * Called at the end of prediction.
      */
-    open fun onPredictEnd() {}
+    public open fun onPredictEnd() {}
 }

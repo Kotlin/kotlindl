@@ -2,7 +2,7 @@ package examples.keras.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import datasets.Dataset
-import datasets.util.getImage
+import datasets.image.ImageConverter
 import java.awt.image.DataBufferByte
 import java.io.IOException
 import java.util.zip.ZipEntry
@@ -36,7 +36,7 @@ private fun loadImagesFromZipArchive(
 
     while (entries.hasMoreElements()) {
         val entry = entries.nextElement() as ZipEntry
-        val (imageByteArrays, image) = getImage(zipFile.getInputStream(entry))
+        val image = ImageConverter.getImage(zipFile.getInputStream(entry))
 
         val pixels = (image.raster.dataBuffer as DataBufferByte).data
 
