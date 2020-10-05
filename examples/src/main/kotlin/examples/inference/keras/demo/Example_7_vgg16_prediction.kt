@@ -43,7 +43,7 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = loadImageAndConvertToFloatArray(inputStream)
 
-            val (res, _) = it.predictAndGetActivations(floatArray, "Activation_predictions")
+            val res = it.predict(floatArray, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)

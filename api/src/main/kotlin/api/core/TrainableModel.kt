@@ -221,26 +221,6 @@ public abstract class TrainableModel : InferenceModel() {
     public abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
 
     /**
-     * Saves the model as graph and weights.
-     *
-     * @param [modelDirectory] Path to model directory.
-     * @param [savingFormat] One of approaches to store model configurations and weights.
-     * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
-     * @param [writingMode] Default behaviour of handling different edge cases with existing directory before model saving.
-     */
-    public abstract fun save(
-        modelDirectory: File,
-        savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
-        saveOptimizerState: Boolean = false,
-        writingMode: WrintingMode = WrintingMode.FAIL_IF_EXISTS
-    )
-
-    override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
-
-    }
-
-
-    /**
      * Predicts and returns not only prediction but list of activations values from intermediate model layers
      * (for visualisation or debugging purposes).
      *
@@ -263,9 +243,27 @@ public abstract class TrainableModel : InferenceModel() {
      */
     protected abstract fun predictSoftlyAndGetActivations(
         inputData: FloatArray,
-        visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>>
+
+    /**
+     * Saves the model as graph and weights.
+     *
+     * @param [modelDirectory] Path to model directory.
+     * @param [savingFormat] One of approaches to store model configurations and weights.
+     * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
+     * @param [writingMode] Default behaviour of handling different edge cases with existing directory before model saving.
+     */
+    public abstract fun save(
+        modelDirectory: File,
+        savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+        saveOptimizerState: Boolean = false,
+        writingMode: WrintingMode = WrintingMode.FAIL_IF_EXISTS
+    )
+
+    override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
+
+    }
 
     /**
      * Trains the model for a fixed number of [epochs] (iterations on a dataset).

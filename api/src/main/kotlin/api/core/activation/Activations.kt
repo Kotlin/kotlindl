@@ -6,7 +6,7 @@ import org.tensorflow.op.Ops
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
  */
-enum class Activations {
+public enum class Activations {
     /**
      * Linear unit. Returns unmodified input.
      *
@@ -210,11 +210,11 @@ enum class Activations {
      */
     Swish;
 
-    companion object {
+    public companion object {
         /**
          * Converts [activationType] to the appropriate [Activation] sub-class.
          */
-        fun convert(activationType: Activations): Activation {
+        public fun convert(activationType: Activations): Activation {
             return when (activationType) {
                 Sigmoid -> SigmoidActivation()
                 Linear -> LinearActivation()
@@ -238,7 +238,7 @@ enum class Activations {
 /**
  * @see [Activations.Linear]
  */
-class LinearActivation : Activation {
+public class LinearActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         return features
     }
@@ -247,42 +247,42 @@ class LinearActivation : Activation {
 /**
  * @see [Activations.Sigmoid]
  */
-class SigmoidActivation : Activation {
+public class SigmoidActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sigmoid(features)
 }
 
 /**
  * @see [Activations.Relu]
  */
-class ReluActivation : Activation {
+public class ReluActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu(features)
 }
 
 /**
  * @see [Activations.Relu6]
  */
-class Relu6Activation : Activation {
+public class Relu6Activation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu6(features)
 }
 
 /**
  * @see [Activations.Tanh]
  */
-class TanhActivation : Activation {
+public class TanhActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
 }
 
 /**
  * @see [Activations.Elu]
  */
-class EluActivation : Activation {
+public class EluActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.elu(features)
 }
 
 /**
  * @see [Activations.Selu]
  */
-class SeluActivation : Activation {
+public class SeluActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.selu(features)
 }
 
@@ -300,28 +300,28 @@ class SeluActivation : Activation {
  *
  * @see [Activations.Softmax] for explanation.
  */
-class SoftmaxActivation : Activation {
+public class SoftmaxActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softmax(features)
 }
 
 /**
  * @see [Activations.LogSoftmax]
  */
-class LogSoftmaxActivation : Activation {
+public class LogSoftmaxActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.logSoftmax(features)
 }
 
 /**
  * @see [Activations.Exponential]
  */
-class ExponentialActivation : Activation {
+public class ExponentialActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.exp(features)
 }
 
 /**
  * @see [Activations.SoftPlus]
  */
-class SoftPlusActivation : Activation {
+public class SoftPlusActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.log(tf.math.add(tf.math.exp(features), tf.constant(1.0f)))
 }
@@ -329,14 +329,14 @@ class SoftPlusActivation : Activation {
 /**
  * @see [Activations.SoftSign]
  */
-class SoftSignActivation : Activation {
+public class SoftSignActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softsign(features)
 }
 
 /**
  * @see [Activations.HardSigmoid]
  */
-class HardSigmoidActivation : Activation {
+public class HardSigmoidActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         val point2: Operand<Float> = tf.constant(0.2f)
         val point5: Operand<Float> = tf.constant(0.5f)
@@ -348,7 +348,7 @@ class HardSigmoidActivation : Activation {
 /**
  * @see [Activations.Swish]
  */
-class SwishActivation : Activation {
+public class SwishActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.sigmoid(features))
 }

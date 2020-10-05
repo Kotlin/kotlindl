@@ -13,6 +13,7 @@ import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import api.core.loss.Losses
+import api.core.metric.Accuracy
 import api.core.metric.Metrics
 import api.core.optimizer.*
 import datasets.Dataset
@@ -117,7 +118,11 @@ class ExportImportModelTest {
         val (newTrain, validation) = train.split(0.95)
 
         lenet5.use {
-            it.compile(optimizer = SGD(learningRate = 0.05f), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(
+                optimizer = SGD(learningRate = 0.05f),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Accuracy()
+            )
 
             it.summary()
 
@@ -194,7 +199,11 @@ class ExportImportModelTest {
         )
 
         lenet5.use {
-            it.compile(optimizer = SGD(learningRate = 0.05f), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(
+                optimizer = SGD(learningRate = 0.05f),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Accuracy()
+            )
 
             it.summary()
 
@@ -357,7 +366,7 @@ class ExportImportModelTest {
 
         val lenet5 = Sequential.of(lenet5Layers)
         lenet5.use {
-            it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
             it.fit(
                 trainingDataset = newTrain,

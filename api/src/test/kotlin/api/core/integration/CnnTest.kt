@@ -12,6 +12,7 @@ import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import api.core.loss.Losses
+import api.core.metric.Accuracy
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
@@ -106,7 +107,7 @@ internal class CnnTest : IntegrationTest() {
         )
 
         testModel.use {
-            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
@@ -190,7 +191,7 @@ internal class CnnTest : IntegrationTest() {
         )
 
         testModelWithSmallAmountOfClasses.use {
-            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
             val exception =
                 Assertions.assertThrows(IllegalStateException::class.java) {

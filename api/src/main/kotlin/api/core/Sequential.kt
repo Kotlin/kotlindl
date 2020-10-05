@@ -511,7 +511,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
-
     override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         callback.onPredictBegin()
@@ -564,9 +563,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return predictions
     }
 
-    /**
-     * Predicts the unknown class for the given image.
-     */
     override fun predict(inputData: FloatArray): Int {
         val softPrediction = predictSoftly(inputData)
         return softPrediction.indexOf(softPrediction.max()!!)
@@ -578,19 +574,23 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
-        val (softPrediction, activations) = predictSoftlyAndGetActivations(inputData, true, predictionTensorName)
+        val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
         return Pair(softPrediction.indexOf(softPrediction.max()!!), activations)
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        val (softPrediction, _) = predictSoftlyAndGetActivations(inputData, false, predictionTensorName)
+        val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
     }
 
-    /**
-     * Predicts the probability distribution for all classes for the given image.
-     */
     override fun predictSoftlyAndGetActivations(
+        inputData: FloatArray,
+        predictionTensorName: String
+    ): Pair<FloatArray, List<*>> {
+        return internalPredict(inputData, true, predictionTensorName)
+    }
+
+    private fun internalPredict(
         inputData: FloatArray,
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
