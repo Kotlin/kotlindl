@@ -10,7 +10,7 @@ import datasets.handlers.*
 import io.jhdf.HdfFile
 import java.io.File
 
-/** All weigths are loaded, the model just evaluated */
+/** All weights are loaded, the model just evaluated */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,

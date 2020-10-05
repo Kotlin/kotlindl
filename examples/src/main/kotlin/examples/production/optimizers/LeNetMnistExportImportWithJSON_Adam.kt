@@ -88,7 +88,6 @@ fun main() {
             trainBatchSize = 1000,
             validationBatchSize = 100,
             verbose = true,
-            isWeightsInitRequired = false, // for transfer learning
             isOptimizerInitRequired = false // for optimizer transfer learning
         )
 
@@ -119,7 +118,6 @@ fun main() {
             trainBatchSize = 1000,
             validationBatchSize = 100,
             verbose = true,
-            isWeightsInitRequired = false, // for transfer learning
             isOptimizerInitRequired = true // for optimizer transfer learning
         )
 

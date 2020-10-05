@@ -52,11 +52,11 @@ public abstract class TrainableModel : InferenceModel() {
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false
-        protected set
+        internal set
 
     /** Is true when model is initialized. */
     public var isModelInitialized: Boolean = false
-        protected set
+        internal set
 
     /** Special flag for callbacks. */
     public var stopTraining: Boolean = false
@@ -136,7 +136,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [batchSize] Number of samples per gradient update.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isWeightsInitRequired] Weights initialization mode.
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
@@ -150,7 +149,6 @@ public abstract class TrainableModel : InferenceModel() {
         epochs: Int = 5,
         batchSize: Int = 32,
         verbose: Boolean = true,
-        isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
 
@@ -163,9 +161,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isWeightsInitRequired] Weights initialization mode.
-     * True (default) = Weights are initialized at the beginning of the training phase.
-     * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
@@ -179,7 +174,6 @@ public abstract class TrainableModel : InferenceModel() {
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
         verbose: Boolean = true,
-        isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory
 
@@ -274,9 +268,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isWeightsInitRequired] Layer variables initialization mode.
-     * True (default) = layer variables are initialized at the beginning of the training phase.
-     * False = layer variables are not initialized during training phase. It should be initialized before (via transfer learning or [init] method call).
      * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
@@ -290,7 +281,6 @@ public abstract class TrainableModel : InferenceModel() {
         trainBatchSize: Int,
         validationBatchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) {
@@ -306,7 +296,6 @@ public abstract class TrainableModel : InferenceModel() {
             trainBatchSize,
             validationBatchSize,
             verbose,
-            isWeightsInitRequired,
             isOptimizerInitRequired
         )
     }

@@ -7,7 +7,7 @@ import api.core.optimizer.Adam
 import datasets.Dataset
 import datasets.handlers.*
 
-/** All weigths are loaded, the model just evaluated */
+/** The model is loaded, weights are initialized by model initializers, the model just evaluated */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -19,7 +19,6 @@ fun main() {
         ::extractFashionLabels
     )
 
-
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
@@ -29,9 +28,8 @@ fun main() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-
-        it.summary()
         it.init()
+        it.summary()
 
         val accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

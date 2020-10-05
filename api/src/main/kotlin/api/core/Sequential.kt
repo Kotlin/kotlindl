@@ -187,7 +187,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        if (isModelCompiled) logger.info { "Model was recompiled." }
+        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
         amountOfClasses = (layers.last() as Dense).outputSize.toLong()
@@ -244,7 +244,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         trainBatchSize: Int,
         validationBatchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean,
         isOptimizerInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
@@ -255,7 +254,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             true,
             validationDataset,
             validationBatchSize,
-            isWeightsInitRequired,
             isOptimizerInitRequired
         )
     }
@@ -265,7 +263,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         epochs: Int,
         batchSize: Int,
         verbose: Boolean,
-        isWeightsInitRequired: Boolean,
         isOptimizerInitRequired: Boolean
     ): TrainingHistory {
         return internalFit(
@@ -276,7 +273,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             false,
             null,
             null,
-            isWeightsInitRequired,
             isOptimizerInitRequired
         )
     }
@@ -284,11 +280,12 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /**
      * Initializes kGraph variables.
      *
-     * NOTE: Model becomes initialized after this method call. (Flag [isModelInitialized] = true)
+     * NOTE: Model becomes initialized after this method call. (Flag [isModelInitialized] is set up to true)
      */
     public fun init() {
-        require(!isModelInitialized) { "Model is initialized already!" }
-        logger.debug { "Initialization of TensorFlow Graph variables" }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(!isModelInitialized) { "Model is initialized already!" }
+        logger.debug { "Initialization of TensorFlow Graph variables." }
         kGraph.initializeGraphVariables(session)
         isModelInitialized = true
     }
@@ -301,13 +298,12 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
         validationBatchSize: Int?,
-        isWeightsInitRequired: Boolean = true,
         isOptimizerInitRequired: Boolean = true
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
 
-        if (isWeightsInitRequired) {
-            logger.debug { "Initialization of TensorFlow Graph variables" }
+        if (!isModelInitialized) {
+            logger.debug { "Initialization of TensorFlow Graph variables." }
             kGraph.initializeGraphVariables(session)
             isModelInitialized = true
         }
@@ -452,6 +448,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
         val evaluationHistory = History()
 
         callback.onTestBegin()
@@ -513,6 +512,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
         callback.onPredictBegin()
 
         val prediction = when (loss) {
@@ -595,6 +597,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
         val predictionData: Array<FloatArray> = arrayOf(inputData)
 
         val imageShape = calculateXShape(1)
@@ -701,7 +706,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
      *
      * NOTE: Be careful, this is a direct access to the model graph, not a copy.
      */
-    fun kGraph(): KGraph {
+    public fun kGraph(): KGraph {
         return kGraph
     }
 
@@ -711,6 +716,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         saveOptimizerState: Boolean,
         writingMode: WrintingMode
     ) {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {
             WrintingMode.FAIL_IF_EXISTS -> {

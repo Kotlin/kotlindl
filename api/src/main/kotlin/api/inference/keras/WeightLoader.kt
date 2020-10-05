@@ -25,6 +25,7 @@ public fun Sequential.loadWeights(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     this.logger.debug { "Starting weights loading.." }
     this.layers.forEach {
         run {
@@ -43,6 +44,7 @@ public fun Sequential.loadWeights(
         }
     }
     this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
 }
 
 /**
@@ -61,6 +63,7 @@ public fun Sequential.loadWeights(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {
@@ -94,6 +97,7 @@ public fun Sequential.loadWeights(
         }
     }
     this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
 }
 
 /**
@@ -110,6 +114,7 @@ public fun Sequential.loadWeightsForFrozenLayers(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {
@@ -143,6 +148,7 @@ public fun Sequential.loadWeightsForFrozenLayers(
         }
     }
     this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
 }
 
 private fun initConv2DVariablesByDefaultInitializer(name: String, model: Sequential) {
