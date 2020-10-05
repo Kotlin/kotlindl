@@ -58,6 +58,15 @@ public abstract class TrainableModel : InferenceModel() {
     public var isModelInitialized: Boolean = false
         internal set
 
+    /**
+     * Is true when model optimizer variables are initialized.
+     *
+     * NOTE: This flag is important for training purposes only (in training from zero to hero or transfer learning training).
+     * This flag is not checked before evaluation or prediction phases.
+     */
+    public var isOptimizerVariableInitialized: Boolean = false
+        internal set
+
     /** Special flag for callbacks. */
     public var stopTraining: Boolean = false
 
@@ -138,9 +147,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
-     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
-     * True (default) = optimizer variables are initialized at the beginning of the training phase.
-     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
      *
      * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
      */
@@ -148,8 +154,7 @@ public abstract class TrainableModel : InferenceModel() {
         dataset: Dataset,
         epochs: Int = 5,
         batchSize: Int = 32,
-        verbose: Boolean = true,
-        isOptimizerInitRequired: Boolean = true
+        verbose: Boolean = true
     ): TrainingHistory
 
     /**
@@ -161,7 +166,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
      *
@@ -173,8 +177,7 @@ public abstract class TrainableModel : InferenceModel() {
         epochs: Int = 5,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256,
-        verbose: Boolean = true,
-        isOptimizerInitRequired: Boolean = true
+        verbose: Boolean = true
     ): TrainingHistory
 
     /**
@@ -268,10 +271,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
      * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
-     * @param [isOptimizerInitRequired] Optimizer variables initialization mode.
-     * True (default) = optimizer variables are initialized at the beginning of the training phase.
-     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
-     *
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public fun fit(
@@ -280,8 +279,7 @@ public abstract class TrainableModel : InferenceModel() {
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
-        verbose: Boolean,
-        isOptimizerInitRequired: Boolean = true
+        verbose: Boolean
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) {
             "Validation rate should be more than 0.0 and less than 1.0. " +
@@ -295,8 +293,7 @@ public abstract class TrainableModel : InferenceModel() {
             epochs,
             trainBatchSize,
             validationBatchSize,
-            verbose,
-            isOptimizerInitRequired
+            verbose
         )
     }
 }

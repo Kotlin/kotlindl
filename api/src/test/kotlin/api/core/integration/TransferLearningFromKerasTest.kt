@@ -90,8 +90,7 @@ class TransferLearningTest : IntegrationTest() {
                 epochs = EPOCHS,
                 trainBatchSize = TRAINING_BATCH_SIZE,
                 validationBatchSize = VALIDATION_BATCH_SIZE,
-                verbose = true,
-                isWeightsInitRequired = true
+                verbose = true
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = VALIDATION_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -177,8 +176,7 @@ class TransferLearningTest : IntegrationTest() {
                 epochs = 3,
                 trainBatchSize = 1000,
                 validationBatchSize = 100,
-                verbose = false,
-                isWeightsInitRequired = false // for transfer learning
+                verbose = false
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -238,8 +236,7 @@ class TransferLearningTest : IntegrationTest() {
                 epochs = 3,
                 trainBatchSize = 1000,
                 validationBatchSize = 100,
-                verbose = false,
-                isWeightsInitRequired = false // for transfer learning
+                verbose = false
             )
 
             val conv2DKernelWeightsAfterTraining =
@@ -311,8 +308,7 @@ class TransferLearningTest : IntegrationTest() {
                 epochs = 4,
                 trainBatchSize = 1000,
                 validationBatchSize = 100,
-                verbose = false,
-                isWeightsInitRequired = false // for transfer learning
+                verbose = false
             )
 
             val conv2DKernelWeightsAfterTraining =

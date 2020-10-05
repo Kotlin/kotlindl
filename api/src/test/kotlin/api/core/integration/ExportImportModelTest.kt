@@ -18,7 +18,6 @@ import api.core.metric.Metrics
 import api.core.optimizer.*
 import datasets.Dataset
 import datasets.handlers.*
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -173,8 +172,7 @@ class ExportImportModelTest {
                 epochs = EPOCHS,
                 trainBatchSize = TRAINING_BATCH_SIZE,
                 validationBatchSize = TEST_BATCH_SIZE,
-                verbose = false,
-                isWeightsInitRequired = false // for transfer learning
+                verbose = false
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -251,8 +249,7 @@ class ExportImportModelTest {
                 epochs = EPOCHS,
                 trainBatchSize = TRAINING_BATCH_SIZE,
                 validationBatchSize = TEST_BATCH_SIZE,
-                verbose = false,
-                isWeightsInitRequired = false // for transfer learning
+                verbose = false
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -283,7 +280,6 @@ class ExportImportModelTest {
     }
 
     @Test
-    @Ignore
     fun exportImportWithAdaGradOptimizerInternalState(@TempDir tempDir: Path?) {
         val testMetrics =
             trainingAndInferenceWithSpecificOptimizer(AdaGrad(clipGradient = ClipGradientByValue(0.01f)), tempDir)
@@ -414,9 +410,7 @@ class ExportImportModelTest {
                 epochs = 1,
                 trainBatchSize = 1000,
                 validationBatchSize = 100,
-                verbose = true,
-                isWeightsInitRequired = false, // for transfer learning
-                isOptimizerInitRequired = false // for optimizer transfer learning
+                verbose = true
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -443,9 +437,7 @@ class ExportImportModelTest {
                 epochs = 1,
                 trainBatchSize = 1000,
                 validationBatchSize = 100,
-                verbose = true,
-                isWeightsInitRequired = false, // for transfer learning
-                isOptimizerInitRequired = true // for optimizer transfer learning
+                verbose = true
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

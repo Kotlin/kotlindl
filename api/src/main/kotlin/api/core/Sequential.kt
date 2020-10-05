@@ -146,6 +146,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @return Non-compiled and non-trained Sequential model.
          */
         public fun loadModelConfiguration(configuration: File): Sequential {
+            require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
+
             return api.inference.keras.loadModelConfiguration(configuration)
         }
 
@@ -156,6 +158,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @return Pair of <input layer; list of layers>.
          */
         public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
+            require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
+
             return loadModelLayers(configuration)
         }
 
@@ -166,7 +170,10 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @return Non-compiled and non-trained Sequential model.
          */
         public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
+            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
+
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+
             return api.inference.keras.loadModelConfiguration(configuration)
         }
 
@@ -177,6 +184,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @return Pair of <input layer; list of layers>.
          */
         public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
+            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
+
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
             return loadModelLayers(configuration)
         }
@@ -243,8 +252,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int,
-        verbose: Boolean,
-        isOptimizerInitRequired: Boolean
+        verbose: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -253,8 +261,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             trainingDataset,
             true,
             validationDataset,
-            validationBatchSize,
-            isOptimizerInitRequired
+            validationBatchSize
         )
     }
 
@@ -262,8 +269,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         dataset: Dataset,
         epochs: Int,
         batchSize: Int,
-        verbose: Boolean,
-        isOptimizerInitRequired: Boolean
+        verbose: Boolean
     ): TrainingHistory {
         return internalFit(
             verbose,
@@ -272,22 +278,27 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             dataset,
             false,
             null,
-            null,
-            isOptimizerInitRequired
+            null
         )
     }
 
     /**
      * Initializes kGraph variables.
      *
-     * NOTE: Model becomes initialized after this method call. (Flag [isModelInitialized] is set up to true)
+     * NOTE: Model becomes initialized after this method call. (Flags [isModelInitialized] and [isOptimizerVariableInitialized] are set up to true)
      */
     public fun init() {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(!isModelInitialized) { "Model is initialized already!" }
+        check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
+
         logger.debug { "Initialization of TensorFlow Graph variables." }
         kGraph.initializeGraphVariables(session)
         isModelInitialized = true
+
+        logger.debug { "Initialization of optimizer variables." }
+        kGraph.initializeOptimizerVariables(session)
+        isOptimizerVariableInitialized = true
     }
 
     private fun internalFit(
@@ -297,8 +308,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         trainingDataset: Dataset,
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
-        validationBatchSize: Int?,
-        isOptimizerInitRequired: Boolean = true
+        validationBatchSize: Int?
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
 
@@ -322,7 +332,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         val metricOp = metric.apply(tf, prediction, yOp)
 
-        if (isOptimizerInitRequired) kGraph.initializeOptimizerVariables(session)
+        if (!isOptimizerVariableInitialized) {
+            logger.debug { "Initialization of optimizer variables." }
+            kGraph.initializeOptimizerVariables(session)
+            isOptimizerVariableInitialized = true
+        }
 
         callback.onTrainBegin()
 
@@ -718,6 +732,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
 
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {
@@ -810,6 +825,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(!isModelInitialized) { "The model is initialized already." }
+
         // Load variables names
         val variableNames = File("${modelDirectory.absolutePath}/variableNames.txt").readLines()
         if (variableNames.isNotEmpty()) {
@@ -821,6 +839,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                 else loadVariable(variableName, modelDirectory.absolutePath)
             }
         }
+
+        isModelInitialized = true
+        if (loadOptimizerState) isOptimizerVariableInitialized = true
     }
 
     private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {

@@ -59,7 +59,7 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    val model = Sequential.loadModelConfiguration(File(PATH_TO_MODEL))
+    val model = Sequential.loadModelConfiguration(File("$PATH_TO_MODEL/modelConfig.json"))
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
@@ -87,8 +87,7 @@ fun main() {
             epochs = 1,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = true,
-            isOptimizerInitRequired = false // for optimizer transfer learning
+            verbose = true
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -96,7 +95,7 @@ fun main() {
         println("Accuracy after training with restored optimizer: $accuracyAfterTraining")
     }
 
-    val model2 = Sequential.loadModelConfiguration(File(PATH_TO_MODEL))
+    val model2 = Sequential.loadModelConfiguration(File("$PATH_TO_MODEL/modelConfig.json"))
 
     model2.use {
         it.compile(
@@ -117,8 +116,7 @@ fun main() {
             epochs = 1,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = true,
-            isOptimizerInitRequired = true // for optimizer transfer learning
+            verbose = true
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
