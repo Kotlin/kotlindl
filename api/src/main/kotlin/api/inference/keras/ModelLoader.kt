@@ -110,7 +110,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_HE_UNIFORM -> HeUniform(seed = seed)
         INITIALIZER_LECUN_NORMAL -> LeCunNormal(seed = seed)
         INITIALIZER_LECUN_UNIFORM -> LeCunUniform(seed = seed)
-        INITIALIZER_ZEROS -> RandomUniform(
+        /*INITIALIZER_ZEROS -> RandomUniform(
             seed = seed,
             minVal = 0.0f,
             maxVal = 0.0f
@@ -119,7 +119,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
             seed = seed,
             minVal = 1.0f,
             maxVal = 1.0f
-        ) // instead of real initializers, because it doesn't influence on nothing
+        ) // instead of real initializers, because it doesn't influence on nothing*/
         INITIALIZER_RANDOM_NORMAL -> RandomNormal(
             seed = seed,
             mean = initializer.config.mean!!.toFloat(),
@@ -132,7 +132,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
-        INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())
+        /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }

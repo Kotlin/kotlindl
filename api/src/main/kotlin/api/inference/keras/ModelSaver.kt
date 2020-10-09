@@ -74,8 +74,6 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            Zeros::class -> Pair(INITIALIZER_ZEROS, KerasInitializerConfig(seed = 12))
-            Ones::class -> Pair(INITIALIZER_ONES, KerasInitializerConfig(seed = 12))
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
@@ -89,8 +87,6 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> INITIALIZER_HE_UNIFORM
             LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
             LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
-            Zeros::class -> INITIALIZER_ZEROS
-            Ones::class -> INITIALIZER_ONES
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
         config = KerasInitializerConfig(seed = 12)

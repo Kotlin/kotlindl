@@ -241,11 +241,19 @@ public open class InferenceModel : AutoCloseable {
                     "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
-        val scanner = Scanner(file.inputStream())
-        try {
+        Scanner(file.inputStream()).use { scanner ->
             scanner.useLocale(Locale.US)
             val initializerName = defaultInitializerOpName(variableName)
             val assignOpName = defaultAssignOpName(variableName)
+
+            val initOp = kGraph.tfGraph.operation(initializerName)
+            check(initOp != null) {
+                "Operation $initializerName is not found in static graph.\n" +
+                        "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+            }
+
+            val assignOp = kGraph.tfGraph.operation(assignOpName)
+            check(assignOp != null) { "Operation $assignOp is not found in static graph." }
 
             val shape = operation.output<Float>(0).shape()
             val tensorShape = TensorShape(shape)
@@ -256,10 +264,6 @@ public open class InferenceModel : AutoCloseable {
             logger.debug { "Loading the variable $variableName data" }
             logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
             logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
-        } catch (ex: Exception) {
-            logger.error { ex.message }
-        } finally {
-            scanner.close()
         }
     }
 

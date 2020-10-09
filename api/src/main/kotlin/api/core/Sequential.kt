@@ -802,11 +802,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     private fun saveGraphDef(pathToModelDirectory: String) {
         val file = File("$pathToModelDirectory/graph.pb")
 
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'graph.pb' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
-        )
-
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
@@ -827,11 +822,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         val file = File("$pathToModelDirectory/variableNames.txt")
 
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
         file.bufferedWriter().use { variableNamesFile ->
             for (modelWeight in modelWeights.withIndex()) {
                 val variableName = variables[modelWeight.index].asOutput().op().name()
@@ -839,11 +829,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                 variableNamesFile.newLine()
 
                 val variableNameFile = File("$pathToModelDirectory/$variableName.txt")
-
-                if (!file.exists()) throw FileNotFoundException(
-                    "File '$variableName.txt' is not found. This file must be in the model directory." +
-                            "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-                )
 
                 variableNameFile.bufferedWriter().use { file ->
                     val tensorForCopying = modelWeight.value
