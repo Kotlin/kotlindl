@@ -781,12 +781,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-
-        if (!jsonConfig.exists()) throw FileNotFoundException(
-            "File 'modelConfig.json' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
         this.saveModelConfiguration(jsonConfig)
     }
 
@@ -801,7 +795,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun saveGraphDef(pathToModelDirectory: String) {
         val file = File("$pathToModelDirectory/graph.pb")
-
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
