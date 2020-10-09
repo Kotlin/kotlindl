@@ -5,7 +5,7 @@ package api.inference.savedmodel
  *
  * @property [tfName] Maps TensorFlow operand name to enum value.
  */
-enum class Output(val tfName: String) {
+public enum class Output(public val tfName: String) {
     /** ArgMax. */
     ARGMAX("ArgMax")
 }

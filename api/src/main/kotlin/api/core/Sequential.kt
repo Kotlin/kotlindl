@@ -30,6 +30,7 @@ import mu.KotlinLogging
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.io.File
+import java.io.FileNotFoundException
 
 /**
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
@@ -167,12 +168,18 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * Loads a [Sequential] model from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
+         * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
          * @return Non-compiled and non-trained Sequential model.
          */
         public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+
+            if (!configuration.exists()) throw FileNotFoundException(
+                "File 'modelConfig.json' is not found. This file must be in the model directory. " +
+                        "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+            )
 
             return api.inference.keras.loadModelConfiguration(configuration)
         }
@@ -181,12 +188,19 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * Loads a [Sequential] model layers from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
+         * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
          * @return Pair of <input layer; list of layers>.
          */
         public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+
+            if (!configuration.exists()) throw FileNotFoundException(
+                "File 'modelConfig.json' is not found. This file must be in the model directory. " +
+                        "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+            )
+
             return loadModelLayers(configuration)
         }
     }
@@ -767,6 +781,12 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+
+        if (!jsonConfig.exists()) throw FileNotFoundException(
+            "File 'modelConfig.json' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        )
+
         this.saveModelConfiguration(jsonConfig)
     }
 
@@ -780,7 +800,14 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun saveGraphDef(pathToModelDirectory: String) {
-        File("$pathToModelDirectory/graph.pb").writeBytes(kGraph.tfGraph.toGraphDef())
+        val file = File("$pathToModelDirectory/graph.pb")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'graph.pb' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
+        )
+
+        file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
     private fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
@@ -798,18 +825,31 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         val modelWeights = modelWeightsExtractorRunner.run()
 
-        File("$pathToModelDirectory/variableNames.txt").bufferedWriter().use { variableNamesFile ->
+        val file = File("$pathToModelDirectory/variableNames.txt")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        )
+
+        file.bufferedWriter().use { variableNamesFile ->
             for (modelWeight in modelWeights.withIndex()) {
                 val variableName = variables[modelWeight.index].asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
 
-                File("$pathToModelDirectory/$variableName.txt").bufferedWriter().use { file ->
+                val variableNameFile = File("$pathToModelDirectory/$variableName.txt")
+
+                if (!file.exists()) throw FileNotFoundException(
+                    "File '$variableName.txt' is not found. This file must be in the model directory." +
+                            "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+                )
+
+                variableNameFile.bufferedWriter().use { file ->
                     val tensorForCopying = modelWeight.value
 
                     tensorForCopying.use {
                         val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
-
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")
@@ -829,7 +869,15 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(!isModelInitialized) { "The model is initialized already." }
 
         // Load variables names
-        val variableNames = File("${modelDirectory.absolutePath}/variableNames.txt").readLines()
+        val file = File("${modelDirectory.absolutePath}/variableNames.txt")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        )
+
+        val variableNames = file.readLines()
+
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables

@@ -19,7 +19,7 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     public constructor(graphDef: ByteArray) : this(graphDef, "")
 
     /** Internal static TensorFlow graph. */
-    public var tfGraph: Graph = Graph()
+    internal var tfGraph: Graph = Graph()
 
     /** A list of initializer to initialize the trainableVariables. */
     private val optimizerInitializers: MutableList<Assign<*>> = mutableListOf()

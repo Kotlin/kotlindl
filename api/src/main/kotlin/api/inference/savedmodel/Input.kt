@@ -5,7 +5,7 @@ package api.inference.savedmodel
  *
  * @property [tfName] Maps TensorFlow operand name to enum value.
  */
-enum class Input(val tfName: String) {
+public enum class Input(public val tfName: String) {
     /** Placeholder. */
     PLACEHOLDER("Placeholder")
 }

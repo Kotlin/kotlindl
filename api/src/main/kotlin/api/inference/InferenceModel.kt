@@ -1,7 +1,6 @@
 package api.inference
 
 import api.core.KGraph
-import api.core.SavingFormat
 import api.core.shape.TensorShape
 import api.core.util.DATA_PLACEHOLDER
 import api.core.util.OUTPUT_NAME
@@ -17,6 +16,7 @@ import org.tensorflow.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 import java.io.File
+import java.io.FileNotFoundException
 import java.nio.file.NotDirectoryException
 import java.util.*
 
@@ -30,11 +30,10 @@ public open class InferenceModel : AutoCloseable {
     protected lateinit var tf: Ops
 
     /** TensorFlow session. */
-    lateinit var session: Session
-        protected set
+    internal lateinit var session: Session
 
     /** TensorFlow wrapped computational graph. */
-    lateinit var kGraph: KGraph
+    public lateinit var kGraph: KGraph
         protected set
 
     /** Input operand. */
@@ -45,6 +44,10 @@ public open class InferenceModel : AutoCloseable {
 
     /** Function for conversion from flat float array to input tensor. */
     protected lateinit var reshapeFunction: (FloatArray) -> Tensor<*>
+
+    /** Is true when model is initialized. */
+    public var isModelInitialized: Boolean = false
+        internal set
 
     /** Logger. */
     private val logger = KotlinLogging.logger {}
@@ -59,41 +62,30 @@ public open class InferenceModel : AutoCloseable {
     public companion object {
         /**
          * Loads tensorflow graphs and variable data (if required).
+         * It loads graph from .pb file format and variable data from .txt files
          *
          * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
-         * @param [savingFormat] Loading strategy. By default, it loads graph from .pb file format and variable data from .txt files.
          * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
          */
         public fun load(
             modelDirectory: File,
-            savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
             loadOptimizerState: Boolean = false
         ): InferenceModel {
             val model = InferenceModel()
 
-            // Load graph
             val pathToModelDirectory = modelDirectory.absolutePath
             if (!modelDirectory.exists()) {
                 throw NotDirectoryException(pathToModelDirectory)
             } else {
                 model.logger.debug { "The model loading is started." }
-
-                when (savingFormat) {
-                    SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> model.loadModelFromSimpleFormat(
-                        pathToModelDirectory,
-                        loadOptimizerState
-                    )
-                    SavingFormat.TF_GRAPH -> model.loadModelFromSavedModelFormat(pathToModelDirectory)
-                    SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> throw UnsupportedOperationException("The inference model requires the graph in .pb format to load. To load Sequential model in Keras format use Sequential.load(..) instead. ")
-                }
-
+                model.loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
+                model.isModelInitialized = true
                 model.logger.debug { "The model loading is finished." }
             }
 
             return model
         }
     }
-
 
     /**
      * Predicts the class of [inputData].
@@ -103,6 +95,7 @@ public open class InferenceModel : AutoCloseable {
      */
     public open fun predict(inputData: FloatArray): Int {
         require(reshapeFunction != null) { "Reshape functions is missed!" }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         reshapeFunction(inputData).use { tensor ->
             val runner = session.runner()
@@ -124,6 +117,7 @@ public open class InferenceModel : AutoCloseable {
      */
     public open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
         require(reshapeFunction != null) { "Reshape functions is missed!" }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
 
@@ -209,25 +203,18 @@ public open class InferenceModel : AutoCloseable {
     /**
      * Loads variable data from .txt files.
      *
-     * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
-     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
-     */
-    public open fun loadWeights(
-        modelDirectory: File,
-        loadOptimizerState: Boolean = false
-    ) {
-        loadVariablesFromTxt(modelDirectory.absolutePath, loadOptimizerState)
-    }
-
-    /**
-     * Loads variable data from .txt files.
-     *
      * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     protected fun loadVariablesFromTxt(pathToModelDirectory: String, loadOptimizerState: Boolean) {
-        // Load variables names
-        val variableNames = File("$pathToModelDirectory/variableNames.txt").readLines()
+        val file = File("$pathToModelDirectory/variableNames.txt")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        )
+
+        val variableNames = file.readLines()
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
@@ -246,7 +233,15 @@ public open class InferenceModel : AutoCloseable {
     protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
-        val scanner = Scanner(File("$pathToModelDirectory/$variableName.txt").inputStream())
+
+        val file = File("$pathToModelDirectory/$variableName.txt")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File '$variableName.txt' is not found. This file must be in the model directory." +
+                    "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        )
+
+        val scanner = Scanner(file.inputStream())
         try {
             scanner.useLocale(Locale.US)
             val initializerName = defaultInitializerOpName(variableName)
@@ -268,17 +263,20 @@ public open class InferenceModel : AutoCloseable {
         }
     }
 
-    private fun loadModelFromSavedModelFormat(pathToModelDirectory: String) {
-        throw UnsupportedOperationException("Model loading from $pathToModelDirectory is not supported yet for SavedModelBundle! ")
-    }
-
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         inferenceGraphInitialization(pathToModelDirectory)
-        loadWeights(File(pathToModelDirectory), loadOptimizerState)
+        loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
     }
 
     private fun inferenceGraphInitialization(pathToModelDirectory: String) {
-        kGraph = KGraph(File("$pathToModelDirectory/graph.pb").readBytes())
+        val file = File("$pathToModelDirectory/graph.pb")
+
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'graph.pb' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
+        )
+
+        kGraph = KGraph(file.readBytes())
         tf = Ops.create(kGraph.tfGraph)
         session = Session(kGraph.tfGraph)
     }

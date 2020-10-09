@@ -15,6 +15,7 @@ import api.inference.InferenceModel
 import datasets.Dataset
 import org.tensorflow.Operand
 import java.io.File
+import java.io.FileNotFoundException
 
 /**
  * Base abstract class for all trainable models.
@@ -52,10 +53,6 @@ public abstract class TrainableModel : InferenceModel() {
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false
-        internal set
-
-    /** Is true when model is initialized. */
-    public var isModelInitialized: Boolean = false
         internal set
 
     /**
@@ -250,6 +247,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [savingFormat] One of approaches to store model configurations and weights.
      * @param [saveOptimizerState] Saves internal optimizer states (variables) if true.
      * @param [writingMode] Default behaviour of handling different edge cases with existing directory before model saving.
+     * @throws [FileNotFoundException] If [modelDirectory] does not contain all required files.
      */
     public abstract fun save(
         modelDirectory: File,
@@ -258,8 +256,18 @@ public abstract class TrainableModel : InferenceModel() {
         writingMode: WrintingMode = WrintingMode.FAIL_IF_EXISTS
     )
 
-    override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
-
+    /**
+     * Loads variable data from .txt files.
+     *
+     * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+     * @throws [FileNotFoundException] If file with weights is not found.
+     */
+    public open fun loadWeights(
+        modelDirectory: File,
+        loadOptimizerState: Boolean = false
+    ) {
+        loadVariablesFromTxt(modelDirectory.absolutePath, loadOptimizerState)
     }
 
     /**
