@@ -13,21 +13,21 @@ private const val FAN_OUT = 4
 private const val SEED = 12L
 private const val DEFAULT_LAYER_NAME = "default_name"
 
-internal class HeNormalTest {
+internal class RandomNormalTest {
     @Test
     fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }
         val expected = Array(2) { FloatArray(2) { 0f } }
-        expected[0][0] = 0.4739421f
-        expected[0][1] = -0.15234587f
-        expected[1][0] = 0.12772104f
-        expected[1][1] = -0.7704968f
+        expected[0][0] = 0.41689163f
+        expected[0][1] = -0.13400733f
+        expected[1][0] = 0.1123467f
+        expected[1][1] = -0.67774874f
 
         val shape = Shape.make(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = HeNormal(seed = SEED)
+            val instance = RandomNormal(seed = SEED)
             val operand =
                 instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), DEFAULT_LAYER_NAME)
             operand.asOutput().tensor().copyTo(actual)

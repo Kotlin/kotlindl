@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
 
-const val EPS = 1e-2f
+const val EPS: Float = 1e-2f
 
 open class ActivationTest {
     protected fun assertActivationFunction(

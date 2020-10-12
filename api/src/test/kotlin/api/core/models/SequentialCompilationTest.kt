@@ -78,7 +78,6 @@ internal class SequentialModelTest {
         )
     )
 
-
     @Test
     fun buildModel() {
         assertEquals(correctTestModel.layers.size, 7)
@@ -200,7 +199,6 @@ internal class SequentialModelTest {
                 biasInitializer = Constant(0.1f)
             )
         )
-
 
         assertEquals(model.layers[0].name, "conv2d_1")
         assertEquals(model.layers[1].name, "maxpool2d_2")

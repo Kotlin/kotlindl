@@ -94,7 +94,7 @@ public open class InferenceModel : AutoCloseable {
      * @return Predicted class index.
      */
     public open fun predict(inputData: FloatArray): Int {
-        require(reshapeFunction != null) { "Reshape functions is missed!" }
+        require(::reshapeFunction.isInitialized) { "Reshape functions is missed!" }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         reshapeFunction(inputData).use { tensor ->
@@ -165,8 +165,12 @@ public open class InferenceModel : AutoCloseable {
 
     /** Closes internal resources: session and kGraph. */
     override fun close() {
-        session.close()
-        kGraph.close()
+        if (::session.isInitialized) {
+            session.close()
+        }
+        if (::kGraph.isInitialized) {
+            kGraph.close()
+        }
     }
 
     /**

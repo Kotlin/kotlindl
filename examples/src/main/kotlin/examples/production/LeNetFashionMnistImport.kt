@@ -7,6 +7,7 @@ import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 
+
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,

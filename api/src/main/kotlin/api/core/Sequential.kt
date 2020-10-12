@@ -324,7 +324,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         validationDataset: Dataset?,
         validationBatchSize: Int?
     ): TrainingHistory {
-        check(isModelCompiled) { "The model is not compile yet. Call 'compile' method to compile the model." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         if (!isModelInitialized) {
             logger.debug { "Initialization of TensorFlow Graph variables." }
