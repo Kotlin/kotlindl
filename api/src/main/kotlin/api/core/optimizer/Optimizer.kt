@@ -16,7 +16,7 @@ import org.tensorflow.op.core.Variable
  *
  * @property [clipGradient] Strategy of gradient clipping as sub-class of [ClipGradientAction].
  */
-abstract class Optimizer(val clipGradient: ClipGradientAction) {
+public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     /**
      * Top level map key is the variable name, lower level map key is the slot name.
      */
@@ -32,7 +32,7 @@ abstract class Optimizer(val clipGradient: ClipGradientAction) {
      * @param [loss] Loss function.
      * @return List of optimizer operands to update variables.
      */
-    fun prepareTargets(
+    internal fun prepareTargets(
         graph: KGraph,
         tf: Ops,
         loss: Operand<Float>

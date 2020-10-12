@@ -11,6 +11,7 @@ import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import api.inference.keras.loadWeights
+import api.inference.keras.loadWeightsForFrozenLayers
 import datasets.Dataset
 import datasets.handlers.*
 import io.jhdf.HdfFile
@@ -80,6 +81,7 @@ class TransferLearningTest : IntegrationTest() {
         assertArrayEquals(testModel.firstLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 
+    /** Weights are not loaded, but initialized via default initializers. */
     @Test
     fun loadModelConfigFromKerasAndTrain() {
         val jsonConfigFile = File(realPathToConfig)
@@ -120,6 +122,42 @@ class TransferLearningTest : IntegrationTest() {
         }
     }
 
+    /** Compilation is missed. */
+    @Test
+    fun loadModelConfigFromKerasAndMissCompilation() {
+        val jsonConfigFile = File(realPathToConfig)
+
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            FASHION_TRAIN_IMAGES_ARCHIVE,
+            FASHION_TRAIN_LABELS_ARCHIVE,
+            FASHION_TEST_IMAGES_ARCHIVE,
+            FASHION_TEST_LABELS_ARCHIVE,
+            AMOUNT_OF_CLASSES,
+            ::extractFashionImages,
+            ::extractFashionLabels
+        )
+
+        testModel.use {
+            val exception =
+                assertThrows(IllegalStateException::class.java) {
+                    it.fit(
+                        dataset = train,
+                        validationRate = VALIDATION_RATE,
+                        epochs = EPOCHS,
+                        trainBatchSize = TRAINING_BATCH_SIZE,
+                        validationBatchSize = VALIDATION_BATCH_SIZE,
+                        verbose = true
+                    )
+                }
+            assertEquals(
+                "The model is not compiled yet. Compile the model to use this method.",
+                exception.message
+            )
+        }
+    }
+
     @Test
     fun loadWeights() {
         val file = File(realPathToWeights)
@@ -156,6 +194,34 @@ class TransferLearningTest : IntegrationTest() {
 
             val conv2DKernelWeights1 = it.getLayer("conv2d_1").getWeights()[0] as Array<Array<Array<FloatArray>>>
             assertEquals(conv2DKernelWeights1[0][0][0][0], 0.027743129f)
+        }
+    }
+
+    @Test
+    fun loadModelConfigAndWeightsTwiceFromKeras() {
+        val jsonConfigFile = File(realPathToConfig)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeights)
+        val hdfFile = HdfFile(file)
+
+        testModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            it.loadWeights(hdfFile)
+
+            val exception =
+                assertThrows(IllegalStateException::class.java) {
+                    it.loadWeights(hdfFile)
+                }
+            assertEquals(
+                "Model is initialized already!",
+                exception.message
+            )
         }
     }
 
@@ -322,6 +388,84 @@ class TransferLearningTest : IntegrationTest() {
             )
 
             it.loadWeights(hdfFile, layerList)
+
+            val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
+
+            if (accuracyBefore != null) {
+                assertTrue(accuracyBefore > 0.1) // Dense layers has no meaningful weights
+            }
+
+            val conv2DKernelWeighsBeforeTraining =
+                it.getLayer("conv2d").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeighsBeforeTraining[0][0][0][0], 0.06445057f)
+            val denseDKernelWeightsBeforeTraining = it.getLayer("dense").getWeights()[0] as Array<FloatArray>
+            assertEquals(denseDKernelWeightsBeforeTraining[0][0], 0.008463251f)
+
+            it.fit(
+                dataset = train,
+                validationRate = 0.1,
+                epochs = 4,
+                trainBatchSize = 1000,
+                validationBatchSize = 100,
+                verbose = false
+            )
+
+            val conv2DKernelWeightsAfterTraining =
+                it.getLayer("conv2d").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeightsAfterTraining[0][0][0][0], 0.06445057f)
+            assertArrayEquals(conv2DKernelWeighsBeforeTraining, conv2DKernelWeightsAfterTraining)
+
+            val denseDKernelWeightsAfterTraining = it.getLayer("dense").getWeights()[0] as Array<FloatArray>
+            assertFalse(denseDKernelWeightsBeforeTraining.contentEquals(denseDKernelWeightsAfterTraining))
+
+            val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
+
+            if (accuracyAfterTraining != null && accuracyBefore != null) {
+                assertTrue(accuracyAfterTraining > accuracyBefore)
+            }
+        }
+    }
+
+    /**
+     * Simple transfer learning with additional training and Conv2D layers weights freezing.
+     *
+     * NOTE: Dense weights are initialized via default initializers and trained from zero to hero.
+     */
+    @Test
+    fun loadModelConfigAndWeightsPartiallyByLayersListFromKerasAndTrainDenseLayersOnly() {
+        val jsonConfigFile = File(realPathToConfig)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeights)
+        val hdfFile = HdfFile(file)
+
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            FASHION_TRAIN_IMAGES_ARCHIVE,
+            FASHION_TRAIN_LABELS_ARCHIVE,
+            FASHION_TEST_IMAGES_ARCHIVE,
+            FASHION_TEST_LABELS_ARCHIVE,
+            datasets.handlers.AMOUNT_OF_CLASSES,
+            ::extractFashionImages,
+            ::extractFashionLabels
+        )
+
+        testModel.use {
+            val layerList = mutableListOf<Layer>()
+
+            for (layer in it.layers) {
+                if (layer is Conv2D) {
+                    layer.isTrainable = false
+                    layerList.add(layer)
+                }
+            }
+
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            it.loadWeightsForFrozenLayers(hdfFile)
 
             val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

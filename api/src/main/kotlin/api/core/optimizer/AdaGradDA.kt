@@ -40,7 +40,7 @@ private const val SQUARED_ACCUMULATOR = "gradient_squared_accumulator"
  * @property [l1Strength] A float value, must be greater than or equal to zero.
  * @property [l2Strength] A float value, must be greater than or equal to zero.
  */
-class AdaGradDA(
+public class AdaGradDA(
     private val learningRate: Float = 0.1f,
     private val initialAccumulatorValue: Float = 0.01f,
     private val l1Strength: Float = 0.01f,

@@ -20,7 +20,7 @@ private const val MOMENTUM = "momentum"
  * @property [momentum] Float >= 0. Parameter that accelerates SGD in the relevant direction and dampens oscillations.
  * @property [useNesterov] If true, applies Nesterov momentum.
  */
-class Momentum(
+public class Momentum(
     private val learningRate: Float = 0.001f,
     private val momentum: Float = 0.99f,
     private val useNesterov: Boolean = true,

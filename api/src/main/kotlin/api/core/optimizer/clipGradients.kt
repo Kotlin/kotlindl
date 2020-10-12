@@ -6,7 +6,7 @@ import org.tensorflow.op.Ops
 /**
  * No gradient clipping. Gradients go forward without any cnahges.
  */
-class NoClipGradient : ClipGradientAction() {
+public class NoClipGradient : ClipGradientAction() {
     override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
         return gradient
     }
@@ -18,7 +18,7 @@ class NoClipGradient : ClipGradientAction() {
  *
  * @property [clipValue] Value limit for gradient.
  */
-class ClipGradientByValue(private val clipValue: Float) : ClipGradientAction() {
+public class ClipGradientByValue(private val clipValue: Float) : ClipGradientAction() {
     override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
         return tf.clipByValue(gradient, tf.constant(-clipValue) as Operand<Float>, tf.constant(clipValue))
     }
@@ -29,7 +29,7 @@ class ClipGradientByValue(private val clipValue: Float) : ClipGradientAction() {
  *
  * NOTE: Is not supported yet.
  */
-class ClipGradientByNorm(private val clipNormValue: Float) : ClipGradientAction() {
+public class ClipGradientByNorm(private val clipNormValue: Float) : ClipGradientAction() {
     override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
         throw UnsupportedOperationException("Is not implemented yet!")
     }
@@ -38,11 +38,11 @@ class ClipGradientByNorm(private val clipNormValue: Float) : ClipGradientAction(
 /**
  * Base abstract class for approaches to clip gradient values from step to step in optimizer.
  */
-abstract class ClipGradientAction {
+public abstract class ClipGradientAction {
     /**
      * Clips [gradient].
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    abstract fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float>
+    public abstract fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float>
 }

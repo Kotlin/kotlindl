@@ -239,7 +239,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         yOp = tf.placeholder(getDType()) as Operand<Float>
 
         yPred = transformInputWithNNModel(xOp)
-        //lossOp = Losses.convert(loss).apply(tf, yPred, yOp)
         lossOp = loss.apply(tf, yPred, yOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 

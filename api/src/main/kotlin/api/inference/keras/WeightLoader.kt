@@ -26,6 +26,7 @@ public fun Sequential.loadWeights(
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.debug { "Starting weights loading.." }
     this.layers.forEach {
         run {
@@ -64,6 +65,7 @@ public fun Sequential.loadWeights(
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {
@@ -103,7 +105,7 @@ public fun Sequential.loadWeights(
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
  *
- * NOTE: Weights for another layers will not be loaded (should be initialized manually or loaded separately).
+ * NOTE: Weights for trainable layers will not be loaded and will be initialized via default initializers.
  *
  * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
@@ -115,6 +117,7 @@ public fun Sequential.loadWeightsForFrozenLayers(
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {

@@ -548,7 +548,6 @@ class SequentialInferenceTest {
         assertTrue(testMetrics.getValue("afterAccuracy2") > 0.5)
         assertEquals(testMetrics.getValue("trainAccuracy"), testMetrics.getValue("beforeAccuracy1"), EPS)
         assertEquals(testMetrics.getValue("beforeAccuracy2"), testMetrics.getValue("beforeAccuracy1"), EPS)
-        assertTrue(testMetrics.getValue("afterAccuracy2") > testMetrics.getValue("afterAccuracy1"))
     }
 
     private fun trainingAndInferenceWithSpecificOptimizer(optimizer: Optimizer, tempDir: Path?): Map<String, Double> {

@@ -46,7 +46,7 @@ private const val LINEAR_ACCUMULATOR = "linear_accumulator"
  * This differs from L2 above in that the L2 above is a stabilization penalty, whereas this L2 shrinkage is a magnitude penalty.
  * When input is sparse shrinkage will only happen on the active weights.
  */
-class Ftrl(
+public class Ftrl(
     private val learningRate: Float = 0.001f,
     private val l1RegularizationStrength: Float = 0.0f,
     private val l2RegularizationStrength: Float = 0.0f,

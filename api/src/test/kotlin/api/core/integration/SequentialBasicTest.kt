@@ -13,6 +13,7 @@ import api.core.loss.Losses
 import api.core.metric.Accuracy
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
+import api.core.util.OUTPUT_NAME
 import datasets.Dataset
 import datasets.handlers.*
 import org.junit.jupiter.api.Assertions
@@ -92,6 +93,31 @@ internal class SequentialBasicTest : IntegrationTest() {
         assertEquals(test.xSize(), 10000)
     }
 
+
+    @Test
+    fun initLeNetModel() {
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            AMOUNT_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
+
+        testModel.use {
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
+            it.init()
+
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.1)
+            }
+        }
+    }
+
     @Test
     fun trainingLeNetModel() {
         val (train, test) = Dataset.createTrainAndTestDatasets(
@@ -116,11 +142,45 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
 
+            // Evaluation testing
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
             if (accuracy != null) {
                 assertTrue(accuracy > 0.7)
             }
+
+            // Prediction testing
+            val label = it.predict(test.getX(0))
+            assertEquals(test.getLabel(0), label)
+
+            val softPrediction = it.predictSoftly(test.getX(0))
+
+            assertEquals(
+                test.getLabel(0),
+                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! })
+
+            // Test predict method with specified tensor name
+            val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
+            assertEquals(test.getLabel(0), label2)
+
+            // Test predictAndGetActivations method
+            val (label3, activations) = it.predictAndGetActivations(test.getX(0))
+            assertEquals(test.getLabel(0), label3)
+            assertEquals(3, activations.size)
+
+            val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2d1Activations[0][0][0][0].toDouble(), 0.00690492382273078, EPS)
+            val conv2d2Activations = activations[1] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2d2Activations[0][0][0][0].toDouble(), 0.9169542789459229, EPS)
+            val denseActivations = activations[2] as Array<FloatArray>
+            assertEquals(denseActivations[0][0].toDouble(), 0.0, EPS)
+
+            val predictions = it.predictAll(test, TEST_BATCH_SIZE)
+            assertEquals(test.xSize(), predictions.size)
+
+            var manualAccuracy = 0
+            predictions.forEachIndexed { index, lb -> if (lb == test.getLabel(index)) manualAccuracy++ }
+            assertTrue(manualAccuracy > 0.7)
         }
     }
 

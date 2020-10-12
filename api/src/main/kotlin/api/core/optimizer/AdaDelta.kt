@@ -40,7 +40,7 @@ private const val ACCUMULATOR_UPDATE = "accum_update"
  * @property [rho] Float >= 0. Adadelta decay factor, corresponding to fraction of gradient to keep at each time step.
  * @property [epsilon] Float >= 0. Fuzz factor.
  */
-class AdaDelta(
+public class AdaDelta(
     private val learningRate: Float = 0.1f,
     private val rho: Float = 0.95f,
     private val epsilon: Float = 1e-8f,

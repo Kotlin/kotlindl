@@ -24,7 +24,7 @@ private const val MOMENTUM = "momentum"
  * @property [epsilon] Float >= 0. Fuzz factor.
  * @property [centered] Centered or not.
  */
-class RMSProp(
+public class RMSProp(
     private val learningRate: Float = 0.001f,
     private val decay: Float = 0.9f,
     private val momentum: Float = 0.0f,

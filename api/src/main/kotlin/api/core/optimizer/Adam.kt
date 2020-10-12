@@ -39,7 +39,7 @@ private val SECOND_BETA_POWER_NAME = defaultOptimizerVariableName("beta2_power")
  * @property [beta2] 0 < beta < 1. Generally close to 1.
  * @property [epsilon] Float >= 0. Fuzz factor.
  */
-class Adam(
+public class Adam(
     private val learningRate: Float = 0.001f,
     private val beta1: Float = 0.9f,
     private val beta2: Float = 0.999f,
