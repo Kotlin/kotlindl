@@ -16,6 +16,7 @@ import api.core.optimizer.Adam;
 import api.core.optimizer.NoClipGradient;
 import datasets.Dataset;
 import datasets.handlers.MnistUtilKt;
+import kotlin.Pair;
 
 public class LeNetClassic {
     public static final Integer EPOCHS = 3;
@@ -25,41 +26,38 @@ public class LeNetClassic {
     public static final Long SEED = 12L;
     public static final Integer TEST_BATCH_SIZE = 1000;
 
-    public static final Sequential lenet5Classic = Sequential.Companion.of(
-            new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
-            new Conv2D(6, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_1"),
-            new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),
-            new Conv2D(16, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_2"),
-            new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_2"),
-            new Flatten(), // 3136
-            new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
-            new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
-            new Dense(datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
-    );
-
-
     public static void main(String[] args) {
-        var result = Dataset.Companion.createTrainAndTestDatasets(
-                datasets.handlers.MnistUtilKt.TRAIN_IMAGES_ARCHIVE,
-                datasets.handlers.MnistUtilKt.TRAIN_LABELS_ARCHIVE,
-                datasets.handlers.MnistUtilKt.TEST_IMAGES_ARCHIVE,
-                datasets.handlers.MnistUtilKt.TEST_LABELS_ARCHIVE,
-                datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES,
+        Pair<Dataset, Dataset> result = Dataset.Companion.createTrainAndTestDatasets(
+                MnistUtilKt.TRAIN_IMAGES_ARCHIVE,
+                MnistUtilKt.TRAIN_LABELS_ARCHIVE,
+                MnistUtilKt.TEST_IMAGES_ARCHIVE,
+                MnistUtilKt.TEST_LABELS_ARCHIVE,
+                MnistUtilKt.AMOUNT_OF_CLASSES,
                 MnistUtilKt::extractImages,
                 MnistUtilKt::extractLabels
         );
 
-        var train = result.component1();
-        var test = result.component2();
+        Dataset train = result.component1();
+        Dataset test = result.component2();
 
-        var adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
+        try (Sequential lenet5Classic = Sequential.Companion.of(
+                new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
+                new Conv2D(6, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_1"),
+                new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),
+                new Conv2D(16, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_2"),
+                new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_2"),
+                new Flatten(), // 3136
+                new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
+                new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
+                new Dense(datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
+        )) {
 
-        try (lenet5Classic) {
+            Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY, new Callback());
             lenet5Classic.summary(30, 26);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true);
 
-            var accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE).getMetrics().get(Metrics.ACCURACY);
+            Double accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE).getMetrics().get(Metrics.ACCURACY);
             System.out.println("Accuracy: " + accuracy);
         }
     }
