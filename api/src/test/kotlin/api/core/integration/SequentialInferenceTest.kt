@@ -541,11 +541,11 @@ class SequentialInferenceTest {
         assertTrue(tempDir!!.toFile().isDirectory)
         val testMetrics = trainingAndInferenceWithSpecificOptimizer(RMSProp(), tempDir)
 
-        assertTrue(testMetrics.getValue("trainAccuracy") > 0.5)
-        assertTrue(testMetrics.getValue("beforeAccuracy1") > 0.5)
-        assertTrue(testMetrics.getValue("afterAccuracy1") > 0.5)
-        assertTrue(testMetrics.getValue("beforeAccuracy2") > 0.5)
-        assertTrue(testMetrics.getValue("afterAccuracy2") > 0.5)
+        assertTrue(testMetrics.getValue("trainAccuracy") > 0.3)
+        assertTrue(testMetrics.getValue("beforeAccuracy1") > 0.3)
+        assertTrue(testMetrics.getValue("afterAccuracy1") > 0.3)
+        assertTrue(testMetrics.getValue("beforeAccuracy2") > 0.3)
+        assertTrue(testMetrics.getValue("afterAccuracy2") > 0.3)
         assertEquals(testMetrics.getValue("trainAccuracy"), testMetrics.getValue("beforeAccuracy1"), EPS)
         assertEquals(testMetrics.getValue("beforeAccuracy2"), testMetrics.getValue("beforeAccuracy1"), EPS)
     }
