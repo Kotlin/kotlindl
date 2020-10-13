@@ -36,17 +36,18 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-artifacts {
-    archives sourcesJar
-}
-
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Version': '1.15'
     }
-    classifier = 'all'
+    classifier 'all'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+}
+
+artifacts {
+    archives sourcesJar
+    archives fatJar
 }
 
 publishing {
