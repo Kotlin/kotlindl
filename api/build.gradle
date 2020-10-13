@@ -40,6 +40,15 @@ artifacts {
     archives sourcesJar
 }
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Version': '1.15'
+    }
+    classifier = 'all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
