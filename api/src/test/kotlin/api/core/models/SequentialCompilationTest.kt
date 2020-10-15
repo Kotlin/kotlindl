@@ -87,7 +87,7 @@ internal class SequentialModelTest {
         assertTrue(correctTestModel.getLayer("conv2d_1").hasActivation())
         assertTrue(correctTestModel.getLayer("flatten_1").isTrainable)
         assertFalse(correctTestModel.getLayer("flatten_1").hasActivation())
-        assertArrayEquals(correctTestModel.firstLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
+        assertArrayEquals(correctTestModel.inputLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 
     @Test

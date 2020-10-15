@@ -94,7 +94,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     }
 
     /** Returns optimizer name. */
-    abstract fun getOptimizerName(): String
+    public abstract fun getOptimizerName(): String
 
     /**
      * Creates a slot in the graph for the specified variable with the specified name. Adds the slot's
@@ -146,10 +146,10 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     /**
      * Creates name for [variable] used in slot with name [slotName].
      */
-    open fun createName(variable: Output<Float>, slotName: String): String {
+    internal open fun createName(variable: Output<Float>, slotName: String): String {
         return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
 
     /** True, if optimizer implemented for GPU. */
-    abstract fun isRunningOnGPU(): Boolean
+    internal abstract fun isRunningOnGPU(): Boolean
 }

@@ -9,7 +9,7 @@ import kotlin.math.abs
  * NOTE: Developer API.
  * TODO: Create extension functions for [Shape] object.
  */
-class TensorShape() {
+internal class TensorShape() {
     private lateinit var dims: LongArray
 
     constructor(shape: Shape) : this() {

@@ -78,7 +78,7 @@ class TransferLearningTest : IntegrationTest() {
         assertTrue((testModel.getLayer(dense1LayerName) as Dense).biasInitializer is RandomUniform)
         assertTrue((testModel.getLayer(dense1LayerName) as Dense).outputSize == 84)
         assertTrue((testModel.getLayer(dense1LayerName) as Dense).activation == Activations.Relu)
-        assertArrayEquals(testModel.firstLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
+        assertArrayEquals(testModel.inputLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 
     /** Weights are not loaded, but initialized via default initializers. */

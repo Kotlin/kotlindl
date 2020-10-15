@@ -5,7 +5,13 @@ import api.core.layer.twodim.ConvPadding
 /**
  * Calculates output length.
  */
-fun convOutputLength(inputLength: Long, filterSize: Int, padding: ConvPadding, stride: Int, dilation: Int = 1): Long {
+internal fun convOutputLength(
+    inputLength: Long,
+    filterSize: Int,
+    padding: ConvPadding,
+    stride: Int,
+    dilation: Int = 1
+): Long {
     val dilatedFilterSize = filterSize + (filterSize - 1) * (dilation - 1)
     val outputLength = when (padding) {
         ConvPadding.SAME -> inputLength

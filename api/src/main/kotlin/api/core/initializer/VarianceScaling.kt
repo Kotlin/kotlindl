@@ -207,7 +207,7 @@ public open class VarianceScaling(
 /**
  * Mode.
  */
-enum class Mode {
+public enum class Mode {
     /** */
     FAN_IN,
 
@@ -221,7 +221,7 @@ enum class Mode {
 /**
  * Distribution.
  */
-enum class Distribution {
+public enum class Distribution {
     /** */
     TRUNCATED_NORMAL,
 

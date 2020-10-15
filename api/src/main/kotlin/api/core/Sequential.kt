@@ -36,19 +36,19 @@ import java.io.FileNotFoundException
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
  * Also, it provides training and inference features on this model.
  *
- * @property [input] the input layer with initial shapes.
+ * @property [inputLayer] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
- * @constructor Creates a Sequential group with [input] and [layers].
+ * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
 public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
-    val logger = KotlinLogging.logger {}
+    internal val logger = KotlinLogging.logger {}
 
     /** Input layer. */
-    val firstLayer: Input = input
+    public val inputLayer: Input = input
 
     /** The bunch of layers. */
-    val layers: List<Layer> = listOf(*layers)
+    public val layers: List<Layer> = listOf(*layers)
 
     /** Layers indexed by name. */
     private var layersByName: Map<String, Layer> = mapOf()
@@ -222,8 +222,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         this.callback = callback
         this.callback.model = this // TODO: cyclic reference
 
-        firstLayer.defineVariables(tf)
-        var inputShape: Shape = firstLayer.computeOutputShape()
+        inputLayer.defineVariables(tf)
+        var inputShape: Shape = inputLayer.computeOutputShape()
 
         layers.forEach {
             it.defineVariables(tf, kGraph, inputShape)
@@ -235,7 +235,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             logger.debug { it.toString() + "; outputShape: " + dims.contentToString() }
         }
 
-        xOp = firstLayer.input
+        xOp = inputLayer.input
         yOp = tf.placeholder(getDType()) as Operand<Float>
 
         yPred = transformInputWithNNModel(xOp)
@@ -716,7 +716,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun calculateXShape(amountOfImages: Long): LongArray {
-        val xTensorShape = firstLayer.input.asOutput().shape()
+        val xTensorShape = inputLayer.input.asOutput().shape()
 
         return longArrayOf(
             amountOfImages,

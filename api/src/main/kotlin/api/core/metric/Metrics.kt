@@ -7,7 +7,7 @@ import org.tensorflow.op.Ops
 /**
  * Metrics.
  */
-enum class Metrics {
+public enum class Metrics {
     /**
      * Computes the rate of true answers.
      *

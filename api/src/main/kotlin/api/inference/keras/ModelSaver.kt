@@ -27,7 +27,7 @@ public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyC
         }
     }
 
-    val inputShape = this.firstLayer.packedDims.map { it.toInt() }
+    val inputShape = this.inputLayer.packedDims.map { it.toInt() }
 
     (kerasLayers.first().config as LayerConfig).batch_input_shape =
         listOf(null, inputShape[0], inputShape[1], inputShape[2])

@@ -7,7 +7,7 @@ import api.core.shape.reshape4DTo1D
 import org.tensorflow.Tensor
 
 /** Copies tensor data to float array. */
-fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
+public fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
     val tensorForCopying = this
 
     val shape = tensorForCopying.shape()
@@ -57,7 +57,7 @@ fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
 }
 
 /** Copies tensor to multi-dimensional float array. Array rank is equal to tensor rank. */
-fun Tensor<*>.convertTensorToMultiDimArray(): Array<*> {
+public fun Tensor<*>.convertTensorToMultiDimArray(): Array<*> {
     val tensorForCopying = this
 
     val shape = tensorForCopying.shape()

@@ -8,12 +8,12 @@ import kotlin.math.abs
 /**
  * Creates constant array.
  */
-fun constArray(tf: Ops, vararg data: Int): Operand<Int> {
+internal fun constArray(tf: Ops, vararg data: Int): Operand<Int> {
     return tf.constant(data)
 }
 
 /** Creates shape [Operand] from [Shape]. */
-fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
+internal fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
     val shapeArray = IntArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i).toInt()
@@ -22,7 +22,7 @@ fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
 }
 
 /** Extracts dimensions as [IntArray] from [Shape]. */
-fun shapeToIntArray(shape: Shape): IntArray {
+internal fun shapeToIntArray(shape: Shape): IntArray {
     val shapeArray = IntArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i).toInt()
@@ -31,7 +31,7 @@ fun shapeToIntArray(shape: Shape): IntArray {
 }
 
 /** Extracts dimensions as [LongArray] from [Shape]. */
-fun shapeToLongArray(shape: Shape): LongArray {
+internal fun shapeToLongArray(shape: Shape): LongArray {
     val shapeArray = LongArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i)
@@ -40,7 +40,7 @@ fun shapeToLongArray(shape: Shape): LongArray {
 }
 
 /** Extracts dimensions as [String] from [shape]. */
-fun shapeArrayToString(shape: Shape): String {
+internal fun shapeArrayToString(shape: Shape): String {
     val shapeArray = IntArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i).toInt()
@@ -49,17 +49,17 @@ fun shapeArrayToString(shape: Shape): String {
 }
 
 /** Returns first dimension from all dimensions [dims]. */
-fun head(vararg dims: Long): Long {
+internal fun head(vararg dims: Long): Long {
     return dims[0]
 }
 
 /** Returns last dimensions (except first) from [dims]. */
-fun tail(vararg dims: Long): LongArray {
+internal fun tail(vararg dims: Long): LongArray {
     return dims.copyOfRange(1, dims.size)
 }
 
 /** Returns last dimensions (except first) from [shape]. */
-fun tail(shape: Shape): LongArray {
+internal fun tail(shape: Shape): LongArray {
     val shapeArray = LongArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i)
@@ -68,12 +68,12 @@ fun tail(shape: Shape): LongArray {
 }
 
 /** Creates [Shape] object from a few [Long] values in [dims]. */
-fun shapeFromDims(vararg dims: Long): Shape {
+internal fun shapeFromDims(vararg dims: Long): Shape {
     return Shape.make(head(*dims), *tail(*dims))
 }
 
 /** Returns amount of elements in Tensor with [shape]. */
-fun numElementsInShape(shape: LongArray): Long {
+internal fun numElementsInShape(shape: LongArray): Long {
     var prod = 1L
     for (i in shape.indices) {
         prod *= abs(shape[i])
@@ -82,7 +82,7 @@ fun numElementsInShape(shape: LongArray): Long {
 }
 
 /** Reshapes 2D array of floats to 1D array of floats. */
-fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
+internal fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
@@ -98,7 +98,7 @@ fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
 }
 
 /** Reshapes 3D array of floats to 1D array of floats. */
-fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
+internal fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
@@ -116,7 +116,7 @@ fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
 }
 
 /** Reshapes 4D array of floats to 1D array of floats. */
-fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
+internal fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
