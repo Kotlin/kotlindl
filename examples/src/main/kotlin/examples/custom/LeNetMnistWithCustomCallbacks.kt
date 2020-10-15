@@ -24,7 +24,6 @@ private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
-private const val SEED = 12L
 
 /**
  * Kotlin implementation of LeNet on Keras.

@@ -84,7 +84,7 @@ val lenet5 = Sequential.of(
 
 fun getLabel(dataset: Dataset, imageId: Int): Int {
     val imageLabel = dataset.getY(imageId)
-    return imageLabel.indexOf(imageLabel.max()!!)
+    return imageLabel.indexOfFirst { it == imageLabel.maxOrNull()!! }
 }
 
 fun mnistReshape(image: FloatArray): Tensor<*> {

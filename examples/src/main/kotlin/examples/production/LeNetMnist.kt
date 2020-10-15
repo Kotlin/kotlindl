@@ -58,7 +58,7 @@ fun main() {
 
         val trainImageLabel = train.getY(imageId)
 
-        val maxIdx = trainImageLabel.indexOf(trainImageLabel.max()!!)
+        val maxIdx = trainImageLabel.indexOfFirst { it == trainImageLabel.maxOrNull()!! }
 
         println("Ground Truth: $maxIdx")
     }

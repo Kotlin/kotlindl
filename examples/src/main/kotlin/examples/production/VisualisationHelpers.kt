@@ -34,9 +34,9 @@ class Conv2dJPanel(
                     val float = dst[i][j][0][k]
                     val grey = (min(1.0f, max(float * colorCoefficient.toFloat(), 0.0f)) * 255).toInt()
                     val color = Color(grey, grey, grey)
-                    g.color = color;
+                    g.color = color
                     g.fillRect(y, x, width, height)
-                    g.color = Color.BLACK;
+                    g.color = Color.BLACK
                     g.drawRect(y, x, width, height)
                 }
             }
@@ -53,9 +53,9 @@ class Conv2dJPanel1(val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
                     val float = dst[i][j][0][k]
                     val grey = (min(1.0f, max(float * 2, 0.0f)) * 255).toInt()
                     val color = Color(grey, grey, grey)
-                    g.color = color;
+                    g.color = color
                     g.fillRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
-                    g.color = Color.BLACK;
+                    g.color = Color.BLACK
                     g.drawRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
                 }
             }
@@ -90,7 +90,7 @@ class ReluGraphics(private val dst: Array<Array<Array<FloatArray>>>) : JPanel() 
                     g.color = color
 
                     g.fillRect(y, x, width, height)
-                    g.color = Color.BLACK;
+                    g.color = Color.BLACK
                     g.drawRect(y, x, width, height)
                 }
             }
@@ -139,7 +139,7 @@ class ReluGraphics2(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
                     val color = Color(grey, grey, grey)
                     g.color = color
                     g.fillRect(y, x, width, height)
-                    g.color = Color.BLACK;
+                    g.color = Color.BLACK
                     g.drawRect(y, x, width, height)
                 }
             }
