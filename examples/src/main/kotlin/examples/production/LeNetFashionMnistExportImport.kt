@@ -1,6 +1,6 @@
 package examples.production
 
-import api.core.WrintingMode
+import api.core.WritingMode
 import api.core.loss.Losses
 import api.core.metric.Metrics
 import api.core.optimizer.Adam
@@ -33,7 +33,7 @@ fun main() {
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractFashionImages,
         ::extractFashionLabels
     )
@@ -60,7 +60,7 @@ fun main() {
 
         println("Accuracy $accuracy")
 
-        it.save(File(PATH_TO_MODEL), writingMode = WrintingMode.OVERRIDE)
+        it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
     }
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)

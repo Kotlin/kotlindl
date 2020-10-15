@@ -195,7 +195,7 @@ public abstract class TrainableModel : InferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
-     * @return Array of labels. The length is equal to the Number of sampless on the [dataset].
+     * @return Array of labels. The length is equal to the Number of samples on the [dataset].
      */
     public abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
 
@@ -253,7 +253,7 @@ public abstract class TrainableModel : InferenceModel() {
         modelDirectory: File,
         savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
         saveOptimizerState: Boolean = false,
-        writingMode: WrintingMode = WrintingMode.FAIL_IF_EXISTS
+        writingMode: WritingMode = WritingMode.FAIL_IF_EXISTS
     )
 
     /**

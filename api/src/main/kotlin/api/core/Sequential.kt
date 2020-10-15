@@ -580,7 +580,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                 val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
 
                 dst.forEachIndexed { index, element ->
-                    argMaxBatchPrediction[index] = element.indexOf(element.max()!!)
+                    argMaxBatchPrediction[index] = element.indexOfFirst { it == element.maxOrNull()!! }
                 }
 
                 callback.onPredictBatchEnd(batchCounter, batchSize)
@@ -594,17 +594,17 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     override fun predict(inputData: FloatArray): Int {
         val softPrediction = predictSoftly(inputData)
-        return softPrediction.indexOf(softPrediction.max()!!)
+        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
     }
 
     override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
-        return softPrediction.indexOf(softPrediction.max()!!)
+        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
     }
 
     override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
-        return Pair(softPrediction.indexOf(softPrediction.max()!!), activations)
+        return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
@@ -741,7 +741,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         modelDirectory: File,
         savingFormat: SavingFormat,
         saveOptimizerState: Boolean,
-        writingMode: WrintingMode
+        writingMode: WritingMode
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -749,17 +749,17 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {
-            WrintingMode.FAIL_IF_EXISTS -> {
+            WritingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
                 modelDirectory.mkdir()
             }
-            WrintingMode.OVERRIDE -> {
+            WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
                 modelDirectory.mkdir()
             }
-            WrintingMode.APPEND -> {
+            WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
                     modelDirectory.mkdir()
                 }
@@ -815,15 +815,14 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         val file = File("$pathToModelDirectory/variableNames.txt")
 
         file.bufferedWriter().use { variableNamesFile ->
-            for (modelWeight in modelWeights.withIndex()) {
-                val variableName = variables[modelWeight.index].asOutput().op().name()
+            for ((index, tensorForCopying) in modelWeights.withIndex()) {
+                val variableName = variables[index].asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
 
                 val variableNameFile = File("$pathToModelDirectory/$variableName.txt")
 
                 variableNameFile.bufferedWriter().use { file ->
-                    val tensorForCopying = modelWeight.value
 
                     tensorForCopying.use {
                         val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()

@@ -1,7 +1,7 @@
 package api.core
 
 /** Model writing mode. */
-public enum class WrintingMode {
+public enum class WritingMode {
     /** Throws an exception if directory exists. */
     FAIL_IF_EXISTS,
 

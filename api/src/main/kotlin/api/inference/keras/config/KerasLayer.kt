@@ -1,6 +1,6 @@
 package api.inference.keras.config
 
-data class KerasLayer(
+internal data class KerasLayer(
     val class_name: String?,
     val config: LayerConfig?
 )

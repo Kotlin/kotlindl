@@ -239,7 +239,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )
@@ -291,7 +291,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )
@@ -366,7 +366,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )
@@ -444,7 +444,7 @@ class TransferLearningTest : IntegrationTest() {
             FASHION_TRAIN_LABELS_ARCHIVE,
             FASHION_TEST_IMAGES_ARCHIVE,
             FASHION_TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractFashionImages,
             ::extractFashionLabels
         )

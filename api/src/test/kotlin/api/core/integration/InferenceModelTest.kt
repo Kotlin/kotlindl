@@ -2,7 +2,7 @@ package api.core.integration
 
 import api.core.SavingFormat
 import api.core.Sequential
-import api.core.WrintingMode
+import api.core.WritingMode
 import api.core.activation.Activations
 import api.core.initializer.HeNormal
 import api.core.initializer.HeUniform
@@ -121,7 +121,7 @@ class InferenceModelTest {
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
             TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractImages,
             ::extractLabels
         )
@@ -148,7 +148,7 @@ class InferenceModelTest {
             it.save(
                 modelDirectory = tempDir.toFile(),
                 savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
-                writingMode = WrintingMode.OVERRIDE
+                writingMode = WritingMode.OVERRIDE
             )
         }
 
@@ -175,7 +175,7 @@ class InferenceModelTest {
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
             TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractImages,
             ::extractLabels
         )
@@ -202,7 +202,7 @@ class InferenceModelTest {
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
             TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractImages,
             ::extractLabels
         )
@@ -231,7 +231,7 @@ class InferenceModelTest {
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
             TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractImages,
             ::extractLabels
         )
@@ -258,7 +258,7 @@ class InferenceModelTest {
             it.save(
                 modelDirectory = tempDir.toFile(),
                 savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-                writingMode = WrintingMode.OVERRIDE
+                writingMode = WritingMode.OVERRIDE
             )
         }
 
@@ -284,7 +284,7 @@ class InferenceModelTest {
             TRAIN_LABELS_ARCHIVE,
             TEST_IMAGES_ARCHIVE,
             TEST_LABELS_ARCHIVE,
-            datasets.handlers.AMOUNT_OF_CLASSES,
+            datasets.handlers.NUMBER_OF_CLASSES,
             ::extractImages,
             ::extractLabels
         )
@@ -311,7 +311,7 @@ class InferenceModelTest {
             it.save(
                 modelDirectory = tempDir.toFile(),
                 savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
-                writingMode = WrintingMode.OVERRIDE
+                writingMode = WritingMode.OVERRIDE
             )
         }
 

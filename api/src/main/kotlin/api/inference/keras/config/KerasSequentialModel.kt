@@ -1,6 +1,6 @@
 package api.inference.keras.config
 
-data class KerasSequentialModel(
+internal data class KerasSequentialModel(
     val backend: String? = "tensorflow",
     val class_name: String? = "Sequential",
     val config: SequentialConfig?,

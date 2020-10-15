@@ -2,7 +2,7 @@ package examples.production
 
 import api.core.SavingFormat
 import api.core.Sequential
-import api.core.WrintingMode
+import api.core.WritingMode
 import api.core.layer.twodim.Conv2D
 import api.core.loss.Losses
 import api.core.metric.Metrics
@@ -23,7 +23,7 @@ fun main() {
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
@@ -51,7 +51,7 @@ fun main() {
         it.save(
             File(PATH_TO_MODEL),
             SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
-            writingMode = WrintingMode.OVERRIDE
+            writingMode = WritingMode.OVERRIDE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

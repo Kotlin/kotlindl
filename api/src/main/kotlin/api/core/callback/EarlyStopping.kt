@@ -157,7 +157,7 @@ public class EarlyStopping : Callback() {
         wait = 0
         stoppedEpoch = 0
         best =
-            if (baseline != null) baseline!! else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
+            if (baseline != null) baseline else if (monitorGreater) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
     }
 
     override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {

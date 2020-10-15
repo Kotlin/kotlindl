@@ -17,7 +17,7 @@ fun main() {
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )

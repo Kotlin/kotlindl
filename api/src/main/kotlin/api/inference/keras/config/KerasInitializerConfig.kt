@@ -1,6 +1,6 @@
 package api.inference.keras.config
 
-data class KerasInitializerConfig(
+internal data class KerasInitializerConfig(
     val distribution: String? = null,
     val maxval: Double? = null,
     val mean: Double? = null,

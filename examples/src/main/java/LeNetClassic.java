@@ -32,7 +32,7 @@ public class LeNetClassic {
                 MnistUtilKt.TRAIN_LABELS_ARCHIVE,
                 MnistUtilKt.TEST_IMAGES_ARCHIVE,
                 MnistUtilKt.TEST_LABELS_ARCHIVE,
-                MnistUtilKt.AMOUNT_OF_CLASSES,
+                MnistUtilKt.NUMBER_OF_CLASSES,
                 MnistUtilKt::extractImages,
                 MnistUtilKt::extractLabels
         );
@@ -49,7 +49,7 @@ public class LeNetClassic {
                 new Flatten(), // 3136
                 new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
                 new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
-                new Dense(datasets.handlers.MnistUtilKt.AMOUNT_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
+                new Dense(datasets.handlers.MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
         )) {
 
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());

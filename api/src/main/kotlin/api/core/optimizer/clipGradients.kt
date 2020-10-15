@@ -4,7 +4,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /**
- * No gradient clipping. Gradients go forward without any cnahges.
+ * No gradient clipping. Gradients go forward without any changes.
  */
 public class NoClipGradient : ClipGradientAction() {
     override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {

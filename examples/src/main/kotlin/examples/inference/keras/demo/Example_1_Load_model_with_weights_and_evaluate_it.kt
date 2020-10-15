@@ -17,7 +17,7 @@ fun main() {
         FASHION_TRAIN_LABELS_ARCHIVE,
         FASHION_TEST_IMAGES_ARCHIVE,
         FASHION_TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractFashionImages,
         ::extractFashionLabels
     )

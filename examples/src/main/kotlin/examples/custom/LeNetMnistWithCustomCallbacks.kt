@@ -70,7 +70,7 @@ private val model = Sequential.of(
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = AMOUNT_OF_CLASSES,
+        outputSize = NUMBER_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = Constant(0.1f)
@@ -83,7 +83,7 @@ fun main() {
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )

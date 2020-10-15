@@ -41,6 +41,14 @@ public open class SavedModel : InferenceModel() {
         }
     }
 
+    /**
+     * Predicts the class of [inputData].
+     *
+     * @param [inputData] The single example with unknown label.
+     * @param [inputTensorName] The name of input tensor.
+     * @param [outputTensorName] The name of output tensor.
+     * @return Predicted class index.
+     */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         require(reshapeFunction != null) { "Reshape functions is missed!" }
 
@@ -102,7 +110,6 @@ public open class SavedModel : InferenceModel() {
     }
 }
 
-/** Defines receiver for [SavedModel]. */
 /*public fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
     SavedModel()
         .apply(init)*/

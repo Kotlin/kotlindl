@@ -9,7 +9,8 @@ import java.io.IOException
 import java.io.InputStream
 import javax.imageio.ImageIO
 
-public class ImageConverter() {
+/** Helper class to convert images to [FloatArray]. */
+public class ImageConverter {
     public companion object {
         /** All pixels has values in range [0; 255]. */
         public fun toRawFloatArray(inputStream: InputStream, imageType: ImageType = ImageType.JPG): FloatArray {
@@ -42,11 +43,12 @@ public class ImageConverter() {
         private fun toRawPixels(inputStream: InputStream): ByteArray {
             val image = getImage(inputStream)
 
-            val pixels = (image.raster.dataBuffer as DataBufferByte).data
-
-            return pixels
+            return (image.raster.dataBuffer as DataBufferByte).data // pixels
         }
 
+        /**
+         * Returns [BufferedImage] extracted from [inputStream] with [imageType].
+         */
         @Throws(IOException::class)
         public fun getImage(inputStream: InputStream, imageType: String = "png"): BufferedImage {
             val image = ImageIO.read(inputStream)
@@ -57,8 +59,14 @@ public class ImageConverter() {
     }
 }
 
+/** */
 public enum class ImageType {
+    /** */
     JPG,
+
+    /** */
     PNG,
+
+    /** */
     GIF
 }

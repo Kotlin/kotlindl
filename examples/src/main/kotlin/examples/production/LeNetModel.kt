@@ -11,7 +11,7 @@ import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import datasets.Dataset
-import datasets.handlers.AMOUNT_OF_CLASSES
+import datasets.handlers.NUMBER_OF_CLASSES
 import org.tensorflow.Tensor
 
 private const val NUM_CHANNELS = 1L
@@ -74,7 +74,7 @@ val lenet5 = Sequential.of(
         name = "dense_7"
     ),
     Dense(
-        outputSize = AMOUNT_OF_CLASSES,
+        outputSize = NUMBER_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,

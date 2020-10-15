@@ -1,6 +1,6 @@
 package api.inference.keras.config
 
-data class LayerConfig(
+internal data class LayerConfig(
     val activation: String? = null,
     val activity_regularizer: ActivityRegularizer? = null,
     var batch_input_shape: List<Int?>? = null,
