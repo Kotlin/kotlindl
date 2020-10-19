@@ -57,11 +57,11 @@ public enum class Metrics {
 
         /** Converts sub-class of [Metric] to enum value. */
         public fun convertBack(metric: Metric): Metrics {
-            return when (metric) {
-                Accuracy() -> ACCURACY
-                MAE() -> MAE
-                MSE() -> MSE
-                RMSE() -> RMSE
+            return when (metric::class) {
+                Accuracy::class -> ACCURACY
+                api.core.metric.MAE::class -> MAE
+                api.core.metric.MSE::class -> MSE
+                api.core.metric.RMSE::class -> RMSE
                 else -> ACCURACY
             }
         }
