@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    group = 'org.jetbrains.kotlin.kotlin-dl'
+    group = 'org.jetbrains.kotlin-deeplearning'
     version = '0.0.9'
 
     apply plugin: "com.jfrog.bintray"

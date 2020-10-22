@@ -1,4 +1,4 @@
-rootProject.name = 'kotlin-dl'
+rootProject.name = 'KotlinDL'
 include("api")
 include("examples")
 
