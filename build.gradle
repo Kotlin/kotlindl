@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
     id 'maven-publish'
     id 'maven'
     id "com.jfrog.bintray" version "1.8.4"
@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = 'org.jetbrains.kotlin-deeplearning'
-    version = '0.0.9'
+    version = '0.0.10'
 
     apply plugin: "com.jfrog.bintray"
     apply plugin: "maven-publish"

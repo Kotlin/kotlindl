@@ -22,7 +22,7 @@ import api.core.optimizer.SGD
 import datasets.Dataset
 
 private const val LEARNING_RATE = 0.1f
-private const val EPOCHS = 20
+private const val EPOCHS = 50
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
