@@ -1,4 +1,4 @@
-Kotof is Keras API at the top of TensorFlow 1.15 and its Java API.
+Kotlin DL is Keras-like API at the top of TensorFlow 1.15 and its Java API.
 
 Classic LeNet-5 with minor changes looks so Keras, isn't it?
 
