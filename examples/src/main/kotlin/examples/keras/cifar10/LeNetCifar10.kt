@@ -18,11 +18,11 @@ import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import api.core.loss.Losses
 import api.core.metric.Metrics
-import api.core.optimizer.SGD
+import api.core.optimizer.Adam
 import datasets.Dataset
 
 private const val LEARNING_RATE = 0.1f
-private const val EPOCHS = 50
+private const val EPOCHS = 20
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
@@ -91,7 +91,7 @@ fun main() {
 
     model.use {
         it.compile(
-            optimizer = SGD(LEARNING_RATE),
+            optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )

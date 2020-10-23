@@ -234,10 +234,18 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             it.defineVariables(tf, kGraph, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
-            val dims = TensorShape(inputShape).dims()
+            val tensorShape = TensorShape(inputShape)
+            val dims = tensorShape.dims()
+
+            check(tensorShape.tail().all { elem -> elem > 0 })
+            {
+                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
+                        "Analyze your model architecture and layer output shapes carefully to discover a problem."
+            }
+
             it.outputShape = dims
 
-            logger.debug { it.toString() + "; outputShape: " + dims.contentToString() }
+            logger.debug { "$it; outputShape: $tensorShape" }
         }
 
         xOp = inputLayer.input
@@ -936,7 +944,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             stringBuilder.append(" ")
         }
 
-        val secondPart = l.outputShape.contentToString()
+        val secondPart = TensorShape(l.outputShape).toString()
 
         stringBuilder.append(secondPart)
 

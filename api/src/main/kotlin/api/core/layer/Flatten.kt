@@ -33,7 +33,8 @@ public class Flatten(name: String = "") : Layer(name) {
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
-        return Shape.make(TensorShape(inputShape).numElements())
+        val tensorShape = TensorShape(inputShape)
+        return Shape.make(tensorShape.head(), tensorShape.numElements())
     }
 
     override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {

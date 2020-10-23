@@ -164,17 +164,31 @@ internal class TensorShape() {
     }
 
     /** Returns first dimension from all dimensions [dims]. */
+    // TODO: to companion
     fun head(vararg dims: Long): Long {
         return dims[0]
     }
 
+    fun head(): Long {
+        return dims[0]
+    }
+
     /** Returns last dimensions (except first) from [dims]. */
+    // TODO: to companion
     fun tail(vararg dims: Long): LongArray {
+        return dims.copyOfRange(1, dims.size)
+    }
+
+    fun tail(): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
 
     /** Converts to [Shape] object. */
     fun toShape(): Shape {
         return Shape.make(head(*dims), *tail(*dims))
+    }
+
+    override fun toString(): String {
+        return dims.contentToString().replace("-1", "None")
     }
 }

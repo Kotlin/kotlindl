@@ -19,6 +19,7 @@ import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import api.core.loss.Losses
 import api.core.metric.Accuracy
+import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -100,7 +101,7 @@ internal class SequentialModelTest {
         correctTestModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             val layerDescriptions = it.summary()
-            assertTrue(layerDescriptions[0].contentEquals("conv2d_1(Conv2D)             [-1, 28, 28, 32]          832"))
+            assertTrue(layerDescriptions[0].contentEquals("conv2d_1(Conv2D)             [None, 28, 28, 32]        832"))
         }
     }
 
@@ -131,9 +132,9 @@ internal class SequentialModelTest {
             assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))
             assertArrayEquals(it.layers[2].outputShape, longArrayOf(-1, 14, 14, 64))
             assertArrayEquals(it.layers[3].outputShape, longArrayOf(-1, 7, 7, 64))
-            assertArrayEquals(it.layers[4].outputShape, longArrayOf(3136))
-            assertArrayEquals(it.layers[5].outputShape, longArrayOf(512))
-            assertArrayEquals(it.layers[6].outputShape, longArrayOf(10))
+            assertArrayEquals(it.layers[4].outputShape, longArrayOf(-1, 3136))
+            assertArrayEquals(it.layers[5].outputShape, longArrayOf(-1, 512))
+            assertArrayEquals(it.layers[6].outputShape, longArrayOf(-1, 10))
         }
     }
 
@@ -173,6 +174,144 @@ internal class SequentialModelTest {
             "The layer name conv2d_1 is used in previous layers. The layer name should be unique.",
             exception.message
         )
+    }
+
+    @Test
+    fun failOnIncorrectShape() {
+        val heNormal = HeNormal(SEED)
+
+        val vgg11 = Sequential.of(
+            Input(
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            ),
+            Conv2D(
+                filters = 32,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+            ),
+            Conv2D(
+                filters = 64,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+            ),
+            Conv2D(
+                filters = 128,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            Conv2D(
+                filters = 128,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+            ),
+            Conv2D(
+                filters = 256,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            Conv2D(
+                filters = 256,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+            ),
+            Conv2D(
+                filters = 128,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            Conv2D(
+                filters = 128,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal,
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+            ),
+            Flatten(),
+            Dense(
+                outputSize = 2048,
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal
+            ),
+            Dense(
+                outputSize = 1000,
+                activation = Activations.Relu,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal
+            ),
+            Dense(
+                outputSize = 10,
+                activation = Activations.Linear,
+                kernelInitializer = heNormal,
+                biasInitializer = heNormal
+            )
+        )
+
+        vgg11.use {
+            val exception = assertThrows(IllegalStateException::class.java) {
+                it.compile(
+                    optimizer = Adam(),
+                    loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                    metric = Metrics.ACCURACY
+                )
+            }
+            assertEquals(
+                "The last dimensions (except first = -1) of shape of layer maxpool2d_13 contains zero or negative dimension values: [-1, 0, 0, 128].\n" +
+                        "Analyze your model architecture and layer output shapes carefully to discover a problem.",
+                exception.message
+            )
+        }
     }
 
     @Test

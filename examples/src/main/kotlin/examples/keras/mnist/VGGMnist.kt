@@ -52,7 +52,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 64,
@@ -65,7 +66,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
@@ -87,7 +89,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 256,
@@ -109,7 +112,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
@@ -131,7 +135,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Flatten(),
     /*Dense(
@@ -173,6 +178,8 @@ fun main() {
 
     vgg11.use {
         it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
+
+        it.summary()
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
