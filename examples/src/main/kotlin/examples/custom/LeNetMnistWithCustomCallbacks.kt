@@ -9,9 +9,7 @@ import api.core.Sequential
 import api.core.activation.Activations
 import api.core.callback.Callback
 import api.core.history.*
-import api.core.initializer.Constant
 import api.core.initializer.HeNormal
-import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Flatten
 import api.core.layer.Input
@@ -20,7 +18,7 @@ import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
 import api.core.loss.Losses
 import api.core.metric.Metrics
-import api.core.optimizer.SGD
+import api.core.optimizer.Adam
 import datasets.Dataset
 import datasets.handlers.*
 
@@ -42,11 +40,11 @@ private val model = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(5, 5),
+        kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -55,11 +53,11 @@ private val model = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(5, 5),
+        kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -71,13 +69,13 @@ private val model = Sequential.of(
         outputSize = 512,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = HeNormal()
     ),
     Dense(
         outputSize = NUMBER_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = HeNormal()
     )
 )
 
@@ -94,8 +92,8 @@ fun main() {
 
     model.use {
         it.compile(
-            optimizer = SGD(learningRate = 0.0001f),
-            loss = Losses.MSE,
+            optimizer = Adam(),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY,
             callback = CustomCallback()
         )
