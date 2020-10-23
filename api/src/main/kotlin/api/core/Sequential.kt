@@ -390,6 +390,10 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                         Tensor.create(yBatchShape, batch.y).use { batchLabels ->
                             val (lossValue, metricValue) = trainOnBatch(targets, batchImages, batchLabels, metricOp)
 
+                            if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                                logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
+                            }
+
                             averageTrainingLossAccum += lossValue
                             averageTrainingMetricAccum += metricValue
                             val batchTrainingEvent =

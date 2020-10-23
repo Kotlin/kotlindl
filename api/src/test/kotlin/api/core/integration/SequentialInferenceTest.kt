@@ -182,10 +182,10 @@ class SequentialInferenceTest {
             Assertions.assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))
             Assertions.assertArrayEquals(it.layers[2].outputShape, longArrayOf(-1, 14, 14, 64))
             Assertions.assertArrayEquals(it.layers[3].outputShape, longArrayOf(-1, 7, 7, 64))
-            Assertions.assertArrayEquals(it.layers[4].outputShape, longArrayOf(3136))
-            Assertions.assertArrayEquals(it.layers[5].outputShape, longArrayOf(120))
-            Assertions.assertArrayEquals(it.layers[6].outputShape, longArrayOf(84))
-            Assertions.assertArrayEquals(it.layers[7].outputShape, longArrayOf(10))
+            Assertions.assertArrayEquals(it.layers[4].outputShape, longArrayOf(-1, 3136))
+            Assertions.assertArrayEquals(it.layers[5].outputShape, longArrayOf(-1, 120))
+            Assertions.assertArrayEquals(it.layers[6].outputShape, longArrayOf(-1, 84))
+            Assertions.assertArrayEquals(it.layers[7].outputShape, longArrayOf(-1, 10))
 
             it.loadWeights(tempDir.toFile())
 
