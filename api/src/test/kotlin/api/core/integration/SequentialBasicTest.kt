@@ -390,6 +390,131 @@ internal class SequentialBasicTest : IntegrationTest() {
     }
 
     @Test
+    fun allActivationsAreBelongToUs() {
+        val testModel = Sequential.of(
+            Input(
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            ),
+            Conv2D(
+                filters = 32,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Selu,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                padding = ConvPadding.SAME,
+                name = "conv2d_1"
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+                name = "maxPool_1"
+            ),
+            Conv2D(
+                filters = 64,
+                kernelSize = longArrayOf(3, 3),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Elu,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                padding = ConvPadding.SAME,
+                name = "conv2d_2"
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+                name = "maxPool_2"
+            ),
+            Flatten(name = "flatten_1"), // 3136
+            Dense(
+                outputSize = 64,
+                activation = Activations.Relu6,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_1"
+            ),
+            Dense(
+                outputSize = 32,
+                activation = Activations.Swish,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_2"
+            ),
+            Dense(
+                outputSize = 32,
+                activation = Activations.SoftPlus,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_3"
+            ),
+            Dense(
+                outputSize = 32,
+                activation = Activations.HardSigmoid,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_4"
+            ),
+            Dense(
+                outputSize = 32,
+                activation = Activations.LogSoftmax,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_5"
+            ),
+            Dense(
+                outputSize = 32,
+                activation = Activations.Exponential,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_6"
+            ),
+            Dense(
+                outputSize = 10,
+                activation = Activations.Linear,
+                kernelInitializer = HeNormal(),
+                biasInitializer = HeNormal(),
+                name = "dense_7"
+            )
+        )
+
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            AMOUNT_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
+
+        testModel.use {
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
+
+            it.summary()
+
+            val trainingHistory =
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+            assertEquals(trainingHistory.batchHistory.size, 60)
+            assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
+            assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
+            assertTrue(trainingHistory.batchHistory[0].lossValue > 100.0f)
+            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+
+            // Evaluation testing
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.05)
+            }
+        }
+
+    }
+
+
+    @Test
     fun incorrectAmountOfClassesInTheLastDenseLayer() {
         val testModelWithSmallAmountOfClasses = Sequential.of(
             Input(

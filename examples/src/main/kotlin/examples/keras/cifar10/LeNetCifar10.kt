@@ -7,9 +7,7 @@ package examples.keras.cifar10
 
 import api.core.Sequential
 import api.core.activation.Activations
-import api.core.initializer.Constant
 import api.core.initializer.HeNormal
-import api.core.initializer.Zeros
 import api.core.layer.Dense
 import api.core.layer.Flatten
 import api.core.layer.Input
@@ -21,14 +19,12 @@ import api.core.metric.Metrics
 import api.core.optimizer.Adam
 import datasets.Dataset
 
-private const val LEARNING_RATE = 0.1f
 private const val EPOCHS = 20
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 32L
-private const val VALIDATION_RATE = 0.75
 private const val SEED = 12L
 
 private val model = Sequential.of(
@@ -39,11 +35,11 @@ private val model = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(5, 5),
+        kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -52,11 +48,11 @@ private val model = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(5, 5),
+        kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Zeros(),
+        biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -65,16 +61,22 @@ private val model = Sequential.of(
     ),
     Flatten(), // 3136
     Dense(
-        outputSize = 512,
+        outputSize = 256,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = HeNormal(SEED)
+    ),
+    Dense(
+        outputSize = 64,
+        activation = Activations.Relu,
+        kernelInitializer = HeNormal(SEED),
+        biasInitializer = HeNormal(SEED)
     ),
     Dense(
         outputSize = NUM_LABELS,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Constant(0.1f)
+        biasInitializer = HeNormal(SEED)
     )
 )
 
@@ -87,7 +89,7 @@ fun main() {
         ::extractCifar10Labels
     )
 
-    val (train, test) = dataset.split(VALIDATION_RATE)
+    val (train, test) = dataset.split(0.95)
 
     model.use {
         it.compile(
@@ -95,6 +97,8 @@ fun main() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+
+        it.summary()
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 

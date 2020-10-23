@@ -7,9 +7,9 @@ package api.core.layer
 
 import api.core.KGraph
 import api.core.activation.Activations
-import api.core.initializer.GlorotUniform
+import api.core.initializer.HeNormal
+import api.core.initializer.HeUniform
 import api.core.initializer.Initializer
-import api.core.initializer.Zeros
 import api.core.shape.TensorShape
 import api.core.shape.numElementsInShape
 import api.core.shape.shapeToLongArray
@@ -41,8 +41,8 @@ private const val BIAS = "dense_bias"
 public class Dense(
     public val outputSize: Int = 128,
     public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = GlorotUniform(),
-    public val biasInitializer: Initializer = Zeros(),
+    public val kernelInitializer: Initializer = HeNormal(),
+    public val biasInitializer: Initializer = HeUniform(),
     name: String = ""
 ) : Layer(name) {
     private lateinit var kernelShape: Shape

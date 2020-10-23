@@ -7,9 +7,9 @@ package api.core.layer.twodim
 
 import api.core.KGraph
 import api.core.activation.Activations
-import api.core.initializer.GlorotUniform
+import api.core.initializer.HeNormal
+import api.core.initializer.HeUniform
 import api.core.initializer.Initializer
-import api.core.initializer.Zeros
 import api.core.layer.Layer
 import api.core.shape.convOutputLength
 import api.core.shape.numElementsInShape
@@ -72,8 +72,8 @@ public class Conv2D(
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),
     public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = GlorotUniform(),
-    public val biasInitializer: Initializer = Zeros(),
+    public val kernelInitializer: Initializer = HeNormal(),
+    public val biasInitializer: Initializer = HeUniform(),
     public val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
 ) : Layer(name) {
