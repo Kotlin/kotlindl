@@ -4,26 +4,28 @@ This tutorial does not require any previous experience with Deep Learning.
 
 ## Image Classification
 
-For the purposes of this tutorial, we'll be using the [Fashion-MNIST dataset|https://github.com/zalandoresearch/fashion-mnist] 
+For the purposes of this tutorial, we'll be using the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist)
 which you can think of a "Hello World" dataset in Deep Learning. 
 This dataset contains 70000 images that represent 10 different categories of clothing items. 
 Each example is a 28x28 grayscale image, associated with a single label from 10 classes. Here are the labels and how 
 they map to actual classes: 
 
-|| Label || Class ||
-| 0 | T-shirt/top |
-| 1 | Trouser |
-| 2 | Pullover |
-| 3 | Dress |
-| 4 | Coat |
-| 5 | Sandal |
-| 6 | Shirt |
-| 7 | Sneaker |
-| 8 | Bag |
-| 9 | Ankle boot |
- 
+| Label        | Class           | 
+| ------------- |:-------------:| 
+| 0      | T-shirt/top | 
+| 1      | Trouser |
+| 2      | Pullover |
+| 3      | Dress |
+| 4      | Coat |
+| 5      | Sandal |
+| 6      | Shirt |
+| 7      | Sneaker |
+| 8      | Bag |
+| 9      | Ankle boot |
+
 And this is what the images themselves look like: 
 ![](images/fashion-mnist-sprite.png)
+
 In this tutorial we are going to build and train a neural network that will be able to classify images like these 
 into given categories. 
 
@@ -113,4 +115,4 @@ INFO  api.core.Sequential - ====================================================
 Great! You have defined the structure of your first neural network, what optimization algorithm will be used during its training, 
 and what you are optimizing for. 
 
-In the next tutorial, you'll learn how you can train this model on the [Fashion-MNIST dataset|https://github.com/zalandoresearch/fashion-mnist].  
+In the next tutorial, you'll learn how you can train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).  
