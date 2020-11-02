@@ -57,7 +57,7 @@ public class LeNetClassic {
                 new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
         )) {
 
-            Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());
+            Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY, new Callback());
             lenet5Classic.summary(30, 26);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, true);

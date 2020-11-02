@@ -18,6 +18,7 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyAdam
 import java.util.*
 
 private const val FIRST_MOMENT = "m"
@@ -40,7 +41,7 @@ private val SECOND_BETA_POWER_NAME = defaultOptimizerVariableName("beta2_power")
  *
  *
  * @property [learningRate] Float >= 0. Initial learning rate.
- * @property [beta1] 0 < beta < 1. Generally close to 1.
+ * @property [beta1] 0 < beta < 1. Generally close to 1. Known as momentum decay.
  * @property [beta2] 0 < beta < 1. Generally close to 1.
  * @property [epsilon] Float >= 0. Fuzz factor.
  */
@@ -49,6 +50,7 @@ public class Adam(
     private val beta1: Float = 0.9f,
     private val beta2: Float = 0.999f,
     private val epsilon: Float = 1e-07f,
+    private val useNesterov: Boolean = false,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
@@ -99,7 +101,8 @@ public class Adam(
                     betaOneConst,
                     betaTwoConst,
                     epsilonConstant,
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyAdam.useNesterov(useNesterov)
                 )
             )
         }
