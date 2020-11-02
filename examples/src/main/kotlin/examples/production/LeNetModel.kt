@@ -17,7 +17,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.NUMBER_OF_CLASSES
-import org.tensorflow.Tensor
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -92,10 +91,10 @@ fun getLabel(dataset: Dataset, imageId: Int): Int {
     return imageLabel.indexOfFirst { it == imageLabel.maxOrNull()!! }
 }
 
-fun mnistReshape(image: FloatArray): Tensor<*> {
+fun mnistReshape(image: FloatArray): Array<Array<Array<FloatArray>>> {
     val reshaped = Array(
         1
     ) { Array(28) { Array(28) { FloatArray(1) } } }
     for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
-    return Tensor.create(reshaped)
+    return reshaped
 }

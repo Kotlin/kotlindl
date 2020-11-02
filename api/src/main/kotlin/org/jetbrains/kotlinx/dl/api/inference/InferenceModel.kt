@@ -48,7 +48,7 @@ public open class InferenceModel : AutoCloseable {
     protected var output: Output = Output.ARGMAX
 
     /** Function for conversion from flat float array to input tensor. */
-    protected lateinit var reshapeFunction: (FloatArray) -> Tensor<*>
+    protected lateinit var reshapeFunction: (FloatArray) -> Array<*>
 
     /** Is true when model is initialized. */
     public var isModelInitialized: Boolean = false
@@ -102,15 +102,19 @@ public open class InferenceModel : AutoCloseable {
         require(::reshapeFunction.isInitialized) { "Reshape functions is missed!" }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
-        reshapeFunction(inputData).use { tensor ->
+        val preparedData = reshapeFunction(inputData)
+        val tensor = Tensor.create(preparedData)
+
+        tensor.use {
             val runner = session.runner()
 
-            val result = runner.feed(DATA_PLACEHOLDER, tensor)
+            val result = runner.feed(DATA_PLACEHOLDER, it)
                 .fetch(output.tfName)
                 .run()[0]
 
             return result.copyTo(LongArray(1))[0].toInt()
         }
+
     }
 
     /**
@@ -128,9 +132,12 @@ public open class InferenceModel : AutoCloseable {
 
         require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
 
-        reshapeFunction(inputData).use { tensor ->
+        val preparedData = reshapeFunction(inputData)
+        val tensor = Tensor.create(preparedData)
+
+        tensor.use {
             val runner1 = session.runner()
-            val result1 = runner1.feed(DATA_PLACEHOLDER, tensor)
+            val result1 = runner1.feed(DATA_PLACEHOLDER, it)
                 .fetch(fetchTensorName)
                 .run()[0]
 
@@ -158,9 +165,9 @@ public open class InferenceModel : AutoCloseable {
     /**
      * Chain-like setter to set up [reshapeFunction] function.
      *
-     * @param reshapeFunction The approach to convert raw input data to Tensor.
+     * @param reshapeFunction The approach to convert raw input data to multidimensional array of floats.
      */
-    public fun reshape(reshapeFunction: (FloatArray) -> Tensor<*>) {
+    public fun reshape(reshapeFunction: (FloatArray) -> Array<*>) {
         this.reshapeFunction = reshapeFunction
     }
 

@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.tensorflow.SavedModelBundle
+import org.tensorflow.Tensor
 
 /**
  * Inference model built on SavedModelBundle format to predict on images.
@@ -37,9 +38,12 @@ public open class SavedModel : InferenceModel() {
     override fun predict(inputData: FloatArray): Int {
         require(reshapeFunction != null) { "Reshape functions is missed!" }
 
-        reshapeFunction(inputData).use { tensor ->
+        val preparedData = reshapeFunction(inputData)
+        val tensor = Tensor.create(preparedData)
+
+        tensor.use {
             val runner = session.runner()
-            return runner.feed(input.tfName, tensor)
+            return runner.feed(input.tfName, it)
                 .fetch(output.tfName)
                 .run()[0]
                 .copyTo(LongArray(1))[0].toInt()
@@ -57,9 +61,12 @@ public open class SavedModel : InferenceModel() {
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         require(reshapeFunction != null) { "Reshape functions is missed!" }
 
-        reshapeFunction(inputData).use { tensor ->
+        val preparedData = reshapeFunction(inputData)
+        val tensor = Tensor.create(preparedData)
+
+        tensor.use {
             val runner = session.runner()
-            return runner.feed(inputTensorName, tensor)
+            return runner.feed(inputTensorName, it)
                 .fetch(outputTensorName)
                 .run()[0]
                 .copyTo(LongArray(1))[0].toInt()

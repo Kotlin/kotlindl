@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
-import org.tensorflow.Tensor
 
 private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
 
@@ -45,10 +44,10 @@ fun main() {
     }
 }
 
-fun reshapeInput(inputData: FloatArray): Tensor<*> {
+fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
     val reshaped = Array(
         1
     ) { Array(28) { FloatArray(28) } }
     for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-    return Tensor.create(reshaped)
+    return reshaped
 }

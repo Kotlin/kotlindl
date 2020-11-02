@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.tensorflow.Tensor
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Path
@@ -107,12 +106,12 @@ class InferenceModelTest {
         )
     )
 
-    private fun mnistReshape(image: FloatArray): Tensor<*> {
+    private fun mnistReshape(image: FloatArray): Array<Array<Array<FloatArray>>> {
         val reshaped = Array(
             1
         ) { Array(28) { Array(28) { FloatArray(1) } } }
         for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
-        return Tensor.create(reshaped)
+        return reshaped
     }
 
     @Test

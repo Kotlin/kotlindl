@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.tensorflow.Tensor
 
 class SavedModelTest {
     @Test
@@ -51,12 +50,12 @@ class SavedModelTest {
         }
     }
 
-    fun reshapeInput(inputData: FloatArray): Tensor<*> {
+    fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
         val reshaped = Array(
             1
         ) { Array(28) { FloatArray(28) } }
         for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-        return Tensor.create(reshaped)
+        return reshaped
     }
 }
 
