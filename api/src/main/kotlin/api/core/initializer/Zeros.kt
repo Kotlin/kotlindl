@@ -24,4 +24,8 @@ public class Zeros : Initializer() {
     ): Operand<Float> {
         return tf.withName(name).zeros(shape, getDType())
     }
+
+    override fun toString(): String {
+        return "Zeros()"
+    }
 }

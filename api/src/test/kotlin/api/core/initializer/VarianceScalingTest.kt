@@ -7,6 +7,7 @@ package api.core.initializer
 
 import api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -47,6 +48,44 @@ internal class VarianceScalingTest {
                 expected[1],
                 actual[1],
                 EPS
+            )
+        }
+    }
+
+    @Test
+    fun alternativeConfig() {
+        val actual = Array(2) { FloatArray(2) { 0f } }
+        val expected = Array(2) { FloatArray(2) { 0f } }
+        expected[0][0] = 0.2947869f
+        expected[0][1] = -0.09475749f
+        expected[1][0] = 0.079441115f
+        expected[1][1] = -0.47924072f
+
+        val shape = Shape.make(2, 2)
+
+        EagerSession.create().use { session ->
+            val tf = Ops.create(session)
+            val instance =
+                VarianceScaling(seed = SEED, distribution = Distribution.UNTRUNCATED_NORMAL, mode = Mode.FAN_OUT)
+            val operand =
+                instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), DEFAULT_LAYER_NAME)
+            operand.asOutput().tensor().copyTo(actual)
+
+            assertArrayEquals(
+                expected[0],
+                actual[0],
+                EPS
+            )
+
+            assertArrayEquals(
+                expected[1],
+                actual[1],
+                EPS
+            )
+
+            assertEquals(
+                "VarianceScaling(scale=1.0, mode=FAN_OUT, distribution=UNTRUNCATED_NORMAL, seed=12)",
+                instance.toString()
             )
         }
     }

@@ -7,6 +7,7 @@ package api.core.initializer
 
 import api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -47,6 +48,11 @@ internal class RandomNormalTest {
                 expected[1],
                 actual[1],
                 EPS
+            )
+
+            assertEquals(
+                "RandomNormal(mean=0.0, stdev=1.0, seed=12)",
+                instance.toString()
             )
         }
     }

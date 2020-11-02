@@ -20,6 +20,8 @@ import org.tensorflow.op.random.RandomUniform
  * The units that are kept are scaled by `1 / (1 - rate)`, so that their
  * sum is unchanged at training time and inference time.
  *
+ * NOTE: Import and export for this layer is not supported yet.
+ *
  * @property keepProbability The dropout rate, between 0 and 1. E.g. `rate=0.1` would drop out 10% of input units.
  * @property [name] Custom layer name.
  * @constructor Creates [Dropout] object.

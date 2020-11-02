@@ -9,8 +9,10 @@ import api.core.Sequential
 import api.core.activation.Activations
 import api.core.initializer.*
 import api.core.layer.Dense
+import api.core.layer.Dropout
 import api.core.layer.Flatten
 import api.core.layer.Input
+import api.core.layer.twodim.AvgPool2D
 import api.core.layer.twodim.Conv2D
 import api.core.layer.twodim.ConvPadding
 import api.core.layer.twodim.MaxPool2D
@@ -513,6 +515,92 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     }
 
+    @Test
+    fun rarelyUsedBuildingBlocks() {
+        val testModel = Sequential.of(
+            Input(
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            ),
+            Conv2D(
+                filters = 32,
+                kernelInitializer = HeNormal(13L),
+                biasInitializer = HeNormal(13L),
+                padding = ConvPadding.VALID,
+                name = "conv2d_1"
+            ),
+            AvgPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+                name = "avgPool_1"
+            ),
+            Conv2D(
+                filters = 64,
+                kernelInitializer = GlorotNormal(13L),
+                biasInitializer = GlorotUniform(13L),
+                padding = ConvPadding.SAME,
+                name = "conv2d_2"
+            ),
+            AvgPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1),
+                name = "maxPool_2"
+            ),
+            Flatten(name = "flatten_1"), // 3136
+            Dense(
+                outputSize = 64,
+                kernelInitializer = LeCunNormal(13L),
+                biasInitializer = LeCunUniform(13L),
+                name = "dense_1"
+            ),
+            Dropout(
+                keepProbability = 0.3f,
+                seed = 13L,
+                name = "dropout_1"
+            ),
+            Dense(
+                outputSize = 32,
+                name = "dense_2"
+            ),
+            Dense(
+                outputSize = 10,
+                activation = Activations.Linear,
+                name = "dense_3"
+            )
+        )
+
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            AMOUNT_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
+
+        testModel.use {
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
+
+            it.summary()
+
+            val trainingHistory =
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+            assertEquals(trainingHistory.batchHistory.size, 60)
+            assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
+            assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
+
+            // Evaluation testing
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.05)
+            }
+        }
+
+    }
 
     @Test
     fun incorrectAmountOfClassesInTheLastDenseLayer() {

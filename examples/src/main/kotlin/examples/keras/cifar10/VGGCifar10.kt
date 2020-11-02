@@ -38,6 +38,37 @@ private val vgg11 = Sequential.of(
         NUM_CHANNELS
     ),
     Conv2D(
+        filters = 16,
+        kernelSize = longArrayOf(3, 3),
+        strides = longArrayOf(1, 1, 1, 1),
+        activation = Activations.Elu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
+        padding = ConvPadding.SAME
+    ),
+    Conv2D(
+        filters = 16,
+        kernelSize = longArrayOf(3, 3),
+        strides = longArrayOf(1, 1, 1, 1),
+        activation = Activations.Elu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
+        padding = ConvPadding.SAME
+    ),
+    MaxPool2D(
+        poolSize = intArrayOf(1, 2, 2, 1),
+        strides = intArrayOf(1, 2, 2, 1)
+    ),
+    Conv2D(
+        filters = 32,
+        kernelSize = longArrayOf(3, 3),
+        strides = longArrayOf(1, 1, 1, 1),
+        activation = Activations.Elu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
+        padding = ConvPadding.SAME
+    ),
+    Conv2D(
         filters = 32,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
@@ -59,21 +90,8 @@ private val vgg11 = Sequential.of(
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
-    MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
-    ),
     Conv2D(
-        filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Elu,
-        kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
-        padding = ConvPadding.SAME
-    ),
-    Conv2D(
-        filters = 128,
+        filters = 64,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
@@ -86,7 +104,7 @@ private val vgg11 = Sequential.of(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Conv2D(
-        filters = 256,
+        filters = 64,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
@@ -95,7 +113,7 @@ private val vgg11 = Sequential.of(
         padding = ConvPadding.SAME
     ),
     Conv2D(
-        filters = 256,
+        filters = 64,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
@@ -108,7 +126,7 @@ private val vgg11 = Sequential.of(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Conv2D(
-        filters = 128,
+        filters = 64,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
@@ -117,7 +135,7 @@ private val vgg11 = Sequential.of(
         padding = ConvPadding.SAME
     ),
     Conv2D(
-        filters = 128,
+        filters = 64,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
@@ -131,13 +149,19 @@ private val vgg11 = Sequential.of(
     ),*/
     Flatten(),
     Dense(
-        outputSize = 4096,
+        outputSize = 512,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform()
     ),
     Dense(
-        outputSize = 512,
+        outputSize = 256,
+        activation = Activations.Relu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeUniform()
+    ),
+    Dense(
+        outputSize = 32,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform()

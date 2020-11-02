@@ -13,7 +13,7 @@ import datasets.Dataset
 import datasets.handlers.*
 import org.tensorflow.Tensor
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/savedmodel"
+private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(

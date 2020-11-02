@@ -162,13 +162,6 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     }
 
     /**
-     * Returns all variables used in optimizer and initialized by AssignAdd TensorFlow operand.
-     */
-    public fun optimizerVariablesForAssignAddInitializer(): List<Variable<Long>> {
-        return optimizerVariablesForAssignAddInitializer().toList()
-    }
-
-    /**
      * Initializes TensorFlow graph variables used in model layers.
      */
     public fun initializeGraphVariables(session: Session) {

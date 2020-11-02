@@ -7,6 +7,7 @@ package api.core.initializer
 
 import api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -40,6 +41,11 @@ internal class OnesTest {
                 expected[1],
                 actual[1],
                 EPS
+            )
+
+            assertEquals(
+                "Ones()",
+                instance.toString()
             )
         }
     }

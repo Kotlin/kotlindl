@@ -7,6 +7,7 @@ package api.core.initializer
 
 import api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -48,6 +49,11 @@ internal class ParametrizedRandomNormalTest {
                 expected[1],
                 actual[1],
                 EPS
+            )
+
+            assertEquals(
+                "ParametrizedTruncatedNormal(mean=0.0, stdev=3.0, p1=-4.0, p2=4.0, seed=12)",
+                instance.toString()
             )
         }
     }

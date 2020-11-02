@@ -7,6 +7,7 @@ package api.core.initializer
 
 import api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -47,6 +48,11 @@ internal class LeCunUniformTest {
                 expected[1],
                 actual[1],
                 EPS
+            )
+
+            assertEquals(
+                "LeCunUniform(seed=12) VarianceScaling(scale=1.0, mode=FAN_IN, distribution=UNIFORM, seed=12)",
+                instance.toString()
             )
         }
     }
