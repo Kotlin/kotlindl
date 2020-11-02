@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStopping
 import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStoppingMode
+import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
@@ -100,10 +101,14 @@ fun main() {
     )
 
     lenet5Classic.use {
-        val earlyStopping = EarlyStopping().setUp(
-            monitor = "valLoss", // TODO: could be complex dsl with a few fields of EpochTrainingEvent
-            minDelta = 0.0, patience = 2, verbose = true, mode = EarlyStoppingMode.AUTO,
-            baseline = 0.1, restoreBestWeights = false
+        val earlyStopping = EarlyStopping(
+            monitor = EpochTrainingEvent::valLossValue,
+            minDelta = 0.0,
+            patience = 2,
+            verbose = true,
+            mode = EarlyStoppingMode.AUTO,
+            baseline = 0.1,
+            restoreBestWeights = false
         )
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),

@@ -8,9 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.callback
 import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
 import java.util.function.BiFunction
-import java.util.logging.Level
-import java.util.logging.Logger
-import kotlin.math.abs
+import kotlin.reflect.KProperty1
 
 /**
  * This enum describes a few strategies of training stopping.
@@ -47,91 +45,47 @@ public enum class EarlyStoppingMode {
  *
  * The quantity to be monitored needs to be available in `logs`.
  * To make it so, pass the loss or metrics at `model.compile()`.
+ *
+ * @property [monitor] Quantity to be monitored.
+ * @property [minDelta] Minimum change in the monitored quantity to qualify as an
+ * improvement, i.e. an absolute change of less than min_delta, will count
+ * as no improvement.
+ * @property [patience] Number of epochs with no improvement after which training
+ * will be stopped.
+ * @property [verbose] Verbosity mode.
+ * @property [mode] One of {"auto", "min", "max"}. In min mode, training will stop when the quantity monitored
+ * has stopped decreasing; in max mode it will stop when the quantity
+ * monitored has stopped increasing; in auto mode, the direction is
+ * automatically inferred from the name of the monitored quantity.
+ * @property [baseline] Baseline value for the monitored quantity. Training will
+ * stop if the model doesn't show improvement over the baseline.
+ * @property [restoreBestWeights] Whether to restore model weights from the epoch
+ * with the best value of the monitored quantity. If false, the model
+ * weights obtained at the last step of training are used.
+ *
+ * @constructor Creates an EarlyStopping Callback.
  */
-public class EarlyStopping : Callback() {
+public class EarlyStopping(
+    private var monitor: KProperty1<EpochTrainingEvent, Double?> = EpochTrainingEvent::lossValue,
+    private var minDelta: Double = 0.0,
+    private var patience: Int = 0,
+    private var verbose: Boolean = false,
+    private var mode: EarlyStoppingMode = EarlyStoppingMode.AUTO,
+    private var baseline: Double = 0.001,
+    private val restoreBestWeights: Boolean = false
+) : Callback() {
     private var wait = 0
+
     private var stoppedEpoch = 0
 
-    /**
-     * Quantity to be monitored. Default is "val_loss".
-     */
-    private var monitor: String = "val_loss"
-
-    /**
-     * Minimum change in the monitored quantity to qualify as an improvement,
-     * i.e. an absolute change of less than min_delta, will count as no
-     * improvement. Default is 0.
-     */
-    private var minDelta = 0.0
-
-    /**
-     * Number of epochs with no improvement after which training will be
-     * stopped. Default is 0.
-     */
-    private var patience = 0
-
-    /**
-     * verbosity mode. Default is false.
-     */
-    private var verbose = false
-
-    /**
-     * One of {"auto", "min", "max"}. In min mode, training will stop when the
-     * quantity monitored has stopped decreasing; in max mode it will stop when
-     * the quantity monitored has stopped increasing; in auto mode, the
-     * direction is automatically inferred from the name of the monitored
-     * quantity. Default is Mode.auto.
-     */
-    private var mode: EarlyStoppingMode = EarlyStoppingMode.AUTO
-
-    /**
-     * Baseline value for the monitored quantity. Training will stop if the
-     * model doesn't show improvement over the baseline.
-     */
-    private var baseline: Double = 0.001
-
-    /**
-     * Flag indicating whether to restore model weights from the epoch with the
-     * best value of the monitored quantity. If false (default), the model
-     * weights obtained at the last step of training are used.
-     */
-    private var restoreBestWeights = false
     private var best = 0.0
+
     private var monitorGreater = false
+
     private var monitorOp: BiFunction<Number, Number, Boolean>? = null
 
-    /**
-     * Create an EarlyStopping Callback
-     *
-     * @param monitor Quantity to be monitored.
-     * @param minDelta Minimum change in the monitored quantity to qualify as an
-     * improvement, i.e. an absolute change of less than min_delta, will count
-     * as no improvement.
-     * @param patience Number of epochs with no improvement after which training
-     * will be stopped.
-     * @param verbose verbosity mode.
-     * @param mode In min mode, training will stop when the quantity monitored
-     * has stopped decreasing; in max mode it will stop when the quantity
-     * monitored has stopped increasing; in auto mode, the direction is
-     * automatically inferred from the name of the monitored quantity.
-     * @param baseline Baseline value for the monitored quantity. Training will
-     * stop if the model doesn't show improvement over the baseline.
-     * @param restoreBestWeights Whether to restore model weights from the epoch
-     * with the best value of the monitored quantity. If false, the model
-     * weights obtained at the last step of training are used.
-     */
-    fun setUp(
-        monitor: String,
-        minDelta: Double, patience: Int, verbose: Boolean, mode: EarlyStoppingMode,
-        baseline: Double, restoreBestWeights: Boolean
-    ): EarlyStopping {
-        this.monitor = monitor
-        this.minDelta = abs(minDelta)
-        this.patience = patience
-        this.verbose = verbose
-        this.mode = mode
-        this.baseline = baseline
-        this.restoreBestWeights = restoreBestWeights
+    init {
+        require(minDelta >= 0.0 && baseline >= 0.0)
 
         when (mode) {
             EarlyStoppingMode.MIN -> {
@@ -144,18 +98,19 @@ public class EarlyStopping : Callback() {
                 monitorGreater = true
                 best = Double.MIN_VALUE
             }
-            else -> if (this.monitor == "acc") {
+            // If metric
+            else -> if (this.monitor == EpochTrainingEvent::metricValue || this.monitor == EpochTrainingEvent::valMetricValue) {
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MAX_VALUE
-            } else {
+            }
+            // If loss
+            else {
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() < b.toDouble() }
                 this.minDelta *= -1.0
                 best = Double.MIN_VALUE
             }
         }
-
-        return this
     }
 
     override fun onTrainBegin() {
@@ -180,10 +135,7 @@ public class EarlyStopping : Callback() {
                 this.model.stopTraining = true
                 if (restoreBestWeights) {
                     if (verbose) {
-                        Logger.getLogger(EarlyStopping::class.java.name).log(
-                            Level.INFO,
-                            "Restoring model weights from the end of the best epoch."
-                        )
+                        this.model.logger.info { "Restoring model weights from the end of the best epoch." }
                     }
                     // TODO this.model.setWeights(this.bestWeights)
                 }
@@ -199,8 +151,8 @@ public class EarlyStopping : Callback() {
         }
     }
 
-    private fun getMonitorValue(logs: EpochTrainingEvent, monitor: String): Number? {
-        val monitorValue = logs.lossValue // TODO: extract specific monitor metric instead default
+    private fun getMonitorValue(logs: EpochTrainingEvent, monitor: KProperty1<EpochTrainingEvent, Double?>): Number? {
+        val monitorValue = monitor.get(logs)
         if (monitorValue == null) {
             this.model.logger.warn {
                 "Early stopping conditioned on metric $monitor which is not available. Available metrics are: $logs"
