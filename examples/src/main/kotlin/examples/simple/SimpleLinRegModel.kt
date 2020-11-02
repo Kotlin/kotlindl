@@ -5,16 +5,16 @@
 
 package examples.simple
 
-import api.core.Sequential
-import api.core.activation.Activations
-import api.core.initializer.HeNormal
-import api.core.initializer.Zeros
-import api.core.layer.Dense
-import api.core.layer.Input
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.SGD
-import datasets.Dataset
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.Input
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.datasets.Dataset
 import kotlin.random.Random
 
 private const val SEED = 12L

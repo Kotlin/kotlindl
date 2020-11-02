@@ -6,8 +6,8 @@
 package examples.keras.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import datasets.Dataset
-import datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.awt.image.DataBufferByte
 import java.io.IOException
 import java.util.zip.ZipEntry

@@ -6,21 +6,21 @@
 package examples.inference.keras
 
 import LeNetClassic.SEED
-import api.core.Sequential
-import api.core.activation.Activations
-import api.core.initializer.HeNormal
-import api.core.layer.Dense
-import api.core.layer.Flatten
-import api.core.layer.Layer
-import api.core.layer.twodim.Conv2D
-import api.core.layer.twodim.MaxPool2D
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import api.inference.keras.loadWeightsForFrozenLayers
-import datasets.Dataset
-import datasets.handlers.*
 import io.jhdf.HdfFile
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.layer.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import java.io.File
 
 /**

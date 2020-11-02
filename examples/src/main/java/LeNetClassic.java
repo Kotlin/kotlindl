@@ -3,25 +3,25 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import api.core.Sequential;
-import api.core.activation.Activations;
-import api.core.callback.Callback;
-import api.core.initializer.Constant;
-import api.core.initializer.GlorotNormal;
-import api.core.initializer.Zeros;
-import api.core.layer.Dense;
-import api.core.layer.Flatten;
-import api.core.layer.Input;
-import api.core.layer.twodim.Conv2D;
-import api.core.layer.twodim.ConvPadding;
-import api.core.layer.twodim.MaxPool2D;
-import api.core.loss.SoftmaxCrossEntropyWithLogits;
-import api.core.metric.Metrics;
-import api.core.optimizer.Adam;
-import api.core.optimizer.NoClipGradient;
-import datasets.Dataset;
-import datasets.handlers.MnistUtilKt;
 import kotlin.Pair;
+import org.jetbrains.kotlinx.dl.api.core.Sequential;
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations;
+import org.jetbrains.kotlinx.dl.api.core.callback.Callback;
+import org.jetbrains.kotlinx.dl.api.core.initializer.Constant;
+import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal;
+import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros;
+import org.jetbrains.kotlinx.dl.api.core.layer.Dense;
+import org.jetbrains.kotlinx.dl.api.core.layer.Flatten;
+import org.jetbrains.kotlinx.dl.api.core.layer.Input;
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D;
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding;
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D;
+import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits;
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics;
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam;
+import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
+import org.jetbrains.kotlinx.dl.datasets.Dataset;
+import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
 
 public class LeNetClassic {
     public static final Integer EPOCHS = 3;
@@ -54,7 +54,7 @@ public class LeNetClassic {
                 new Flatten(), // 3136
                 new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
                 new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
-                new Dense(datasets.handlers.MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
+                new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
         )) {
 
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, new NoClipGradient());

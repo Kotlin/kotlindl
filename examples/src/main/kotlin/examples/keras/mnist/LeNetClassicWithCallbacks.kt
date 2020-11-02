@@ -5,25 +5,25 @@
 
 package examples.keras.mnist
 
-import api.core.Sequential
-import api.core.activation.Activations
-import api.core.callback.EarlyStopping
-import api.core.callback.EarlyStoppingMode
-import api.core.initializer.Constant
-import api.core.initializer.GlorotNormal
-import api.core.initializer.Zeros
-import api.core.layer.Dense
-import api.core.layer.Flatten
-import api.core.layer.Input
-import api.core.layer.twodim.AvgPool2D
-import api.core.layer.twodim.Conv2D
-import api.core.layer.twodim.ConvPadding
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import api.core.optimizer.ClipGradientByValue
-import datasets.Dataset
-import datasets.handlers.*
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStopping
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStoppingMode
+import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
+import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 1000

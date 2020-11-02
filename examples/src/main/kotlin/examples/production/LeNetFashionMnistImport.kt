@@ -5,9 +5,9 @@
 
 package examples.production
 
-import api.inference.InferenceModel
-import datasets.Dataset
-import datasets.handlers.*
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"

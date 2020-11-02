@@ -5,13 +5,13 @@
 
 package examples.inference.keras.demo
 
-import api.core.Sequential
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import api.inference.keras.loadWeights
-import datasets.Dataset
-import datasets.handlers.*
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(

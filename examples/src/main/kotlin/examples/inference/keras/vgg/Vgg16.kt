@@ -6,13 +6,13 @@
 package examples.inference.keras.vgg
 
 
-import api.core.Sequential
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import datasets.Dataset
-import datasets.image.ImageConverter
 import examples.production.drawActivations
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 
 /** Loads weights from .txt files especially prepared. */

@@ -5,10 +5,10 @@
 
 package examples.inference
 
-import datasets.Dataset
-import datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/savedmodel"
+private const val PATH_TO_MODEL = "api/src/main/resources/savedmodel"
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(

@@ -5,15 +5,15 @@
 
 package examples.inference.keras
 
-import api.core.Sequential
-import api.core.layer.twodim.Conv2D
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import api.inference.keras.loadWeights
-import datasets.Dataset
-import datasets.handlers.*
 import io.jhdf.HdfFile
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import java.io.File
 
 /** All weigths are loaded, Conv2D layers are freezed, Dense weights could be changed during the training. */

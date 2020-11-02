@@ -5,16 +5,16 @@
 
 package examples.production.optimizers
 
-import api.core.SavingFormat
-import api.core.Sequential
-import api.core.WritingMode
-import api.core.layer.twodim.Conv2D
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import datasets.Dataset
-import datasets.handlers.*
 import examples.production.lenet5
+import org.jetbrains.kotlinx.dl.api.core.SavingFormat
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.WritingMode
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5KerasWithOptimizers"

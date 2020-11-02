@@ -5,12 +5,12 @@
 
 package examples.inference
 
-import api.core.metric.Metrics
-import api.inference.savedmodel.Input
-import api.inference.savedmodel.Output
-import api.inference.savedmodel.SavedModel
-import datasets.Dataset
-import datasets.handlers.*
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
+import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
+import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.tensorflow.Tensor
 
 private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"

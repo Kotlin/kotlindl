@@ -6,14 +6,14 @@
 package examples.inference.keras.demo
 
 
-import api.core.Sequential
-import api.core.loss.Losses
-import api.core.metric.Metrics
-import api.core.optimizer.Adam
-import api.inference.keras.loadWeights
-import datasets.Dataset
-import datasets.image.ImageConverter
 import io.jhdf.HdfFile
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 
 fun main() {
