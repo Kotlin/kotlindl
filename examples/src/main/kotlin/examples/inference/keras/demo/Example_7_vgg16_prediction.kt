@@ -40,9 +40,7 @@ fun main() {
         val file = File(pathToWeights)
         val hdfFile = HdfFile(file)
 
-        val kernelDataPathTemplate = "/%s/%s_1/kernel:0"
-        val biasDataPathTemplate = "/%s/%s_1/bias:0"
-        it.loadWeights(hdfFile, kernelDataPathTemplate, biasDataPathTemplate)
+        it.loadWeights(hdfFile)
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")

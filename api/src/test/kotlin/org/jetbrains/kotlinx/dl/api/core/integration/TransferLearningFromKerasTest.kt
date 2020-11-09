@@ -18,6 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroup
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.junit.jupiter.api.Assertions.*
@@ -31,21 +32,48 @@ private const val pathToIncorrectConfig = "inference/lenet/unsupportedInitialize
 private val realPathToIncorrectConfig =
     TransferLearningTest::class.java.classLoader.getResource(pathToIncorrectConfig).path.toString()
 
+private const val pathToConfigWithWrongJSON = "inference/lenet/wrongJson/model.json"
+private val realPathToConfigWithWrongJSON =
+    TransferLearningTest::class.java.classLoader.getResource(pathToConfigWithWrongJSON).path.toString()
+
 private const val pathToWeights = "inference/lenet/mnist_weights_only.h5"
 private val realPathToWeights = TransferLearningTest::class.java.classLoader.getResource(pathToWeights).path.toString()
 
 class TransferLearningTest : IntegrationTest() {
     /** Loads configuration with default initializers for the last Dense layer from Keras. But Zeros initializer (default initializers for bias) is not supported yet. */
-    @Test
+    /*@Test
     fun loadIncorrectSequentialJSONConfig() {
         val jsonConfigFile = File(realPathToIncorrectConfig)
 
         val exception =
-            assertThrows(IllegalStateException::class.java) {
+            assertThrows(IllegalArgumentException::class.java) {
                 Sequential.loadModelConfiguration(jsonConfigFile)
             }
         assertEquals(
             "Zeros is not supported yet!",
+            exception.message
+        )
+    }*/
+
+    /**
+     * This test covers the case, when Python Keras user saves JSON as a String.
+     *
+     * ```
+     * json_config = model.to_json()
+     *    with open('keras-cifar-10/model.json', 'w') as f:
+     *    json.dump(json_config, f)
+     * ```
+     */
+    @Test
+    fun loadSequentialJSONConfigWithUnsupportedJSONFormat() {
+        val jsonConfigFile = File(realPathToConfigWithWrongJSON)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                Sequential.loadModelConfiguration(jsonConfigFile)
+            }
+        assertEquals(
+            "JSON file: model.json contains invalid JSON. The model configuration could not be loaded from this file.",
             exception.message
         )
     }
@@ -184,6 +212,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
+        recursivePrintGroup(hdfFile, hdfFile, 0)
 
         testModel.use {
             it.compile(

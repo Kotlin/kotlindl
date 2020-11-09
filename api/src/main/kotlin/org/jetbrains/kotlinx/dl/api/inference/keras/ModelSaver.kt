@@ -12,7 +12,9 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
@@ -50,6 +52,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean): 
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
+        AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
         Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
         else -> throw IllegalStateException("${layer.name} is not supported yet!")
     }
@@ -127,6 +130,14 @@ private fun convertMode(mode: Mode): String {
     }
 }
 
+private fun convertPadding(padding: ConvPadding): String {
+    return when (padding) {
+        ConvPadding.SAME -> "same"
+        ConvPadding.VALID -> "valid"
+        ConvPadding.FULL -> "full"
+    }
+}
+
 private fun convertToKerasActivation(activation: Activations): String? {
     return when (activation) {
         Activations.Relu -> ACTIVATION_RELU
@@ -153,11 +164,25 @@ private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
-        padding = PADDING_SAME,
+        padding = convertPadding(layer.padding),
         pool_size = poolSize,
         strides = strides
     )
     return KerasLayer(class_name = LAYER_MAX_POOLING_2D, config = configX)
+}
+
+private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2])
+    val strides = mutableListOf(layer.strides[1], layer.strides[2])
+    val configX = LayerConfig(
+        data_format = CHANNELS_LAST,
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = convertPadding(layer.padding),
+        pool_size = poolSize,
+        strides = strides
+    )
+    return KerasLayer(class_name = LAYER_AVG_POOLING_2D, config = configX)
 }
 
 private fun createKerasFlatten(layer: Flatten): KerasLayer {
@@ -179,7 +204,7 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
-        padding = PADDING_SAME,
+        padding = convertPadding(layer.padding),
         name = layer.name,
         use_bias = true
     )

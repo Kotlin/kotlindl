@@ -48,14 +48,22 @@ internal fun loadModelConfiguration(
  * @return Pair of <input layer; list of layers>.
  */
 internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
-    val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-
-    val sequentialConfig = Klaxon()
-        .parse<KerasSequentialModel>(jsonString)
+    val sequentialConfig = try {
+        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
+        Klaxon()
+            .parse<KerasSequentialModel>(jsonString)
+    } catch (e: Exception) {
+        try {
+            Klaxon()
+                .parse<KerasSequentialModel>(jsonConfigFile)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
+        }
+    }
 
     val layers = mutableListOf<Layer>()
 
-    sequentialConfig!!.config!!.layers!!.forEach {
+    (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it)
@@ -115,7 +123,12 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_HE_UNIFORM -> HeUniform(seed = seed)
         INITIALIZER_LECUN_NORMAL -> LeCunNormal(seed = seed)
         INITIALIZER_LECUN_UNIFORM -> LeCunUniform(seed = seed)
-        /*INITIALIZER_ZEROS -> RandomUniform(
+        INITIALIZER_ZEROS -> RandomUniform(
+            seed = seed,
+            minVal = 0.0f,
+            maxVal = 0.0f
+        ) // instead of real initializers, because it doesn't influence on nothing
+        INITIALIZER_CONSTANT -> RandomUniform(
             seed = seed,
             minVal = 0.0f,
             maxVal = 0.0f
@@ -296,7 +309,7 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
-        padding = ConvPadding.SAME,
+        padding = convertPadding(config.padding!!),
         name = name
     )
 }

@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsViaPathTemplates
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
@@ -56,8 +56,7 @@ fun main() {
 
         val kernelDataPathTemplate = "/%s/%s_1/kernel:0"
         val biasDataPathTemplate = "/%s/%s_1/bias:0"
-        it.loadWeights(hdfFile, kernelDataPathTemplate, biasDataPathTemplate)
-
+        it.loadWeightsViaPathTemplates(hdfFile, kernelDataPathTemplate, biasDataPathTemplate)
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")

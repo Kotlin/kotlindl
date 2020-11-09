@@ -11,7 +11,7 @@ import io.jhdf.api.Group
 /**
  * Helper function to print out file in hdf5 format for debugging purposes.
  */
-internal fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
+public fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
     var level = level
     level++
 
@@ -36,7 +36,7 @@ internal fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
             val dims = arrayOf(dataset.dimensions)
             println(dims.contentDeepToString())
 
-            when (dataset.dimensions.size) {
+            /*when (dataset.dimensions.size) {
                 4 -> {
                     val data = dataset.data as Array<Array<Array<FloatArray>>>
                     println(data.contentDeepToString())
@@ -53,7 +53,7 @@ internal fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
                     val data = dataset.data as FloatArray
                     println(data.contentToString())
                 }
-            }
+            }*/
         }
     }
 }

@@ -117,6 +117,14 @@ public class Dense(
         return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
     }
 
+    public fun getKernelShape(): LongArray {
+        return TensorShape(kernelShape).dims()
+    }
+
+    public fun getBiasShape(): LongArray {
+        return TensorShape(biasShape).dims()
+    }
+
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"
     }

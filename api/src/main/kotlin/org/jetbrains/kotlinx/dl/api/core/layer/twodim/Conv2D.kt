@@ -11,10 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
-import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
+import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -166,6 +163,14 @@ public class Conv2D(
         result.add(dstData2)
 
         return result.toList()
+    }
+
+    public fun getKernelShape(): LongArray {
+        return TensorShape(kernelShape).dims()
+    }
+
+    public fun getBiasShape(): LongArray {
+        return TensorShape(biasShape).dims()
     }
 
     override fun hasActivation(): Boolean {
