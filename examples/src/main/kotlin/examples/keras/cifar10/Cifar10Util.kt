@@ -8,12 +8,10 @@ package examples.keras.cifar10
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
-import java.awt.image.DataBufferByte
+import java.io.File
 import java.io.IOException
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 
-const val IMAGES_ARCHIVE = "C:\\zaleslaw\\home\\data\\cifar10\\images.zip"
+const val IMAGES_ARCHIVE = "C:\\zaleslaw\\home\\data\\cifar10\\images\\images"
 const val LABELS_ARCHIVE = "C:\\zaleslaw\\home\\data\\cifar10\\trainLabels.csv"
 private const val DATASET_SIZE = 50000
 
@@ -34,25 +32,11 @@ private fun loadImagesFromZipArchive(
     archiveName: String
 ): Array<FloatArray> {
     val images = Array(subDatasetSize) { FloatArray(numOfPixels) }
-    val zipFile = ZipFile(archiveName)
-    val entries = zipFile.entries()
 
-    var cnt = 0
-
-    while (entries.hasMoreElements()) {
-        val entry = entries.nextElement() as ZipEntry
-        val image = ImageConverter.getImage(zipFile.getInputStream(entry))
-
-        val pixels = (image.raster.dataBuffer as DataBufferByte).data
-
-        images[cnt] =
-            Dataset.toNormalizedVector(
-                pixels
-            )
-        cnt++
+    for (i in 1..50000) {
+        images[i - 1] = ImageConverter.toNormalizedFloatArray(File("$archiveName\\$i.png"))
     }
 
-    zipFile.close()
     return images
 }
 
@@ -63,7 +47,13 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
     val labelBuffer = ByteArray(labelCount)
 
     val dictionary = mapOf(
-        "airplane" to 0, "automobile" to 1, "bird" to 2, "cat" to 3, "deer" to 4, "dog" to 5, "frog" to 6,
+        "airplane" to 0,
+        "automobile" to 1,
+        "bird" to 2,
+        "cat" to 3,
+        "deer" to 4,
+        "dog" to 5,
+        "frog" to 6,
         "horse" to 7,
         "ship" to 8,
         "truck" to 9

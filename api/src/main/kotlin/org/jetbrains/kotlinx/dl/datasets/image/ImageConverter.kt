@@ -18,37 +18,54 @@ import javax.imageio.ImageIO
 public class ImageConverter {
     public companion object {
         /** All pixels has values in range [0; 255]. */
-        public fun toRawFloatArray(inputStream: InputStream, imageType: ImageType = ImageType.JPG): FloatArray {
+        public fun toRawFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
             return Dataset.toRawVector(
-                toRawPixels(inputStream)
+                toRawPixels(inputStream, colorOrder)
             )
         }
 
         /** All pixels has values in range [0; 255]. */
-        public fun toRawFloatArray(imageFile: File, imageType: ImageType = ImageType.JPG): FloatArray {
+        public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
             return Dataset.toRawVector(
-                toRawPixels(imageFile.inputStream())
+                toRawPixels(imageFile.inputStream(), colorOrder)
             )
         }
 
         /** All pixels in range [0;1) */
-        public fun toNormalizedFloatArray(inputStream: InputStream, imageType: ImageType = ImageType.JPG): FloatArray {
+        public fun toNormalizedFloatArray(
+            inputStream: InputStream,
+            colorOrder: ColorOrder = ColorOrder.BGR
+        ): FloatArray {
             return Dataset.toNormalizedVector(
-                toRawPixels(inputStream)
+                toRawPixels(inputStream, colorOrder)
             )
         }
 
         /** All pixels in range [0;1) */
-        public fun toNormalizedFloatArray(imageFile: File, imageType: ImageType = ImageType.JPG): FloatArray {
+        public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
             return Dataset.toNormalizedVector(
-                toRawPixels(imageFile.inputStream())
+                toRawPixels(imageFile.inputStream(), colorOrder)
             )
         }
 
-        private fun toRawPixels(inputStream: InputStream): ByteArray {
+        public fun toRawPixels(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): ByteArray {
             val image = getImage(inputStream)
 
-            return (image.raster.dataBuffer as DataBufferByte).data // pixels
+            return imageToByteArray(image, colorOrder)
+        }
+
+        private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
+            val res = (image.raster.dataBuffer as DataBufferByte).data // pixels
+            if (colorOrder == ColorOrder.BGR) {
+                for (i in res.indices) {
+                    if (i % 3 == 2) { // swap i and i-2 elements from BGR to RGB
+                        val tmp = res[i]
+                        res[i] = res[i - 2]
+                        res[i - 2] = tmp
+                    }
+                }
+            }
+            return res
         }
 
         /**
@@ -64,14 +81,7 @@ public class ImageConverter {
     }
 }
 
-/** */
-public enum class ImageType {
-    /** */
-    JPG,
-
-    /** */
-    PNG,
-
-    /** */
-    GIF
+public enum class ColorOrder {
+    RGB,
+    BGR
 }
