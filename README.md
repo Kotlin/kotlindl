@@ -1,3 +1,5 @@
+# KotlinDL: High-level Deep Learning API in Kotlin
+
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). Under the 
  hood it is using TensorFlow Java API. 
 KotlinDL offers simple APIs for training deep learning models from scratch, importing existing Keras models 
@@ -5,6 +7,8 @@ for inference, and leveraging transfer learning for tweaking existing pre-traine
 
 This project aims to make Deep Learning easier for JVM developers, and to simplify deploying deep learning models
  in JVM production environments. 
+ 
+ Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
 ```kotlin
 private val lenet5Classic = Sequential.of<Float>(
