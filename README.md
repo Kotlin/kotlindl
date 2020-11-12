@@ -11,7 +11,14 @@ This project aims to make Deep Learning easier for JVM developers, and to simpli
  Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
 ```kotlin
-private val lenet5Classic = Sequential.of<Float>(
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 1000
+private const val NUM_CHANNELS = 1L
+private const val IMAGE_SIZE = 28L
+private const val SEED = 12L
+private const val TEST_BATCH_SIZE = 1000
+
+private val lenet5Classic = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
@@ -59,7 +66,7 @@ private val lenet5Classic = Sequential.of<Float>(
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = AMOUNT_OF_CLASSES,
+        outputSize = NUMBER_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
@@ -67,18 +74,22 @@ private val lenet5Classic = Sequential.of<Float>(
 )
 
 fun main() {
-    val (train, test) = ImageDataset.createTrainAndTestDatasets(
+    val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
         TRAIN_LABELS_ARCHIVE,
         TEST_IMAGES_ARCHIVE,
         TEST_LABELS_ARCHIVE,
-        AMOUNT_OF_CLASSES,
+        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
 
     lenet5Classic.use {
-        it.compile(optimizer = Adam(), loss = LossFunctions.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS)
+        it.compile(
+            optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
 
         it.summary()
 

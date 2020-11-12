@@ -20,40 +20,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
 
-/**
- * Loads weights from hdf5 file created in Keras TensorFlow framework.
- *
- * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
- * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
- * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
- */
-public fun Sequential.loadWeightsViaPathTemplates(
-    hdfFile: HdfFile,
-    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
-) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.debug { "Starting weights loading.." }
-    this.layers.forEach {
-        run {
-            when (it::class) {
-                Dense::class -> fillDenseVariables(it.name, hdfFile, this, kernelDataPathTemplate, biasDataPathTemplate)
-                Conv2D::class -> fillConv2DVariables(
-                    it.name,
-                    hdfFile,
-                    this,
-                    kernelDataPathTemplate,
-                    biasDataPathTemplate
-                )
-                else -> println("No weights loading for ${it.name}")
-            }
-            this.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
-        }
-    }
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
-}
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
@@ -131,11 +97,17 @@ public fun Sequential.loadWeightsForFrozenLayers(
 }
 
 private fun loadWeightsFromHdf5Group(group: Group, model: Sequential, layerList: MutableList<Layer>?) {
-    if (group.attributes.containsKey("keras_version") && (group.attributes["keras_version"]!!.data as String).startsWith(
-            "1"
-        )
+    var originalKerasVersion = 1
+
+    if (group.attributes.containsKey("keras_version")) {
+        originalKerasVersion = (group.attributes["keras_version"]!!.data as String).toInt()
+    }
+    if (originalKerasVersion == 1
     ) {
-        throw UnsupportedOperationException("The weights loading from Keras 1.x is not supported!")
+        throw UnsupportedOperationException(
+            "The weights loading from Keras 1.x is not supported by default!" +
+                    "\nUse loadWeightsViaPathTemplates() method to make custom loading!"
+        )
     }
 
     if (layerList != null) {
@@ -209,9 +181,6 @@ private fun fillConv2DVariablesFromKeras(
         }
 
     }
-    // (group.children[name]!!.attributes["weight_names"]!!.data as Array<String>)[0]
-    /*val kernelData = group.getDatasetByPath("").data
-    val biasData = group.getDatasetByPath("").data*/
 }
 
 private fun fillDenseVariablesFromKeras(
@@ -252,6 +221,30 @@ private fun fillDenseVariablesFromKeras(
 }
 
 /**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework.
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
+ */
+public fun Sequential.loadWeightsByPathTemplates(
+    hdfFile: HdfFile,
+    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
+    this.logger.debug { "Starting weights loading.." }
+    this.layers.forEach {
+        run {
+            fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+        }
+    }
+    this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
+}
+
+/**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
  *
  * NOTE: Weights for another layers will not be loaded (should be initialized manually).
@@ -261,7 +254,7 @@ private fun fillDenseVariablesFromKeras(
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-public fun Sequential.loadWeights(
+public fun Sequential.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
     layerList: MutableList<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
@@ -273,24 +266,7 @@ public fun Sequential.loadWeights(
     this.layers.forEach {
         run {
             if (layerList.contains(it)) {
-                when (it::class) {
-                    Dense::class -> fillDenseVariables(
-                        it.name,
-                        hdfFile,
-                        this,
-                        kernelDataPathTemplate,
-                        biasDataPathTemplate
-                    )
-                    Conv2D::class -> fillConv2DVariables(
-                        it.name,
-                        hdfFile,
-                        this,
-                        kernelDataPathTemplate,
-                        biasDataPathTemplate
-                    )
-                    else -> println("No weights loading for ${it.name}")
-                }
-                this.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
             } else {
                 initLayerWeights(it, this)
             }
@@ -298,6 +274,33 @@ public fun Sequential.loadWeights(
     }
     this.logger.info { "Weights are loaded." }
     this.isModelInitialized = true
+}
+
+private fun fillLayerWeights(
+    it: Layer,
+    hdfFile: HdfFile,
+    kernelDataPathTemplate: String,
+    biasDataPathTemplate: String,
+    model: Sequential
+) {
+    when (it::class) {
+        Dense::class -> fillDenseVariables(
+            it.name,
+            hdfFile,
+            model,
+            kernelDataPathTemplate,
+            biasDataPathTemplate
+        )
+        Conv2D::class -> fillConv2DVariables(
+            it.name,
+            hdfFile,
+            model,
+            kernelDataPathTemplate,
+            biasDataPathTemplate
+        )
+        else -> println("No weights loading for ${it.name}")
+    }
+    model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
 }
 
 private fun initLayerWeights(it: Layer, model: Sequential) {
@@ -318,7 +321,7 @@ private fun initLayerWeights(it: Layer, model: Sequential) {
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-public fun Sequential.loadWeightsForFrozenLayers(
+public fun Sequential.loadWeightsForFrozenLayersByPathTemplates(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
@@ -327,7 +330,7 @@ public fun Sequential.loadWeightsForFrozenLayers(
     this.layers.forEach {
         if (!it.isTrainable) frozenLayers.add(it)
     }
-    this.loadWeights(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
+    this.loadWeightsByPathTemplates(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
 }
 
 private fun initConv2DVariablesByDefaultInitializer(name: String, model: Sequential) {
@@ -343,6 +346,87 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: Sequenti
     model.runAssignOpByVarName(kernelVariableName)
     model.runAssignOpByVarName(biasVariableName)
 }
+
+/**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework.
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [weightPaths] Fully-specified paths to kernel and bias weights of each layer.
+ *
+ * NOTE: Kernel and bias will be initialized by default initializers if they are missed in [weightPaths] object.
+ */
+public fun Sequential.loadWeightsByPaths(
+    hdfFile: HdfFile,
+    weightPaths: List<LayerKernelAndBiasPaths>
+) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
+    this.logger.debug { "Starting weights loading.." }
+    this.layers.forEach {
+        run {
+            val initializedLayerName = it.name
+            val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
+            if (layerWeightPaths != null) {
+                val kernelDataPathTemplate = layerWeightPaths.kernelPath
+                val biasDataPathTemplate = layerWeightPaths.biasPath
+                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+            } else {
+                this.logger.info { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
+                initLayerWeights(it, this)
+            }
+        }
+    }
+    this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
+}
+
+/**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
+ *
+ * NOTE: Weights for another layers will not be loaded (should be initialized manually).
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
+ */
+public fun Sequential.loadWeightsByPaths(
+    hdfFile: HdfFile,
+    layerList: MutableList<Layer>,
+    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+) {
+    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(!isModelInitialized) { "Model is initialized already!" }
+    this.logger.info { "Starting weights loading.." }
+    this.layers.forEach {
+        run {
+            if (layerList.contains(it)) {
+                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+            } else {
+                initLayerWeights(it, this)
+            }
+        }
+    }
+    this.logger.info { "Weights are loaded." }
+    this.isModelInitialized = true
+}
+
+/**
+ * Contains [layerName], [kernelPath], [biasPath] for specific layer, found in hdf5 file via
+ * ```
+ * recursivePrintGroupInHDF5File()
+ * ```
+ * function call.
+ */
+public data class LayerKernelAndBiasPaths(
+    /** */
+    public val layerName: String,
+    /** */
+    public val kernelPath: String,
+    /** */
+    public val biasPath: String
+)
 
 private fun fillConv2DVariables(
     name: String,

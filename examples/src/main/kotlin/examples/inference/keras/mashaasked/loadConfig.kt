@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras
+package examples.inference.keras.mashaasked
 
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroup
+import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroupInHDF5File
 import java.io.File
 
 fun main() {
@@ -19,7 +19,7 @@ fun main() {
     val model = Sequential.loadModelConfiguration(JSONConfig)
     val modelDirectory = HdfFile(File("C:\\weights"))
 
-    recursivePrintGroup(modelDirectory, modelDirectory, 0)
+    recursivePrintGroupInHDF5File(modelDirectory, modelDirectory)
     model.compile(
         optimizer = Adam(),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

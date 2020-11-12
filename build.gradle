@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = 'org.jetbrains.kotlin-deeplearning'
-    version = '0.0.11'
+    version = '0.0.13'
 
     apply plugin: "com.jfrog.bintray"
     apply plugin: "maven-publish"

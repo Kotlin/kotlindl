@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core
 
 import ch.qos.logback.classic.Level
+import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
@@ -47,7 +48,7 @@ import java.io.FileNotFoundException
  */
 public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
-    internal val logger = KotlinLogging.logger {}
+    public val logger: KLogger = KotlinLogging.logger {}
 
     /** Input layer. */
     public val inputLayer: Input = input

@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroup
+import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroupInHDF5File
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.junit.jupiter.api.Assertions.*
@@ -212,7 +212,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
-        recursivePrintGroup(hdfFile, hdfFile, 0)
+        recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
         testModel.use {
             it.compile(

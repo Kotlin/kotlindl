@@ -11,49 +11,27 @@ import io.jhdf.api.Group
 /**
  * Helper function to print out file in hdf5 format for debugging purposes.
  */
-public fun recursivePrintGroup(hdfFile: HdfFile, group: Group, level: Int) {
-    var level = level
-    level++
-
-    var indent = ""
-
-    for (i in 1..level) {
-        indent += "    "
-    }
-
+public fun recursivePrintGroupInHDF5File(hdfFile: HdfFile, group: Group) {
     for (node in group) {
-        println(indent + node.name)
+        println("[HDFUtil] Node: " + node.name)
 
-        for (entry in node.attributes.entries) {
-            println(entry.value)
+        for ((key, value) in node.attributes) {
+            println("[HDFUtil] attribute name: $key")
+            if (value.isScalar) {
+                println("[HDFUtil] attribute data: " + value.data.toString())
+            } else if (value.data is Array<*>) {
+                for (i in 0 until value.size.toInt())
+                    println("[HDFUtil] attribute #$i data: " + (value.data as Array<*>)[i].toString())
+            }
         }
 
         if (node is Group) {
-            recursivePrintGroup(hdfFile, node, level)
+            recursivePrintGroupInHDF5File(hdfFile, node)
         } else {
-            println(node.path)
+            println("[HDFUtil] Path to node: " + node.path)
             val dataset = hdfFile.getDatasetByPath(node.path)
             val dims = arrayOf(dataset.dimensions)
-            println(dims.contentDeepToString())
-
-            /*when (dataset.dimensions.size) {
-                4 -> {
-                    val data = dataset.data as Array<Array<Array<FloatArray>>>
-                    println(data.contentDeepToString())
-                }
-                3 -> {
-                    val data = dataset.data as Array<Array<FloatArray>>
-                    println(data.contentDeepToString())
-                }
-                2 -> {
-                    val data = dataset.data as Array<FloatArray>
-                    println(data.contentDeepToString())
-                }
-                1 -> {
-                    val data = dataset.data as FloatArray
-                    println(data.contentToString())
-                }
-            }*/
+            println("[HDFUtil] Shape: " + dims.contentDeepToString())
         }
     }
 }
