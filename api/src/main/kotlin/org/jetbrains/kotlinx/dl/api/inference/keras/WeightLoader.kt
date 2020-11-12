@@ -99,8 +99,11 @@ public fun Sequential.loadWeightsForFrozenLayers(
 private fun loadWeightsFromHdf5Group(group: Group, model: Sequential, layerList: MutableList<Layer>?) {
     var originalKerasVersion = 1
 
-    if (group.attributes.containsKey("keras_version")) {
-        originalKerasVersion = (group.attributes["keras_version"]!!.data as String).toInt()
+    if (group.attributes.containsKey("keras_version") && (group.attributes["keras_version"]!!.data as String).startsWith(
+            "2"
+        )
+    ) {
+        originalKerasVersion = 2
     }
     if (originalKerasVersion == 1
     ) {
