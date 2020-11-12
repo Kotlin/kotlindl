@@ -183,6 +183,6 @@ You are also welcome to join [#deeplearning channel](https://kotlinlang.slack.co
 This project and the corresponding community is governed by the [JetBrains Open Source and Community Code of Conduct](https://confluence.jetbrains.com/display/ALL/JetBrains+Open+Source+and+Community+Code+of+Conduct). Please make sure you read it. 
 
 ## License
-Kotlin for Apache Spark is licensed under the [Apache 2.0 License](LICENSE).
+KotlinDL is licensed under the [Apache 2.0 License](LICENSE).
 
 
