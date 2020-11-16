@@ -28,7 +28,7 @@ private val model = Sequential.of(
     Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
     Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
     Dense(128, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
-    Dense(10, Activations.Softmax, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
+    Dense(10, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
 fun main() {

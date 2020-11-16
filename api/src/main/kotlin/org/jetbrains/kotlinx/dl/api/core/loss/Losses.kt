@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.core.util.tfMean
@@ -114,7 +115,12 @@ public enum class Losses {
  * @see [Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS]
  */
 public class SoftmaxCrossEntropyWithLogits : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val batchLoss = tf.nn.softmaxCrossEntropyWithLogits(yPred, yTrue)
 
         return tf.withName(TRAINING_LOSS).math.mean(batchLoss.loss(), tf.constant(0))
@@ -125,7 +131,12 @@ public class SoftmaxCrossEntropyWithLogits : LossFunction {
  * @see [Losses.MAE]
  */
 public class MAE : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
     }
@@ -135,7 +146,12 @@ public class MAE : LossFunction {
  * @see [Losses.MSE]
  */
 public class MSE : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
     }
@@ -145,7 +161,12 @@ public class MSE : LossFunction {
  * @see [Losses.MAPE]
  */
 public class MAPE : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val epsilon = 1e-5f
 
         val diff = tf.math.abs(
@@ -166,7 +187,12 @@ public class MAPE : LossFunction {
  * @see [Losses.MLSE]
  */
 public class MLSE : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val epsilon = 1e-5f
 
         val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
@@ -182,7 +208,12 @@ public class MLSE : LossFunction {
  * @see [Losses.POISSON]
  */
 public class Poisson : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val epsilon = 1e-5f
         val sub = tf.math.sub(yPred, tf.math.mul(yTrue, tf.math.log(tf.math.add(yPred, tf.constant(epsilon)))))
 
@@ -195,7 +226,12 @@ public class Poisson : LossFunction {
  * @see [Losses.RMSE]
  */
 public class RMSE : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(yPred, yTrue))
         return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
     }
@@ -204,18 +240,29 @@ public class RMSE : LossFunction {
 /**
  * @see [Losses.HINGE_LOSS]
  */
-public class HingeLoss : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+public class HingeLoss(val reductionType1: ReductionType = ReductionType.SUM) : LossFunction {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         // We first need to convert binary labels to -1/1 labels (as floats).
         val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2f) as Operand<Float>, yTrue), yTrue)
 
-        return tf.withName(TRAINING_LOSS).reduceSum(
-            tf.math.mean(
-                tf.nn.relu(
-                    tf.math.sub(yTrue, tf.math.mul(labelsShifted, yPred))
-                ), tf.constant(-1)
-            ), tf.constant(0)
+        val loss: Operand<Float> = tf.nn.relu(
+            tf.math.sub(yTrue, tf.math.mul(labelsShifted, yPred))
         )
+
+        return if (reductionType1 == ReductionType.SUM_OVER_BATCH_SIZE)
+            safeMean(tf, loss, TensorShape(loss.asOutput().shape()).numElements())
+        else {
+            tf.withName(TRAINING_LOSS).reduceSum(
+                tf.math.mean(
+                    loss, tf.constant(-1)
+                ), tf.constant(0)
+            )
+        }
     }
 }
 
@@ -226,7 +273,12 @@ public class HingeLoss : LossFunction {
  */
 // TODO: Huber is close to MAE/MSE via delta parameter: https://www.machinecurve.com/index.php/2019/10/12/using-huber-loss-in-keras/
 public class HuberLoss(public val delta: Float) : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val error = tf.math.sub(yPred, yTrue)
 
         val deltaConst: Operand<Float> =
@@ -252,7 +304,12 @@ public class HuberLoss(public val delta: Float) : LossFunction {
  * @see [Losses.LOG_LOSS]
  */
 public class LogLoss : LossFunction {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType
+    ): Operand<Float> {
         val epsilon = 1e-5f
 
         val oneOp = tf.constant(1.0f) as Operand<Float>
@@ -269,4 +326,39 @@ public class LogLoss : LossFunction {
             tf.constant(0)
         )
     }
+}
+
+/*fun safeMean(
+    tf: Ops, losses: Operand<Float>, numElements: Long
+): Operand<Float> {
+    val totalLoss: Operand<Float> = tf.reduceSum(losses, tf.constant(-1))
+    return tf.withName(TRAINING_LOSS).math.divNoNan(
+        totalLoss, tf.dtypes.cast(tf.constant(numElements), getDType())
+    )
+}*/
+
+fun safeMean(tf: Ops, loss: Operand<Float>, numElements: Long): Operand<Float> {
+    if (loss.asOutput().shape().numDimensions() == 0) {
+        return tf.math.divNoNan(loss, tf.dtypes.cast(tf.constant(numElements.toFloat()), getDType()))
+    } else {
+        val totalLoss = tf.reduceSum(loss, KallAxis(tf, loss))
+        return tf.withName(TRAINING_LOSS).math.divNoNan(totalLoss, tf.constant(numElements.toFloat()) as Operand<Float>)
+    }
+
+}
+
+fun KallAxis(tf: Ops, op: Operand<Float>): Operand<Int> {
+    val ranks: IntArray = KallAxis(op)
+    return tf.constant(ranks)
+
+}
+
+fun KallAxis(op: Operand<Float>): IntArray {
+    var rank = op.asOutput().shape().numDimensions()
+    if (rank == 0) return intArrayOf(1)
+    val ranks = IntArray(rank)
+    for (i in 0 until rank) {
+        ranks[i] = i
+    }
+    return ranks
 }

@@ -17,7 +17,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.HingeLoss
+import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
@@ -25,7 +26,7 @@ import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
 private const val EPOCHS = 3
-private const val TRAINING_BATCH_SIZE = 2000
+private const val TRAINING_BATCH_SIZE = 200
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
@@ -80,7 +81,7 @@ private val lenet5Classic = Sequential.of(
     ),
     Dense(
         outputSize = NUMBER_OF_CLASSES,
-        activation = Activations.Sigmoid,
+        activation = Activations.Softmax,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
@@ -102,7 +103,7 @@ fun main() {
     lenet5Classic.use {
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.5f)),
-            loss = Losses.RMSE,
+            loss = HingeLoss(reductionType1 = ReductionType.SUM_OVER_BATCH_SIZE),
             metric = Metrics.ACCURACY
         )
 

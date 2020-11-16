@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 100
-private const val EPOCHS = 30
+private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
@@ -27,18 +27,16 @@ private val model = Sequential.of(
     Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
-/**
- * Doesn't work due to incorrect loss functions for regression
- */
 fun main() {
     val rnd = Random(SEED)
-    val data = Array(1000) { doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0) }
+    val data = Array(10000) { doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0) }
     for (i in data.indices) {
         data[i][1] = 2 * (rnd.nextDouble() - 0.5)
         data[i][2] = 2 * (rnd.nextDouble() - 0.5)
         data[i][3] = 2 * (rnd.nextDouble() - 0.5)
         data[i][4] = 2 * (rnd.nextDouble() - 0.5)
-        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4] + rnd.nextDouble(0.1)
+        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4] + 0.2 + rnd.nextDouble(0.1)
+        // 1 * x1 - 2 * x2 + 1.5 * x3  - 0.95 * x4 +- 0.1
     }
 
     data.shuffle()
@@ -74,16 +72,16 @@ fun main() {
     model.use {
         it.compile(
             optimizer = SGD(learningRate = 0.001f),
-            loss = Losses.MSE,
-            metric = Metrics.MSE
+            loss = Losses.MLSE,
+            metric = Metrics.MLSE
         )
 
         it.summary()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
         val mse = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
-        println(it.getLayer("dense_1").getWeights()[0].contentDeepToString())
-
+        println("Weights: " + it.getLayer("dense_1").getWeights()[0].contentDeepToString())
+        println("Bias" + it.getLayer("dense_1").getWeights()[1].contentDeepToString())
         println("MSE: $mse")
     }
 }

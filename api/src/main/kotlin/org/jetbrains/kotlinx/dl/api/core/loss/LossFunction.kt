@@ -21,5 +21,22 @@ public interface LossFunction {
      * shape = `[batch_size, d0, .. dN-1]`.
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
+    public fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        reductionType: ReductionType = ReductionType.SUM
+    ): Operand<Float>
+}
+
+/** Choose type of loss values reduction in calculation of loss function value on the specific batch. */
+public enum class ReductionType {
+    /** Scalar sum of weighted losses. */
+    SUM,
+
+    /**
+     * Scalar `SUM` divided by number of elements in losses.
+     * This reduction type is not supported when used with outside of built-in training loops with`compile`/`fit`.
+     */
+    SUM_OVER_BATCH_SIZE
 }
