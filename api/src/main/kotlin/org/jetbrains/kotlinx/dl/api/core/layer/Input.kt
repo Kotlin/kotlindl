@@ -14,7 +14,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 
 /**
- * First and required layer in [api.core.Sequential.of] method.
+ * First and required layer in [org.jetbrains.kotlinx.dl.api.core.Sequential.of] method.
  *
  * @property [name] Custom layer name.
  * @constructor Creates [Input] layer from [packedDims] representing [input] data shape.

@@ -309,4 +309,8 @@ public abstract class TrainableModel : InferenceModel() {
             verbose
         )
     }
+
+    public override fun close() {
+        super.close()
+    }
 }

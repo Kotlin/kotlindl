@@ -87,6 +87,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
+        @JvmStatic
         public fun of(input: Input, vararg layers: Layer): Sequential {
             preProcessLayerNames(layers)
             val seqModel = Sequential(input, *layers)
@@ -100,6 +101,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * NOTE: First layer should be input layer.
          * @return the [Sequential] model.
          */
+        @JvmStatic
         public fun of(layers: List<Layer>): Sequential {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
@@ -119,6 +121,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @property [layers] The layers to describe the model design.
          * @return the [Sequential] model.
          */
+        @JvmStatic
         public fun of(input: Input, layers: List<Layer>): Sequential {
             preProcessLayerNames(layers.toTypedArray())
             val seqModel = Sequential(input, *layers.toTypedArray())
@@ -130,7 +133,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
-                    val generatedLayerName = layer::class.simpleName!!.toLowerCase() + "_" + cnt
+                    val generatedLayerName = (layer::class.simpleName ?: return).toLowerCase() + "_" + cnt
                     layer.name = generatedLayerName
                     cnt++
                 }
@@ -740,10 +743,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             amountOfImages,
             *tail(xTensorShape)
         )
-    }
-
-    override fun close() {
-        session.close()
     }
 
     /**

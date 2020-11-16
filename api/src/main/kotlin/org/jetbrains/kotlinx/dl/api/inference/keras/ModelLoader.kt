@@ -87,7 +87,7 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
 private fun convertToLayer(kerasLayer: KerasLayer): Layer {
     return when (kerasLayer.class_name) {
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
         LAYER_MAX_POOLING_2D -> createMaxPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -280,7 +280,7 @@ private fun convertPadding(padding: String): ConvPadding {
     }
 }
 
-private fun createFlatten(config: LayerConfig, name: String): Flatten {
+private fun createFlatten(name: String): Flatten {
     return Flatten(name = name)
 }
 

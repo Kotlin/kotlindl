@@ -54,7 +54,7 @@ public open class Callback {
      * @param [event] Metric and loss values for this batch.
      * @param [logs] training history, containing full information about previous epochs.
      */
-    public open fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {}
+    public open fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent, logs: TrainingHistory) {}
 
     /**
      * Called at the beginning of training.

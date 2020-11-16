@@ -31,7 +31,7 @@ public fun Sequential.loadWeights(
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.debug { "Starting weights loading.." }
+    this.logger.info { "Starting weights loading.." }
 
     when {
         hdfFile.attributes.containsKey("layer_names") -> loadWeightsFromHdf5Group(hdfFile, this, null)
@@ -40,7 +40,6 @@ public fun Sequential.loadWeights(
         }
         else -> {
             this.logger.info { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
-            // TODO: add method to load pairs layer and path to its weights (instead of templates)
         }
     }
 
@@ -71,7 +70,6 @@ public fun Sequential.loadWeights(
         }
         else -> {
             this.logger.info { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
-            // TODO: add method to load pairs layer and path to its weights (instead of templates)
         }
     }
 
@@ -99,7 +97,7 @@ public fun Sequential.loadWeightsForFrozenLayers(
 private fun loadWeightsFromHdf5Group(group: Group, model: Sequential, layerList: MutableList<Layer>?) {
     var originalKerasVersion = 1
 
-    if (group.attributes.containsKey("keras_version") && (group.attributes["keras_version"]!!.data as String).startsWith(
+    if (group.attributes.containsKey("keras_version") && ((if (group.attributes["keras_version"] != null) group.attributes["keras_version"]?.data else "1") as String).startsWith(
             "2"
         )
     ) {

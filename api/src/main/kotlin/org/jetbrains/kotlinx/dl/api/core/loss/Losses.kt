@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
-import org.jetbrains.kotlinx.dl.api.core.util.Kmean
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
+import org.jetbrains.kotlinx.dl.api.core.util.tfMean
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -243,7 +243,7 @@ public class HuberLoss(public val delta: Float) : LossFunction {
         val deltaLinear: Operand<Float> = tf.math.mul(deltaConst, linear)
         val loss: Operand<Float> = tf.math.add(q2Point5, deltaLinear)
 
-        val result: Operand<Float> = Kmean(tf, loss, tf.constant(-1))
+        val result: Operand<Float> = tfMean(tf, loss, tf.constant(-1))
         return tf.withName(TRAINING_LOSS).identity(tf.reduceSum(result, tf.constant(0)))
     }
 }

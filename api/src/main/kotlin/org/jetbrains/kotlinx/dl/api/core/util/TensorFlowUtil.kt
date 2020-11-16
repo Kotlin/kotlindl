@@ -10,26 +10,26 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.math.Mean
 
 /** */
-internal fun Kmean(tf: Ops, x: Operand<Float>): Operand<Float> {
-    return Kmean(tf, x, null, false)
+internal fun tfMean(tf: Ops, x: Operand<Float>): Operand<Float> {
+    return tfMean(tf, x, null, false)
 }
 
 /** */
-internal fun Kmean(
+internal fun tfMean(
     tf: Ops,
     x: Operand<Float>,
     axis: Operand<Int>
 ): Operand<Float> {
-    return Kmean(tf, x, axis, false)
+    return tfMean(tf, x, axis, false)
 }
 
 /** */
-internal fun Kmean(tf: Ops, x: Operand<Float>, keepDims: Boolean): Operand<Float> {
-    return Kmean(tf, x, null, keepDims)
+internal fun tfMean(tf: Ops, x: Operand<Float>, keepDims: Boolean): Operand<Float> {
+    return tfMean(tf, x, null, keepDims)
 }
 
 /** */
-internal fun Kmean(
+internal fun tfMean(
     tf: Ops,
     x: Operand<Float>,
     axis: Operand<Int>?,

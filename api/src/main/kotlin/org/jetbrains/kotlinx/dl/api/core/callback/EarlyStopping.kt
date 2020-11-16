@@ -122,7 +122,7 @@ public class EarlyStopping(
 
     override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {
         val current: Number = getMonitorValue(event, monitor) ?: return
-        if (monitorOp!!.apply(current.toDouble() - minDelta, best)) {
+        if ((monitorOp ?: return).apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()
             wait = 0
             if (restoreBestWeights) {

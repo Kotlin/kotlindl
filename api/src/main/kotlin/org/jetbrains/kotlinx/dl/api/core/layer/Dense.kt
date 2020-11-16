@@ -117,10 +117,12 @@ public class Dense(
         return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
     }
 
+    /** Returns the shape of kernel weights. */
     public fun getKernelShape(): LongArray {
         return TensorShape(kernelShape).dims()
     }
 
+    /** Returns the shape of bias weights. */
     public fun getBiasShape(): LongArray {
         return TensorShape(biasShape).dims()
     }

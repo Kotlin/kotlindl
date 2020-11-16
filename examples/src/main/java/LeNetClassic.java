@@ -45,7 +45,7 @@ public class LeNetClassic {
         Dataset train = result.component1();
         Dataset test = result.component2();
 
-        try (Sequential lenet5Classic = Sequential.Companion.of(
+        try (Sequential lenet5Classic = Sequential.of(
                 new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
                 new Conv2D(6, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, "conv2d_1"),
                 new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),

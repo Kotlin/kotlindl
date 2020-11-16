@@ -48,7 +48,7 @@ public class ImageConverter {
             )
         }
 
-        public fun toRawPixels(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): ByteArray {
+        private fun toRawPixels(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): ByteArray {
             val image = getImage(inputStream)
 
             return imageToByteArray(image, colorOrder)
@@ -81,7 +81,11 @@ public class ImageConverter {
     }
 }
 
+/** Represents the order of colors in pixel reading. */
 public enum class ColorOrder {
+    /** Red, green, blue. */
     RGB,
+
+    /** Blue, green, red. */
     BGR
 }

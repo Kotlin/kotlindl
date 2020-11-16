@@ -119,7 +119,7 @@ public enum class Activations {
      * NOTE: The values of `alpha` and `scale` are
      * chosen so that the mean and variance of the inputs are preserved
      * between two consecutive layers as long as the weights are initialized
-     * correctly (see [api.core.initializer.LeCunNormal] initializer)
+     * correctly (see [org.jetbrains.kotlinx.dl.api.core.initializer.LeCunNormal] initializer)
      * and the number of input units is "large enough"
      * (see reference paper for more information).
      *

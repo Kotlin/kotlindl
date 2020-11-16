@@ -165,10 +165,12 @@ public class Conv2D(
         return result.toList()
     }
 
+    /** Returns the shape of kernel weights. */
     public fun getKernelShape(): LongArray {
         return TensorShape(kernelShape).dims()
     }
 
+    /** Returns the shape of bias weights. */
     public fun getBiasShape(): LongArray {
         return TensorShape(biasShape).dims()
     }
