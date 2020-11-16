@@ -140,8 +140,9 @@ val layers = mutableListOf<Layer>()
 
 ```
 
-Finally we can train this model. The only difference as opposed to training a model from scratch will be that we will 
-load the weights for the frozen layers, and those will not be trained. 
+Finally, we can train this model. The only difference as opposed to training a model from scratch will be 
+loading the weights for the frozen layers. These will not be further trained - that's how we leverage the fact that this 
+model has already learned some patterns on a much larger dataset.  
 
 ```kotlin
 model.use {
