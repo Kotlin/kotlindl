@@ -16,9 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.recursivePrintGroupInHDF5File
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.junit.jupiter.api.Assertions.*
@@ -27,6 +25,11 @@ import java.io.File
 
 private const val pathToConfig = "inference/lenet/modelConfig.json"
 private val realPathToConfig = TransferLearningTest::class.java.classLoader.getResource(pathToConfig).path.toString()
+
+private const val pathToMismatchConfig = "inference/lenet/mismatchModelConfig.json"
+private val realPathToMismatchConfig =
+    TransferLearningTest::class.java.classLoader.getResource(pathToMismatchConfig).path.toString()
+
 
 private const val pathToIncorrectConfig = "inference/lenet/unsupportedInitializers/modelConfig.json"
 private val realPathToIncorrectConfig =
@@ -74,6 +77,31 @@ class TransferLearningTest : IntegrationTest() {
             }
         assertEquals(
             "JSON file: model.json contains invalid JSON. The model configuration could not be loaded from this file.",
+            exception.message
+        )
+    }
+
+
+    @Test
+    fun loadMismatchJSONConfigAndH5Weights() {
+        val JSONConfig = File(realPathToMismatchConfig)
+        val model = Sequential.loadModelConfiguration(JSONConfig)
+        val modelDirectory = HdfFile(File(realPathToWeights))
+
+        model.compile(
+            optimizer = Adam(),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
+
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                model.loadWeights(modelDirectory)
+            }
+        assertEquals(
+            "Weights for the loaded Conv2D layer conv2d_12 are not found in .h5 file! \n" +
+                    "h5 weight file contains weights for the following list of layers: [conv2d, conv2d_1, dense, dense_1, dense_2, flatten, max_pooling2d, max_pooling2d_1]\n" +
+                    "Double-check your loaded configuration which contains layers with the following names: [conv2d_12, max_pooling2d_96, conv2d_1, max_pooling2d_1, flatten, dense, dense_1, dense_2].",
             exception.message
         )
     }
@@ -222,6 +250,87 @@ class TransferLearningTest : IntegrationTest() {
             )
 
             it.loadWeights(hdfFile)
+
+            val conv2DKernelWeights = it.getLayer("conv2d").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeights[0][0][0][0], 0.06445057f)
+
+            val conv2DKernelWeights1 = it.getLayer("conv2d_1").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeights1[0][0][0][0], 0.027743129f)
+        }
+    }
+
+    @Test
+    fun loadModelConfigAndWeightsFromKerasByTemplates() {
+        val jsonConfigFile = File(realPathToConfig)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeights)
+        val hdfFile = HdfFile(file)
+        recursivePrintGroupInHDF5File(hdfFile, hdfFile)
+
+        testModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            val kernelDataPathTemplate = "/%s/%s/kernel:0"
+            val biasDataPathTemplate = "/%s/%s/bias:0"
+            it.loadWeightsByPathTemplates(hdfFile, kernelDataPathTemplate, biasDataPathTemplate)
+
+            val conv2DKernelWeights = it.getLayer("conv2d").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeights[0][0][0][0], 0.06445057f)
+
+            val conv2DKernelWeights1 = it.getLayer("conv2d_1").getWeights()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(conv2DKernelWeights1[0][0][0][0], 0.027743129f)
+        }
+    }
+
+    @Test
+    fun loadModelConfigAndWeightsFromKerasByPaths() {
+        val jsonConfigFile = File(realPathToConfig)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeights)
+        val hdfFile = HdfFile(file)
+        recursivePrintGroupInHDF5File(hdfFile, hdfFile)
+
+        testModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            val weightPaths = listOf(
+                LayerKernelAndBiasPaths(
+                    "conv2d",
+                    "/conv2d/conv2d/kernel:0",
+                    "/conv2d/conv2d/bias:0"
+                ),
+                LayerKernelAndBiasPaths(
+                    "conv2d_1",
+                    "/conv2d_1/conv2d_1/kernel:0",
+                    "/conv2d_1/conv2d_1/bias:0"
+                ),
+                LayerKernelAndBiasPaths(
+                    "dense",
+                    "/dense/dense/kernel:0",
+                    "/dense/dense/bias:0"
+                ),
+                LayerKernelAndBiasPaths(
+                    "dense_1",
+                    "/dense_1/dense_1/kernel:0",
+                    "/dense_1/dense_1/bias:0"
+                ),
+                LayerKernelAndBiasPaths(
+                    "dense_2",
+                    "/dense_2/dense_2/kernel:0",
+                    "/dense_2/dense_2/bias:0"
+                )
+            )
+            it.loadWeightsByPaths(hdfFile, weightPaths)
 
             val conv2DKernelWeights = it.getLayer("conv2d").getWeights()[0] as Array<Array<Array<FloatArray>>>
             assertEquals(conv2DKernelWeights[0][0][0][0], 0.06445057f)

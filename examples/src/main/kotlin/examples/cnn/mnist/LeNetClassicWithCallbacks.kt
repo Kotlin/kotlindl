@@ -3,10 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.keras.mnist
+package examples.cnn.mnist
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStopping
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStoppingMode
 import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
@@ -24,8 +26,8 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-private const val EPOCHS = 3
-private const val TRAINING_BATCH_SIZE = 2000
+private const val EPOCHS = 10
+private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
@@ -80,11 +82,12 @@ private val lenet5Classic = Sequential.of(
     ),
     Dense(
         outputSize = NUMBER_OF_CLASSES,
-        activation = Activations.Sigmoid,
+        activation = Activations.Linear,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
     )
 )
+
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
@@ -97,31 +100,29 @@ fun main() {
         ::extractLabels
     )
 
-    val (newTrain, validation) = train.split(0.95)
-
     lenet5Classic.use {
+        val earlyStopping = EarlyStopping(
+            monitor = EpochTrainingEvent::valLossValue,
+            minDelta = 0.0,
+            patience = 2,
+            verbose = true,
+            mode = EarlyStoppingMode.AUTO,
+            baseline = 0.1,
+            restoreBestWeights = false
+        )
         it.compile(
-            optimizer = Adam(clipGradient = ClipGradientByValue(0.5f)),
-            loss = Losses.RMSE,
-            metric = Metrics.ACCURACY
+            optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY,
+            callback = earlyStopping
         )
 
         it.summary()
 
-        val history = it.fit(
-            trainingDataset = newTrain,
-            validationDataset = validation,
-            validationBatchSize = TRAINING_BATCH_SIZE,
-            epochs = EPOCHS,
-            trainBatchSize = TRAINING_BATCH_SIZE,
-            verbose = true
-        )
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
-
-        val accuracyByEpoch = history[EpochTrainingEvent::metricValue]
-        println(accuracyByEpoch.contentToString())
     }
 }

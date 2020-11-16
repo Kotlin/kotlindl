@@ -3,11 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.keras.fashionmnist
+package examples.cnn.cifar10
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.Input
@@ -18,21 +20,21 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import java.io.File
 
-private const val EPOCHS = 5
-private const val TRAINING_BATCH_SIZE = 100
+private const val PATH_TO_MODEL = "savedmodels/vgg11"
+private const val EPOCHS = 20
+private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
-private const val NUM_CHANNELS = 1L
-private const val IMAGE_SIZE = 28L
-private const val SEED = 12L
+private const val NUM_CHANNELS = 3L
+private const val IMAGE_SIZE = 32L
+private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
-val heNormal = HeNormal(SEED)
-
-/**
- * Kotlin implementation of VGG'11 on Keras.
- * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
+/** This model is an implementation of VGG'11 model with reduced number of neurons in each layer (2 times for Conv2D and 8 times for Dense).
+ *
+ * @see <a href="https://arxiv.org/abs/1409.1556">
+ *     Very Deep Convolutional Networks for Large-Scale Image Recognition:[Karen Simonyan, Andrew Zisserman, 2015]</a>
  */
 private val vgg11 = Sequential.of(
     Input(
@@ -45,8 +47,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -58,8 +60,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -71,8 +73,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -80,8 +82,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -93,8 +95,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     Conv2D(
@@ -102,8 +104,8 @@ private val vgg11 = Sequential.of(
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -111,21 +113,21 @@ private val vgg11 = Sequential.of(
         strides = intArrayOf(1, 2, 2, 1)
     ),
     Conv2D(
-        filters = 128,
+        filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        activation = Activations.Elu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     Conv2D(
-        filters = 128,
+        filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal,
+        activation = Activations.Elu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
@@ -134,35 +136,35 @@ private val vgg11 = Sequential.of(
     ),
     Flatten(),
     Dense(
-        outputSize = 2048,
+        outputSize = 512,
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeUniform()
     ),
     Dense(
-        outputSize = 1000,
+        outputSize = 512,
         activation = Activations.Relu,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeUniform()
     ),
     Dense(
-        outputSize = NUM_LABELS, // changed due to 10 classes instead of
+        outputSize = NUM_LABELS,
         activation = Activations.Linear,
-        kernelInitializer = heNormal,
-        biasInitializer = heNormal
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeUniform()
     )
 )
 
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        FASHION_TRAIN_IMAGES_ARCHIVE,
-        FASHION_TRAIN_LABELS_ARCHIVE,
-        FASHION_TEST_IMAGES_ARCHIVE,
-        FASHION_TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractFashionImages,
-        ::extractFashionLabels
+    val dataset = Dataset.create(
+        IMAGES_ARCHIVE,
+        LABELS_ARCHIVE,
+        NUM_LABELS,
+        ::extractCifar10Images,
+        ::extractCifar10Labels
     )
+
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     vgg11.use {
         it.compile(
@@ -171,7 +173,11 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
+        it.summary()
+
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+
+        it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

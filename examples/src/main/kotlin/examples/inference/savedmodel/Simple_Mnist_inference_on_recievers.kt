@@ -3,16 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference
+package examples.inference.savedmodel
 
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
+private const val PATH_TO_MODEL = "api/src/main/resources/savedmodel"
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
@@ -25,13 +21,14 @@ fun main() {
         ::extractLabels
     )
 
-    SavedModel.load(PATH_TO_MODEL).use {
-        println(it)
+    /*val mnistModel = prepareModelForInference {
+        loadModel(PATH_TO_MODEL)
+        reshape(::reshapeInput)
+        input(Input.PLACEHOLDER)
+        output(Output.ARGMAX)
+    }
 
-        it.reshape(::reshapeInput)
-        it.input(Input.PLACEHOLDER)
-        it.output(Output.ARGMAX)
-
+    mnistModel.use {
         val prediction = it.predict(train.getX(0))
 
         println("Predicted Label is: $prediction")
@@ -41,13 +38,6 @@ fun main() {
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")
-    }
+    }*/
 }
 
-fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
-    val reshaped = Array(
-        1
-    ) { Array(28) { FloatArray(28) } }
-    for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-    return reshaped
-}

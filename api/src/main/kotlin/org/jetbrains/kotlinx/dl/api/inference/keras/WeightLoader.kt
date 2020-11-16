@@ -152,7 +152,16 @@ private fun fillConv2DVariablesFromKeras(
     group: Group,
     model: Sequential
 ) {
-    val firstLevelGroup: Group = group.children[layerName] as Group
+    val availableLayerNames = group.children.map { e -> group.children[e.key]!!.name }.toList()
+    val modelLayerNames = model.layers.map { e -> e.name }.toList()
+    val layerWeightsNode = group.children[layerName]
+    check(layerWeightsNode != null) {
+        "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
+                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+    }
+
+    val firstLevelGroup: Group = layerWeightsNode as Group
     val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
     val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
 

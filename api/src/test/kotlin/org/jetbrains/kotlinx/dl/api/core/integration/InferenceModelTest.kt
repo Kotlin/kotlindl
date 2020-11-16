@@ -163,6 +163,8 @@ class InferenceModelTest {
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
                 val prediction = it.predict(train.getX(imageId))
+                val softPrediction = it.predictSoftly(train.getX(imageId))
+                assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getLabel(imageId))
                     accuracy += (1.0 / amountOfTestSet)

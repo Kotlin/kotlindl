@@ -3,13 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.keras.mnist
+package examples.cnn.mnist
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStopping
-import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStoppingMode
-import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
@@ -26,7 +23,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-private const val EPOCHS = 10
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -88,7 +85,6 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
@@ -101,20 +97,10 @@ fun main() {
     )
 
     lenet5Classic.use {
-        val earlyStopping = EarlyStopping(
-            monitor = EpochTrainingEvent::valLossValue,
-            minDelta = 0.0,
-            patience = 2,
-            verbose = true,
-            mode = EarlyStoppingMode.AUTO,
-            baseline = 0.1,
-            restoreBestWeights = false
-        )
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Metrics.ACCURACY,
-            callback = earlyStopping
+            metric = Metrics.ACCURACY
         )
 
         it.summary()

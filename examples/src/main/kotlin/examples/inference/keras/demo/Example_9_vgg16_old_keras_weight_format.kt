@@ -66,7 +66,7 @@ fun main() {
         val hdfFile = HdfFile(file)
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
-        val weightPaths = listOf<LayerKernelAndBiasPaths>(
+        val weightPaths = listOf(
             LayerKernelAndBiasPaths(
                 "block1_conv1",
                 "/block1_conv1/block1_conv1_W_1:0",

@@ -92,6 +92,26 @@ public open class SavedModel : InferenceModel() {
     }
 
     /**
+     * Predicts labels for all [images].
+     *
+     * NOTE: Slow method, executed on client side, not in TensorFlow.
+     *
+     * @param [inputTensorName] The name of input tensor.
+     * @param [outputTensorName] The name of output tensor.
+     * @param [dataset] Dataset.
+     */
+    public fun predictAll(dataset: Dataset, inputTensorName: String, outputTensorName: String): List<Int> {
+        val predictedLabels: MutableList<Int> = mutableListOf()
+
+        for (i in 0 until dataset.xSize()) {
+            val predictedLabel = predict(dataset.getX(i), inputTensorName, outputTensorName)
+            predictedLabels.add(predictedLabel)
+        }
+
+        return predictedLabels
+    }
+
+    /**
      * Evaluates [dataset] via [metric].
      *
      * NOTE: Slow method, executed on client side, not in TensorFlow.
@@ -115,10 +135,10 @@ public open class SavedModel : InferenceModel() {
         }
     }
 
+
     override fun close() {
-        session.close()
+        super.close()
         bundle.close()
-        kGraph.close()
     }
 }
 

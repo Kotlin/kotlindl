@@ -14,39 +14,67 @@ import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.io.File
+
+private const val PATH_TO_MODEL = "src/main/resources/models/savedmodel"
 
 class SavedModelTest {
     @Test
     fun basicInferenceOnMnist() {
-        val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            NUMBER_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
 
-        fun main() {
-            val (train, test) = Dataset.createTrainAndTestDatasets(
-                TRAIN_IMAGES_ARCHIVE,
-                TRAIN_LABELS_ARCHIVE,
-                TEST_IMAGES_ARCHIVE,
-                TEST_LABELS_ARCHIVE,
-                NUMBER_OF_CLASSES,
-                ::extractImages,
-                ::extractLabels
-            )
+        val modelDirectory = File(PATH_TO_MODEL)
 
-            SavedModel.load(PATH_TO_MODEL).use {
-                println(it)
+        SavedModel.load(modelDirectory.absolutePath).use {
+            it.reshape(::reshapeInput)
+            it.input(Input.PLACEHOLDER)
+            it.output(Output.ARGMAX)
 
-                it.reshape(::reshapeInput)
-                it.input(Input.PLACEHOLDER)
-                it.output(Output.ARGMAX)
+            val prediction = it.predict(train.getX(0))
 
-                val prediction = it.predict(train.getX(0))
+            assertEquals(train.getLabel(0), prediction)
 
-                assertEquals(train.getLabel(0), prediction)
+            val predictions = it.predictAll(test)
 
-                val predictions = it.predictAll(test)
+            assertEquals(10000, predictions.size)
+            assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
+        }
+    }
 
-                assertEquals(10000, predictions.size)
-                assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
-            }
+    @Test
+    fun basicInferenceOnMnistWithCustomTensorNames() {
+        val (train, test) = Dataset.createTrainAndTestDatasets(
+            TRAIN_IMAGES_ARCHIVE,
+            TRAIN_LABELS_ARCHIVE,
+            TEST_IMAGES_ARCHIVE,
+            TEST_LABELS_ARCHIVE,
+            NUMBER_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels
+        )
+
+        val modelDirectory = File(PATH_TO_MODEL)
+
+        SavedModel.load(modelDirectory.absolutePath).use {
+            it.reshape(::reshapeInput)
+
+            val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
+
+            assertEquals(train.getLabel(0), prediction)
+
+            val predictions = it.predictAll(test, "Placeholder", "ArgMax")
+
+            assertEquals(10000, predictions.size)
+            assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
+            assertTrue(it.evaluate(test, Metrics.MAE).isNaN())
         }
     }
 

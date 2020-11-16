@@ -124,8 +124,8 @@ class CustomCallback : Callback() {
         println("Training batch $batch begins.")
     }
 
-    override fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent?, logs: TrainingHistory) {
-        println("Training batch $batch ends with loss ${event!!.lossValue}.")
+    override fun onTrainBatchEnd(batch: Int, batchSize: Int, event: BatchTrainingEvent, logs: TrainingHistory) {
+        println("Training batch $batch ends with loss ${event.lossValue}.")
     }
 
     override fun onTrainBegin() {
