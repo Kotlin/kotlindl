@@ -187,4 +187,4 @@ it.loadWeightsForFrozenLayersByPathTemplates(hdfFile, kernelDataPathTemplate, bi
    
 --- 
 
-This is it! 
+This is it! You have learned how to use transfer learning technique with KotlinDL.  
