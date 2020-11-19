@@ -11,7 +11,10 @@ import org.tensorflow.op.Ops
 /**
  * Basic interface for all loss functions.
  */
-public interface LossFunction {
+public abstract class LossFunction(
+    /** Reduction type. Should be defined in sub-class*/
+    public val reductionType: ReductionType
+) {
     /**
      * Applies [LossFunction] to the [yPred] labels predicted by the model and known [yTrue] hidden during training.
      *
@@ -21,11 +24,11 @@ public interface LossFunction {
      * shape = `[batch_size, d0, .. dN-1]`.
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun apply(
+    public abstract fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType = ReductionType.SUM
+        numberOfLosses: Operand<Float>?
     ): Operand<Float>
 }
 
@@ -35,7 +38,7 @@ public enum class ReductionType {
     SUM,
 
     /**
-     * Scalar `SUM` divided by number of elements in losses.
+     * Scalar `SUM` divided by number of elements in losses (number of losses).
      * This reduction type is not supported when used with outside of built-in training loops with`compile`/`fit`.
      */
     SUM_OVER_BATCH_SIZE

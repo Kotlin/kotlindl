@@ -53,6 +53,9 @@ public abstract class TrainableModel : InferenceModel() {
     /** TensorFlow operand for Y data. */
     protected lateinit var yOp: Operand<Float>
 
+    /** TensorFlow operand for batch size data. */
+    protected lateinit var numberOfLossesOp: Operand<Float>
+
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     protected var amountOfClasses: Long = -1
 

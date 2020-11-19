@@ -72,7 +72,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = SGD(learningRate = 0.001f),
-            loss = Losses.MLSE,
+            loss = Losses.MSLE,
             metric = Metrics.MLSE
         )
 

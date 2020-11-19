@@ -5,12 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.core.util.tfMean
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.ReduceSum
+import org.tensorflow.op.math.Mean
+import java.lang.Boolean
 
 /**
  * Loss functions.
@@ -31,7 +32,7 @@ public enum class Losses {
      * `y_true` values are expected to be -1 or 1. If binary (0 or 1) labels are
      * provided we will convert them to -1 or 1.
      */
-    HINGE_LOSS,
+    HINGE,
 
     /**
      * Computes the Huber loss between `y_true` and `y_pred`.
@@ -43,12 +44,12 @@ public enum class Losses {
      * loss = 0.5 * d^2 + d * (|x| - d)  if |x| > d
      * ```
      */
-    HUBER_LOSS,
+    HUBER,
 
     /**
-     * Computes the Log loss between `y_true` and `y_pred`.
+     * Computes the binary cross-entropy between `y_true` and `y_pred`.
      */
-    LOG_LOSS,
+    BINARY_CROSSENTROPY,
 
     /**
      * Computes the mean of absolute difference between labels and predictions.
@@ -65,13 +66,6 @@ public enum class Losses {
     MSE,
 
     /**
-     * Computes the root of mean of squares of errors between labels and predictions.
-     *
-     * `loss = root(square(y_true - y_pred))`
-     */
-    RMSE,
-
-    /**
      * Computes the mean absolute percentage error between `y_true` and `y_pred`.
      *
      * `loss = 100 * abs(y_true - y_pred) / y_true`
@@ -83,7 +77,16 @@ public enum class Losses {
      *
      * `loss = square(log(y_true + 1.) - log(y_pred + 1.))`
      */
-    MLSE,
+    MSLE,
+
+    /**
+     * Computes the squared hinge loss between labels and predictions.
+     *
+     * `loss = square(maximum(1 - labels * predictions, 0))`
+     */
+    SQUARED_HINGE,
+
+    LOG_COSH,
 
     /**
      * Computes the Poisson loss between `y_true` and `y_pred`.
@@ -97,15 +100,16 @@ public enum class Losses {
         public fun convert(lossFunctionType: Losses): LossFunction {
             return when (lossFunctionType) {
                 SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits()
-                HINGE_LOSS -> HingeLoss()
-                HUBER_LOSS -> HuberLoss(0.5f)
-                LOG_LOSS -> LogLoss()
+                HINGE -> Hinge()
+                HUBER -> Huber()
+                BINARY_CROSSENTROPY -> BinaryCrossEntropy()
                 MAE -> MAE()
                 MSE -> MSE()
-                RMSE -> RMSE()
                 MAPE -> MAPE()
-                MLSE -> MLSE()
+                MSLE -> MSLE()
                 POISSON -> Poisson()
+                SQUARED_HINGE -> SquaredHinge()
+                LOG_COSH -> LogCosh()
             }
         }
     }
@@ -114,12 +118,13 @@ public enum class Losses {
 /**
  * @see [Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS]
  */
-public class SoftmaxCrossEntropyWithLogits : LossFunction {
+public class SoftmaxCrossEntropyWithLogits(reductionType: ReductionType = ReductionType.SUM) :
+    LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val batchLoss = tf.nn.softmaxCrossEntropyWithLogits(yPred, yTrue)
 
@@ -127,47 +132,48 @@ public class SoftmaxCrossEntropyWithLogits : LossFunction {
     }
 }
 
-/**
- * @see [Losses.MAE]
- */
-public class MAE : LossFunction {
-    override fun apply(
-        tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        reductionType: ReductionType
-    ): Operand<Float> {
-        val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
-        return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
-    }
-}
 
 /**
  * @see [Losses.MSE]
  */
-public class MSE : LossFunction {
+public class MSE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
-        return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
+        return meanOfLosses(tf, reductionType, squaredError, numberOfLosses)
+    }
+}
+
+/**
+ * @see [Losses.MAE]
+ */
+public class MAE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
+        return meanOfLosses(tf, reductionType, absoluteErrors, numberOfLosses)
     }
 }
 
 /**
  * @see [Losses.MAPE]
  */
-public class MAPE : LossFunction {
+public class MAPE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val epsilon = 1e-5f
+        val epsilon = 1e-7f
 
         val diff = tf.math.abs(
             tf.math.div(
@@ -176,30 +182,28 @@ public class MAPE : LossFunction {
             )
         )
 
-        return tf.withName(TRAINING_LOSS).math.mul(
-            tf.constant(100f),
-            tf.reduceSum(tf.math.mean(diff, tf.constant(-1)), tf.constant(0))
-        )
+        return meanOfLosses(tf, reductionType, tf.math.mul(diff, tf.constant(100f)), numberOfLosses)
     }
 }
 
 /**
- * @see [Losses.MLSE]
+ * @see [Losses.MSLE]
  */
-public class MLSE : LossFunction {
+public class MSLE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val epsilon = 1e-5f
 
         val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
         val secondLog = tf.math.log(tf.math.add(tf.math.maximum(yTrue, tf.constant(epsilon)), tf.constant(1.0f)))
 
-        return tf.withName(TRAINING_LOSS)
-            .reduceSum(tf.math.mean(tf.math.squaredDifference(firstLog, secondLog), tf.constant(-1)), tf.constant(0))
+        val loss = tf.math.squaredDifference(firstLog, secondLog)
+
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
     }
 }
 
@@ -207,77 +211,114 @@ public class MLSE : LossFunction {
 /**
  * @see [Losses.POISSON]
  */
-public class Poisson : LossFunction {
+public class Poisson(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val epsilon = 1e-5f
-        val sub = tf.math.sub(yPred, tf.math.mul(yTrue, tf.math.log(tf.math.add(yPred, tf.constant(epsilon)))))
+        val loss = tf.math.sub(yPred, tf.math.mul(yTrue, tf.math.log(tf.math.add(yPred, tf.constant(epsilon)))))
 
-        return tf.withName(TRAINING_LOSS)
-            .reduceSum(tf.math.mean(sub, tf.constant(-1)), tf.constant(0))
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
     }
 }
 
+
 /**
- * @see [Losses.RMSE]
+ * @see [Losses.HINGE]
  */
-public class RMSE : LossFunction {
+public class Hinge(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
-    ): Operand<Float> {
-        val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(yPred, yTrue))
-        return tf.withName(TRAINING_LOSS).reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
-    }
-}
-
-/**
- * @see [Losses.HINGE_LOSS]
- */
-public class HingeLoss(val reductionType1: ReductionType = ReductionType.SUM) : LossFunction {
-    override fun apply(
-        tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         // We first need to convert binary labels to -1/1 labels (as floats).
-        val labelsShifted = tf.math.sub(tf.math.mul(tf.constant(2f) as Operand<Float>, yTrue), yTrue)
+        val two = tf.constant(2f)
+        val one = tf.constant(1f)
+        val zero = tf.constant(0f)
 
-        val loss: Operand<Float> = tf.nn.relu(
-            tf.math.sub(yTrue, tf.math.mul(labelsShifted, yPred))
-        )
+        val labelsShifted = tf.math.sub(tf.math.mul(two, yTrue), one)
 
-        return if (reductionType1 == ReductionType.SUM_OVER_BATCH_SIZE)
-            safeMean(tf, loss, TensorShape(loss.asOutput().shape()).numElements())
-        else {
-            tf.withName(TRAINING_LOSS).reduceSum(
-                tf.math.mean(
-                    loss, tf.constant(-1)
-                ), tf.constant(0)
-            )
-        }
+        val loss: Operand<Float> =
+            tf.math.maximum(tf.math.sub(one, tf.math.mul(labelsShifted, yPred)), zero)
+
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
     }
 }
 
 /**
- * @see [Losses.HUBER_LOSS]
+ * @see [Losses.SQUARED_HINGE]
+ */
+public class SquaredHinge(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(
+    reductionType
+) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        // We first need to convert binary labels to -1/1 labels (as floats).
+        val two = tf.constant(2f)
+        val one = tf.constant(1f)
+        val zero = tf.constant(0f)
+
+        val labelsShifted = tf.math.sub(tf.math.mul(two, yTrue), one)
+
+        val loss: Operand<Float> = tf.math.square(
+            tf.math.maximum(
+                tf.math.sub(one, tf.math.mul(labelsShifted, yPred)),
+                zero
+            )
+        )
+
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
+    }
+}
+
+/**
+ * @see [Losses.LOG_COSH]
+ */
+public class LogCosh(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(
+    reductionType
+) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val two = tf.constant(2f)
+        val minusTwo = tf.constant(-2f)
+
+        val diff = tf.math.sub(yPred, yTrue)
+        val softplus = tf.math.softplus(tf.math.mul(minusTwo, diff))
+        val loss = tf.math.sub(tf.math.add(diff, softplus), tf.math.log(two))
+
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
+    }
+}
+
+/**
+ * @see [Losses.HUBER]
  *
  * @param [delta] Huber loss delta.
  */
 // TODO: Huber is close to MAE/MSE via delta parameter: https://www.machinecurve.com/index.php/2019/10/12/using-huber-loss-in-keras/
-public class HuberLoss(public val delta: Float) : LossFunction {
+public class Huber(
+    public val delta: Float = 1.0f,
+    reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE
+) :
+    LossFunction(reductionType) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val error = tf.math.sub(yPred, yTrue)
 
@@ -295,70 +336,95 @@ public class HuberLoss(public val delta: Float) : LossFunction {
         val deltaLinear: Operand<Float> = tf.math.mul(deltaConst, linear)
         val loss: Operand<Float> = tf.math.add(q2Point5, deltaLinear)
 
-        val result: Operand<Float> = tfMean(tf, loss, tf.constant(-1))
-        return tf.withName(TRAINING_LOSS).identity(tf.reduceSum(result, tf.constant(0)))
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
     }
 }
 
 /**
- * @see [Losses.LOG_LOSS]
+ * @see [Losses.BINARY_CROSSENTROPY]
  */
-public class LogLoss : LossFunction {
+public class BinaryCrossEntropy(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : LossFunction(
+    reductionType
+) {
     override fun apply(
         tf: Ops,
         yPred: Operand<Float>,
         yTrue: Operand<Float>,
-        reductionType: ReductionType
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val epsilon = 1e-5f
+        val epsilon = 1e-7f
 
+        // Compute cross entropy from probabilities.
         val oneOp = tf.constant(1.0f) as Operand<Float>
         val minusOneOp = tf.constant(-1.0f) as Operand<Float>
         val epsilonOp = tf.constant(epsilon) as Operand<Float>
+        val oneMinusEpsilonOp = tf.math.sub(oneOp, epsilonOp)
 
-        val right = tf.math.mul(yTrue, tf.math.log(tf.math.add(yPred, epsilonOp)))
+        // TODO: Exception in thread "main" org.tensorflow.TensorFlowException: No gradient defined for op: ClipByValue
+        // val clippedYPred = tf.clipByValue(yPred, epsilonOp, oneMinusEpsilonOp)
+        val clippedYPred = tf.math.minimum(
+            oneMinusEpsilonOp,
+            tf.math.maximum(epsilonOp, yPred)
+        ) // probably takes 2 times memory for gradients instead of commented variant
+
+        val right = tf.math.mul(yTrue, tf.math.log(tf.math.add(clippedYPred, epsilonOp)))
         val left =
-            tf.math.mul(tf.math.log(tf.math.add(tf.math.sub(oneOp, yPred), epsilonOp)), tf.math.sub(oneOp, yTrue))
+            tf.math.mul(
+                tf.math.log(tf.math.add(tf.math.sub(oneOp, clippedYPred), epsilonOp)),
+                tf.math.sub(oneOp, yTrue)
+            )
 
         val sum = tf.math.add(right, left)
-        return tf.withName(TRAINING_LOSS).reduceSum(
-            tf.math.mean(tf.math.mul(minusOneOp, sum), tf.constant(-1)),
-            tf.constant(0)
+        val loss = tf.math.mul(minusOneOp, sum)
+
+        return meanOfLosses(tf, reductionType, loss, numberOfLosses)
+    }
+}
+
+private fun meanOfLosses(
+    tf: Ops,
+    reductionType: ReductionType,
+    loss: Operand<Float>,
+    numberOfLosses: Operand<Float>?
+): Operand<Float> {
+    val meanLoss = tf.math.mean(loss, tf.constant(-1), Mean.keepDims(false))
+
+    // Eager session, correct calculation
+    // numberOfLosses = tf.constant(TensorShape(loss.asOutput().shape()).numElements().toFloat())
+
+    var totalLoss: Operand<Float> = tf.reduceSum(
+        meanLoss,
+        allAxes(tf, meanLoss),
+        ReduceSum.keepDims(Boolean.FALSE)
+    )
+
+    if (reductionType == ReductionType.SUM_OVER_BATCH_SIZE) {
+        check(numberOfLosses != null) { "Operand numberOfLosses must be not null." }
+
+        totalLoss = safeMean(
+            tf,
+            loss,
+            numberOfLosses
         )
     }
+
+    return tf.withName(TRAINING_LOSS).identity(totalLoss)
 }
 
-/*fun safeMean(
-    tf: Ops, losses: Operand<Float>, numElements: Long
-): Operand<Float> {
-    val totalLoss: Operand<Float> = tf.reduceSum(losses, tf.constant(-1))
-    return tf.withName(TRAINING_LOSS).math.divNoNan(
-        totalLoss, tf.dtypes.cast(tf.constant(numElements), getDType())
-    )
-}*/
+internal fun safeMean(tf: Ops, loss: Operand<Float>, numElements: Operand<Float>): Operand<Float> {
+    val totalLoss: Operand<Float> = tf.reduceSum(loss, allAxes(tf, loss))
+    return tf.math.divNoNan(totalLoss, numElements)
+}
 
-fun safeMean(tf: Ops, loss: Operand<Float>, numElements: Long): Operand<Float> {
-    if (loss.asOutput().shape().numDimensions() == 0) {
-        return tf.math.divNoNan(loss, tf.dtypes.cast(tf.constant(numElements.toFloat()), getDType()))
+internal fun allAxes(tf: Ops, op: Operand<Float>): Operand<Int> {
+    val rank = op.asOutput().shape().numDimensions()
+    return if (rank != -1) {
+        val axes = IntArray(rank)
+        for (i in 0 until rank) {
+            axes[i] = i
+        }
+        tf.constant(axes)
     } else {
-        val totalLoss = tf.reduceSum(loss, KallAxis(tf, loss))
-        return tf.withName(TRAINING_LOSS).math.divNoNan(totalLoss, tf.constant(numElements.toFloat()) as Operand<Float>)
+        tf.range(tf.constant(0), tf.rank(op), tf.constant(1))
     }
-
-}
-
-fun KallAxis(tf: Ops, op: Operand<Float>): Operand<Int> {
-    val ranks: IntArray = KallAxis(op)
-    return tf.constant(ranks)
-
-}
-
-fun KallAxis(op: Operand<Float>): IntArray {
-    var rank = op.asOutput().shape().numDimensions()
-    if (rank == 0) return intArrayOf(1)
-    val ranks = IntArray(rank)
-    for (i in 0 until rank) {
-        ranks[i] = i
-    }
-    return ranks
 }

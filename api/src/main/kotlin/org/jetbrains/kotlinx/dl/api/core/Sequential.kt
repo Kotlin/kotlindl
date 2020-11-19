@@ -35,6 +35,7 @@ import org.jetbrains.kotlinx.dl.datasets.DataBatch
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -155,6 +156,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @param [configuration] File in .json format, containing the [Sequential] model.
          * @return Non-compiled and non-trained Sequential model.
          */
+        @JvmStatic
         public fun loadModelConfiguration(configuration: File): Sequential {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
@@ -167,6 +169,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @param [configuration] File in .json format, containing the [Sequential] model.
          * @return Pair of <input layer; list of layers>.
          */
+        @JvmStatic
         public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
@@ -180,6 +183,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
          * @return Non-compiled and non-trained Sequential model.
          */
+        @JvmStatic
         public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
@@ -200,6 +204,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
          * @return Pair of <input layer; list of layers>.
          */
+        @JvmStatic
         public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
@@ -254,9 +259,13 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         xOp = inputLayer.input
         yOp = tf.placeholder(getDType()) as Operand<Float>
+        numberOfLossesOp = tf.withName("batchSize").placeholder(
+            getDType(),
+            Placeholder.shape(Shape.scalar())
+        )
 
         yPred = transformInputWithNNModel(xOp)
-        lossOp = loss.apply(tf, yPred, yOp)
+        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         isModelCompiled = true
@@ -390,23 +399,41 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                     Tensor.create(
                         xBatchShape,
                         batch.x
-                    ).use { batchImages ->
-                        Tensor.create(yBatchShape, batch.y).use { batchLabels ->
-                            val (lossValue, metricValue) = trainOnBatch(targets, batchImages, batchLabels, metricOp)
+                    ).use { batchImagesTensor ->
+                        Tensor.create(yBatchShape, batch.y).use { batchLabelsTensor ->
+                            Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
+                                .use { numberOfLossesTensor ->
+                                    val (lossValue, metricValue) = trainOnBatch(
+                                        targets,
+                                        batchImagesTensor,
+                                        batchLabelsTensor,
+                                        numberOfLossesTensor as Tensor<Float>,
+                                        metricOp
+                                    )
+                                    if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                                        logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
+                                    }
 
-                            if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
-                                logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
-                            }
+                                    averageTrainingLossAccum += lossValue
+                                    averageTrainingMetricAccum += metricValue
+                                    val batchTrainingEvent =
+                                        BatchTrainingEvent(
+                                            i,
+                                            batchCounter,
+                                            lossValue.toDouble(),
+                                            metricValue.toDouble()
+                                        )
+                                    trainingHistory.appendBatch(batchTrainingEvent)
 
-                            averageTrainingLossAccum += lossValue
-                            averageTrainingMetricAccum += metricValue
-                            val batchTrainingEvent =
-                                BatchTrainingEvent(i, batchCounter, lossValue.toDouble(), metricValue.toDouble())
-                            trainingHistory.appendBatch(batchTrainingEvent)
+                                    logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
 
-                            logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
-
-                            callback.onTrainBatchEnd(batchCounter, trainBatchSize, batchTrainingEvent, trainingHistory)
+                                    callback.onTrainBatchEnd(
+                                        batchCounter,
+                                        trainBatchSize,
+                                        batchTrainingEvent,
+                                        trainingHistory
+                                    )
+                                }
                         }
                     }
                     batchCounter++
@@ -467,6 +494,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         targets: List<Operand<Float>>,
         batchImages: Tensor<Float>,
         batchLabels: Tensor<Float>,
+        numberOfLosses: Tensor<Float>,
         metricOp: Operand<Float>
     ): Pair<Float, Float> {
         val runner = session.runner()
@@ -478,6 +506,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         runner
             .feed(xOp.asOutput(), batchImages)
             .feed(yOp.asOutput(), batchLabels)
+            .feed(numberOfLossesOp.asOutput(), numberOfLosses)
 
         runner
             .fetch(TRAINING_LOSS)
@@ -526,25 +555,32 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             Tensor.create(
                 imageShape,
                 batch.x
-            ).use { testImages ->
-                Tensor.create(labelShape, batch.y).use { testLabels ->
-                    val lossAndMetrics = session.runner()
-                        .fetch(metricOp)
-                        .fetch(TRAINING_LOSS)
-                        .feed(xOp.asOutput(), testImages)
-                        .feed(yOp.asOutput(), testLabels)
-                        .run()
+            ).use { testImagesTensor ->
+                Tensor.create(labelShape, batch.y).use { testLabelsTensor ->
+                    Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
+                        val lossAndMetricsTensors = session.runner()
+                            .fetch(metricOp)
+                            .fetch(TRAINING_LOSS)
+                            .feed(xOp.asOutput(), testImagesTensor)
+                            .feed(yOp.asOutput(), testLabelsTensor)
+                            .feed(
+                                numberOfLossesOp.asOutput(),
+                                numberOfLossesTensor
+                            ) // TODO: change to number of loss pieces
+                            .run()
 
-                    val metricValue = lossAndMetrics[0].floatValue()
-                    val lossValue = lossAndMetrics[1].floatValue()
+                        val metricValue = lossAndMetricsTensors[0].floatValue()
+                        val lossValue = lossAndMetricsTensors[1].floatValue()
 
-                    averageMetricAccum += metricValue
-                    averageLossAccum += lossValue
+                        averageMetricAccum += metricValue
+                        averageLossAccum += lossValue
 
-                    val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
-                    evaluationHistory.appendBatch(batchEvent)
+                        val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
+                        evaluationHistory.appendBatch(batchEvent)
 
-                    callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                        callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                    }
+
                 }
             }
 

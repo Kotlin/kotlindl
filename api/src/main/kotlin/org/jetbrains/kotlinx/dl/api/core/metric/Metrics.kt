@@ -39,14 +39,7 @@ public enum class Metrics {
      *
      * `loss = square(log(y_true + 1.) - log(y_pred + 1.))`
      */
-    MLSE,
-
-    /**
-     * Computes the root of mean of squares of errors between labels and predictions.
-     *
-     * `metric = root(square(y_true - y_pred))`
-     */
-    RMSE;
+    MLSE;
 
     public companion object {
         /** Converts enum value to sub-class of [Metric]. */
@@ -55,7 +48,6 @@ public enum class Metrics {
                 ACCURACY -> Accuracy()
                 MAE -> MAE()
                 MSE -> MSE()
-                RMSE -> RMSE()
                 MLSE -> MLSE()
             }
         }
@@ -66,7 +58,6 @@ public enum class Metrics {
                 Accuracy::class -> ACCURACY
                 org.jetbrains.kotlinx.dl.api.core.metric.MAE::class -> MAE
                 org.jetbrains.kotlinx.dl.api.core.metric.MSE::class -> MSE
-                org.jetbrains.kotlinx.dl.api.core.metric.RMSE::class -> RMSE
                 else -> ACCURACY
             }
         }
@@ -102,16 +93,6 @@ public class MSE : Metric {
     override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
         return tf.reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
-    }
-}
-
-/**
- * @see [Metrics.RMSE]
- */
-public class RMSE : Metric {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
-        val rootSquaredError = tf.math.sqrt(tf.math.squaredDifference(yPred, yTrue))
-        return tf.reduceSum(tf.math.mean(rootSquaredError, tf.constant(-1)), tf.constant(0))
     }
 }
 
