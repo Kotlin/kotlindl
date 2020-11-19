@@ -166,6 +166,7 @@ documentation to help you get started. At this point, feel free to check out the
 - [Training a model](docs/training_a_model.md)
 - [Running inference with a trained model](docs/loading_trained_model_for_inference.md)
 - [Importing a Keras model](docs/importing_keras_model.md) 
+- [Transfer learning](docs/transfer_learning.md)
 
 For more inspiration, take a look at the [code examples](examples) in this repo.
 
