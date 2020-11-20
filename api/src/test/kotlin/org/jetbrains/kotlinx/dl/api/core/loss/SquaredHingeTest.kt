@@ -6,11 +6,11 @@
 package org.jetbrains.kotlinx.dl.api.core.loss
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import kotlin.test.assertEquals
 
 internal class SquaredHingeTest {
     @Test
