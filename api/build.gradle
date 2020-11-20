@@ -84,7 +84,7 @@ if (hasProperty('bintray_user') && hasProperty('bintray_key')) {
             name = 'kotlin-dl'
             vcsUrl = 'https://github.com/JetBrains/KotlinDL'
             userOrg = 'kotlin'
-            licenses = ['MIT']
+            licenses = ['Apache-2.0']
             publicDownloadNumbers = true
 
             //Optional version descriptor
