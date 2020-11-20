@@ -160,6 +160,7 @@ internal class SequentialModelTest {
                             "Name: Init_dense_2_dense_bias; Type: Fill; Out #tensors:  1\n" +
                             "Name: Assign_dense_2_dense_bias; Type: Assign; Out #tensors:  1\n" +
                             "Name: Placeholder; Type: Placeholder; Out #tensors:  1\n" +
+                            "Name: numberOfLosses; Type: Placeholder; Out #tensors:  1\n" +
                             "Name: Conv2d; Type: Conv2D; Out #tensors:  1\n" +
                             "Name: BiasAdd; Type: BiasAdd; Out #tensors:  1\n" +
                             "Name: Relu; Type: Relu; Out #tensors:  1\n" +
