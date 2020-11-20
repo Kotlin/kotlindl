@@ -18,8 +18,8 @@ import org.jetbrains.kotlinx.dl.datasets.Dataset
 import kotlin.random.Random
 
 private const val SEED = 12L
-private const val TEST_BATCH_SIZE = 100
-private const val EPOCHS = 10
+private const val TEST_BATCH_SIZE = 1000
+private const val EPOCHS = 100
 private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
@@ -72,17 +72,17 @@ fun main() {
     model.use {
         it.compile(
             optimizer = SGD(learningRate = 0.001f),
-            loss = Losses.MSLE,
-            metric = Metrics.MLSE
+            loss = Losses.MAE,
+            metric = Metrics.MAE
         )
 
         it.summary()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
 
-        val mse = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
+        val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
         println("Weights: " + it.getLayer("dense_1").getWeights()[0].contentDeepToString())
         println("Bias" + it.getLayer("dense_1").getWeights()[1].contentDeepToString())
-        println("MSE: $mse")
+        println("MAE: $mae")
     }
 }
 

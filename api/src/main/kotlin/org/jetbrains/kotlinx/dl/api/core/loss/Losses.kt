@@ -381,7 +381,7 @@ public class BinaryCrossEntropy(reductionType: ReductionType = ReductionType.SUM
     }
 }
 
-private fun meanOfLosses(
+internal fun meanOfLosses(
     tf: Ops,
     reductionType: ReductionType,
     loss: Operand<Float>,

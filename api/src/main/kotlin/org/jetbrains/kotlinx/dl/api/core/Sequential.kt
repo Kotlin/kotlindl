@@ -259,7 +259,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         xOp = inputLayer.input
         yOp = tf.placeholder(getDType()) as Operand<Float>
-        numberOfLossesOp = tf.withName("batchSize").placeholder(
+        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
             getDType(),
             Placeholder.shape(Shape.scalar())
         )
@@ -369,7 +369,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = metric.apply(tf, prediction, yOp)
+        val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
 
         if (!isOptimizerVariableInitialized) {
             logger.debug { "Initialization of optimizer variables." }
@@ -537,7 +537,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
-        val metricOp = metric.apply(tf, prediction, yOp)
+        val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
 
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize

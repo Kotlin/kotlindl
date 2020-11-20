@@ -32,14 +32,3 @@ public abstract class LossFunction(
     ): Operand<Float>
 }
 
-/** Choose type of loss values reduction in calculation of loss function value on the specific batch. */
-public enum class ReductionType {
-    /** Scalar sum of weighted losses. */
-    SUM,
-
-    /**
-     * Scalar `SUM` divided by number of elements in losses (number of losses).
-     * This reduction type is not supported when used with outside of built-in training loops with`compile`/`fit`.
-     */
-    SUM_OVER_BATCH_SIZE
-}

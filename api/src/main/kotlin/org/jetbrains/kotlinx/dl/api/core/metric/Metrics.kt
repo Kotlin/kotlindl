@@ -5,9 +5,16 @@
 
 package org.jetbrains.kotlinx.dl.api.core.metric
 
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
+import org.jetbrains.kotlinx.dl.api.core.loss.allAxes
+import org.jetbrains.kotlinx.dl.api.core.loss.safeMean
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.ReduceSum
+import org.tensorflow.op.math.Mean
+import java.lang.Boolean
 
 /**
  * Metrics.
@@ -39,7 +46,7 @@ public enum class Metrics {
      *
      * `loss = square(log(y_true + 1.) - log(y_pred + 1.))`
      */
-    MLSE;
+    MSLE;
 
     public companion object {
         /** Converts enum value to sub-class of [Metric]. */
@@ -48,7 +55,7 @@ public enum class Metrics {
                 ACCURACY -> Accuracy()
                 MAE -> MAE()
                 MSE -> MSE()
-                MLSE -> MLSE()
+                MSLE -> MSLE()
             }
         }
 
@@ -58,6 +65,7 @@ public enum class Metrics {
                 Accuracy::class -> ACCURACY
                 org.jetbrains.kotlinx.dl.api.core.metric.MAE::class -> MAE
                 org.jetbrains.kotlinx.dl.api.core.metric.MSE::class -> MSE
+                org.jetbrains.kotlinx.dl.api.core.metric.MSLE::class -> MSLE
                 else -> ACCURACY
             }
         }
@@ -67,8 +75,13 @@ public enum class Metrics {
 /**
  * @see [Metrics.ACCURACY]
  */
-public class Accuracy : Metric {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+public class Accuracy : Metric(reductionType = ReductionType.SUM_OVER_BATCH_SIZE) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float> {
         val predicted: Operand<Long> = tf.math.argMax(yPred, tf.constant(1))
         val expected: Operand<Long> = tf.math.argMax(yTrue, tf.constant(1))
 
@@ -77,38 +90,103 @@ public class Accuracy : Metric {
 }
 
 /**
- * @see [Metrics.MAE]
+ * @see [Losses.MSE]
  */
-public class MAE : Metric {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
-        val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
-        return tf.reduceSum(tf.math.mean(absoluteErrors, tf.constant(-1)), tf.constant(0))
-    }
-}
-
-/**
- * @see [Metrics.MSE]
- */
-public class MSE : Metric {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+public class MSE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
-        return tf.reduceSum(tf.math.mean(squaredError, tf.constant(-1)), tf.constant(0))
+        return meanOfMetrics(tf, reductionType, squaredError, numberOfLabels, "Metric_MSE")
     }
 }
 
 /**
- * @see [Metrics.MLSE]
+ * @see [Losses.MAE]
  */
-public class MLSE : Metric {
-    override fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float> {
+public class MAE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float> {
+        val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
+        return meanOfMetrics(tf, reductionType, absoluteErrors, numberOfLabels, "Metric_MAE")
+    }
+}
+
+/**
+ * @see [Losses.MAPE]
+ */
+public class MAPE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float> {
+        val epsilon = 1e-7f
+
+        val diff = tf.math.abs(
+            tf.math.div(
+                tf.math.sub(yTrue, yPred),
+                tf.math.maximum(tf.math.abs(yTrue), tf.constant(epsilon))
+            )
+        )
+
+        return meanOfMetrics(tf, reductionType, tf.math.mul(diff, tf.constant(100f)), numberOfLabels, "Metric_MAPE")
+    }
+}
+
+/**
+ * @see [Losses.MSLE]
+ */
+public class MSLE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
+    override fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float> {
         val epsilon = 1e-5f
 
         val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
         val secondLog = tf.math.log(tf.math.add(tf.math.maximum(yTrue, tf.constant(epsilon)), tf.constant(1.0f)))
 
-        return tf.reduceSum(
-            tf.math.mean(tf.math.squaredDifference(firstLog, secondLog), tf.constant(-1)), tf.constant(0)
-        )
+        val loss = tf.math.squaredDifference(firstLog, secondLog)
+
+        return meanOfMetrics(tf, reductionType, loss, numberOfLabels, "Metric_MSLE")
     }
 }
 
+internal fun meanOfMetrics(
+    tf: Ops,
+    reductionType: ReductionType,
+    metric: Operand<Float>,
+    numberOfLabels: Operand<Float>?,
+    metricName: String
+): Operand<Float> {
+    val meanMetric = tf.math.mean(metric, tf.constant(-1), Mean.keepDims(false))
+
+    var totalMetric: Operand<Float> = tf.reduceSum(
+        meanMetric,
+        allAxes(tf, meanMetric),
+        ReduceSum.keepDims(Boolean.FALSE)
+    )
+
+    if (reductionType == ReductionType.SUM_OVER_BATCH_SIZE) {
+        check(numberOfLabels != null) { "Operand numberOfLosses must be not null." }
+
+        totalMetric = safeMean(
+            tf,
+            metric,
+            numberOfLabels
+        )
+    }
+
+    return tf.withName(metricName).identity(totalMetric)
+}

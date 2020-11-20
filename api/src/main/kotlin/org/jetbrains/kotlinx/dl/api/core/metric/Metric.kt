@@ -5,13 +5,17 @@
 
 package org.jetbrains.kotlinx.dl.api.core.metric
 
+import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /**
  * Basic interface for all metric functions.
  */
-public interface Metric {
+public abstract class Metric(
+    /** Reduction type. Should be defined in sub-class*/
+    public val reductionType: ReductionType
+) {
     /**
      * Applies [Metric] to the [yPred] labels predicted by the model and known [yTrue] hidden during training.
      *
@@ -19,5 +23,10 @@ public interface Metric {
      * @param yTrue Ground truth values. Shape = `[batch_size, d0, .. dN]`.
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun apply(tf: Ops, yPred: Operand<Float>, yTrue: Operand<Float>): Operand<Float>
+    public abstract fun apply(
+        tf: Ops,
+        yPred: Operand<Float>,
+        yTrue: Operand<Float>,
+        numberOfLabels: Operand<Float>?
+    ): Operand<Float>
 }
