@@ -5,16 +5,17 @@ already of the same size, and grayscale only.
 With built-in functionality we can convert Fashion MNIST image archives into a Dataset object that we can use for model training.    
 
 ```kotlin
-val (train, test) = Dataset.createTrainAndTestDatasets(
-        "MNIST/train-images-idx3-ubyte.gz",
-        "MNIST/train-labels-idx1-ubyte.gz",
-        "MNIST/t10k-images-idx3-ubyte.gz",
-        "MNIST/t10k-labels-idx1-ubyte.gz",
-        10,
+    val (train, test) = Dataset.createTrainAndTestDatasets(
+        trainFeaturesPath = "datasets/mnist/train-images-idx3-ubyte.gz",
+        trainLabelsPath = "datasets/mnist/train-labels-idx1-ubyte.gz",
+        testFeaturesPath = "datasets/mnist/t10k-images-idx3-ubyte.gz",
+        testLabelsPath = "datasets/mnist/t10k-labels-idx1-ubyte.gz",
+        numClasses = 10,
         ::extractImages,
         ::extractLabels
     )
-    val (newTrain, validation) = train.split(0.95)
+
+    val (newTrain, validation) = train.split(splitRatio = 0.95)
 ```
 
 You may also notice that we are splitting the data into three sets. First, we have the train and the est sets. We won't be touching 
@@ -26,13 +27,21 @@ Now everything is ready to train the model. Use `fit` method for this:
 
 ```kotlin
 model.use{
-        it.compile(Adam(), Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY)
+        it.compile(optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY)
+
         it.summary()
 
         // You can think of the training process as "fitting" the model to describe the given data :)
-        it.fit(dataset = newTrain, epochs = 10, batchSize = 100, verbose = false)
+        it.fit(dataset = newTrain,
+                epochs = 10,
+                batchSize = 100,
+                verbose = false)
 
-        val accuracy = it.evaluate(dataset = validation, batchSize = 100).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = validation,
+                batchSize = 100).metrics[Metrics.ACCURACY]
+
         println("Accuracy: $accuracy")
         it.save(File("src/model/my_model"))
     }
@@ -65,7 +74,9 @@ Once the model has been trained, it's important to evaluate its performance on t
 check how it generalizes to the new data. 
 
 ```kotlin
-val accuracy = model.evaluate(dataset = validation, batchSize = 100).metrics[Metrics.ACCURACY]
+val accuracy = it.evaluate(dataset = validation,
+        batchSize = 100).metrics[Metrics.ACCURACY]
+
 println("Accuracy: $accuracy")
 ```
 

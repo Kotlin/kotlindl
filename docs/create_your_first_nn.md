@@ -97,7 +97,10 @@ describe this in the *compile* method:
     
 ```kotlin
     model.use{
-            it.compile(Adam(), Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY)
+            it.compile(optimizer = Adam(),
+                    loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                    metric = Metrics.ACCURACY)
+
             // next step here is training the model: this is described in the next tutorial
             // ...
         }
