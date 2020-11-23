@@ -1,0 +1,5671 @@
+{
+  "class_name": "Model",
+  "config": {
+    "name": "xception",
+    "layers": [
+      {
+        "class_name": "InputLayer",
+        "config": {
+          "batch_input_shape": [
+            null,
+            299,
+            299,
+            3
+          ],
+          "dtype": "float32",
+          "sparse": false,
+          "name": "input_1"
+        },
+        "name": "input_1",
+        "inbound_nodes": []
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "block1_conv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 32,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            2,
+            2
+          ],
+          "padding": "valid",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "block1_conv1",
+        "inbound_nodes": [
+          [
+            [
+              "input_1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block1_conv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block1_conv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block1_conv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block1_conv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "block1_conv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 64,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "valid",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "block1_conv2",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block1_conv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block1_conv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block1_conv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block1_conv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block2_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 128,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block2_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block2_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block2_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block2_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block2_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block2_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block2_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block2_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 128,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block2_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block2_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block2_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block2_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block2_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "conv2d",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 128,
+          "kernel_size": [
+            1,
+            1
+          ],
+          "strides": [
+            2,
+            2
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "conv2d",
+        "inbound_nodes": [
+          [
+            [
+              "block1_conv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "MaxPooling2D",
+        "config": {
+          "name": "block2_pool",
+          "trainable": true,
+          "dtype": "float32",
+          "pool_size": [
+            3,
+            3
+          ],
+          "padding": "same",
+          "strides": [
+            2,
+            2
+          ],
+          "data_format": "channels_last"
+        },
+        "name": "block2_pool",
+        "inbound_nodes": [
+          [
+            [
+              "block2_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "batch_normalization",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "batch_normalization",
+        "inbound_nodes": [
+          [
+            [
+              "conv2d",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add",
+        "inbound_nodes": [
+          [
+            [
+              "block2_pool",
+              0,
+              0,
+              {}
+            ],
+            [
+              "batch_normalization",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block3_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block3_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block3_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 256,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block3_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block3_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block3_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block3_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block3_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block3_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 256,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block3_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block3_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block3_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "conv2d_1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 256,
+          "kernel_size": [
+            1,
+            1
+          ],
+          "strides": [
+            2,
+            2
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "conv2d_1",
+        "inbound_nodes": [
+          [
+            [
+              "add",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "MaxPooling2D",
+        "config": {
+          "name": "block3_pool",
+          "trainable": true,
+          "dtype": "float32",
+          "pool_size": [
+            3,
+            3
+          ],
+          "padding": "same",
+          "strides": [
+            2,
+            2
+          ],
+          "data_format": "channels_last"
+        },
+        "name": "block3_pool",
+        "inbound_nodes": [
+          [
+            [
+              "block3_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "batch_normalization_1",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "batch_normalization_1",
+        "inbound_nodes": [
+          [
+            [
+              "conv2d_1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_1",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_1",
+        "inbound_nodes": [
+          [
+            [
+              "block3_pool",
+              0,
+              0,
+              {}
+            ],
+            [
+              "batch_normalization_1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block4_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block4_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block4_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block4_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block4_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block4_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block4_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block4_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block4_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block4_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block4_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block4_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "conv2d_2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            1,
+            1
+          ],
+          "strides": [
+            2,
+            2
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "conv2d_2",
+        "inbound_nodes": [
+          [
+            [
+              "add_1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "MaxPooling2D",
+        "config": {
+          "name": "block4_pool",
+          "trainable": true,
+          "dtype": "float32",
+          "pool_size": [
+            3,
+            3
+          ],
+          "padding": "same",
+          "strides": [
+            2,
+            2
+          ],
+          "data_format": "channels_last"
+        },
+        "name": "block4_pool",
+        "inbound_nodes": [
+          [
+            [
+              "block4_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "batch_normalization_2",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "batch_normalization_2",
+        "inbound_nodes": [
+          [
+            [
+              "conv2d_2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_2",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_2",
+        "inbound_nodes": [
+          [
+            [
+              "block4_pool",
+              0,
+              0,
+              {}
+            ],
+            [
+              "batch_normalization_2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block5_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block5_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block5_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block5_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block5_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block5_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block5_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block5_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block5_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block5_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block5_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block5_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block5_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block5_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block5_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block5_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block5_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block5_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_3",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_3",
+        "inbound_nodes": [
+          [
+            [
+              "block5_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block6_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block6_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block6_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block6_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block6_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block6_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block6_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block6_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block6_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block6_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block6_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block6_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block6_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block6_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block6_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block6_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block6_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block6_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_4",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_4",
+        "inbound_nodes": [
+          [
+            [
+              "block6_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block7_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block7_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_4",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block7_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block7_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block7_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block7_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block7_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block7_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block7_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block7_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block7_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block7_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block7_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block7_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block7_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block7_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block7_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block7_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_5",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_5",
+        "inbound_nodes": [
+          [
+            [
+              "block7_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_4",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block8_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block8_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_5",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block8_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block8_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block8_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block8_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block8_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block8_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block8_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block8_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block8_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block8_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block8_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block8_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block8_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block8_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block8_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block8_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_6",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_6",
+        "inbound_nodes": [
+          [
+            [
+              "block8_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_5",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block9_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block9_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_6",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block9_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block9_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block9_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block9_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block9_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block9_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block9_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block9_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block9_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block9_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block9_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block9_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block9_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block9_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block9_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block9_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_7",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_7",
+        "inbound_nodes": [
+          [
+            [
+              "block9_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_6",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block10_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block10_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_7",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block10_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block10_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block10_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block10_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block10_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block10_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block10_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block10_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block10_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block10_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block10_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block10_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block10_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block10_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block10_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block10_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_8",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_8",
+        "inbound_nodes": [
+          [
+            [
+              "block10_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_7",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block11_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block11_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_8",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block11_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block11_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block11_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block11_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block11_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block11_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block11_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block11_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block11_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block11_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block11_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block11_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block11_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block11_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block11_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block11_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_9",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_9",
+        "inbound_nodes": [
+          [
+            [
+              "block11_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_8",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block12_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block12_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_9",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block12_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block12_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block12_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block12_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block12_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block12_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block12_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block12_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block12_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block12_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block12_sepconv3_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block12_sepconv3_act",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block12_sepconv3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block12_sepconv3",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv3_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block12_sepconv3_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block12_sepconv3_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_10",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_10",
+        "inbound_nodes": [
+          [
+            [
+              "block12_sepconv3_bn",
+              0,
+              0,
+              {}
+            ],
+            [
+              "add_9",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block13_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block13_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "add_10",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block13_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 728,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block13_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block13_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block13_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block13_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block13_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block13_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 1024,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block13_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block13_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block13_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Conv2D",
+        "config": {
+          "name": "conv2d_3",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 1024,
+          "kernel_size": [
+            1,
+            1
+          ],
+          "strides": [
+            2,
+            2
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "conv2d_3",
+        "inbound_nodes": [
+          [
+            [
+              "add_10",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "MaxPooling2D",
+        "config": {
+          "name": "block13_pool",
+          "trainable": true,
+          "dtype": "float32",
+          "pool_size": [
+            3,
+            3
+          ],
+          "padding": "same",
+          "strides": [
+            2,
+            2
+          ],
+          "data_format": "channels_last"
+        },
+        "name": "block13_pool",
+        "inbound_nodes": [
+          [
+            [
+              "block13_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "batch_normalization_3",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "batch_normalization_3",
+        "inbound_nodes": [
+          [
+            [
+              "conv2d_3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Add",
+        "config": {
+          "name": "add_11",
+          "trainable": true,
+          "dtype": "float32"
+        },
+        "name": "add_11",
+        "inbound_nodes": [
+          [
+            [
+              "block13_pool",
+              0,
+              0,
+              {}
+            ],
+            [
+              "batch_normalization_3",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block14_sepconv1",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 1536,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block14_sepconv1",
+        "inbound_nodes": [
+          [
+            [
+              "add_11",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block14_sepconv1_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block14_sepconv1_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv1",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block14_sepconv1_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block14_sepconv1_act",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv1_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "SeparableConv2D",
+        "config": {
+          "name": "block14_sepconv2",
+          "trainable": true,
+          "dtype": "float32",
+          "filters": 2048,
+          "kernel_size": [
+            3,
+            3
+          ],
+          "strides": [
+            1,
+            1
+          ],
+          "padding": "same",
+          "data_format": "channels_last",
+          "dilation_rate": [
+            1,
+            1
+          ],
+          "activation": "linear",
+          "use_bias": false,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null,
+          "depth_multiplier": 1,
+          "depthwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "pointwise_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "depthwise_regularizer": null,
+          "pointwise_regularizer": null,
+          "depthwise_constraint": null,
+          "pointwise_constraint": null
+        },
+        "name": "block14_sepconv2",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv1_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "BatchNormalization",
+        "config": {
+          "name": "block14_sepconv2_bn",
+          "trainable": true,
+          "dtype": "float32",
+          "axis": [
+            3
+          ],
+          "momentum": 0.99,
+          "epsilon": 0.001,
+          "center": true,
+          "scale": true,
+          "beta_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "gamma_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "moving_mean_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "moving_variance_initializer": {
+            "class_name": "Ones",
+            "config": {}
+          },
+          "beta_regularizer": null,
+          "gamma_regularizer": null,
+          "beta_constraint": null,
+          "gamma_constraint": null
+        },
+        "name": "block14_sepconv2_bn",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv2",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Activation",
+        "config": {
+          "name": "block14_sepconv2_act",
+          "trainable": true,
+          "dtype": "float32",
+          "activation": "relu"
+        },
+        "name": "block14_sepconv2_act",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv2_bn",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "GlobalAveragePooling2D",
+        "config": {
+          "name": "avg_pool",
+          "trainable": true,
+          "dtype": "float32",
+          "data_format": "channels_last"
+        },
+        "name": "avg_pool",
+        "inbound_nodes": [
+          [
+            [
+              "block14_sepconv2_act",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      },
+      {
+        "class_name": "Dense",
+        "config": {
+          "name": "predictions",
+          "trainable": true,
+          "dtype": "float32",
+          "units": 1000,
+          "activation": "softmax",
+          "use_bias": true,
+          "kernel_initializer": {
+            "class_name": "GlorotUniform",
+            "config": {
+              "seed": null
+            }
+          },
+          "bias_initializer": {
+            "class_name": "Zeros",
+            "config": {}
+          },
+          "kernel_regularizer": null,
+          "bias_regularizer": null,
+          "activity_regularizer": null,
+          "kernel_constraint": null,
+          "bias_constraint": null
+        },
+        "name": "predictions",
+        "inbound_nodes": [
+          [
+            [
+              "avg_pool",
+              0,
+              0,
+              {}
+            ]
+          ]
+        ]
+      }
+    ],
+    "input_layers": [
+      [
+        "input_1",
+        0,
+        0
+      ]
+    ],
+    "output_layers": [
+      [
+        "predictions",
+        0,
+        0
+      ]
+    ]
+  },
+  "keras_version": "2.2.4-tf",
+  "backend": "tensorflow"
+}

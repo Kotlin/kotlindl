@@ -1,2 +1,5 @@
-rootProject.name = 'Kotof'
+rootProject.name = 'KotlinDL'
+include("api")
+include("examples")
+
 
