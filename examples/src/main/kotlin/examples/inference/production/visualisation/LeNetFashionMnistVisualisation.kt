@@ -28,6 +28,11 @@ private val fashionMnistLabelEncoding = mapOf(
     9 to "Ankle boot"
 )
 
+/**
+ * This examples demonstrates model activations and Conv2D filters visualisation.
+ *
+ * Model is trained on FashionMnist dataset.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,

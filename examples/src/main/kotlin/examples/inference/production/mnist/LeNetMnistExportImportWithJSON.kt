@@ -22,6 +22,17 @@ private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 
+/**
+ * This examples demonstrates model and model weights export and import back.
+ *
+ * Models is exported in Keras-style json format, weights are exported in custom (txt) format.
+ *
+ * After loading model is trained again with another optimizer with frozen Conv2D layers. Only weights in Dense layers can be updated.
+ *
+ * Model is trained on Mnist dataset.
+ *
+ * It saves all the data to the project root directory.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,

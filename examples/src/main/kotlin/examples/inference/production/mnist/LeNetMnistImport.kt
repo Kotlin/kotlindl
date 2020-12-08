@@ -12,6 +12,11 @@ import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
 
+/**
+ * Inference model is used here, separately from model training code to illustrate the ability to load model graph and weights to start prediction process.
+ *
+ * NOTE: The example requires the saved model in the appropriate directory (run LeNetMnistExportImport.kt firstly).
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
@@ -35,8 +40,6 @@ fun main() {
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)
-
-            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
         }
         println("Accuracy: $accuracy")
     }

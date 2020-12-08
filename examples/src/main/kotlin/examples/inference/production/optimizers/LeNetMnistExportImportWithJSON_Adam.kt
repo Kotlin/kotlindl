@@ -22,6 +22,13 @@ private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 
+/**
+ * This examples demonstrates model, model weights and optimizer weights export and import back.
+ *
+ * Models is exported in json format, weights are exported in custom (txt) format.
+ *
+ * It saves all the data to the project root directory.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,

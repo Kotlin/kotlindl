@@ -32,6 +32,15 @@ private val fashionMnistLabelEncoding = mapOf(
     9 to "Ankle boot"
 )
 
+/**
+ * This examples demonstrates model and model weights export and import back.
+ *
+ * Models is exported as graph in .pb format, weights are exported in custom (txt) format.
+ *
+ * Model is trained on FashionMnist dataset.
+ *
+ * It saves all the data to the project root directory.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -56,10 +65,6 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE,
             verbose = true
         )
-
-        val weights = it.layers[0].getWeights() // first conv2d layer
-
-        drawFilters(weights[0])
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

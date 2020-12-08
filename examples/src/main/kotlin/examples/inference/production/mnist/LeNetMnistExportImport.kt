@@ -19,6 +19,15 @@ private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
+/**
+ * This examples demonstrates model and model weights export and import back.
+ *
+ * Models is exported as graph in .pb format, weights are exported in custom (txt) format.
+ *
+ * Model is trained on Mnist dataset.
+ *
+ * It saves all the data to the project root directory.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,
