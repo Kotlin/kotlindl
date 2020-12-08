@@ -29,8 +29,10 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
 /**
- * Kotlin implementation of LeNet on Keras.
- * Architecture could be copied here: https://github.com/TaavishThaman/LeNet-5-with-Keras/blob/master/lenet_5.py
+ * This is an CNN based on an implementation of LeNet-5 from classic paper trained with custom callback.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
+ *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
  */
 private val model = Sequential.of(
     Input(

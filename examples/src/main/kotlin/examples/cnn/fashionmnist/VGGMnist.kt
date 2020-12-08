@@ -31,8 +31,7 @@ private const val SEED = 12L
 val heNormal = HeNormal(SEED)
 
 /**
- * Kotlin implementation of VGG'11 on Keras.
- * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
+ * This model is an implementation of VGG'11 model for FashionMnist Dataset.
  */
 private val vgg11 = Sequential.of(
     Input(
@@ -146,7 +145,7 @@ private val vgg11 = Sequential.of(
         biasInitializer = heNormal
     ),
     Dense(
-        outputSize = NUM_LABELS, // changed due to 10 classes instead of
+        outputSize = NUM_LABELS,
         activation = Activations.Linear,
         kernelInitializer = heNormal,
         biasInitializer = heNormal

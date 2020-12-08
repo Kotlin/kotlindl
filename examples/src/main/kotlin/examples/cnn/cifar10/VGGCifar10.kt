@@ -21,6 +21,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import java.io.File
+import java.io.FileReader
+import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
 private const val EPOCHS = 20
@@ -31,7 +33,11 @@ private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 32L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
-/** This model is an implementation of VGG'11 model with reduced number of neurons in each layer (2 times for Conv2D and 8 times for Dense).
+/**
+ * This model is an implementation of VGG'11 model with reduced number of neurons in each layer (2 times for Conv2D and 8 times for Dense).
+ *
+ * @see <a href="https://drive.google.com/drive/folders/1AgXUyxNj_THugDNZfYvQlPJfR7SKkHW4">
+ *     Cifar'10 images and labels could be downloaded here.</a>
  *
  * @see <a href="https://arxiv.org/abs/1409.1556">
  *     Very Deep Convolutional Networks for Large-Scale Image Recognition:[Karen Simonyan, Andrew Zisserman, 2015]</a>
@@ -156,9 +162,16 @@ private val vgg11 = Sequential.of(
 )
 
 fun main() {
+    val properties = Properties()
+    val reader = FileReader("examples.properties")
+    properties.load(reader)
+
+    val cifarImagesArchive = properties["cifarImagesArchive"] as String
+    val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
+
     val dataset = Dataset.create(
-        IMAGES_ARCHIVE,
-        LABELS_ARCHIVE,
+        cifarImagesArchive,
+        cifarLabelsArchive,
         NUM_LABELS,
         ::extractCifar10Images,
         ::extractCifar10Labels

@@ -11,8 +11,6 @@ import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.IOException
 
-const val IMAGES_ARCHIVE = "C:\\zaleslaw\\home\\data\\cifar10\\images\\images"
-const val LABELS_ARCHIVE = "C:\\zaleslaw\\home\\data\\cifar10\\trainLabels.csv"
 private const val DATASET_SIZE = 50000
 
 @Throws(IOException::class)

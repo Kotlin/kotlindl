@@ -24,7 +24,7 @@ import org.jetbrains.kotlinx.dl.datasets.Dataset;
 import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
 
 /**
- * This example demonstrates the
+ * This example demonstrates the ability to define and train LeNet-5 model in Java.
  */
 public class LeNetClassic {
     public static final Integer EPOCHS = 3;

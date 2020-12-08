@@ -31,9 +31,7 @@ private const val SEED = 12L
 val heNormal = HeNormal(SEED)
 
 /**
- * Kotlin implementation of VGG'11 on Keras.
- * Make accuracy ~ 0.9 on Mnist Test dataset
- * Architecture could be copied here: https://medium.com/@amir_hf8/implementing-vgg13-for-mnist-dataset-in-tensorflow-abc1460e2b93
+ * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
  */
 private val vgg11 = Sequential.of(
     Input(
@@ -139,12 +137,6 @@ private val vgg11 = Sequential.of(
         padding = ConvPadding.SAME
     ),
     Flatten(),
-    /*Dense(
-        outputSize = 4096,
-        activation = Activations.Relu,
-        kernelInitializer = Zeros(),
-        biasInitializer = Zeros()
-    ),*/
     Dense(
         outputSize = 2048,
         activation = Activations.Relu,

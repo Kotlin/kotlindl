@@ -17,8 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.loss.BinaryCrossEntropy
-import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
@@ -31,6 +30,12 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 100
 
+/**
+ * This is an CNN based on an implementation of LeNet-5 from classic paper trained with alternative to popular CrossEntropy losses like Huber.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
+ *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ */
 private val lenet5Classic = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -102,7 +107,7 @@ fun main() {
     lenet5Classic.use {
         it.compile(
             optimizer = Adam(),
-            loss = BinaryCrossEntropy(reductionType = ReductionType.SUM_OVER_BATCH_SIZE),
+            loss = Losses.HUBER,
             metric = Metrics.ACCURACY
         )
 
