@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.transferlearning
+package examples.transferlearning
 
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -14,10 +14,15 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
+import java.io.FileReader
+import java.util.*
 
+/**
+ * This examples demonstrates weights loading from outdated or custom weights schema in .h5 file.
+ * Also recursivePrintGroupInHDF5File() is helpful to discover hidden schema and paths.
+ */
 fun main() {
-    val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
-    val jsonConfigFile = File(jsonConfigFilePath)
+    val jsonConfigFile = getVGG16JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
@@ -30,9 +35,7 @@ fun main() {
         )
         it.summary()
 
-        val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\vgg16_weights_tf_dim_ordering_tf_kernels.h5"
-        val file = File(pathToWeights)
-        val hdfFile = HdfFile(file)
+        val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
         val kernelDataPathTemplate = "/%s/%s_W_1:0"
@@ -61,9 +64,7 @@ fun main() {
         )
         it.summary()
 
-        val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\vgg16_weights_tf_dim_ordering_tf_kernels.h5"
-        val file = File(pathToWeights)
-        val hdfFile = HdfFile(file)
+        val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
         val weightPaths = listOf(
@@ -160,13 +161,33 @@ fun main() {
         )
         it.summary()
 
-        val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\vgg16_weights_tf_dim_ordering_tf_kernels.h5"
-        val file = File(pathToWeights)
-        val hdfFile = HdfFile(file)
+        val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
         it.loadWeights(hdfFile) // await exception
     }
+}
+
+/** Returns JSON file with model configuration, saved from Keras 2.x. */
+private fun getVGG16JSONConfigFile(): File {
+    val properties = Properties()
+    val reader = FileReader("data.properties")
+    properties.load(reader)
+
+    val vgg16JSONModelPathForOldWeightSchema = properties["vgg16JSONModelPathForOldWeightSchema"] as String
+
+    return File(vgg16JSONModelPathForOldWeightSchema)
+}
+
+/** Returns .h5 file with model weights, saved from Keras 2.x. with old weights schema in h5 file */
+private fun getVGG16WeightsFile(): HdfFile {
+    val properties = Properties()
+    val reader = FileReader("data.properties")
+    properties.load(reader)
+
+    val vgg19h5WeightsPathForOldWeightSchema = properties["vgg19h5WeightsPathForOldWeightSchema"] as String
+
+    return HdfFile(File(vgg19h5WeightsPathForOldWeightSchema))
 }
 
 

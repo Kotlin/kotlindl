@@ -3,9 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.transferlearning
+package examples.transferlearning
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -17,9 +18,9 @@ import org.jetbrains.kotlinx.dl.datasets.handlers.*
 /**
  * This examples demonstrates the transfer learning concept:
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * Weights are loaded from .h5 file for a pre-filtered list of layers (Conv2D only), configuration is loaded from .json file.
  *
- * Conv2D layer are added to the new Neural Network, its weights are frozen, Dense layers are added too and its weights are not frozen, and can be changed during the training.
+ * Conv2D layer are added to the new Neural Network, its weights are frozen, Dense layers are added too and its weights are initialized via defined initializers.
  *
  * No new layers are added.
  *
@@ -36,15 +37,17 @@ fun main() {
         ::extractFashionLabels
     )
 
-
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
+        val layerList = mutableListOf<Layer>()
         // Freeze conv2d layers, keep dense layers trainable
         for (layer in it.layers) {
-            if (layer is Conv2D)
+            if (layer::class == Conv2D::class) {
                 layer.isTrainable = false
+                layerList.add(layer)
+            }
         }
 
         it.compile(
@@ -56,7 +59,7 @@ fun main() {
         it.summary()
 
         val hdfFile = getWeightsFile()
-        it.loadWeights(hdfFile)
+        it.loadWeights(hdfFile, layerList)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBefore")
@@ -64,10 +67,10 @@ fun main() {
         it.fit(
             dataset = train,
             validationRate = 0.1,
-            epochs = 3,
+            epochs = 5,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = true,
+            verbose = true
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

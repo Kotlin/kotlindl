@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.transferlearning
+package examples.transferlearning
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
@@ -17,10 +17,11 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
+import java.io.FileReader
+import java.util.*
 
 fun main() {
-    val jsonConfigFilePath = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
-    val jsonConfigFile = File(jsonConfigFilePath)
+    val jsonConfigFile = getVGG16JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
@@ -35,9 +36,7 @@ fun main() {
 
         it.summary()
 
-        val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\weights.h5"
-        val file = File(pathToWeights)
-        val hdfFile = HdfFile(file)
+        val hdfFile = getVGG16WeightsFile()
 
         it.loadWeights(hdfFile)
 
@@ -95,19 +94,25 @@ fun prepareHumanReadableClassLabels(): MutableMap<Int, String> {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-fun getVGG16JSONConfigFile(): File {
-    val pathToConfig = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
-    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+private fun getVGG16JSONConfigFile(): File {
+    val properties = Properties()
+    val reader = FileReader("data.properties")
+    properties.load(reader)
 
-    return File(realPathToConfig)
+    val vgg16JSONModelPath = properties["vgg16JSONModelPath"] as String
+
+    return File(vgg16JSONModelPath)
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
-fun getVGG16WeightsFile(): HdfFile {
-    val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\weights.h5"
-    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
-    val file = File(realPathToWeights)
-    return HdfFile(file)
+private fun getVGG16WeightsFile(): HdfFile {
+    val properties = Properties()
+    val reader = FileReader("data.properties")
+    properties.load(reader)
+
+    val vgg16h5WeightsPath = properties["vgg16h5WeightsPath"] as String
+
+    return HdfFile(File(vgg16h5WeightsPath))
 }
 
 

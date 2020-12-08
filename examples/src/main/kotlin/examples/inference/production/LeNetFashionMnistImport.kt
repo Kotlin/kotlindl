@@ -3,21 +3,22 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.production
+package examples.inference.production
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 import java.io.File
 
-private const val PATH_TO_MODEL = "savedmodels/lenet5"
+private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
+
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
+        FASHION_TRAIN_IMAGES_ARCHIVE,
+        FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE,
+        FASHION_TEST_LABELS_ARCHIVE,
         NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
@@ -35,9 +36,15 @@ fun main() {
 
             if (prediction == getLabel(train, imageId))
                 accuracy += (1.0 / amountOfTestSet)
-
-            //println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId)}")
         }
         println("Accuracy: $accuracy")
+
+        val amountOfOps = 1000
+        val start = System.currentTimeMillis()
+        for (i in 0..amountOfOps) {
+            it.predict(train.getX(i % 50000))
+        }
+        println("Time, s: ${(System.currentTimeMillis() - start) / 1000f}")
+        println("Throughput, op/s: ${amountOfOps / ((System.currentTimeMillis() - start) / 1000f)}")
     }
 }

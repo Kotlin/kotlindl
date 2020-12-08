@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.transferlearning
+package examples.transferlearning
 
 import LeNetClassic.SEED
 import org.jetbrains.kotlinx.dl.api.core.Sequential

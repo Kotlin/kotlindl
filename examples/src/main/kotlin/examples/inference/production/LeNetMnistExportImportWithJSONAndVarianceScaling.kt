@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.production
+package examples.inference.production
 
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -63,7 +63,7 @@ fun main() {
         println("Accuracy $accuracy")
     }
 
-    val model = Sequential.loadModelConfiguration(File("$PATH_TO_MODEL/modelConfig.json"))
+    val model = Sequential.loadDefaultModelConfiguration(File(PATH_TO_MODEL))
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
