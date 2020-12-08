@@ -35,7 +35,7 @@ and call the `predict` method on them.
 ```kotlin
 fun main() {
     InferenceModel.load(File(PATH_TO_MODEL)).use {
-        it.reshape(::reshape)
+        it.reshape(::reshapeInput)
         val prediction = it.predict(floatArray)
         println("Predicted label is: $prediction. This corresponds to class ${stringLabels[prediction]}.")
     }
