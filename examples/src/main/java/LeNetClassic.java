@@ -23,6 +23,9 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
 import org.jetbrains.kotlinx.dl.datasets.Dataset;
 import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
 
+/**
+ * This example demonstrates the
+ */
 public class LeNetClassic {
     public static final Integer EPOCHS = 3;
     public static final Integer TRAINING_BATCH_SIZE = 1000;
@@ -32,7 +35,7 @@ public class LeNetClassic {
     public static final Integer TEST_BATCH_SIZE = 1000;
 
     public static void main(String[] args) {
-        Pair<Dataset, Dataset> result = Dataset.Companion.createTrainAndTestDatasets(
+        Pair<Dataset, Dataset> result = Dataset.createTrainAndTestDatasets(
                 MnistUtilKt.TRAIN_IMAGES_ARCHIVE,
                 MnistUtilKt.TRAIN_LABELS_ARCHIVE,
                 MnistUtilKt.TEST_IMAGES_ARCHIVE,

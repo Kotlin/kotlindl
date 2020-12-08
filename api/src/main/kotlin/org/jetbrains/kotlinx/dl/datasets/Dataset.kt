@@ -59,6 +59,7 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
 
     public companion object {
         /** Creates binary vector with size [numClasses] from [label]. */
+        @JvmStatic
         public fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
             val ret = FloatArray(numClasses)
             ret[label.toInt() and 0xFF] = 1f
@@ -66,16 +67,19 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
         }
 
         /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
+        @JvmStatic
         public fun toNormalizedVector(bytes: ByteArray): FloatArray {
             return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)) / 255f }
         }
 
         /** Converts [bytes] to [FloatArray]. */
+        @JvmStatic
         public fun toRawVector(bytes: ByteArray): FloatArray {
             return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF).toFloat()) }
         }
 
         /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
+        @JvmStatic
         public fun serializeToBuffer(src: Array<FloatArray>, start: Int, length: Int): FloatBuffer {
             val buffer = FloatBuffer.allocate(length * src[0].size)
             for (i in start until start + length) {
@@ -89,6 +93,7 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
          * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
          * to create pair of train and test [Dataset].
          */
+        @JvmStatic
         public fun createTrainAndTestDatasets(
             trainFeaturesPath: String,
             trainLabelsPath: String,
@@ -114,6 +119,7 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
          * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
          * to create pair of train and test [Dataset].
          */
+        @JvmStatic
         public fun create(
             featuresPath: String,
             labelsPath: String,
@@ -137,6 +143,7 @@ public class Dataset internal constructor(private val x: Array<FloatArray>, priv
          * Takes data from consumers [featuresConsumer] and [labelConsumer]
          * to create pair of train and test [Dataset].
          */
+        @JvmStatic
         public fun create(
             featuresConsumer: () -> Array<FloatArray>,
             labelConsumer: () -> Array<FloatArray>
