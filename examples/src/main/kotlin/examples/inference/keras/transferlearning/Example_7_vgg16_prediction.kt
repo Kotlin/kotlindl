@@ -3,8 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.demo
-
+package examples.inference.keras.transferlearning
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
@@ -93,6 +92,22 @@ fun prepareHumanReadableClassLabels(): MutableMap<Int, String> {
         imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
     }
     return imageNetClassIndices
+}
+
+/** Returns JSON file with model configuration, saved from Keras 2.x. */
+fun getVGG16JSONConfigFile(): File {
+    val pathToConfig = "C:\\zaleslaw\\home\\models\\vgg\\modelConfig.json"
+    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+
+    return File(realPathToConfig)
+}
+
+/** Returns .h5 file with model weights, saved from Keras 2.x. */
+fun getVGG16WeightsFile(): HdfFile {
+    val pathToWeights = "C:\\zaleslaw\\home\\models\\vgg\\hdf\\weights.h5"
+    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    val file = File(realPathToWeights)
+    return HdfFile(file)
 }
 
 

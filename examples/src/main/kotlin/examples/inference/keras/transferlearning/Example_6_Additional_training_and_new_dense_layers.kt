@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.demo
+package examples.inference.keras.transferlearning
 
 import LeNetClassic.SEED
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -21,6 +21,17 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
+/**
+ * This examples demonstrates the transfer learning concept:
+ *
+ * Weights are loaded from .h5 file, configuration is loaded from .json file.
+ *
+ * Conv2D layer are added to the new Neural Network, its weights are frozen.
+ *
+ * Flatten and new Dense layers are added and initialized via defined initializers.
+ *
+ * NOTE: Model and weights are resources in api module.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,

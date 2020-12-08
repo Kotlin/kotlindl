@@ -1,7 +1,7 @@
 /gradlew
 /gradlew.bat
 /gradle.properties
-/example.properties
+/data.properties
 /logs.txt
 /savedmodels/
 /.gradle/

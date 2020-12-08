@@ -163,7 +163,7 @@ private val vgg11 = Sequential.of(
 
 fun main() {
     val properties = Properties()
-    val reader = FileReader("examples.properties")
+    val reader = FileReader("data.properties")
     properties.load(reader)
 
     val cifarImagesArchive = properties["cifarImagesArchive"] as String

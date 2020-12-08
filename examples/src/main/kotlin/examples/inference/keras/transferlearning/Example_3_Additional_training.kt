@@ -3,20 +3,27 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras
+package examples.inference.keras.transferlearning
 
-import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
-import java.io.File
 
-/** All weigths are loaded, Conv2D layers are freezed, Dense weights could be changed during the training. */
+/**
+ * This examples demonstrates the transfer learning concept:
+ *
+ * Weights are loaded from .h5 file, configuration is loaded from .json file.
+ *
+ * All model weights are not frozen, and can be changed during the training.
+ *
+ * No new layers are added.
+ *
+ * NOTE: Model and weights are resources in api module.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -28,36 +35,22 @@ fun main() {
         ::extractFashionLabels
     )
 
-    val pathToWeights = "models/mnist/lenet/lenet_weights_only.h5"
-    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
-    val file = File(realPathToWeights)
-    val hdfFile = HdfFile(file)
-
-    val pathToConfig = "models/mnist/lenet/lenetMdl.json"
-    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
-
-    val jsonConfigFile = File(realPathToConfig)
-
+    val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
-        // Freeze conv2d layers, keep dense layers trainable
-        for (layer in it.layers) {
-            if (layer::class == Conv2D::class)
-                layer.isTrainable = false
-        }
-
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+
         it.summary()
 
+        val hdfFile = getWeightsFile()
         it.loadWeights(hdfFile)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-
         println("Accuracy before training $accuracyBefore")
 
         it.fit(
@@ -66,7 +59,7 @@ fun main() {
             epochs = 5,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = false
+            verbose = true
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -74,6 +67,7 @@ fun main() {
         println("Accuracy after training $accuracyAfterTraining")
     }
 }
+
 
 
 

@@ -1,12 +1,12 @@
 {
   "class_name": "Sequential",
   "config": {
-    "name": "sequential_4",
+    "name": "sequential",
     "layers": [
       {
         "class_name": "Conv2D",
         "config": {
-          "name": "conv2d_8",
+          "name": "conv2d",
           "trainable": true,
           "batch_input_shape": [
             null,
@@ -52,14 +52,14 @@
       {
         "class_name": "MaxPooling2D",
         "config": {
-          "name": "max_pooling2d_8",
+          "name": "max_pooling2d",
           "trainable": true,
           "dtype": "float32",
           "pool_size": [
             2,
             2
           ],
-          "padding": "valid",
+          "padding": "same",
           "strides": [
             2,
             2
@@ -70,7 +70,7 @@
       {
         "class_name": "Conv2D",
         "config": {
-          "name": "conv2d_9",
+          "name": "conv2d_1",
           "trainable": true,
           "dtype": "float32",
           "filters": 64,
@@ -110,14 +110,14 @@
       {
         "class_name": "MaxPooling2D",
         "config": {
-          "name": "max_pooling2d_9",
+          "name": "max_pooling2d_1",
           "trainable": true,
           "dtype": "float32",
           "pool_size": [
             2,
             2
           ],
-          "padding": "valid",
+          "padding": "same",
           "strides": [
             2,
             2
@@ -128,7 +128,7 @@
       {
         "class_name": "Flatten",
         "config": {
-          "name": "flatten_4",
+          "name": "flatten",
           "trainable": true,
           "dtype": "float32",
           "data_format": "channels_last"
@@ -137,7 +137,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_12",
+          "name": "dense",
           "trainable": true,
           "dtype": "float32",
           "units": 256,
@@ -163,7 +163,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_13",
+          "name": "dense_1",
           "trainable": true,
           "dtype": "float32",
           "units": 84,
@@ -189,7 +189,7 @@
       {
         "class_name": "Dense",
         "config": {
-          "name": "dense_14",
+          "name": "dense_2",
           "trainable": true,
           "dtype": "float32",
           "units": 10,

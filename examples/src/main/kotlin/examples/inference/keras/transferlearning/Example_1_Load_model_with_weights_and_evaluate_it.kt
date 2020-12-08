@@ -3,16 +3,31 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.keras.demo
+package examples.inference.keras.transferlearning
 
+import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import java.io.File
 
-/** The model is loaded, weights are initialized by model initializers, the model just evaluated */
+/**
+ * This examples demonstrates the inference concept:
+ *
+ * Weights are loaded from .h5 file, configuration is loaded from .json file.
+ *
+ * Model is evaluated after loading to obtain accuracy value.
+ *
+ * No additional training.
+ *
+ * No new layers are added.
+ *
+ * NOTE: Model and weights are resources in api module.
+ */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,
@@ -33,8 +48,11 @@ fun main() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-        it.init()
+
         it.summary()
+
+        val hdfFile = getWeightsFile()
+        it.loadWeights(hdfFile)
 
         val accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
@@ -42,6 +60,21 @@ fun main() {
     }
 }
 
+/** Returns JSON file with model configuration, saved from Keras 2.x. */
+fun getJSONConfigFile(): File {
+    val pathToConfig = "models/mnist/lenet/modelConfig.json"
+    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+
+    return File(realPathToConfig)
+}
+
+/** Returns .h5 file with model weights, saved from Keras 2.x. */
+fun getWeightsFile(): HdfFile {
+    val pathToWeights = "models/mnist/lenet/mnist_weights_only.h5"
+    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    val file = File(realPathToWeights)
+    return HdfFile(file)
+}
 
 
 
