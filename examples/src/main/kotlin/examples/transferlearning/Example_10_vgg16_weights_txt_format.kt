@@ -15,6 +15,26 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 
+/**
+ * This examples demonstrates the inference concept on VGG'16 model and weights loading from KotlinDL txt format:
+ *
+ * Weights are loaded from txt files, configuration is loaded from .json file.
+ *
+ * Model predicts on a few images located in resources.
+ *
+ * No additional training.
+ *
+ * No new layers are added.
+ *
+ * NOTE: The specific image preprocessing is not implemented yet (see Keras for more details).
+ *
+ * @see <a href="https://drive.google.com/drive/folders/1TkshZWtMKP-_oeJPvCl5dZKqxHzxwfRg">
+ *     VGG'16 weights in txt format and model could be loaded here.</a>
+ * @see <a href="https://arxiv.org/abs/1409.1556">
+ *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
+ * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">
+ *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
+ */
 fun main() {
     val jsonConfigFile = getVGG16JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
