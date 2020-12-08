@@ -10,24 +10,36 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
-import javax.swing.JFrame
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
+private val fashionMnistLabelEncoding = mapOf(
+    0 to "T-shirt/top",
+    1 to "Trouser",
+    2 to "Pullover",
+    3 to "Dress",
+    4 to "Coat",
+    5 to "Sandal",
+    6 to "Shirt",
+    7 to "Sneaker",
+    8 to "Bag",
+    9 to "Ankle boot"
+)
+
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
+        FASHION_TRAIN_IMAGES_ARCHIVE,
+        FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE,
+        FASHION_TEST_LABELS_ARCHIVE,
         NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
+        ::extractFashionImages,
+        ::extractFashionLabels
     )
 
-    val imageId = 1
+    val (newTrain, validation) = train.split(0.95)
 
     lenet5.use {
         it.compile(
@@ -36,16 +48,16 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
-
         it.fit(
-            dataset = train,
-            validationRate = 0.1,
+            trainingDataset = newTrain,
+            validationDataset = validation,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
             validationBatchSize = TEST_BATCH_SIZE,
             verbose = true
         )
+
+        val imageId = 0
 
         val weights = it.layers[0].getWeights() // first conv2d layer
 
@@ -53,7 +65,7 @@ fun main() {
 
         val weights2 = it.layers[2].getWeights() // first conv2d layer
 
-        drawFilters(weights2[0], colorCoefficient = 10.0)
+        drawFilters(weights2[0], colorCoefficient = 12.0)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
@@ -61,7 +73,7 @@ fun main() {
 
         val (prediction, activations) = it.predictAndGetActivations(train.getX(imageId))
 
-        println("Prediction: $prediction")
+        println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
 
         drawActivations(activations)
 
@@ -69,31 +81,6 @@ fun main() {
 
         val maxIdx = trainImageLabel.indexOfFirst { it == trainImageLabel.maxOrNull()!! }
 
-        println("Ground Truth: $maxIdx")
+        println("Ground Truth: ${fashionMnistLabelEncoding[maxIdx]}")
     }
-}
-
-fun drawActivations(activations: List<*>) {
-    val frame = JFrame("Visualise the matrix weights on Relu")
-    frame.contentPane.add(ReluGraphics(activations[0] as Array<Array<Array<FloatArray>>>))
-    frame.setSize(1500, 1500)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
-
-    val frame2 = JFrame("Visualise the matrix weights on Relu_1")
-    frame2.contentPane.add(ReluGraphics2(activations[1] as Array<Array<Array<FloatArray>>>))
-    frame2.setSize(1500, 1500)
-    frame2.isVisible = true
-    frame2.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame2.isResizable = false
-}
-
-fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
-    val frame = JFrame("Filters")
-    frame.contentPane.add(Conv2dJPanel(filters as Array<Array<Array<FloatArray>>>, colorCoefficient))
-    frame.setSize(1000, 1000)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
 }
