@@ -136,6 +136,7 @@ KotlinDL supports model inference in JVM backend applications, Android support i
 To use KotlinDL in your project, you need to add the following dependency to your `build.gradle` file:
 ```kotlin
    repositories {
+      jcenter()
        maven {
            url  "https://kotlin.bintray.com/kotlin-datascience"
        }
@@ -145,6 +146,7 @@ To use KotlinDL in your project, you need to add the following dependency to you
        implementation 'org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]'
    }
 ```
+The latest KotlinDL version is 0.1.0. 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
 ## Working with KotlinDL in Jupyter Notebook
