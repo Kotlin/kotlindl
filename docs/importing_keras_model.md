@@ -95,7 +95,7 @@ Once you have the HDF5 and JSON model files, you can load and use the model from
 preprocessing has been done to the images before training the model, needs to be done before running inference as well.
 
 In this case we only normalized the pixel values before training, and KotlinDL provides a convenient method to read an 
- image srtaight into a normalized array, so you don't have to do it manually - `ImageConverter.toNormalizedFloatArray()`. 
+ image straight into a normalized array, so you don't have to do it manually - `ImageConverter.toNormalizedFloatArray()`. 
 
 ```kotlin
 val labelsMap = mapOf(
