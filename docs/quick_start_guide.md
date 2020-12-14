@@ -10,6 +10,7 @@ in [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.
     * If you're using Gradle as build system, add the following to the `build.gradle` file:
     ```kotlin
    repositories {
+       jcenter()
        maven {
            url  "https://kotlin.bintray.com/kotlin-datascience"
        }
@@ -22,6 +23,7 @@ in [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.
    * For `build.gradle.kts`: 
    ```kotlin
    repositories {
+       jcenter()
        maven(url = "https://kotlin.bintray.com/kotlin-datascience")
    }
        
