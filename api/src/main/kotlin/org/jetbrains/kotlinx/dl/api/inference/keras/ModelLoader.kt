@@ -17,8 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasInitializer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasLayer
+import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasPadding
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasSequentialModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.LayerConfig
 import java.io.File
@@ -51,12 +53,15 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
     val sequentialConfig = try {
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
+            .converter(PaddingConverter())
             .parse<KerasSequentialModel>(jsonString)
     } catch (e: Exception) {
+        e.printStackTrace()
         try {
             Klaxon()
                 .parse<KerasSequentialModel>(jsonConfigFile)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
         }
     }
@@ -97,6 +102,7 @@ private fun convertToLayer(kerasLayer: KerasLayer): Layer {
             kerasLayer.config.name!!
         )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")
     }
 }
@@ -271,11 +277,11 @@ private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
     return AvgPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
-private fun convertPadding(padding: String): ConvPadding {
+private fun convertPadding(padding: KerasPadding): ConvPadding {
     return when (padding) {
-        "same" -> ConvPadding.SAME
-        "valid" -> ConvPadding.VALID
-        "full" -> ConvPadding.FULL
+        is KerasPadding.Same -> ConvPadding.SAME
+        is KerasPadding.Valid -> ConvPadding.VALID
+        is KerasPadding.Full -> ConvPadding.FULL
         else -> throw UnsupportedOperationException("The $padding is not supported!")
     }
 }
@@ -311,5 +317,14 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         padding = convertPadding(config.padding!!),
         name = name
+    )
+}
+
+private fun createZeroPadding2D(config: LayerConfig, name: String) : ZeroPadding2D {
+    assert(config.padding is KerasPadding.ZeroPadding2D)
+    return ZeroPadding2D(
+        (config.padding as KerasPadding.ZeroPadding2D).padding,
+        config.data_format,
+        name
     )
 }
