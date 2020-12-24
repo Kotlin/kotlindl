@@ -43,7 +43,9 @@ public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyC
     val config = SequentialConfig(name = "", layers = kerasLayers)
     val sequentialConfig = KerasSequentialModel(config = config)
 
-    val jsonString2 = Klaxon().toJsonString(sequentialConfig)
+    val jsonString2 = Klaxon()
+        .converter(PaddingConverter())
+        .toJsonString(sequentialConfig)
 
     jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
 }

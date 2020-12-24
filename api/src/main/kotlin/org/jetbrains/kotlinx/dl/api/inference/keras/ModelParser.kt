@@ -10,6 +10,13 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonValue
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasPadding
 
+/**
+ * Custom json converter, which supports different types of `config.layers[].padding` field in `.json` model configs.
+ * See https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/pooling.py#L470
+ * and https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2795
+ * for detailed explaination of supported formats. Could be string for `same`, `valid` or `causal`,
+ * or Int, or tuple of 2 ints, or tuple of 2 tuples of 2 ints - for ZeroPadding layer.
+ */
 internal class PaddingConverter : Converter {
     override fun canConvert(cls: Class<*>): Boolean {
         return cls == KerasPadding::class.java
@@ -41,12 +48,6 @@ internal class PaddingConverter : Converter {
 
     @Suppress("UNCHECKED_CAST")
     override fun fromJson(jv: JsonValue): KerasPadding? {
-        // See https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/pooling.py#L470
-        // and https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2795
-        // for detailed explaination of supported formats.
-        // Could be string for `same`, `valid` or `causal`,
-        // or Int, or tuple of 2 ints, or tuple of 2 tuples of 2 ints - for ZeroPadding layer.
-
         val stringValue = jv.string
         if (stringValue != null) {
             return when (stringValue) {
@@ -59,7 +60,7 @@ internal class PaddingConverter : Converter {
 
         val intValue = jv.int
         if (intValue != null) {
-            return KerasPadding.ZeroPadding2D(intArrayOf(intValue))
+            return KerasPadding.ZeroPadding2D(intValue)
         }
 
         val array = jv.array
@@ -76,11 +77,9 @@ internal class PaddingConverter : Converter {
                     assert(array[1] is JsonArray<*>) { "[KerasPaddingConverter]: invalid padding $jv, expected JsonArray at ${array[1]}" }
                     val firstArray = array[0] as JsonArray<Int>
                     val secondArray = array[1] as JsonArray<Int>
-                    return KerasPadding.ZeroPadding2D(intArrayOf(
-                        firstArray[0],
-                        firstArray[1],
-                        secondArray[0],
-                        secondArray[1]
+                    return KerasPadding.ZeroPadding2D(arrayOf(
+                        firstArray.toIntArray(),
+                        secondArray.toIntArray()
                     ))
                 }
             }

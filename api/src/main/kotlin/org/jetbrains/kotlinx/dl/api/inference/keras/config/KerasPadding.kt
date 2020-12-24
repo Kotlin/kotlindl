@@ -5,6 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
+/**
+ * This class enumerates all possible `padding` types, which could be faced in config-files.
+ * Those are strings, like "same", "valid", "full" (for example, from `Conv2D` layers),
+ * and numeric values/tuples from `ZeroPadding2D`
+ */
 internal sealed class KerasPadding {
     object Same : KerasPadding()
 
@@ -13,18 +18,20 @@ internal sealed class KerasPadding {
     object Full : KerasPadding()
 
     class ZeroPadding2D : KerasPadding {
-        val padding: IntArray = IntArray(4) { 0 }
+        val padding: IntArray
 
         constructor(padding: Int) {
-            this.padding[0] = padding
+            this.padding = IntArray(1) { padding }
         }
 
         constructor(padding: IntArray) {
+            this.padding = IntArray(2)
             this.padding[0] = padding[0]
             this.padding[1] = padding[1]
         }
 
         constructor(padding: Array<IntArray>) {
+            this.padding = IntArray(4)
             this.padding[0] = padding[0][0]
             this.padding[1] = padding[0][1]
             this.padding[2] = padding[1][0]

@@ -13,34 +13,91 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-class ZeroPadding2D(
-    val padding: IntArray,
-    private val dataFormat: String? = CHANNELS_LAST,
-    name: String = ""
-) : Layer(name) {
+/**
+ * Zero-padding layer, which adds zeros on sides of image
+ * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2765)
+ */
+class ZeroPadding2D : Layer {
 
+    val padding: IntArray
+    private val dataFormat: String
     private lateinit var inputShape: Shape
+
+    /**
+     * Constructs an instance of ZeroPadding2D layer
+     * @param[padding] symmetric padding applied to width and height (same on all sides)
+     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
+     * input to this layer
+     * @param[name] layer name
+     */
+    constructor(
+        padding: Int,
+        dataFormat: String?,
+        name: String = ""
+    ) : this(
+        IntArray(4) { padding },
+        dataFormat,
+        name
+    )
+
+    /**
+     * Constructs an instance of ZeroPadding2D layer
+     * @param[padding] pair of padding values - [padding.first] represents vertical padding (applied to top and
+     * bottom of image, and [padding.last] is horizontal padding (left and right sides)
+     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
+     * input to this layer
+     * @param[name] layer name
+     */
+    constructor(
+        padding: Pair<Int, Int>,
+        dataFormat: String?,
+        name: String = ""
+    ) : this(
+        intArrayOf(padding.first, padding.first, padding.second, padding.second),
+        dataFormat,
+        name
+    )
+
+    /**
+     * Constructs an instance of ZeroPadding2D layer
+     * @param[padding] list of padding values. Size of list must be equal to 4. Those list values maps to
+     * the following paddings:
+     * padding[0] -> top padding,
+     * padding[1] -> bottom padding,
+     * padding[2] -> left padding,
+     * padding[3] -> right padding
+     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
+     * input to this layer
+     * @param[name] layer name
+     */
+    constructor(padding: IntArray, dataFormat: String?, name: String = "") : super(name) {
+        require(padding.size == 4)
+        this.padding = padding
+        this.dataFormat = dataFormat ?: CHANNELS_LAST
+    }
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         this.inputShape = inputShape
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        assert(inputShape.numDimensions() == 4) { "input tensor must have 4 dimensions" }
+        require(inputShape.numDimensions() == 4) { "input tensor must have 4 dimensions" }
 
-        val normalizedPadding = normalizePaddingArray()
         return if (dataFormat == CHANNELS_FIRST) {
             Shape.make(
                 inputShape.size(0),
                 inputShape.size(1),
-                inputShape.size(2) + normalizedPadding[0] + normalizedPadding[1],
-                inputShape.size(3) + normalizedPadding[2] + normalizedPadding[3]
+                inputShape.size(2) + padding[0] + padding[1],
+                inputShape.size(3) + padding[2] + padding[3]
             )
         } else {
             Shape.make(
                 inputShape.size(0),
-                inputShape.size(1) + normalizedPadding[0] + normalizedPadding[1],
-                inputShape.size(2) + normalizedPadding[2] + normalizedPadding[3],
+                inputShape.size(1) + padding[0] + padding[1],
+                inputShape.size(2) + padding[2] + padding[3],
                 inputShape.size(3)
             )
         }
@@ -67,15 +124,6 @@ class ZeroPadding2D(
 
     override fun toString(): String {
         return "ZeroPadding2D(padding=$padding)"
-    }
-
-    private fun normalizePaddingArray(): IntArray {
-        return when (padding.size) {
-            4 -> padding
-            2 -> intArrayOf(padding[0], padding[0], padding[1], padding[1])
-            1 -> intArrayOf(padding[0], padding[0], padding[0], padding[0])
-            else -> throw IllegalArgumentException("Invalid padding argument at layer $name")
-        }
     }
 
     private fun paddingArrayToTfFormat(): Array<IntArray> {

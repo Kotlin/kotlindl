@@ -25,14 +25,13 @@ internal class ZeroPadding2DTest {
     @Test
     fun oneArgumentChannelsLast() {
         val padding = 1
-        val paddingArray = intArrayOf(padding)
         val inputDimensionsArray = intArrayOf(BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
         val inputShape = Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
         val expectedOutputSize = IMAGE_SIZE + 2 * padding
 
         EagerSession.create().use {
             val tf = Ops.create(it)
-            val paddingLayer = ZeroPadding2D(paddingArray, dataFormat = CHANNELS_LAST)
+            val paddingLayer = ZeroPadding2D(padding, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             paddingLayer.defineVariables(tf, KGraph(Graph().toGraphDef()), inputShape)
@@ -77,7 +76,7 @@ internal class ZeroPadding2DTest {
     fun twoArgumentsChannelsLast() {
         val paddingHeight = 1
         val paddingWidth = 2
-        val paddingArray = intArrayOf(paddingHeight, paddingWidth)
+        val paddingArray = paddingHeight to paddingWidth
         val inputDimensionsArray = intArrayOf(BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
         val inputShape = Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
         val expectedOutputHeight = IMAGE_SIZE + paddingHeight * 2

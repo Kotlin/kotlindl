@@ -59,6 +59,7 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
         e.printStackTrace()
         try {
             Klaxon()
+                .converter(PaddingConverter())
                 .parse<KerasSequentialModel>(jsonConfigFile)
         } catch (e: Exception) {
             e.printStackTrace()

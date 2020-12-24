@@ -81,7 +81,7 @@ internal class PaddingConverterTest {
         var serializedConfig: String
         var jsonObject: JsonObject
 
-        var layerConfig = LayerConfig(padding = KerasPadding.ZeroPadding2D(intArrayOf(1)))
+        var layerConfig = LayerConfig(padding = KerasPadding.ZeroPadding2D(1))
         serializedConfig = klaxon.toJsonString(layerConfig)
         jsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
         assertEquals(1, jsonObject["padding"])
@@ -91,7 +91,14 @@ internal class PaddingConverterTest {
         jsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
         assertArrayEquals(intArrayOf(1, 2), jsonObject.array<Int>("padding")!!.toIntArray())
 
-        layerConfig = LayerConfig(padding = KerasPadding.ZeroPadding2D(intArrayOf(1, 2, 3, 4)))
+        layerConfig = LayerConfig(
+            padding = KerasPadding.ZeroPadding2D(
+                arrayOf(
+                    intArrayOf(1, 2),
+                    intArrayOf(3, 4)
+                )
+            )
+        )
         serializedConfig = klaxon.toJsonString(layerConfig)
         jsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
         val parsedArray = jsonObject.array<JsonArray<Int>>("padding")!!
