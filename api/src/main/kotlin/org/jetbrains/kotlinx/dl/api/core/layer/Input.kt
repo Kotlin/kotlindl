@@ -51,7 +51,12 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         return input.asOutput().shape()
     }
 
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         return input
     }
 

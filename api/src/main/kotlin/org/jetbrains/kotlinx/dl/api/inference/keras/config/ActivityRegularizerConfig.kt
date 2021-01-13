@@ -6,6 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
 internal data class ActivityRegularizerConfig(
-    val l1: Double?,
-    val l2: Double?
+    val l1: Double? = null,
+    val l2: Double? = null
 )

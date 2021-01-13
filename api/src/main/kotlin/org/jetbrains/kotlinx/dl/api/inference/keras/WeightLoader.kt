@@ -9,13 +9,11 @@ import io.jhdf.HdfFile
 import io.jhdf.api.Group
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.*
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
@@ -142,6 +140,7 @@ private fun fillLayerWeights(
             group,
             model
         )
+        BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
         else -> println("No weights loading for ${it.name}")
     }
     model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
@@ -221,6 +220,66 @@ private fun fillDenseVariablesFromKeras(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
                 model.fillVariable(biasVariableName, data)
+            }
+            else -> {
+                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
+            }
+        }
+    }
+}
+
+private fun fillBatchNormVariablesFromKeras(
+    layerName: String,
+    group: Group,
+    model: Sequential
+) {
+    val firstLevelGroup: Group = group.children[layerName] as Group
+    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
+    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
+
+    dataNodes.values.map { it as DatasetBase }.forEach {
+        val dims = it.dimensions
+        val data = it.data
+        when (it.name) {
+            /*"kernel:0" -> {
+                val kernelVariableName = denseKernelVarName(layerName)
+                val kernelShape = (model.getLayer(layerName) as Dense).getKernelShape()
+                require(
+                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
+                model.fillVariable(kernelVariableName, data)
+            }*/
+            "gamma:0" -> {
+                val gammaVariableName = batchNormGammaVarName(layerName)
+                val gammaShape = (model.getLayer(layerName) as BatchNorm).getWeightShape()
+                require(
+                    gammaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Gamma shape in loaded data is ${dims.contentToString()}. Should be ${gammaShape.contentToString()}" }
+                model.fillVariable(gammaVariableName, data)
+            }
+            "beta:0" -> {
+                val betaVariableName = batchNormBetaVarName(layerName)
+                val betaShape = (model.getLayer(layerName) as BatchNorm).getWeightShape()
+                require(
+                    betaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Beta shape in loaded data is ${dims.contentToString()}. Should be ${betaShape.contentToString()}" }
+                model.fillVariable(betaVariableName, data)
+            }
+            "moving_mean:0" -> {
+                val movingMeanVariableName = batchNormMovingMeanVarName(layerName)
+                val movingMeanShape = (model.getLayer(layerName) as BatchNorm).getWeightShape()
+                require(
+                    movingMeanShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Moving mean shape in loaded data is ${dims.contentToString()}. Should be ${movingMeanShape.contentToString()}" }
+                model.fillVariable(movingMeanVariableName, data)
+            }
+            "moving_variance:0" -> {
+                val movingVarianceVariableName = batchNormMovingVarianceVarName(layerName)
+                val movingVarianceShape = (model.getLayer(layerName) as BatchNorm).getWeightShape()
+                require(
+                    movingVarianceShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Moving variance shape in loaded data is ${dims.contentToString()}. Should be ${movingVarianceShape.contentToString()}" }
+                model.fillVariable(movingVarianceVariableName, data)
             }
             else -> {
                 throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")

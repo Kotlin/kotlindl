@@ -227,7 +227,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
-        amountOfClasses = (layers.last() as Dense).outputSize.toLong()
+        amountOfClasses = if (layers.last() is Dense) (layers.last() as Dense).outputSize.toLong() else 1
 
         this.loss = loss
         this.metric = metric
@@ -264,10 +264,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             Placeholder.shape(Shape.scalar())
         )
 
-        yPred = transformInputWithNNModel(xOp)
-        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
-
         isModelCompiled = true
     }
 
@@ -280,8 +276,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun validateModelArchitecture() {
-        require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
-        require(layers.last().hasActivation()) { "Last layer must have an activation function." }
+        //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
+        //   require(layers.last().hasActivation()) { "Last layer must have an activation function." }
 //        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
     }
 
@@ -334,10 +330,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         logger.debug { "Initialization of TensorFlow Graph variables." }
         kGraph.initializeGraphVariables(session)
         isModelInitialized = true
-
-        logger.debug { "Initialization of optimizer variables." }
-        kGraph.initializeOptimizerVariables(session)
-        isOptimizerVariableInitialized = true
     }
 
     private fun internalFit(
@@ -363,6 +355,14 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         if (!isDebugMode) {
             logger.level = Level.INFO
         }
+
+        yPred = forward(xOp, isTraining = true)
+        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
+        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+
+        logger.debug { "Initialization of optimizer variables." }
+        kGraph.initializeOptimizerVariables(session)
+        isOptimizerVariableInitialized = true
 
         val prediction = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -532,6 +532,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         callback.onTestBegin()
 
+        yPred = forward(xOp, isTraining = false)
+        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
+
         val prediction = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
             else -> tf.withName(OUTPUT_NAME).identity(yPred)
@@ -600,6 +603,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         callback.onPredictBegin()
+
+        yPred = forward(xOp, isTraining = false)
+        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
 
         val prediction = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
@@ -720,6 +726,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             .runner()
 
         if (predictionTensorName.isEmpty()) {
+            yPred = forward(xOp, isTraining = false)
+            lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
+
             val prediction = when (loss) {
                 is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
                 else -> tf.withName(OUTPUT_NAME).identity(yPred)
@@ -760,10 +769,10 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return Pair(xBatchShape, yBatchShape)
     }
 
-    private fun transformInputWithNNModel(input: Operand<Float>): Operand<Float> {
+    private fun forward(input: Operand<Float>, isTraining: Boolean): Operand<Float> {
         var out: Operand<Float> = input
         for (layer in layers) {
-            out = layer.transformInput(tf, out)
+            out = layer.forward(tf, out, isTraining, numberOfLossesOp)
         }
         return out
     }

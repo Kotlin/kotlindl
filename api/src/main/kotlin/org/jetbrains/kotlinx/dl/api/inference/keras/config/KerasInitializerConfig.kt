@@ -14,5 +14,6 @@ internal data class KerasInitializerConfig(
     val scale: Double? = null,
     val seed: Int? = null,
     val stddev: Double? = null,
-    val value: Int? = null
+    val value: Int? = null,
+    val gain: Double? = null
 )

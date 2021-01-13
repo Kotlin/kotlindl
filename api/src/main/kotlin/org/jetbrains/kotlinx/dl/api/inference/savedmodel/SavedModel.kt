@@ -135,7 +135,6 @@ public open class SavedModel : InferenceModel() {
         }
     }
 
-
     override fun close() {
         super.close()
         bundle.close()

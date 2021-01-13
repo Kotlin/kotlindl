@@ -47,7 +47,12 @@ public class AvgPool2D(
         return Shape.make(inputShape.size(0), rows, cols, inputShape.size(3))
     }
 
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         // data conversion due to different signatures of nn.avgPool and nn.maxPool
         val poolSizeLongList: MutableList<Long> = mutableListOf()
         poolSize.forEach {

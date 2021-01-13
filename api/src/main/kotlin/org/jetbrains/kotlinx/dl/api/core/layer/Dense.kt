@@ -82,7 +82,12 @@ public class Dense(
         return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
     }
 
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         val signal: Operand<Float> = tf.math.add(tf.linalg.matMul(input, kernel), bias)
         return Activations.convert(activation).apply(tf, signal, name)
     }

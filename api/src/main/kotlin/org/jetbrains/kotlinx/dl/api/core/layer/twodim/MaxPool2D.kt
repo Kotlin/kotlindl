@@ -47,7 +47,12 @@ public class MaxPool2D(
         return Shape.make(inputShape.size(0), rows, cols, inputShape.size(3))
     }
 
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         val tfPadding = when (padding) {
             ConvPadding.SAME -> "SAME"
             ConvPadding.VALID -> "VALID"

@@ -47,6 +47,8 @@ public abstract class TrainableModel : InferenceModel() {
     /** TensorFlow operand for prediction phase. */
     protected lateinit var yPred: Operand<Float>
 
+    protected fun isYPredInitialized(): Boolean = ::yPred.isInitialized
+
     /** TensorFlow operand for X data. */
     protected lateinit var xOp: Operand<Float>
 

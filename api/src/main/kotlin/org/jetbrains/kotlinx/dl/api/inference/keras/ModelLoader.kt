@@ -9,10 +9,7 @@ import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
@@ -76,11 +73,27 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
 
     val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
 
-    input = Input(
-        batchInputShape!![1]?.toLong()!!,
-        batchInputShape[2]?.toLong()!!,
-        batchInputShape[3]?.toLong()!!
-    )
+    // TODO: write more universal code here
+    val size = batchInputShape!!.size
+    if (size == 3) {
+        input = Input(
+            batchInputShape!![1]?.toLong()!!,
+            batchInputShape[2]?.toLong()!!
+        )
+    } else if (size == 4) {
+        input = Input(
+            batchInputShape!![1]?.toLong()!!,
+            batchInputShape[2]?.toLong()!!,
+            batchInputShape[3]?.toLong()!!
+        )
+    } else {
+        input = Input(
+            batchInputShape!![1]?.toLong()!!,
+            batchInputShape[2]?.toLong()!!,
+            batchInputShape[3]?.toLong()!!
+        )
+    }
+
     return Pair(input, layers)
 }
 
@@ -97,8 +110,62 @@ private fun convertToLayer(kerasLayer: KerasLayer): Layer {
             kerasLayer.config.name!!
         )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")
     }
+}
+
+private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
+    return Dropout(
+        keepProbability = config.rate!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createLstmLayer(config: LayerConfig, name: String): Layer {
+    return LSTM(
+        units = config.units!!,
+        activation = convertToActivation(config.activation!!),
+        recurrentActivation = convertToActivation(config.recurrent_activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        useBias = config.use_bias!!,
+        unitForgetBias = config.unit_forget_bias!!,
+        dropout = config.dropout!!.toFloat(),
+        recurrentDropout = config.recurrent_dropout!!.toFloat(),
+        returnSequences = config.return_sequences!!,
+        returnState = config.return_state!!,
+        goBackwards = config.go_backwards!!,
+        stateful = config.stateful!!,
+        timeMajor = config.time_major!!,
+        unroll = config.unroll!!,
+        name = name
+    )
+}
+
+private fun createActivationLayer(config: LayerConfig, name: String): Layer {
+    return ActivationLayer(
+        activation = convertToActivation(config.activation!!),
+        name = name
+    )
+}
+
+private fun createBatchNorm(config: LayerConfig, name: String): Layer {
+    return BatchNorm(
+        axis = config.axis!!,
+        momentum = config.momentum!!,
+        center = config.center!!,
+        epsilon = config.epsilon!!,
+        scale = config.scale!!,
+        gammaInitializer = convertToInitializer(config.gamma_initializer!!),
+        betaInitializer = convertToInitializer(config.beta_initializer!!),
+        movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
+        movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!),
+        name = name
+    )
 }
 
 private fun createDense(config: LayerConfig, name: String): Dense {

@@ -54,7 +54,12 @@ public abstract class Layer(public var name: String) {
     /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      */
-    public abstract fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float>
+    public abstract fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float>
 
     /**
      * Adds a new weight tensor to the layer
@@ -70,8 +75,8 @@ public abstract class Layer(public var name: String) {
         variable: Variable<Float>,
         initializer: Initializer
     ): Variable<Float> {
-        require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
-        require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
+        // require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
+        // require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
 
         val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
         kGraph.addLayerVariable(variable, isTrainable)

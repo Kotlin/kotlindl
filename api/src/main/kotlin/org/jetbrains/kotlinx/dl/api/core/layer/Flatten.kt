@@ -37,7 +37,12 @@ public class Flatten(name: String = "") : Layer(name) {
         return Shape.make(tensorShape.head(), tensorShape.numElements())
     }
 
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Boolean,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         return tf.reshape(input, units)
     }
 

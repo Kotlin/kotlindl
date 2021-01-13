@@ -30,3 +30,11 @@ internal fun denseBiasVarName(name: String) = name + "_" + "dense_bias"
 
 /** Default Dense kernel variable name in TensorFlow graph, based on variable's name. */
 internal fun denseKernelVarName(name: String) = name + "_" + "dense_kernel"
+
+internal fun batchNormGammaVarName(name: String) = name + "_" + "batch_norm_gamma"
+
+internal fun batchNormBetaVarName(name: String) = name + "_" + "batch_norm_beta"
+
+internal fun batchNormMovingMeanVarName(name: String) = name + "_" + "batch_norm_moving_mean"
+
+internal fun batchNormMovingVarianceVarName(name: String) = name + "_" + "batch_norm_moving_variance"
