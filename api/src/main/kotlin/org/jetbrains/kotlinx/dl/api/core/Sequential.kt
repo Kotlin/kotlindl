@@ -38,6 +38,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.FloatBuffer
 
 /**
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
@@ -677,13 +678,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
-        val predictionData: Array<FloatArray> = arrayOf(inputData)
-
         val imageShape = calculateXShape(1)
 
         Tensor.create(
             imageShape,
-            Dataset.serializeToBuffer(predictionData, 0, 1)
+            FloatBuffer.wrap(inputData)
         ).use { testImages ->
             val tensors =
                 formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
