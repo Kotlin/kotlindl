@@ -367,7 +367,8 @@ internal class SequentialModelTest {
                             "Name: Mul; Type: Mul; Out #tensors:  1\n" +
                             "Name: Assign; Type: Assign; Out #tensors:  1\n" +
                             "Name: Mul_1; Type: Mul; Out #tensors:  1\n" +
-                            "Name: Assign_1; Type: Assign; Out #tensors:  1\n"
+                            "Name: Assign_1; Type: Assign; Out #tensors:  1\n" +
+                            "Name: default_output; Type: Softmax; Out #tensors:  1\n"
                 )
             )
         }

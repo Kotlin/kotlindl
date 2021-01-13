@@ -63,6 +63,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Main loss operand. */
     private lateinit var lossOp: Operand<Float>
 
+    /** Main prediction operand. */
+    private lateinit var prediction: Operand<Float>
+
     /** A list of targets to be optimized. */
     private lateinit var targets: List<Operand<Float>>
 
@@ -267,6 +270,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         yPred = transformInputWithNNModel(xOp)
         lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+        prediction = when (loss) {
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
+            else -> tf.withName(OUTPUT_NAME).identity(yPred)
+        }
+
 
         isModelCompiled = true
     }
@@ -362,11 +370,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         this.isDebugMode = verbose
         if (!isDebugMode) {
             logger.level = Level.INFO
-        }
-
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
         }
 
         val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
@@ -532,11 +535,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         callback.onTestBegin()
 
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
-
         val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
 
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
@@ -600,11 +598,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         callback.onPredictBegin()
-
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
 
         val imageShape = calculateXShape(batchSize)
 
@@ -707,6 +700,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                     activations.add(tensors[i].convertTensorToMultiDimArray())
                 }
             }
+
+            tensors.forEach { it.close() }
             return Pair(dst[0], activations.toList())
         }
     }
@@ -720,11 +715,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             .runner()
 
         if (predictionTensorName.isEmpty()) {
-            val prediction = when (loss) {
-                is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-                else -> tf.withName(OUTPUT_NAME).identity(yPred)
-            }
-
             runner
                 .fetch(prediction)
                 .feed(xOp.asOutput(), testImages)

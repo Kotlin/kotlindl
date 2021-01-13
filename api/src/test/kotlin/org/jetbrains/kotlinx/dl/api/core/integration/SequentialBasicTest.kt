@@ -156,6 +156,8 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.7)
             }
 
+            it.summary()
+
             // Prediction testing
             val label = it.predict(test.getX(0))
             assertEquals(test.getLabel(0), label)
