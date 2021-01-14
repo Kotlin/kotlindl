@@ -220,8 +220,17 @@ class InferenceModelTest {
                     it.predict(train.getX(0))
                 }
             assertEquals(
-                "Reshape functions is missed!",
+                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
                 exception.message
+            )
+
+            val exception2 =
+                Assertions.assertThrows(IllegalArgumentException::class.java) {
+                    it.predictSoftly(train.getX(0))
+                }
+            assertEquals(
+                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
+                exception2.message
             )
         }
     }
