@@ -99,7 +99,7 @@ public open class InferenceModel : AutoCloseable {
      * @return Predicted class index.
      */
     public open fun predict(inputData: FloatArray): Int {
-        require(::reshapeFunction.isInitialized) { "Reshape functions is missed!" }
+        require(::reshapeFunction.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val preparedData = reshapeFunction(inputData)
@@ -125,7 +125,7 @@ public open class InferenceModel : AutoCloseable {
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     public open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
-        require(reshapeFunction != null) { "Reshape functions is missed!" }
+        require(::reshapeFunction.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
