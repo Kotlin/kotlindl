@@ -184,8 +184,12 @@ internal class SequentialBasicTest : IntegrationTest() {
             val denseActivations = activations[2] as Array<FloatArray>
             assertEquals(denseActivations[0][0].toDouble(), 0.0, EPS)
 
-            val predictions = it.predictAll(test, TEST_BATCH_SIZE)
+            val predictions = it.predict(test, TEST_BATCH_SIZE)
             assertEquals(test.xSize(), predictions.size)
+
+            val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
+            assertEquals(test.xSize(), softPredictions.size)
+            assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
 
             var manualAccuracy = 0
             predictions.forEachIndexed { index, lb -> if (lb == test.getLabel(index)) manualAccuracy++ }
@@ -349,7 +353,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             val exception =
                 Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predictAll(test, 256)
+                    it.predict(test, 256)
                 }
             assertEquals(
                 "The amount of images must be a multiple of batch size.",
@@ -360,7 +364,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             val exception =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predictAll(test, 100)
+                    it.predict(test, 100)
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",

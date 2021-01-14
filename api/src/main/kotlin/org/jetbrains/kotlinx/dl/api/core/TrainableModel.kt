@@ -205,7 +205,17 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [batchSize] Number of samples per batch of computation.
      * @return Array of labels. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
+    public abstract fun predict(dataset: Dataset, batchSize: Int): IntArray
+
+    /**
+     * Generates output predictions for the input samples.
+     * Each prediction is a vector of probabilities instead of specific class in [predict] method.
+     *
+     * @param [dataset] Data to predict on.
+     * @param [batchSize] Number of samples per batch of computation.
+     * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
+     */
+    public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
 
     /**
      * Generates output prediction for the input sample.

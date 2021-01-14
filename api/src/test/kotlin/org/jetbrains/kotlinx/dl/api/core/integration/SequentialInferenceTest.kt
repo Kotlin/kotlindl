@@ -280,7 +280,7 @@ class SequentialInferenceTest {
 
             val predictAllException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predictAll(test, TEST_BATCH_SIZE)
+                    it.predict(test, TEST_BATCH_SIZE)
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
@@ -318,7 +318,7 @@ class SequentialInferenceTest {
 
             val predictAllException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predictAll(test, TEST_BATCH_SIZE)
+                    it.predict(test, TEST_BATCH_SIZE)
                 }
             assertEquals(
                 "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method.",

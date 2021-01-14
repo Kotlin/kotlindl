@@ -593,7 +593,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
-    override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
+    override fun predict(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -656,6 +656,50 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
         return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
+    }
+
+    override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
+        require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
+        callback.onPredictBegin()
+
+        val imageShape = calculateXShape(batchSize)
+
+        val predictions = Array(dataset.xSize()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
+            batchSize
+        )
+
+        var batchCounter = 0
+
+        while (batchIter.hasNext()) {
+            callback.onPredictBatchBegin(batchCounter, batchSize)
+
+            val batch: DataBatch = batchIter.next()
+
+            Tensor.create(
+                imageShape,
+                batch.x
+            ).use { testImages ->
+                val predictionsTensor = session.runner()
+                    .fetch(prediction)
+                    .feed(xOp.asOutput(), testImages)
+                    .run()[0]
+
+                val dst = Array(imageShape[0].toInt()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+                predictionsTensor.copyTo(dst)
+
+                callback.onPredictBatchEnd(batchCounter, batchSize)
+                batchCounter++
+                dst.copyInto(predictions, batchSize * (batchCounter - 1))
+            }
+        }
+        callback.onPredictEnd()
+        return predictions
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
