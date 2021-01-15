@@ -116,10 +116,9 @@ fun main() {
         val history = it.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
-            validationBatchSize = TEST_BATCH_SIZE,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
-            verbose = true
+            validationBatchSize = TEST_BATCH_SIZE
         )
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

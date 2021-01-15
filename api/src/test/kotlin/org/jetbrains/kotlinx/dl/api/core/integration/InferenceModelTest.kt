@@ -140,8 +140,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -261,8 +260,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -314,8 +312,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

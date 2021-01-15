@@ -7,10 +7,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     compile 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
-    compile 'io.github.microutils:kotlin-logging:1.7.9' // for logging
-    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'io.github.microutils:kotlin-logging:2.0.4' // for logging
     compile 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     compile 'com.beust:klaxon:5.0.1'
+    testCompile 'ch.qos.logback:logback-classic:1.2.3'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'

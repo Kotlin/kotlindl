@@ -67,7 +67,6 @@ fun main() {
             epochs = 3,
             trainBatchSize = 1000,
             validationBatchSize = 100,
-            verbose = true,
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

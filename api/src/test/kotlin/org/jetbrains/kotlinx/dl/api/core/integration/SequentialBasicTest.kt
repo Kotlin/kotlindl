@@ -141,7 +141,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
             val trainingHistory =
-                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = false)
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
             assertEquals(trainingHistory.batchHistory.size, 60)
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
@@ -219,8 +219,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                     validationDataset = validation,
                     epochs = EPOCHS,
                     trainBatchSize = TRAINING_BATCH_SIZE,
-                    validationBatchSize = TEST_BATCH_SIZE,
-                    verbose = true
+                    validationBatchSize = TEST_BATCH_SIZE
                 )
 
             assertEquals(57, trainingHistory.batchHistory.size)
@@ -255,8 +254,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                     it.fit(
                         dataset = train,
                         epochs = EPOCHS,
-                        batchSize = TRAINING_BATCH_SIZE,
-                        verbose = false
+                        batchSize = TRAINING_BATCH_SIZE
                     )
                 }
             assertEquals(
@@ -503,7 +501,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             it.summary()
 
             val trainingHistory =
-                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
             assertEquals(trainingHistory.batchHistory.size, 60)
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
@@ -592,7 +590,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             it.summary()
 
             val trainingHistory =
-                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
             assertEquals(trainingHistory.batchHistory.size, 60)
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
@@ -682,8 +680,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                     it.fit(
                         dataset = train,
                         epochs = EPOCHS,
-                        batchSize = TRAINING_BATCH_SIZE,
-                        verbose = false
+                        batchSize = TRAINING_BATCH_SIZE
                     )
                 }
             assertEquals(

@@ -47,8 +47,7 @@ fun main() {
             validationRate = 0.1,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
-            validationBatchSize = TEST_BATCH_SIZE,
-            verbose = true
+            validationBatchSize = TEST_BATCH_SIZE
         )
 
         val weights = it.layers[0].getWeights() // first conv2d layer

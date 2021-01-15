@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference
 
-import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.Logger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
@@ -56,13 +54,6 @@ public open class InferenceModel : AutoCloseable {
 
     /** Logger. */
     private val logger = KotlinLogging.logger {}
-
-    /** Logging level. */
-    protected var mu.KLogger.level: Level
-        get() = (logger.underlyingLogger as Logger).level
-        set(value) {
-            (underlyingLogger as Logger).level = value
-        }
 
     public companion object {
         /**

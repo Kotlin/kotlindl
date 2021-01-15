@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import ch.qos.logback.classic.Level
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
@@ -299,11 +298,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int,
-        verbose: Boolean
+        validationBatchSize: Int
     ): TrainingHistory {
         return internalFit(
-            verbose,
             trainBatchSize,
             epochs,
             trainingDataset,
@@ -316,11 +313,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     override fun fit(
         dataset: Dataset,
         epochs: Int,
-        batchSize: Int,
-        verbose: Boolean
+        batchSize: Int
     ): TrainingHistory {
         return internalFit(
-            verbose,
             batchSize,
             epochs,
             dataset,
@@ -350,7 +345,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun internalFit(
-        verbose: Boolean,
         trainBatchSize: Int,
         epochs: Int,
         trainingDataset: Dataset,
@@ -367,11 +361,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         val trainingHistory = TrainingHistory()
-
-        this.isDebugMode = verbose
-        if (!isDebugMode) {
-            logger.level = Level.INFO
-        }
 
         val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
 

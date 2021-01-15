@@ -58,8 +58,7 @@ fun main() {
             validationDataset = validation,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
-            validationBatchSize = TEST_BATCH_SIZE,
-            verbose = true
+            validationBatchSize = TEST_BATCH_SIZE
         )
 
         val imageId = 0
