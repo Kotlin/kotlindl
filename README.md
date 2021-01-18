@@ -114,6 +114,7 @@ fun main() {
 - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
+- [Logging](#logging)
 - [Reporting issues/Support](#reporting-issuessupport)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
@@ -186,15 +187,65 @@ Note that only NVIDIA devices are supported.
 You will also need to add the following dependencies in your project if you wish to leverage GPU: 
 
 ```
-* _compile 'org.tensorflow:libtensorflow:1.15.0'_
-
-* _compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
+  compile 'org.tensorflow:libtensorflow:1.15.0'_
+  compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
 ```
 
 On Windows the following distributions are required:
 - CUDA cuda_10.0.130_411.31_win10
 - [cudnn-10.0](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
+
+## Logging
+
+By default, the API module uses [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from specific logger implementation.
+
+You could use any widely known JVM logging library with [Simple Logging Facade for Java (SLF4J)](http://www.slf4j.org/) implementation such as Logback or Log4j/Log4j2.
+
+You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2
+
+```
+  compile 'org.apache.logging.log4j:log4j-api:2.14.0'
+  compile 'org.apache.logging.log4j:log4j-core:2.14.0'
+  compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+```
+
+```
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="STDOUT" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+```
+
+or the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project if you wish to use Logback
+
+```
+  compile 'ch.qos.logback:logback-classic:1.2.3'
+``` 
+
+```
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
+```
+These configuration files could be found in the Examples module.
 
 ## Reporting issues/Support
 
