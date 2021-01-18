@@ -250,15 +250,15 @@ These configuration files could be found in the Examples module.
 
 ## Fat Jar issue
 
-There is a known issue with Fat Jar creation and execution (on Amazon EC2 instances, for example).
+There is a known StackOverflow [question](https://stackoverflow.com/questions/47477069/issue-running-tensorflow-with-java/52003343) and TensorFlow [issue](https://github.com/tensorflow/tensorflow/issues/30488) with Fat Jar creation and execution (on Amazon EC2 instances, for example).
 
 ```
-libtensorflow_framework.so: cannot open shared object file: No such file or directory
+java.lang.UnsatisfiedLinkError: /tmp/tensorflow_native_libraries-1562914806051-0/libtensorflow_jni.so: libtensorflow_framework.so.1: cannot open shared object file: No such file or directory
 ```
 
 Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of Tensorflow 1.14, it was not fully fixed and requires an additional line in the build script
 
-One simple solution is to add a Tensorflow version specification to the Jar's Manifest. Below you could find an example of Gradle build task for Fat Jar creation.
+One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a Tensorflow version specification to the Jar's Manifest. Below you could find an example of Gradle build task for Fat Jar creation.
 
 ```
 task fatJar(type: Jar) {
