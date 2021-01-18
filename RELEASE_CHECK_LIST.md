@@ -1,6 +1,6 @@
 **Release activities check-list for minor releases:**
 
-0. Update documentation and CHANGELOG.md according last code changes
+0. Update documentation, README.MD and CHANGELOG.md according last code changes
 1. Make last commit with tag _v0.1.1_ for example
 2. Run tests and build artifacts on TC
 3. Deploy artifacts on Bintray or MavenCentral

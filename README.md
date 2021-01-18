@@ -115,6 +115,7 @@ fun main() {
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
 - [Logging](#logging)
+- [Fat Jar issue](#fat-jar-issue)
 - [Reporting issues/Support](#reporting-issuessupport)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
@@ -246,6 +247,29 @@ or the following dependency and configuration file ``logback.xml`` to ``src/reso
 </configuration>
 ```
 These configuration files could be found in the Examples module.
+
+## Fat Jar issue
+
+There is a known issue with Fat Jar creation and execution (on Amazon EC2 instances, for example).
+
+```
+libtensorflow_framework.so: cannot open shared object file: No such file or directory
+```
+
+Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of Tensorflow 1.14, it was not fully fixed and requires an additional line in the build script
+
+One simple solution is to add a Tensorflow version specification to the Jar's Manifest. Below you could find an example of Gradle build task for Fat Jar creation.
+
+```
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Version': '1.15'
+    }
+    classifier = 'all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+```
 
 ## Reporting issues/Support
 
