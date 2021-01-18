@@ -10,6 +10,7 @@ dependencies {
     compile 'io.github.microutils:kotlin-logging:2.0.4' // for logging
     compile 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     compile 'com.beust:klaxon:5.0.1'
+    compile 'com.microsoft.onnxruntime:onnxruntime:1.6.0'
     testCompile 'ch.qos.logback:logback-classic:1.2.3'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
