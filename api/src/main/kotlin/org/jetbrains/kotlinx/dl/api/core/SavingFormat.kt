@@ -7,10 +7,10 @@ package org.jetbrains.kotlinx.dl.api.core
 
 /** Model saving format. */
 public enum class SavingFormat {
-    /** Saves model as graph in .pb file format and variables in .txt file format. */
+    /** Saves model as graph in .pb file 1.15 Tensorflow format and variables in .txt file format. */
     TF_GRAPH_CUSTOM_VARIABLES,
 
-    /** Saves model as graph in .pb file format and variables in .txt file format. */
+    /** Saves model as graph in .pb file 1.15 Tensorflow format without variables data. */
     TF_GRAPH,
 
     /** Saves model as a list of layers in .json file format and variables in .txt file format. */
