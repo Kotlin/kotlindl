@@ -96,14 +96,16 @@ what optimization algorithm will be used, what do we want to optimize for, and h
 describe this in the *compile* method:
     
 ```kotlin
-    model.use{
-            it.compile(optimizer = Adam(),
-                    loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                    metric = Metrics.ACCURACY)
+model.use {
+    it.compile(
+        optimizer = Adam(),
+        loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+        metric = Metrics.ACCURACY
+    )
 
-            // next step here is training the model: this is described in the next tutorial
-            // ...
-        }
+    // next step here is training the model: this is described in the next tutorial
+    // ...
+}
 ```
 
 * `model` is an AutoCloseable object, so you can leverage the `use` construct. If not, do not forget to call `model.close()`. 
@@ -117,7 +119,7 @@ predictions out of all predictions made.
 At this point we can call `summary()` method to get a printout of the neural network's architecture. 
 
 ```kotlin
-    it.summary()
+it.summary()
 ```
 
 ```
@@ -144,4 +146,4 @@ INFO  api.core.Sequential - ====================================================
 Great! We have defined the structure of the neural network, what optimization algorithm will be used during its training, 
 and what we will be optimizing for. 
 
-In the next tutorial, you'll learn how you can train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).  
+In the [next tutorial](training_a_model.md), you'll learn how you can train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).  

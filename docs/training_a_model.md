@@ -1,50 +1,53 @@
-In the previous tutorial we have defined a neural network. Now let's train it on the actual data. 
+In the [previous tutorial](create_your_first_nn.md) we have defined a neural network. Now let's train it on the actual data. 
 
 Before you can use any data, typically some preprocessing is required. In this case it's minimal - all images are 
 already of the same size, and grayscale only. 
-With built-in functionality we can convert Fashion MNIST image archives into a Dataset object that we can use for model training.    
+With built-in functionality we can convert the [Fashion MNIST image archives](https://github.com/zalandoresearch/fashion-mnist#get-the-data) into a Dataset object that we can use for model training.    
 
 ```kotlin
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        trainFeaturesPath = "datasets/mnist/train-images-idx3-ubyte.gz",
-        trainLabelsPath = "datasets/mnist/train-labels-idx1-ubyte.gz",
-        testFeaturesPath = "datasets/mnist/t10k-images-idx3-ubyte.gz",
-        testLabelsPath = "datasets/mnist/t10k-labels-idx1-ubyte.gz",
-        numClasses = 10,
-        ::extractImages,
-        ::extractLabels
-    )
+val (train, test) = Dataset.createTrainAndTestDatasets(
+    trainFeaturesPath = "datasets/mnist/train-images-idx3-ubyte.gz",
+    trainLabelsPath = "datasets/mnist/train-labels-idx1-ubyte.gz",
+    testFeaturesPath = "datasets/mnist/t10k-images-idx3-ubyte.gz",
+    testLabelsPath = "datasets/mnist/t10k-labels-idx1-ubyte.gz",
+    numClasses = 10,
+    ::extractImages,
+    ::extractLabels
+)
 
-    val (newTrain, validation) = train.split(splitRatio = 0.95)
+val (newTrain, validation) = train.split(splitRatio = 0.95)
 ```
 
-You may also notice that we are splitting the data into three sets. First, we have the train and the est sets. We won't be touching 
+You may also notice that we are splitting the data into three sets. First, we have the train and the test sets. We won't be touching 
 the test set up until the very last moment when we are satisfied with the model and want to confirm its performance on unseen data.
 However, we also split the train set into `newTrain` and `validation` sets. We'll be using these during the training and validation 
 process.  
 
-Now everything is ready to train the model. Use `fit` method for this: 
+Now everything is ready to train the model. Use the `fit` method for this: 
 
 ```kotlin
-model.use{
-        it.compile(optimizer = Adam(),
-                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                metric = Metrics.ACCURACY)
+model.use {
+    it.compile(
+        optimizer = Adam(),
+        loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+        metric = Metrics.ACCURACY
+    )
 
-        it.summary()
+    it.summary()
 
-        // You can think of the training process as "fitting" the model to describe the given data :)
-        it.fit(dataset = newTrain,
-                epochs = 10,
-                batchSize = 100,
-                verbose = false)
+    // You can think of the training process as "fitting" the model to describe the given data :)
+    it.fit(
+        dataset = newTrain,
+        epochs = 10,
+        batchSize = 100,
+        verbose = false
+    )
 
-        val accuracy = it.evaluate(dataset = validation,
-                batchSize = 100).metrics[Metrics.ACCURACY]
+    val accuracy = it.evaluate(dataset = validation, batchSize = 100).metrics[Metrics.ACCURACY]
 
-        println("Accuracy: $accuracy")
-        it.save(File("src/model/my_model"))
-    }
+    println("Accuracy: $accuracy")
+    it.save(File("src/model/my_model"))
+}
 
 ```
 
@@ -75,7 +78,7 @@ check how it generalizes to the new data.
 
 ```kotlin
 val accuracy = it.evaluate(dataset = validation,
-        batchSize = 100).metrics[Metrics.ACCURACY]
+    batchSize = 100).metrics[Metrics.ACCURACY]
 
 println("Accuracy: $accuracy")
 ```
