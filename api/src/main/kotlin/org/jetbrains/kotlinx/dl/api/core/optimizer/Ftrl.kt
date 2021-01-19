@@ -137,9 +137,7 @@ public class Ftrl(
         }
     }
 
-    override fun getOptimizerName(): String {
-        return "Ftrl"
-    }
+    override val optimizerName: String get() = "Ftrl"
 
     override fun isRunningOnGPU(): Boolean = false
 }

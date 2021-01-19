@@ -112,9 +112,7 @@ public class AdaDelta(
         }
     }
 
-    override fun getOptimizerName(): String {
-        return "Adadelta"
-    }
+    override val optimizerName: String get() = "Adadelta"
 
     override fun isRunningOnGPU(): Boolean = true
 }

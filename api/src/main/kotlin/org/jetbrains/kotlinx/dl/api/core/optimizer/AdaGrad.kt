@@ -96,9 +96,7 @@ public class AdaGrad(
         }
     }
 
-    override fun getOptimizerName(): String {
-        return "Adagrad"
-    }
+    override val optimizerName: String get() = "Adagrad"
 
     override fun isRunningOnGPU(): Boolean = true
 }
