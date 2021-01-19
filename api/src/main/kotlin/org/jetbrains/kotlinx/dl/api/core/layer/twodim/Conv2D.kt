@@ -175,13 +175,10 @@ public class Conv2D(
         return TensorShape(biasShape).dims()
     }
 
-    override fun hasActivation(): Boolean {
-        return true
-    }
+    override val hasActivation: Boolean get() = true
 
-    override fun getParams(): Int {
-        return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
-    }
+    override val paramCount: Int
+        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
 
     override fun toString(): String {
         return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"

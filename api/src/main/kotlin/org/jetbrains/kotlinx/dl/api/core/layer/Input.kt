@@ -63,13 +63,9 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         return emptyList()
     }
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = false
 
-    override fun getParams(): Int {
-        return 0
-    }
+    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "Input(shape=${packedDims.contentToString()})"

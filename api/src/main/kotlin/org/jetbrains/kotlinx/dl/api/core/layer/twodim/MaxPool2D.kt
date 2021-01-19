@@ -66,13 +66,9 @@ public class MaxPool2D(
         return emptyList()
     }
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = false
 
-    override fun getParams(): Int {
-        return 0
-    }
+    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "MaxPool2D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"

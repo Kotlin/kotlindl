@@ -144,7 +144,7 @@ private fun fillLayerWeights(
         )
         else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
 }
 
 private fun fillConv2DVariablesFromKeras(
@@ -310,7 +310,7 @@ private fun fillLayerWeights(
         )
         else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
 }
 
 private fun initLayerWeights(it: Layer, model: Sequential) {
@@ -319,7 +319,7 @@ private fun initLayerWeights(it: Layer, model: Sequential) {
         Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
         else -> println("No default initialization handled for ${it.name}")
     }
-    model.logger.info { " Weights initialized for ${it.name}. ${it.getParams()} parameters are initialized. " }
+    model.logger.info { " Weights initialized for ${it.name}. ${it.paramCount} parameters are initialized. " }
 }
 
 /**

@@ -109,13 +109,10 @@ public class Dense(
         return result.toList()
     }
 
-    override fun hasActivation(): Boolean {
-        return true
-    }
+    override val hasActivation: Boolean get() = true
 
-    override fun getParams(): Int {
-        return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
-    }
+    override val paramCount: Int
+        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
 
     /** Returns the shape of kernel weights. */
     public fun getKernelShape(): LongArray {
