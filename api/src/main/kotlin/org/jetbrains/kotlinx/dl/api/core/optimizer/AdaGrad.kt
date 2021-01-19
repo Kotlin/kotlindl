@@ -98,5 +98,5 @@ public class AdaGrad(
 
     override val optimizerName: String get() = "Adagrad"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

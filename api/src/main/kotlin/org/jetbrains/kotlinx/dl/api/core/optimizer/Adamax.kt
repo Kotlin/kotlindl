@@ -144,5 +144,5 @@ public class Adamax(
 
     override val optimizerName: String get() = "Adamax"
 
-    override fun isRunningOnGPU(): Boolean = false
+    override val isRunningOnGPU: Boolean get() = false
 }

@@ -162,5 +162,5 @@ public class Adam(
 
     override val optimizerName: String get() = "Adam"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

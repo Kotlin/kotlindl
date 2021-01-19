@@ -55,5 +55,5 @@ public class SGD(
 
     override val optimizerName: String get() = "SGD"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

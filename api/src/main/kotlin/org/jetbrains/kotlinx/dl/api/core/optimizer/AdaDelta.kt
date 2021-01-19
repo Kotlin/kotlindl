@@ -114,5 +114,5 @@ public class AdaDelta(
 
     override val optimizerName: String get() = "Adadelta"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

@@ -155,6 +155,6 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
 
-    /** True, if optimizer implemented for GPU. */
-    internal abstract fun isRunningOnGPU(): Boolean
+    /** True, if optimizer is implemented for GPU. */
+    internal abstract val isRunningOnGPU: Boolean
 }
