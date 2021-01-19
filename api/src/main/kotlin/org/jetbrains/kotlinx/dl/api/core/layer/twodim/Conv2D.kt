@@ -143,7 +143,7 @@ public class Conv2D(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override fun getWeights(): List<Array<*>> {
+    override fun extractWeights(): List<Array<*>> {
         val result = mutableListOf<Array<*>>()
 
         val session = parentModel.session

@@ -80,7 +80,7 @@ public abstract class Layer(public var name: String) {
     }
 
     /** Returns layer's weights. */
-    public abstract fun getWeights(): List<Array<*>>
+    public abstract fun extractWeights(): List<Array<*>>
 
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean

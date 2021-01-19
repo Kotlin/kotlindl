@@ -62,7 +62,7 @@ public class MaxPool2D(
         )
     }
 
-    override fun getWeights(): List<Array<*>> {
+    override fun extractWeights(): List<Array<*>> {
         return emptyList()
     }
 

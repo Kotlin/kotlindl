@@ -59,7 +59,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         return inputShape
     }
 
-    override fun getWeights(): List<Array<*>> {
+    override fun extractWeights(): List<Array<*>> {
         return emptyList()
     }
 

@@ -61,7 +61,7 @@ public class Dropout(
         return tf.math.div(tf.math.mul(input, mask), probability)
     }
 
-    override fun getWeights(): List<Array<*>> {
+    override fun extractWeights(): List<Array<*>> {
         return emptyList()
     }
 
