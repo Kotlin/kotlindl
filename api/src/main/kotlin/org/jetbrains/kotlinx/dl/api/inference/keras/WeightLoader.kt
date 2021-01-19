@@ -171,7 +171,7 @@ private fun fillConv2DVariablesFromKeras(
         when (it.name) {
             "kernel:0" -> {
                 val kernelVariableName = conv2dKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Conv2D).getKernelShape()
+                val kernelShape = (model.getLayer(layerName) as Conv2D).kernelShapeArray
                 require(
                     kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
@@ -179,7 +179,7 @@ private fun fillConv2DVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = conv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Conv2D).getBiasShape()
+                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -208,7 +208,7 @@ private fun fillDenseVariablesFromKeras(
         when (it.name) {
             "kernel:0" -> {
                 val kernelVariableName = denseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Dense).getKernelShape()
+                val kernelShape = (model.getLayer(layerName) as Dense).kernelShapeArray
                 require(
                     kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
@@ -216,7 +216,7 @@ private fun fillDenseVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = denseBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Dense).getBiasShape()
+                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }

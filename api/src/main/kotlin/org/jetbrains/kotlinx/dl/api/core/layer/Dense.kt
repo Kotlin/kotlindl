@@ -115,14 +115,10 @@ public class Dense(
         get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
 
     /** Returns the shape of kernel weights. */
-    public fun getKernelShape(): LongArray {
-        return TensorShape(kernelShape).dims()
-    }
+    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
 
     /** Returns the shape of bias weights. */
-    public fun getBiasShape(): LongArray {
-        return TensorShape(biasShape).dims()
-    }
+    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"

@@ -166,14 +166,10 @@ public class Conv2D(
     }
 
     /** Returns the shape of kernel weights. */
-    public fun getKernelShape(): LongArray {
-        return TensorShape(kernelShape).dims()
-    }
+    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
 
     /** Returns the shape of bias weights. */
-    public fun getBiasShape(): LongArray {
-        return TensorShape(biasShape).dims()
-    }
+    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
     override val hasActivation: Boolean get() = true
 
