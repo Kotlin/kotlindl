@@ -26,6 +26,25 @@ they map to the actual classes:
 | 8      | Bag |
 | 9      | Ankle boot |
 
+For this example, we'll hardcode the label to string class mapping in a constant. We'll later use it to get human-readable
+predictions:
+
+```kotlin
+val stringLabels = mapOf(0 to "T-shirt/top",
+        1 to "Trouser",
+        2 to "Pullover",
+        3 to "Dress",
+        4 to "Coat",
+        5 to "Sandal",
+        6 to "Shirt",
+        7 to "Sneaker",
+        8 to "Bag",
+        9 to "Ankle boot"
+)
+```
+When working with other datasets you may need to lookup such mapping in a metadata file that comes with a dataset, or perhaps 
+you will need to encode it yourself first, if original data contains string representation of classes instead of integers. 
+
 Here's what the images themselves look like:
  
 ![](images/fashion-mnist-sprite.png)
