@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import ch.qos.logback.classic.Level
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
@@ -38,6 +37,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.FloatBuffer
 
 /**
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
@@ -62,6 +62,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     /** Main loss operand. */
     private lateinit var lossOp: Operand<Float>
+
+    /** Main prediction operand. */
+    private lateinit var prediction: Operand<Float>
 
     /** A list of targets to be optimized. */
     private lateinit var targets: List<Operand<Float>>
@@ -286,11 +289,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int,
-        verbose: Boolean
+        validationBatchSize: Int
     ): TrainingHistory {
         return internalFit(
-            verbose,
             trainBatchSize,
             epochs,
             trainingDataset,
@@ -303,11 +304,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     override fun fit(
         dataset: Dataset,
         epochs: Int,
-        batchSize: Int,
-        verbose: Boolean
+        batchSize: Int
     ): TrainingHistory {
         return internalFit(
-            verbose,
             batchSize,
             epochs,
             dataset,
@@ -333,7 +332,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun internalFit(
-        verbose: Boolean,
         trainBatchSize: Int,
         epochs: Int,
         trainingDataset: Dataset,
@@ -597,7 +595,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
-    override fun predictAll(dataset: Dataset, batchSize: Int): IntArray {
+    override fun predict(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -670,6 +668,50 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
     }
 
+    override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
+        require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+
+        callback.onPredictBegin()
+
+        val imageShape = calculateXShape(batchSize)
+
+        val predictions = Array(dataset.xSize()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
+            batchSize
+        )
+
+        var batchCounter = 0
+
+        while (batchIter.hasNext()) {
+            callback.onPredictBatchBegin(batchCounter, batchSize)
+
+            val batch: DataBatch = batchIter.next()
+
+            Tensor.create(
+                imageShape,
+                batch.x
+            ).use { testImages ->
+                val predictionsTensor = session.runner()
+                    .fetch(prediction)
+                    .feed(xOp.asOutput(), testImages)
+                    .run()[0]
+
+                val dst = Array(imageShape[0].toInt()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+
+                predictionsTensor.copyTo(dst)
+
+                callback.onPredictBatchEnd(batchCounter, batchSize)
+                batchCounter++
+                dst.copyInto(predictions, batchSize * (batchCounter - 1))
+            }
+        }
+        callback.onPredictEnd()
+        return predictions
+    }
+
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
         val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
@@ -690,13 +732,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
-        val predictionData: Array<FloatArray> = arrayOf(inputData)
-
         val imageShape = calculateXShape(1)
 
         Tensor.create(
             imageShape,
-            Dataset.serializeToBuffer(predictionData, 0, 1)
+            FloatBuffer.wrap(inputData)
         ).use { testImages ->
             val tensors =
                 formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
@@ -713,6 +753,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                     activations.add(tensors[i].convertTensorToMultiDimArray())
                 }
             }
+
+            tensors.forEach { it.close() }
             return Pair(dst[0], activations.toList())
         }
     }

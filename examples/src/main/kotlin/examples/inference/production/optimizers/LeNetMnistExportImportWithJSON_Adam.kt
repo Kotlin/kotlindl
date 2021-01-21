@@ -56,8 +56,7 @@ fun main() {
             validationDataset = validation,
             epochs = EPOCHS,
             trainBatchSize = TRAINING_BATCH_SIZE,
-            validationBatchSize = TEST_BATCH_SIZE,
-            verbose = true
+            validationBatchSize = TEST_BATCH_SIZE
         )
 
         it.save(
@@ -98,8 +97,7 @@ fun main() {
             validationRate = 0.1,
             epochs = 1,
             trainBatchSize = 1000,
-            validationBatchSize = 100,
-            verbose = true
+            validationBatchSize = 100
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -127,8 +125,7 @@ fun main() {
             validationRate = 0.1,
             epochs = 1,
             trainBatchSize = 1000,
-            validationBatchSize = 100,
-            verbose = true
+            validationBatchSize = 100
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

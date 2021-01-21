@@ -140,8 +140,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -220,8 +219,17 @@ class InferenceModelTest {
                     it.predict(train.getX(0))
                 }
             assertEquals(
-                "Reshape functions is missed!",
+                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
                 exception.message
+            )
+
+            val exception2 =
+                Assertions.assertThrows(IllegalArgumentException::class.java) {
+                    it.predictSoftly(train.getX(0))
+                }
+            assertEquals(
+                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
+                exception2.message
             )
         }
     }
@@ -252,8 +260,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -305,8 +312,7 @@ class InferenceModelTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

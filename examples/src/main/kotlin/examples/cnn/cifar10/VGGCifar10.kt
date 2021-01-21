@@ -188,7 +188,7 @@ fun main() {
 
         it.summary()
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 

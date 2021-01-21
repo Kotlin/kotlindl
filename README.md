@@ -1,5 +1,9 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
+[![Download](https://api.bintray.com/packages/kotlin/kotlin-datascience/kotlin-dl/images/download.svg?version=0.1.0) ](https://bintray.com/kotlin/kotlin-datascience/kotlin-dl/0.1.0)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.4.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/deep-learning/)
+
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). Under the 
  hood it is using TensorFlow Java API. 
 KotlinDL offers simple APIs for training deep learning models from scratch, importing existing Keras models 
@@ -110,6 +114,8 @@ fun main() {
 - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
+- [Logging](#logging)
+- [Fat Jar issue](#fat-jar-issue)
 - [Reporting issues/Support](#reporting-issuessupport)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
@@ -182,15 +188,88 @@ Note that only NVIDIA devices are supported.
 You will also need to add the following dependencies in your project if you wish to leverage GPU: 
 
 ```
-* _compile 'org.tensorflow:libtensorflow:1.15.0'_
-
-* _compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
+  compile 'org.tensorflow:libtensorflow:1.15.0'_
+  compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
 ```
 
 On Windows the following distributions are required:
 - CUDA cuda_10.0.130_411.31_win10
 - [cudnn-10.0](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
+
+## Logging
+
+By default, the API module uses [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from specific logger implementation.
+
+You could use any widely known JVM logging library with [Simple Logging Facade for Java (SLF4J)](http://www.slf4j.org/) implementation such as Logback or Log4j/Log4j2.
+
+You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2
+
+```
+  compile 'org.apache.logging.log4j:log4j-api:2.14.0'
+  compile 'org.apache.logging.log4j:log4j-core:2.14.0'
+  compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+```
+
+```
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="STDOUT" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+```
+
+or the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project if you wish to use Logback
+
+```
+  compile 'ch.qos.logback:logback-classic:1.2.3'
+``` 
+
+```
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
+```
+These configuration files could be found in the Examples module.
+
+## Fat Jar issue
+
+There is a known StackOverflow [question](https://stackoverflow.com/questions/47477069/issue-running-tensorflow-with-java/52003343) and TensorFlow [issue](https://github.com/tensorflow/tensorflow/issues/30488) with Fat Jar creation and execution (on Amazon EC2 instances, for example).
+
+```
+java.lang.UnsatisfiedLinkError: /tmp/tensorflow_native_libraries-1562914806051-0/libtensorflow_jni.so: libtensorflow_framework.so.1: cannot open shared object file: No such file or directory
+```
+
+Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of Tensorflow 1.14, it was not fully fixed and requires an additional line in the build script
+
+One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a Tensorflow version specification to the Jar's Manifest. Below you could find an example of Gradle build task for Fat Jar creation.
+
+```
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Version': '1.15'
+    }
+    classifier = 'all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+```
 
 ## Reporting issues/Support
 

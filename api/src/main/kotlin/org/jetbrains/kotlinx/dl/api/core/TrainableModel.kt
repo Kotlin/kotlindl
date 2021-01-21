@@ -26,9 +26,6 @@ import java.io.FileNotFoundException
  * Base abstract class for all trainable models.
  */
 public abstract class TrainableModel : InferenceModel() {
-    /** Controls level of verbosity. */
-    protected var isDebugMode: Boolean = false
-
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
@@ -151,7 +148,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [dataset] The train dataset that combines input data (X) and target data (Y).
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [batchSize] Number of samples per gradient update.
-     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      *
@@ -160,8 +156,7 @@ public abstract class TrainableModel : InferenceModel() {
     public abstract fun fit(
         dataset: Dataset,
         epochs: Int = 5,
-        batchSize: Int = 32,
-        verbose: Boolean = true
+        batchSize: Int = 32
     ): TrainingHistory
 
     /**
@@ -172,7 +167,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
-     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
      *
@@ -183,8 +177,7 @@ public abstract class TrainableModel : InferenceModel() {
         validationDataset: Dataset,
         epochs: Int = 5,
         trainBatchSize: Int = 32,
-        validationBatchSize: Int = 256,
-        verbose: Boolean = true
+        validationBatchSize: Int = 256
     ): TrainingHistory
 
     /**
@@ -207,7 +200,17 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [batchSize] Number of samples per batch of computation.
      * @return Array of labels. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predictAll(dataset: Dataset, batchSize: Int): IntArray
+    public abstract fun predict(dataset: Dataset, batchSize: Int): IntArray
+
+    /**
+     * Generates output predictions for the input samples.
+     * Each prediction is a vector of probabilities instead of specific class in [predict] method.
+     *
+     * @param [dataset] Data to predict on.
+     * @param [batchSize] Number of samples per batch of computation.
+     * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
+     */
+    public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
 
     /**
      * Generates output prediction for the input sample.
@@ -288,7 +291,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
-     * @param [verbose] Verbosity mode. False = silent, True = one line per batch and epoch.
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public fun fit(
@@ -296,8 +298,7 @@ public abstract class TrainableModel : InferenceModel() {
         validationRate: Double,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int,
-        verbose: Boolean
+        validationBatchSize: Int
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) {
             "Validation rate should be more than 0.0 and less than 1.0. " +
@@ -310,8 +311,7 @@ public abstract class TrainableModel : InferenceModel() {
             validation,
             epochs,
             trainBatchSize,
-            validationBatchSize,
-            verbose
+            validationBatchSize
         )
     }
 

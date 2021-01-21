@@ -26,6 +26,25 @@ they map to the actual classes:
 | 8      | Bag |
 | 9      | Ankle boot |
 
+For this example, we'll hardcode the label to string class mapping in a constant. We'll later use it to get human-readable
+predictions:
+
+```kotlin
+val stringLabels = mapOf(0 to "T-shirt/top",
+        1 to "Trouser",
+        2 to "Pullover",
+        3 to "Dress",
+        4 to "Coat",
+        5 to "Sandal",
+        6 to "Shirt",
+        7 to "Sneaker",
+        8 to "Bag",
+        9 to "Ankle boot"
+)
+```
+When working with other datasets you may need to lookup such mapping in a metadata file that comes with a dataset, or perhaps 
+you will need to encode it yourself first, if original data contains string representation of classes instead of integers. 
+
 Here's what the images themselves look like:
  
 ![](images/fashion-mnist-sprite.png)
@@ -96,14 +115,16 @@ what optimization algorithm will be used, what do we want to optimize for, and h
 describe this in the *compile* method:
     
 ```kotlin
-    model.use{
-            it.compile(optimizer = Adam(),
-                    loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                    metric = Metrics.ACCURACY)
+model.use {
+    it.compile(
+        optimizer = Adam(),
+        loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+        metric = Metrics.ACCURACY
+    )
 
-            // next step here is training the model: this is described in the next tutorial
-            // ...
-        }
+    // next step here is training the model: this is described in the next tutorial
+    // ...
+}
 ```
 
 * `model` is an AutoCloseable object, so you can leverage the `use` construct. If not, do not forget to call `model.close()`. 
@@ -117,7 +138,7 @@ predictions out of all predictions made.
 At this point we can call `summary()` method to get a printout of the neural network's architecture. 
 
 ```kotlin
-    it.summary()
+it.summary()
 ```
 
 ```
@@ -144,4 +165,4 @@ INFO  api.core.Sequential - ====================================================
 Great! We have defined the structure of the neural network, what optimization algorithm will be used during its training, 
 and what we will be optimizing for. 
 
-In the next tutorial, you'll learn how you can train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).  
+In the [next tutorial](training_a_model.md), you'll learn how you can train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).  

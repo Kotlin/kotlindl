@@ -129,8 +129,7 @@ class SequentialInferenceTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -223,8 +222,7 @@ class SequentialInferenceTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -260,8 +258,7 @@ class SequentialInferenceTest {
                         validationRate = 0.1,
                         epochs = EPOCHS,
                         trainBatchSize = TRAINING_BATCH_SIZE,
-                        validationBatchSize = TEST_BATCH_SIZE,
-                        verbose = false
+                        validationBatchSize = TEST_BATCH_SIZE
                     )
                 }
             assertEquals(
@@ -280,7 +277,7 @@ class SequentialInferenceTest {
 
             val predictAllException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predictAll(test, TEST_BATCH_SIZE)
+                    it.predict(test, TEST_BATCH_SIZE)
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
@@ -318,7 +315,7 @@ class SequentialInferenceTest {
 
             val predictAllException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predictAll(test, TEST_BATCH_SIZE)
+                    it.predict(test, TEST_BATCH_SIZE)
                 }
             assertEquals(
                 "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method.",
@@ -376,8 +373,7 @@ class SequentialInferenceTest {
             it.fit(
                 dataset = train,
                 epochs = EPOCHS,
-                batchSize = TRAINING_BATCH_SIZE,
-                verbose = true
+                batchSize = TRAINING_BATCH_SIZE
             )
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -420,8 +416,7 @@ class SequentialInferenceTest {
                 validationRate = 0.1,
                 epochs = EPOCHS,
                 trainBatchSize = TRAINING_BATCH_SIZE,
-                validationBatchSize = TEST_BATCH_SIZE,
-                verbose = false
+                validationBatchSize = TEST_BATCH_SIZE
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -584,8 +579,7 @@ class SequentialInferenceTest {
                 validationDataset = validation,
                 epochs = EPOCHS,
                 trainBatchSize = TRAINING_BATCH_SIZE,
-                validationBatchSize = TEST_BATCH_SIZE,
-                verbose = true
+                validationBatchSize = TEST_BATCH_SIZE
             )
 
             it.save(
@@ -623,8 +617,7 @@ class SequentialInferenceTest {
                 validationRate = 0.1,
                 epochs = 1,
                 trainBatchSize = 1000,
-                validationBatchSize = 100,
-                verbose = true
+                validationBatchSize = 100
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -649,8 +642,7 @@ class SequentialInferenceTest {
                 validationRate = 0.1,
                 epochs = 1,
                 trainBatchSize = 1000,
-                validationBatchSize = 100,
-                verbose = true
+                validationBatchSize = 100
             )
 
             val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

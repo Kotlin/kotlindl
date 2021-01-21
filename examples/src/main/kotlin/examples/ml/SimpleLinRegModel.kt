@@ -77,7 +77,7 @@ fun main() {
         )
 
         it.summary()
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
         println("Weights: " + it.getLayer("dense_1").getWeights()[0].contentDeepToString())
