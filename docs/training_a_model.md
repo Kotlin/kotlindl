@@ -59,18 +59,17 @@ to see updates per epoch.
 
 Here's what you can expect to see as the output during the training process: 
 ```
-DEBUG o.j.kotlinx.dl.api.core.Sequential - Initialization of TensorFlow Graph variables.
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 1 loss: 0.49412054 metric: 0.8269117
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 2 loss: 0.37001204 metric: 0.8689473
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 3 loss: 0.33682162 metric: 0.8792109
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 4 loss: 0.31501168 metric: 0.8863342
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 5 loss: 0.29811463 metric: 0.8926845
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 6 loss: 0.28373528 metric: 0.8974922
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 7 loss: 0.27145803 metric: 0.9017029
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 8 loss: 0.26044646 metric: 0.9054747
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 9 loss: 0.24978207 metric: 0.9097908
-INFO  o.j.kotlinx.dl.api.core.Sequential - epochs: 10 loss: 0.24072464 metric: 0.9134394
-
+o.j.kotlinx.dl.api.core.Sequential - Initialization of TensorFlow Graph variables.
+o.j.kotlinx.dl.api.core.Sequential - epochs: 1 loss: 0.28763896 metric: 0.9179658
+o.j.kotlinx.dl.api.core.Sequential - epochs: 2 loss: 0.13266732 metric: 0.96149194
+o.j.kotlinx.dl.api.core.Sequential - epochs: 3 loss: 0.0978983 metric: 0.9719294
+o.j.kotlinx.dl.api.core.Sequential - epochs: 4 loss: 0.07665476 metric: 0.97835064
+o.j.kotlinx.dl.api.core.Sequential - epochs: 5 loss: 0.06175016 metric: 0.98247266
+o.j.kotlinx.dl.api.core.Sequential - epochs: 6 loss: 0.0505572 metric: 0.98652506
+o.j.kotlinx.dl.api.core.Sequential - epochs: 7 loss: 0.04168837 metric: 0.98938525
+o.j.kotlinx.dl.api.core.Sequential - epochs: 8 loss: 0.03445377 metric: 0.9916132
+o.j.kotlinx.dl.api.core.Sequential - epochs: 9 loss: 0.028447991 metric: 0.99368316
+o.j.kotlinx.dl.api.core.Sequential - epochs: 10 loss: 0.023344817 metric: 0.9952095
 ```  
 
 Once the model has been trained, it's important to evaluate its performance on the validation dataset, so that we can 
@@ -84,13 +83,13 @@ println("Accuracy: $accuracy")
 ```
 
 ```
-Accuracy: 0.8909999132156372
+Accuracy: 0.9806665182113647
 ```
 
 ---
 **NOTE**
 
-The results are nondeterministic, and you may have slightly different Accuracy value. 
+The results are nondeterministic, and you may have a slightly different Accuracy value. 
 
 --- 
 
