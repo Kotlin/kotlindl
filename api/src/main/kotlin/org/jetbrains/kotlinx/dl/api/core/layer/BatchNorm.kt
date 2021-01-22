@@ -7,7 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.initializer.RandomNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
+import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.tensorflow.Operand
@@ -23,10 +24,10 @@ public class BatchNorm(
     public val center: Boolean = true,
     public val epsilon: Double = 0.001,
     public val scale: Boolean = true,
-    public val gammaInitializer: Initializer = RandomNormal(),
-    public val betaInitializer: Initializer = RandomNormal(),
-    public val movingMeanInitializer: Initializer = RandomNormal(),
-    public val movingVarianceInitializer: Initializer = RandomNormal(),
+    public val gammaInitializer: Initializer = Ones(),
+    public val betaInitializer: Initializer = Zeros(),
+    public val movingMeanInitializer: Initializer = Zeros(),
+    public val movingVarianceInitializer: Initializer = Ones(),
     public val isTraining: Boolean = false,
     name: String = "",
 ) : Layer(name) {
@@ -78,57 +79,67 @@ public class BatchNorm(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Boolean,
+        isTraining: Operand<Float>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        if (isTraining) {
-            val axes = calculateAxes(input)
 
-            val axesOp = tf.constant(axes)
+        val axes = calculateAxes(input)
 
-            val batchMeanSum = tf.reduceSum(
-                input,
-                axesOp,
-                ReduceSum.keepDims(java.lang.Boolean.TRUE)
-            )
-            var batchMean: Operand<Float> = tf.math.divNoNan(batchMeanSum, numberOfLosses)
+        val axesOp = tf.constant(axes)
 
-            val batchVarianceSum = tf.reduceSum(
-                tf.math.squaredDifference(
-                    input, tf.stopGradient(batchMean)
-                ), axesOp, ReduceSum.keepDims(java.lang.Boolean.TRUE)
-            )
-            var batchVariance: Operand<Float> = tf.math.divNoNan(batchVarianceSum, numberOfLosses)
+        val batchMeanSum = tf.reduceSum(
+            input,
+            axesOp,
+            ReduceSum.keepDims(java.lang.Boolean.TRUE)
+        )
+        var batchMean: Operand<Float> = tf.math.divNoNan(batchMeanSum, numberOfLosses)
 
-            batchMean = tf.squeeze(batchMean, Squeeze.axis(axes.map { it.toLong() }))
-            batchVariance = tf.squeeze(batchVariance, Squeeze.axis(axes.map { it.toLong() }))
+        val batchVarianceSum = tf.reduceSum(
+            tf.math.squaredDifference(
+                input, tf.stopGradient(batchMean)
+            ), axesOp, ReduceSum.keepDims(java.lang.Boolean.TRUE)
+        )
+        var batchVariance: Operand<Float> = tf.math.divNoNan(batchVarianceSum, numberOfLosses)
 
-            val meanUpdate = assignMovingAverage(tf, movingMean, batchMean, momentum)
-            val varianceUpdate = assignMovingAverage(tf, movingVariance, batchVariance, momentum)
+        batchMean = tf.squeeze(batchMean, Squeeze.axis(axes.map { it.toLong() }))
+        batchVariance = tf.squeeze(batchVariance, Squeeze.axis(axes.map { it.toLong() }))
 
-            val meanIdentity = tf
-                .withControlDependencies(listOf(meanUpdate))
-                .identity(batchMean)
-            val varianceIdentity = tf
-                .withControlDependencies(listOf(varianceUpdate))
-                .identity(batchVariance)
+        val meanUpdate = assignMovingAverage(tf, movingMean, batchMean, momentum)
+        val varianceUpdate = assignMovingAverage(tf, movingVariance, batchVariance, momentum)
 
-            return tf.withName("BN_TRAINING")
-                .identity(
-                    batchNorm(
-                        tf,
-                        input,
-                        gamma,
-                        beta,
-                        meanIdentity,
-                        varianceIdentity,
-                        tf.constant(epsilon.toFloat())
-                    )
+        val meanIdentity = tf
+            .withControlDependencies(listOf(meanUpdate))
+            .identity(batchMean)
+        val varianceIdentity = tf
+            .withControlDependencies(listOf(varianceUpdate))
+            .identity(batchVariance)
+
+        val ifTrainingModeBranch = tf.withName("BN_TRAINING")
+            .identity(
+                batchNorm(
+                    tf,
+                    input,
+                    gamma,
+                    beta,
+                    meanIdentity,
+                    varianceIdentity,
+                    tf.constant(epsilon.toFloat())
                 )
-        } else {
-            return tf.withName("BN_INFERENCE")
-                .identity(batchNorm(tf, input, gamma, beta, movingMean, movingVariance, tf.constant(epsilon.toFloat())))
-        }
+            )
+
+        val ifNotTrainingModeBranch = tf.withName("BN_INFERENCE")
+            .identity(batchNorm(tf, input, gamma, beta, movingMean, movingVariance, tf.constant(epsilon.toFloat())))
+
+        return ifTrainingModeBranch
+        /*return tf.math.add(
+            tf.math.mul(isTraining, ifTrainingModeBranch),
+            tf.math.mul(
+                tf.math.sub(
+                    tf.constant(1.0f),
+                    isTraining
+                ), ifNotTrainingModeBranch
+            )
+        )*/
     }
 
     private fun calculateAxes(input: Operand<Float>): IntArray {

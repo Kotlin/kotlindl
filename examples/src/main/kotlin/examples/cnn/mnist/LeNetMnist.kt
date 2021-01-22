@@ -99,15 +99,26 @@ fun main() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+        println("Graph after compilation.")
+        println(it.kGraph)
 
+        it.init()
+        var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy before: $accuracy")
+
+        println("Graph after evaluation.")
         println(it.kGraph)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
+        println("Graph after training.")
         println(it.kGraph)
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
-        println("Accuracy: $accuracy")
+        println("Graph after training and evaluation.")
+        println(it.kGraph)
+
+        println("Accuracy after: $accuracy")
     }
 }

@@ -40,7 +40,7 @@ public class Flatten(name: String = "") : Layer(name) {
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Boolean,
+        isTraining: Operand<Float>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return tf.reshape(input, units)

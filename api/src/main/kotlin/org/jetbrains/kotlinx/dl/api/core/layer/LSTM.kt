@@ -131,7 +131,7 @@ public class LSTM(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Boolean,
+        isTraining: Operand<Float>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return input

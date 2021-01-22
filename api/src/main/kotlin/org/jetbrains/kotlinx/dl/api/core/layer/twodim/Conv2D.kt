@@ -134,7 +134,7 @@ public class Conv2D(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Boolean,
+        isTraining: Operand<Float>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val tfPadding = when (padding) {

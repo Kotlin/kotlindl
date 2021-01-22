@@ -19,12 +19,12 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 1000
-private const val TEST_BATCH_SIZE = 1000
+private const val EPOCHS = 2
+private const val TRAINING_BATCH_SIZE = 100
+private const val TEST_BATCH_SIZE = 100
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
-private const val SEED = 12L
+private const val SEED = 13L
 
 /**
  * This is an CNN based on an implementation of LeNet-5 from classic paper.
@@ -113,19 +113,16 @@ fun main() {
             metric = Metrics.ACCURACY
         )
         it.init()
-        // TODO: uncommenting this breaks the batch calculations (possible due to co-existing in graph BATCH_INFERENCE and BATCH_TRAINING nodes - maybe we should create whem in scopes and remove in scopes
 
-        /*println(it.kGraph)
+        println(it.kGraph)
         var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println(it.kGraph)
-        println("Accuracy before : $accuracy")*/
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, verbose = true)
+        println("Accuracy before : $accuracy")
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-        //println(it.kGraph)
+        println(it.kGraph)
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-        // TODO: accuracy after pass through batch norm is 0.09 - without is equal to 0.96
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy after : $accuracy")
     }
 }

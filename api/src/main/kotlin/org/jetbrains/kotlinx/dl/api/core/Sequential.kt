@@ -60,14 +60,32 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Layers indexed by name. */
     private var layersByName: Map<String, Layer> = mapOf()
 
-    /** Main loss operand. */
+    /** TensorFlow operand for prediction phase. */
+    private lateinit var yPredOp: Operand<Float>
+
+    /** TensorFlow loss operand. */
     private lateinit var lossOp: Operand<Float>
 
-    /** Main prediction operand. */
-    private lateinit var prediction: Operand<Float>
+    /** TensorFlow prediction operand. */
+    private lateinit var predictionOp: Operand<Float>
+
+    /** TensorFlow prediction operand. */
+    private lateinit var metricOp: Operand<Float>
 
     /** A list of targets to be optimized. */
     private lateinit var targets: List<Operand<Float>>
+
+    /** TensorFlow operand for X data. */
+    private lateinit var xOp: Operand<Float>
+
+    /** TensorFlow operand for Y data. */
+    private lateinit var yTrueOp: Operand<Float>
+
+    /** TensorFlow operand for batch size data. */
+    private lateinit var numberOfLossesOp: Operand<Float>
+
+    /** TensorFlow operand for batch size data. */
+    private lateinit var training: Operand<Float>
 
     init {
         for (layer in layers) {
@@ -261,11 +279,29 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         xOp = inputLayer.input
-        yOp = tf.placeholder(getDType()) as Operand<Float>
+        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
             getDType(),
             Placeholder.shape(Shape.scalar())
         )
+
+        training = tf.withName("training").placeholder(
+            getDType(),
+            Placeholder.shape(Shape.scalar())
+        )
+
+
+
+        yPredOp = forward(xOp)
+        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+
+        predictionOp = when (loss) {
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
+            else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
+        }
+
+        metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
         isModelCompiled = true
     }
@@ -349,26 +385,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         val trainingHistory = TrainingHistory()
 
-        this.isDebugMode = verbose
-        if (!isDebugMode) {
-            logger.level = Level.INFO
-        }
-
-        yPred = forward(xOp, isTraining = true)
-        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
-
-        logger.debug { "Initialization of optimizer variables." }
-        kGraph.initializeOptimizerVariables(session)
-        isOptimizerVariableInitialized = true
-
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
-
-        val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
-
         if (!isOptimizerVariableInitialized) {
             logger.debug { "Initialization of optimizer variables." }
             kGraph.initializeOptimizerVariables(session)
@@ -401,36 +417,39 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                         Tensor.create(yBatchShape, batch.y).use { batchLabelsTensor ->
                             Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
                                 .use { numberOfLossesTensor ->
-                                    val (lossValue, metricValue) = trainOnBatch(
-                                        targets,
-                                        batchImagesTensor,
-                                        batchLabelsTensor,
-                                        numberOfLossesTensor as Tensor<Float>,
-                                        metricOp
-                                    )
-                                    if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
-                                        logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
-                                    }
-
-                                    averageTrainingLossAccum += lossValue
-                                    averageTrainingMetricAccum += metricValue
-                                    val batchTrainingEvent =
-                                        BatchTrainingEvent(
-                                            i,
-                                            batchCounter,
-                                            lossValue.toDouble(),
-                                            metricValue.toDouble()
+                                    Tensor.create(1.0f).use { isTraining ->
+                                        val (lossValue, metricValue) = trainOnBatch(
+                                            targets,
+                                            batchImagesTensor,
+                                            batchLabelsTensor,
+                                            numberOfLossesTensor as Tensor<Float>,
+                                            isTraining as Tensor<Float>,
+                                            metricOp
                                         )
-                                    trainingHistory.appendBatch(batchTrainingEvent)
+                                        if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                                            logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
+                                        }
 
-                                    logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+                                        averageTrainingLossAccum += lossValue
+                                        averageTrainingMetricAccum += metricValue
+                                        val batchTrainingEvent =
+                                            BatchTrainingEvent(
+                                                i,
+                                                batchCounter,
+                                                lossValue.toDouble(),
+                                                metricValue.toDouble()
+                                            )
+                                        trainingHistory.appendBatch(batchTrainingEvent)
 
-                                    callback.onTrainBatchEnd(
-                                        batchCounter,
-                                        trainBatchSize,
-                                        batchTrainingEvent,
-                                        trainingHistory
-                                    )
+                                        logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+
+                                        callback.onTrainBatchEnd(
+                                            batchCounter,
+                                            trainBatchSize,
+                                            batchTrainingEvent,
+                                            trainingHistory
+                                        )
+                                    }
                                 }
                         }
                     }
@@ -493,6 +512,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         batchImages: Tensor<Float>,
         batchLabels: Tensor<Float>,
         numberOfLosses: Tensor<Float>,
+        isTraining: Tensor<Float>,
         metricOp: Operand<Float>
     ): Pair<Float, Float> {
         val runner = session.runner()
@@ -503,8 +523,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         runner
             .feed(xOp.asOutput(), batchImages)
-            .feed(yOp.asOutput(), batchLabels)
+            .feed(yTrueOp.asOutput(), batchLabels)
             .feed(numberOfLossesOp.asOutput(), numberOfLosses)
+            .feed(training.asOutput(), isTraining)
 
         runner
             .fetch(TRAINING_LOSS)
@@ -530,16 +551,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         callback.onTestBegin()
 
-        yPred = forward(xOp, isTraining = false)
-        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
-
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
-
-        val metricOp = metric.apply(tf, prediction, yOp, numberOfLossesOp)
-
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
@@ -559,27 +570,30 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             ).use { testImagesTensor ->
                 Tensor.create(labelShape, batch.y).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
-                        val lossAndMetricsTensors = session.runner()
-                            .fetch(metricOp)
-                            .fetch(TRAINING_LOSS)
-                            .feed(xOp.asOutput(), testImagesTensor)
-                            .feed(yOp.asOutput(), testLabelsTensor)
-                            .feed(
-                                numberOfLossesOp.asOutput(),
-                                numberOfLossesTensor
-                            ) // TODO: change to number of loss pieces
-                            .run()
+                        Tensor.create(0.0f).use { isTraining ->
+                            val lossAndMetricsTensors = session.runner()
+                                .fetch(metricOp)
+                                .fetch(TRAINING_LOSS)
+                                .feed(xOp.asOutput(), testImagesTensor)
+                                .feed(yTrueOp.asOutput(), testLabelsTensor)
+                                .feed(training.asOutput(), isTraining)
+                                .feed(
+                                    numberOfLossesOp.asOutput(),
+                                    numberOfLossesTensor
+                                ) // TODO: change to number of loss pieces
+                                .run()
 
-                        val metricValue = lossAndMetricsTensors[0].floatValue()
-                        val lossValue = lossAndMetricsTensors[1].floatValue()
+                            val metricValue = lossAndMetricsTensors[0].floatValue()
+                            val lossValue = lossAndMetricsTensors[1].floatValue()
 
-                        averageMetricAccum += metricValue
-                        averageLossAccum += lossValue
+                            averageMetricAccum += metricValue
+                            averageLossAccum += lossValue
 
-                        val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
-                        evaluationHistory.appendBatch(batchEvent)
+                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
+                            evaluationHistory.appendBatch(batchEvent)
 
-                        callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                            callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                        }
                     }
 
                 }
@@ -602,14 +616,6 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         callback.onPredictBegin()
 
-        yPred = forward(xOp, isTraining = false)
-        lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
-
-        val prediction = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-            else -> tf.withName(OUTPUT_NAME).identity(yPred)
-        }
-
         val imageShape = calculateXShape(batchSize)
 
         val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
@@ -629,24 +635,27 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                 imageShape,
                 batch.x
             ).use { testImages ->
-                val predictionsTensor = session.runner()
-                    .fetch(prediction)
-                    .feed(xOp.asOutput(), testImages)
-                    .run()[0]
+                Tensor.create(0.0f).use { isTraining ->
+                    val predictionsTensor = session.runner()
+                        .fetch(predictionOp)
+                        .feed(xOp.asOutput(), testImages)
+                        .feed(training.asOutput(), isTraining)
+                        .run()[0]
 
-                val dst = Array(imageShape[0].toInt()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
+                    val dst = Array(imageShape[0].toInt()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
 
-                predictionsTensor.copyTo(dst)
+                    predictionsTensor.copyTo(dst)
 
-                val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
+                    val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
 
-                dst.forEachIndexed { index, element ->
-                    argMaxBatchPrediction[index] = element.indexOfFirst { it == element.maxOrNull()!! }
+                    dst.forEachIndexed { index, element ->
+                        argMaxBatchPrediction[index] = element.indexOfFirst { it == element.maxOrNull()!! }
+                    }
+
+                    callback.onPredictBatchEnd(batchCounter, batchSize)
+                    batchCounter++
+                    argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
                 }
-
-                callback.onPredictBatchEnd(batchCounter, batchSize)
-                batchCounter++
-                argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
             }
         }
         callback.onPredictEnd()
@@ -695,7 +704,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                 batch.x
             ).use { testImages ->
                 val predictionsTensor = session.runner()
-                    .fetch(prediction)
+                    .fetch(predictionOp)
                     .feed(xOp.asOutput(), testImages)
                     .run()[0]
 
@@ -768,16 +777,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             .runner()
 
         if (predictionTensorName.isEmpty()) {
-            yPred = forward(xOp, isTraining = false)
-            lossOp = loss.apply(tf, yPred, yOp, numberOfLossesOp)
-
-            val prediction = when (loss) {
-                is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPred)
-                else -> tf.withName(OUTPUT_NAME).identity(yPred)
-            }
-
             runner
-                .fetch(prediction)
+                .fetch(predictionOp)
                 .feed(xOp.asOutput(), testImages)
 
         } else {
@@ -811,10 +812,10 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return Pair(xBatchShape, yBatchShape)
     }
 
-    private fun forward(input: Operand<Float>, isTraining: Boolean): Operand<Float> {
+    private fun forward(input: Operand<Float>): Operand<Float> {
         var out: Operand<Float> = input
         for (layer in layers) {
-            out = layer.forward(tf, out, isTraining, numberOfLossesOp)
+            out = layer.forward(tf, out, training, numberOfLossesOp)
         }
         return out
     }

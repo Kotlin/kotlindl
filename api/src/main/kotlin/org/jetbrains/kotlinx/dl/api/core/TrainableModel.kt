@@ -18,7 +18,6 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.tensorflow.Operand
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -40,20 +39,6 @@ public abstract class TrainableModel : InferenceModel() {
 
     /** List of metrics for evaluation phase. */
     protected var metrics: List<Metric> = listOf(Accuracy())
-
-    /** TensorFlow operand for prediction phase. */
-    protected lateinit var yPred: Operand<Float>
-
-    protected fun isYPredInitialized(): Boolean = ::yPred.isInitialized
-
-    /** TensorFlow operand for X data. */
-    protected lateinit var xOp: Operand<Float>
-
-    /** TensorFlow operand for Y data. */
-    protected lateinit var yOp: Operand<Float>
-
-    /** TensorFlow operand for batch size data. */
-    protected lateinit var numberOfLossesOp: Operand<Float>
 
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
     protected var amountOfClasses: Long = -1

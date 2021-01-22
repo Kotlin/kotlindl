@@ -6,11 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.random.RandomUniform
 
 /**
  * Applies Dropout to the input.
@@ -43,31 +41,31 @@ public class Dropout(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Boolean,
+        isTraining: Operand<Float>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        if (isTraining) {
-            val trainingFactor = tf.placeholderWithDefault(tf.constant(1.0f), Shape.scalar())
+        /* if (isTraining) {
+             val trainingFactor = tf.placeholderWithDefault(tf.constant(1.0f), Shape.scalar())
 
-            val probability = tf.math.add(
-                tf.math.mul(trainingFactor, tf.constant(keepProbability - 1.0f)),
-                tf.constant(1.0f)
-            ) // When training TODO: refactor because training factor is known
+             val probability = tf.math.add(
+                 tf.math.mul(trainingFactor, tf.constant(keepProbability - 1.0f)),
+                 tf.constant(1.0f)
+             ) // When training TODO: refactor because training factor is known
 
-            val inputShape = input.asOutput().shape()
-            val dims = mutableListOf<Long>()
-            for (i in 1 until inputShape.numDimensions()) // skip first dimension
-                dims.add(inputShape.size(i))
+             val inputShape = input.asOutput().shape()
+             val dims = mutableListOf<Long>()
+             for (i in 1 until inputShape.numDimensions()) // skip first dimension
+                 dims.add(inputShape.size(i))
 
-            val options = RandomUniform.seed(seed).seed2(seed + 1)
-            val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType(), options)
+             val options = RandomUniform.seed(seed).seed2(seed + 1)
+             val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType(), options)
 
-            val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<Float>))
+             val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<Float>))
 
-            return tf.math.div(tf.math.mul(input, mask), probability)
-        } else {
+             return tf.math.div(tf.math.mul(input, mask), probability)
+         } else {*/
             return input // TODO: double check that should be returned in Dropout
-        }
+        /* }*/
     }
 
     override fun getWeights(): List<Array<*>> {
