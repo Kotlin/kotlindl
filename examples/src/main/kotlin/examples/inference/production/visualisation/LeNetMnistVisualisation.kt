@@ -50,11 +50,11 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val weights = it.layers[0].extractWeights() // first conv2d layer
+        val weights = it.layers[0].weights // first conv2d layer
 
         drawFilters(weights[0], colorCoefficient = 10.0)
 
-        val weights2 = it.layers[2].extractWeights() // first conv2d layer
+        val weights2 = it.layers[2].weights // first conv2d layer
 
         drawFilters(weights2[0], colorCoefficient = 10.0)
 

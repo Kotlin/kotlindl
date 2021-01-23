@@ -87,9 +87,9 @@ public class Dense(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override fun extractWeights(): List<Array<*>> {
-        val result = mutableListOf<Array<*>>()
+    override val weights: List<Array<*>> get() = extractDenseWeights()
 
+    private fun extractDenseWeights(): List<Array<*>> {
         val session = parentModel.session
 
         val runner = session.runner()
@@ -100,13 +100,10 @@ public class Dense(
         val filtersTensor = tensorList[0]
         val biasTensor = tensorList[1]
 
-        val dstData = filtersTensor.convertTensorToMultiDimArray()
-        result.add(dstData)
-
-        val dstData2 = biasTensor.convertTensorToMultiDimArray()
-        result.add(dstData2)
-
-        return result.toList()
+        return listOf(
+            filtersTensor.convertTensorToMultiDimArray(),
+            biasTensor.convertTensorToMultiDimArray(),
+        )
     }
 
     override val hasActivation: Boolean get() = true

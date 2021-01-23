@@ -41,9 +41,7 @@ public class Flatten(name: String = "") : Layer(name) {
         return tf.reshape(input, units)
     }
 
-    override fun extractWeights(): List<Array<*>> {
-        return emptyList()
-    }
+    override val weights: List<Array<*>> get() = emptyList()
 
     override val hasActivation: Boolean get() = false
 

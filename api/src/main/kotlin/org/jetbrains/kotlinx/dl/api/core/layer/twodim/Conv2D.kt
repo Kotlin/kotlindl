@@ -143,9 +143,9 @@ public class Conv2D(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override fun extractWeights(): List<Array<*>> {
-        val result = mutableListOf<Array<*>>()
+    override val weights: List<Array<*>> get() = extractConv2DWeights()
 
+    private fun extractConv2DWeights(): List<Array<*>> {
         val session = parentModel.session
 
         val runner = session.runner()
@@ -156,13 +156,10 @@ public class Conv2D(
         val filtersTensor = tensorList[0]
         val biasTensor = tensorList[1]
 
-        val dstData = filtersTensor.convertTensorToMultiDimArray()
-        result.add(dstData)
-
-        val dstData2 = biasTensor.convertTensorToMultiDimArray()
-        result.add(dstData2)
-
-        return result.toList()
+        return listOf(
+            filtersTensor.convertTensorToMultiDimArray(),
+            biasTensor.convertTensorToMultiDimArray(),
+        )
     }
 
     /** Returns the shape of kernel weights. */

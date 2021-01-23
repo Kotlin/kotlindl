@@ -80,8 +80,8 @@ fun main() {
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
-        println("Weights: " + it.getLayer("dense_1").extractWeights()[0].contentDeepToString())
-        println("Bias" + it.getLayer("dense_1").extractWeights()[1].contentDeepToString())
+        println("Weights: " + it.getLayer("dense_1").weights[0].contentDeepToString())
+        println("Bias" + it.getLayer("dense_1").weights[1].contentDeepToString())
         println("MAE: $mae")
     }
 }
