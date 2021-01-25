@@ -39,8 +39,7 @@ model.use {
     it.fit(
         dataset = newTrain,
         epochs = 10,
-        batchSize = 100,
-        verbose = false
+        batchSize = 100
     )
 
     val accuracy = it.evaluate(dataset = validation, batchSize = 100).metrics[Metrics.ACCURACY]
@@ -54,23 +53,6 @@ model.use {
 Here are some important parameters that we need to pass to the `fit` method:
 * `epochs`: Number of iterations over the data you want the training process to perform. Epoch = iteration. 
 * `batchSize`: How many examples will be used for updating model's parameters (aka weights and biases) at a time
-*  You can set `verbose` to `true` you want to monitor the training process for every batch, and `false` if you only want 
-to see updates per epoch.
-
-Here's what you can expect to see as the output during the training process: 
-```
-o.j.kotlinx.dl.api.core.Sequential - Initialization of TensorFlow Graph variables.
-o.j.kotlinx.dl.api.core.Sequential - epochs: 1 loss: 0.28763896 metric: 0.9179658
-o.j.kotlinx.dl.api.core.Sequential - epochs: 2 loss: 0.13266732 metric: 0.96149194
-o.j.kotlinx.dl.api.core.Sequential - epochs: 3 loss: 0.0978983 metric: 0.9719294
-o.j.kotlinx.dl.api.core.Sequential - epochs: 4 loss: 0.07665476 metric: 0.97835064
-o.j.kotlinx.dl.api.core.Sequential - epochs: 5 loss: 0.06175016 metric: 0.98247266
-o.j.kotlinx.dl.api.core.Sequential - epochs: 6 loss: 0.0505572 metric: 0.98652506
-o.j.kotlinx.dl.api.core.Sequential - epochs: 7 loss: 0.04168837 metric: 0.98938525
-o.j.kotlinx.dl.api.core.Sequential - epochs: 8 loss: 0.03445377 metric: 0.9916132
-o.j.kotlinx.dl.api.core.Sequential - epochs: 9 loss: 0.028447991 metric: 0.99368316
-o.j.kotlinx.dl.api.core.Sequential - epochs: 10 loss: 0.023344817 metric: 0.9952095
-```  
 
 Once the model has been trained, it's important to evaluate its performance on the validation dataset, so that we can 
 check how it generalizes to the new data. 
