@@ -84,8 +84,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
     /** TensorFlow operand for batch size data. */
     private lateinit var numberOfLossesOp: Operand<Float>
 
-    /** TensorFlow operand for batch size data. */
-    private lateinit var training: Operand<Float>
+    private lateinit var training: Operand<Boolean>
 
     init {
         for (layer in layers) {
@@ -286,11 +285,9 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         )
 
         training = tf.withName("training").placeholder(
-            getDType(),
+            Boolean::class.javaObjectType,
             Placeholder.shape(Shape.scalar())
         )
-
-
 
         yPredOp = forward(xOp)
         lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
@@ -417,7 +414,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                         Tensor.create(yBatchShape, batch.y).use { batchLabelsTensor ->
                             Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
                                 .use { numberOfLossesTensor ->
-                                    Tensor.create(1.0f).use { isTraining ->
+                                    Tensor.create(true).use { isTraining ->
                                         val (lossValue, metricValue) = trainOnBatch(
                                             targets,
                                             batchImagesTensor,
@@ -570,7 +567,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             ).use { testImagesTensor ->
                 Tensor.create(labelShape, batch.y).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
-                        Tensor.create(0.0f).use { isTraining ->
+                        Tensor.create(false).use { isTraining ->
                             val lossAndMetricsTensors = session.runner()
                                 .fetch(metricOp)
                                 .fetch(TRAINING_LOSS)

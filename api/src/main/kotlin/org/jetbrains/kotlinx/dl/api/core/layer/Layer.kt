@@ -57,7 +57,7 @@ public abstract class Layer(public var name: String) {
     public abstract fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float>
 

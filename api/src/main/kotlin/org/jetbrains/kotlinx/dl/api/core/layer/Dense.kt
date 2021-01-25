@@ -85,7 +85,7 @@ public class Dense(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val signal: Operand<Float> = tf.math.add(tf.linalg.matMul(input, kernel), bias)

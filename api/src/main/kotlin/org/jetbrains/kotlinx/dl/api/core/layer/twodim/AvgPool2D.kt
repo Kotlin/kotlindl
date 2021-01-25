@@ -50,7 +50,7 @@ public class AvgPool2D(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         // data conversion due to different signatures of nn.avgPool and nn.maxPool

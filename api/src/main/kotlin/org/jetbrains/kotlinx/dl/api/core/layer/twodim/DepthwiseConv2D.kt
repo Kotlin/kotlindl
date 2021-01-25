@@ -12,37 +12,18 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
-import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
+import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
-import org.tensorflow.op.nn.Conv2d
-import org.tensorflow.op.nn.Conv2d.dilations
+import org.tensorflow.op.nn.DepthwiseConv2dNative
+import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
 import kotlin.math.roundToInt
 
-/**
- * Type of padding.
- */
-public enum class ConvPadding {
-    /**
-     * Results in padding evenly to the left/right or up/down of the input such that output has the same
-     * height/width dimension as the input.
-     */
-    SAME,
-
-    /** No padding. */
-    VALID,
-
-    /** Full padding. For Keras compatibility goals. */
-    FULL
-}
-
-private const val KERNEL = "conv2d_kernel"
-private const val BIAS = "conv2d_bias"
+private const val KERNEL = "depthwise_conv2d_kernel"
+private const val BIAS = "depthwise_conv2d_bias"
 
 /**
  * 2D convolution layer (e.g. spatial convolution over images).
@@ -61,9 +42,9 @@ private const val BIAS = "conv2d_bias"
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
- * @constructor Creates [Conv2D] object.
+ * @constructor Creates [DepthwiseConv2D] object.
  */
-public class Conv2D(
+public class DepthwiseConv2D(
     public val filters: Long = 32,
     public val kernelSize: LongArray = longArrayOf(3, 3),
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),
@@ -99,8 +80,8 @@ public class Conv2D(
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
         if (name.isNotEmpty()) {
-            val kernelVariableName = conv2dKernelVarName(name)
-            val biasVariableName = conv2dBiasVarName(name)
+            val kernelVariableName = depthwiseConv2dKernelVarName(name)
+            val biasVariableName = depthwiseConv2dBiasVarName(name)
 
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
             bias = tf.withName(biasVariableName).variable(biasShape, getDType())
@@ -143,8 +124,9 @@ public class Conv2D(
             ConvPadding.FULL -> "FULL"
         }
 
-        val options: Conv2d.Options = dilations(dilations.toList()).dataFormat("NHWC")
-        val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options), bias)
+        val options: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
+        val signal =
+            tf.nn.biasAdd(tf.nn.depthwiseConv2dNative(input, kernel, strides.toMutableList(), tfPadding, options), bias)
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
@@ -189,6 +171,6 @@ public class Conv2D(
     }
 
     override fun toString(): String {
-        return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"
+        return "DepthwiseConv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"
     }
 }

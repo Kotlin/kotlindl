@@ -41,7 +41,7 @@ public class Dropout(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         /* if (isTraining) {

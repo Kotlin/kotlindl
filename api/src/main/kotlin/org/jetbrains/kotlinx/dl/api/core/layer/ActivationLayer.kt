@@ -27,7 +27,7 @@ public class ActivationLayer(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return Activations.convert(activation).apply(tf, input, name)

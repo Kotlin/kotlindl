@@ -94,7 +94,6 @@ private val model = Sequential.of(
     )
 )
 
-
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         TRAIN_IMAGES_ARCHIVE,

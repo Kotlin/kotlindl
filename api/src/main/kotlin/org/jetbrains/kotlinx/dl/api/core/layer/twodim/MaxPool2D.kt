@@ -50,7 +50,7 @@ public class MaxPool2D(
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val tfPadding = when (padding) {

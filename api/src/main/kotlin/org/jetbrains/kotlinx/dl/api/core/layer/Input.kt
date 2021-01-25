@@ -54,7 +54,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
-        isTraining: Operand<Float>,
+        isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return input
