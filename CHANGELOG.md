@@ -9,6 +9,7 @@ Bugs:
 * Fixed #25 [Suspiciously slow calls to `Sequential.predictSoftly`](https://github.com/JetBrains/KotlinDL/issues/25)
 * Fixed #24 [reshapeFunction not initialized after model load](https://github.com/JetBrains/KotlinDL/issues/24)
 * Fixed #22 [Exception in combination with Log4J](https://github.com/JetBrains/KotlinDL/issues/22)
+* Added permission 'executable' making gradle wraper script runnable on Linux/Mac OS X systems
 
 Internals improvements:
 * Removed unnecessary copying of FloatArray to off-heap memory in `internalPredict` method
