@@ -127,9 +127,7 @@ public class AdaGradDA(
         graph.addOptimizerVariableInitializer(globalStepInit)
     }
 
-    override fun getOptimizerName(): String {
-        return "AdaGradDA"
-    }
+    override val optimizerName: String get() = "AdaGradDA"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

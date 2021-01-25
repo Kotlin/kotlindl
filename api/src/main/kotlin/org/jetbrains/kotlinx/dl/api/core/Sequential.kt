@@ -289,7 +289,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun validateModelArchitecture() {
         require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
-        require(layers.last().hasActivation()) { "Last layer must have an activation function." }
+        require(layers.last().hasActivation) { "Last layer must have an activation function." }
 //        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
     }
 
@@ -761,7 +761,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
-                if (layer.hasActivation() && layer != layers.last()) runner.fetch(defaultActivationName(layer))
+                if (layer.hasActivation && layer != layers.last()) runner.fetch(defaultActivationName(layer))
             }
         }
         return runner.run()
@@ -978,7 +978,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         val layerDescriptions = mutableListOf<String>()
 
         for (l in layers) {
-            if (l.isTrainable) totalTrainableParams += l.getParams() else totalFrozenParams += l.getParams()
+            if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
             val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
             layerDescriptions.add(layerDescription)
             logger.info(layerDescription)
@@ -1014,7 +1014,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             stringBuilder.append(" ")
         }
 
-        stringBuilder.append(l.getParams())
+        stringBuilder.append(l.paramCount)
 
         return stringBuilder.toString()
     }

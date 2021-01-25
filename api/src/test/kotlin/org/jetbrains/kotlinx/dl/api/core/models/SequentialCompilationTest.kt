@@ -90,9 +90,9 @@ internal class SequentialModelTest {
         assertTrue(correctTestModel.getLayer("conv2d_1") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_2") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_1").isTrainable)
-        assertTrue(correctTestModel.getLayer("conv2d_1").hasActivation())
+        assertTrue(correctTestModel.getLayer("conv2d_1").hasActivation)
         assertTrue(correctTestModel.getLayer("flatten_1").isTrainable)
-        assertFalse(correctTestModel.getLayer("flatten_1").hasActivation())
+        assertFalse(correctTestModel.getLayer("flatten_1").hasActivation)
         assertArrayEquals(correctTestModel.inputLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 
@@ -377,7 +377,7 @@ internal class SequentialModelTest {
     @Test
     fun compilation() {
         val exception =
-            assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[0].getParams() }
+            assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[0].paramCount }
         assertEquals(
             "lateinit property kernelShape has not been initialized",
             exception.message
@@ -389,13 +389,13 @@ internal class SequentialModelTest {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             assertTrue(correctTestModel.isModelCompiled)
 
-            assertEquals(it.layers[0].getParams(), 832)
-            assertEquals(it.layers[1].getParams(), 0)
-            assertEquals(it.layers[2].getParams(), 51264)
-            assertEquals(it.layers[3].getParams(), 0)
-            assertEquals(it.layers[4].getParams(), 0)
-            assertEquals(it.layers[5].getParams(), 1606144)
-            assertEquals(it.layers[6].getParams(), 5130)
+            assertEquals(it.layers[0].paramCount, 832)
+            assertEquals(it.layers[1].paramCount, 0)
+            assertEquals(it.layers[2].paramCount, 51264)
+            assertEquals(it.layers[3].paramCount, 0)
+            assertEquals(it.layers[4].paramCount, 0)
+            assertEquals(it.layers[5].paramCount, 1606144)
+            assertEquals(it.layers[6].paramCount, 5130)
 
             assertArrayEquals(it.layers[0].outputShape, longArrayOf(-1, 28, 28, 32))
             assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))

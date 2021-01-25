@@ -133,9 +133,7 @@ public class RMSProp(
         }
     }
 
-    override fun getOptimizerName(): String {
-        return "RMSProp"
-    }
+    override val optimizerName: String get() = "RMSProp"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

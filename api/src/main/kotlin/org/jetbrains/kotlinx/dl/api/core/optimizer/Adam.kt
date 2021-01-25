@@ -160,9 +160,7 @@ public class Adam(
         graph.addOptimizerVariableInitializer(betaTwoPowerInit)
     }
 
-    override fun getOptimizerName(): String {
-        return "Adam"
-    }
+    override val optimizerName: String get() = "Adam"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }
