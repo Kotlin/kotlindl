@@ -788,7 +788,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
-                if (layer.hasActivation() && layer != layers.last()) runner.fetch(defaultActivationName(layer))
+                if (layer.hasActivation && layer != layers.last()) runner.fetch(defaultActivationName(layer))
             }
         }
         return runner.run()
@@ -1005,7 +1005,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         val layerDescriptions = mutableListOf<String>()
 
         for (l in layers) {
-            if (l.isTrainable) totalTrainableParams += l.getParams() else totalFrozenParams += l.getParams()
+            if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
             val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
             layerDescriptions.add(layerDescription)
             logger.info(layerDescription)
@@ -1041,7 +1041,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             stringBuilder.append(" ")
         }
 
-        stringBuilder.append(l.getParams())
+        stringBuilder.append(l.paramCount)
 
         return stringBuilder.toString()
     }

@@ -1,3 +1,24 @@
+# 0.1.1 (01/02/2021)
+Features:
+* Added [support batch processing for predictSoftly in #28](https://github.com/JetBrains/KotlinDL/issues/28)
+* Converted [getXXX functions to properties in public API (layers and model classes)](https://github.com/JetBrains/KotlinDL/issues/29)
+* Removed [a flag `verbose` from public API](https://github.com/JetBrains/KotlinDL/issues/20)
+* Made logging based on a configuration.
+
+Bugs:
+* Fixed #25 [Suspiciously slow calls to `Sequential.predictSoftly`](https://github.com/JetBrains/KotlinDL/issues/25)
+* Fixed #24 [reshapeFunction not initialized after model load](https://github.com/JetBrains/KotlinDL/issues/24)
+* Fixed #22 [Exception in combination with Log4J](https://github.com/JetBrains/KotlinDL/issues/22)
+* Added permission 'executable' making gradle wraper script runnable on Linux/Mac OS X systems
+
+Internals improvements:
+* Removed unnecessary copying of FloatArray to off-heap memory in `internalPredict` method
+
+Docs:
+* Added "Release check list" for release managers
+* Updated Readme.md with new chapters about logging and fatJar issue
+* Minor updates in "Tutorials"
+
 # 0.1.0 (09/12/2020)
 Features:
 * Added @JvmStatic for companion methods
@@ -12,7 +33,6 @@ Examples:
 
 Docs:
 * Minor updates in "Transfer Learning Tutorial"
-
 
 # 0.0.14 (20/11/2020)
 Features:

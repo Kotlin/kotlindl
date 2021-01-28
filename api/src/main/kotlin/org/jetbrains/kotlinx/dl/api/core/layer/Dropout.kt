@@ -68,17 +68,11 @@ public class Dropout(
         /* }*/
     }
 
-    override fun getWeights(): List<Array<*>> {
-        return emptyList()
-    }
+    override val weights: List<Array<*>> get() = emptyList()
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = false
 
-    override fun getParams(): Int {
-        return 0
-    }
+    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "Dropout(keepProbability=$keepProbability)"

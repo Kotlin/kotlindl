@@ -53,9 +53,7 @@ public class SGD(
         return targets
     }
 
-    override fun getOptimizerName(): String {
-        return "SGD"
-    }
+    override val optimizerName: String get() = "SGD"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

@@ -143,7 +143,7 @@ private fun fillLayerWeights(
         BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
         else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
 }
 
 private fun fillConv2DVariablesFromKeras(
@@ -170,7 +170,7 @@ private fun fillConv2DVariablesFromKeras(
         when (it.name) {
             "kernel:0" -> {
                 val kernelVariableName = conv2dKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Conv2D).getKernelShape()
+                val kernelShape = (model.getLayer(layerName) as Conv2D).kernelShapeArray
                 require(
                     kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
@@ -178,7 +178,7 @@ private fun fillConv2DVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = conv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Conv2D).getBiasShape()
+                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -207,7 +207,7 @@ private fun fillDenseVariablesFromKeras(
         when (it.name) {
             "kernel:0" -> {
                 val kernelVariableName = denseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Dense).getKernelShape()
+                val kernelShape = (model.getLayer(layerName) as Dense).kernelShapeArray
                 require(
                     kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
@@ -215,7 +215,7 @@ private fun fillDenseVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = denseBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Dense).getBiasShape()
+                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -369,7 +369,7 @@ private fun fillLayerWeights(
         )
         else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.getParams()} parameters are loaded. " }
+    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
 }
 
 private fun initLayerWeights(it: Layer, model: Sequential) {
@@ -378,7 +378,7 @@ private fun initLayerWeights(it: Layer, model: Sequential) {
         Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
         else -> println("No default initialization handled for ${it.name}")
     }
-    model.logger.info { " Weights initialized for ${it.name}. ${it.getParams()} parameters are initialized. " }
+    model.logger.info { " Weights initialized for ${it.name}. ${it.paramCount} parameters are initialized. " }
 }
 
 /**

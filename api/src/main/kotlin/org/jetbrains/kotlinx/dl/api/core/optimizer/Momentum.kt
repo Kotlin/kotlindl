@@ -83,9 +83,7 @@ public class Momentum(
         }
     }
 
-    override fun getOptimizerName(): String {
-        return "Momentum"
-    }
+    override val optimizerName: String get() = "Momentum"
 
-    override fun isRunningOnGPU(): Boolean = true
+    override val isRunningOnGPU: Boolean get() = true
 }

@@ -85,11 +85,11 @@ public abstract class Layer(public var name: String) {
     }
 
     /** Returns layer's weights. */
-    public abstract fun getWeights(): List<Array<*>>
+    public abstract val weights: List<Array<*>>
 
     /** Returns True, if layer has internal activation function. */
-    public abstract fun hasActivation(): Boolean
+    public abstract val hasActivation: Boolean
 
     /** Returns amount of neurons. */
-    public abstract fun getParams(): Int
+    public abstract val paramCount: Int
 }
