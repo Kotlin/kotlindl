@@ -37,6 +37,9 @@ public abstract class Layer(public var name: String) {
     /** Returns number of output parameters. */
     protected var fanOut: Int = Int.MIN_VALUE
 
+    /** Returns inbound layers. */
+    public var inboundLayers: List<Layer> = emptyList()
+
     /**
      * Extend this function to define variables in layer.
      *

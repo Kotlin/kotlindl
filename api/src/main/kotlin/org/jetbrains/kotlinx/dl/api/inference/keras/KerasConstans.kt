@@ -16,6 +16,8 @@ internal const val LAYER_BATCH_NORM: String = "BatchNormalization"
 internal const val LAYER_ACTIVATION: String = "Activation"
 internal const val LAYER_LSTM: String = "LSTM"
 internal const val LAYER_DROPOUT: String = "Dropout"
+internal const val LAYER_ADD: String = "Add"
+internal const val LAYER_GLOBAL_AVG_POOLING_2D: String = "GlobalAveragePooling2D"
 
 // Keras data types
 internal const val DATATYPE_FLOAT32: String = "float32"

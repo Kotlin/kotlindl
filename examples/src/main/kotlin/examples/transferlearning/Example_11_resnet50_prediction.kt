@@ -77,9 +77,9 @@ private fun getResNet50JSONConfigFile(): File {
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val vgg19JSONModelPath = properties["vgg19JSONModelPath"] as String
+    val resnet50JSONModelPath = properties["resnet50JSONModelPath"] as String
 
-    return File(vgg19JSONModelPath)
+    return File(resnet50JSONModelPath)
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
@@ -88,9 +88,9 @@ private fun getResNet50WeightsFile(): HdfFile {
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val vgg19h5WeightsPath = properties["vgg19h5WeightsPath"] as String
+    val resnet50h5WeightsPath = properties["resnet50h5WeightsPath"] as String
 
-    return HdfFile(File(vgg19h5WeightsPath))
+    return HdfFile(File(resnet50h5WeightsPath))
 }
 
 

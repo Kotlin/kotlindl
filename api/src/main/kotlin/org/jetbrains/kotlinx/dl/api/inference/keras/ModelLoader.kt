@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.*
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
@@ -61,11 +62,13 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
     (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it)
+                val layer = convertToLayer(it, layers)
                 layers.add(layer)
             }
         }
     }
+
+    layers.removeAt(174)
 
     val input: Input
 
@@ -95,7 +98,7 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
     return Pair(input, layers)
 }
 
-private fun convertToLayer(kerasLayer: KerasLayer): Layer {
+private fun convertToLayer(kerasLayer: KerasLayer, layers: MutableList<Layer>): Layer {
     return when (kerasLayer.class_name) {
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
@@ -113,8 +116,30 @@ private fun convertToLayer(kerasLayer: KerasLayer): Layer {
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")
+        LAYER_ADD -> createAddLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers)
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
+}
+
+private fun createGlobalAvgPooling2D(config: LayerConfig, name: String): Layer {
+    return Dropout(
+        name = name
+    )// TODO: write correct filling
+}
+
+private fun createAddLayer(inboundNodes: List<List<List<Any>>>?, name: String, layers: MutableList<Layer>): Layer {
+
+    val mergedLayers = mutableListOf<Layer>()
+
+    inboundNodes!![0].forEach { inboundNode ->
+        layers.find { it.name == inboundNode[0] as String }?.let { mergedLayers.add(it) }
+    }
+
+    return Add(
+        mergedLayers = mergedLayers,
+        name = name
+    )
 }
 
 private fun createDropoutLayer(config: LayerConfig, name: String): Layer {

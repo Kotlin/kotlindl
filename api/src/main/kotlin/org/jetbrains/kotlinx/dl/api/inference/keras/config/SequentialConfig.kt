@@ -6,6 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
 internal data class SequentialConfig(
+    val input_layers: List<List<Any>>? = null,
     val layers: List<KerasLayer>?,
-    val name: String?
+    val name: String?,
+    val output_layers: List<List<Any>>? = null
 )
