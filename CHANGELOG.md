@@ -17,6 +17,7 @@ Internals improvements:
 Docs:
 * Added "Release check list" for release managers
 * Updated Readme.md with new chapters about logging and fatJar issue
+* Minor updates in "Tutorials"
 
 # 0.1.0 (09/12/2020)
 Features:
