@@ -33,17 +33,11 @@ public class ActivationLayer(
         return Activations.convert(activation).apply(tf, input, name)
     }
 
-    override fun getWeights(): List<Array<*>> {
-        return emptyList()
-    }
+    override val weights: List<Array<*>> get() = emptyList()
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = true
 
-    override fun getParams(): Int {
-        return 0
-    }
+    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "ActivationLayer(activation=$activation)"

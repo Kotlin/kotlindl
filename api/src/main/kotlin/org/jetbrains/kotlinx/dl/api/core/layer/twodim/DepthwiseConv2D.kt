@@ -12,7 +12,9 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
-import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -26,7 +28,7 @@ private const val KERNEL = "depthwise_conv2d_kernel"
 private const val BIAS = "depthwise_conv2d_bias"
 
 /**
- * 2D convolution layer (e.g. spatial convolution over images).
+ * Depthwise 2D convolution layer (e.g. spatial convolution over images).
  *
  * This layer creates a convolution kernel that is convolved (actually cross-correlated)
  * with the layer input to produce a tensor of outputs.
@@ -130,45 +132,35 @@ public class DepthwiseConv2D(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override fun getWeights(): List<Array<*>> {
-        val result = mutableListOf<Array<*>>()
+    override val weights: List<Array<*>> get() = extractDepthConv2DWeights()
 
+    private fun extractDepthConv2DWeights(): List<Array<*>> {
         val session = parentModel.session
 
         val runner = session.runner()
-            .fetch(conv2dKernelVarName(name))
-            .fetch(conv2dBiasVarName(name))
+            .fetch(depthwiseConv2dKernelVarName(name))
+            .fetch(depthwiseConv2dBiasVarName(name))
 
         val tensorList = runner.run()
         val filtersTensor = tensorList[0]
         val biasTensor = tensorList[1]
 
-        val dstData = filtersTensor.convertTensorToMultiDimArray()
-        result.add(dstData)
-
-        val dstData2 = biasTensor.convertTensorToMultiDimArray()
-        result.add(dstData2)
-
-        return result.toList()
+        return listOf(
+            filtersTensor.convertTensorToMultiDimArray(),
+            biasTensor.convertTensorToMultiDimArray(),
+        )
     }
 
     /** Returns the shape of kernel weights. */
-    public fun getKernelShape(): LongArray {
-        return TensorShape(kernelShape).dims()
-    }
+    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
 
     /** Returns the shape of bias weights. */
-    public fun getBiasShape(): LongArray {
-        return TensorShape(biasShape).dims()
-    }
+    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
-    override fun hasActivation(): Boolean {
-        return true
-    }
+    override val hasActivation: Boolean get() = true
 
-    override fun getParams(): Int {
-        return (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
-    }
+    override val paramCount: Int
+        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
 
     override fun toString(): String {
         return "DepthwiseConv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"

@@ -38,6 +38,7 @@ public class BatchNorm(
 
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
+        //
         weightShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1))
 
         if (name.isNotEmpty()) {
@@ -172,23 +173,17 @@ public class BatchNorm(
         )
     }
 
-    override fun getWeights(): List<Array<*>> {
-        return emptyList()
-    }
+    // TODO: return real weights
+    override val weights: List<Array<*>> get() = emptyList()
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = false
 
-    override fun getParams(): Int {
-        return 4
-    }
+    override val paramCount: Int get() = 4
 
     override fun toString(): String {
         return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"
     }
 
-    fun getWeightShape(): LongArray {
-        return TensorShape(weightShape).dims()
-    }
+    public val weightShapeArray: LongArray get() = TensorShape(weightShape).dims()
+
 }

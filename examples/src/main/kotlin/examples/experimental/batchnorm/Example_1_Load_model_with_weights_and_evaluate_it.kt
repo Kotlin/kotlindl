@@ -65,11 +65,11 @@ fun main() {
         var accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracy")
 
-        /* it.fit(dataset = train, epochs = 1, batchSize = 100)
-         println(it.kGraph)
-         accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
-         println(it.kGraph)
-         println("Accuracy after training $accuracy")*/
+        it.fit(dataset = train, epochs = 1, batchSize = 100)
+        println(it.kGraph)
+        accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
+        println(it.kGraph)
+        println("Accuracy after training $accuracy")
     }
 }
 
