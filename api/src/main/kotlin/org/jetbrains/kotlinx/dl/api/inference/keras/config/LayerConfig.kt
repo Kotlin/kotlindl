@@ -21,7 +21,7 @@ internal data class LayerConfig(
     val kernel_regularizer: KerasRegularizer? = null,
     val kernel_size: List<Int>? = null,
     val name: String? = null,
-    val padding: String? = null,
+    val padding: KerasPadding? = null,
     val pool_size: List<Int>? = null,
     val strides: List<Int>? = null,
     val trainable: Boolean? = true,
