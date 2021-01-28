@@ -17,9 +17,8 @@ import org.tensorflow.op.Ops
  * Zero-padding layer, which adds zeros on sides of image
  * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2765)
  */
-class ZeroPadding2D : Layer {
-
-    val padding: IntArray
+public class ZeroPadding2D : Layer {
+    public val padding: IntArray
     private val dataFormat: String
     private lateinit var inputShape: Shape
 
@@ -31,7 +30,7 @@ class ZeroPadding2D : Layer {
      * input to this layer
      * @param[name] layer name
      */
-    constructor(
+    public constructor(
         padding: Int,
         dataFormat: String?,
         name: String = ""
@@ -50,7 +49,7 @@ class ZeroPadding2D : Layer {
      * input to this layer
      * @param[name] layer name
      */
-    constructor(
+    public constructor(
         padding: Pair<Int, Int>,
         dataFormat: String?,
         name: String = ""
@@ -73,7 +72,7 @@ class ZeroPadding2D : Layer {
      * input to this layer
      * @param[name] layer name
      */
-    constructor(padding: IntArray, dataFormat: String?, name: String = "") : super(name) {
+    public constructor(padding: IntArray, dataFormat: String?, name: String = "") : super(name) {
         require(padding.size == 4)
         this.padding = padding
         this.dataFormat = dataFormat ?: CHANNELS_LAST
@@ -103,24 +102,22 @@ class ZeroPadding2D : Layer {
         }
     }
 
-
-    override fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         val paddingOperand = tf.constant(paddingArrayToTfFormat())
         val constantValue = tf.constant(0f)
         return tf.pad(input, paddingOperand, constantValue)
     }
 
-    override fun getWeights(): List<Array<*>> {
-        return emptyList()
-    }
+    override val weights: List<Array<*>> get() = emptyList()
 
-    override fun hasActivation(): Boolean {
-        return false
-    }
+    override val hasActivation: Boolean get() = false
 
-    override fun getParams(): Int {
-        return 0
-    }
+    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "ZeroPadding2D(padding=$padding)"

@@ -35,7 +35,9 @@ internal class ZeroPadding2DTest {
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             paddingLayer.defineVariables(tf, KGraph(Graph().toGraphDef()), inputShape)
-            val output = paddingLayer.transformInput(tf, input).asOutput().tensor()
+            val isTraining = tf.constant(true)
+            val numberOfLosses = tf.constant(1.0f)
+            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),
@@ -88,7 +90,9 @@ internal class ZeroPadding2DTest {
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             paddingLayer.defineVariables(tf, KGraph(Graph().toGraphDef()), inputShape)
-            val output = paddingLayer.transformInput(tf, input).asOutput().tensor()
+            val isTraining = tf.constant(true)
+            val numberOfLosses = tf.constant(1.0f)
+            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),
@@ -143,7 +147,9 @@ internal class ZeroPadding2DTest {
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             paddingLayer.defineVariables(tf, KGraph(Graph().toGraphDef()), inputShape)
-            val output = paddingLayer.transformInput(tf, input).asOutput().tensor()
+            val isTraining = tf.constant(true)
+            val numberOfLosses = tf.constant(1.0f)
+            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),

@@ -194,5 +194,4 @@ public class BatchNorm(
     }
 
     public val weightShapeArray: LongArray get() = TensorShape(weightShape).dims()
-
 }
