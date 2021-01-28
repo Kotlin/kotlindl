@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
@@ -42,7 +43,9 @@ public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyC
     val config = SequentialConfig(name = "", layers = kerasLayers)
     val sequentialConfig = KerasSequentialModel(config = config)
 
-    val jsonString2 = Klaxon().toJsonString(sequentialConfig)
+    val jsonString2 = Klaxon()
+        .converter(PaddingConverter())
+        .toJsonString(sequentialConfig)
 
     jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
 }
@@ -54,6 +57,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean): 
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
         AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
         Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
+        ZeroPadding2D::class -> createKerasZeroPadding2D(layer as ZeroPadding2D)
         else -> throw IllegalStateException("${layer.name} is not supported yet!")
     }
 }
@@ -130,11 +134,11 @@ private fun convertMode(mode: Mode): String {
     }
 }
 
-private fun convertPadding(padding: ConvPadding): String {
+private fun convertPadding(padding: ConvPadding): KerasPadding {
     return when (padding) {
-        ConvPadding.SAME -> "same"
-        ConvPadding.VALID -> "valid"
-        ConvPadding.FULL -> "full"
+        ConvPadding.SAME -> KerasPadding.Same
+        ConvPadding.VALID -> KerasPadding.Valid
+        ConvPadding.FULL -> KerasPadding.Full
     }
 }
 
@@ -209,4 +213,14 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         use_bias = true
     )
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
+}
+
+private fun createKerasZeroPadding2D(layer: ZeroPadding2D): KerasLayer {
+    val configX = LayerConfig(
+        data_format = CHANNELS_LAST,
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = KerasPadding.ZeroPadding2D(layer.padding)
+    )
+    return KerasLayer(class_name = LAYER_ZERO_PADDING_2D, config = configX)
 }

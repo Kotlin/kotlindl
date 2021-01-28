@@ -11,6 +11,7 @@ internal const val LAYER_DENSE: String = "Dense"
 internal const val LAYER_MAX_POOLING_2D: String = "MaxPooling2D"
 internal const val LAYER_AVG_POOLING_2D: String = "AvgPooling2D"
 internal const val LAYER_FLATTEN: String = "Flatten"
+internal const val LAYER_ZERO_PADDING_2D = "ZeroPadding2D"
 internal const val LAYER_BATCH_NORM: String = "BatchNormalization"
 internal const val LAYER_ACTIVATION: String = "Activation"
 internal const val LAYER_LSTM: String = "LSTM"
@@ -52,4 +53,5 @@ internal const val ACTIVATION_EXP: String = "exponential"
 
 // Layer settings
 internal const val CHANNELS_LAST: String = "channels_last"
+internal const val CHANNELS_FIRST = "channels_first"
 internal const val PADDING_SAME: String = "same"
