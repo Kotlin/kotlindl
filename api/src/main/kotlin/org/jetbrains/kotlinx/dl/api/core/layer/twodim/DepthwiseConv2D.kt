@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
@@ -56,7 +57,7 @@ public class DepthwiseConv2D(
     public val biasInitializer: Initializer = HeUniform(),
     public val padding: ConvPadding = ConvPadding.SAME,
     name: String = ""
-) : Layer(name) {
+) : Layer(name), ForwardLayer {
     // weight tensors
     private lateinit var kernel: Variable<Float>
     private lateinit var bias: Variable<Float>

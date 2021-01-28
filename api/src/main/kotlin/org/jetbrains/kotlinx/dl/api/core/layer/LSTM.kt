@@ -92,7 +92,7 @@ public class LSTM(
     public val timeMajor: Boolean = true,
     public val unroll: Boolean = true,
     name: String = "",
-) : Layer(name) {
+) : Layer(name), ForwardLayer {
 
     private lateinit var weightShape: Shape
     private lateinit var gamma: Variable<Float>
