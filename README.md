@@ -1,6 +1,6 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-[![Download](https://api.bintray.com/packages/kotlin/kotlin-datascience/kotlin-dl/images/download.svg?version=0.1.0) ](https://bintray.com/kotlin/kotlin-datascience/kotlin-dl/0.1.0)
+[![Download](https://api.bintray.com/packages/kotlin/kotlin-datascience/kotlin-dl/images/download.svg?version=0.1.1) ](https://bintray.com/kotlin/kotlin-datascience/kotlin-dl/0.1.1)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.4.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/deep-learning/)
 
@@ -152,7 +152,7 @@ To use KotlinDL in your project, you need to add the following dependency to you
        implementation 'org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.1.0. 
+The latest KotlinDL version is 0.1.1. 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
 ## Working with KotlinDL in Jupyter Notebook
