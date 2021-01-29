@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.twodim
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.util.tfMean
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -24,27 +24,13 @@ import org.tensorflow.op.Ops
  * @property [name] Custom layer name.
  * @constructor Creates [GlovalAvgPool2D] object.
  */
-public class GlovalAvgPool2D(
-    public val poolSize: IntArray = intArrayOf(1, 2, 2, 1),
-    public val strides: IntArray = intArrayOf(1, 2, 2, 1),
-    public val padding: ConvPadding = ConvPadding.VALID,
+public class GlobalAvgPool2D(
     name: String = ""
 ) : Layer(name) {
     override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        var rows = inputShape.size(1)
-        var cols = inputShape.size(2)
-        rows = convOutputLength(
-            rows, poolSize[1], padding,
-            strides[1]
-        )
-        cols = convOutputLength(
-            cols, poolSize[2], padding,
-            strides[2]
-        )
-
-        return Shape.make(inputShape.size(0), rows, cols, inputShape.size(3))
+        return Shape.make(inputShape.size(0), inputShape.size(3)) //   if (this.dataFormat == 'channelsLast')
     }
 
     override fun forward(
@@ -53,29 +39,7 @@ public class GlovalAvgPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // data conversion due to different signatures of nn.avgPool and nn.maxPool
-        val poolSizeLongList: MutableList<Long> = mutableListOf()
-        poolSize.forEach {
-            poolSizeLongList.add(it.toLong())
-        }
-
-        val stridesLongList: MutableList<Long> = mutableListOf()
-        strides.forEach {
-            stridesLongList.add(it.toLong())
-        }
-
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
-
-        return tf.nn.avgPool(
-            input,
-            poolSizeLongList,
-            stridesLongList,
-            tfPadding
-        )
+        return tfMean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 
     override val weights: List<Array<*>> get() = emptyList()
@@ -85,6 +49,6 @@ public class GlovalAvgPool2D(
     override val paramCount: Int get() = 0
 
     override fun toString(): String {
-        return "AvgPool2D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+        return "GlobalAvgPool2D()"
     }
 }

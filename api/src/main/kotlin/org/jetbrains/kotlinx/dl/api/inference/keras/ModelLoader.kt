@@ -68,8 +68,6 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
         }
     }
 
-    layers.removeAt(174)
-
     val input: Input
 
     val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
@@ -123,7 +121,7 @@ private fun convertToLayer(kerasLayer: KerasLayer, layers: MutableList<Layer>): 
 }
 
 private fun createGlobalAvgPooling2D(config: LayerConfig, name: String): Layer {
-    return Dropout(
+    return GlobalAvgPool2D(
         name = name
     )// TODO: write correct filling
 }

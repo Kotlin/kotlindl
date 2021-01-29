@@ -26,14 +26,15 @@ public class Add(public val mergedLayers: List<Layer>, name: String = "") : Laye
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.math.add(input, input)
+        //return tf.math.add(input, input)
+        return input
     }
 
 
     override val weights: List<Array<*>>
-        get() = TODO("Not yet implemented")
+        get() = emptyList()
     override val hasActivation: Boolean
-        get() = TODO("Not yet implemented")
+        get() = false
     override val paramCount: Int
-        get() = TODO("Not yet implemented")
+        get() = 0
 }
