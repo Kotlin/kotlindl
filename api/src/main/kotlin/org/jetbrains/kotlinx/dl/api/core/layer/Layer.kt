@@ -40,6 +40,9 @@ public abstract class Layer(public var name: String) {
     /** Returns inbound layers. */
     public var inboundLayers: List<Layer> = emptyList()
 
+    /** Returns outbound layers. */
+    public var outboundLayers: List<Layer> = emptyList()
+
     /**
      * Extend this function to define variables in layer.
      *
@@ -47,7 +50,7 @@ public abstract class Layer(public var name: String) {
      * @param [kGraph] [KGraph] to update it.
      * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
      */
-    public abstract fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape)
+    public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)
 
     /**
      * Computes output shape, based on [inputShape] and [Layer] type.
@@ -63,6 +66,18 @@ public abstract class Layer(public var name: String) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float>
+
+    /**
+     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
+     */
+    public open fun forward(
+        tf: Ops,
+        input: List<Operand<Float>>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        return forward(tf, input[0], isTraining, numberOfLosses)
+    }
 
     /**
      * Adds a new weight tensor to the layer
@@ -87,6 +102,11 @@ public abstract class Layer(public var name: String) {
         return variable
     }
 
+    public operator fun invoke(vararg layers: Layer): Layer {
+        inboundLayers = layers.toList()
+        return this
+    }
+
     /** Returns layer's weights. */
     public abstract val weights: List<Array<*>>
 
@@ -95,4 +115,6 @@ public abstract class Layer(public var name: String) {
 
     /** Returns amount of neurons. */
     public abstract val paramCount: Int
+
+    // apply
 }

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.toyresnet
 
 
 import io.jhdf.HdfFile
@@ -36,7 +36,7 @@ fun main() {
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = Losses.MAE,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
@@ -46,13 +46,16 @@ fun main() {
 
         it.loadWeights(hdfFile)
 
-        println(it.kGraph)
-
         var accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
 
         println("Accuracy before: $accuracy")
 
-        it.fit(dataset = train, epochs = 5, batchSize = 100)
+        for (layer in it.layers) {
+            layer.isTrainable = false
+        }
+        it.layers.last().isTrainable = true
+
+        it.fit(dataset = train, epochs = 1, batchSize = 1000)
 
         accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
 

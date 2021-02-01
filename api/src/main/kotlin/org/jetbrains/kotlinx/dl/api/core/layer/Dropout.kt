@@ -30,7 +30,7 @@ public class Dropout(
     name: String = ""
 ) : Layer(name) {
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         //left empty
     }
 

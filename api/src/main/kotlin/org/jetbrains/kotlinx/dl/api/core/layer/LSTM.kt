@@ -100,7 +100,7 @@ public class LSTM(
     private lateinit var movingMean: Variable<Float>
     private lateinit var movingVariance: Variable<Float>
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         weightShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1))
 

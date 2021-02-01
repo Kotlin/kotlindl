@@ -26,16 +26,16 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
     public val packedDims: LongArray = dims
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     /**
      * Extend this function to define placeholder in layer.
      *
-     * NOTE: Called instead of [Layer.defineVariables].
+     * NOTE: Called instead of [Layer.build].
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun defineVariables(tf: Ops) {
+    public fun build(tf: Ops) {
         input = tf.withName(DATA_PLACEHOLDER).placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))

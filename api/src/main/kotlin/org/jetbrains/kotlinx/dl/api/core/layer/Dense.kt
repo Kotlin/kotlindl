@@ -52,7 +52,7 @@ public class Dense(
     private lateinit var kernel: Variable<Float>
     private lateinit var bias: Variable<Float>
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         biasShape = Shape.make(outputSize.toLong())

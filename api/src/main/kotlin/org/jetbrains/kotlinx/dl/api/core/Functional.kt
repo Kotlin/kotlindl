@@ -29,7 +29,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadModelLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.datasets.DataBatch
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.tensorflow.*
@@ -47,7 +46,7 @@ import java.nio.FloatBuffer
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
-public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
+public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
@@ -102,50 +101,50 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     public companion object {
         /**
-         * Creates the [Sequential] model.
+         * Creates the [Functional] model.
          *
          * @property [input] The input layer with initial shapes.
          * @property [layers] The layers to describe the model design.
-         * @return the [Sequential] model.
+         * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(input: Input, vararg layers: Layer): Sequential {
+        public fun of(input: Input, vararg layers: Layer): Functional {
             preProcessLayerNames(layers)
-            val seqModel = Sequential(input, *layers)
+            val seqModel = Functional(input, *layers)
             postProcessLayerNames(layers, seqModel)
             return seqModel
         }
 
         /**
-         * Creates the [Sequential] model.
+         * Creates the [Functional] model.
          * @property [layers] The layers to describe the model design.
          * NOTE: First layer should be input layer.
-         * @return the [Sequential] model.
+         * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>): Sequential {
+        public fun of(layers: List<Layer>): Functional {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
 
             val otherLayers = layers.subList(1, layers.size)
             preProcessLayerNames(otherLayers.toTypedArray())
-            val seqModel = Sequential(input, *otherLayers.toTypedArray())
+            val seqModel = Functional(input, *otherLayers.toTypedArray())
             postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
             return seqModel
         }
 
         /**
-         * Creates the [Sequential] model.
+         * Creates the [Functional] model.
          *
          * @property [input] The input layer with initial shapes.
          * @property [layers] The layers to describe the model design.
-         * @return the [Sequential] model.
+         * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(input: Input, layers: List<Layer>): Sequential {
+        public fun of(input: Input, layers: List<Layer>): Functional {
             preProcessLayerNames(layers.toTypedArray())
-            val seqModel = Sequential(input, *layers.toTypedArray())
+            val seqModel = Functional(input, *layers.toTypedArray())
             postProcessLayerNames(layers.toTypedArray(), seqModel)
             return seqModel
         }
@@ -163,7 +162,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
         private fun postProcessLayerNames(
             layers: Array<out Layer>,
-            seqModel: Sequential
+            seqModel: Functional
         ) {
             for (layer in layers) {
                 layer.parentModel = seqModel
@@ -171,22 +170,22 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         /**
-         * Loads a [Sequential] model from json file with model configuration.
+         * Loads a [Functional] model from json file with model configuration.
          *
-         * @param [configuration] File in .json format, containing the [Sequential] model.
+         * @param [configuration] File in .json format, containing the [Functional] model.
          * @return Non-compiled and non-trained Sequential model.
          */
         @JvmStatic
-        public fun loadModelConfiguration(configuration: File): Sequential {
+        public fun loadModelConfiguration(configuration: File): Functional {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadModelConfiguration(configuration)
+            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
         }
 
         /**
-         * Loads a [Sequential] model layers from json file with model configuration.
+         * Loads a [Functional] model layers from json file with model configuration.
          *
-         * @param [configuration] File in .json format, containing the [Sequential] model.
+         * @param [configuration] File in .json format, containing the [Functional] model.
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
@@ -197,14 +196,14 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         }
 
         /**
-         * Loads a [Sequential] model from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
+         * Loads a [Functional] model from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
          * @return Non-compiled and non-trained Sequential model.
          */
         @JvmStatic
-        public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
+        public fun loadDefaultModelConfiguration(modelDirectory: File): Functional {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -214,11 +213,11 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadModelConfiguration(configuration)
+            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
         }
 
         /**
-         * Loads a [Sequential] model layers from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
+         * Loads a [Functional] model layers from json file with name 'modelConfig.json' with model configuration located in [modelDirectory].
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
@@ -253,8 +252,8 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         this.metric = metric
         this.metrics = listOf(metric) // handle multiple metrics
         this.optimizer = optimizer
-        this.callback = callback
-        this.callback.model = this // TODO: cyclic reference
+        //this.callback = callback
+        //this.callback.model = this // TODO: cyclic reference
 
         inputLayer.build(tf)
         var inputShape: Shape = inputLayer.computeOutputShape()
@@ -289,7 +288,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             Placeholder.shape(Shape.scalar())
         )
 
-        yPredOp = forward(xOp)
+        yPredOp = forward(xOp, inputLayer)
         lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
@@ -809,12 +808,20 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
         return Pair(xBatchShape, yBatchShape)
     }
 
-    private fun forward(input: Operand<Float>): Operand<Float> {
-        var out: Operand<Float> = input
+    private fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
+        var output: Operand<Float> = input
+        val outputByLayerName = mutableMapOf<String, Operand<Float>>()
+        val outputs = mutableListOf<Operand<Float>>()
+        outputs.add(input)
         for (layer in layers) {
-            out = layer.forward(tf, out, training, numberOfLossesOp)
+            for (inboundLayer in layer.inboundLayers) {
+                outputs.add(outputByLayerName[inboundLayer.name]!!)
+            }
+            output = layer.forward(tf, outputs, training, numberOfLossesOp)
+            outputByLayerName[layer.name] = output
+            outputs.clear()
         }
-        return out
+        return output
     }
 
     private fun calculateXShape(batchSize: Int): LongArray {
@@ -882,7 +889,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        this.saveModelConfiguration(jsonConfig)
+        //this.saveModelConfiguration(jsonConfig)
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {

@@ -66,7 +66,7 @@ public class DepthwiseConv2D(
     private lateinit var biasShape: Shape
     private lateinit var kernelShape: Shape
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
 

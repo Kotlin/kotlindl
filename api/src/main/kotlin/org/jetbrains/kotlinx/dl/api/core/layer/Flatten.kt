@@ -22,7 +22,7 @@ import kotlin.math.abs
 public class Flatten(name: String = "") : Layer(name) {
     private lateinit var units: Constant<Int>
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))

@@ -78,7 +78,7 @@ public class ZeroPadding2D : Layer {
         this.dataFormat = dataFormat ?: CHANNELS_LAST
     }
 
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         this.inputShape = inputShape
     }
 

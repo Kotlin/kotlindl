@@ -11,8 +11,14 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-public class Add(public val mergedLayers: List<Layer>, name: String = "") : Layer(name) {
-    override fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+public class Add(name: String = "") : Layer(name) {
+    public val mergedLayers: List<Layer> = emptyList()
+
+    init {
+        inboundLayers = mergedLayers
+    }
+
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
 
     }
 
@@ -30,6 +36,14 @@ public class Add(public val mergedLayers: List<Layer>, name: String = "") : Laye
         return input
     }
 
+    override fun forward(
+        tf: Ops,
+        input: List<Operand<Float>>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        return tf.withName("ADD_LAYER").math.add(input[0], input[1])
+    }
 
     override val weights: List<Array<*>>
         get() = emptyList()

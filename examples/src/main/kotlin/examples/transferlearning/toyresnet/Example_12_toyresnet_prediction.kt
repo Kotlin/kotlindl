@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.toyresnet
 
 
 import io.jhdf.HdfFile
@@ -29,14 +29,13 @@ fun main() {
         ::extractFashionLabels
     )
 
-
     val jsonConfigFile = getResNetJSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     model.use {
         it.compile(
             optimizer = Adam(),
-            loss = Losses.MAE,
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
@@ -48,15 +47,9 @@ fun main() {
 
         println(it.kGraph)
 
-        var accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
 
         println("Accuracy before: $accuracy")
-
-        it.fit(dataset = train, epochs = 5, batchSize = 100)
-
-        accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
-
-        println("Accuracy after: $accuracy")
     }
 }
 
