@@ -7,13 +7,16 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 // Keras layers
 internal const val LAYER_CONV2D: String = "Conv2D"
+internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_DENSE: String = "Dense"
 internal const val LAYER_MAX_POOLING_2D: String = "MaxPooling2D"
 internal const val LAYER_AVG_POOLING_2D: String = "AvgPooling2D"
 internal const val LAYER_FLATTEN: String = "Flatten"
+internal const val LAYER_RESHAPE: String = "Reshape"
 internal const val LAYER_ZERO_PADDING_2D = "ZeroPadding2D"
 internal const val LAYER_BATCH_NORM: String = "BatchNormalization"
 internal const val LAYER_ACTIVATION: String = "Activation"
+internal const val LAYER_RELU: String = "ReLU"
 internal const val LAYER_LSTM: String = "LSTM"
 internal const val LAYER_DROPOUT: String = "Dropout"
 internal const val LAYER_ADD: String = "Add"

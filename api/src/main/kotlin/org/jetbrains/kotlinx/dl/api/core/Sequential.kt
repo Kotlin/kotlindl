@@ -274,7 +274,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
 
             it.outputShape = dims
 
-            logger.debug { "$it; outputShape: $tensorShape" }
+            logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
         }
 
         xOp = inputLayer.input

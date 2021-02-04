@@ -39,7 +39,7 @@ import java.util.*
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    val jsonConfigFile = getResNet50JSONConfigFile()
+    val jsonConfigFile = getResNet50v2JSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
@@ -53,7 +53,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getResNet50WeightsFile()
+        val hdfFile = getResNet50v2WeightsFile()
 
         it.loadWeights(hdfFile)
 
@@ -72,25 +72,25 @@ fun main() {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNet50JSONConfigFile(): File {
+private fun getResNet50v2JSONConfigFile(): File {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val resnet50JSONModelPath = properties["resnet50JSONModelPath"] as String
+    val resnet50v2JSONModelPath = properties["resnet50v2JSONModelPath"] as String
 
-    return File(resnet50JSONModelPath)
+    return File(resnet50v2JSONModelPath)
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNet50WeightsFile(): HdfFile {
+private fun getResNet50v2WeightsFile(): HdfFile {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val resnet50h5WeightsPath = properties["resnet50h5WeightsPath"] as String
+    val resnet50v2h5WeightsPath = properties["resnet50v2h5WeightsPath"] as String
 
-    return HdfFile(File(resnet50h5WeightsPath))
+    return HdfFile(File(resnet50v2h5WeightsPath))
 }
 
 

@@ -107,7 +107,9 @@ private fun convertToLayer(
 ): Layer {
     val layer = when (kerasLayer.class_name) {
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!, layersByName)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_MAX_POOLING_2D -> createMaxPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!, layersByName
@@ -120,6 +122,7 @@ private fun convertToLayer(
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
+        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ADD -> createAddLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
@@ -203,6 +206,13 @@ private fun createLstmLayer(config: LayerConfig, name: String, layersByName: Mut
 private fun createActivationLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
     return ActivationLayer(
         activation = convertToActivation(config.activation!!),
+        name = name
+    )
+}
+
+private fun createReluLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+    return ReLU(
+        maxValue = config.max_value!!.toFloat(),
         name = name
     )
 }
@@ -405,6 +415,10 @@ private fun createFlatten(name: String, layersByName: MutableMap<String, Layer>)
     return Flatten(name = name)
 }
 
+private fun createReshape(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Reshape {
+    return Reshape(name = name, targetShape = config.target_shape!!)
+}
+
 private fun createConv2D(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Conv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
@@ -431,9 +445,46 @@ private fun createConv2D(config: LayerConfig, name: String, layersByName: Mutabl
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
         name = name
     )
 }
+
+private fun createDepthwiseConv2D(
+    config: LayerConfig,
+    name: String,
+    layersByName: MutableMap<String, Layer>
+): DepthwiseConv2D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(4)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(4)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = dilation[1]
+    addedOnesDilation[3] = 1
+
+    return DepthwiseConv2D(
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
+        depthMultiplier = config.depth_multiplier!!,
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
+}
+
 
 private fun createZeroPadding2D(
     config: LayerConfig,

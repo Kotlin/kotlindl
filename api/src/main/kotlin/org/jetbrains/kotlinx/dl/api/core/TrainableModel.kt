@@ -41,7 +41,7 @@ public abstract class TrainableModel : InferenceModel() {
     protected var metrics: List<Metric> = listOf(Accuracy())
 
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
-    protected var amountOfClasses: Long = -1
+    public var amountOfClasses: Long = -1
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false

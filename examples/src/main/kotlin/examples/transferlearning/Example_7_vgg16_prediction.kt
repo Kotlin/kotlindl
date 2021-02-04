@@ -10,6 +10,7 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -75,7 +76,7 @@ fun main() {
 }
 
 fun predictTop5Labels(
-    it: Sequential,
+    it: TrainableModel,
     floatArray: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>
 ): MutableMap<Int, Pair<String, Float>> {

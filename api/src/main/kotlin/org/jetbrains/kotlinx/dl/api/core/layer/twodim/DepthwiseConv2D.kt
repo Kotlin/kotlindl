@@ -48,36 +48,37 @@ private const val BIAS = "depthwise_conv2d_bias"
  * @constructor Creates [DepthwiseConv2D] object.
  */
 public class DepthwiseConv2D(
-    public val filters: Long = 32,
     public val kernelSize: LongArray = longArrayOf(3, 3),
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),
     public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = HeNormal(),
+    public val depthMultiplier: Int = 1,
+    public val depthwiseInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
     public val padding: ConvPadding = ConvPadding.SAME,
+    public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name), ForwardLayer {
     // weight tensors
-    private lateinit var kernel: Variable<Float>
-    private lateinit var bias: Variable<Float>
+    private lateinit var depthwiseKernel: Variable<Float>
+    private var bias: Variable<Float>? = null
 
     // weight tensor shapes
     private lateinit var biasShape: Shape
-    private lateinit var kernelShape: Shape
+    private lateinit var depthwiseKernelShape: Shape
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
-        val lastElement = inputShape.size(inputShape.numDimensions() - 1)
+        val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
-        biasShape = Shape.make(filters)
+        depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
+        biasShape = Shape.make(numberOfChannels * this.depthMultiplier)
 
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
-        val inputDepth = lastElement // amount of channels
-        val outputDepth = filters // amount of channels for the next layer
+        val inputDepth = numberOfChannels // amount of channels
+        val outputDepth = numberOfChannels * this.depthMultiplier // amount of channels for the next layer
 
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
@@ -86,16 +87,16 @@ public class DepthwiseConv2D(
             val kernelVariableName = depthwiseConv2dKernelVarName(name)
             val biasVariableName = depthwiseConv2dBiasVarName(name)
 
-            kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+            depthwiseKernel = tf.withName(kernelVariableName).variable(depthwiseKernelShape, getDType())
+            if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
+            depthwiseKernel = addWeight(tf, kGraph, kernelVariableName, depthwiseKernel, depthwiseInitializer)
+            if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
         } else {
-            kernel = tf.variable(kernelShape, getDType())
-            bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, BIAS, bias, biasInitializer)
+            depthwiseKernel = tf.variable(depthwiseKernelShape, getDType())
+            if (useBias) bias = tf.variable(biasShape, getDType())
+            depthwiseKernel = addWeight(tf, kGraph, KERNEL, depthwiseKernel, depthwiseInitializer)
+            if (useBias) bias = addWeight(tf, kGraph, BIAS, bias!!, biasInitializer)
         }
     }
 
@@ -111,8 +112,9 @@ public class DepthwiseConv2D(
             strides[2].toInt()
         )
 
+        val outFilters = inputShape.size(3) * this.depthMultiplier
         // TODO: make this calculation for others dimensions conv layers https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/keras/layers/convolutional.py#L224
-        return Shape.make(inputShape.size(0), rows, cols, filters)
+        return Shape.make(inputShape.size(0), rows, cols, outFilters)
     }
 
     override fun forward(
@@ -128,9 +130,20 @@ public class DepthwiseConv2D(
         }
 
         val options: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
-        val signal =
-            tf.nn.biasAdd(tf.nn.depthwiseConv2dNative(input, kernel, strides.toMutableList(), tfPadding, options), bias)
-        return Activations.convert(activation).apply(tf, signal, name)
+        var output: Operand<Float> =
+            tf.nn.depthwiseConv2dNative(
+                input,
+                depthwiseKernel,
+                strides.toMutableList(),
+                tfPadding,
+                options
+            )
+
+        if (useBias) {
+            output = tf.nn.biasAdd(output, bias)
+        }
+
+        return Activations.convert(activation).apply(tf, output, name)
     }
 
     override val weights: List<Array<*>> get() = extractDepthConv2DWeights()
@@ -153,7 +166,7 @@ public class DepthwiseConv2D(
     }
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = TensorShape(depthwiseKernelShape).dims()
 
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
@@ -161,9 +174,13 @@ public class DepthwiseConv2D(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
+        get() = (numElementsInShape(shapeToLongArray(depthwiseKernelShape)) + numElementsInShape(
+            shapeToLongArray(
+                biasShape
+            )
+        )).toInt()
 
     override fun toString(): String {
-        return "DepthwiseConv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"
+        return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"
     }
 }

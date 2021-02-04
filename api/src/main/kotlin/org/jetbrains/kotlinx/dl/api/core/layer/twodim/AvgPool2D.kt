@@ -84,7 +84,5 @@ public class AvgPool2D(
 
     override val paramCount: Int get() = 0
 
-    override fun toString(): String {
-        return "AvgPool2D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
-    }
+
 }

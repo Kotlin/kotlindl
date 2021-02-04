@@ -246,7 +246,6 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
-        amountOfClasses = if (layers.last() is Dense) (layers.last() as Dense).outputSize.toLong() else 1
 
         this.loss = loss
         this.metric = metric
@@ -256,13 +255,16 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
         //this.callback.model = this // TODO: cyclic reference
 
         inputLayer.build(tf)
-        var inputShape: Shape = inputLayer.computeOutputShape()
+        var inputShape: Shape? = inputLayer.computeOutputShape()
 
         layers.forEach {
-            it.build(tf, kGraph, inputShape)
+            if (inputShape == null) {
+                inputShape = TensorShape(it.inboundLayers[0].outputShape).toShape()
+            }
 
-            inputShape = it.computeOutputShape(inputShape)
-            val tensorShape = TensorShape(inputShape)
+            it.build(tf, kGraph, inputShape!!)
+            val outputShape = it.computeOutputShape(inputShape!!)
+            val tensorShape = TensorShape(outputShape)
             val dims = tensorShape.dims()
 
             check(tensorShape.tail().all { elem -> elem > 0 })
@@ -273,8 +275,13 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
 
             it.outputShape = dims
 
-            logger.debug { "$it; outputShape: $tensorShape" }
+            logger.debug { "${it.name}; outputShape: $tensorShape $it" }
+
+            inputShape = null
         }
+
+        if (layers.last() is Dense) amountOfClasses = (layers.last() as Dense).outputSize.toLong()
+        // TODO: if last layer is Activation (need to extract from shape in the last layer
 
         xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>

@@ -72,11 +72,12 @@ public class Conv2D(
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
     public val padding: ConvPadding = ConvPadding.SAME,
+    public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name) {
     // weight tensors
     private lateinit var kernel: Variable<Float>
-    private lateinit var bias: Variable<Float>
+    private var bias: Variable<Float>? = null
 
     // weight tensor shapes
     private lateinit var biasShape: Shape
@@ -103,15 +104,15 @@ public class Conv2D(
             val biasVariableName = conv2dBiasVarName(name)
 
             kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+            if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
             kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
+            if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
         } else {
             kernel = tf.variable(kernelShape, getDType())
-            bias = tf.variable(biasShape, getDType())
+            if (useBias) bias = tf.variable(biasShape, getDType())
             kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, BIAS, bias, biasInitializer)
+            if (useBias) bias = addWeight(tf, kGraph, BIAS, bias!!, biasInitializer)
         }
     }
 
@@ -144,8 +145,13 @@ public class Conv2D(
         }
 
         val options: Conv2d.Options = dilations(dilations.toList()).dataFormat("NHWC")
-        val signal = tf.nn.biasAdd(tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options), bias)
-        return Activations.convert(activation).apply(tf, signal, name)
+        var output: Operand<Float> = tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options)
+
+        if (useBias) {
+            output = tf.nn.biasAdd(output, bias)
+        }
+
+        return Activations.convert(activation).apply(tf, output, name)
     }
 
     override val weights: List<Array<*>> get() = extractConv2DWeights()
