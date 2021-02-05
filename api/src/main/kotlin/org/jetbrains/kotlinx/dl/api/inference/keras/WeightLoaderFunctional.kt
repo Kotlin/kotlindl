@@ -18,7 +18,12 @@ import org.jetbrains.kotlinx.dl.api.core.util.*
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
-
+private const val GAMMA_DATA_PATH_TEMPLATE = "/%s/%s/gamma:0"
+private const val BETA_DATA_PATH_TEMPLATE = "/%s/%s/beta:0"
+private const val MOVING_MEAN_DATA_PATH_TEMPLATE = "/%s/%s/moving_mean:0"
+private const val MOVING_VARIANCE_DATA_PATH_TEMPLATE = "/%s/%s/moving_variance:0"
+private const val DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_kernel:0"
+private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
@@ -281,6 +286,7 @@ private fun fillDenseVariablesFromKeras(
     }
 }
 
+// TODO: gamma and beta could be misssed due to batchNorm formula https://stackoverflow.com/questions/43813549/restoring-tensorflow-model-cannot-find-gamma-scale-for-batch-norm-layers-in-the
 private fun fillBatchNormVariablesFromKeras(
     layerName: String,
     group: Group,
@@ -294,14 +300,6 @@ private fun fillBatchNormVariablesFromKeras(
         val dims = it.dimensions
         val data = it.data
         when (it.name) {
-            /*"kernel:0" -> {
-                val kernelVariableName = denseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Dense).getKernelShape()
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }*/
             "gamma:0" -> {
                 val gammaVariableName = batchNormGammaVarName(layerName)
                 val gammaShape = (model.getLayer(layerName) as BatchNorm).weightShapeArray
@@ -351,7 +349,7 @@ private fun fillBatchNormVariablesFromKeras(
  */
 public fun Functional.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
-    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
+    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE, // TODO: doesnt' work for batchnorm/depthwise
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
@@ -359,7 +357,12 @@ public fun Functional.loadWeightsByPathTemplates(
     this.logger.debug { "Starting weights loading.." }
     this.layers.forEach {
         run {
-            fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+            fillLayerWeights(
+                it,
+                hdfFile,
+                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+                this
+            ) // TODO: doesnt' work for batchnorm/depthwise
         }
     }
     this.logger.info { "Weights are loaded." }
@@ -388,7 +391,12 @@ public fun Functional.loadWeightsByPathTemplates(
     this.layers.forEach {
         run {
             if (layerList.contains(it)) {
-                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+                fillLayerWeights(
+                    it,
+                    hdfFile,
+                    LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+                    this
+                ) // TODO: doesnt' work for batchnorm/depthwise
             } else {
                 initLayerWeights(it, this)
             }
@@ -401,31 +409,38 @@ public fun Functional.loadWeightsByPathTemplates(
 private fun fillLayerWeights(
     it: Layer,
     hdfFile: HdfFile,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String,
+    layerPaths: LayerPaths?,
     model: Functional
 ) {
+
+
     when (it::class) {
         Dense::class -> fillDenseVariables(
             it.name,
             hdfFile,
             model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
+            //TODO: add (it as Dense).useBias,
+            layerPaths
         )
         Conv2D::class -> fillConv2DVariables(
             it.name,
             hdfFile,
             model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
+            (it as Conv2D).useBias,
+            layerPaths
         )
         DepthwiseConv2D::class -> fillDepthwiseConv2DVariables(
             it.name,
             hdfFile,
             model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
+            (it as DepthwiseConv2D).useBias,
+            layerPaths
+        )
+        BatchNorm::class -> fillBatchNormVariables(
+            it.name,
+            hdfFile,
+            model,
+            layerPaths
         )
         else -> println("No weights loading for ${it.name}")
     }
@@ -437,6 +452,7 @@ private fun initLayerWeights(it: Layer, model: Functional) {
         Dense::class -> initDenseVariablesByDefaultInitializer(it.name, model)
         Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
         DepthwiseConv2D::class -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
+        BatchNorm::class -> initBatchNormVariablesByDefaultInitializer(it.name, model)
         else -> println("No default initialization handled for ${it.name}")
     }
     model.logger.info { " Weights initialized for ${it.name}. ${it.paramCount} parameters are initialized. " }
@@ -477,6 +493,18 @@ private fun initDepthwiseConv2DVariablesByDefaultInitializer(name: String, model
     model.runAssignOpByVarName(biasVariableName)
 }
 
+private fun initBatchNormVariablesByDefaultInitializer(name: String, model: Functional) {
+    val betaVariableName = batchNormBetaVarName(name)
+    val gammaVariableName = batchNormGammaVarName(name)
+    val movingMeanVariableName = batchNormMovingMeanVarName(name)
+    val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
+
+    model.runAssignOpByVarName(betaVariableName)
+    model.runAssignOpByVarName(gammaVariableName)
+    model.runAssignOpByVarName(movingMeanVariableName)
+    model.runAssignOpByVarName(movingVarianceVariableName)
+}
+
 private fun initDenseVariablesByDefaultInitializer(name: String, model: Functional) {
     val kernelVariableName = denseKernelVarName(name)
     val biasVariableName = denseBiasVarName(name)
@@ -494,7 +522,8 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: Function
  */
 public fun Functional.loadWeightsByPaths(
     hdfFile: HdfFile,
-    weightPaths: List<LayerKernelAndBiasPaths>
+    weightPaths: List<LayerPaths>,
+    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE // TODO: undocumented behaviour
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -504,17 +533,29 @@ public fun Functional.loadWeightsByPaths(
             val initializedLayerName = it.name
             val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
             if (layerWeightPaths != null) {
-                val kernelDataPathTemplate = layerWeightPaths.kernelPath
-                val biasDataPathTemplate = layerWeightPaths.biasPath
-                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+                fillLayerWeights(it, hdfFile, layerWeightPaths, this)
             } else {
-                this.logger.info { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
-                initLayerWeights(it, this)
+                if (missedWeights == MissedWeightsStrategy.LOAD_NEW_FORMAT) {
+                    fillLayerWeights(
+                        it,
+                        hdfFile,
+                        null, // TODO: refactor = it doesn't work for batchnorm or depthwise
+                        this
+                    )
+                } else {
+                    this.logger.info { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
+                    initLayerWeights(it, this)
+                }
             }
         }
     }
     this.logger.info { "Weights are loaded." }
     this.isModelInitialized = true
+}
+
+enum class MissedWeightsStrategy {
+    INITIALIZE,
+    LOAD_NEW_FORMAT
 }
 
 /**
@@ -539,7 +580,12 @@ public fun Functional.loadWeightsByPaths(
     this.layers.forEach {
         run {
             if (layerList.contains(it)) {
-                fillLayerWeights(it, hdfFile, kernelDataPathTemplate, biasDataPathTemplate, this)
+                fillLayerWeights(
+                    it,
+                    hdfFile,
+                    LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+                    this
+                ) // TODO: does not work for BatchNorm/Depthwise
             } else {
                 initLayerWeights(it, this)
             }
@@ -553,41 +599,121 @@ private fun fillConv2DVariables(
     name: String,
     hdfFile: HdfFile,
     model: Functional,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String
+    useBias: Boolean,
+    layerPaths: LayerPaths?
 ) {
-    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+    val kernelDataPathTemplate: String
+    val biasDataPathTemplate: String
 
+    if (layerPaths == null) {
+        kernelDataPathTemplate = KERNEL_DATA_PATH_TEMPLATE
+        biasDataPathTemplate = BIAS_DATA_PATH_TEMPLATE
+    } else {
+        layerPaths as LayerConvOrDensePaths
+        kernelDataPathTemplate = layerPaths.kernelPath
+        biasDataPathTemplate = layerPaths.biasPath
+    }
+
+    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
     val kernelVariableName = conv2dKernelVarName(name)
-    val biasVariableName = conv2dBiasVarName(name)
     model.fillVariable(kernelVariableName, kernelData)
-    model.fillVariable(biasVariableName, biasData)
+
+    if (useBias) {
+        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+        val biasVariableName = conv2dBiasVarName(name)
+        model.fillVariable(biasVariableName, biasData)
+    }
 }
 
 private fun fillDepthwiseConv2DVariables(
     name: String,
     hdfFile: HdfFile,
     model: Functional,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String
+    useBias: Boolean,
+    layerPaths: LayerPaths?
 ) {
-    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+    val kernelDataPathTemplate: String
+    val biasDataPathTemplate: String
 
+    if (layerPaths == null) {
+        kernelDataPathTemplate = DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE
+        biasDataPathTemplate = DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
+    } else {
+        layerPaths as LayerConvOrDensePaths
+        kernelDataPathTemplate = layerPaths.kernelPath
+        biasDataPathTemplate = layerPaths.biasPath
+    }
+
+    layerPaths as LayerConvOrDensePaths
+    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
     val kernelVariableName = depthwiseConv2dKernelVarName(name)
-    val biasVariableName = depthwiseConv2dBiasVarName(name)
     model.fillVariable(kernelVariableName, kernelData)
-    model.fillVariable(biasVariableName, biasData)
+
+    if (useBias) {
+        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+        val biasVariableName = depthwiseConv2dBiasVarName(name)
+        model.fillVariable(biasVariableName, biasData)
+    }
+}
+
+private fun fillBatchNormVariables(
+    name: String,
+    hdfFile: HdfFile,
+    model: Functional,
+    layerPaths: LayerPaths?
+) {
+    val gammaDataPathTemplate: String
+    val betaDataPathTemplate: String
+    val movingMeanDataPathTemplate: String
+    val movingVarianceDataPathTemplate: String
+
+    if (layerPaths == null) {
+        gammaDataPathTemplate = GAMMA_DATA_PATH_TEMPLATE
+        betaDataPathTemplate = BETA_DATA_PATH_TEMPLATE
+        movingMeanDataPathTemplate = MOVING_MEAN_DATA_PATH_TEMPLATE
+        movingVarianceDataPathTemplate = MOVING_VARIANCE_DATA_PATH_TEMPLATE
+    } else {
+        layerPaths as LayerBatchNormPaths
+        gammaDataPathTemplate = layerPaths.gammaPath
+        betaDataPathTemplate = layerPaths.betaPath
+        movingMeanDataPathTemplate = layerPaths.movingMeanPath
+        movingVarianceDataPathTemplate = layerPaths.movingVariancePath
+    }
+
+    val gammaData = hdfFile.getDatasetByPath(gammaDataPathTemplate.format(name, name)).data
+    val betaData = hdfFile.getDatasetByPath(betaDataPathTemplate.format(name, name)).data
+    val movingMeanData = hdfFile.getDatasetByPath(movingMeanDataPathTemplate.format(name, name)).data
+    val movingVarianceData = hdfFile.getDatasetByPath(movingVarianceDataPathTemplate.format(name, name)).data
+
+    val gammaVariableName = batchNormGammaVarName(name)
+    val betaVariableName = batchNormBetaVarName(name)
+    val movingMeanVariableName = batchNormMovingMeanVarName(name)
+    val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
+
+    model.fillVariable(gammaVariableName, gammaData)
+    model.fillVariable(betaVariableName, betaData)
+    model.fillVariable(movingMeanVariableName, movingMeanData)
+    model.fillVariable(movingVarianceVariableName, movingVarianceData)
 }
 
 private fun fillDenseVariables(
     name: String,
     hdfFile: HdfFile,
     model: Functional,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String
+    layerPaths: LayerPaths?
 ) {
+    val kernelDataPathTemplate: String
+    val biasDataPathTemplate: String
+
+    if (layerPaths == null) {
+        kernelDataPathTemplate = KERNEL_DATA_PATH_TEMPLATE
+        biasDataPathTemplate = BIAS_DATA_PATH_TEMPLATE
+    } else {
+        layerPaths as LayerConvOrDensePaths
+        kernelDataPathTemplate = layerPaths.kernelPath
+        biasDataPathTemplate = layerPaths.biasPath
+    }
+
     val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
     val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
 

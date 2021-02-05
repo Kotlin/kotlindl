@@ -302,27 +302,27 @@ class TransferLearningTest : IntegrationTest() {
             )
 
             val weightPaths = listOf(
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "conv2d",
                     "/conv2d/conv2d/kernel:0",
                     "/conv2d/conv2d/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "conv2d_1",
                     "/conv2d_1/conv2d_1/kernel:0",
                     "/conv2d_1/conv2d_1/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense",
                     "/dense/dense/kernel:0",
                     "/dense/dense/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense_1",
                     "/dense_1/dense_1/kernel:0",
                     "/dense_1/dense_1/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense_2",
                     "/dense_2/dense_2/kernel:0",
                     "/dense_2/dense_2/bias:0"

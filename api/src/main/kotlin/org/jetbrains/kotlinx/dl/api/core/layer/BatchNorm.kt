@@ -23,7 +23,7 @@ import org.tensorflow.op.core.Variable
 public class BatchNorm(
     public val axis: List<Int> = arrayListOf(3),
     public val momentum: Double = 0.99,
-    public val center: Boolean = true,
+    public val center: Boolean = true, // TODO: if center false = disable shifting to zero like in batchNorm in TFJS
     public val epsilon: Double = 0.001,
     public val scale: Boolean = true,
     public val gammaInitializer: Initializer = Ones(),
@@ -34,7 +34,7 @@ public class BatchNorm(
 ) : Layer(name), ForwardLayer {
 
     private lateinit var weightShape: Shape
-    private lateinit var gamma: Variable<Float>
+    private var gamma: Variable<Float>? = null
     private lateinit var beta: Variable<Float>
     private lateinit var movingMean: Variable<Float>
     private lateinit var movingVariance: Variable<Float>
@@ -44,22 +44,26 @@ public class BatchNorm(
         weightShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1))
 
         if (name.isNotEmpty()) {
-            val gammaVariableName = batchNormGammaVarName(name)
             val betaVariableName = batchNormBetaVarName(name)
             val movingMeanVariableName = batchNormMovingMeanVarName(name)
             val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
 
-            gamma = tf.withName(gammaVariableName).variable(weightShape, getDType())
             beta = tf.withName(betaVariableName).variable(weightShape, getDType())
             movingMean = tf.withName(movingMeanVariableName).variable(weightShape, getDType())
             movingVariance = tf.withName(movingVarianceVariableName).variable(weightShape, getDType())
 
             isTrainable = false // TODO: add isTrainable to addWeight method as a flag
-            gamma = addWeight(tf, kGraph, gammaVariableName, gamma, gammaInitializer)
+
             beta = addWeight(tf, kGraph, betaVariableName, beta, betaInitializer)
             movingMean = addWeight(tf, kGraph, movingMeanVariableName, movingMean, movingMeanInitializer)
             movingVariance =
                 addWeight(tf, kGraph, movingVarianceVariableName, movingVariance, movingVarianceInitializer)
+
+            if (scale) {
+                val gammaVariableName = batchNormGammaVarName(name)
+                gamma = tf.withName(gammaVariableName).variable(weightShape, getDType())
+                gamma = addWeight(tf, kGraph, gammaVariableName, gamma!!, gammaInitializer)
+            }
         }
     }
 
@@ -168,14 +172,16 @@ public class BatchNorm(
     private fun batchNorm(
         tf: Ops,
         x: Operand<Float>,
-        gamma: Operand<Float>,
+        gamma: Variable<Float>?,
         beta: Operand<Float>,
         movingMean: Operand<Float>,
         movingVar: Operand<Float>,
         eps: Operand<Float>,
     ): Operand<Float> {
         var inv: Operand<Float> = tf.math.rsqrt(tf.math.add(movingVar, eps))
-        inv = tf.math.mul(inv, gamma)
+
+        if (scale) inv = tf.math.mul(inv, gamma!!)
+
         return tf.math.add(
             tf.math.mul(x, inv),
             tf.math.sub(beta, tf.math.mul(movingMean, inv))

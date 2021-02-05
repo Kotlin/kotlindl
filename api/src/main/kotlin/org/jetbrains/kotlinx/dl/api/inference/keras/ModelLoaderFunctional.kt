@@ -12,6 +12,10 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Multiply
+import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Normalization
+import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Rescaling
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
@@ -118,6 +122,18 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!, layersByName
         )
+        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!, layersByName
+        )
+        LAYER_RESCALING -> createRescalingLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!, layersByName
+        )
+        LAYER_NORMALIZATION -> createNormalizationLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!, layersByName
+        )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
@@ -126,6 +142,18 @@ private fun convertToLayer(
         LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ADD -> createAddLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_MULTIPLY -> createMultiplyLayer(
+            kerasLayer.inbound_nodes,
+            kerasLayer.config!!.name!!,
+            layers,
+            layersByName
+        )
+        LAYER_CONCATENATE -> createConcatenateLayer(
+            kerasLayer.config!!,
+            kerasLayer.config!!.name!!,
+            layers,
+            layersByName
+        )
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!,
@@ -152,26 +180,60 @@ private fun createGlobalAvgPooling2D(
     )// TODO: write correct filling
 }
 
+private fun createRescalingLayer(
+    config: LayerConfig,
+    name: String,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    return Rescaling(
+        name = name
+    )// TODO: write correct filling
+}
+
+private fun createNormalizationLayer(
+    config: LayerConfig,
+    name: String,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    return Normalization(
+        name = name
+    )// TODO: write correct filling
+}
+
 private fun createAddLayer(
     inboundNodes: List<List<List<Any>>>?,
     name: String,
     layers: MutableList<Layer>,
     layersByName: MutableMap<String, Layer>
 ): Layer {
-
-    val mergedLayers = mutableListOf<Layer>()
-
-    inboundNodes!![0].forEach { inboundNode ->
-        layersByName[inboundNode[0] as String]?.let { mergedLayers.add(it) }
-    }
-
     val layer = Add(
-        //mergedLayers = mergedLayers,
         name = name
     )
+    return layer
+}
 
-    layer.inboundLayers = mergedLayers
+private fun createMultiplyLayer(
+    inboundNodes: List<List<List<Any>>>?,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Multiply(
+        name = name
+    )
+    return layer
+}
 
+private fun createConcatenateLayer(
+    config: LayerConfig,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Concatenate(
+        axis = config.axis!! as Int,
+        name = name
+    )
     return layer
 }
 
@@ -219,11 +281,11 @@ private fun createReluLayer(config: LayerConfig, name: String, layersByName: Mut
 
 private fun createBatchNorm(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
     return BatchNorm(
-        axis = config.axis!!,
+        axis = config.axis!! as List<Int>,
         momentum = config.momentum!!,
         center = config.center!!,
         epsilon = config.epsilon!!,
-        scale = config.scale!!,
+        scale = config.scale!! as Boolean,
         gammaInitializer = convertToInitializer(config.gamma_initializer!!),
         betaInitializer = convertToInitializer(config.beta_initializer!!),
         movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),

@@ -11,7 +11,7 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-public class Add(name: String = "") : Layer(name) {
+public class Multiply(name: String = "") : Layer(name) {
     public val mergedLayers: List<Layer> = emptyList()
 
     init {
@@ -33,7 +33,6 @@ public class Add(name: String = "") : Layer(name) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        //return tf.math.add(input, input)
         return input
     }
 
@@ -45,7 +44,7 @@ public class Add(name: String = "") : Layer(name) {
     ): Operand<Float> {
         // TODO: add universal for n inputs (and define merge function) or addN
         // TODO: need to check all output shapes for all inputs (it should be equal)
-        return tf.withName("ADD_LAYER").math.add(input[0], input[1])
+        return tf.withName("ADD_LAYER").math.mul(input[0], input[1])
     }
 
     override val weights: List<Array<*>>

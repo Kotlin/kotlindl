@@ -7,11 +7,16 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-public class Add(name: String = "") : Layer(name) {
+// TODO: for inception it should work with more than 2 inputs (4 for example) need to write more universal formulas here, for this layer and add
+public class Concatenate(
+    public val axis: Int = 3,
+    name: String = ""
+) : Layer(name) {
     public val mergedLayers: List<Layer> = emptyList()
 
     init {
@@ -23,8 +28,17 @@ public class Add(name: String = "") : Layer(name) {
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        // TODO: rewrite as in concatenate layer
-        return inputShape
+        val inputShapes = mutableListOf<LongArray>()
+        inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
+
+        // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
+        // take shape from first input and replace axis dimenstion
+        val newShape = inputShapes[0].clone()
+        newShape[axis] = inputShapes.map { it[axis] }.sum() // concatenated dimension
+
+        val tensorShape = TensorShape(newShape)
+        outputShape = tensorShape.dims()
+        return tensorShape.toShape()
     }
 
     override fun forward(
@@ -33,7 +47,7 @@ public class Add(name: String = "") : Layer(name) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        //return tf.math.add(input, input)
+        // TODO: this call should be banned or merged with the following method forward()
         return input
     }
 
@@ -43,9 +57,7 @@ public class Add(name: String = "") : Layer(name) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO: add universal for n inputs (and define merge function) or addN
-        // TODO: need to check all output shapes for all inputs (it should be equal)
-        return tf.withName("ADD_LAYER").math.add(input[0], input[1])
+        return tf.withName("CONCAT_LAYER").concat(input, tf.constant(axis))
     }
 
     override val weights: List<Array<*>>

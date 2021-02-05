@@ -426,7 +426,7 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: Sequenti
  */
 public fun Sequential.loadWeightsByPaths(
     hdfFile: HdfFile,
-    weightPaths: List<LayerKernelAndBiasPaths>
+    weightPaths: List<LayerConvOrDensePaths>
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -481,6 +481,10 @@ public fun Sequential.loadWeightsByPaths(
     this.isModelInitialized = true
 }
 
+
+public open class LayerPaths(public val layerName: String)
+
+
 /**
  * Contains [layerName], [kernelPath], [biasPath] for specific layer, found in hdf5 file via
  * ```
@@ -488,14 +492,25 @@ public fun Sequential.loadWeightsByPaths(
  * ```
  * function call.
  */
-public data class LayerKernelAndBiasPaths(
-    /** */
-    public val layerName: String,
+public class LayerConvOrDensePaths(
+    layerName: String,
     /** */
     public val kernelPath: String,
     /** */
     public val biasPath: String
-)
+) : LayerPaths(layerName)
+
+public class LayerBatchNormPaths(
+    layerName: String,
+    /** */
+    public val gammaPath: String,
+    /** */
+    public val betaPath: String,
+    /** */
+    public val movingMeanPath: String,
+    /** */
+    public val movingVariancePath: String
+) : LayerPaths(layerName)
 
 private fun fillConv2DVariables(
     name: String,
@@ -511,6 +526,47 @@ private fun fillConv2DVariables(
     val biasVariableName = conv2dBiasVarName(name)
     model.fillVariable(kernelVariableName, kernelData)
     model.fillVariable(biasVariableName, biasData)
+}
+
+private fun fillDepthwiseConv2DVariables(
+    name: String,
+    hdfFile: HdfFile,
+    model: Sequential,
+    kernelDataPathTemplate: String,
+    biasDataPathTemplate: String
+) {
+    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
+    val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+
+    val kernelVariableName = depthwiseConv2dKernelVarName(name)
+    val biasVariableName = depthwiseConv2dBiasVarName(name)
+    model.fillVariable(kernelVariableName, kernelData)
+    model.fillVariable(biasVariableName, biasData)
+}
+
+private fun fillBatchNormVariables(
+    name: String,
+    hdfFile: HdfFile,
+    model: Sequential,
+    gammaDataPathTemplate: String,
+    betaDataPathTemplate: String,
+    movingMeanDataPathTemplate: String,
+    movingVarianceDataPathTemplate: String
+) {
+    val gammaData = hdfFile.getDatasetByPath(gammaDataPathTemplate.format(name, name)).data
+    val betaData = hdfFile.getDatasetByPath(betaDataPathTemplate.format(name, name)).data
+    val movingMeanData = hdfFile.getDatasetByPath(movingMeanDataPathTemplate.format(name, name)).data
+    val movingVarianceData = hdfFile.getDatasetByPath(movingVarianceDataPathTemplate.format(name, name)).data
+
+    val gammaVariableName = batchNormGammaVarName(name)
+    val betaVariableName = batchNormBetaVarName(name)
+    val movingMeanVariableName = batchNormMovingMeanVarName(name)
+    val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
+
+    model.fillVariable(gammaVariableName, gammaData)
+    model.fillVariable(betaVariableName, betaData)
+    model.fillVariable(movingMeanVariableName, movingMeanData)
+    model.fillVariable(movingVarianceVariableName, movingVarianceData)
 }
 
 private fun fillDenseVariables(

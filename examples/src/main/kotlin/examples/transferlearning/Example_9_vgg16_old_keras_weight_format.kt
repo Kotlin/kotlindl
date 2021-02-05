@@ -85,74 +85,74 @@ fun main() {
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
 
         val weightPaths = listOf(
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block1_conv1",
                 "/block1_conv1/block1_conv1_W_1:0",
                 "/block1_conv1/block1_conv1_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block1_conv2",
                 "/block1_conv2/block1_conv2_W_1:0",
                 "/block1_conv2/block1_conv2_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block2_conv1",
                 "/block2_conv1/block2_conv1_W_1:0",
                 "/block2_conv1/block2_conv1_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block2_conv2",
                 "/block2_conv2/block2_conv2_W_1:0",
                 "/block2_conv2/block2_conv2_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block3_conv1",
                 "/block3_conv1/block3_conv1_W_1:0",
                 "/block3_conv1/block3_conv1_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block3_conv2",
                 "/block3_conv2/block3_conv2_W_1:0",
                 "/block3_conv2/block3_conv2_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block3_conv3",
                 "/block3_conv3/block3_conv3_W_1:0",
                 "/block3_conv3/block3_conv3_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block4_conv1",
                 "/block4_conv1/block4_conv1_W_1:0",
                 "/block4_conv1/block4_conv1_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block4_conv2",
                 "/block4_conv2/block4_conv2_W_1:0",
                 "/block4_conv2/block4_conv2_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block4_conv3",
                 "/block4_conv3/block4_conv3_W_1:0",
                 "/block4_conv3/block4_conv3_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block5_con2v1",
                 "/block5_conv1/block5_conv21_W_1:0",
                 "/block5_conv1/block5_conv1_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block5_conv2",
                 "/block5_conv2/block5_conv2_W_1:0",
                 "/block5_conv2/block5_conv2_b_1:0"
             ),
-            LayerKernelAndBiasPaths(
+            LayerConvOrDensePaths(
                 "block5_conv3",
                 "/block5_conv3/block5_conv3_W_1:0",
                 "/block5_conv3/block5_conv3_b_1:0"
             ),
-            LayerKernelAndBiasPaths("fc1", "/fc1/fc1_W_1:0", "/fc1/fc1_b_1:0"),
-            LayerKernelAndBiasPaths("fc2", "/fc2/fc2_W_1:0", "/fc2/fc2_b_1:0"),
-            LayerKernelAndBiasPaths("predictions", "/predictions/predictions_W_1:0", "/predictions/predictions_b_1:0"),
+            LayerConvOrDensePaths("fc1", "/fc1/fc1_W_1:0", "/fc1/fc1_b_1:0"),
+            LayerConvOrDensePaths("fc2", "/fc2/fc2_W_1:0", "/fc2/fc2_b_1:0"),
+            LayerConvOrDensePaths("predictions", "/predictions/predictions_W_1:0", "/predictions/predictions_b_1:0"),
         )
         it.loadWeightsByPaths(hdfFile, weightPaths)
 

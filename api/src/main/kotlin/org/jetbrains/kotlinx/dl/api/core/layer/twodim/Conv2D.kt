@@ -129,7 +129,9 @@ public class Conv2D(
         )
 
         // TODO: make this calculation for others dimensions conv layers https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/keras/layers/convolutional.py#L224
-        return Shape.make(inputShape.size(0), rows, cols, filters)
+        val shape = Shape.make(inputShape.size(0), rows, cols, filters)
+        outputShape = TensorShape(shape).dims()
+        return shape
     }
 
     override fun forward(

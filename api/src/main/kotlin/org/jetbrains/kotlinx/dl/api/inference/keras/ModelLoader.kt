@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import com.beust.klaxon.Klaxon
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
@@ -177,11 +176,11 @@ private fun createActivationLayer(config: LayerConfig, name: String): Layer {
 
 private fun createBatchNorm(config: LayerConfig, name: String): Layer {
     return BatchNorm(
-        axis = config.axis!!,
+        axis = config.axis!! as List<Int>,
         momentum = config.momentum!!,
         center = config.center!!,
         epsilon = config.epsilon!!,
-        scale = config.scale!!,
+        scale = config.scale!! as Boolean,
         gammaInitializer = convertToInitializer(config.gamma_initializer!!),
         betaInitializer = convertToInitializer(config.beta_initializer!!),
         movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
