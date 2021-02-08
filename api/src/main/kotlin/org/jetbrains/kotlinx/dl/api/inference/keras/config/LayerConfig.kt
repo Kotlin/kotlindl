@@ -43,6 +43,7 @@ internal data class LayerConfig(
     val name: String? = null,
     val negative_slope: Double? = null,
     val padding: KerasPadding? = null,
+    val pointwise_initializer: KerasInitializer? = null,
     val noise_shape: List<Any>? = null,
     val offset: Double? = null,
     val ragged: Boolean? = null,

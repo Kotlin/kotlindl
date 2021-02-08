@@ -500,6 +500,16 @@ public class LayerConvOrDensePaths(
     public val biasPath: String
 ) : LayerPaths(layerName)
 
+public class LayerSeparableConv2DPaths(
+    layerName: String,
+    /** */
+    public val depthwiseKernelPath: String,
+    /** */
+    public val pointwiseKernelPath: String,
+    /** */
+    public val biasPath: String
+) : LayerPaths(layerName)
+
 public class LayerBatchNormPaths(
     layerName: String,
     /** */

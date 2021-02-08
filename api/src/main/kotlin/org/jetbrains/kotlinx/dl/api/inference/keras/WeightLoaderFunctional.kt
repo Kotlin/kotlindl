@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.DepthwiseConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.util.*
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
@@ -23,6 +24,7 @@ private const val BETA_DATA_PATH_TEMPLATE = "/%s/%s/beta:0"
 private const val MOVING_MEAN_DATA_PATH_TEMPLATE = "/%s/%s/moving_mean:0"
 private const val MOVING_VARIANCE_DATA_PATH_TEMPLATE = "/%s/%s/moving_variance:0"
 private const val DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_kernel:0"
+private const val POINTWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/pointwise_kernel:0"
 private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 
 /**
@@ -151,6 +153,11 @@ private fun fillLayerWeights(
             group,
             model
         )
+        SeparableConv2D::class -> fillSeparableConv2DVariablesFromKeras(
+            it.name,
+            group,
+            model
+        )
         BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
         else -> println("No weights loading for ${it.name}")
     }
@@ -237,6 +244,60 @@ private fun fillDepthwiseConv2DVariablesFromKeras(
             "depthwise_bias:0" -> {
                 val biasVariableName = depthwiseConv2dBiasVarName(layerName)
                 val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray
+                require(
+                    biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
+                model.fillVariable(biasVariableName, data)
+            }
+            else -> {
+                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
+            }
+        }
+
+    }
+}
+
+private fun fillSeparableConv2DVariablesFromKeras(
+    layerName: String,
+    group: Group,
+    model: Functional
+) {
+    val availableLayerNames = group.children.map { e -> group.children[e.key]!!.name }.toList()
+    val modelLayerNames = model.layers.map { e -> e.name }.toList()
+    val layerWeightsNode = group.children[layerName]
+    check(layerWeightsNode != null) {
+        "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
+                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+    }
+
+    val firstLevelGroup: Group = layerWeightsNode as Group
+    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
+    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
+
+    dataNodes.values.map { it as DatasetBase }.forEach {
+        val dims = it.dimensions
+        val data = it.data
+        when (it.name) {
+            "depthwise_kernel:0" -> {
+                val kernelVariableName = separableConv2dDepthwiseKernelVarName(layerName)
+                val kernelShape = (model.getLayer(layerName) as SeparableConv2D).depthwiseShapeArray
+                require(
+                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
+                model.fillVariable(kernelVariableName, data)
+            }
+            "pointwise_kernel:0" -> {
+                val kernelVariableName = separableConv2dPointwiseKernelVarName(layerName)
+                val kernelShape = (model.getLayer(layerName) as SeparableConv2D).pointwiseShapeArray
+                require(
+                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
+                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
+                model.fillVariable(kernelVariableName, data)
+            }
+            "depthwise_bias:0" -> {
+                val biasVariableName = separableConv2dBiasVarName(layerName)
+                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -436,6 +497,13 @@ private fun fillLayerWeights(
             (it as DepthwiseConv2D).useBias,
             layerPaths
         )
+        SeparableConv2D::class -> fillSeparableConv2DVariables(
+            it.name,
+            hdfFile,
+            model,
+            (it as SeparableConv2D).useBias,
+            layerPaths
+        )
         BatchNorm::class -> fillBatchNormVariables(
             it.name,
             hdfFile,
@@ -452,6 +520,7 @@ private fun initLayerWeights(it: Layer, model: Functional) {
         Dense::class -> initDenseVariablesByDefaultInitializer(it.name, model)
         Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
         DepthwiseConv2D::class -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
+        SeparableConv2D::class -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
         BatchNorm::class -> initBatchNormVariablesByDefaultInitializer(it.name, model)
         else -> println("No default initialization handled for ${it.name}")
     }
@@ -490,6 +559,15 @@ private fun initDepthwiseConv2DVariablesByDefaultInitializer(name: String, model
     val kernelVariableName = depthwiseConv2dKernelVarName(name)
     val biasVariableName = depthwiseConv2dBiasVarName(name)
     model.runAssignOpByVarName(kernelVariableName)
+    model.runAssignOpByVarName(biasVariableName)
+}
+
+private fun initSeparableConv2DVariablesByDefaultInitializer(name: String, model: Functional) {
+    val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
+    val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
+    val biasVariableName = depthwiseConv2dBiasVarName(name)
+    model.runAssignOpByVarName(depthwiseKernelVariableName)
+    model.runAssignOpByVarName(pointwiseKernelVariableName)
     model.runAssignOpByVarName(biasVariableName)
 }
 
@@ -648,6 +726,44 @@ private fun fillDepthwiseConv2DVariables(
     val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
     val kernelVariableName = depthwiseConv2dKernelVarName(name)
     model.fillVariable(kernelVariableName, kernelData)
+
+    if (useBias) {
+        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+        val biasVariableName = depthwiseConv2dBiasVarName(name)
+        model.fillVariable(biasVariableName, biasData)
+    }
+}
+
+private fun fillSeparableConv2DVariables(
+    name: String,
+    hdfFile: HdfFile,
+    model: Functional,
+    useBias: Boolean,
+    layerPaths: LayerPaths?
+) {
+    val depthwiseKernelDataPathTemplate: String
+    val pointwiseKernelDataPathTemplate: String
+    val biasDataPathTemplate: String
+
+    if (layerPaths == null) {
+        depthwiseKernelDataPathTemplate = DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE
+        pointwiseKernelDataPathTemplate = POINTWISE_KERNEL_DATA_PATH_TEMPLATE
+        biasDataPathTemplate = DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
+    } else {
+        layerPaths as LayerSeparableConv2DPaths
+        depthwiseKernelDataPathTemplate = layerPaths.depthwiseKernelPath
+        pointwiseKernelDataPathTemplate = layerPaths.depthwiseKernelPath
+        biasDataPathTemplate = layerPaths.biasPath
+    }
+
+    layerPaths as LayerConvOrDensePaths
+    val depthwiseKernelData = hdfFile.getDatasetByPath(depthwiseKernelDataPathTemplate.format(name, name)).data
+    val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
+    model.fillVariable(depthwiseKernelVariableName, depthwiseKernelData)
+
+    val pointwiseKernelData = hdfFile.getDatasetByPath(pointwiseKernelDataPathTemplate.format(name, name)).data
+    val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
+    model.fillVariable(pointwiseKernelVariableName, pointwiseKernelData)
 
     if (useBias) {
         val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data

@@ -31,6 +31,15 @@ internal fun depthwiseConv2dBiasVarName(name: String) = name + "_" + "depthwise_
 /** Default DepthwiseConv2d kernel variable name in TensorFlow graph, based on variable's name. */
 internal fun depthwiseConv2dKernelVarName(name: String) = name + "_" + "depthwise_conv2d_kernel"
 
+/** Default SeparableConv2d bias variable name in TensorFlow graph, based on variable's name. */
+internal fun separableConv2dBiasVarName(name: String) = name + "_" + "separable_conv2d_bias"
+
+/** Default SeparableConv2d depthwise kernel variable name in TensorFlow graph, based on variable's name. */
+internal fun separableConv2dDepthwiseKernelVarName(name: String) = name + "_" + "separable_conv2d_depthwise_kernel"
+
+/** Default SeparableConv2d pointwise kernel variable name in TensorFlow graph, based on variable's name. */
+internal fun separableConv2dPointwiseKernelVarName(name: String) = name + "_" + "separable_conv2d_pointwise_kernel"
+
 /** Default Dense bias variable name in TensorFlow graph, based on variable's name. */
 internal fun denseBiasVarName(name: String) = name + "_" + "dense_bias"
 

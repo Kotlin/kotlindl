@@ -41,7 +41,7 @@ public class BatchNorm(
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
-        weightShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1))
+        weightShape = Shape.make(inputShape.size(axis[0]))
 
         if (name.isNotEmpty()) {
             val betaVariableName = batchNormBetaVarName(name)

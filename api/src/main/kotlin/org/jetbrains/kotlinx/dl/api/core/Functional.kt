@@ -275,7 +275,7 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
 
             it.outputShape = dims
 
-            logger.debug { "${it.name}; outputShape: $tensorShape $it" }
+            logger.info { "${it.name}; outputShape: $tensorShape $it" }
 
             inputShape = null
         }
