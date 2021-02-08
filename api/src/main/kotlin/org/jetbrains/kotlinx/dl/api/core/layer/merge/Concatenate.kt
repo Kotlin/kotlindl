@@ -14,7 +14,7 @@ import org.tensorflow.op.Ops
 
 // TODO: for inception it should work with more than 2 inputs (4 for example) need to write more universal formulas here, for this layer and add
 public class Concatenate(
-    public val axis: Int = 3,
+    public var axis: Int = 3,
     name: String = ""
 ) : Layer(name) {
     public val mergedLayers: List<Layer> = emptyList()
@@ -30,11 +30,24 @@ public class Concatenate(
     override fun computeOutputShape(inputShape: Shape): Shape {
         val inputShapes = mutableListOf<LongArray>()
         inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
-
-        // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
-        // take shape from first input and replace axis dimenstion
         val newShape = inputShapes[0].clone()
-        newShape[axis] = inputShapes.map { it[axis] }.sum() // concatenated dimension
+
+        var axe = axis
+        if (axis == -1) { // TODO: I don't know how to handle this case correctly, it influences on nasmobilemodel
+            val rank: Int = inputShapes[0].size
+            axe = rank + axis // to make axe positive
+            /*if (rank != 0) {
+                axe %= rank
+            } else {
+                axe = 0;
+            }*/
+
+
+        }
+        newShape[axe] = inputShapes.map { it[axe] }.sum() // concatenated dimension
+        // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
+        // take shape from first input and replace axis dimension
+
 
         val tensorShape = TensorShape(newShape)
         outputShape = tensorShape.dims()

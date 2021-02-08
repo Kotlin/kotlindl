@@ -20,7 +20,7 @@ import org.tensorflow.op.Ops
 public class ZeroPadding2D : Layer {
     public val padding: IntArray
     private val dataFormat: String
-    private lateinit var inputShape: Shape
+    private lateinit var inputShape: Shape // TODO: refactor this shape to another property in another place
 
     /**
      * Constructs an instance of ZeroPadding2D layer

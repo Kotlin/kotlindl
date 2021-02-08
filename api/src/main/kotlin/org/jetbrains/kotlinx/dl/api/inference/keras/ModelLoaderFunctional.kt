@@ -137,6 +137,7 @@ private fun convertToLayer(
         )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
@@ -594,6 +595,18 @@ private fun createZeroPadding2D(
     return ZeroPadding2D(
         (config.padding as KerasPadding.ZeroPadding2D).padding,
         config.data_format,
+        name
+    )
+}
+
+private fun createCropping2D(
+    config: LayerConfig,
+    name: String,
+    layersByName: MutableMap<String, Layer>
+): Cropping2D {
+    val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
+    return Cropping2D(
+        cropping,
         name
     )
 }

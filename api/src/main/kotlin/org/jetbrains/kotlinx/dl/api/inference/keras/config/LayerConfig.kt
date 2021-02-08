@@ -17,6 +17,7 @@ internal data class LayerConfig(
     val bias_initializer: KerasInitializer? = null,
     val bias_regularizer: KerasRegularizer? = null,
     val center: Boolean? = null,
+    val cropping: List<List<Int>>? = null,
     val data_format: String? = null,
     val depth_multiplier: Int? = null,
     val depthwise_constraint: Any? = null,
