@@ -14,6 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
@@ -65,14 +67,93 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
-            val res = it.predict(floatArray, "Activation_predictions")
+            val xTensorShape = it.inputLayer.input.asOutput().shape()
+            val tensorShape = longArrayOf(
+                1,
+                *tail(xTensorShape)
+            )
+
+            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+
+            val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)
+            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
     }
+}
+
+fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = null, inputType: InputType): FloatArray {
+    return when (inputType) {
+        InputType.TF -> floatArray.map { it / 127.5f - 1 }.toFloatArray()
+        InputType.CAFFE -> caffeStylePreprocessing(floatArray, tensorShape!!)
+        InputType.TORCH -> torchStylePreprocessing(floatArray, tensorShape!!)
+    }
+}
+
+fun torchStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
+    val height = tensorShape[1].toInt()
+    val width = tensorShape[2].toInt()
+    val channels = tensorShape[3].toInt()
+
+    val mean = floatArrayOf(0.485f, 0.456f, 0.406f)
+    val std = floatArrayOf(0.229f, 0.224f, 0.225f)
+
+    val scaledInput = input.map { it / 255f }.toFloatArray()
+    val reshapedInput = reshapeInput(scaledInput, tensorShape)
+
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            for (k in 0 until channels) {
+                reshapedInput[i][j][k] = (reshapedInput[i][j][k] - mean[k]) / std[k]
+            }
+        }
+    }
+
+    return reshape3DTo1D(reshapedInput, height * width * channels)
+}
+
+fun caffeStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
+    val height = tensorShape[1].toInt()
+    val width = tensorShape[2].toInt()
+    val channels = tensorShape[3].toInt()
+
+    val mean = floatArrayOf(103.939f, 116.779f, 123.68f)
+
+    val reshapedInput = reshapeInput(input, tensorShape)
+
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            for (k in 0 until channels) {
+                reshapedInput[i][j][k] = reshapedInput[i][j][k] - mean[k]
+            }
+        }
+    }
+
+    return reshape3DTo1D(reshapedInput, height * width * channels)
+}
+
+fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Array<FloatArray>> {
+    val height = tensorShape[1].toInt()
+    val width = tensorShape[2].toInt()
+    val channels = tensorShape[3].toInt()
+    val reshaped = Array(
+        height
+    ) { Array(width) { FloatArray(channels) } }
+
+    var pos = 0
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            for (k in 0 until channels) {
+                reshaped[i][j][k] = inputData[pos]
+                pos++
+            }
+        }
+    }
+
+    return reshaped
 }
 
 fun predictTop5Labels(

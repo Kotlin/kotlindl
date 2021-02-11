@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
@@ -57,10 +58,17 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
-            val res = it.predict(floatArray, "Activation_predictions")
+            val xTensorShape = it.inputLayer.input.asOutput().shape()
+            val tensorShape = longArrayOf(
+                1,
+                *tail(xTensorShape)
+            )
+
+            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+            val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)
+            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

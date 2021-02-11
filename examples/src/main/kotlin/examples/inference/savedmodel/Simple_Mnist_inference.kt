@@ -28,7 +28,7 @@ fun main() {
     SavedModel.load(PATH_TO_MODEL).use {
         println(it)
 
-        it.reshape(::reshapeInput)
+        it.reshape(::reshapeInput) // TODO: maybe pass here a Shape like in Sequential model, shape could a be set via setter or passed in predict method
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 

@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -82,12 +83,13 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg299/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream, ColorOrder.RGB)
 
-            val res = it.predict(floatArray)
+            val inputData = preprocessInput(floatArray, inputType = InputType.TF)
+            val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)
+            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

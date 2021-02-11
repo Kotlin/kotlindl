@@ -11,11 +11,13 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
 import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -99,12 +101,20 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream, ColorOrder.RGB)
 
-            val res = it.predict(floatArray)
+            val xTensorShape = it.inputLayer.input.asOutput().shape()
+            val tensorShape = longArrayOf(
+                1,
+                *tail(xTensorShape)
+            )
+
+            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.TORCH)
+
+            val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, floatArray, imageNetClassLabels)
+            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
