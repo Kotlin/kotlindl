@@ -12,7 +12,7 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 public class Add(name: String = "") : Layer(name) {
-    public val mergedLayers: List<Layer> = emptyList()
+    public val mergedLayers: MutableList<Layer> = mutableListOf()
 
     init {
         inboundLayers = mergedLayers

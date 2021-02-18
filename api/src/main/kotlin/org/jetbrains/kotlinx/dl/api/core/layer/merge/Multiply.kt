@@ -15,7 +15,7 @@ public class Multiply(name: String = "") : Layer(name) {
     public val mergedLayers: List<Layer> = emptyList()
 
     init {
-        inboundLayers = mergedLayers
+        inboundLayers = mergedLayers as MutableList<Layer>
     }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {

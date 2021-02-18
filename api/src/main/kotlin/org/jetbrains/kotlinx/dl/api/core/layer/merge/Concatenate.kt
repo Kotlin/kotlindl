@@ -20,7 +20,7 @@ public class Concatenate(
     public val mergedLayers: List<Layer> = emptyList()
 
     init {
-        inboundLayers = mergedLayers
+        inboundLayers = mergedLayers as MutableList<Layer>
     }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {

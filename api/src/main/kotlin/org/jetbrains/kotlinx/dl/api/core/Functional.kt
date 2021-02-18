@@ -92,7 +92,9 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
             } else {
                 layersByName = layersByName + (layer.name to layer)
             }
+            layer.parentModel = this // TODO: shoykd be correct hanled
         }
+
 
         kGraph = KGraph(Graph().toGraphDef())
         tf = Ops.create(kGraph.tfGraph)

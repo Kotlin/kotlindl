@@ -38,10 +38,10 @@ public abstract class Layer(public var name: String) {
     protected var fanOut: Int = Int.MIN_VALUE
 
     /** Returns inbound layers. */
-    public var inboundLayers: List<Layer> = emptyList()
+    public var inboundLayers: MutableList<Layer> = mutableListOf()
 
     /** Returns outbound layers. */
-    public var outboundLayers: List<Layer> = emptyList()
+    public var outboundLayers: MutableList<Layer> = mutableListOf()
 
     /**
      * Extend this function to define variables in layer.
@@ -103,7 +103,7 @@ public abstract class Layer(public var name: String) {
     }
 
     public operator fun invoke(vararg layers: Layer): Layer {
-        inboundLayers = layers.toList()
+        inboundLayers = layers.toList() as MutableList<Layer>
         return this
     }
 
