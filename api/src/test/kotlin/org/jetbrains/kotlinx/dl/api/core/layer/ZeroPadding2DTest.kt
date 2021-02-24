@@ -3,10 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.api.core.layer.twodim
+package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -185,5 +186,4 @@ internal class ZeroPadding2DTest {
             }
         }
     }
-
 }

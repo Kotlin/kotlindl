@@ -9,9 +9,21 @@ import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.*
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.*
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.recurrent.LSTM
+import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 

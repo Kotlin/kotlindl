@@ -10,9 +10,9 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits

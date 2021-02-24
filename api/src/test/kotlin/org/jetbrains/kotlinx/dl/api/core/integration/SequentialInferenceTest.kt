@@ -12,11 +12,11 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics

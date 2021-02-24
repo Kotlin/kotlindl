@@ -1,4 +1,4 @@
-package org.jetbrains.kotlinx.dl.api.core.layer.twodim
+package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 /*
  * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.

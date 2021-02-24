@@ -11,19 +11,17 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.*
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
-import java.io.File
-import java.io.FileReader
-import java.util.*
 
 
 private const val EPOCHS = 2

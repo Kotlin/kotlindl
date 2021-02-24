@@ -9,9 +9,9 @@ import io.jhdf.HdfFile
 import io.jhdf.api.Group
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.layer.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.util.*
 

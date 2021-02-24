@@ -3,19 +3,19 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.api.core.layer
+package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- *
+ * TODO: add threshold and negative slope fields
  */
-public class ActivationLayer(
-    public val activation: Activations = Activations.Relu,
+public class ReLU(
+    public val maxValue: Float,
     name: String = ""
 ) : Layer(name) {
 
@@ -33,7 +33,15 @@ public class ActivationLayer(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return Activations.convert(activation).apply(tf, input, name)
+        return tf.clipByValue(
+            input,
+            tf.constant(0.0f) as Operand<Float>,
+            tf.constant(maxValue)
+        ) // TODO: maybe rewrite it via ops with gradients via maximum and etc due to missed grads for clibByValue
+    }
+
+    override fun toString(): String {
+        return "ReLU(maxValue=$maxValue)"
     }
 
     override val weights: List<Array<*>> get() = emptyList()
@@ -41,8 +49,4 @@ public class ActivationLayer(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "ActivationLayer(activation=$activation)"
-    }
 }
