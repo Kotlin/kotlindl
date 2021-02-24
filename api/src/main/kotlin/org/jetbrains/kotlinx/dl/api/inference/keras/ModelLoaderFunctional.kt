@@ -294,6 +294,8 @@ private fun createActivationLayer(config: LayerConfig, name: String, layersByNam
 private fun createReluLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
     return ReLU(
         maxValue = config.max_value!!.toFloat(),
+        negativeSlope = config.negative_slope!!.toFloat(),
+        threshold = config.threshold!!.toFloat(),
         name = name
     )
 }

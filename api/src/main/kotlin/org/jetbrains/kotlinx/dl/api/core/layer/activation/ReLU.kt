@@ -12,15 +12,37 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- * TODO: add threshold and negative slope fields
+ * Rectified Linear Unit activation function.
+ *
+ * With default values, it returns element-wise `max(x, 0)`.
+ *
+ * Otherwise, it follows:
+ * ```
+ * f(x) = maxValue if x >= maxValue
+ * f(x) = x if threshold <= x < maxValue
+ * f(x) = negativeSlope * (x - threshold) otherwise
+ * ```
  */
 public class ReLU(
-    public val maxValue: Float,
+    /** Maximum activation value. Should be >= 0. */
+    public val maxValue: Float? = null,
+
+    /** Negative slope coefficient. Should be >= 0. */
+    public val negativeSlope: Float = 0.0f,
+
+    /** Threshold value for thresholded activation. */
+    public val threshold: Float = 0.0f,
+
     name: String = ""
 ) : Layer(name) {
 
+    init {
+        require(negativeSlope >= 0.0f) { "Negative slope $negativeSlope should be >= 0.0." }
+        require(maxValue == null || maxValue >= 0.0f) { "Max value $maxValue should be >= 0.0." }
+    }
+
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        //left empty
+
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -33,15 +55,12 @@ public class ReLU(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.clipByValue(
-            input,
-            tf.constant(0.0f) as Operand<Float>,
-            tf.constant(maxValue)
-        ) // TODO: maybe rewrite it via ops with gradients via maximum and etc due to missed grads for clibByValue
+        // alpha is used for leaky relu slope in activations instead of negativeSlope.
+        return commonRelu(tf, input = input, alpha = negativeSlope, maxValue = maxValue, threshold = threshold)
     }
 
     override fun toString(): String {
-        return "ReLU(maxValue=$maxValue)"
+        return "ReLU(maxValue=$maxValue, negativeSlope=$negativeSlope, threshold=$threshold)"
     }
 
     override val weights: List<Array<*>> get() = emptyList()
