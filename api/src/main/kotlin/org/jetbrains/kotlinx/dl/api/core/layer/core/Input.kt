@@ -25,7 +25,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     public lateinit var input: Placeholder<Float>
 
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
-    public val packedDims: LongArray = dims
+    public var packedDims: LongArray = dims
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 

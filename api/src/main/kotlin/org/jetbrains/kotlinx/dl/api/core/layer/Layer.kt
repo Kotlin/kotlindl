@@ -117,6 +117,4 @@ public abstract class Layer(public var name: String) {
     public abstract val paramCount: Int
 
     // apply
-
-
 }

@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten

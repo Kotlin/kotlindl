@@ -22,7 +22,6 @@ private const val NUM_CHANNELS = 1
 private const val IMAGE_SIZE = 3
 
 internal class ZeroPadding2DTest {
-
     @Test
     fun oneArgumentChannelsLast() {
         val padding = 1
