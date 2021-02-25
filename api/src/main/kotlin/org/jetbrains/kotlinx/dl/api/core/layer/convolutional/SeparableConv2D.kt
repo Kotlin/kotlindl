@@ -13,8 +13,10 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
-import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
+import org.jetbrains.kotlinx.dl.api.core.util.getDType
+import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dPointwiseKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -50,6 +52,7 @@ private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
  * @property [pointwiseInitializer] An initializer for the pointwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
+ * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
  * @constructor Creates [DepthwiseConv2D] object.
  */
@@ -95,6 +98,7 @@ public class SeparableConv2D(
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
         val (depthwiseKernelVariableName, pointwiseKernelVariableName, biasVariableName) = defineVariableNames()
+
         createSeparableConv2DVariables(
             tf,
             depthwiseKernelVariableName,
@@ -163,6 +167,7 @@ public class SeparableConv2D(
         }
 
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
+
         val depthwiseOutput: Operand<Float> =
             tf.nn.depthwiseConv2dNative(
                 input,
@@ -187,22 +192,8 @@ public class SeparableConv2D(
 
     override val weights: List<Array<*>> get() = extractDepthConv2DWeights()
 
-    // TODO: write correctly
     private fun extractDepthConv2DWeights(): List<Array<*>> {
-        val session = parentModel.session
-
-        val runner = session.runner()
-            .fetch(depthwiseConv2dKernelVarName(name))
-            .fetch(depthwiseConv2dBiasVarName(name))
-
-        val tensorList = runner.run()
-        val filtersTensor = tensorList[0]
-        val biasTensor = tensorList[1]
-
-        return listOf(
-            filtersTensor.convertTensorToMultiDimArray(),
-            biasTensor.convertTensorToMultiDimArray(),
-        )
+        return extractWeigths(defineVariableNames().toList())
     }
 
     /** Returns the shape of kernel weights. */

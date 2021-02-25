@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -44,6 +43,7 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
+ * @property [useBias] If true the layer uses a bias vector.
  * @constructor Creates [Conv2D] object.
  */
 public class Conv2D(
@@ -150,20 +150,7 @@ public class Conv2D(
     override val weights: List<Array<*>> get() = extractConv2DWeights()
 
     private fun extractConv2DWeights(): List<Array<*>> {
-        val session = parentModel.session
-
-        val runner = session.runner()
-            .fetch(conv2dKernelVarName(name))
-            .fetch(conv2dBiasVarName(name))
-
-        val tensorList = runner.run()
-        val filtersTensor = tensorList[0]
-        val biasTensor = tensorList[1]
-
-        return listOf(
-            filtersTensor.convertTensorToMultiDimArray(),
-            biasTensor.convertTensorToMultiDimArray(),
-        )
+        return extractWeigths(defineVariableNames().toList())
     }
 
     /** Returns the shape of kernel weights. */

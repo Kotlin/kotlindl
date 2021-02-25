@@ -14,17 +14,16 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
-import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
-private const val KERNEL = "dense_kernel"
-private const val BIAS = "dense_bias"
+private const val KERNEL_VARIABLE_NAME = "dense_kernel"
+private const val BIAS_VARIABLE_NAME = "dense_bias"
 
 /**
  * Densely-connected (fully-connected) layer class.
@@ -32,10 +31,16 @@ private const val BIAS = "dense_bias"
  * This layer implements the operation:
  * `outputs = activation(inputs * kernel + bias)`
  *
+ * where `activation` is the element-wise activation function
+ * passed as the `activation` argument, `kernel` is a weights matrix
+ * created by the layer, and `bias` is a bias vector created by the layer
+ * (only applicable if `use_bias` is `True`).
+ *
  * @property [outputSize] Dimensionality of the output space.
  * @property [activation] Activation function.
  * @property [kernelInitializer] Initializer function for the weight matrix.
  * @property [biasInitializer] Initializer function for the bias.
+ * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
  * @constructor Creates [Dense] object.
  */
@@ -44,6 +49,7 @@ public class Dense(
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name) {
     private lateinit var kernelShape: Shape
@@ -61,21 +67,29 @@ public class Dense(
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
-        if (name.isNotEmpty()) {
-            val kernelVariableName = denseKernelVarName(name)
-            val biasVariableName = denseBiasVarName(name)
+        val (kernelVariableName, biasVariableName) = defineVariableNames()
+        createDepthwiseConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
+    }
 
-            kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
+    private fun defineVariableNames(): Pair<String, String> {
+        return if (name.isNotEmpty()) {
+            Pair(denseKernelVarName(name), depthwiseConv2dBiasVarName(name))
         } else {
-            kernel = tf.variable(kernelShape, getDType())
-            bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
-            bias = addWeight(tf, kGraph, BIAS, bias, biasInitializer)
+            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
         }
+    }
+
+    private fun createDepthwiseConv2DVariables(
+        tf: Ops,
+        kernelVariableName: String,
+        biasVariableName: String,
+        kGraph: KGraph
+    ) {
+        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
+        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -96,20 +110,7 @@ public class Dense(
     override val weights: List<Array<*>> get() = extractDenseWeights()
 
     private fun extractDenseWeights(): List<Array<*>> {
-        val session = parentModel.session
-
-        val runner = session.runner()
-            .fetch(denseKernelVarName(name))
-            .fetch(denseBiasVarName(name))
-
-        val tensorList = runner.run()
-        val filtersTensor = tensorList[0]
-        val biasTensor = tensorList[1]
-
-        return listOf(
-            filtersTensor.convertTensorToMultiDimArray(),
-            biasTensor.convertTensorToMultiDimArray(),
-        )
+        return extractWeigths(defineVariableNames().toList())
     }
 
     override val hasActivation: Boolean get() = true

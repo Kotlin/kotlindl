@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -105,6 +106,17 @@ public abstract class Layer(public var name: String) {
     public operator fun invoke(vararg layers: Layer): Layer {
         inboundLayers = layers.toList() as MutableList<Layer>
         return this
+    }
+
+    /** Extract weights values by variable names. */
+    protected fun extractWeigths(variableNames: List<String>): List<Array<*>> {
+        val session = parentModel.session
+        val runner = session.runner()
+
+        for (variableName in variableNames) {
+            runner.fetch(variableName)
+        }
+        return runner.run().map { it.convertTensorToMultiDimArray() }.toList()
     }
 
     /** Returns layer's weights. */

@@ -16,7 +16,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -46,6 +45,7 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
+ * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
  * @constructor Creates [DepthwiseConv2D] object.
  */
@@ -159,20 +159,7 @@ public class DepthwiseConv2D(
     override val weights: List<Array<*>> get() = extractDepthConv2DWeights()
 
     private fun extractDepthConv2DWeights(): List<Array<*>> {
-        val session = parentModel.session
-
-        val runner = session.runner()
-            .fetch(depthwiseConv2dKernelVarName(name))
-            .fetch(depthwiseConv2dBiasVarName(name))
-
-        val tensorList = runner.run()
-        val filtersTensor = tensorList[0]
-        val biasTensor = tensorList[1]
-
-        return listOf(
-            filtersTensor.convertTensorToMultiDimArray(),
-            biasTensor.convertTensorToMultiDimArray(),
-        )
+        return extractWeigths(defineVariableNames().toList())
     }
 
     /** Returns the shape of kernel weights. */
