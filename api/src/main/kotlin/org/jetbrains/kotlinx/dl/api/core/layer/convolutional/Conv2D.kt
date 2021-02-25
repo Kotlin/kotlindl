@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.api.core.layer.twodim
+package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
@@ -24,25 +24,8 @@ import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.Conv2d.dilations
 import kotlin.math.roundToInt
 
-/**
- * Type of padding.
- */
-public enum class ConvPadding {
-    /**
-     * Results in padding evenly to the left/right or up/down of the input such that output has the same
-     * height/width dimension as the input.
-     */
-    SAME,
-
-    /** No padding. */
-    VALID,
-
-    /** Full padding. For Keras compatibility goals. */
-    FULL
-}
-
-private const val KERNEL = "conv2d_kernel"
-private const val BIAS = "conv2d_bias"
+private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
+private const val BIAS_VARIABLE_NAME = "conv2d_bias"
 
 /**
  * 2D convolution layer (e.g. spatial convolution over images).
@@ -99,21 +82,29 @@ public class Conv2D(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        if (name.isNotEmpty()) {
-            val kernelVariableName = conv2dKernelVarName(name)
-            val biasVariableName = conv2dBiasVarName(name)
+        val (kernelVariableName, biasVariableName) = defineVariableNames()
+        createConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
+    }
 
-            kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-            if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-            kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+    private fun defineVariableNames(): Pair<String, String> {
+        return if (name.isNotEmpty()) {
+            Pair(conv2dKernelVarName(name), conv2dBiasVarName(name))
         } else {
-            kernel = tf.variable(kernelShape, getDType())
-            if (useBias) bias = tf.variable(biasShape, getDType())
-            kernel = addWeight(tf, kGraph, KERNEL, kernel, kernelInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, BIAS, bias!!, biasInitializer)
+            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
         }
+    }
+
+    private fun createConv2DVariables(
+        tf: Ops,
+        kernelVariableName: String,
+        biasVariableName: String,
+        kGraph: KGraph
+    ) {
+        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
+        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

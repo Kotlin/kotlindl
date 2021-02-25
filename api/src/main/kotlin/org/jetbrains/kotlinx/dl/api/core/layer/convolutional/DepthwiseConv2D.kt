@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
@@ -26,23 +25,25 @@ import org.tensorflow.op.nn.DepthwiseConv2dNative
 import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
 import kotlin.math.roundToInt
 
-private const val KERNEL = "depthwise_conv2d_kernel"
-private const val BIAS = "depthwise_conv2d_bias"
+private const val KERNEL_VARIABLE_NAME = "depthwise_conv2d_kernel"
+private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
 
 /**
- * Depthwise 2D convolution layer (e.g. spatial convolution over images).
+ * Depthwise separable 2D convolution. (e.g. spatial convolution over images).
  *
- * This layer creates a convolution kernel that is convolved (actually cross-correlated)
- * with the layer input to produce a tensor of outputs.
- * Finally, if `activation` is applied to the outputs as well.
+ * Depthwise Separable convolutions consist of performing just the first step in a depthwise spatial convolution
+ * (which acts on each input channel separately).
+ * The `depthMultiplier` argument controls how many
+ * output channels are generated per input channel in the depthwise step.
  *
- * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
  * @property [dilations] Four numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
  * @property [activation] Activation function.
- * @property [kernelInitializer] An initializer for the convolution kernel
+ * @property [depthMultiplier] The number of depthwise convolution output channels for each input channel.
+ * The total number of depthwise convolution output channels will be equal to `numberOfChannels * depthMultiplier`.
+ * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
@@ -84,21 +85,29 @@ public class DepthwiseConv2D(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        if (name.isNotEmpty()) {
-            val kernelVariableName = depthwiseConv2dKernelVarName(name)
-            val biasVariableName = depthwiseConv2dBiasVarName(name)
+        val (kernelVariableName, biasVariableName) = defineVariableNames()
+        createDepthwiseConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
+    }
 
-            depthwiseKernel = tf.withName(kernelVariableName).variable(depthwiseKernelShape, getDType())
-            if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-            depthwiseKernel = addWeight(tf, kGraph, kernelVariableName, depthwiseKernel, depthwiseInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+    private fun defineVariableNames(): Pair<String, String> {
+        return if (name.isNotEmpty()) {
+            Pair(depthwiseConv2dKernelVarName(name), depthwiseConv2dBiasVarName(name))
         } else {
-            depthwiseKernel = tf.variable(depthwiseKernelShape, getDType())
-            if (useBias) bias = tf.variable(biasShape, getDType())
-            depthwiseKernel = addWeight(tf, kGraph, KERNEL, depthwiseKernel, depthwiseInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, BIAS, bias!!, biasInitializer)
+            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
         }
+    }
+
+    private fun createDepthwiseConv2DVariables(
+        tf: Ops,
+        kernelVariableName: String,
+        biasVariableName: String,
+        kGraph: KGraph
+    ) {
+        depthwiseKernel = tf.withName(kernelVariableName).variable(depthwiseKernelShape, getDType())
+        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+
+        depthwiseKernel = addWeight(tf, kGraph, kernelVariableName, depthwiseKernel, depthwiseInitializer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -182,6 +191,6 @@ public class DepthwiseConv2D(
         )).toInt()
 
     override fun toString(): String {
-        return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"
+        return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, useBias=$useBias, depthwiseKernel=$depthwiseKernel, bias=$bias, biasShape=$biasShape, depthwiseKernelShape=$depthwiseKernelShape)"
     }
 }

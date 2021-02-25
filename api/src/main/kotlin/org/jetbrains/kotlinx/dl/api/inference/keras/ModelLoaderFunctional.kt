@@ -12,6 +12,8 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -32,8 +34,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 

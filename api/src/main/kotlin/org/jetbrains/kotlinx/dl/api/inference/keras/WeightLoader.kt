@@ -10,9 +10,9 @@ import io.jhdf.api.Group
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.util.*
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"

@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -25,17 +24,19 @@ import org.tensorflow.op.nn.DepthwiseConv2dNative
 import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
 import kotlin.math.roundToInt
 
-private const val DEPTHWISE_KERNEL = "separable_conv2d_depthwise_kernel"
-private const val POINTWISE_KERNEL = "separable_conv2d_pointwise_kernel"
-private const val BIAS = "separable_conv2d_bias"
+private const val DEPTHWISE_KERNEL_VARIABLE_NAME = "separable_conv2d_depthwise_kernel"
+private const val POINTWISE_KERNEL_VARIABLE_NAME = "separable_conv2d_pointwise_kernel"
+private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
 
 /**
  * 2-D convolution with separable filters.
-
-Performs a depthwise convolution that acts separately on channels followed by
-a pointwise convolution that mixes channels.  Note that this is separability
-between dimensions `[1, 2]` and `3`, not spatial separability between
-dimensions `1` and `2`.
+ *
+ * Performs a depthwise convolution that acts separately on channels followed by
+ * a pointwise convolution that mixes channels.  Note that this is separability
+ * between dimensions `[1, 2]` and `3`, not spatial separability between dimensions `1` and `2`.
+ *
+ * Intuitively, separable convolutions can be understood as
+ * a way to factorize a convolution kernel into two smaller kernels, or as an extreme version of an Inception block.
  *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
@@ -43,7 +44,10 @@ dimensions `1` and `2`.
  * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
  * @property [dilations] Four numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
  * @property [activation] Activation function.
- * @property [kernelInitializer] An initializer for the convolution kernel
+ * @property [depthMultiplier] The number of depthwise convolution output channels for each input channel.
+ * The total number of depthwise convolution output channels will be equal to `numberOfChannels * depthMultiplier`.
+ * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
+ * @property [pointwiseInitializer] An initializer for the pointwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
@@ -90,26 +94,42 @@ public class SeparableConv2D(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        if (name.isNotEmpty()) {
-            val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
-            val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
-            val biasVariableName = separableConv2dBiasVarName(name)
+        val (depthwiseKernelVariableName, pointwiseKernelVariableName, biasVariableName) = defineVariableNames()
+        createSeparableConv2DVariables(
+            tf,
+            depthwiseKernelVariableName,
+            pointwiseKernelVariableName,
+            biasVariableName,
+            kGraph
+        )
+    }
 
-            depthwiseKernel = tf.withName(depthwiseKernelVariableName).variable(depthwiseKernelShape, getDType())
-            pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
-            if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-            depthwiseKernel = addWeight(tf, kGraph, depthwiseKernelVariableName, depthwiseKernel, depthwiseInitializer)
-            pointwiseKernel = addWeight(tf, kGraph, pointwiseKernelVariableName, pointwiseKernel, pointwiseInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+    private fun defineVariableNames(): Triple<String, String, String> {
+        return if (name.isNotEmpty()) {
+            Triple(
+                separableConv2dPointwiseKernelVarName(name),
+                separableConv2dDepthwiseKernelVarName(name),
+                separableConv2dBiasVarName(name)
+            )
         } else {
-            depthwiseKernel = tf.variable(depthwiseKernelShape, getDType())
-            pointwiseKernel = tf.variable(pointwiseKernelShape, getDType())
-            if (useBias) bias = tf.variable(biasShape, getDType())
-            depthwiseKernel = addWeight(tf, kGraph, DEPTHWISE_KERNEL, depthwiseKernel, depthwiseInitializer)
-            pointwiseKernel = addWeight(tf, kGraph, POINTWISE_KERNEL, pointwiseKernel, pointwiseInitializer)
-            if (useBias) bias = addWeight(tf, kGraph, BIAS, bias!!, biasInitializer)
+            Triple(DEPTHWISE_KERNEL_VARIABLE_NAME, POINTWISE_KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
         }
+    }
+
+    private fun createSeparableConv2DVariables(
+        tf: Ops,
+        depthwiseKernelVariableName: String,
+        pointwiseKernelVariableName: String,
+        biasVariableName: String,
+        kGraph: KGraph
+    ) {
+        depthwiseKernel = tf.withName(depthwiseKernelVariableName).variable(depthwiseKernelShape, getDType())
+        pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
+        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+
+        depthwiseKernel = addWeight(tf, kGraph, depthwiseKernelVariableName, depthwiseKernel, depthwiseInitializer)
+        pointwiseKernel = addWeight(tf, kGraph, pointwiseKernelVariableName, pointwiseKernel, pointwiseInitializer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

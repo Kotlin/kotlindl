@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.shape
 
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 
 /**
  * Calculates output length.
