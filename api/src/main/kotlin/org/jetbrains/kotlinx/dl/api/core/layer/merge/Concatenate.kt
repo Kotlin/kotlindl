@@ -17,12 +17,6 @@ public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
 ) : Layer(name) {
-    public val mergedLayers: List<Layer> = emptyList()
-
-    init {
-        inboundLayers = mergedLayers as MutableList<Layer>
-    }
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
 
     }
@@ -36,13 +30,6 @@ public class Concatenate(
         if (axis == -1) { // TODO: I don't know how to handle this case correctly, it influences on nasmobilemodel
             val rank: Int = inputShapes[0].size
             axe = rank + axis // to make axe positive
-            /*if (rank != 0) {
-                axe %= rank
-            } else {
-                axe = 0;
-            }*/
-
-
         }
         newShape[axe] = inputShapes.map { it[axe] }.sum() // concatenated dimension
         // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
@@ -60,7 +47,6 @@ public class Concatenate(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO: this call should be banned or merged with the following method forward()
         return input
     }
 
@@ -70,13 +56,15 @@ public class Concatenate(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.withName("CONCAT_LAYER").concat(input, tf.constant(axis))
+        return tf.withName("ConcatenateLayer").concat(input, tf.constant(axis))
     }
 
     override val weights: List<Array<*>>
         get() = emptyList()
+
     override val hasActivation: Boolean
         get() = false
+
     override val paramCount: Int
         get() = 0
 }

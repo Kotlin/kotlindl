@@ -13,7 +13,11 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
+ * Applies an activation function to an output.
  *
+ * @property [activation] Activation function.
+ * @property [name] Custom layer name.
+ * @constructor Creates [Dense] object.
  */
 public class ActivationLayer(
     public val activation: Activations = Activations.Relu,

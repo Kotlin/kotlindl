@@ -13,11 +13,11 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- * Layer that multiplies (element-wise) a list of inputs.
+ * Layer that computes the maximum (element-wise) a list of inputs.
  *
  * It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape).
  */
-public class Multiply(name: String = "") : Layer(name) {
+public class Maximum(name: String = "") : Layer(name) {
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
 
     }
@@ -57,15 +57,17 @@ public class Multiply(name: String = "") : Layer(name) {
 
         var output = input[0]
         for (i in 1 until input.size)
-            output = tf.math.mul(output, input[i])
+            output = tf.math.maximum(output, input[i])
 
-        return tf.withName("MultiplyLayer").identity(output)
+        return tf.withName("MaximumLayer").identity(output)
     }
 
     override val weights: List<Array<*>>
         get() = emptyList()
+
     override val hasActivation: Boolean
         get() = false
+
     override val paramCount: Int
         get() = 0
 }

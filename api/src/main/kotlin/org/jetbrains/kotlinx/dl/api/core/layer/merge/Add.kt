@@ -7,17 +7,17 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Layer that adds a list of inputs.
+ *
+ * It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape).
+ */
 public class Add(name: String = "") : Layer(name) {
-    public val mergedLayers: MutableList<Layer> = mutableListOf()
-
-    init {
-        inboundLayers = mergedLayers
-    }
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
 
     }
@@ -33,7 +33,6 @@ public class Add(name: String = "") : Layer(name) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        //return tf.math.add(input, input)
         return input
     }
 
@@ -43,15 +42,32 @@ public class Add(name: String = "") : Layer(name) {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO: add universal for n inputs (and define merge function) or addN
-        // TODO: need to check all output shapes for all inputs (it should be equal)
-        return tf.withName("ADD_LAYER").math.add(input[0], input[1])
+        require(input.size > 1) { "The number of input layers should be more than 1." }
+
+        val firstInputShape = TensorShape(input[0].asOutput().shape())
+
+        for (layer in input) {
+            val tensorShape = TensorShape(
+                layer.asOutput().shape()
+            )
+            require(
+                firstInputShape == tensorShape
+            ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
+        }
+
+        var output = input[0]
+        for (i in 1 until input.size)
+            output = tf.math.add(output, input[i])
+
+        return tf.withName("AddLayer").identity(output)
     }
 
     override val weights: List<Array<*>>
         get() = emptyList()
+
     override val hasActivation: Boolean
         get() = false
+
     override val paramCount: Int
         get() = 0
 }

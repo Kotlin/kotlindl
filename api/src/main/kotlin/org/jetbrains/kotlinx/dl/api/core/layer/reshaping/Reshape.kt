@@ -15,8 +15,10 @@ import org.tensorflow.op.core.Constant
 import kotlin.math.abs
 
 /**
- * TODO: different calculation for targetShape size 1,2,3
+ * Layer that reshapes inputs into the given shape.
  *
+ * TODO: different calculation for targetShape size 1,2,3
+ * @property [targetShape] Target shape. List of integers, does not include the samples dimension (batch size)
  * @property [name] Custom layer name.
  * @constructor Creates [Reshape] object.
  */
@@ -38,13 +40,21 @@ public class Reshape(
     override fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
         val tensorShape = TensorShape(inputShape)
-        if (targetShape.size == 3) return Shape.make(
-            tensorShape.head(),
-            targetShape[0].toLong(),
-            targetShape[1].toLong(),
-            targetShape[2].toLong()
-        )
-        else return Shape.make(tensorShape.head(), targetShape[0].toLong()) //  if (targetShape.size == 1)
+        return when (targetShape.size) {
+            3 -> Shape.make(
+                tensorShape.head(),
+                targetShape[0].toLong(),
+                targetShape[1].toLong(),
+                targetShape[2].toLong()
+            )
+            2 -> Shape.make(
+                tensorShape.head(),
+                targetShape[0].toLong(),
+                targetShape[1].toLong(),
+            )
+            1 -> Shape.make(tensorShape.head(), targetShape[0].toLong())
+            else -> throw UnsupportedOperationException("Input shape with ${targetShape.size} dimensions is not supported.")
+        }
     }
 
     override fun forward(

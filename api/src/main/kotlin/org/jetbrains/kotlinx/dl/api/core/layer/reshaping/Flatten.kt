@@ -15,7 +15,7 @@ import org.tensorflow.op.core.Constant
 import kotlin.math.abs
 
 /**
- * Flattens an input tensor while preserving the batch axis (axis 0).
+ * Flattens the input. Does not affect the batch size.
  *
  * @property [name] Custom layer name.
  * @constructor Creates [Flatten] object.
