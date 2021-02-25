@@ -19,9 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.Multiply
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
@@ -161,6 +159,15 @@ private fun convertToLayer(
         LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
         LAYER_ADD -> createAddLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_AVERAGE -> createAverageLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_SUBTRACT -> createSubtractLayer(
+            kerasLayer.inbound_nodes,
+            kerasLayer.config!!.name!!,
+            layers,
+            layersByName
+        )
+        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
         LAYER_MULTIPLY -> createMultiplyLayer(
             kerasLayer.inbound_nodes,
             kerasLayer.config!!.name!!,
@@ -226,6 +233,54 @@ private fun createAddLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = Add(
+        name = name
+    )
+    return layer
+}
+
+private fun createSubtractLayer(
+    inboundNodes: List<List<List<Any>>>?,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Subtract(
+        name = name
+    )
+    return layer
+}
+
+private fun createAverageLayer(
+    inboundNodes: List<List<List<Any>>>?,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Average(
+        name = name
+    )
+    return layer
+}
+
+private fun createMaximumLayer(
+    inboundNodes: List<List<List<Any>>>?,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Maximum(
+        name = name
+    )
+    return layer
+}
+
+private fun createMinimumLayer(
+    inboundNodes: List<List<List<Any>>>?,
+    name: String,
+    layers: MutableList<Layer>,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = Minimum(
         name = name
     )
     return layer
