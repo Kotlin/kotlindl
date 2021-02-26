@@ -5,26 +5,15 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 // TODO: for inception it should work with more than 2 inputs (4 for example) need to write more universal formulas here, for this layer and add
 public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
-) : Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        throw UnsupportedOperationException("This layer is not supported for Sequential model!")
-    }
-
+) : AbstractMerge("ConcatenateLayer", name) {
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
         val inputShapes = mutableListOf<TensorShape>()
         inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
@@ -38,39 +27,18 @@ public class Concatenate(
 
 
         newShape[axe] = inputShapes.map { it[axe] }.sum() // concatenated dimension
-        // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
-        // take shape from first input and replace axis dimension
-
 
         val tensorShape = newShape.clone()
         outputShape = tensorShape
         return tensorShape
     }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return input
+    override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
+// TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
+        // take shape from first input and replace axis dimension
     }
 
-    override fun forward(
-        tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return tf.withName("ConcatenateLayer").concat(input, tf.constant(axis))
+    override fun mergeFunction(input: List<Operand<Float>>, tf: Ops): Operand<Float> {
+        return tf.concat(input, tf.constant(axis))
     }
-
-    override val weights: List<Array<*>>
-        get() = emptyList()
-
-    override val hasActivation: Boolean
-        get() = false
-
-    override val paramCount: Int
-        get() = 0
 }
