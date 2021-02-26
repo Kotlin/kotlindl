@@ -177,14 +177,14 @@ class SequentialInferenceTest {
             assertEquals(it.layers[6].paramCount, 10164)
             assertEquals(it.layers[7].paramCount, 850)
 
-            Assertions.assertArrayEquals(it.layers[0].outputShape, longArrayOf(-1, 28, 28, 32))
-            Assertions.assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))
-            Assertions.assertArrayEquals(it.layers[2].outputShape, longArrayOf(-1, 14, 14, 64))
-            Assertions.assertArrayEquals(it.layers[3].outputShape, longArrayOf(-1, 7, 7, 64))
-            Assertions.assertArrayEquals(it.layers[4].outputShape, longArrayOf(-1, 3136))
-            Assertions.assertArrayEquals(it.layers[5].outputShape, longArrayOf(-1, 120))
-            Assertions.assertArrayEquals(it.layers[6].outputShape, longArrayOf(-1, 84))
-            Assertions.assertArrayEquals(it.layers[7].outputShape, longArrayOf(-1, 10))
+            Assertions.assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
+            Assertions.assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
+            Assertions.assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
+            Assertions.assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
+            Assertions.assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 3136))
+            Assertions.assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 120))
+            Assertions.assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 84))
+            Assertions.assertArrayEquals(it.layers[7].outputShape.dims(), longArrayOf(-1, 10))
 
             it.loadWeights(tempDir.toFile())
 

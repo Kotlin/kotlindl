@@ -397,13 +397,13 @@ internal class SequentialModelTest {
             assertEquals(it.layers[5].paramCount, 1606144)
             assertEquals(it.layers[6].paramCount, 5130)
 
-            assertArrayEquals(it.layers[0].outputShape, longArrayOf(-1, 28, 28, 32))
-            assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))
-            assertArrayEquals(it.layers[2].outputShape, longArrayOf(-1, 14, 14, 64))
-            assertArrayEquals(it.layers[3].outputShape, longArrayOf(-1, 7, 7, 64))
-            assertArrayEquals(it.layers[4].outputShape, longArrayOf(-1, 3136))
-            assertArrayEquals(it.layers[5].outputShape, longArrayOf(-1, 512))
-            assertArrayEquals(it.layers[6].outputShape, longArrayOf(-1, 10))
+            assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
+            assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
+            assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
+            assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
+            assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 3136))
+            assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 512))
+            assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 10))
         }
     }
 
