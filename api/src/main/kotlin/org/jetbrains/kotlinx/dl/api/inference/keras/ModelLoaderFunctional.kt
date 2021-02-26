@@ -35,6 +35,135 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
+/**
+ * Loads a [Sequential] model from json file with model configuration.
+ *
+ * @param [configuration] File containing model configuration.
+ * @return Non-compiled and non-trained Sequential model.
+ */
+internal fun loadModelConfiguration(
+    configuration: File
+): Sequential {
+    val pair = loadSequentialModelLayers(configuration)
+    val input: Input = pair.first
+    val layers = pair.second
+
+    return Sequential.of(input, layers.toList())
+}
+
+/**
+ * Loads a [Sequential] model layers from json file with model configuration.
+ *
+ * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
+ *
+ * @param jsonConfigFile File containing model configuration.
+ * @return Pair of <input layer; list of layers>.
+ */
+internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
+    val sequentialConfig = try {
+        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
+        Klaxon()
+            .converter(PaddingConverter())
+            .parse<KerasSequentialModel>(jsonString)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        try {
+            Klaxon()
+                .converter(PaddingConverter())
+                .parse<KerasSequentialModel>(jsonConfigFile)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
+        }
+    }
+
+    val layers = mutableListOf<Layer>()
+
+    (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
+        run {
+            if (!it.class_name.equals("InputLayer")) {
+                val layer = convertToSequentialLayer(it)
+                layers.add(layer)
+            }
+        }
+    }
+
+    val input: Input
+
+    val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
+
+    // TODO: write more universal code here
+    when (batchInputShape!!.size) {
+        3 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!
+            )
+        }
+        4 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!
+            )
+        }
+        else -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!
+            )
+        }
+    }
+
+    return Pair(input, layers)
+}
+
+private fun convertToSequentialLayer(
+    kerasLayer: KerasLayer
+): Layer {
+    return when (kerasLayer.class_name) {
+        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOLING_2D -> createMaxPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_RESCALING -> createRescalingLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_NORMALIZATION -> createNormalizationLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
+    }
+}
+
 
 /**
  * Loads a [Sequential] model from json file with model configuration.
@@ -57,7 +186,7 @@ internal fun loadFunctionalModelConfiguration(
  * @return Pair of <input layer; list of layers>.
  */
 internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
-    val sequentialConfig = try {
+    val functionalConfig = try {
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
             .converter(PaddingConverter())
@@ -80,11 +209,11 @@ internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
     val input: Input
 
     val batchInputShape =
-        (sequentialConfig as KerasSequentialModel).config!!.layers!!.first().config!!.batch_input_shape
+        (functionalConfig as KerasSequentialModel).config!!.layers!!.first().config!!.batch_input_shape
 
     // TODO: write more universal code here
     val size = batchInputShape!!.size
-    val name = sequentialConfig.config!!.layers!!.first().config!!.name!!
+    val name = functionalConfig.config!!.layers!!.first().config!!.name!!
     when (size) {
         3 -> {
             input = Input(
@@ -114,7 +243,7 @@ internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
     layers.add(input)
     layersByNames[input.name] = input
 
-    sequentialConfig.config!!.layers!!.forEach {
+    functionalConfig.config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it, layers, layersByNames)
@@ -133,65 +262,56 @@ private fun convertToLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = when (kerasLayer.class_name) {
-        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!, layersByName)
-        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
+        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOLING_2D -> createMaxPooling2D(
             kerasLayer.config!!,
-            kerasLayer.config.name!!, layersByName
+            kerasLayer.config.name!!
         )
         LAYER_AVG_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
-            kerasLayer.config.name!!, layersByName
+            kerasLayer.config.name!!
         )
         LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
-            kerasLayer.config.name!!, layersByName
+            kerasLayer.config.name!!
         )
         LAYER_RESCALING -> createRescalingLayer(
             kerasLayer.config!!,
-            kerasLayer.config.name!!, layersByName
+            kerasLayer.config.name!!
         )
         LAYER_NORMALIZATION -> createNormalizationLayer(
             kerasLayer.config!!,
-            kerasLayer.config.name!!, layersByName
+            kerasLayer.config.name!!
         )
-        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!, layersByName)
-        LAYER_ADD -> createAddLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
-        LAYER_AVERAGE -> createAverageLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
+        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
         LAYER_SUBTRACT -> createSubtractLayer(
-            kerasLayer.inbound_nodes,
-            kerasLayer.config!!.name!!,
-            layers,
-            layersByName
+            kerasLayer.config!!.name!!
         )
-        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
-        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.inbound_nodes, kerasLayer.config!!.name!!, layers, layersByName)
+        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
+        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
         LAYER_MULTIPLY -> createMultiplyLayer(
-            kerasLayer.inbound_nodes,
-            kerasLayer.config!!.name!!,
-            layers,
-            layersByName
+            kerasLayer.config!!.name!!
         )
         LAYER_CONCATENATE -> createConcatenateLayer(
             kerasLayer.config!!,
-            kerasLayer.config!!.name!!,
-            layers,
-            layersByName
+            kerasLayer.config!!.name!!
         )
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!,
-            kerasLayer.config.name!!,
-            layersByName
+            kerasLayer.config.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
@@ -206,8 +326,7 @@ private fun convertToLayer(
 
 private fun createGlobalAvgPooling2D(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
     return GlobalAvgPool2D(
         name = name
@@ -216,8 +335,7 @@ private fun createGlobalAvgPooling2D(
 
 private fun createRescalingLayer(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
     return Rescaling(
         name = name
@@ -226,8 +344,7 @@ private fun createRescalingLayer(
 
 private fun createNormalizationLayer(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
     return Normalization(
         name = name
@@ -235,98 +352,71 @@ private fun createNormalizationLayer(
 }
 
 private fun createAddLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Add(
+    return Add(
         name = name
     )
-    return layer
 }
 
 private fun createSubtractLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Subtract(
+    return Subtract(
         name = name
     )
-    return layer
 }
 
 private fun createAverageLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Average(
+    return Average(
         name = name
     )
-    return layer
 }
 
 private fun createMaximumLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Maximum(
+    return Maximum(
         name = name
     )
-    return layer
 }
 
 private fun createMinimumLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Minimum(
+    return Minimum(
         name = name
     )
-    return layer
 }
 
 private fun createMultiplyLayer(
-    inboundNodes: List<List<List<Any>>>?,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Multiply(
+    return Multiply(
         name = name
     )
-    return layer
 }
 
 private fun createConcatenateLayer(
     config: LayerConfig,
-    name: String,
-    layers: MutableList<Layer>,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Layer {
-    val layer = Concatenate(
+    return Concatenate(
         axis = config.axis!! as Int,
         name = name
     )
-    return layer
 }
 
-private fun createDropoutLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
     return Dropout(
         keepProbability = config.rate!!.toFloat(),
         name = name
     )
 }
 
-private fun createLstmLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+private fun createLstmLayer(config: LayerConfig, name: String): Layer {
     return LSTM(
         units = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -347,14 +437,14 @@ private fun createLstmLayer(config: LayerConfig, name: String, layersByName: Mut
     )
 }
 
-private fun createActivationLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+private fun createActivationLayer(config: LayerConfig, name: String): Layer {
     return ActivationLayer(
         activation = convertToActivation(config.activation!!),
         name = name
     )
 }
 
-private fun createReluLayer(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+private fun createReluLayer(config: LayerConfig, name: String): Layer {
     return ReLU(
         maxValue = config.max_value!!.toFloat(),
         negativeSlope = config.negative_slope!!.toFloat(),
@@ -363,7 +453,7 @@ private fun createReluLayer(config: LayerConfig, name: String, layersByName: Mut
     )
 }
 
-private fun createBatchNorm(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Layer {
+private fun createBatchNorm(config: LayerConfig, name: String): Layer {
     return BatchNorm(
         axis = config.axis!! as List<Int>,
         momentum = config.momentum!!,
@@ -378,7 +468,7 @@ private fun createBatchNorm(config: LayerConfig, name: String, layersByName: Mut
     )
 }
 
-private fun createDense(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Dense {
+private fun createDense(config: LayerConfig, name: String): Dense {
     return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -512,7 +602,7 @@ private fun convertToActivation(activation: String): Activations {
     }
 }
 
-private fun createMaxPooling2D(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): MaxPool2D {
+private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -530,7 +620,7 @@ private fun createMaxPooling2D(config: LayerConfig, name: String, layersByName: 
     return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
-private fun createAvgPooling2D(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): AvgPool2D {
+private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -557,15 +647,15 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
     }
 }
 
-private fun createFlatten(name: String, layersByName: MutableMap<String, Layer>): Flatten {
+private fun createFlatten(name: String): Flatten {
     return Flatten(name = name)
 }
 
-private fun createReshape(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Reshape {
+private fun createReshape(config: LayerConfig, name: String): Reshape {
     return Reshape(name = name, targetShape = config.target_shape!!)
 }
 
-private fun createConv2D(config: LayerConfig, name: String, layersByName: MutableMap<String, Layer>): Conv2D {
+private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 
@@ -598,8 +688,7 @@ private fun createConv2D(config: LayerConfig, name: String, layersByName: Mutabl
 
 private fun createDepthwiseConv2D(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): DepthwiseConv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
@@ -633,8 +722,7 @@ private fun createDepthwiseConv2D(
 
 private fun createSeparableConv2D(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): SeparableConv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
@@ -670,8 +758,7 @@ private fun createSeparableConv2D(
 
 private fun createZeroPadding2D(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): ZeroPadding2D {
     assert(config.padding is KerasPadding.ZeroPadding2D)
     return ZeroPadding2D(
@@ -683,8 +770,7 @@ private fun createZeroPadding2D(
 
 private fun createCropping2D(
     config: LayerConfig,
-    name: String,
-    layersByName: MutableMap<String, Layer>
+    name: String
 ): Cropping2D {
     val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
     return Cropping2D(

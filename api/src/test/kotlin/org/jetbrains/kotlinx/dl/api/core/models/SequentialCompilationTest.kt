@@ -86,7 +86,7 @@ internal class SequentialModelTest {
 
     @Test
     fun buildModel() {
-        assertEquals(correctTestModel.layers.size, 7)
+        assertEquals(correctTestModel.layers.size, 8)
         assertTrue(correctTestModel.getLayer("conv2d_1") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_2") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_1").isTrainable)
@@ -101,7 +101,7 @@ internal class SequentialModelTest {
         correctTestModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             val layerDescriptions = it.summary()
-            assertTrue(layerDescriptions[0].contentEquals("conv2d_1(Conv2D)             [None, 28, 28, 32]        832"))
+            assertTrue(layerDescriptions[1].contentEquals("conv2d_1(Conv2D)             [None, 28, 28, 32]        832"))
 
             assertTrue(
                 it.kGraph().toString().contentEquals(
@@ -377,7 +377,7 @@ internal class SequentialModelTest {
     @Test
     fun compilation() {
         val exception =
-            assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[0].paramCount }
+            assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
         assertEquals(
             "lateinit property kernelShape has not been initialized",
             exception.message
@@ -613,9 +613,9 @@ internal class SequentialModelTest {
             )
         )
 
-        assertEquals(model.layers[0].name, "conv2d_1")
-        assertEquals(model.layers[1].name, "maxpool2d_2")
-        assertEquals(model.layers[2].name, "flatten_3")
-        assertEquals(model.layers[3].name, "dense_4")
+        assertEquals(model.layers[1].name, "conv2d_1")
+        assertEquals(model.layers[2].name, "maxpool2d_2")
+        assertEquals(model.layers[3].name, "flatten_3")
+        assertEquals(model.layers[4].name, "dense_4")
     }
 }
