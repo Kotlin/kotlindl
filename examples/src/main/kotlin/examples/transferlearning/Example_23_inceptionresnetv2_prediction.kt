@@ -19,7 +19,7 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 
-
+// Lambda is not supported yet!
 // TODO: write about my experience and unhandled exception with strange layer names
 /**
  * 2021-02-04 16:38:00.413198: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2

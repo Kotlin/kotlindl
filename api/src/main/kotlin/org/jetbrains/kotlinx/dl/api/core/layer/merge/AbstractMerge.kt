@@ -27,7 +27,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
     }
 
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        checkInputShapesOfInboundLayers()
+        checkInputShapesOfInboundLayers() //TODO: crash efficientNet models
         outputShape = inboundLayers[0].outputShape.clone()
         return outputShape
     }
@@ -47,7 +47,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        checkInputShapesOfInputOperands(input)
+        checkInputShapesOfInputOperands(input) //TODO: crash efficientNet models
         return tf.withName(layerTypeName).identity(mergeFunction(input, tf))
     }
 
@@ -57,6 +57,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         tf: Ops
     ): Operand<Float>
 
+    /** Checks input shapes of input operands. */
     protected open fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
         require(input.size > 1) { "The number of input layers should be more than 1." }
 

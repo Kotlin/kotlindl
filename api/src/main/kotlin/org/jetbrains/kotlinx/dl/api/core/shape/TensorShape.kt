@@ -217,4 +217,14 @@ public class TensorShape() {
     public fun clone(): TensorShape {
         return TensorShape(dims)
     }
+
+    public fun almostEqual(tensorShape: TensorShape, except: Int): Boolean {
+        var almostEqual = true
+        for (i in 0 until tensorShape.numDimensions()) {
+            if (i == except) continue
+            if (this[i] != tensorShape[i]) almostEqual = false
+        }
+
+        return almostEqual
+    }
 }

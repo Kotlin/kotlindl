@@ -9,7 +9,14 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
-// TODO: for inception it should work with more than 2 inputs (4 for example) need to write more universal formulas here, for this layer and add
+/**
+ * Layer that concatenates a list of inputs.
+ *
+ * It takes as input a list of tensors, all of the same shape except
+ * for the concatenation axis, and returns a single tensor that is the concatenation of all inputs.
+ *
+ * @property [axis] Axis along which to concatenate.
+ */
 public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
@@ -20,7 +27,7 @@ public class Concatenate(
         val newShape = inputShapes[0].clone()
 
         var axe = axis
-        if (axis == -1) { // TODO: I don't know how to handle this case correctly, it influences on nasmobilemodel
+        if (axis == -1) { // it influences on nasmobilemodel
             val rank: Int = inputShapes[0].rank()
             axe = (rank + axis) // to make axe positive
         }
@@ -34,8 +41,21 @@ public class Concatenate(
     }
 
     override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
-// TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
-        // take shape from first input and replace axis dimension
+        require(input.size > 1) { "The number of input layers should be more than 1." }
+
+        val firstInputShape = TensorShape(input[0].asOutput().shape())
+
+        for (layer in input) {
+            val tensorShape = TensorShape(
+                layer.asOutput().shape()
+            )
+            require(
+                firstInputShape.almostEqual(tensorShape, except = axis)
+            ) {
+                "A Concatenate layer requires inputs with matching shapes except for the concat axis. " +
+                        "But shapes are the following: shape of first input is $firstInputShape and shape of layer $layer is $tensorShape."
+            }
+        }
     }
 
     override fun mergeFunction(input: List<Operand<Float>>, tf: Ops): Operand<Float> {

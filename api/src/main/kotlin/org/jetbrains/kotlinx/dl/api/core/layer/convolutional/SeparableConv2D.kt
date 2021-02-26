@@ -76,9 +76,9 @@ public class SeparableConv2D(
     private var bias: Variable<Float>? = null
 
     // weight tensor shapes
-    private lateinit var biasShape: Shape
     private lateinit var depthwiseKernelShape: Shape
     private lateinit var pointwiseKernelShape: Shape
+    private lateinit var biasShape: Shape
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
@@ -111,8 +111,8 @@ public class SeparableConv2D(
     private fun defineVariableNames(): Triple<String, String, String> {
         return if (name.isNotEmpty()) {
             Triple(
-                separableConv2dPointwiseKernelVarName(name),
                 separableConv2dDepthwiseKernelVarName(name),
+                separableConv2dPointwiseKernelVarName(name),
                 separableConv2dBiasVarName(name)
             )
         } else {
