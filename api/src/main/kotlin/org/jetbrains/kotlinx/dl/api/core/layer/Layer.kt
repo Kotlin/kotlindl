@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -27,7 +28,7 @@ public abstract class Layer(public var name: String) {
     public var isTrainable: Boolean = true
 
     /** Output data tensor shape. */
-    public lateinit var outputShape: LongArray
+    public lateinit var outputShape: TensorShape
 
     /** Model where this layer is used. */
     public lateinit var parentModel: TrainableModel
@@ -53,10 +54,36 @@ public abstract class Layer(public var name: String) {
      */
     public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)
 
+
+    /**
+     * Extend this function to define variables in layer.
+     *
+     * NOTE: This function should be overridden for layers with multiple inputs.
+     * NOTE: Used in Functional API
+     *
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [kGraph] [KGraph] to update it.
+     */
+    public fun buildFromInboundLayers(tf: Ops, kGraph: KGraph) {
+        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
+        build(tf, kGraph, inboundLayers[0].outputShape.toShape())
+    }
+
     /**
      * Computes output shape, based on [inputShape] and [Layer] type.
      */
     public abstract fun computeOutputShape(inputShape: Shape): Shape
+
+    /**
+     * Computes output shape, based on input shapes of inbound layers.
+     *
+     * NOTE: This function should be overridden for layers with multiple inputs.
+     * NOTE: Used in Functional API
+     */
+    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
+        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
+        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
+    }
 
     /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
@@ -104,7 +131,7 @@ public abstract class Layer(public var name: String) {
     }
 
     public operator fun invoke(vararg layers: Layer): Layer {
-        inboundLayers = layers.toList() as MutableList<Layer>
+        inboundLayers = layers.toMutableList()
         return this
     }
 

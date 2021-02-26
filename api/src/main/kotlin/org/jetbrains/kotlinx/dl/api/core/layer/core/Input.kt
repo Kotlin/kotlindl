@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.core
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
@@ -49,7 +50,8 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
      * NOTE: Called instead of [Layer.computeOutputShape].
      */
     public fun computeOutputShape(): Shape {
-        return input.asOutput().shape()
+        outputShape = TensorShape(input.asOutput().shape())
+        return outputShape.toShape()
     }
 
     override fun forward(

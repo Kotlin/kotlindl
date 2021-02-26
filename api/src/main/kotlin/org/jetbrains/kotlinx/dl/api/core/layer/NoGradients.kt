@@ -6,4 +6,4 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 /** Marker interface for layers that has no gradients for graph, described in forward method. */
-public interface ForwardLayer
+public interface NoGradients

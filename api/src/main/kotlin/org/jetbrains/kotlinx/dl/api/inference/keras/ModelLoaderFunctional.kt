@@ -45,11 +45,7 @@ import java.io.File
 internal fun loadFunctionalModelConfiguration(
     configuration: File
 ): Functional {
-    val pair = loadModelLayersF(configuration)
-    val input: Input = pair.first
-    val layers = pair.second
-
-    return Functional.of(input, layers.toList())
+    return Functional.of(loadModelLayersF(configuration).toList())
 }
 
 /**
@@ -60,7 +56,7 @@ internal fun loadFunctionalModelConfiguration(
  * @param jsonConfigFile File containing model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadModelLayersF(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
+internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
     val sequentialConfig = try {
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
@@ -81,7 +77,44 @@ internal fun loadModelLayersF(jsonConfigFile: File): Pair<Input, MutableList<Lay
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
-    (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
+    val input: Input
+
+    val batchInputShape =
+        (sequentialConfig as KerasSequentialModel).config!!.layers!!.first().config!!.batch_input_shape
+
+    // TODO: write more universal code here
+    val size = batchInputShape!!.size
+    val name = sequentialConfig.config!!.layers!!.first().config!!.name!!
+    when (size) {
+        3 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                name = name
+            )
+        }
+        4 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = name
+            )
+        }
+        else -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = name
+            )
+        }
+    }
+
+    layers.add(input)
+    layersByNames[input.name] = input
+
+    sequentialConfig.config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it, layers, layersByNames)
@@ -91,32 +124,7 @@ internal fun loadModelLayersF(jsonConfigFile: File): Pair<Input, MutableList<Lay
         }
     }
 
-    val input: Input
-
-    val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
-
-    // TODO: write more universal code here
-    val size = batchInputShape!!.size
-    if (size == 3) {
-        input = Input(
-            batchInputShape!![1]?.toLong()!!,
-            batchInputShape[2]?.toLong()!!
-        )
-    } else if (size == 4) {
-        input = Input(
-            batchInputShape!![1]?.toLong()!!,
-            batchInputShape[2]?.toLong()!!,
-            batchInputShape[3]?.toLong()!!
-        )
-    } else {
-        input = Input(
-            batchInputShape!![1]?.toLong()!!,
-            batchInputShape[2]?.toLong()!!,
-            batchInputShape[3]?.toLong()!!
-        )
-    }
-
-    return Pair(input, layers)
+    return layers
 }
 
 private fun convertToLayer(

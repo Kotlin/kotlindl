@@ -133,7 +133,7 @@ val dense_2 = Dense(
 
 private val model = Functional.of(
     input,
-    conv2D_1(), //TODO: not to use input here yet, but need to refactoir to conv2D_1(input)
+    conv2D_1(input),
     conv2D_2(conv2D_1),
     maxPool2D(conv2D_2),
     conv2D_4(maxPool2D),

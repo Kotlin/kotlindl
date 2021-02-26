@@ -9,8 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -94,7 +94,7 @@ public class LSTM(
     public val timeMajor: Boolean = true,
     public val unroll: Boolean = true,
     name: String = "",
-) : Layer(name), ForwardLayer {
+) : Layer(name), NoGradients {
 
     private lateinit var weightShape: Shape
     private lateinit var gamma: Variable<Float>

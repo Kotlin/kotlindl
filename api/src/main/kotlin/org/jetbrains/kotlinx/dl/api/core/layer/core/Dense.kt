@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
+import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -73,7 +73,7 @@ public class Dense(
 
     private fun defineVariableNames(): Pair<String, String> {
         return if (name.isNotEmpty()) {
-            Pair(denseKernelVarName(name), depthwiseConv2dBiasVarName(name))
+            Pair(denseKernelVarName(name), denseBiasVarName(name))
         } else {
             Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
         }
@@ -93,7 +93,6 @@ public class Dense(
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        // leaves unknown dimensions unknown
         return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
     }
 

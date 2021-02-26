@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
@@ -44,17 +45,17 @@ import java.nio.FloatBuffer
  *
  * @property [inputLayer] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
- * @constructor Creates a Sequential group with [inputLayer] and [layers].
+ * @constructor Creates a Functional model via sequence of [layers].
  */
-public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
+public class Functional(vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
-    /** Input layer. */
-    public val inputLayer: Input = input
-
     /** The bunch of layers. */
     public val layers: List<Layer> = listOf(*layers)
+
+    public val inputLayer: Input
+        get() = layers[0] as Input
 
     /** Layers indexed by name. */
     private var layersByName: Map<String, Layer> = mapOf()
@@ -92,7 +93,7 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
             } else {
                 layersByName = layersByName + (layer.name to layer)
             }
-            layer.parentModel = this // TODO: shoykd be correct hanled
+            layer.parentModel = this // TODO: should be correct handled
         }
 
 
@@ -110,9 +111,13 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(input: Input, vararg layers: Layer): Functional {
+        public fun of(vararg layers: Layer): Functional {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+
             preProcessLayerNames(layers)
-            val seqModel = Functional(input, *layers)
+            val seqModel = Functional(*layers)
             postProcessLayerNames(layers, seqModel)
             return seqModel
         }
@@ -131,23 +136,8 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
 
             val otherLayers = layers.subList(1, layers.size)
             preProcessLayerNames(otherLayers.toTypedArray())
-            val seqModel = Functional(input, *otherLayers.toTypedArray())
+            val seqModel = Functional(*layers.toTypedArray())
             postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
-            return seqModel
-        }
-
-        /**
-         * Creates the [Functional] model.
-         *
-         * @property [input] The input layer with initial shapes.
-         * @property [layers] The layers to describe the model design.
-         * @return the [Functional] model.
-         */
-        @JvmStatic
-        public fun of(input: Input, layers: List<Layer>): Functional {
-            preProcessLayerNames(layers.toTypedArray())
-            val seqModel = Functional(input, *layers.toTypedArray())
-            postProcessLayerNames(layers.toTypedArray(), seqModel)
             return seqModel
         }
 
@@ -256,28 +246,29 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
         //this.callback = callback
         //this.callback.model = this // TODO: cyclic reference
 
+        val inputLayer = layers[0] as Input
+
         inputLayer.build(tf)
         var inputShape: Shape? = inputLayer.computeOutputShape()
 
-        layers.forEach {
-            if (inputShape == null) {
-                inputShape = TensorShape(it.inboundLayers[0].outputShape).toShape()
-            }
+        layers.filter { it !is Input }.forEach {
+            /*if (inputShape == null) {
+                inputShape = it.inboundLayers[0].outputShape.toShape()
+            }*/
 
-            it.build(tf, kGraph, inputShape!!)
-            val outputShape = it.computeOutputShape(inputShape!!)
-            val tensorShape = TensorShape(outputShape)
-            val dims = tensorShape.dims()
+            it.buildFromInboundLayers(tf, kGraph)
+            val outputShape = it.computeOutputShapeFromInboundLayers()
+            val dims = outputShape.dims()
 
-            check(tensorShape.tail().all { elem -> elem > 0 })
+            check(outputShape.tail().all { elem -> elem > 0 })
             {
                 "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = dims
+            it.outputShape = outputShape // it could be done inside computeOutputShapeMethods
 
-            logger.info { "${it.name}; outputShape: $tensorShape $it" }
+            logger.info { "${it.name}; outputShape: $outputShape $it" }
 
             inputShape = null
         }
@@ -381,6 +372,14 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
         validationBatchSize: Int?
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+
+        // TODO: add this check to Sequential too
+        for (layer in layers) {
+            check(!(layer is NoGradients && layer.isTrainable)) {
+                "Layer $layer has no gradients implementations in TensorFlow and should be non-trainable only. " +
+                        "Set 'isTrainable' to 'false'."
+            }
+        }
 
         if (!isModelInitialized) {
             logger.debug { "Initialization of TensorFlow Graph variables." }
@@ -822,6 +821,7 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
         val outputByLayerName = mutableMapOf<String, Operand<Float>>()
         val outputs = mutableListOf<Operand<Float>>()
         outputs.add(input)
+        outputByLayerName[inputLayer.name] = input
         for (layer in layers) {
             for (inboundLayer in layer.inboundLayers) {
                 outputs.add(outputByLayerName[inboundLayer.name]!!)
@@ -838,6 +838,8 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
     }
 
     private fun calculateXShape(amountOfImages: Long): LongArray {
+        val inputLayer = layers.first() as Input
+
         val xTensorShape = inputLayer.input.asOutput().shape()
 
         return longArrayOf(
@@ -1049,7 +1051,7 @@ public class Functional(input: Input, vararg layers: Layer) : TrainableModel() {
             stringBuilder.append(" ")
         }
 
-        val secondPart = TensorShape(l.outputShape).toString()
+        val secondPart = l.outputShape.toString()
 
         stringBuilder.append(secondPart)
 

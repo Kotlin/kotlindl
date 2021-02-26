@@ -55,9 +55,9 @@ public class LeNetClassic {
                 new Conv2D(16, new long[]{5, 5}, new long[]{1, 1, 1, 1}, new long[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), ConvPadding.SAME, true, "conv2d_2"),
                 new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_2"),
                 new Flatten(), // 3136
-                new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_1"),
-                new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), "dense_2"),
-                new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), "dense_3")
+                new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), true, "dense_1"),
+                new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), true, "dense_2"),
+                new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), true, "dense_3")
         )) {
 
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());

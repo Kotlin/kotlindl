@@ -24,6 +24,7 @@ public class Add(name: String = "") : Layer(name) {
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // TODO: rewrite as in concatenate layer
+        // TODO: take shape from the inputLayers or better argument in this function should be inputShapes: List<Shape> or refactor all layers to this argument
         return inputShape
     }
 

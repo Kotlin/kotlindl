@@ -9,8 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.tensorflow.Operand
@@ -33,7 +33,7 @@ public class BatchNorm(
     public val movingMeanInitializer: Initializer = Zeros(),
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
-) : Layer(name), ForwardLayer {
+) : Layer(name), NoGradients {
 
     private lateinit var weightShape: Shape
     private var gamma: Variable<Float>? = null

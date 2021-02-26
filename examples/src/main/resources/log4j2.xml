@@ -10,8 +10,8 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="info">
-            <AppenderRef ref="STDOUT" level="INFO"/>
+        <Root level="debug">
+            <AppenderRef ref="STDOUT" level="DEBUG"/>
         </Root>
     </Loggers>
 </Configuration>

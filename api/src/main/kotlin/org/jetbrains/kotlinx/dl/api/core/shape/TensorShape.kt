@@ -11,13 +11,11 @@ import kotlin.math.abs
 /**
  * Helper wrapper of [Shape] class with helper methods.
  *
- * NOTE: Developer API.
- * TODO: Create extension functions for [Shape] object.
  */
-internal class TensorShape() {
+public class TensorShape() {
     private lateinit var dims: LongArray
 
-    constructor(shape: Shape) : this() {
+    public constructor(shape: Shape) : this() {
         dims = dimsFromShape(shape)
     }
 
@@ -26,7 +24,7 @@ internal class TensorShape() {
      *
      * @param dims The sizes of the remaining dimensions
      */
-    constructor(dims: LongArray) : this() {
+    public constructor(dims: LongArray) : this() {
         this.dims = dims
     }
 
@@ -36,7 +34,7 @@ internal class TensorShape() {
      * @param firstDimension The size of the first dimension
      * @param dims The sizes of the remaining dimensions
      */
-    constructor(firstDimension: Long, vararg dims: Long) : this() {
+    public constructor(firstDimension: Long, vararg dims: Long) : this() {
         this.dims = LongArray(dims.size + 1)
         this.dims[0] = firstDimension
         System.arraycopy(dims, 0, this.dims, 1, dims.size)
@@ -47,7 +45,7 @@ internal class TensorShape() {
     }
 
     /** Returns amount of elements in Tensor with the given shape. */
-    fun numElements(): Long {
+    public fun numElements(): Long {
         var prod = 1L
         for (i in 0 until numDimensions()) {
             prod *= abs(dims[i])
@@ -56,12 +54,12 @@ internal class TensorShape() {
     }
 
     /** Returns the rank of this shape.  */
-    fun rank(): Int {
+    public fun rank(): Int {
         return dims.size
     }
 
     /** Returns the array of dimensions representing this shape.  */
-    fun dims(): LongArray {
+    public fun dims(): LongArray {
         return dims
     }
 
@@ -71,8 +69,17 @@ internal class TensorShape() {
      * @param i The index at which to retrieve a dimension.
      * @return The size of dimension i
      */
-    operator fun get(i: Int): Long {
+    public operator fun get(i: Int): Long {
         return dims[i]
+    }
+
+    /**
+     * Sets the value of a dimension
+     *
+     * @param i The index at which to retrieve a dimension.
+     */
+    public operator fun set(i: Int, value: Long) {
+        dims[i] = value
     }
 
     /**
@@ -91,7 +98,7 @@ internal class TensorShape() {
      * @param i Target dimension to test
      * @throws IllegalStateException if dimension i is unknown
      */
-    fun assertKnown(i: Int) {
+    public fun assertKnown(i: Int) {
         check(isKnown(i)) { "Dimension $i in shape needs to be known." }
     }
 
@@ -102,7 +109,7 @@ internal class TensorShape() {
      * @param dim The new dimension size.
      * @return The new changed TensorShape
      */
-    fun replace(i: Int, dim: Long): TensorShape {
+    public fun replace(i: Int, dim: Long): TensorShape {
         dims[i] = dim
         return this
     }
@@ -113,7 +120,7 @@ internal class TensorShape() {
      * @param dim New size for the last dimensions
      * @return The new changed TensorShape
      */
-    fun replaceLast(dim: Long): TensorShape {
+    public fun replaceLast(dim: Long): TensorShape {
         return replace(dims.size - 1, dim)
     }
 
@@ -123,7 +130,7 @@ internal class TensorShape() {
      * @param dim New size for first dimension
      * @return The new changed TensorShape.
      */
-    fun replaceFirst(dim: Long): TensorShape {
+    public fun replaceFirst(dim: Long): TensorShape {
         return replace(0, dim)
     }
 
@@ -133,7 +140,7 @@ internal class TensorShape() {
      * @param i Target dimension.
      * @return The size of dimension i
      */
-    fun size(i: Int): Long {
+    public fun size(i: Int): Long {
         return dims[i]
     }
 
@@ -143,7 +150,7 @@ internal class TensorShape() {
      * @param dims The new dimensions to incorporate
      * @return The new changed TensorShape
      */
-    fun concatenate(vararg dims: Long): TensorShape {
+    public fun concatenate(vararg dims: Long): TensorShape {
         this.dims = concatenate(this.dims, *dims)
         return this
     }
@@ -165,26 +172,26 @@ internal class TensorShape() {
 
     /** Returns first dimension from all dimensions [dims]. */
     // TODO: to companion
-    fun head(vararg dims: Long): Long {
+    public fun head(vararg dims: Long): Long {
         return dims[0]
     }
 
-    fun head(): Long {
+    public fun head(): Long {
         return dims[0]
     }
 
     /** Returns last dimensions (except first) from [dims]. */
     // TODO: to companion
-    fun tail(vararg dims: Long): LongArray {
+    public fun tail(vararg dims: Long): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
 
-    fun tail(): LongArray {
+    public fun tail(): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
 
     /** Converts to [Shape] object. */
-    fun toShape(): Shape {
+    public fun toShape(): Shape {
         return Shape.make(head(*dims), *tail(*dims))
     }
 
@@ -205,5 +212,9 @@ internal class TensorShape() {
 
     override fun hashCode(): Int {
         return dims.contentHashCode()
+    }
+
+    public fun clone(): TensorShape {
+        return TensorShape(dims)
     }
 }

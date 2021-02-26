@@ -125,8 +125,7 @@ fun main() {
         newDenseLayer2
     )
 
-    val input = model.inputLayer
-    val model2 = Functional.of(input, layers)
+    val model2 = Functional.of(layers)
 
     model2.use {
         it.compile(

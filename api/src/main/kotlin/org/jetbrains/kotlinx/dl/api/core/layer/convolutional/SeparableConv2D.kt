@@ -10,8 +10,8 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.ForwardLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
@@ -69,7 +69,7 @@ public class SeparableConv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Layer(name), ForwardLayer {
+) : Layer(name), NoGradients {
     // weight tensors
     private lateinit var depthwiseKernel: Variable<Float>
     private lateinit var pointwiseKernel: Variable<Float>
@@ -150,7 +150,7 @@ public class SeparableConv2D(
 
         // TODO: make this calculation for others dimensions conv layers https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/keras/layers/convolutional.py#L224
         val shape = Shape.make(inputShape.size(0), rows, cols, filters)
-        outputShape = TensorShape(shape).dims()
+        outputShape = TensorShape(shape)
         return shape
     }
 

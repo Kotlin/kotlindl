@@ -272,7 +272,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = dims
+            it.outputShape = tensorShape
 
             logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
         }
@@ -1033,7 +1033,7 @@ public class Sequential(input: Input, vararg layers: Layer) : TrainableModel() {
             stringBuilder.append(" ")
         }
 
-        val secondPart = TensorShape(l.outputShape).toString()
+        val secondPart = l.outputShape.toString()
 
         stringBuilder.append(secondPart)
 

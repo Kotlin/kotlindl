@@ -22,23 +22,29 @@ public class Concatenate(
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        val inputShapes = mutableListOf<LongArray>()
+        throw UnsupportedOperationException("This layer is not supported for Sequential model!")
+    }
+
+    override fun computeOutputShapeFromInboundLayers(): TensorShape {
+        val inputShapes = mutableListOf<TensorShape>()
         inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
         val newShape = inputShapes[0].clone()
 
         var axe = axis
         if (axis == -1) { // TODO: I don't know how to handle this case correctly, it influences on nasmobilemodel
-            val rank: Int = inputShapes[0].size
-            axe = rank + axis // to make axe positive
+            val rank: Int = inputShapes[0].rank()
+            axe = (rank + axis) // to make axe positive
         }
+
+
         newShape[axe] = inputShapes.map { it[axe] }.sum() // concatenated dimension
         // TODO: check (all shapes has the equal dimension) and same size on all dims except axis dimension
         // take shape from first input and replace axis dimension
 
 
-        val tensorShape = TensorShape(newShape)
-        outputShape = tensorShape.dims()
-        return tensorShape.toShape()
+        val tensorShape = newShape.clone()
+        outputShape = tensorShape
+        return tensorShape
     }
 
     override fun forward(
