@@ -41,7 +41,7 @@ public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyC
         listOf(null, inputShape[0], inputShape[1], inputShape[2])
 
     val config = SequentialConfig(name = "", layers = kerasLayers)
-    val sequentialConfig = KerasSequentialModel(config = config)
+    val sequentialConfig = KerasModel(config = config)
 
     val jsonString2 = Klaxon()
         .converter(PaddingConverter())

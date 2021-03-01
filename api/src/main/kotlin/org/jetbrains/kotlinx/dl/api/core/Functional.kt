@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadModelLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelLayers
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.core.Placeholder
@@ -93,10 +93,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromConfiguration(configuration: File): MutableList<Layer> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadModelLayers(configuration)
+            return loadModelLayersFromConfiguration(configuration)
         }
 
         /**
@@ -128,7 +128,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): MutableList<Layer> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -138,7 +138,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadModelLayers(configuration)
+            return loadFunctionalModelLayers(configuration)
         }
     }
 

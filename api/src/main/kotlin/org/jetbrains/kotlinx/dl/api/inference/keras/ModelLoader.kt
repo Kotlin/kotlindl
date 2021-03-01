@@ -64,13 +64,13 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
             .converter(PaddingConverter())
-            .parse<KerasSequentialModel>(jsonString)
+            .parse<KerasModel>(jsonString)
     } catch (e: Exception) {
         e.printStackTrace()
         try {
             Klaxon()
                 .converter(PaddingConverter())
-                .parse<KerasSequentialModel>(jsonConfigFile)
+                .parse<KerasModel>(jsonConfigFile)
         } catch (e: Exception) {
             e.printStackTrace()
             throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
@@ -79,7 +79,7 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
 
     val layers = mutableListOf<Layer>()
 
-    (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
+    (sequentialConfig as KerasModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToSequentialLayer(it)
@@ -157,8 +157,7 @@ private fun convertToSequentialLayer(
         LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
+            kerasLayer.config!!.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
@@ -174,29 +173,29 @@ private fun convertToSequentialLayer(
 internal fun loadFunctionalModelConfiguration(
     configuration: File
 ): Functional {
-    return Functional.of(loadModelLayersF(configuration).toList())
+    return Functional.of(loadFunctionalModelLayers(configuration).toList())
 }
 
 /**
- * Loads a [Sequential] model layers from json file with model configuration.
+ * Loads a [Functional] model layers from json file with model configuration.
  *
- * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
+ * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Functional model.
  *
  * @param jsonConfigFile File containing model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
+internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer> {
     val functionalConfig = try {
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
             .converter(PaddingConverter())
-            .parse<KerasSequentialModel>(jsonString)
+            .parse<KerasModel>(jsonString)
     } catch (e: Exception) {
         e.printStackTrace()
         try {
             Klaxon()
                 .converter(PaddingConverter())
-                .parse<KerasSequentialModel>(jsonConfigFile)
+                .parse<KerasModel>(jsonConfigFile)
         } catch (e: Exception) {
             e.printStackTrace()
             throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
@@ -209,7 +208,7 @@ internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
     val input: Input
 
     val batchInputShape =
-        (functionalConfig as KerasSequentialModel).config!!.layers!!.first().config!!.batch_input_shape
+        (functionalConfig as KerasModel).config!!.layers!!.first().config!!.batch_input_shape
 
     // TODO: write more universal code here
     val size = batchInputShape!!.size
@@ -246,7 +245,7 @@ internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
     functionalConfig.config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it, layers, layersByNames)
+                val layer = convertToLayer(it, layersByNames)
                 layers.add(layer)
                 layersByNames[layer.name] = layer
             }
@@ -258,7 +257,6 @@ internal fun loadModelLayersF(jsonConfigFile: File): MutableList<Layer> {
 
 private fun convertToLayer(
     kerasLayer: KerasLayer,
-    layers: MutableList<Layer>,
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = when (kerasLayer.class_name) {
@@ -310,8 +308,7 @@ private fun convertToLayer(
             kerasLayer.config!!.name!!
         )
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
+            kerasLayer.config!!.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
@@ -325,7 +322,6 @@ private fun convertToLayer(
 }
 
 private fun createGlobalAvgPooling2D(
-    config: LayerConfig,
     name: String
 ): Layer {
     return GlobalAvgPool2D(

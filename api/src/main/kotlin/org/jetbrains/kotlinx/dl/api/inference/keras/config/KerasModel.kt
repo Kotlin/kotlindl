@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
-internal data class KerasSequentialModel(
+internal data class KerasModel(
     val backend: String? = "tensorflow",
     val class_name: String? = "Sequential",
     val config: SequentialConfig?,

@@ -77,10 +77,12 @@ internal class PaddingConverter : Converter {
                     assert(array[1] is JsonArray<*>) { "[KerasPaddingConverter]: invalid padding $jv, expected JsonArray at ${array[1]}" }
                     val firstArray = array[0] as JsonArray<Int>
                     val secondArray = array[1] as JsonArray<Int>
-                    return KerasPadding.ZeroPadding2D(arrayOf(
-                        firstArray.toIntArray(),
-                        secondArray.toIntArray()
-                    ))
+                    return KerasPadding.ZeroPadding2D(
+                        arrayOf(
+                            firstArray.toIntArray(),
+                            secondArray.toIntArray()
+                        )
+                    )
                 }
             }
         }

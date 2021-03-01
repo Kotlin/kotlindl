@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadModelLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.core.Placeholder
@@ -128,7 +128,7 @@ public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableMode
         public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadModelLayers(configuration)
+            return loadSequentialModelLayers(configuration)
         }
 
         /**
@@ -170,7 +170,7 @@ public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableMode
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadModelLayers(configuration)
+            return loadSequentialModelLayers(configuration)
         }
     }
 
