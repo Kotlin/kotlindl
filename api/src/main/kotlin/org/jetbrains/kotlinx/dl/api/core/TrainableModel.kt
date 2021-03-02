@@ -29,7 +29,7 @@ public abstract class TrainableModel : InferenceModel() {
     protected var optimizer: Optimizer = SGD(0.2f)
 
     /** Loss function. */
-    protected var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
+    var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
 
     /** Callback. */
     protected var callback: Callback = Callback()
@@ -45,6 +45,10 @@ public abstract class TrainableModel : InferenceModel() {
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false
+        internal set
+
+    /** Is true when model is ready for forward mode. */
+    public var isBuiltForForwardMode: Boolean = false
         internal set
 
     /**
@@ -302,5 +306,9 @@ public abstract class TrainableModel : InferenceModel() {
 
     public override fun close() {
         super.close()
+    }
+
+    open fun buildForForwardMode() {
+
     }
 }

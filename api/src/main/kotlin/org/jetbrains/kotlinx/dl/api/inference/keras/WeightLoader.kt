@@ -36,7 +36,7 @@ private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 public fun GraphTrainableModel.loadWeights(
     hdfFile: HdfFile
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(this.isBuiltForForwardMode) { "The model is not built for forward mode yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
 

@@ -85,7 +85,7 @@ fun main() {
     }
 }
 
-fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = null, inputType: InputType): FloatArray {
+public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = null, inputType: InputType): FloatArray {
     return when (inputType) {
         InputType.TF -> floatArray.map { it / 127.5f - 1 }.toFloatArray()
         InputType.CAFFE -> caffeStylePreprocessing(floatArray, tensorShape!!)

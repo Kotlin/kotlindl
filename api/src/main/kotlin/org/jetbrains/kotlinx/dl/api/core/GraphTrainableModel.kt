@@ -42,6 +42,8 @@ import java.nio.FloatBuffer
  * @constructor Creates a Functional model via sequence of [layers].
  */
 public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
+    public var classifierActivation: ClassifierActivation = ClassifierActivation.LINEAR
+
     /** Logger for Sequential model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
@@ -91,6 +93,10 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         kGraph = KGraph(Graph().toGraphDef())
         tf = Ops.create(kGraph.tfGraph)
         session = Session(kGraph.tfGraph)
+
+
+        buildForForwardMode() //TODO: maybe better to make wrapper for this method which is set up the flag like compile
+        isBuiltForForwardMode = true
     }
 
     public companion object {
@@ -601,7 +607,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isBuiltForForwardMode) { "The model is not built for Forward Mode yet. Build the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         val imageShape = calculateXShape(1)

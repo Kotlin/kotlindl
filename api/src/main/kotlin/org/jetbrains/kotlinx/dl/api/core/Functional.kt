@@ -143,17 +143,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
+    override fun buildForForwardMode() {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
-
-        this.loss = loss
-        this.metric = metric
-        this.metrics = listOf(metric) // handle multiple metrics
-        this.optimizer = optimizer
-        //this.callback = callback
-        //this.callback.model = this // TODO: cyclic reference
 
         val inputLayer = layers[0] as Input
 
@@ -198,13 +191,28 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         )
 
         yPredOp = forward(xOp, inputLayer)
-        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
         }
+    }
+
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
+        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
+
+        validateModelArchitecture()
+
+        this.loss = loss
+        this.metric = metric
+        this.metrics = listOf(metric) // handle multiple metrics
+        this.optimizer = optimizer
+        //this.callback = callback
+        //this.callback.model = this // TODO: cyclic reference
+
+
+        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
