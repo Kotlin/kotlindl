@@ -8,6 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.config
 internal data class KerasLayer(
     val class_name: String?,
     val config: LayerConfig?,
-    val inbound_nodes: List<List<List<Any>>>? = null,
+    var inbound_nodes: List<Any>? = null,
     val name: String? = null
 )

@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasPadding
  * Custom json converter, which supports different types of `config.layers[].padding` field in `.json` model configs.
  * See https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/pooling.py#L470
  * and https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2795
- * for detailed explaination of supported formats. Could be string for `same`, `valid` or `causal`,
+ * for detailed explanation of supported formats. Could be string for `same`, `valid` or `causal`,
  * or Int, or tuple of 2 ints, or tuple of 2 tuples of 2 ints - for ZeroPadding layer.
  */
 internal class PaddingConverter : Converter {

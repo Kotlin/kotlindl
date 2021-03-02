@@ -314,10 +314,17 @@ private fun convertToLayer(
     }
 
     val inboundLayers = mutableListOf<Layer>()
-    kerasLayer.inbound_nodes!![0].forEach { inboundNode ->
-        layersByName[inboundNode[0] as String]?.let { inboundLayers.add(it) }
+    if (kerasLayer.class_name != LAYER_INPUT) {
+        val inboundNodes = kerasLayer.inbound_nodes!! as List<List<List<Any>>>
+        inboundNodes[0].forEach { inboundNode ->
+            check(inboundNode.isNotEmpty()) { "This .json config is incorrect and could not be parsed! The list of inbound nodes for layer ${layer.name} could not be empty on this level!" }
+            layersByName[inboundNode[0] as String]?.let { inboundLayers.add(it) }
+
+        }
+        layer.inboundLayers = inboundLayers
     }
-    layer.inboundLayers = inboundLayers
+
+
     return layer
 }
 

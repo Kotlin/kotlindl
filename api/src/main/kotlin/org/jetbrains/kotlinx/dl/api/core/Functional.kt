@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.core.Placeholder
@@ -235,7 +236,8 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-        check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        //TODO: work wrong for cases in resnet50_prediction_save_load
+        // check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
 
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {
@@ -270,7 +272,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        //this.saveModelConfiguration(jsonConfig)
+        this.saveModelConfiguration(
+            jsonConfig,
+            isKerasFullyCompatible = true
+        ) // TODO: propogate or remove this parameter
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {
