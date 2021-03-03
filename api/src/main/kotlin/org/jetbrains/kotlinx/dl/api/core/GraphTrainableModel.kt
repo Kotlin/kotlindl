@@ -601,7 +601,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        check(isBuiltForForwardMode) { "The model is not built for Forward Mode yet. Build the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         val imageShape = calculateXShape(1)
