@@ -155,7 +155,7 @@ fun main() {
 }
 
 
-private fun prepareCustomDatasetFromPaths(vararg paths: String): Dataset {
+fun prepareCustomDatasetFromPaths(vararg paths: String): Dataset {
     val listOfImages = mutableListOf<FloatArray>()
     val listOfLabels = mutableListOf<FloatArray>()
     val numberOfClasses = paths.size

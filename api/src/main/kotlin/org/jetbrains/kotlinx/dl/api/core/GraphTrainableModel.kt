@@ -847,6 +847,10 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         if (loadOptimizerState) isOptimizerVariableInitialized = true
     }
 
+    override fun summary(stringLayerNameTypeSize: Int, stringOutputShapeSize: Int): List<String> {
+        TODO("Not yet implemented")
+    }
+
     private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
         return variableName.startsWith("optimizer") && kGraph().frozenLayerVariables()
             .map { it.ref().op().name() } // extract names

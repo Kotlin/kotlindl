@@ -292,12 +292,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
-    /**
-     * Formats and builds the model description.
-     *
-     * @return list of layer descriptions.
-     */
-    public fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
+    public override fun summary(stringLayerNameTypeSize: Int, stringOutputShapeSize: Int): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("=================================================================")

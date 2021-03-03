@@ -3,21 +3,21 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.modelzoo.vgg19
 
 
 import io.jhdf.HdfFile
-import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -44,19 +44,12 @@ import java.util.*
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    val jsonConfigFile = getmobilenetv2JSONConfigFile()
-    val model = Functional.loadModelConfiguration(jsonConfigFile)
+    val jsonConfigFile = getResNet50JSONConfigFile()
+    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
 
     model.use {
-        for (layer in it.layers) {
-            layer.isTrainable = false
-        }
-        it.layers.last().isTrainable = true
-
-        it.amountOfClasses = 1000
-
         it.compile(
             optimizer = Adam(),
             loss = Losses.MAE,
@@ -65,15 +58,21 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getmobilenetv2WeightsFile()
+        val hdfFile = getResNet50WeightsFile()
 
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream, ColorOrder.RGB)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val xTensorShape = it.inputLayer.input.asOutput().shape()
+            val tensorShape = longArrayOf(
+                1,
+                *tail(xTensorShape)
+            )
 
-            val inputData = preprocessInput(floatArray, inputType = InputType.TF)
+            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
@@ -85,25 +84,25 @@ fun main() {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getmobilenetv2JSONConfigFile(): File {
+private fun getResNet50JSONConfigFile(): File {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val mobilenetv2JSONModelPath = properties["mobilenetv2JSONModelPath"] as String
+    val vgg19JSONModelPath = properties["vgg19JSONModelPath"] as String
 
-    return File(mobilenetv2JSONModelPath)
+    return File(vgg19JSONModelPath)
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getmobilenetv2WeightsFile(): HdfFile {
+private fun getResNet50WeightsFile(): HdfFile {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val mobilenetv2h5WeightsPath = properties["mobilenetv2h5WeightsPath"] as String
+    val vgg19h5WeightsPath = properties["vgg19h5WeightsPath"] as String
 
-    return HdfFile(File(mobilenetv2h5WeightsPath))
+    return HdfFile(File(vgg19h5WeightsPath))
 }
 
 

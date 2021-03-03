@@ -308,7 +308,10 @@ public abstract class TrainableModel : InferenceModel() {
         super.close()
     }
 
-    open fun buildForForwardMode() {
-
-    }
+    /**
+     * Formats and builds the model description.
+     *
+     * @return list of layer descriptions.
+     */
+    public abstract fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String>
 }

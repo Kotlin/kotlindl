@@ -3,26 +3,21 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.modelzoo
 
-import io.jhdf.HdfFile
+
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
-import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
 
 /**
@@ -46,10 +41,11 @@ import java.nio.file.StandardCopyOption
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    val jsonConfigFile = getVGG16JSONConfigFile()
-    val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
-    val imageNetClassLabels = prepareHumanReadableClassLabels()
+    val modelLoader = ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_16)
+    val model = modelLoader.loadModel() as Sequential
+
+    val imageNetClassLabels = modelLoader.loadClassLabels()
 
     model.use {
         it.compile(
@@ -61,7 +57,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getVGG16WeightsFile()
+        val hdfFile = modelLoader.loadWeights()
 
         it.loadWeights(hdfFile)
 
@@ -75,7 +71,7 @@ fun main() {
                 *tail(xTensorShape)
             )
 
-            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+            val inputData = modelLoader.preprocessInput(floatArray, tensorShape)
 
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -88,29 +84,6 @@ fun main() {
 }
 
 
-/** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getVGG16JSONConfigFile(): File {
-    val CONFIG_URL = "https://kotlindl.s3.amazonaws.com/vgg16/modelConfig.json"
-    val FILE_NAME = "savedmodels/modelConfig.json"
-    val file = File(FILE_NAME)
-    println(file.isFile)
-    val `in` = URL(CONFIG_URL).openStream()
-    Files.copy(`in`, Paths.get(FILE_NAME), StandardCopyOption.REPLACE_EXISTING)
-
-    return File(FILE_NAME)
-}
-
-/** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getVGG16WeightsFile(): HdfFile {
-    val CONFIG_URL = "https://kotlindl.s3.amazonaws.com/vgg16/weights.h5"
-    val FILE_NAME = "savedmodels/vgg16.h5"
-    val file = File(FILE_NAME)
-    println(file.isFile)
-    val `in` = URL(CONFIG_URL).openStream()
-    Files.copy(`in`, Paths.get(FILE_NAME), StandardCopyOption.REPLACE_EXISTING)
-
-    return HdfFile(File(FILE_NAME))
-}
 
 
 
