@@ -3,19 +3,15 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelzoo
+package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import examples.transferlearning.InputType
-import examples.transferlearning.preprocessInput
 import io.jhdf.HdfFile
 import mu.KLogger
 import mu.KotlinLogging
-import org.jetbrains.kotlinx.dl.api.core.ClassifierActivation
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
@@ -66,11 +62,11 @@ public class VGG16ModelLoader(public val commonModelDirectory: File) {
 
     }
 
-    fun loadWeightsRemotely(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): HdfFile {
+    public fun loadWeightsRemotely(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): HdfFile {
         return getVGG16WeightsFile(loadingMode)
     }
 
-    fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray): FloatArray {
+    public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray): FloatArray {
         return preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
     }
 
@@ -103,20 +99,7 @@ public class VGG16ModelLoader(public val commonModelDirectory: File) {
             logger.debug { "Weights loading is finished!" }
         }
 
-
         return HdfFile(File(fileName))
-    }
-
-    fun loadModelAndWeightsRemotely(
-        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
-        activationType: ClassifierActivation = ClassifierActivation.SOFTMAX
-    ): Sequential {
-        val model = loadModelRemotely(loadingMode)
-        val hdfFile = loadWeightsRemotely(loadingMode)
-        model.classifierActivation = activationType
-        model.loadWeights(hdfFile)
-
-        return model
     }
 }
 

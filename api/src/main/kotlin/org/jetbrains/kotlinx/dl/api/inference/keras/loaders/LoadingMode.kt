@@ -3,9 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.api.core
+package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-public enum class ClassifierActivation {
-    SOFTMAX,
-    LINEAR
+/** Loading strategy for remote loading. */
+enum class LoadingMode {
+    SKIP_LOADING_IF_EXISTS,
+
+    OVERRIDE_IF_EXISTS
 }

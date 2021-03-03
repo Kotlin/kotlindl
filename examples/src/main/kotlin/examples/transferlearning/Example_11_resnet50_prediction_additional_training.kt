@@ -16,6 +16,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File

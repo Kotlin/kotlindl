@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-enum class InputType {
+public enum class InputType {
     /**
      * caffe: will convert the images from RGB to BGR,
     then will zero-center each color channel with

@@ -46,7 +46,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
 
         slots = mutableMapOf()
 
-        println(graph.toString())
+     //   println(graph.toString())
 
         val gradients: Gradients = computeGradients(tf, loss, weights)
 

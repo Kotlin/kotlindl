@@ -16,6 +16,10 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter

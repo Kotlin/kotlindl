@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
 import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.util.CLASSIFIER_OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
@@ -32,7 +31,10 @@ import java.io.FileNotFoundException
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
-public class Sequential(public val inputLayer: Input, vararg layers: Layer) : GraphTrainableModel(inputLayer, *layers) {
+public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableModel(input, *layers) {
+    /** Input layer. */
+    public val inputLayer: Input = input
+
     public companion object {
         /**
          * Creates the [Sequential] model.
@@ -172,18 +174,23 @@ public class Sequential(public val inputLayer: Input, vararg layers: Layer) : Gr
         }
     }
 
-    override fun buildForForwardMode() {
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
         amountOfClasses = if (layers.last() is Dense) (layers.last() as Dense).outputSize.toLong() else 1
 
-        val input = inputLayer ?: layers[0] as Input
+        this.loss = loss
+        this.metric = metric
+        this.metrics = listOf(metric) // handle multiple metrics
+        this.optimizer = optimizer
+        this.callback = callback
+        this.callback.model = this // TODO: cyclic reference
 
-        input.build(tf)
-        var inputShape: Shape = input.computeOutputShape()
+        inputLayer.build(tf)
+        var inputShape: Shape = inputLayer.computeOutputShape()
 
-        layers.filter { it !is Input }.forEach {
+        layers.forEach {
             it.build(tf, kGraph, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
@@ -201,7 +208,7 @@ public class Sequential(public val inputLayer: Input, vararg layers: Layer) : Gr
             logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
         }
 
-        xOp = input.input
+        xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
             getDType(),
@@ -214,30 +221,9 @@ public class Sequential(public val inputLayer: Input, vararg layers: Layer) : Gr
         )
 
         yPredOp = forward(xOp)
-
-        predictionOp = when (classifierActivation) {
-            ClassifierActivation.SOFTMAX -> tf.withName(CLASSIFIER_OUTPUT_NAME).nn.softmax(yPredOp)
-            else -> tf.withName(CLASSIFIER_OUTPUT_NAME).identity(yPredOp)
-        } // this will be erased after compilation
-    }
-
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
-
-        validateModelArchitecture()
-        amountOfClasses = if (layers.last() is Dense) (layers.last() as Dense).outputSize.toLong() else 1
-
-        this.loss = loss
-        this.metric = metric
-        this.metrics = listOf(metric) // handle multiple metrics
-        this.optimizer = optimizer
-        this.callback = callback
-        this.callback.model = this // TODO: cyclic reference
-
         lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
-        // we replace the predictionOp
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
@@ -262,7 +248,7 @@ public class Sequential(public val inputLayer: Input, vararg layers: Layer) : Gr
      * @return list of layer descriptions.
      */
     public fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String> {
-        check(isBuiltForForwardMode) { "The model is not build for forward mode yet. Compile the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("=================================================================")
         logger.info("Model: Sequential")
