@@ -117,7 +117,7 @@ class TransferLearningTest : IntegrationTest() {
         val denseLayerName = "dense"
         val dense1LayerName = "dense_1"
 
-        assertEquals(testModel.layers.size, 8)
+        assertEquals(testModel.layers.size, 9)
         assertTrue(testModel.getLayer(flattenLayerName).isTrainable)
         assertFalse(testModel.getLayer(flattenLayerName).hasActivation)
         assertTrue(testModel.getLayer(conv2dLayerName) is Conv2D)

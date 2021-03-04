@@ -5,9 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
+import com.beust.klaxon.Json
+
 internal data class KerasLayer(
     val class_name: String?,
     val config: LayerConfig?,
+    @Json(serializeNull = false)
     var inbound_nodes: List<Any>? = null,
+    @Json(serializeNull = false)
     val name: String? = null
 )

@@ -5,7 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
+import com.beust.klaxon.Json
+
 internal data class ActivityRegularizerConfig(
+    @Json(serializeNull = false)
     val l1: Double? = null,
+    @Json(serializeNull = false)
     val l2: Double? = null
 )
