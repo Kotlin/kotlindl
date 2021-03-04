@@ -75,7 +75,7 @@ fun main() {
         }
         it.layers.last().isTrainable = true
 
-        it.amountOfClasses = 1000
+        //it.amountOfClasses = 1000
 
         it.compile(
             optimizer = Adam(),

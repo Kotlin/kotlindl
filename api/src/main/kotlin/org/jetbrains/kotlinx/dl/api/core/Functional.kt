@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
@@ -183,7 +184,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
 
         if (layers.last() is Dense) amountOfClasses = (layers.last() as Dense).outputSize.toLong()
-        // TODO: if last layer is Activation (need to extract from shape in the last layer
+        else if (layers.last() is ActivationLayer) amountOfClasses =
+            (layers.last() as ActivationLayer).outputShape.tail().last() // valid for mobileNet/DenseNet
+
 
         xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>
