@@ -5,9 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
+import com.beust.klaxon.Json
+
 internal data class KerasModel(
     val backend: String? = "tensorflow",
-    val class_name: String? = "Model",
+    @Json(serializeNull = false)
+    val class_name: String? = null,
+    @Json(serializeNull = false)
     val config: KerasModelConfig?,
-    val keras_version: String? = "2.2.4-tf"
+    @Json(serializeNull = false)
+    val keras_version: String? = null
 )

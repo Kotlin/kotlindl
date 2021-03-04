@@ -25,6 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.defaultActivationName
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
+import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.datasets.DataBatch
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.tensorflow.*
@@ -759,7 +760,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
     private fun saveModel(pathToModelDirectory: String) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        //this.saveModelConfiguration(jsonConfig)
+        this.saveModelConfiguration(jsonConfig)
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {

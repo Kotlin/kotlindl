@@ -6,6 +6,7 @@
 package examples.transferlearning
 
 
+import examples.transferlearning.modelzoo.resnet.resnet50.prepareCustomDatasetFromPaths
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
