@@ -18,6 +18,7 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 
+/** Just loading ToyResNet trained in Keras. */
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
         FASHION_TRAIN_IMAGES_ARCHIVE,

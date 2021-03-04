@@ -23,7 +23,15 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.*
 
-
+/**
+ * What's about Functional API usage in KotlinDL directly?
+ *
+ * Describe the model like the function of functions, where each layer is just a callable function.
+ *
+ * Combine two functions in special merge layers like Add or Concatenate.
+ *
+ * NOTE: Functional API supports one output and one input for model.
+ */
 private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 100
 private const val TEST_BATCH_SIZE = 100
@@ -147,7 +155,6 @@ private val model = Functional.of(
     dense_1(globalAvgPool2D),
     dense_2(dense_1)
 )
-
 
 fun main() {
     val (train, test) = Dataset.createTrainAndTestDatasets(
