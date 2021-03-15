@@ -120,9 +120,9 @@ public class ModelLoader(public val commonModelDirectory: File, public val model
         val file = File(fileName)
 
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-            val `in` = URL(configURL).openStream()
+            val inputStream = URL(configURL).openStream()
             logger.debug { "Model loading is started!" }
-            Files.copy(`in`, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
             logger.debug { "Model loading is finished!" }
         }
 
@@ -134,9 +134,9 @@ public class ModelLoader(public val commonModelDirectory: File, public val model
         val fileName = commonModelDirectory.absolutePath + relativeWeightsPath
         val file = File(fileName)
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-            val `in` = URL(weightsURL).openStream()
+            val inputStream = URL(weightsURL).openStream()
             logger.debug { "Weights loading is started!" }
-            Files.copy(`in`, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
             logger.debug { "Weights loading is finished!" }
         }
 

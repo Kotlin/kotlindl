@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelzoo
+package examples.transferlearning.modelzoo.vgg16
 
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -41,7 +41,7 @@ import java.io.File
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun main() {
-
+    // TODO: modelLoader rename
     val modelLoader = ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_16)
     val model = modelLoader.loadModel() as Sequential
 
@@ -65,6 +65,7 @@ fun main() {
             val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
+            // TODO: getInputShape
             val xTensorShape = it.inputLayer.input.asOutput().shape()
             val tensorShape = longArrayOf(
                 1,
