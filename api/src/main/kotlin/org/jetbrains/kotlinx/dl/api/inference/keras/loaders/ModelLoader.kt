@@ -23,7 +23,7 @@ import java.nio.file.StandardCopyOption
 
 private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
-private const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
+internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory

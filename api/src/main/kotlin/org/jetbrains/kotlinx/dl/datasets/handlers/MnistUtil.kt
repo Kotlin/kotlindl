@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.datasets.handlers
 
 import org.jetbrains.kotlinx.dl.datasets.Dataset
 import java.io.DataInputStream
+import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
 
 private const val IMAGE_ARCHIVE_MAGIC = 2051
@@ -33,7 +34,7 @@ public const val NUMBER_OF_CLASSES: Int = 10
 public fun extractImages(archivePath: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            Dataset::class.java.classLoader.getResourceAsStream(archivePath)
+            FileInputStream(archivePath)
         )
     )
     val magic = archiveStream.readInt()
@@ -69,7 +70,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
 public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            Dataset::class.java.classLoader.getResourceAsStream(archivePath)
+            FileInputStream(archivePath)
         )
     )
     val magic = archiveStream.readInt()

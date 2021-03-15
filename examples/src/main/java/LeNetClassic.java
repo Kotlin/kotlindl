@@ -21,7 +21,10 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
 import org.jetbrains.kotlinx.dl.datasets.Dataset;
+import org.jetbrains.kotlinx.dl.datasets.DatasetsKt;
 import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
+
+import java.io.File;
 
 /**
  * This example demonstrates the ability to define and train LeNet-5 model in Java.
@@ -35,15 +38,7 @@ public class LeNetClassic {
     public static final Integer TEST_BATCH_SIZE = 1000;
 
     public static void main(String[] args) {
-        Pair<Dataset, Dataset> result = Dataset.createTrainAndTestDatasets(
-                MnistUtilKt.TRAIN_IMAGES_ARCHIVE,
-                MnistUtilKt.TRAIN_LABELS_ARCHIVE,
-                MnistUtilKt.TEST_IMAGES_ARCHIVE,
-                MnistUtilKt.TEST_LABELS_ARCHIVE,
-                MnistUtilKt.NUMBER_OF_CLASSES,
-                MnistUtilKt::extractImages,
-                MnistUtilKt::extractLabels
-        );
+        Pair<Dataset, Dataset> result = DatasetsKt.mnist(new File("cache"));
 
         Dataset train = result.component1();
         Dataset test = result.component2();
