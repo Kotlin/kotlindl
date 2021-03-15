@@ -25,6 +25,7 @@ import org.tensorflow.op.Ops
  * @property [name] Custom layer name.
  * @constructor Creates [Dropout] object.
  */
+// TODO: Dropout for inference only
 public class Dropout(
     private val keepProbability: Float = 0.1f,
     private val seed: Long = 12L,

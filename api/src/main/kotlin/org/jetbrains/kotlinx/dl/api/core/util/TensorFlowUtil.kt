@@ -9,6 +9,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.math.Mean
 
+// TODO: rename correctly, move to namespace
 /** */
 internal fun tfMean(tf: Ops, x: Operand<Float>): Operand<Float> {
     return tfMean(tf, x, null, false)
