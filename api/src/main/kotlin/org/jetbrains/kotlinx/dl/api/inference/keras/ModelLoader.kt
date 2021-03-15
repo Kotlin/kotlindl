@@ -6,23 +6,33 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import com.beust.klaxon.Klaxon
+import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ZeroPadding2D
-import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasInitializer
-import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasLayer
-import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasPadding
-import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasSequentialModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.config.LayerConfig
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Normalization
+import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Rescaling
+import org.jetbrains.kotlinx.dl.api.core.layer.recurrent.LSTM
+import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
 /**
@@ -34,7 +44,7 @@ import java.io.File
 internal fun loadModelConfiguration(
     configuration: File
 ): Sequential {
-    val pair = loadModelLayers(configuration)
+    val pair = loadSequentialModelLayers(configuration)
     val input: Input = pair.first
     val layers = pair.second
 
@@ -49,18 +59,18 @@ internal fun loadModelConfiguration(
  * @param jsonConfigFile File containing model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
+internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
     val sequentialConfig = try {
         val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
         Klaxon()
             .converter(PaddingConverter())
-            .parse<KerasSequentialModel>(jsonString)
+            .parse<KerasModel>(jsonString)
     } catch (e: Exception) {
         e.printStackTrace()
         try {
             Klaxon()
                 .converter(PaddingConverter())
-                .parse<KerasSequentialModel>(jsonConfigFile)
+                .parse<KerasModel>(jsonConfigFile)
         } catch (e: Exception) {
             e.printStackTrace()
             throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
@@ -69,10 +79,10 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
 
     val layers = mutableListOf<Layer>()
 
-    (sequentialConfig as KerasSequentialModel).config!!.layers!!.forEach {
+    (sequentialConfig as KerasModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it)
+                val layer = convertToSequentialLayer(it)
                 layers.add(layer)
             }
         }
@@ -82,18 +92,42 @@ internal fun loadModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Laye
 
     val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
 
-    input = Input(
-        batchInputShape!![1]?.toLong()!!,
-        batchInputShape[2]?.toLong()!!,
-        batchInputShape[3]?.toLong()!!
-    )
+    // TODO: write more universal code here
+    when (batchInputShape!!.size) {
+        3 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!
+            )
+        }
+        4 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!
+            )
+        }
+        else -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!
+            )
+        }
+    }
+
     return Pair(input, layers)
 }
 
-private fun convertToLayer(kerasLayer: KerasLayer): Layer {
+private fun convertToSequentialLayer(
+    kerasLayer: KerasLayer
+): Layer {
     return when (kerasLayer.class_name) {
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOLING_2D -> createMaxPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -102,10 +136,339 @@ private fun convertToLayer(kerasLayer: KerasLayer): Layer {
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_RESCALING -> createRescalingLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_NORMALIZATION -> createNormalizationLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        else -> throw IllegalStateException("${kerasLayer.config!!.name!!} is not supported yet!")
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
+            kerasLayer.config!!.name!!
+        )
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
+}
+
+
+/**
+ * Loads a [Sequential] model from json file with model configuration.
+ *
+ * @param [configuration] File containing model configuration.
+ * @return Non-compiled and non-trained Sequential model.
+ */
+internal fun loadFunctionalModelConfiguration(
+    configuration: File
+): Functional {
+    return Functional.of(loadFunctionalModelLayers(configuration).toList())
+}
+
+/**
+ * Loads a [Functional] model layers from json file with model configuration.
+ *
+ * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Functional model.
+ *
+ * @param jsonConfigFile File containing model configuration.
+ * @return Pair of <input layer; list of layers>.
+ */
+internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer> {
+    val functionalConfig = try {
+        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
+        Klaxon()
+            .converter(PaddingConverter())
+            .parse<KerasModel>(jsonString)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        try {
+            Klaxon()
+                .converter(PaddingConverter())
+                .parse<KerasModel>(jsonConfigFile)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
+        }
+    }
+
+    val layers = mutableListOf<Layer>()
+    val layersByNames = mutableMapOf<String, Layer>()
+
+    val input: Input
+
+    val batchInputShape =
+        (functionalConfig as KerasModel).config!!.layers!!.first().config!!.batch_input_shape
+
+    // TODO: write more universal code here
+    val size = batchInputShape!!.size
+    val name = functionalConfig.config!!.layers!!.first().config!!.name!!
+    when (size) {
+        3 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                name = name
+            )
+        }
+        4 -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = name
+            )
+        }
+        else -> {
+            input = Input(
+                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = name
+            )
+        }
+    }
+
+    layers.add(input)
+    layersByNames[input.name] = input
+
+    functionalConfig.config!!.layers!!.forEach {
+        run {
+            if (!it.class_name.equals("InputLayer")) {
+                val layer = convertToLayer(it, layersByNames)
+                layers.add(layer)
+                layersByNames[layer.name] = layer
+            }
+        }
+    }
+
+    return layers
+}
+
+private fun convertToLayer(
+    kerasLayer: KerasLayer,
+    layersByName: MutableMap<String, Layer>
+): Layer {
+    val layer = when (kerasLayer.class_name) {
+        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOLING_2D -> createMaxPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_RESCALING -> createRescalingLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_NORMALIZATION -> createNormalizationLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
+        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
+        LAYER_SUBTRACT -> createSubtractLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
+        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
+        LAYER_MULTIPLY -> createMultiplyLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_CONCATENATE -> createConcatenateLayer(
+            kerasLayer.config!!,
+            kerasLayer.config!!.name!!
+        )
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
+            kerasLayer.config!!.name!!
+        )
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
+    }
+
+    val inboundLayers = mutableListOf<Layer>()
+    if (kerasLayer.class_name != LAYER_INPUT) {
+        val inboundNodes = kerasLayer.inbound_nodes!! as List<List<List<Any>>>
+        inboundNodes[0].forEach { inboundNode ->
+            check(inboundNode.isNotEmpty()) { "This .json config is incorrect and could not be parsed! The list of inbound nodes for layer ${layer.name} could not be empty on this level!" }
+            layersByName[inboundNode[0] as String]?.let { inboundLayers.add(it) }
+
+        }
+        layer.inboundLayers = inboundLayers
+    }
+
+
+    return layer
+}
+
+private fun createGlobalAvgPooling2D(
+    name: String
+): Layer {
+    return GlobalAvgPool2D(
+        name = name
+    )// TODO: write correct filling
+}
+
+private fun createRescalingLayer(
+    config: LayerConfig,
+    name: String
+): Layer {
+    return Rescaling(
+        name = name
+    )// TODO: write correct filling
+}
+
+private fun createNormalizationLayer(
+    config: LayerConfig,
+    name: String
+): Layer {
+    return Normalization(
+        name = name
+    )// TODO: write correct filling
+}
+
+private fun createAddLayer(
+    name: String
+): Layer {
+    return Add(
+        name = name
+    )
+}
+
+private fun createSubtractLayer(
+    name: String
+): Layer {
+    return Subtract(
+        name = name
+    )
+}
+
+private fun createAverageLayer(
+    name: String
+): Layer {
+    return Average(
+        name = name
+    )
+}
+
+private fun createMaximumLayer(
+    name: String
+): Layer {
+    return Maximum(
+        name = name
+    )
+}
+
+private fun createMinimumLayer(
+    name: String
+): Layer {
+    return Minimum(
+        name = name
+    )
+}
+
+private fun createMultiplyLayer(
+    name: String
+): Layer {
+    return Multiply(
+        name = name
+    )
+}
+
+private fun createConcatenateLayer(
+    config: LayerConfig,
+    name: String
+): Layer {
+    return Concatenate(
+        axis = config.axis!! as Int,
+        name = name
+    )
+}
+
+private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
+    return Dropout(
+        keepProbability = config.rate!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createLstmLayer(config: LayerConfig, name: String): Layer {
+    return LSTM(
+        units = config.units!!,
+        activation = convertToActivation(config.activation!!),
+        recurrentActivation = convertToActivation(config.recurrent_activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        useBias = config.use_bias!!,
+        unitForgetBias = config.unit_forget_bias!!,
+        dropout = config.dropout!!.toFloat(),
+        recurrentDropout = config.recurrent_dropout!!.toFloat(),
+        returnSequences = config.return_sequences!!,
+        returnState = config.return_state!!,
+        goBackwards = config.go_backwards!!,
+        stateful = config.stateful!!,
+        timeMajor = config.time_major!!,
+        unroll = config.unroll!!,
+        name = name
+    )
+}
+
+private fun createActivationLayer(config: LayerConfig, name: String): Layer {
+    return ActivationLayer(
+        activation = convertToActivation(config.activation!!),
+        name = name
+    )
+}
+
+private fun createReluLayer(config: LayerConfig, name: String): Layer {
+    return ReLU(
+        maxValue = config.max_value!!.toFloat(),
+        negativeSlope = config.negative_slope!!.toFloat(),
+        threshold = config.threshold!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createBatchNorm(config: LayerConfig, name: String): Layer {
+    return BatchNorm(
+        axis = config.axis!! as List<Int>,
+        momentum = config.momentum!!,
+        center = config.center!!,
+        epsilon = config.epsilon!!,
+        scale = config.scale!! as Boolean,
+        gammaInitializer = convertToInitializer(config.gamma_initializer!!),
+        betaInitializer = convertToInitializer(config.beta_initializer!!),
+        movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
+        movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!),
+        name = name
+    )
 }
 
 private fun createDense(config: LayerConfig, name: String): Dense {
@@ -291,6 +654,10 @@ private fun createFlatten(name: String): Flatten {
     return Flatten(name = name)
 }
 
+private fun createReshape(config: LayerConfig, name: String): Reshape {
+    return Reshape(name = name, targetShape = config.target_shape!!)
+}
+
 private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
@@ -317,15 +684,100 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
         name = name
     )
 }
 
-private fun createZeroPadding2D(config: LayerConfig, name: String) : ZeroPadding2D {
+private fun createDepthwiseConv2D(
+    config: LayerConfig,
+    name: String
+): DepthwiseConv2D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(4)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(4)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = dilation[1]
+    addedOnesDilation[3] = 1
+
+    return DepthwiseConv2D(
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
+        depthMultiplier = config.depth_multiplier!!,
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
+}
+
+private fun createSeparableConv2D(
+    config: LayerConfig,
+    name: String
+): SeparableConv2D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(4)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(4)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = dilation[1]
+    addedOnesDilation[3] = 1
+
+    return SeparableConv2D(
+        filters = config.filters!!.toLong(),
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
+        pointwiseInitializer = convertToInitializer(config.pointwise_initializer!!),
+        depthMultiplier = config.depth_multiplier!!,
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
+}
+
+private fun createZeroPadding2D(
+    config: LayerConfig,
+    name: String
+): ZeroPadding2D {
     assert(config.padding is KerasPadding.ZeroPadding2D)
     return ZeroPadding2D(
         (config.padding as KerasPadding.ZeroPadding2D).padding,
         config.data_format,
+        name
+    )
+}
+
+private fun createCropping2D(
+    config: LayerConfig,
+    name: String
+): Cropping2D {
+    val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
+    return Cropping2D(
+        cropping,
         name
     )
 }

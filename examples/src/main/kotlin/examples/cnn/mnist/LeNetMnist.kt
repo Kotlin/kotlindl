@@ -9,12 +9,12 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
@@ -99,13 +99,26 @@ fun main() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+        println("Graph after compilation.")
+        println(it.kGraph)
 
+        it.init()
+        var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy before: $accuracy")
+
+        println("Graph after evaluation.")
         println(it.kGraph)
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Graph after training.")
+        println(it.kGraph)
 
-        println("Accuracy: $accuracy")
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+        println("Graph after training and evaluation.")
+        println(it.kGraph)
+
+        println("Accuracy after: $accuracy")
     }
 }

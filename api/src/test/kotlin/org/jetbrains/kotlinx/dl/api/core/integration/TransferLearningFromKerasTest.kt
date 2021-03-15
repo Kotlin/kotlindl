@@ -9,10 +9,10 @@ import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -117,7 +117,7 @@ class TransferLearningTest : IntegrationTest() {
         val denseLayerName = "dense"
         val dense1LayerName = "dense_1"
 
-        assertEquals(testModel.layers.size, 8)
+        assertEquals(testModel.layers.size, 9)
         assertTrue(testModel.getLayer(flattenLayerName).isTrainable)
         assertFalse(testModel.getLayer(flattenLayerName).hasActivation)
         assertTrue(testModel.getLayer(conv2dLayerName) is Conv2D)
@@ -302,27 +302,27 @@ class TransferLearningTest : IntegrationTest() {
             )
 
             val weightPaths = listOf(
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "conv2d",
                     "/conv2d/conv2d/kernel:0",
                     "/conv2d/conv2d/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "conv2d_1",
                     "/conv2d_1/conv2d_1/kernel:0",
                     "/conv2d_1/conv2d_1/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense",
                     "/dense/dense/kernel:0",
                     "/dense/dense/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense_1",
                     "/dense_1/dense_1/kernel:0",
                     "/dense_1/dense_1/bias:0"
                 ),
-                LayerKernelAndBiasPaths(
+                LayerConvOrDensePaths(
                     "dense_2",
                     "/dense_2/dense_2/kernel:0",
                     "/dense_2/dense_2/bias:0"

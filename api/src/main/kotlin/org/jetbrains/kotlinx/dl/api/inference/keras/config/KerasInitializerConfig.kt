@@ -5,14 +5,27 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.config
 
+import com.beust.klaxon.Json
+
 internal data class KerasInitializerConfig(
+    @Json(serializeNull = false)
     val distribution: String? = null,
+    @Json(serializeNull = false)
     val maxval: Double? = null,
+    @Json(serializeNull = false)
     val mean: Double? = null,
+    @Json(serializeNull = false)
     val minval: Double? = null,
+    @Json(serializeNull = false)
     val mode: String? = null,
+    @Json(serializeNull = false)
     val scale: Double? = null,
+    @Json(serializeNull = false)
     val seed: Int? = null,
+    @Json(serializeNull = false)
     val stddev: Double? = null,
-    val value: Int? = null
+    @Json(serializeNull = false)
+    val value: Int? = null,
+    @Json(serializeNull = false)
+    val gain: Double? = null
 )

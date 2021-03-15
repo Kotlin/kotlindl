@@ -25,9 +25,19 @@ internal sealed class KerasPadding {
         }
 
         constructor(padding: IntArray) {
-            this.padding = IntArray(2)
-            this.padding[0] = padding[0]
-            this.padding[1] = padding[1]
+            if (padding.size == 2) {
+                this.padding = IntArray(2)
+                this.padding[0] = padding[0]
+                this.padding[1] = padding[1]
+            } else if (padding.size == 4) {
+                this.padding = IntArray(4)
+                this.padding[0] = padding[0]
+                this.padding[1] = padding[1]
+                this.padding[2] = padding[2]
+                this.padding[3] = padding[3]
+            } else {
+                throw UnsupportedOperationException("Padding with size ${padding.size} is not supported!")
+            }
         }
 
         constructor(padding: Array<IntArray>) {

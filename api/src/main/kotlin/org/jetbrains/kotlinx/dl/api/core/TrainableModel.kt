@@ -18,7 +18,6 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.tensorflow.Operand
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -30,7 +29,7 @@ public abstract class TrainableModel : InferenceModel() {
     protected var optimizer: Optimizer = SGD(0.2f)
 
     /** Loss function. */
-    protected var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
+    var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
 
     /** Callback. */
     protected var callback: Callback = Callback()
@@ -41,23 +40,15 @@ public abstract class TrainableModel : InferenceModel() {
     /** List of metrics for evaluation phase. */
     protected var metrics: List<Metric> = listOf(Accuracy())
 
-    /** TensorFlow operand for prediction phase. */
-    protected lateinit var yPred: Operand<Float>
-
-    /** TensorFlow operand for X data. */
-    protected lateinit var xOp: Operand<Float>
-
-    /** TensorFlow operand for Y data. */
-    protected lateinit var yOp: Operand<Float>
-
-    /** TensorFlow operand for batch size data. */
-    protected lateinit var numberOfLossesOp: Operand<Float>
-
     /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
-    protected var amountOfClasses: Long = -1
+    public var amountOfClasses: Long = -1
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false
+        internal set
+
+    /** Is true when model is ready for forward mode. */
+    public var isBuiltForForwardMode: Boolean = false
         internal set
 
     /**
@@ -316,4 +307,11 @@ public abstract class TrainableModel : InferenceModel() {
     public override fun close() {
         super.close()
     }
+
+    /**
+     * Formats and builds the model description.
+     *
+     * @return list of layer descriptions.
+     */
+    public abstract fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String>
 }

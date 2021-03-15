@@ -64,7 +64,7 @@ internal fun tail(vararg dims: Long): LongArray {
 }
 
 /** Returns last dimensions (except first) from [shape]. */
-internal fun tail(shape: Shape): LongArray {
+public fun tail(shape: Shape): LongArray {
     val shapeArray = LongArray(shape.numDimensions())
     for (i in shapeArray.indices) {
         shapeArray[i] = shape.size(i)
@@ -103,14 +103,13 @@ internal fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
 }
 
 /** Reshapes 3D array of floats to 1D array of floats. */
-internal fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
+public fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
     for (i in dst.indices) {
         for (j in dst[i].indices) {
             for (k in dst[i][j].indices) {
-
                 result[pos] = dst[i][j][k]
                 pos++
             }

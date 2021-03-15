@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -26,7 +28,7 @@ public abstract class Layer(public var name: String) {
     public var isTrainable: Boolean = true
 
     /** Output data tensor shape. */
-    public lateinit var outputShape: LongArray
+    public lateinit var outputShape: TensorShape
 
     /** Model where this layer is used. */
     public lateinit var parentModel: TrainableModel
@@ -37,6 +39,12 @@ public abstract class Layer(public var name: String) {
     /** Returns number of output parameters. */
     protected var fanOut: Int = Int.MIN_VALUE
 
+    /** Returns inbound layers. */
+    public var inboundLayers: MutableList<Layer> = mutableListOf()
+
+    /** Returns outbound layers. */
+    public var outboundLayers: MutableList<Layer> = mutableListOf()
+
     /**
      * Extend this function to define variables in layer.
      *
@@ -44,7 +52,22 @@ public abstract class Layer(public var name: String) {
      * @param [kGraph] [KGraph] to update it.
      * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
      */
-    public abstract fun defineVariables(tf: Ops, kGraph: KGraph, inputShape: Shape)
+    public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)
+
+
+    /**
+     * Extend this function to define variables in layer.
+     *
+     * NOTE: This function should be overridden for layers with multiple inputs.
+     * NOTE: Used in Functional API
+     *
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [kGraph] [KGraph] to update it.
+     */
+    public fun buildFromInboundLayers(tf: Ops, kGraph: KGraph) {
+        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
+        build(tf, kGraph, inboundLayers[0].outputShape.toShape())
+    }
 
     /**
      * Computes output shape, based on [inputShape] and [Layer] type.
@@ -52,9 +75,37 @@ public abstract class Layer(public var name: String) {
     public abstract fun computeOutputShape(inputShape: Shape): Shape
 
     /**
+     * Computes output shape, based on input shapes of inbound layers.
+     *
+     * NOTE: This function should be overridden for layers with multiple inputs.
+     * NOTE: Used in Functional API
+     */
+    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
+        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
+        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
+    }
+
+    /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      */
-    public abstract fun transformInput(tf: Ops, input: Operand<Float>): Operand<Float>
+    public abstract fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float>
+
+    /**
+     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
+     */
+    public open fun forward(
+        tf: Ops,
+        input: List<Operand<Float>>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        return forward(tf, input[0], isTraining, numberOfLosses)
+    }
 
     /**
      * Adds a new weight tensor to the layer
@@ -70,13 +121,29 @@ public abstract class Layer(public var name: String) {
         variable: Variable<Float>,
         initializer: Initializer
     ): Variable<Float> {
-        require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
-        require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
+        // require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
+        // require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
 
         val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
         kGraph.addLayerVariable(variable, isTrainable)
         kGraph.addInitializer(name, initOp)
         return variable
+    }
+
+    public operator fun invoke(vararg layers: Layer): Layer {
+        inboundLayers = layers.toMutableList()
+        return this
+    }
+
+    /** Extract weights values by variable names. */
+    protected fun extractWeigths(variableNames: List<String>): List<Array<*>> {
+        val session = parentModel.session
+        val runner = session.runner()
+
+        for (variableName in variableNames) {
+            runner.fetch(variableName)
+        }
+        return runner.run().map { it.convertTensorToMultiDimArray() }.toList()
     }
 
     /** Returns layer's weights. */
@@ -87,4 +154,6 @@ public abstract class Layer(public var name: String) {
 
     /** Returns amount of neurons. */
     public abstract val paramCount: Int
+
+    // apply
 }

@@ -6,17 +6,24 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import com.beust.klaxon.Klaxon
+import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
@@ -26,40 +33,139 @@ import java.io.File
  * @param jsonConfigFile File to write model configuration.
  * @param isKerasFullyCompatible If true, it generates fully Keras-compatible configuration.
  */
-public fun Sequential.saveModelConfiguration(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
+public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {
         run {
-            val layer = convertToKerasLayer(it, isKerasFullyCompatible)
+            val layer = convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
             kerasLayers.add(layer)
         }
     }
 
-    val inputShape = this.inputLayer.packedDims.map { it.toInt() }
+    val inputLayer = when (this::class) {
+        Sequential::class -> (this as Sequential).inputLayer
+        Functional::class -> (this as Functional).layers[0] as Input
+        else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
+    }
+
+    val inputShape = inputLayer.packedDims.map { it.toInt() }
 
     (kerasLayers.first().config as LayerConfig).batch_input_shape =
-        listOf(null, inputShape[0], inputShape[1], inputShape[2])
+        listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
 
-    val config = SequentialConfig(name = "", layers = kerasLayers)
-    val sequentialConfig = KerasSequentialModel(config = config)
+    val config = KerasModelConfig(name = "", layers = kerasLayers)
+    val kerasModel = KerasModel(config = config)
 
     val jsonString2 = Klaxon()
         .converter(PaddingConverter())
-        .toJsonString(sequentialConfig)
+        .toJsonString(kerasModel)
 
     jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
 }
 
-private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean): KerasLayer {
-    return when (layer::class) {
+private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
+    val kerasLayer = when (layer::class) {
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
         AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
         Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
         ZeroPadding2D::class -> createKerasZeroPadding2D(layer as ZeroPadding2D)
-        else -> throw IllegalStateException("${layer.name} is not supported yet!")
+        Input::class -> createKerasInput(layer as Input)
+        BatchNorm::class -> createKerasBatchNorm(layer as BatchNorm, isKerasFullyCompatible)
+        ActivationLayer::class -> createKerasActivationLayer(layer as ActivationLayer)
+        Add::class -> createKerasAddLayer(layer as Add)
+        GlobalAvgPool2D::class -> createKerasGlobalAveragePooling2DLayer(layer as GlobalAvgPool2D)
+        else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
+
+    if (isFunctional) {
+        if (kerasLayer.class_name.equals("InputLayer")) {
+            kerasLayer.inbound_nodes = listOf()
+        } else {
+            kerasLayer.inbound_nodes = listOf()
+
+            for (inboundLayer in layer.inboundLayers) {
+                if (kerasLayer.inbound_nodes!!.isEmpty()) {
+                    kerasLayer.inbound_nodes = listOf(mutableListOf<Any>())
+                }
+
+                (kerasLayer.inbound_nodes as List<MutableList<MutableList<Any>>>)[0].add(
+                    mutableListOf(
+                        inboundLayer.name,
+                        0,
+                        0,
+                        mapOf<Any, Any>()
+                    )
+                )
+            }
+        }
+    }
+
+    return kerasLayer
+}
+
+public class Data(
+
+)
+
+private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_2D, config = configX)
+}
+
+private fun createKerasAddLayer(layer: Add): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_ADD, config = configX)
+}
+
+private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        activation = convertToKerasActivation(layer.activation),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        axis = layer.axis,
+        momentum = layer.momentum,
+        center = layer.center,
+        epsilon = layer.epsilon,
+        scale = layer.scale,
+        gamma_initializer = convertToKerasInitializer(layer.gammaInitializer, isKerasFullyCompatible),
+        beta_initializer = convertToKerasInitializer(layer.betaInitializer, isKerasFullyCompatible),
+        moving_mean_initializer = convertToKerasInitializer(layer.movingMeanInitializer, isKerasFullyCompatible),
+        moving_variance_initializer = convertToKerasInitializer(
+            layer.movingVarianceInitializer,
+            isKerasFullyCompatible
+        ),
+    )
+    return KerasLayer(class_name = LAYER_BATCH_NORM, config = configX)
+}
+
+private fun createKerasInput(layer: Input): KerasLayer {
+    val shape = mutableListOf<Int?>()
+    shape.add(null)
+    layer.packedDims.map { it.toInt() }.forEach { shape.add(it) }
+
+    val config = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        sparse = false,
+        batch_input_shape = shape,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_INPUT, config = config)
 }
 
 private fun createKerasDense(layer: Dense, isKerasFullyCompatible: Boolean): KerasLayer {
@@ -86,6 +192,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
+            RandomUniform::class -> convertToRandomUniform(initializer as RandomUniform)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
@@ -105,6 +212,16 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
     }
 
     return KerasInitializer(class_name = className, config = config)
+}
+
+private fun convertToRandomUniform(initializer: RandomUniform): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_RANDOM_UNIFORM, KerasInitializerConfig(
+            minval = initializer.minVal.toDouble(),
+            maxval = initializer.maxVal.toDouble(),
+            seed = initializer.seed.toInt()
+        )
+    )
 }
 
 private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String, KerasInitializerConfig> {

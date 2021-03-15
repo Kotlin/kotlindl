@@ -11,12 +11,12 @@ import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
-import org.jetbrains.kotlinx.dl.api.core.layer.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.twodim.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -177,14 +177,14 @@ class SequentialInferenceTest {
             assertEquals(it.layers[6].paramCount, 10164)
             assertEquals(it.layers[7].paramCount, 850)
 
-            Assertions.assertArrayEquals(it.layers[0].outputShape, longArrayOf(-1, 28, 28, 32))
-            Assertions.assertArrayEquals(it.layers[1].outputShape, longArrayOf(-1, 14, 14, 32))
-            Assertions.assertArrayEquals(it.layers[2].outputShape, longArrayOf(-1, 14, 14, 64))
-            Assertions.assertArrayEquals(it.layers[3].outputShape, longArrayOf(-1, 7, 7, 64))
-            Assertions.assertArrayEquals(it.layers[4].outputShape, longArrayOf(-1, 3136))
-            Assertions.assertArrayEquals(it.layers[5].outputShape, longArrayOf(-1, 120))
-            Assertions.assertArrayEquals(it.layers[6].outputShape, longArrayOf(-1, 84))
-            Assertions.assertArrayEquals(it.layers[7].outputShape, longArrayOf(-1, 10))
+            Assertions.assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
+            Assertions.assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
+            Assertions.assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
+            Assertions.assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
+            Assertions.assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 3136))
+            Assertions.assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 120))
+            Assertions.assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 84))
+            Assertions.assertArrayEquals(it.layers[7].outputShape.dims(), longArrayOf(-1, 10))
 
             it.loadWeights(tempDir.toFile())
 
