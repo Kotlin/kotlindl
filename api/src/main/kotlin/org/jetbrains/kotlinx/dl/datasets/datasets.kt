@@ -14,7 +14,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
-
 /**
  * Loads the [MNIST dataset](http://yann.lecun.com/exdb/mnist/).
  * This is a dataset of 60,000 28x28 grayscale images of the 10 digits,
@@ -32,6 +31,53 @@ import java.nio.file.StandardCopyOption
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
+    if (!cacheDirectory.exists()) cacheDirectory.mkdir()
+
+    val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
+    val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
+    val testXpath = loadFile(cacheDirectory, TEST_IMAGES_ARCHIVE).absolutePath
+    val testYpath = loadFile(cacheDirectory, TEST_LABELS_ARCHIVE).absolutePath
+
+    return Dataset.createTrainAndTestDatasets(
+        trainXpath,
+        trainYpath,
+        testXpath,
+        testYpath,
+        NUMBER_OF_CLASSES,
+        ::extractImages,
+        ::extractLabels
+    )
+}
+
+/**
+ * Loads the Fashion-MNIST dataset.
+ *
+ * This is a dataset of 60,000 28x28 grayscale images of 10 fashion categories,
+ * along with a test set of 10,000 images. This dataset can be used as
+ * a drop-in replacement for MNIST. The class labels are:
+ *
+ * | Label | Description |
+ * |:-----:|-------------|
+ * |   0   | T-shirt/top |
+ * |   1   | Trouser     |
+ * |   2   | Pullover    |
+ * |   3   | Dress       |
+ * |   4   | Coat        |
+ * |   5   | Sandal      |
+ * |   6   | Shirt       |
+ * |   7   | Sneaker     |
+ * |   8   | Bag         |
+ * |   9   | Ankle boot  |
+ *
+ * NOTE: The copyright for Fashion-MNIST is held by Zalando SE.
+ * Fashion-MNIST is licensed under the [MIT license](https://github.com/zalandoresearch/fashion-mnist/blob/master/LICENSE).
+ *
+ * @param [cacheDirectory] Cache directory to cached models and datasets.
+ *
+ * @return Train and test datasets. Each dataset includes X and Y data. X data are uint8 arrays of grayscale image data with shapes
+ * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
+ */
+public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
     if (!cacheDirectory.exists()) cacheDirectory.mkdir()
 
     val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath

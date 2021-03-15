@@ -20,8 +20,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.datasets.handlers.NUMBER_OF_CLASSES
 
 private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 100
@@ -29,7 +29,7 @@ private const val TEST_BATCH_SIZE = 100
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
-
+// TODO: this example is failed
 /**
  * This is an CNN based on an implementation of LeNet-5 from classic paper.
  *
@@ -99,15 +99,7 @@ private val model = Sequential.of(
 )
 
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = fashionMnist()
 
     model.use {
         it.compile(

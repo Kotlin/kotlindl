@@ -9,21 +9,13 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 
 private const val PATH_TO_MODEL = "api/src/main/resources/models/batchnorm/savedmodelbundle"
 
+// TODO: this example is failed
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        FASHION_TRAIN_IMAGES_ARCHIVE,
-        FASHION_TRAIN_LABELS_ARCHIVE,
-        FASHION_TEST_IMAGES_ARCHIVE,
-        FASHION_TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractFashionImages,
-        ::extractFashionLabels
-    )
+    val (train, test) = fashionMnist()
 
     SavedModel.load(PATH_TO_MODEL).use {
         println(it)

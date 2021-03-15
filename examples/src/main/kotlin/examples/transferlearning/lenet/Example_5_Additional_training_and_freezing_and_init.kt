@@ -12,8 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 
 /**
  * This examples demonstrates the transfer learning concept:
@@ -27,15 +26,7 @@ import org.jetbrains.kotlinx.dl.datasets.handlers.*
  * NOTE: Model and weights are resources in api module.
  */
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        FASHION_TRAIN_IMAGES_ARCHIVE,
-        FASHION_TRAIN_LABELS_ARCHIVE,
-        FASHION_TEST_IMAGES_ARCHIVE,
-        FASHION_TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractFashionImages,
-        ::extractFashionLabels
-    )
+    val (train, test) = fashionMnist()
 
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)

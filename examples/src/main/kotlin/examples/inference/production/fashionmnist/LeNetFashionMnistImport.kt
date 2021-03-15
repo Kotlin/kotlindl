@@ -3,11 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.inference.production.fashionmnist
 
+import examples.inference.production.getLabel
+import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
@@ -18,15 +19,7 @@ private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
  * NOTE: The example requires the saved model in the appropriate directory (run LeNetFashionMnistExportImport.kt firstly).
  */
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        FASHION_TRAIN_IMAGES_ARCHIVE,
-        FASHION_TRAIN_LABELS_ARCHIVE,
-        FASHION_TEST_IMAGES_ARCHIVE,
-        FASHION_TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = fashionMnist()
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 

@@ -3,8 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.inference.production.mnist
 
+import examples.inference.production.lenet5
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -13,8 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
@@ -34,15 +34,7 @@ private const val TEST_BATCH_SIZE = 1000
  * It saves all the data to the project root directory.
  */
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = mnist()
 
     val (newTrain, validation) = train.split(0.95)
 

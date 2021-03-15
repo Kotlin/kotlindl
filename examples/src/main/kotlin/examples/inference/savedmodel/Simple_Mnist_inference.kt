@@ -9,21 +9,12 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 
 private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
 
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = mnist()
 
     SavedModel.load(PATH_TO_MODEL).use {
         println(it)
