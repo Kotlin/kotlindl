@@ -7,7 +7,7 @@ package examples.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 
-private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
+private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
 fun main() {
     val model = SavedModel.load(PATH_TO_MODEL)

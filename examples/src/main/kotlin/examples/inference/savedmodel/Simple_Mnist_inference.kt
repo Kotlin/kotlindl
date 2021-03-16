@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.datasets.mnist
 
-private const val PATH_TO_MODEL = "api/src/main/resources/models/savedmodel"
+private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
 fun main() {
     val (train, test) = mnist()
