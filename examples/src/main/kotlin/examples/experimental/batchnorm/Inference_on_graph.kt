@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 
-private const val PATH_TO_MODEL = "api/src/main/resources/models/batchnorm/savedmodelbundle"
+private const val PATH_TO_MODEL = "examples/src/main/resources/models/batchnorm/savedmodelbundle"
 
 // TODO: this example is failed
 fun main() {
