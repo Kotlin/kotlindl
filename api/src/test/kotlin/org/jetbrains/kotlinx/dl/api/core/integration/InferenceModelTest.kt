@@ -22,8 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -120,15 +119,7 @@ class InferenceModelTest {
 
         val lenet5 = Sequential.of(lenet5Layers)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         lenet5.use {
             it.compile(
@@ -175,15 +166,7 @@ class InferenceModelTest {
 
     @Test
     fun emptyInferenceModel() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         val inferenceModel = InferenceModel()
         inferenceModel.use {
@@ -202,15 +185,7 @@ class InferenceModelTest {
 
     @Test
     fun missedReshapeFunction() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         val inferenceModel = InferenceModel()
         inferenceModel.use {
@@ -240,15 +215,7 @@ class InferenceModelTest {
 
         val lenet5 = Sequential.of(lenet5Layers)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         lenet5.use {
             it.compile(
@@ -292,15 +259,7 @@ class InferenceModelTest {
 
         val lenet5 = Sequential.of(lenet5Layers)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         lenet5.use {
             it.compile(

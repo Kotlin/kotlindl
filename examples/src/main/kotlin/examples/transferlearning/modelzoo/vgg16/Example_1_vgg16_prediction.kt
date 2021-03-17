@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 
@@ -62,7 +61,7 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
+            val inputStream = object {}.javaClass.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             // TODO: getInputShape

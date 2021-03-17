@@ -10,8 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -24,15 +23,7 @@ import java.util.*
  * It's better to to load pretrained model.
  */
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        FASHION_TRAIN_IMAGES_ARCHIVE,
-        FASHION_TRAIN_LABELS_ARCHIVE,
-        FASHION_TEST_IMAGES_ARCHIVE,
-        FASHION_TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractFashionImages,
-        ::extractFashionLabels
-    )
+    val (train, test) = fashionMnist()
 
 
     val jsonConfigFile = getResNetJSONConfigFile()

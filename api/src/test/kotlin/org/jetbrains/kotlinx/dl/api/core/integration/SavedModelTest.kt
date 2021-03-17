@@ -9,8 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -21,15 +20,7 @@ private const val PATH_TO_MODEL = "src/main/resources/models/savedmodel"
 class SavedModelTest {
     @Test
     fun basicInferenceOnMnist() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         val modelDirectory = File(PATH_TO_MODEL)
 
@@ -51,15 +42,7 @@ class SavedModelTest {
 
     @Test
     fun basicInferenceOnMnistWithCustomTensorNames() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         val modelDirectory = File(PATH_TO_MODEL)
 

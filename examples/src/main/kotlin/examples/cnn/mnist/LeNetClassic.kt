@@ -20,8 +20,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.handlers.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.datasets.mnist
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000
@@ -92,15 +92,7 @@ private val lenet5Classic = Sequential.of(
 )
 
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = mnist()
 
     lenet5Classic.use {
         it.compile(
@@ -118,3 +110,4 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+

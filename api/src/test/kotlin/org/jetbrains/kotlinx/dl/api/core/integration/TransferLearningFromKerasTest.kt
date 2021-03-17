@@ -17,8 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -149,15 +148,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             it.compile(
@@ -189,15 +180,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             val exception =
@@ -375,15 +358,7 @@ class TransferLearningTest : IntegrationTest() {
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             it.compile(
@@ -426,15 +401,7 @@ class TransferLearningTest : IntegrationTest() {
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             for (layer in it.layers) {
@@ -500,15 +467,7 @@ class TransferLearningTest : IntegrationTest() {
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             val layerList = mutableListOf<Layer>()
@@ -577,15 +536,7 @@ class TransferLearningTest : IntegrationTest() {
         val file = File(realPathToWeights)
         val hdfFile = HdfFile(file)
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            FASHION_TRAIN_IMAGES_ARCHIVE,
-            FASHION_TRAIN_LABELS_ARCHIVE,
-            FASHION_TEST_IMAGES_ARCHIVE,
-            FASHION_TEST_LABELS_ARCHIVE,
-            NUMBER_OF_CLASSES,
-            ::extractFashionImages,
-            ::extractFashionLabels
-        )
+        val (train, test) = fashionMnist()
 
         testModel.use {
             val layerList = mutableListOf<Layer>()

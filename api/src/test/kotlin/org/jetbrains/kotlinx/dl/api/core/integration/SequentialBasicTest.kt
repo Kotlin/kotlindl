@@ -21,8 +21,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -86,15 +85,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun mnistDatasetCreation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         assertEquals(train.xSize(), 60000)
         assertEquals(test.xSize(), 10000)
@@ -103,15 +94,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun initLeNetModel() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
@@ -127,15 +110,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun trainingLeNetModel() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
@@ -199,15 +174,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun trainingWithValidation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
         val (newTrain, validation) = train.split(0.95)
 
         testModel.use {
@@ -238,15 +205,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun trainingFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -266,15 +225,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun evaluatingFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -290,15 +241,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictionFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -314,15 +257,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun softPredictionFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -338,15 +273,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictAllFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -373,15 +300,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictAndGetActivationsFailedWithoutCompilation() {
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             val exception =
@@ -485,15 +404,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             )
         )
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
@@ -574,15 +485,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             )
         )
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
@@ -662,15 +565,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         )
 
 
-        val (train, test) = Dataset.createTrainAndTestDatasets(
-            TRAIN_IMAGES_ARCHIVE,
-            TRAIN_LABELS_ARCHIVE,
-            TEST_IMAGES_ARCHIVE,
-            TEST_LABELS_ARCHIVE,
-            AMOUNT_OF_CLASSES,
-            ::extractImages,
-            ::extractLabels
-        )
+        val (train, test) = mnist()
 
         testModelWithSmallAmountOfClasses.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())

@@ -24,9 +24,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Normalization
-import org.jetbrains.kotlinx.dl.api.core.layer.preprocessing.Rescaling
-import org.jetbrains.kotlinx.dl.api.core.layer.recurrent.LSTM
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -140,21 +137,12 @@ private fun convertToSequentialLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_RESCALING -> createRescalingLayer(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_NORMALIZATION -> createNormalizationLayer(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
@@ -277,21 +265,12 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_RESCALING -> createRescalingLayer(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_NORMALIZATION -> createNormalizationLayer(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReluLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_LSTM -> createLstmLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
@@ -332,24 +311,6 @@ private fun createGlobalAvgPooling2D(
     name: String
 ): Layer {
     return GlobalAvgPool2D(
-        name = name
-    )// TODO: write correct filling
-}
-
-private fun createRescalingLayer(
-    config: LayerConfig,
-    name: String
-): Layer {
-    return Rescaling(
-        name = name
-    )// TODO: write correct filling
-}
-
-private fun createNormalizationLayer(
-    config: LayerConfig,
-    name: String
-): Layer {
-    return Normalization(
         name = name
     )// TODO: write correct filling
 }
@@ -415,27 +376,6 @@ private fun createConcatenateLayer(
 private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
     return Dropout(
         keepProbability = config.rate!!.toFloat(),
-        name = name
-    )
-}
-
-private fun createLstmLayer(config: LayerConfig, name: String): Layer {
-    return LSTM(
-        units = config.units!!,
-        activation = convertToActivation(config.activation!!),
-        recurrentActivation = convertToActivation(config.recurrent_activation!!),
-        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
-        biasInitializer = convertToInitializer(config.bias_initializer!!),
-        useBias = config.use_bias!!,
-        unitForgetBias = config.unit_forget_bias!!,
-        dropout = config.dropout!!.toFloat(),
-        recurrentDropout = config.recurrent_dropout!!.toFloat(),
-        returnSequences = config.return_sequences!!,
-        returnState = config.return_state!!,
-        goBackwards = config.go_backwards!!,
-        stateful = config.stateful!!,
-        timeMajor = config.time_major!!,
-        unroll = config.unroll!!,
         name = name
     )
 }

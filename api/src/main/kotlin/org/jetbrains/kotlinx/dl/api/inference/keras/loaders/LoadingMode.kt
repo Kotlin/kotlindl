@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 /** Loading strategy for remote loading. */
-enum class LoadingMode {
+public enum class LoadingMode {
     SKIP_LOADING_IF_EXISTS,
 
     OVERRIDE_IF_EXISTS

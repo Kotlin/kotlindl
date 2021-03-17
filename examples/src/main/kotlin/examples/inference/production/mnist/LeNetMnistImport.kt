@@ -3,11 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.inference.production.mnist
 
+import examples.inference.production.getLabel
+import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.datasets.mnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
@@ -18,15 +19,7 @@ private const val PATH_TO_MODEL = "savedmodels/lenet5"
  * NOTE: The example requires the saved model in the appropriate directory (run LeNetMnistExportImport.kt firstly).
  */
 fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
+    val (train, test) = mnist()
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
