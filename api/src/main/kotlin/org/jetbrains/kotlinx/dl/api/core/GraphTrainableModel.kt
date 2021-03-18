@@ -23,11 +23,12 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.defaultActivationName
+import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
-import org.jetbrains.kotlinx.dl.datasets.DataBatch
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataBatch
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.io.File
@@ -38,7 +39,6 @@ import java.nio.FloatBuffer
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
  * Also, it provides training and inference features on this model.
  *
- * @property [inputLayer] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Functional model via sequence of [layers].
  */
@@ -177,8 +177,8 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     override fun fit(
-        trainingDataset: Dataset,
-        validationDataset: Dataset,
+        trainingDataset: OnHeapDataset,
+        validationDataset: OnHeapDataset,
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int
@@ -194,7 +194,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     override fun fit(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         epochs: Int,
         batchSize: Int
     ): TrainingHistory {
@@ -226,9 +226,9 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     private fun internalFit(
         trainBatchSize: Int,
         epochs: Int,
-        trainingDataset: Dataset,
+        trainingDataset: OnHeapDataset,
         validationIsEnabled: Boolean,
-        validationDataset: Dataset?,
+        validationDataset: OnHeapDataset?,
         validationBatchSize: Int?
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
@@ -260,7 +260,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         for (i in 1..epochs) {
             if (!stopTraining) {
                 callback.onEpochBegin(i, trainingHistory)
-                val batchIter: Dataset.BatchIterator = trainingDataset.batchIterator(
+                val batchIter: OnHeapDataset.BatchIterator = trainingDataset.batchIterator(
                     trainBatchSize
                 )
 
@@ -270,15 +270,15 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
                     callback.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)
-                    val batch: DataBatch = batchIter.next()
+                    val batch: OnHeapDataBatch = batchIter.next()
 
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
 
                     Tensor.create(
                         xBatchShape,
-                        batch.x
+                        serializeToBuffer(batch.x)
                     ).use { batchImagesTensor ->
-                        Tensor.create(yBatchShape, batch.y).use { batchLabelsTensor ->
+                        Tensor.create(yBatchShape, serializeToBuffer(batch.y)).use { batchLabelsTensor ->
                             Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
                                 .use { numberOfLossesTensor ->
                                     Tensor.create(true).use { isTraining ->
@@ -348,20 +348,24 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     private fun batchValidation(
-        batch: DataBatch,
+        batch: OnHeapDataBatch,
         xBatchShape: LongArray,
         yBatchShape: LongArray
     ) {
-        check(TensorShape(xBatchShape).numElements().toInt() == batch.x.capacity())
+        check(
+            TensorShape(xBatchShape).numElements().toInt() == batch.x.size
+        ) // TODO: batch.x.size -> need correctly calculate the capacity of batch
         {
             "The calculated [from the Sequential model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.x.capacity()
+                batch.x.size // TODO: batch.x.size -> need correctly calculate the capacity of batch
             }. Please, check input data."
         }
-        check(TensorShape(yBatchShape).numElements().toInt() == batch.y.capacity())
+        check(
+            TensorShape(yBatchShape).numElements().toInt() == batch.y.size
+        ) // TODO: batch.x.size -> need correctly calculate the capacity of batch
         {
             "The calculated [from the Sequential model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.y.capacity()
+                batch.y.size // TODO: batch.x.size -> need correctly calculate the capacity of batch
             }. " +
                     "\nPlease, check the input label data or correct amount of classes [amount of neurons] in last Dense layer, if you have a classification problem." +
                     "\nHighly likely, you have different amount of classes presented in data and described in model as desired output."
@@ -407,7 +411,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         }
     }
 
-    override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
+    override fun evaluate(dataset: OnHeapDataset, batchSize: Int): EvaluationResult {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
@@ -415,7 +419,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         callback.onTestBegin()
 
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
+        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -425,14 +429,14 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         while (batchIter.hasNext()) {
             callback.onTestBatchBegin(batchCounter, batchSize, evaluationHistory)
-            val batch: DataBatch = batchIter.next()
+            val batch: OnHeapDataBatch = batchIter.next()
             val (imageShape, labelShape) = calculateXYShapes(batch)
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImagesTensor ->
-                Tensor.create(labelShape, batch.y).use { testLabelsTensor ->
+                Tensor.create(labelShape, serializeToBuffer(batch.y)).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
                         Tensor.create(false).use { isTraining ->
                             val lossAndMetricsTensors = session.runner()
@@ -473,7 +477,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
-    override fun predict(dataset: Dataset, batchSize: Int): IntArray {
+    override fun predict(dataset: OnHeapDataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -484,7 +488,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
 
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
+        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -493,11 +497,11 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         while (batchIter.hasNext()) {
             callback.onPredictBatchBegin(batchCounter, batchSize)
 
-            val batch: DataBatch = batchIter.next()
+            val batch: OnHeapDataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImages ->
                 Tensor.create(0.0f).use { isTraining ->
                     val predictionsTensor = session.runner()
@@ -541,7 +545,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
     }
 
-    override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
+    override fun predictSoftly(dataset: OnHeapDataset, batchSize: Int): Array<FloatArray> {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -552,7 +556,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         val predictions = Array(dataset.xSize()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
 
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
+        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -561,11 +565,11 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         while (batchIter.hasNext()) {
             callback.onPredictBatchBegin(batchCounter, batchSize)
 
-            val batch: DataBatch = batchIter.next()
+            val batch: OnHeapDataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImages ->
                 val predictionsTensor = session.runner()
                     .fetch(predictionOp)
@@ -661,7 +665,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return runner.run()
     }
 
-    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
+    private fun calculateXYShapes(batch: OnHeapDataBatch): Pair<LongArray, LongArray> {
         val batchSize = batch.size
 
         val xBatchShape = calculateXShape(batchSize)
@@ -671,7 +675,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
             amountOfClasses
         )
 
-        batchValidation(batch, xBatchShape, yBatchShape)
+        //batchValidation(batch, xBatchShape, yBatchShape)
 
         return Pair(xBatchShape, yBatchShape)
     }

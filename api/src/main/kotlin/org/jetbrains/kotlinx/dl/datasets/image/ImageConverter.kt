@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets.image
 
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayOutputStream
@@ -19,14 +19,14 @@ public class ImageConverter {
     public companion object {
         /** All pixels has values in range [0; 255]. */
         public fun toRawFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-            return Dataset.toRawVector(
+            return OnHeapDataset.toRawVector(
                 toRawPixels(inputStream, colorOrder)
             )
         }
 
         /** All pixels has values in range [0; 255]. */
         public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-            return Dataset.toRawVector(
+            return OnHeapDataset.toRawVector(
                 toRawPixels(imageFile.inputStream(), colorOrder)
             )
         }
@@ -36,14 +36,14 @@ public class ImageConverter {
             inputStream: InputStream,
             colorOrder: ColorOrder = ColorOrder.BGR
         ): FloatArray {
-            return Dataset.toNormalizedVector(
+            return OnHeapDataset.toNormalizedVector(
                 toRawPixels(inputStream, colorOrder)
             )
         }
 
         /** All pixels in range [0;1) */
         public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-            return Dataset.toNormalizedVector(
+            return OnHeapDataset.toNormalizedVector(
                 toRawPixels(imageFile.inputStream(), colorOrder)
             )
         }

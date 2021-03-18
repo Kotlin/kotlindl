@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -143,7 +143,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     public abstract fun fit(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         epochs: Int = 5,
         batchSize: Int = 32
     ): TrainingHistory
@@ -162,8 +162,8 @@ public abstract class TrainableModel : InferenceModel() {
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public abstract fun fit(
-        trainingDataset: Dataset,
-        validationDataset: Dataset,
+        trainingDataset: OnHeapDataset,
+        validationDataset: OnHeapDataset,
         epochs: Int = 5,
         trainBatchSize: Int = 32,
         validationBatchSize: Int = 256
@@ -178,7 +178,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @return Value of calculated metric and loss values.
      */
     public abstract fun evaluate(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         batchSize: Int = 256
     ): EvaluationResult
 
@@ -189,7 +189,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [batchSize] Number of samples per batch of computation.
      * @return Array of labels. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predict(dataset: Dataset, batchSize: Int): IntArray
+    public abstract fun predict(dataset: OnHeapDataset, batchSize: Int): IntArray
 
     /**
      * Generates output predictions for the input samples.
@@ -199,7 +199,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @param [batchSize] Number of samples per batch of computation.
      * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
+    public abstract fun predictSoftly(dataset: OnHeapDataset, batchSize: Int): Array<FloatArray>
 
     /**
      * Generates output prediction for the input sample.
@@ -283,7 +283,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public fun fit(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         validationRate: Double,
         epochs: Int,
         trainBatchSize: Int,

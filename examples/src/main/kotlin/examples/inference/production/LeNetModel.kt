@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.handlers.NUMBER_OF_CLASSES
 
 private const val NUM_CHANNELS = 1L
@@ -86,7 +86,7 @@ val lenet5 = Sequential.of(
     )
 )
 
-fun getLabel(dataset: Dataset, imageId: Int): Int {
+fun getLabel(dataset: OnHeapDataset, imageId: Int): Int {
     val imageLabel = dataset.getY(imageId)
     return imageLabel.indexOfFirst { it == imageLabel.maxOrNull()!! }
 }

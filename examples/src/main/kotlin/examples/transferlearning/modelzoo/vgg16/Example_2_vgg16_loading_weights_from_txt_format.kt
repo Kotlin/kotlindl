@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -59,7 +59,7 @@ fun main() {
         it.loadWeights(getVGG16WeightsFile())
 
         for (i in 1..8) {
-            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
+            val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             val xTensorShape = it.inputLayer.input.asOutput().shape()

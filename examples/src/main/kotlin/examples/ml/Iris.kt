@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 5
@@ -30,7 +30,7 @@ private val model = Sequential.of(
 fun main() {
     data.shuffle()
 
-    val dataset = Dataset.create(
+    val dataset = OnHeapDataset.create(
         ::extractX,
         ::extractY
     )

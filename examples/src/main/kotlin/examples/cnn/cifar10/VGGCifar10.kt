@@ -19,7 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -169,7 +169,7 @@ fun main() {
     val cifarImagesArchive = properties["cifarImagesArchive"] as String
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
-    val dataset = Dataset.create(
+    val dataset = OnHeapDataset.create(
         cifarImagesArchive,
         cifarLabelsArchive,
         NUM_LABELS,

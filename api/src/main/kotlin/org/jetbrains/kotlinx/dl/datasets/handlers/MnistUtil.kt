@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets.handlers
 
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.io.DataInputStream
 import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
@@ -57,7 +57,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
     for (i in 0 until imageCount) {
         archiveStream.readFully(imageBuffer)
         images[i] =
-            Dataset.toNormalizedVector(
+            OnHeapDataset.toNormalizedVector(
                 imageBuffer
             )
     }
@@ -83,7 +83,7 @@ public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray
         Array(labelCount) { FloatArray(numClasses) }
     for (i in 0 until labelCount) {
         floats[i] =
-            Dataset.toOneHotVector(
+            OnHeapDataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

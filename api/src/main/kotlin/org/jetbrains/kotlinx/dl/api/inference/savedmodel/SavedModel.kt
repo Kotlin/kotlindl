@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 
@@ -80,7 +80,7 @@ public open class SavedModel : InferenceModel() {
      *
      * @param [dataset] Dataset.
      */
-    public fun predictAll(dataset: Dataset): List<Int> {
+    public fun predictAll(dataset: OnHeapDataset): List<Int> {
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
@@ -100,7 +100,7 @@ public open class SavedModel : InferenceModel() {
      * @param [outputTensorName] The name of output tensor.
      * @param [dataset] Dataset.
      */
-    public fun predictAll(dataset: Dataset, inputTensorName: String, outputTensorName: String): List<Int> {
+    public fun predictAll(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
@@ -117,7 +117,7 @@ public open class SavedModel : InferenceModel() {
      * NOTE: Slow method, executed on client side, not in TensorFlow.
      */
     public fun evaluate(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         metric: Metrics
     ): Double {
 

@@ -6,7 +6,7 @@
 package examples.cnn.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.IOException
@@ -70,7 +70,7 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
 
     for (i in 0 until labelCount) {
         floats[i] =
-            Dataset.toOneHotVector(
+            OnHeapDataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -96,7 +96,7 @@ fun main() {
 }
 
 
-fun prepareCustomDatasetFromPaths(vararg paths: String): Dataset {
+fun prepareCustomDatasetFromPaths(vararg paths: String): OnHeapDataset {
     val listOfImages = mutableListOf<FloatArray>()
     val listOfLabels = mutableListOf<FloatArray>()
     val numberOfClasses = paths.size
@@ -132,7 +132,7 @@ fun prepareCustomDatasetFromPaths(vararg paths: String): Dataset {
     val shuffledData = sortedData.shuffled()
     val (x, y) = shuffledData.unzip()
 
-    return Dataset.create({ x.toTypedArray() }, { y.toTypedArray() })
+    return OnHeapDataset.create({ x.toTypedArray() }, { y.toTypedArray() })
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
