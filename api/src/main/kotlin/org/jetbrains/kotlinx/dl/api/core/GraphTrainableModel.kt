@@ -27,7 +27,8 @@ import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataBatch
+import org.jetbrains.kotlinx.dl.datasets.DataBatch
+import org.jetbrains.kotlinx.dl.datasets.Dataset
 import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
@@ -260,7 +261,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         for (i in 1..epochs) {
             if (!stopTraining) {
                 callback.onEpochBegin(i, trainingHistory)
-                val batchIter: OnHeapDataset.BatchIterator = trainingDataset.batchIterator(
+                val batchIter: Dataset.BatchIterator = trainingDataset.batchIterator(
                     trainBatchSize
                 )
 
@@ -270,7 +271,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
                 while (batchIter.hasNext() && !stopTraining) { // TODO: analyze before release <==== could be stopped via callback
                     callback.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)
-                    val batch: OnHeapDataBatch = batchIter.next()
+                    val batch: DataBatch = batchIter.next()
 
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
 
@@ -348,7 +349,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     private fun batchValidation(
-        batch: OnHeapDataBatch,
+        batch: DataBatch,
         xBatchShape: LongArray,
         yBatchShape: LongArray
     ) {
@@ -419,7 +420,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         callback.onTestBegin()
 
-        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -429,7 +430,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         while (batchIter.hasNext()) {
             callback.onTestBatchBegin(batchCounter, batchSize, evaluationHistory)
-            val batch: OnHeapDataBatch = batchIter.next()
+            val batch: DataBatch = batchIter.next()
             val (imageShape, labelShape) = calculateXYShapes(batch)
 
             Tensor.create(
@@ -488,7 +489,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
 
-        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -497,7 +498,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         while (batchIter.hasNext()) {
             callback.onPredictBatchBegin(batchCounter, batchSize)
 
-            val batch: OnHeapDataBatch = batchIter.next()
+            val batch: DataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
@@ -556,7 +557,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
         val predictions = Array(dataset.xSize()) { FloatArray(amountOfClasses.toInt()) { 0.0f } }
 
-        val batchIter: OnHeapDataset.BatchIterator = dataset.batchIterator(
+        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
         )
 
@@ -565,7 +566,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         while (batchIter.hasNext()) {
             callback.onPredictBatchBegin(batchCounter, batchSize)
 
-            val batch: OnHeapDataBatch = batchIter.next()
+            val batch: DataBatch = batchIter.next()
 
             Tensor.create(
                 imageShape,
@@ -665,7 +666,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return runner.run()
     }
 
-    private fun calculateXYShapes(batch: OnHeapDataBatch): Pair<LongArray, LongArray> {
+    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
         val batchSize = batch.size
 
         val xBatchShape = calculateXShape(batchSize)

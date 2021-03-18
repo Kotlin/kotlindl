@@ -11,7 +11,7 @@ package org.jetbrains.kotlinx.dl.datasets
  * @param [y] Labels.
  * @param [size] Number of rows in batch.
  */
-public data class OnHeapDataBatch internal constructor(
+public data class DataBatch internal constructor(
     val x: Array<FloatArray>,
     val y: Array<FloatArray>,
     val size: Int

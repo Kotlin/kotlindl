@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.datasets
 
 import java.io.IOException
 import java.nio.FloatBuffer
-import kotlin.math.min
 import kotlin.math.truncate
 
 /**
@@ -17,41 +16,14 @@ import kotlin.math.truncate
  */
 public class OnHeapDataset internal constructor(private val x: Array<FloatArray>, private val y: Array<FloatArray>) :
     Dataset() {
-    /**
-     * An iterator over a [OnHeapDataset].
-     */
-    public inner class BatchIterator internal constructor(
-        private val batchSize: Int
-    ) : Iterator<OnHeapDataBatch?> {
-
-        private var batchStart = 0
-
-        override fun hasNext(): Boolean = batchStart < x.size
-
-        override fun next(): OnHeapDataBatch {
-            val size = min(batchSize, x.size - batchStart)
-            val batch = OnHeapDataBatch(
-                copyToBatch(x, batchStart, size), // TODO: make batch copy of X
-                copyToBatch(y, batchStart, size), // TODO: make batch copy of Y
-                size
-            )
-            batchStart += batchSize
-            return batch
-        }
-    }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    public fun copyToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
+    private fun copyToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
         val dataForBatch = Array(length) { FloatArray(src[0].size) { 0.0f } }
         for (i in start until start + length) {
             dataForBatch[i - start] = src[i].copyOf() // Creates new copy for batch data
         }
         return dataForBatch
-    }
-
-    /** Returns [BatchIterator] with fixed [batchSize]. */
-    override fun batchIterator(batchSize: Int): BatchIterator {
-        return BatchIterator(batchSize)
     }
 
     /** Splits datasets on two sub-datasets according [splitRatio].*/
@@ -140,7 +112,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
 
         /**
          * Takes data from consumers [featuresConsumer] and [labelConsumer]
-         * to create pair of train and test [OnHeapDataset].
+         * to dataset [OnHeapDataset].
          */
         @JvmStatic
         public fun create(
@@ -151,6 +123,24 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
                 val features = featuresConsumer()
                 val labels = labelConsumer()
 
+                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+
+                OnHeapDataset(features, labels)
+            } catch (e: IOException) {
+                throw AssertionError(e)
+            }
+        }
+
+        /**
+         * Takes data from external data [features] and [labels]
+         * to create dataset [OnHeapDataset].
+         */
+        @JvmStatic
+        public fun create(
+            features: Array<FloatArray>,
+            labels: Array<FloatArray>
+        ): OnHeapDataset {
+            return try {
                 check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
                 OnHeapDataset(features, labels)
@@ -179,5 +169,22 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
     override fun getLabel(idx: Int): Int {
         val labelArray = y[idx]
         return labelArray.indexOfFirst { it == labelArray.maxOrNull()!! }
+    }
+
+    // TODO: check that initial data are not shuffled or return void if are shuffled
+    override fun shuffle(): OnHeapDataset {
+        val sortedData = x.zip(y)
+        val shuffledData = sortedData.shuffled()
+        val (x, y) = shuffledData.unzip()
+
+        return create({ x.toTypedArray() }, { y.toTypedArray() })
+    }
+
+    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
+        return DataBatch(
+            copyToBatch(x, batchStart, batchLength),
+            copyToBatch(y, batchStart, batchLength),
+            batchLength
+        )
     }
 }

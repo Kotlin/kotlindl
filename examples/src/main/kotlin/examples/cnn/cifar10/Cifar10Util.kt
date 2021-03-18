@@ -17,14 +17,14 @@ private const val DATASET_SIZE = 50000
 fun extractCifar10Images(archiveName: String): Array<FloatArray> {
     val numOfPixels: Int = 32 * 32 * 3
 
-    return loadImagesFromZipArchive(
+    return loadImagesFromDirectory(
         numOfPixels,
         DATASET_SIZE,
         archiveName
     )
 }
 
-private fun loadImagesFromZipArchive(
+private fun loadImagesFromDirectory(
     numOfPixels: Int,
     subDatasetSize: Int,
     archiveName: String

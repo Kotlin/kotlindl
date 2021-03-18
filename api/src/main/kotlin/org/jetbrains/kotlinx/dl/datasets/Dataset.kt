@@ -5,12 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-public abstract class Dataset {
-    /** Returns [BatchIterator] with fixed [batchSize]. */
-    public abstract fun batchIterator(batchSize: Int): OnHeapDataset.BatchIterator
+import kotlin.math.min
 
+public abstract class Dataset {
     /** Splits datasets on two sub-datasets according [splitRatio].*/
-    public abstract fun split(splitRatio: Double): Pair<OnHeapDataset, OnHeapDataset>
+    public abstract fun split(splitRatio: Double): Pair<Dataset, Dataset>
 
     /** Returns amount of data rows. */
     public abstract fun xSize(): Int
@@ -23,4 +22,33 @@ public abstract class Dataset {
 
     /** Returns label as [Int] by index [idx]. */
     public abstract fun getLabel(idx: Int): Int
+
+    public abstract fun shuffle(): Dataset
+
+    /**
+     * An iterator over a [Dataset].
+     */
+    public inner class BatchIterator internal constructor(
+        private val batchSize: Int
+    ) : Iterator<DataBatch?> {
+
+        private var batchStart = 0
+
+        override fun hasNext(): Boolean = batchStart < xSize()
+
+        override fun next(): DataBatch {
+            val batchLength = min(batchSize, xSize() - batchStart)
+            val batch = createDataBatch(batchStart, batchLength)
+            batchStart += batchSize
+            return batch
+        }
+    }
+
+    protected abstract fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch
+
+
+    /** Returns [BatchIterator] with fixed [batchSize]. */
+    public fun batchIterator(batchSize: Int): BatchIterator {
+        return BatchIterator(batchSize)
+    }
 }
