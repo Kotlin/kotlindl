@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-class Normalization(fl: Float = 255.0f) : ImagePreprocessor {
+// TODO: https://en.wikipedia.org/wiki/Normalization_(image_processing)
+public class Normalization(newMin: Float, newMax: Float) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
-        TODO("Not yet implemented")
+        TODO()
     }
-
 }

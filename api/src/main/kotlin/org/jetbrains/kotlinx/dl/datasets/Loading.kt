@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -12,7 +13,7 @@ import java.nio.file.Paths
 import kotlin.streams.toList
 
 
-public class Loading(val dirLocation: String, val imageShape: IntArray) : ImagePreprocessor {
+public class Loading(val dirLocation: String, val imageShape: LongArray, colorMode: ColorOrder) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
         TODO("Not yet implemented")
     }

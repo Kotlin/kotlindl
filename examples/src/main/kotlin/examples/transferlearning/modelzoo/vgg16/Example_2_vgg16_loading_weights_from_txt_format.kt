@@ -68,7 +68,7 @@ fun main() {
                 *tail(xTensorShape)
             )
 
-            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

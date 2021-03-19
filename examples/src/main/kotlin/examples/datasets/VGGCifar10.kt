@@ -21,6 +21,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.*
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -170,11 +171,18 @@ fun main() {
     val cifarImagesArchive = properties["cifarImagesArchive"] as String
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
+    // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
     val imagePreprocessors = listOf(
-        Loading(cifarImagesArchive, imageShape = vgg11.imageShape), // TODO: add imageShape
-        Normalization(255.0f),
-        Cropping(),
-        Resize(),
+        Loading(
+            cifarImagesArchive,
+            imageShape = vgg11.inputDimensions,
+            colorMode = ColorOrder.RGB
+        ), // TODO: add imageShape
+        Rescaling(255.0f),
+        Normalization(newMin = 0.0f, newMax = 100.0f),
+        Cropping(left = 1, right = 1, top = 1, bottom = 1),
+        Rotate(degrees = Degrees.R_90),
+        Resize(height = 34, width = 34, interpolation = InterpolationType.NEAREST),
     )
 
     /* val images = Array(50000) { FloatArray(numOfPixels) }

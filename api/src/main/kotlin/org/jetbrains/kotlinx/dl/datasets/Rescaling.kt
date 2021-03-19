@@ -5,8 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-class Cropping(left: Int, right: Int, top: Int, bottom: Int) : ImagePreprocessor {
+class Rescaling(fl: Float = 255.0f) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
         TODO("Not yet implemented")
     }
+
 }

@@ -29,7 +29,6 @@ import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.datasets.DataBatch
 import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.io.File
@@ -49,6 +48,16 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
     /** The bunch of layers. */
     public val layers: List<Layer> = listOf(*layers)
+
+    public val inputLayer: Input
+        get() = layers[0] as Input
+
+    /** Returns input dimensions in order HWC (height, width, channels) */
+    public val inputDimensions: LongArray
+        get() {
+            val xTensorShape = inputLayer.input.asOutput().shape()
+            return tail(xTensorShape)
+        }
 
     /** Layers indexed by name. */
     protected var layersByName: Map<String, Layer> = mapOf()
@@ -109,6 +118,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
 
+            // TODO: check that preprocessing is correct for input layer
             preProcessLayerNames(layers)
             val seqModel = GraphTrainableModel(*layers)
             postProcessLayerNames(layers, seqModel)
@@ -178,8 +188,8 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     override fun fit(
-        trainingDataset: OnHeapDataset,
-        validationDataset: OnHeapDataset,
+        trainingDataset: Dataset,
+        validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
         validationBatchSize: Int
@@ -195,7 +205,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     override fun fit(
-        dataset: OnHeapDataset,
+        dataset: Dataset,
         epochs: Int,
         batchSize: Int
     ): TrainingHistory {
@@ -227,9 +237,9 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     private fun internalFit(
         trainBatchSize: Int,
         epochs: Int,
-        trainingDataset: OnHeapDataset,
+        trainingDataset: Dataset,
         validationIsEnabled: Boolean,
-        validationDataset: OnHeapDataset?,
+        validationDataset: Dataset?,
         validationBatchSize: Int?
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
@@ -412,7 +422,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         }
     }
 
-    override fun evaluate(dataset: OnHeapDataset, batchSize: Int): EvaluationResult {
+    override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
@@ -478,7 +488,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
     }
 
-    override fun predict(dataset: OnHeapDataset, batchSize: Int): IntArray {
+    override fun predict(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -546,7 +556,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
     }
 
-    override fun predictSoftly(dataset: OnHeapDataset, batchSize: Int): Array<FloatArray> {
+    override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }

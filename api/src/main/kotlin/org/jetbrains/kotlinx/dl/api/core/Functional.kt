@@ -33,9 +33,6 @@ import java.io.FileNotFoundException
  * @constructor Creates a Functional model via sequence of [layers].
  */
 public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
-    public val inputLayer: Input
-        get() = layers[0] as Input
-
     public companion object {
         /**
          * Creates the [Functional] model.
@@ -45,15 +42,16 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Functional {
+        public fun of(vararg layers: Layer): GraphTrainableModel {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
 
+            // TODO: check that preprocessing is correct for input layer
             preProcessLayerNames(layers)
-            val seqModel = Functional(*layers)
-            postProcessLayerNames(layers, seqModel)
-            return seqModel
+            val model = Functional(*layers)
+            postProcessLayerNames(layers, model)
+            return model
         }
 
         /**
@@ -70,9 +68,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             val otherLayers = layers.subList(1, layers.size)
             preProcessLayerNames(otherLayers.toTypedArray())
-            val seqModel = Functional(*layers.toTypedArray())
-            postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
-            return seqModel
+            val model = Functional(*layers.toTypedArray())
+            postProcessLayerNames(otherLayers.toTypedArray(), model)
+            return model
         }
 
         /**

@@ -87,5 +87,9 @@ public enum class ColorOrder {
     RGB,
 
     /** Blue, green, red. */
-    BGR
+    BGR,
+
+    RGBA,
+
+    GREYSCALE
 }

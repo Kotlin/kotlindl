@@ -56,7 +56,7 @@ fun main() {
                 *tail(xTensorShape)
             )
 
-            val inputData = modelLoader.preprocessInput(floatArray, tensorShape)
+            val inputData = modelLoader.preprocessInput(floatArray, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

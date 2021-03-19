@@ -108,7 +108,6 @@ fun prepareCustomDatasetFromPaths(vararg paths: String): OnHeapDataset {
                 val rawImage = ImageConverter.toRawFloatArray(it)
 
                 val tensorShape = longArrayOf(
-                    1,
                     224,
                     224,
                     3

@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-class Cropping(left: Int, right: Int, top: Int, bottom: Int) : ImagePreprocessor {
-    override fun apply(image: FloatArray): FloatArray {
-        TODO("Not yet implemented")
-    }
+public enum class InterpolationType {
+    BILINEAR, NEAREST, BICUBIC, AREA, LANCZOS3, LANCZOS5, GAUSSIAN, MITCHELLCUBIC
 }

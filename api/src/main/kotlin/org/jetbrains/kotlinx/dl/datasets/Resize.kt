@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-class Resize : ImagePreprocessor {
+class Resize(height: Int, width: Int, interpolation: InterpolationType) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
         TODO("Not yet implemented")
     }
