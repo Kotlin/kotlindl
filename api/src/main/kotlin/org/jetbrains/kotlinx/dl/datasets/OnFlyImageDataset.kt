@@ -17,10 +17,9 @@ import java.nio.FloatBuffer
 public class OnFlyImageDataset internal constructor(
     private val imagePreprocessors: List<ImagePreprocessor>,
     private val y: Array<FloatArray>
-) :
-    Dataset() {
+) : Dataset() {
 
-    private lateinit var xFiles: Array<File>
+    private var xFiles: Array<File>
 
     init {
         val loading = imagePreprocessors[0] as Loading

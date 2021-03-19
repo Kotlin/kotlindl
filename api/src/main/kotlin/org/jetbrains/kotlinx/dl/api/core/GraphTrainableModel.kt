@@ -55,8 +55,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     /** Returns input dimensions in order HWC (height, width, channels) */
     public val inputDimensions: LongArray
         get() {
-            val xTensorShape = inputLayer.input.asOutput().shape()
-            return tail(xTensorShape)
+            return (layers[0] as Input).packedDims
         }
 
     /** Layers indexed by name. */

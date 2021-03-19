@@ -7,6 +7,6 @@ package org.jetbrains.kotlinx.dl.datasets
 
 class Cropping(left: Int, right: Int, top: Int, bottom: Int) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
-        TODO("Not yet implemented")
+        return image
     }
 }

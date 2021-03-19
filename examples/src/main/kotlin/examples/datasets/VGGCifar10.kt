@@ -177,7 +177,7 @@ fun main() {
             cifarImagesArchive,
             imageShape = vgg11.inputDimensions,
             colorMode = ColorOrder.RGB
-        ), // TODO: add imageShape
+        ),
         Rescaling(255.0f),
         Normalization(newMin = 0.0f, newMax = 100.0f),
         Cropping(left = 1, right = 1, top = 1, bottom = 1),
@@ -185,17 +185,8 @@ fun main() {
         Resize(height = 34, width = 34, interpolation = InterpolationType.NEAREST),
     )
 
-    /* val images = Array(50000) { FloatArray(numOfPixels) }
-
-     for (i in 1..50000) {
-         images[i - 1] = ImageConverter.toNormalizedFloatArray(File("$cifarImagesArchive\\$i.png"))
-     }
-
-     val x = images*/
     val y = extractCifar10Labels(cifarLabelsArchive, 10)
     val dataset = OnFlyImageDataset.create(imagePreprocessors, y)
-
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     vgg11.use {
         it.compile(
@@ -206,11 +197,11 @@ fun main() {
 
         it.summary()
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = dataset, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
     }

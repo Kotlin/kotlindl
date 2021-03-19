@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.datasets
 
 public class Rotate(degrees: Degrees) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
-        TODO("Not yet implemented")
+        return image
     }
-
 }
