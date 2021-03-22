@@ -27,8 +27,8 @@ import java.io.FileReader
 import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
-private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 500
+private const val EPOCHS = 1
+private const val TRAINING_BATCH_SIZE = 100
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
@@ -198,7 +198,9 @@ fun main() {
 
         it.summary()
 
+        val start = System.currentTimeMillis()
         it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        println("Training time: ${(System.currentTimeMillis() - start) / 1000f}")
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 

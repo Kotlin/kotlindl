@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.datasets.image
 import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -73,9 +72,10 @@ public class ImageConverter {
          */
         @Throws(IOException::class)
         public fun getImage(inputStream: InputStream, imageType: String = "png"): BufferedImage {
+            ImageIO.setUseCache(false)
             val image = ImageIO.read(inputStream)
-            val baos = ByteArrayOutputStream()
-            ImageIO.write(image, imageType, baos)
+            /*val baos = ByteArrayOutputStream()
+            ImageIO.write(image, imageType, baos)*/
             return image
         }
     }
