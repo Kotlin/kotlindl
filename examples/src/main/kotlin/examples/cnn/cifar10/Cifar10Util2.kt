@@ -7,42 +7,15 @@ package examples.cnn.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
-import java.io.File
 import java.io.IOException
 
 private const val DATASET_SIZE = 50000
 
 @Throws(IOException::class)
-fun extractCifar10Images(archiveName: String): Array<FloatArray> {
-    val numOfPixels: Int = 32 * 32 * 3
-
-    return loadImagesFromDirectory(
-        numOfPixels,
-        DATASET_SIZE,
-        archiveName
-    )
-}
-
-private fun loadImagesFromDirectory(
-    numOfPixels: Int,
-    subDatasetSize: Int,
-    archiveName: String
-): Array<FloatArray> {
-    val images = Array(subDatasetSize) { FloatArray(numOfPixels) }
-
-    for (i in 1..50000) {
-        images[i - 1] = ImageConverter.toNormalizedFloatArray(File("$archiveName\\$i.png"))
-    }
-
-    return images
-}
-
-@Throws(IOException::class)
-fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArray> {
+fun extractCifar10LabelsAnsSort(pathToLabels: String, numClasses: Int): Array<FloatArray> {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
-    val labelBuffer = ByteArray(labelCount)
+    val labelSorter = mutableMapOf<String, Int>()
 
     val dictionary = mapOf(
         "airplane" to 0,
@@ -57,14 +30,16 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
         "truck" to 9
     )
 
-    var cnt = 0
     csvReader().open(pathToLabels) {
         readAllAsSequence()
             .forEach { row ->
-                labelBuffer[cnt] = dictionary.getOrElse(row[1]) { 1 }.toByte()
-                cnt++
+                labelSorter[row[0]] = dictionary.getOrElse(row[1]) { 1 }
             }
     }
+
+    val sortedMap = labelSorter.toSortedMap()
+
+    val labelBuffer = sortedMap.values.toIntArray()
 
     val floats =
         Array(labelCount) { FloatArray(numClasses) }
@@ -73,7 +48,7 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
         floats[i] =
             OnHeapDataset.toOneHotVector(
                 numClasses,
-                labelBuffer[i]
+                labelBuffer[i].toByte()
             )
     }
     return floats

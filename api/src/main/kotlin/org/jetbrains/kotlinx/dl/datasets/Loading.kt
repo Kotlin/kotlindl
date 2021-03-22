@@ -11,7 +11,6 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.streams.toList
 
 
 public class Loading(
@@ -31,6 +30,7 @@ public class Loading(
         return Files.list(Paths.get(dirLocation))
             .filter { path: Path -> Files.isRegularFile(path) }
             .filter { path: Path -> path.toString().endsWith(".jpg") || path.toString().endsWith(".png") }
-            .map { obj: Path -> obj.toFile() }.toList().toTypedArray()
+            .map { obj: Path -> obj.toFile() }
+            .toTypedArray()
     }
 }

@@ -50,7 +50,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
         /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
         @JvmStatic
         public fun toNormalizedVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)) / 255f }
+            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)).toFloat() / 255f }
         }
 
         /** Converts [bytes] to [FloatArray]. */

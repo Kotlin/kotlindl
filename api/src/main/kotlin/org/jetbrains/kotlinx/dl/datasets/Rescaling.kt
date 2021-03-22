@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-public class Rescaling(public val scalingCoefficient: Float = 255.0f) : ImagePreprocessor {
+public class Rescaling(public val scalingCoefficient: Float = 255f) : ImagePreprocessor {
     override fun apply(image: FloatArray): FloatArray {
         for (i in image.indices) {
             image[i] = image[i] / scalingCoefficient

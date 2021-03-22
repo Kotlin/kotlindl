@@ -5,7 +5,7 @@
 
 package examples.datasets
 
-import examples.cnn.cifar10.extractCifar10Labels
+import examples.cnn.cifar10.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
@@ -124,7 +124,7 @@ private val vgg11 = Sequential.of(
         filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Elu,
+        activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
@@ -133,7 +133,7 @@ private val vgg11 = Sequential.of(
         filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Elu,
+        activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
@@ -176,16 +176,17 @@ fun main() {
         Loading(
             cifarImagesArchive,
             imageShape = vgg11.inputDimensions,
-            colorMode = ColorOrder.RGB
+            colorMode = ColorOrder.BGR
         ),
-        Rescaling(255.0f),
+        Rescaling(255f),
         Normalization(newMin = 0.0f, newMax = 100.0f),
         Cropping(left = 1, right = 1, top = 1, bottom = 1),
         Rotate(degrees = Degrees.R_90),
         Resize(height = 34, width = 34, interpolation = InterpolationType.NEAREST),
     )
 
-    val y = extractCifar10Labels(cifarLabelsArchive, 10)
+    // TODO: labels should have the same order like files, need to create a dictionary label-to-file
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
     val dataset = OnFlyImageDataset.create(imagePreprocessors, y)
 
     vgg11.use {
