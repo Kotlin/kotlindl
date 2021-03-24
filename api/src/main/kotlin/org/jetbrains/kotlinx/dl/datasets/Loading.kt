@@ -17,6 +17,7 @@ import kotlin.streams.toList
 public class Loading(
     public val dirLocation: String,
     public val imageShape: ImageShape,
+    /** Keep channels in the given order after loading. */
     public val colorMode: ColorOrder
 ) : ImagePreprocessor {
     override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
@@ -27,10 +28,10 @@ public class Loading(
         return ImageConverter.toRawFloatArray(file, colorOrder = colorMode)
     }
 
-    internal fun fileTo2D(file: File): Array<Array<FloatArray>> {
+    /*internal fun fileTo2D(file: File): Array<Array<FloatArray>> {
         val image = ImageConverter.getImage(file.inputStream())
         return ImageConverter.imageTo3DFloatArray(image)
-    }
+    }*/
 
     public fun prepareFileNames(): Array<File> {
         return Files.list(Paths.get(dirLocation))

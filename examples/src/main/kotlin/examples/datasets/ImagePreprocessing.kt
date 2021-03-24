@@ -6,7 +6,7 @@
 package examples.datasets
 
 import examples.cnn.cifar10.extractCifar10LabelsAnsSort
-import org.jetbrains.kotlinx.dl.api.extension.get2D
+import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.datasets.*
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import java.awt.Color
@@ -46,7 +46,7 @@ fun main() {
         8
     )
 
-    val rawImage = batchIter.next().x[1]
+    val rawImage = batchIter.next().x[0]
 
     val frame = JFrame("Filters")
     frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(200, 200, 3)))
@@ -60,7 +60,7 @@ class ImagesJPanel(
     val dst: FloatArray,
     val imageShape: ImageShape
 ) : JPanel() {
-    override fun paint(g: Graphics) {
+    override fun paint(graphics: Graphics) {
         for (i in 0 until imageShape.width.toInt()) {
             for (j in 0 until imageShape.height.toInt()) {
                 val pixelWidth = 4
@@ -68,13 +68,20 @@ class ImagesJPanel(
                 var x = 100 + i * pixelWidth
                 val y = 100 + j * pixelHeight
 
-                val float = dst.get2D(i, j, imageShape.width.toInt()) // just one channel
-                val grey = (min(1.0f, max(float * 0.5f, 0.0f)) * 255).toInt()
-                val color = Color(grey, grey, grey)
-                g.color = color
-                g.fillRect(y, x, pixelWidth, pixelHeight)
-                g.color = Color.BLACK
-                g.drawRect(y, x, pixelWidth, pixelHeight)
+                val r =
+                    dst.get3D(i, j, 2, imageShape.width.toInt(), imageShape.channels.toInt())
+                val g =
+                    dst.get3D(i, j, 1, imageShape.width.toInt(), imageShape.channels.toInt())
+                val b =
+                    dst.get3D(i, j, 0, imageShape.width.toInt(), imageShape.channels.toInt())
+                val r1 = (min(1.0f, max(r * 0.5f, 0.0f)) * 255).toInt()
+                val g1 = (min(1.0f, max(g * 0.5f, 0.0f)) * 255).toInt()
+                val b1 = (min(1.0f, max(b * 0.5f, 0.0f)) * 255).toInt()
+                val color = Color(r1, g1, b1)
+                graphics.color = color
+                graphics.fillRect(y, x, pixelWidth, pixelHeight)
+                graphics.color = Color.BLACK
+                graphics.drawRect(y, x, pixelWidth, pixelHeight)
             }
         }
     }

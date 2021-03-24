@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.datasets.image
 
 import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage.TYPE_3BYTE_BGR
 import java.awt.image.DataBufferByte
 import java.io.File
 import java.io.IOException
@@ -54,15 +55,22 @@ public class ImageConverter {
         }
 
         private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
-            val res = (image.raster.dataBuffer as DataBufferByte).data // pixels
+            var res = (image.raster.dataBuffer as DataBufferByte).data // pixels
+            check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
+            check(image.type == TYPE_3BYTE_BGR) { "Images with image type (constant from BufferedImage class) ${image.type} are not supported!" }
 
-            if (colorOrder == ColorOrder.BGR) {
-                for (i in res.indices) {
-                    if (i % 3 == 2) { // swap i and i-2 elements from BGR to RGB
-                        val tmp = res[i]
-                        res[i] = res[i - 2]
-                        res[i - 2] = tmp
-                    }
+            if (image.type == TYPE_3BYTE_BGR && colorOrder == ColorOrder.RGB) {
+                res = swapRandB(res)
+            }
+            return res
+        }
+
+        private fun swapRandB(res: ByteArray): ByteArray {
+            for (i in res.indices) {
+                if (i % 3 == 2) { // swap i and i-2 elements from BGR to RGB
+                    val tmp = res[i]
+                    res[i] = res[i - 2]
+                    res[i - 2] = tmp
                 }
             }
             return res
@@ -133,10 +141,7 @@ public class ImageConverter {
         @Throws(IOException::class)
         public fun getImage(inputStream: InputStream, imageType: String = "png"): BufferedImage {
             ImageIO.setUseCache(false)
-            val image = ImageIO.read(inputStream)
-            /*val baos = ByteArrayOutputStream()
-            ImageIO.write(image, imageType, baos)*/
-            return image
+            return ImageIO.read(inputStream)
         }
     }
 }
