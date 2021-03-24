@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.datasets
 
 public class Rotate(degrees: Degrees) : ImagePreprocessor {
-    override fun apply(image: FloatArray): FloatArray {
-        return image
+    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
+        return Pair(image, inputShape)
     }
 }

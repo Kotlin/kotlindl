@@ -55,6 +55,7 @@ public class ImageConverter {
 
         private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
             val res = (image.raster.dataBuffer as DataBufferByte).data // pixels
+
             if (colorOrder == ColorOrder.BGR) {
                 for (i in res.indices) {
                     if (i % 3 == 2) { // swap i and i-2 elements from BGR to RGB
@@ -65,6 +66,65 @@ public class ImageConverter {
                 }
             }
             return res
+        }
+
+        public fun imageTo3DFloatArray(
+            image: BufferedImage,
+            colorOrder: ColorOrder = ColorOrder.BGR
+        ): Array<Array<FloatArray>> {
+            val pixels = (image.raster.dataBuffer as DataBufferByte).data
+            val width = image.width
+            val height = image.height
+            val hasAlphaChannel = image.alphaRaster != null
+            val lastDimensions = if (hasAlphaChannel) 4 else 3
+
+            val result = Array(height) { Array(width) { FloatArray(lastDimensions) } }
+            if (hasAlphaChannel) {
+                val pixelLength = 4
+                var pixel = 0
+                var row = 0
+                var col = 0
+                while (pixel < pixels.size) {
+                    result[row][col][3] = (pixels[pixel].toInt() and 0xff shl 24).toFloat() // alpha
+                    result[row][col][0] = (pixels[pixel + 1].toInt() and 0xff).toFloat() // blue
+                    if (colorOrder == ColorOrder.RGB) {
+                        result[row][col][1] = (pixels[pixel + 2].toInt() and 0xff shl 8).toFloat() // green
+                        result[row][col][2] = (pixels[pixel + 3].toInt() and 0xff shl 16).toFloat() // red
+                    } else {
+                        result[row][col][2] = (pixels[pixel + 2].toInt() and 0xff shl 8).toFloat() // green
+                        result[row][col][1] = (pixels[pixel + 3].toInt() and 0xff shl 16).toFloat() // red
+                    }
+
+                    col++
+                    if (col == width) {
+                        col = 0
+                        row++
+                    }
+                    pixel += pixelLength
+                }
+            } else {
+                val pixelLength = 3
+                var pixel = 0
+                var row = 0
+                var col = 0
+                while (pixel < pixels.size) {
+                    result[row][col][0] = (pixels[pixel].toInt() and 0xff).toFloat() // blue
+                    if (colorOrder == ColorOrder.RGB) {
+                        result[row][col][1] = (pixels[pixel + 1].toInt() and 0xff shl 8).toFloat() // green
+                        result[row][col][2] = (pixels[pixel + 2].toInt() and 0xff shl 16).toFloat() // red
+                    } else {
+                        result[row][col][2] = (pixels[pixel + 1].toInt() and 0xff shl 8).toFloat() // green
+                        result[row][col][1] = (pixels[pixel + 2].toInt() and 0xff shl 16).toFloat() // red
+                    }
+                    col++
+                    if (col == width) {
+                        col = 0
+                        row++
+                    }
+                    pixel += pixelLength
+                }
+            }
+            return result
         }
 
         /**

@@ -27,12 +27,12 @@ import java.io.FileReader
 import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 100
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 32L
+private const val IMAGE_SIZE = 28L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 /**
@@ -138,10 +138,10 @@ private val vgg11 = Sequential.of(
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
-    MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
-    ),
+    /* MaxPool2D(
+         poolSize = intArrayOf(1, 2, 2, 1),
+         strides = intArrayOf(1, 2, 2, 1)
+     ),*/
     Flatten(),
     Dense(
         outputSize = 512,
@@ -175,12 +175,12 @@ fun main() {
     val imagePreprocessors = listOf(
         Loading(
             cifarImagesArchive,
-            imageShape = vgg11.inputDimensions,
+            imageShape = ImageShape(32, 32, 3),
             colorMode = ColorOrder.BGR
         ),
         Rescaling(255f),
         Normalization(newMin = 0.0f, newMax = 100.0f),
-        Cropping(left = 1, right = 1, top = 1, bottom = 1),
+        Cropping(left = 2, right = 2, top = 2, bottom = 2),
         Rotate(degrees = Degrees.R_90),
         Resize(height = 34, width = 34, interpolation = InterpolationType.NEAREST),
     )

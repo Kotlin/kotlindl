@@ -16,15 +16,20 @@ import kotlin.streams.toList
 
 public class Loading(
     public val dirLocation: String,
-    public val imageShape: LongArray,
+    public val imageShape: ImageShape,
     public val colorMode: ColorOrder
 ) : ImagePreprocessor {
-    override fun apply(image: FloatArray): FloatArray {
+    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
         TODO("Not yet implemented")
     }
 
     internal fun fileToImage(file: File): FloatArray {
         return ImageConverter.toRawFloatArray(file, colorOrder = colorMode)
+    }
+
+    internal fun fileTo2D(file: File): Array<Array<FloatArray>> {
+        val image = ImageConverter.getImage(file.inputStream())
+        return ImageConverter.imageTo3DFloatArray(image)
     }
 
     public fun prepareFileNames(): Array<File> {

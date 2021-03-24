@@ -5,8 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-class Resize(height: Int, width: Int, interpolation: InterpolationType) : ImagePreprocessor {
-    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
-        return Pair(image, inputShape)
-    }
+public class ImageShape(public val width: Long, public val height: Long, public val channels: Long = 3) {
+    public val numberOfElements: Long
+        get() = width * height * channels
 }

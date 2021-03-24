@@ -39,9 +39,12 @@ public class OnFlyImageDataset internal constructor(
 
     private fun applyImagePreprocessing(file: File): FloatArray {
         val loading = imagePreprocessors[0] as Loading
+        var inputShape = loading.imageShape
         var rawImage = loading.fileToImage(file)
         for (i in 1..imagePreprocessors.lastIndex) {
-            rawImage = imagePreprocessors[i].apply(rawImage)
+            val (image, shape) = imagePreprocessors[i].apply(rawImage, inputShape)
+            rawImage = image
+            inputShape = shape
         }
         return rawImage
     }
