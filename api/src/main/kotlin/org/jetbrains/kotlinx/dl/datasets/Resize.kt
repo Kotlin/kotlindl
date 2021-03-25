@@ -15,14 +15,14 @@ import java.awt.image.BufferedImage
 // как вариант надо обернуть bufferedImage как сделали в той самой библиотеке
 
 public class Resize(
-    public var outputHeight: Int = 100,
     public var outputWidth: Int = 100,
+    public var outputHeight: Int = 100,
     public var interpolation: InterpolationType = InterpolationType.BILINEAR
 ) : ImagePreprocessor {
     override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
         val resizedImage = BufferedImage(outputWidth, outputHeight, BufferedImage.TYPE_3BYTE_BGR)
         val graphics2D = resizedImage.createGraphics()
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
         //graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED)
         //graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         graphics2D.drawImage(image, 0, 0, outputWidth, outputHeight, null)

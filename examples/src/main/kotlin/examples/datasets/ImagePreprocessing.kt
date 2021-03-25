@@ -37,7 +37,7 @@ fun main() {
                 colorMode = ColorOrder.BGR
             }
             rotate {
-                degrees = Degrees.R_90
+                degrees = 30f
             }
             crop {
                 left = 12
@@ -46,8 +46,8 @@ fun main() {
                 bottom = 12
             }
             resize {
-                outputHeight = 400
                 outputWidth = 400
+                outputHeight = 400
                 interpolation = InterpolationType.NEAREST
             }
         }
@@ -96,9 +96,9 @@ class ImagesJPanel(
                 val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
                 val color = Color(r1, g1, b1)
                 graphics.color = color
-                graphics.fillRect(y, x, pixelWidth, pixelHeight)
+                graphics.fillRect(x, y, pixelWidth, pixelHeight)
                 graphics.color = Color.BLACK
-                graphics.drawRect(y, x, pixelWidth, pixelHeight)
+                graphics.drawRect(x, y, pixelWidth, pixelHeight)
             }
         }
     }

@@ -180,7 +180,7 @@ fun main() {
                 colorMode = ColorOrder.BGR
             }
             rotate {
-                degrees = Degrees.R_90
+                degrees = 90f
             }
             crop {
                 left = 2
