@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
+import java.awt.image.BufferedImage
+
 public interface ImagePreprocessor {
-    public fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape>
-    // TODO: image + inputShape should be refactored to the edge object Image
+    public fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape>
 }
+
 
 
 

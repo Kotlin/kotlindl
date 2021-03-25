@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-public class Rotate(degrees: Degrees) : ImagePreprocessor {
-    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
+import java.awt.image.BufferedImage
+
+//TODO: refactor to float value if affine transformation will work
+public class Rotate(public var degrees: Degrees = Degrees.R_90) : ImagePreprocessor {
+    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
         return Pair(image, inputShape)
     }
 }

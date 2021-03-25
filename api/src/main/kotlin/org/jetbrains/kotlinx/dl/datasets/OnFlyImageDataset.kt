@@ -15,14 +15,14 @@ import java.nio.FloatBuffer
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  */
 public class OnFlyImageDataset internal constructor(
-    private val imagePreprocessors: List<ImagePreprocessor>, // TODO: maybe move to builder
+    private val preprocessing: Preprocessing, // TODO: maybe move to builder
     private val y: Array<FloatArray>
 ) : Dataset() {
 
     private var xFiles: Array<File> // maybe move to constructor
 
     init {
-        val loading = imagePreprocessors[0] as Loading
+        val loading = preprocessing.imagePreprocessing.load
         xFiles = loading.prepareFileNames()
     }
 
@@ -38,15 +38,7 @@ public class OnFlyImageDataset internal constructor(
     }
 
     private fun applyImagePreprocessing(file: File): FloatArray {
-        val loading = imagePreprocessors[0] as Loading
-        var inputShape = loading.imageShape
-        var rawImage = loading.fileToImage(file)
-        for (i in 1..imagePreprocessors.lastIndex) {
-            val (image, shape) = imagePreprocessors[i].apply(rawImage, inputShape)
-            rawImage = image
-            inputShape = shape
-        }
-        return rawImage
+        return preprocessing.handleFile(file)
     }
 
     // TODO: src argument could be removed as stupid
@@ -92,7 +84,7 @@ public class OnFlyImageDataset internal constructor(
          */
         @JvmStatic
         public fun create(
-            preprocessors: List<ImagePreprocessor>,
+            preprocessors: Preprocessing,
             labels: Array<FloatArray>
         ): OnFlyImageDataset {
             return try {

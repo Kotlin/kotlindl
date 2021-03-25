@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
+import java.awt.image.BufferedImage
+
 // TODO: https://en.wikipedia.org/wiki/Normalization_(image_processing)
 public class Normalization(newMin: Float, newMax: Float) : ImagePreprocessor {
-    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
-        return Pair(image, inputShape)
+    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+        TODO("Not yet implemented")
     }
+
 }

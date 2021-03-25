@@ -27,21 +27,37 @@ fun main() {
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
     // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
-    val imagePreprocessors = listOf(
-        Loading(
-            "C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg",
-            imageShape = ImageShape(224, 224, 3),
-            colorMode = ColorOrder.BGR
-        ),
-        Rescaling(255f),
-        Normalization(newMin = 0.0f, newMax = 100.0f),
-        Cropping(left = 12, right = 12, top = 12, bottom = 12),
-        Rotate(degrees = Degrees.R_90),
-        Resize(height = 34, width = 34, interpolation = InterpolationType.NEAREST),
-    )
+    val imageDirectory = "C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg"
+
+    val preprocessing: Preprocessing = preprocessing {
+        imagePreprocessing {
+            load {
+                dirLocation = imageDirectory
+                imageShape = ImageShape(224, 224, 3)
+                colorMode = ColorOrder.BGR
+            }
+            rotate {
+                degrees = Degrees.R_90
+            }
+            crop {
+                left = 12
+                right = 12
+                top = 12
+                bottom = 12
+            }
+            resize {
+                outputHeight = 400
+                outputWidth = 400
+                interpolation = InterpolationType.NEAREST
+            }
+        }
+        rescale {
+            scalingCoefficient = 225f
+        }
+    }
 
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnFlyImageDataset.create(imagePreprocessors, y)
+    val dataset = OnFlyImageDataset.create(preprocessing, y)
     val batchIter: Dataset.BatchIterator = dataset.batchIterator(
         8
     )
@@ -49,12 +65,13 @@ fun main() {
     val rawImage = batchIter.next().x[0]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(200, 200, 3)))
+    frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(400, 400, 3)))
     frame.setSize(1000, 1000)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
 }
+
 
 class ImagesJPanel(
     val dst: FloatArray,
@@ -63,8 +80,8 @@ class ImagesJPanel(
     override fun paint(graphics: Graphics) {
         for (i in 0 until imageShape.width.toInt()) {
             for (j in 0 until imageShape.height.toInt()) {
-                val pixelWidth = 4
-                val pixelHeight = 4
+                val pixelWidth = 2
+                val pixelHeight = 2
                 var x = 100 + i * pixelWidth
                 val y = 100 + j * pixelHeight
 
@@ -74,9 +91,9 @@ class ImagesJPanel(
                     dst.get3D(i, j, 1, imageShape.width.toInt(), imageShape.channels.toInt())
                 val b =
                     dst.get3D(i, j, 0, imageShape.width.toInt(), imageShape.channels.toInt())
-                val r1 = (min(1.0f, max(r * 0.5f, 0.0f)) * 255).toInt()
-                val g1 = (min(1.0f, max(g * 0.5f, 0.0f)) * 255).toInt()
-                val b1 = (min(1.0f, max(b * 0.5f, 0.0f)) * 255).toInt()
+                val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
+                val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
+                val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
                 val color = Color(r1, g1, b1)
                 graphics.color = color
                 graphics.fillRect(y, x, pixelWidth, pixelHeight)

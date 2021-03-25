@@ -14,6 +14,7 @@ import java.io.IOException
 import java.io.InputStream
 import javax.imageio.ImageIO
 
+
 /** Helper class to convert images to [FloatArray]. */
 public class ImageConverter {
     public companion object {
@@ -54,7 +55,11 @@ public class ImageConverter {
             return imageToByteArray(image, colorOrder)
         }
 
-        private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
+        public fun toBufferedImage(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): BufferedImage {
+            return getImage(inputStream)
+        }
+
+        internal fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
             var res = (image.raster.dataBuffer as DataBufferByte).data // pixels
             check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
             check(image.type == TYPE_3BYTE_BGR) { "Images with image type (constant from BufferedImage class) ${image.type} are not supported!" }

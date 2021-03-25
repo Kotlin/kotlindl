@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.datasets
 
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -15,17 +16,15 @@ import kotlin.streams.toList
 
 
 public class Loading(
-    public val dirLocation: String,
-    public val imageShape: ImageShape,
+    public var dirLocation: String = "",
+    public var imageShape: ImageShape = ImageShape(32, 32, 3),
     /** Keep channels in the given order after loading. */
-    public val colorMode: ColorOrder
+    public var colorMode: ColorOrder = ColorOrder.BGR
 ) : ImagePreprocessor {
-    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
-        TODO("Not yet implemented")
-    }
 
-    internal fun fileToImage(file: File): FloatArray {
-        return ImageConverter.toRawFloatArray(file, colorOrder = colorMode)
+
+    internal fun fileToImage(file: File): BufferedImage {
+        return ImageConverter.toBufferedImage(file.inputStream(), colorOrder = colorMode)
     }
 
     /*internal fun fileTo2D(file: File): Array<Array<FloatArray>> {
@@ -40,5 +39,9 @@ public class Loading(
             .map { obj: Path -> obj.toFile() }
             .toList()
             .toTypedArray()
+    }
+
+    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+        TODO("Not yet implemented")
     }
 }

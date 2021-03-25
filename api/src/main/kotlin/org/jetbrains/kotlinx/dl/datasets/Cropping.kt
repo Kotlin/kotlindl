@@ -5,12 +5,37 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-import org.jetbrains.kotlinx.dl.api.extension.get3D
-import org.jetbrains.kotlinx.dl.api.extension.set3D
+import java.awt.Graphics
+import java.awt.image.BufferedImage
 
-public class Cropping(public val top: Int, public val bottom: Int, public val left: Int, public val right: Int) :
+
+public class Cropping(
+    public var top: Int = 1,
+    public var bottom: Int = 1,
+    public var left: Int = 1,
+    public var right: Int = 1
+) :
     ImagePreprocessor {
-    override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
+    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+        val croppedImageShape =
+            ImageShape(
+                width = inputShape.width - left - right,
+                height = inputShape.height - top - bottom,
+                channels = inputShape.channels
+            )
+
+        val img = image.getSubimage(
+            top, left, (inputShape.height - top - bottom).toInt(),
+            (inputShape.width - left - right).toInt()
+        )
+
+        val croppedImage = BufferedImage(img.width, img.height, BufferedImage.TYPE_3BYTE_BGR)
+        val g: Graphics = croppedImage.createGraphics()
+        g.drawImage(img, 0, 0, null)
+
+        return Pair(croppedImage, croppedImageShape)
+    }
+    /*override fun apply(image: FloatArray, inputShape: ImageShape): Pair<FloatArray, ImageShape> {
         // TODO: check input parameters with inputShape on logic
         val croppedImageShape =
             ImageShape(
@@ -35,5 +60,5 @@ public class Cropping(public val top: Int, public val bottom: Int, public val le
         }
 
         return Pair(croppedImage, croppedImageShape)
-    }
+    }*/
 }

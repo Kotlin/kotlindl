@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
-public enum class InterpolationType {
-    BILINEAR, NEAREST, BICUBIC
+public interface Preprocessor {
+    public fun apply(data: FloatArray): FloatArray // move to shape
 }
+
+
+
+
