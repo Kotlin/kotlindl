@@ -195,7 +195,7 @@ fun main() {
             }
         }
         rescale {
-            scalingCoefficient = 225f
+            scalingCoefficient = 255f
         }
     }
 

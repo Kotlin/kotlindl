@@ -10,6 +10,20 @@ public class ImagePreprocessing {
     public lateinit var crop: Cropping
     public lateinit var resize: Resize
     public lateinit var rotate: Rotate
+
+    public val isCropInitialized: Boolean
+        get() = ::crop.isInitialized
+
+    public val isResizeInitialized: Boolean
+        get() = ::resize.isInitialized
+
+    public val isRotateInitialized: Boolean
+        get() = ::rotate.isInitialized
+
+    public val isLoadInitialized: Boolean
+        get() = ::load.isInitialized
+
+
 }
 
 public fun imagePreprocessing(init: ImagePreprocessing.() -> Unit): ImagePreprocessing =

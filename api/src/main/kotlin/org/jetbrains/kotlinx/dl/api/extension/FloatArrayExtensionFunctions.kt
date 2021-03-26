@@ -6,18 +6,25 @@
 package org.jetbrains.kotlinx.dl.api.extension
 
 // TODO: add the same method but with 3d channel navigation
-public fun FloatArray.set3D(x: Int, y: Int, z: Int, width: Int, channels: Int, value: Float) {
-    this[width * x * channels + y * channels + z] = value
+public fun FloatArray.set3D(
+    rowIndex: Int,
+    columnIndex: Int,
+    channelIndex: Int,
+    width: Int,
+    channels: Int,
+    value: Float
+) {
+    this[width * rowIndex * channels + columnIndex * channels + channelIndex] = value
 }
 
-public fun FloatArray.get3D(x: Int, y: Int, z: Int, width: Int, channels: Int): Float {
-    return this[width * x * channels + y * channels + z]
+public fun FloatArray.get3D(rowIndex: Int, columnIndex: Int, channelIndex: Int, width: Int, channels: Int): Float {
+    return this[width * rowIndex * channels + columnIndex * channels + channelIndex]
 }
 
-public fun FloatArray.set2D(x: Int, y: Int, width: Int, value: Float) {
-    this[width * x + y] = value
+public fun FloatArray.set2D(rowIndex: Int, columnIndex: Int, width: Int, value: Float) {
+    this[width * rowIndex + columnIndex] = value
 }
 
-public fun FloatArray.get2D(x: Int, y: Int, width: Int): Float {
-    return this[width * x + y]
+public fun FloatArray.get2D(rowIndex: Int, columnIndex: Int, width: Int): Float {
+    return this[width * rowIndex + columnIndex]
 }

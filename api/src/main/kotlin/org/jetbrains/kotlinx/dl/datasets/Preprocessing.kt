@@ -16,14 +16,34 @@ public class Preprocessing {
     public fun handleFile(file: File): FloatArray {
         //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
 
-        val image = imagePreprocessing.load.fileToImage(file)
-        val (croppedImage, croppedShape) = imagePreprocessing.crop.apply(image, imagePreprocessing.load.imageShape)
-        val (rotatedImage, rotatedShape) = imagePreprocessing.rotate.apply(croppedImage, croppedShape)
-        val (resizedImage, resizedShape) = imagePreprocessing.resize.apply(rotatedImage, rotatedShape)
+        var image = imagePreprocessing.load.fileToImage(file)
+        var shape = imagePreprocessing.load.imageShape
+
+        if (imagePreprocessing.isCropInitialized) {
+            val (croppedImage, croppedShape) = imagePreprocessing.crop.apply(image, shape)
+            image = croppedImage
+            shape = croppedShape
+        }
+
+        if (imagePreprocessing.isRotateInitialized) {
+            val (rotatedImage, rotatedShape) = imagePreprocessing.rotate.apply(image, shape)
+            image = rotatedImage
+            shape = rotatedShape
+        }
+
+        if (imagePreprocessing.isResizeInitialized) {
+            val (resizedImage, resizedShape) = imagePreprocessing.resize.apply(image, shape)
+            image = resizedImage
+            shape = resizedShape
+        }
+
         val floatArray = OnHeapDataset.toRawVector(
-            imageToByteArray(resizedImage, imagePreprocessing.load.colorMode)
+            imageToByteArray(image, imagePreprocessing.load.colorMode)
         )
-        return rescaling.apply(floatArray)
+
+        return if (::rescaling.isInitialized) {
+            rescaling.apply(floatArray)
+        } else floatArray
     }
 }
 

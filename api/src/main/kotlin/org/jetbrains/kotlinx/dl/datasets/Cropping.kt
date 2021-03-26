@@ -25,8 +25,7 @@ public class Cropping(
             )
 
         val img = image.getSubimage(
-            top, left, (inputShape.height - top - bottom).toInt(),
-            (inputShape.width - left - right).toInt()
+            left, top, (inputShape.width - left - right).toInt(), (inputShape.height - top - bottom).toInt(),
         )
 
         val croppedImage = BufferedImage(img.width, img.height, BufferedImage.TYPE_3BYTE_BGR)

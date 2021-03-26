@@ -37,13 +37,13 @@ fun main() {
                 colorMode = ColorOrder.BGR
             }
             rotate {
-                degrees = 30f
+                degrees = 0f
             }
             crop {
-                left = 12
-                right = 12
-                top = 12
-                bottom = 12
+                left = 100
+                right = 0
+                top = 100
+                bottom = 0
             }
             resize {
                 outputWidth = 400
@@ -65,7 +65,7 @@ fun main() {
     val rawImage = batchIter.next().x[0]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(400, 400, 3)))
+    frame.contentPane.add(ImagesJPanel2(rawImage, ImageShape(400, 400, 3)))
     frame.setSize(1000, 1000)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -73,7 +73,7 @@ fun main() {
 }
 
 
-private class ImagesJPanel(
+class ImagesJPanel2(
     val dst: FloatArray,
     val imageShape: ImageShape
 ) : JPanel() {
@@ -82,6 +82,9 @@ private class ImagesJPanel(
             for (j in 0 until imageShape.width.toInt()) { // columns
                 val pixelWidth = 2
                 val pixelHeight = 2
+
+                // y = columnIndex
+                // x = rowIndex
                 val y = 100 + i * pixelWidth
                 val x = 100 + j * pixelHeight
 
