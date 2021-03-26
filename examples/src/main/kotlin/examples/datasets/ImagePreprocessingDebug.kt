@@ -9,6 +9,8 @@ import examples.cnn.cifar10.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.datasets.*
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.InterpolationType
 import java.awt.Color
 import java.awt.Graphics
 import java.io.FileReader

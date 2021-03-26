@@ -22,6 +22,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.datasets.*
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.InterpolationType
 import java.io.File
 import java.io.FileReader
 import java.util.*

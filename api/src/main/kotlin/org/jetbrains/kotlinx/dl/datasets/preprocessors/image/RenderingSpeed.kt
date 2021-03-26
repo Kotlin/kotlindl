@@ -3,14 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets
+package org.jetbrains.kotlinx.dl.datasets.preprocessors.image
 
-import java.awt.image.BufferedImage
+public enum class RenderingSpeed {
+    FAST, SLOW, MEDIUM
 
-public interface ImagePreprocessor {
-    public fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape>
 }
-
-
-
-

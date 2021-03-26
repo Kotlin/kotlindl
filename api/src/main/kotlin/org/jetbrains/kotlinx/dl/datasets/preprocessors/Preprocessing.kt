@@ -3,9 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets
+package org.jetbrains.kotlinx.dl.datasets.preprocessors
 
+import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter.Companion.imageToByteArray
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.ImagePreprocessing
 import java.io.File
 
 public class Preprocessing {

@@ -3,8 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets
+package org.jetbrains.kotlinx.dl.datasets.preprocessors
 
-public enum class Degrees {
-    R_90, R_180, R_270, L_90, L_180, L_270
+public interface Preprocessor {
+    public fun apply(data: FloatArray): FloatArray // move to shape
 }
+
+
+
+

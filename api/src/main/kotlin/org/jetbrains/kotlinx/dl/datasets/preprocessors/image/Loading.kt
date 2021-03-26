@@ -3,10 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets
+package org.jetbrains.kotlinx.dl.datasets.preprocessors.image
 
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files

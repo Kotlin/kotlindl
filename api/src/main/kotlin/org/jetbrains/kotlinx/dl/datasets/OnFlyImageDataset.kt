@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
