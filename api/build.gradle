@@ -3,6 +3,29 @@ plugins {
     id 'org.jetbrains.dokka' version '0.10.1'
 }
 
+apply plugin: 'maven-publish'
+apply from: project.rootProject.file('gradle/maven-metadata.gradle')
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier 'javadoc'
+    from javadoc
+}
+
+def sonatypeUser = System.getenv('SONATYPE_USER')
+def sonatypePassword = System.getenv('SONATYPE_PASSWORD')
+
+nexusStaging {
+    username sonatypeUser
+    password sonatypePassword
+    packageGroup project.group.toString()
+    repositoryDescription "kotlinx.kotlindl staging repository, version: $version"
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
@@ -37,10 +60,6 @@ test {
     useJUnitPlatform()
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
 
 task fatJar(type: Jar) {
     manifest {
@@ -59,43 +78,35 @@ artifacts {
 publishing {
     publications {
         maven(MavenPublication) {
+            pom.withXml(configureMavenCentralMetadata)
             from components.java
             groupId project.group
             artifactId project.name
             version project.version
             artifact sourcesJar { classifier "sources" }
+            artifact javadocJar { classifier "javadoc" }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = sonatypeUser
+                password = sonatypePassword
+            }
         }
     }
 }
 
-if (hasProperty('bintray_user') && hasProperty('bintray_key')) {
-    bintray {
+def signingKey = System.getenv("SIGN_KEY_ID")
+def signingKeyPassphrase = System.getenv("SIGN_KEY_PASSPHRASE")
+def signingPrivateKey = System.getenv("SIGN_KEY_PRIVATE")
 
-        // property must be set in ~/.gradle/gradle.properties
-        user = bintray_user
-        key = bintray_key
-
-        publications = ['maven'] //When uploading configuration files
-
-        dryRun = false //Whether to run this as dry-run, without deploying
-        publish = true // If version should be auto published after an upload
-
-        pkg {
-            repo = 'kotlin-datascience'
-            name = 'kotlin-dl'
-            vcsUrl = 'https://github.com/JetBrains/KotlinDL'
-            userOrg = 'kotlin'
-            licenses = ['Apache-2.0']
-            publicDownloadNumbers = true
-
-            //Optional version descriptor
-            version {
-                name = project.version //Bintray logical version name
-                desc = '.'
-                released = new Date()
-                vcsTag = 'v' + project.version
-            }
-        }
+if (signingKey != null) {
+    apply plugin: 'signing'
+    signing {
+        useInMemoryPgpKeys(signingKey, signingPrivateKey, signingKeyPassphrase)
+        sign publishing.publications
     }
 }
 

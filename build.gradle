@@ -1,16 +1,16 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.10'
-    id 'maven-publish'
     id 'maven'
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'io.codearte.nexus-staging' version "0.22.0"
 }
 
+apply plugin: "io.codearte.nexus-staging"
+
 allprojects {
-    group = 'org.jetbrains.kotlin-deeplearning'
+    group = 'org.jetbrains.kotlinx'
     version = '0.1.1'
 
-    apply plugin: "com.jfrog.bintray"
-    apply plugin: "maven-publish"
+
     apply plugin: "maven"
     apply plugin: "kotlin"
 }
@@ -23,16 +23,14 @@ compileTestKotlin {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
 subprojects {
     repositories {
-        mavenLocal()
         mavenCentral()
         jcenter()
-        maven { url 'https://kotlin.bintray.com/kotlin-datascience' }
     }
 }
+
+
