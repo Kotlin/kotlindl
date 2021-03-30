@@ -10,6 +10,7 @@ public class ImagePreprocessing {
     public lateinit var crop: Cropping
     public lateinit var resize: Resize
     public lateinit var rotate: Rotate
+    public lateinit var save: Save
 
     public val isCropInitialized: Boolean
         get() = ::crop.isInitialized
@@ -23,7 +24,8 @@ public class ImagePreprocessing {
     public val isLoadInitialized: Boolean
         get() = ::load.isInitialized
 
-
+    public val isSaveInitialized: Boolean
+        get() = ::save.isInitialized
 }
 
 public fun ImagePreprocessing.load(block: Loading.() -> Unit) {
@@ -40,6 +42,10 @@ public fun ImagePreprocessing.crop(block: Cropping.() -> Unit) {
 
 public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
     resize = Resize().apply(block)
+}
+
+public fun ImagePreprocessing.save(block: Save.() -> Unit) {
+    save = Save().apply(block)
 }
 
 

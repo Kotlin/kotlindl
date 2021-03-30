@@ -39,7 +39,7 @@ public class OnFlyImageDataset internal constructor(
     }
 
     private fun applyImagePreprocessing(file: File): FloatArray {
-        return preprocessing.handleFile(file)
+        return preprocessing.handleFile(file).first
     }
 
     // TODO: src argument could be removed as stupid
@@ -51,7 +51,6 @@ public class OnFlyImageDataset internal constructor(
         }
         return dataForBatch
     }
-
 
     /** Splits datasets on two sub-datasets according [splitRatio].*/
     override fun split(splitRatio: Double): Pair<OnFlyImageDataset, OnFlyImageDataset> {

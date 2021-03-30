@@ -177,7 +177,7 @@ fun main() {
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
-                dirLocation = File(cifarImagesArchive)
+                pathToData = File(cifarImagesArchive)
                 imageShape = ImageShape(32, 32, 3)
                 colorMode = ColorOrder.BGR
             }

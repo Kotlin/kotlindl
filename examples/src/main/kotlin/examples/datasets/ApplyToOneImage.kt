@@ -5,42 +5,29 @@
 
 package examples.datasets
 
-import examples.cnn.cifar10.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.api.extension.get3D
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
 import org.jetbrains.kotlinx.dl.datasets.preprocessors.*
 import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.*
 import java.awt.Color
 import java.awt.Graphics
 import java.io.File
-import java.io.FileReader
-import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
 fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val cifarImagesArchive = properties["cifarImagesArchive"] as String
-    val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
-
-    // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
-    val imageDirectory =
-        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg")
+    val image =
+        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg\\image1.jpg")
 
     val preprocessedImagesDirectory =
-        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\processedImages")
+        File("C:\\Users\\zaleslaw\\processedImages")
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
-                pathToData = imageDirectory
+                pathToData = image
                 imageShape = ImageShape(224, 224, 3)
                 colorMode = ColorOrder.BGR
             }
@@ -67,16 +54,10 @@ fun main() {
         }
     }
 
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnFlyImageDataset.create(preprocessing, y)
-    val batchIter: Dataset.BatchIterator = dataset.batchIterator(
-        8
-    )
-
-    val rawImage = batchIter.next().x[0]
+    val rawImage = preprocessing().first
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagesJPanel2(rawImage, ImageShape(400, 400, 3)))
+    frame.contentPane.add(ImagesJPanel3(rawImage, ImageShape(400, 400, 3)))
     frame.setSize(1000, 1000)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -84,7 +65,7 @@ fun main() {
 }
 
 
-class ImagesJPanel2(
+class ImagesJPanel3(
     val dst: FloatArray,
     val imageShape: ImageShape
 ) : JPanel() {
@@ -108,7 +89,7 @@ class ImagesJPanel2(
                 val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
                 val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
                 val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
-                val color = Color(r1, g1, b1)
+                val color = Color(r, g, b)
                 graphics.color = color
                 graphics.fillRect(x, y, pixelWidth, pixelHeight)
                 graphics.color = Color.BLACK

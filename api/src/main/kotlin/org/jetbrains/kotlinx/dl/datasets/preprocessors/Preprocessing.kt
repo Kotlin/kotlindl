@@ -16,9 +16,16 @@ public class Preprocessing {
 
     public lateinit var rescalingStage: Rescaling
 
-    public fun handleFile(file: File): FloatArray {
-        //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
+    public operator fun invoke(): Pair<FloatArray, ImageShape> {
+        val file = imagePreprocessingStage.load.pathToData
+        require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
 
+        return handleFile(file)
+    }
+
+    internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
+        //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
+        val filename = file.name
         var image = imagePreprocessingStage.load.fileToImage(file)
         var shape = imagePreprocessingStage.load.imageShape
 
@@ -40,13 +47,17 @@ public class Preprocessing {
             shape = resizedShape
         }
 
+        if (imagePreprocessingStage.isSaveInitialized) {
+            imagePreprocessingStage.save.imageToFile(filename, image, shape)
+        }
+
         val floatArray = OnHeapDataset.toRawVector(
             imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
 
         return if (::rescalingStage.isInitialized) {
-            rescalingStage.apply(floatArray)
-        } else floatArray
+            Pair(rescalingStage.apply(floatArray), shape)
+        } else Pair(floatArray, shape)
     }
 }
 

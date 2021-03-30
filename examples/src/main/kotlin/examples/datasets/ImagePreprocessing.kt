@@ -37,7 +37,7 @@ fun main() {
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
-                dirLocation = imageDirectory
+                pathToData = imageDirectory
                 imageShape = ImageShape(224, 224, 3)
                 colorMode = ColorOrder.BGR
             }

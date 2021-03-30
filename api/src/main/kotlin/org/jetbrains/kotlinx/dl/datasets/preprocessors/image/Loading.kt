@@ -16,7 +16,7 @@ import kotlin.streams.toList
 
 
 public class Loading(
-    public var dirLocation: File? = null,
+    public var pathToData: File? = null,
     public var imageShape: ImageShape = ImageShape(32, 32, 3),
     /** Keep channels in the given order after loading. */
     public var colorMode: ColorOrder = ColorOrder.BGR
@@ -33,7 +33,7 @@ public class Loading(
     }*/
 
     public fun prepareFileNames(): Array<File> {
-        return Files.list(dirLocation!!.toPath())
+        return Files.list(pathToData!!.toPath())
             .filter { path: Path -> Files.isRegularFile(path) }
             .filter { path: Path -> path.toString().endsWith(".jpg") || path.toString().endsWith(".png") }
             .map { obj: Path -> obj.toFile() }
