@@ -90,7 +90,7 @@ fun main() {
 }
 
 @Throws(URISyntaxException::class)
-private fun getFileFromResource(fileName: String): File {
+fun getFileFromResource(fileName: String): File {
     val classLoader: ClassLoader = object {}.javaClass.classLoader
     val resource: URL? = classLoader.getResource(fileName)
     return if (resource == null) {

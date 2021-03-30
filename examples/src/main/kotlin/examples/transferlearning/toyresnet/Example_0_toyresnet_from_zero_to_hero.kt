@@ -25,7 +25,6 @@ import java.util.*
 fun main() {
     val (train, test) = fashionMnist()
 
-
     val jsonConfigFile = getResNetJSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 

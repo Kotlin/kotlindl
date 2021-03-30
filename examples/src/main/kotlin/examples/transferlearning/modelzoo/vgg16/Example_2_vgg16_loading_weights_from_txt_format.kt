@@ -9,13 +9,16 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.load
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.imagePreprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.preprocessingPipeline
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -59,16 +62,17 @@ fun main() {
         it.loadWeights(getVGG16WeightsFile())
 
         for (i in 1..8) {
-            val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
 
-            val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
-
-            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
+            val inputData = preprocessInput(preprocessing().first, model.inputDimensions, inputType = InputType.CAFFE)
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

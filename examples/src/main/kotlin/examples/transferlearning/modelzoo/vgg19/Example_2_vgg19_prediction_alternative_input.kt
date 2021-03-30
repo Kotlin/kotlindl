@@ -6,21 +6,22 @@
 package examples.transferlearning
 
 
-import io.jhdf.HdfFile
+import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.load
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.imagePreprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.preprocessingPipeline
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 /**
  * This examples demonstrates the inference concept on VGG'19 model:
@@ -43,11 +44,10 @@ import java.util.*
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    val jsonConfigFile = getResNet50JSONConfigFile()
-    val model = Sequential.loadModelConfiguration(jsonConfigFile)
-    model.inputLayer.packedDims = longArrayOf(240L, 240L, 3L)
+    val modelLoader = ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_19)
+    val model = modelLoader.loadModel() as Sequential
 
-    val imageNetClassLabels = prepareHumanReadableClassLabels()
+    val imageNetClassLabels = modelLoader.loadClassLabels()
 
     model.use {
         it.compile(
@@ -58,15 +58,23 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getResNet50WeightsFile()
+        val hdfFile = modelLoader.loadWeights()
 
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg240/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg240/image$i.jpg")
+                        imageShape = ImageShape(240, 240, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
 
-            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
+            // TODO: bad results, need re-run and rethink
+            val inputData = modelLoader.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -76,28 +84,6 @@ fun main() {
             println(top5.toString())
         }
     }
-}
-
-/** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNet50JSONConfigFile(): File {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val vgg19JSONModelPath = properties["vgg19JSONModelPath"] as String
-
-    return File(vgg19JSONModelPath)
-}
-
-/** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNet50WeightsFile(): HdfFile {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val vgg19h5WeightsPath = properties["vgg19h5WeightsPath"] as String
-
-    return HdfFile(File(vgg19h5WeightsPath))
 }
 
 

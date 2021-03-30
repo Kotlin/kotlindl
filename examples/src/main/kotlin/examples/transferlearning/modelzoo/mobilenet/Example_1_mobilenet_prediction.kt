@@ -6,6 +6,7 @@
 package examples.transferlearning.modelzoo.mobilenet
 
 
+import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -14,9 +15,12 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
 import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.load
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.imagePreprocessing
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.preprocessingPipeline
 import java.io.File
 
 /**
@@ -47,10 +51,17 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream, ColorOrder.RGB)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.RGB
+                    }
+                }
+            }
 
-            val inputData = modelLoader.preprocessInput(floatArray, model.inputDimensions)
+            val inputData = modelLoader.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

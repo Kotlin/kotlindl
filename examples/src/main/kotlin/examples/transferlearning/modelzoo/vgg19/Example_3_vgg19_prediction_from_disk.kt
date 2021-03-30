@@ -43,7 +43,7 @@ import java.util.*
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    val jsonConfigFile = getResNet50JSONConfigFile()
+    val jsonConfigFile = getVGG19JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     val imageNetClassLabels = prepareHumanReadableClassLabels()
@@ -57,7 +57,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getResNet50WeightsFile()
+        val hdfFile = getVGG19WeightsFile()
 
         it.loadWeights(hdfFile)
 
@@ -78,7 +78,7 @@ fun main() {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNet50JSONConfigFile(): File {
+private fun getVGG19JSONConfigFile(): File {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
@@ -89,7 +89,7 @@ private fun getResNet50JSONConfigFile(): File {
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNet50WeightsFile(): HdfFile {
+private fun getVGG19WeightsFile(): HdfFile {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)

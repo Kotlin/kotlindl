@@ -19,7 +19,7 @@ public class Loading(
     public var pathToData: File? = null,
     public var imageShape: ImageShape = ImageShape(32, 32, 3),
     /** Keep channels in the given order after loading. */
-    public var colorMode: ColorOrder = ColorOrder.BGR
+    public var colorMode: ColorOrder = ColorOrder.BGR // TODO: extract to the separate to BGR/RGB mode conversion before rescaling on floatArray, for example
 ) : ImagePreprocessor {
 
 
