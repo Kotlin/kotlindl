@@ -82,6 +82,7 @@ publishing {
             from components.java
             groupId project.group
             artifactId 'kotlin-deeplearning-api'
+            moduleName 'Kotlin Deep Learning API'
             version project.version
             artifact sourcesJar { classifier "sources" }
             artifact javadocJar { classifier "javadoc" }
