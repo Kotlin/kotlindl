@@ -174,10 +174,10 @@ fun main() {
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
     // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
-    val preprocessing: Preprocessing = preprocessing {
+    val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
-                dirLocation = cifarImagesArchive
+                dirLocation = File(cifarImagesArchive)
                 imageShape = ImageShape(32, 32, 3)
                 colorMode = ColorOrder.BGR
             }

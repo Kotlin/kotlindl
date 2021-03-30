@@ -23,7 +23,7 @@ public class OnFlyImageDataset internal constructor(
     private var xFiles: Array<File> // maybe move to constructor
 
     init {
-        val loading = preprocessing.imagePreprocessing.load
+        val loading = preprocessing.imagePreprocessingStage.load
         xFiles = loading.prepareFileNames()
     }
 

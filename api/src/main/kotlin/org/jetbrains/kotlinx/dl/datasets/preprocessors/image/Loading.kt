@@ -12,12 +12,11 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.streams.toList
 
 
 public class Loading(
-    public var dirLocation: String = "",
+    public var dirLocation: File? = null,
     public var imageShape: ImageShape = ImageShape(32, 32, 3),
     /** Keep channels in the given order after loading. */
     public var colorMode: ColorOrder = ColorOrder.BGR
@@ -34,7 +33,7 @@ public class Loading(
     }*/
 
     public fun prepareFileNames(): Array<File> {
-        return Files.list(Paths.get(dirLocation))
+        return Files.list(dirLocation!!.toPath())
             .filter { path: Path -> Files.isRegularFile(path) }
             .filter { path: Path -> path.toString().endsWith(".jpg") || path.toString().endsWith(".png") }
             .map { obj: Path -> obj.toFile() }

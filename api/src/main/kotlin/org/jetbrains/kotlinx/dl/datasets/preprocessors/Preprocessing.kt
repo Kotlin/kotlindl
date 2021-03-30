@@ -12,56 +12,52 @@ import java.io.File
 
 public class Preprocessing {
     // TODO: maybe it should be list of imageStages https://proandroiddev.com/writing-dsls-in-kotlin-part-2-cd9dcd0c4715 для целей расширения DSL кастомными классами
-    public lateinit var imagePreprocessing: ImagePreprocessing
-    public lateinit var rescaling: Rescaling
+    public lateinit var imagePreprocessingStage: ImagePreprocessing
+
+    public lateinit var rescalingStage: Rescaling
 
     public fun handleFile(file: File): FloatArray {
         //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
 
-        var image = imagePreprocessing.load.fileToImage(file)
-        var shape = imagePreprocessing.load.imageShape
+        var image = imagePreprocessingStage.load.fileToImage(file)
+        var shape = imagePreprocessingStage.load.imageShape
 
-        if (imagePreprocessing.isCropInitialized) {
-            val (croppedImage, croppedShape) = imagePreprocessing.crop.apply(image, shape)
+        if (imagePreprocessingStage.isCropInitialized) {
+            val (croppedImage, croppedShape) = imagePreprocessingStage.crop.apply(image, shape)
             image = croppedImage
             shape = croppedShape
         }
 
-        if (imagePreprocessing.isRotateInitialized) {
-            val (rotatedImage, rotatedShape) = imagePreprocessing.rotate.apply(image, shape)
+        if (imagePreprocessingStage.isRotateInitialized) {
+            val (rotatedImage, rotatedShape) = imagePreprocessingStage.rotate.apply(image, shape)
             image = rotatedImage
             shape = rotatedShape
         }
 
-        if (imagePreprocessing.isResizeInitialized) {
-            val (resizedImage, resizedShape) = imagePreprocessing.resize.apply(image, shape)
+        if (imagePreprocessingStage.isResizeInitialized) {
+            val (resizedImage, resizedShape) = imagePreprocessingStage.resize.apply(image, shape)
             image = resizedImage
             shape = resizedShape
         }
 
         val floatArray = OnHeapDataset.toRawVector(
-            imageToByteArray(image, imagePreprocessing.load.colorMode)
+            imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
 
-        return if (::rescaling.isInitialized) {
-            rescaling.apply(floatArray)
+        return if (::rescalingStage.isInitialized) {
+            rescalingStage.apply(floatArray)
         } else floatArray
     }
 }
 
-public fun preprocessing(init: Preprocessing.() -> Unit): Preprocessing =
+public fun preprocessingPipeline(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
 
 public fun Preprocessing.imagePreprocessing(block: ImagePreprocessing.() -> Unit) {
-    imagePreprocessing = ImagePreprocessing().apply(block)
+    imagePreprocessingStage = ImagePreprocessing().apply(block)
 }
 
 public fun Preprocessing.rescale(block: Rescaling.() -> Unit) {
-    rescaling = Rescaling().apply(block)
+    rescalingStage = Rescaling().apply(block)
 }
-
-
-
-
-

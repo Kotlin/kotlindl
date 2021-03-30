@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.datasets.preprocessors.*
 import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.*
 import java.awt.Color
 import java.awt.Graphics
+import java.io.File
 import java.io.FileReader
 import java.util.*
 import javax.swing.JFrame
@@ -30,9 +31,10 @@ fun main() {
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
     // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
-    val imageDirectory = "C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg"
+    val imageDirectory =
+        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg")
 
-    val preprocessing: Preprocessing = preprocessing {
+    val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
                 dirLocation = imageDirectory

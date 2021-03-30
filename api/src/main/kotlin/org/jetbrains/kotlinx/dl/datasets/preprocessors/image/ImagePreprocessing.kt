@@ -26,10 +26,6 @@ public class ImagePreprocessing {
 
 }
 
-public fun imagePreprocessing(init: ImagePreprocessing.() -> Unit): ImagePreprocessing =
-    ImagePreprocessing()
-        .apply(init)
-
 public fun ImagePreprocessing.load(block: Loading.() -> Unit) {
     load = Loading().apply(block)
 }
