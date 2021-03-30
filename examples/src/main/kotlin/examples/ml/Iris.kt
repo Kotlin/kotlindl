@@ -62,11 +62,11 @@ fun extractX(): Array<FloatArray> {
     return Array(data.size, init = init)
 }
 
-fun extractY(): Array<FloatArray> {
-    val labels = Array(data.size) { FloatArray(3) { 0.0f } }
+fun extractY(): FloatArray {
+    val labels = FloatArray(data.size) { 0.0f }
     for (i in labels.indices) {
         val classLabel = data[i][0]
-        labels[i][classLabel.toInt() - 1] = 1.0f
+        labels[i] = classLabel.toFloat()
     }
 
     return labels

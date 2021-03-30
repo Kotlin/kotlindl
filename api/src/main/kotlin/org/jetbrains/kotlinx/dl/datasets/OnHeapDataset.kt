@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.datasets
 
+import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
 import java.io.IOException
 import java.nio.FloatBuffer
 import kotlin.math.truncate
@@ -14,14 +15,23 @@ import kotlin.math.truncate
  *
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  */
-public class OnHeapDataset internal constructor(private val x: Array<FloatArray>, private val y: Array<FloatArray>) :
+public class OnHeapDataset internal constructor(private val x: Array<FloatArray>, private val y: FloatArray) :
     Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    private fun copyToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
+    private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
         val dataForBatch = Array(length) { FloatArray(src[0].size) { 0.0f } }
         for (i in start until start + length) {
             dataForBatch[i - start] = src[i].copyOf() // Creates new copy for batch data
+        }
+        return dataForBatch
+    }
+
+    /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
+    private fun copyLabelsToBatch(src: FloatArray, start: Int, length: Int): FloatArray {
+        val dataForBatch = FloatArray(length) { 0.0f }
+        for (i in start until start + length) {
+            dataForBatch[i - start] = src[i]
         }
         return dataForBatch
     }
@@ -45,6 +55,12 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             val ret = FloatArray(numClasses)
             ret[label.toInt() and 0xFF] = 1f
             return ret
+        }
+
+        /** Creates binary vector with size [numClasses] from [label]. */
+        @JvmStatic
+        public fun convertByteToFloat(label: Byte): Float {
+            return (label.toInt() and 0xFF).toFloat()
         }
 
         /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
@@ -72,7 +88,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             testLabelsPath: String,
             numClasses: Int,
             featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> Array<FloatArray>
+            labelExtractor: (String, Int) -> FloatArray
         ): Pair<OnHeapDataset, OnHeapDataset> {
             return try {
                 val xTrain = featuresExtractor(trainFeaturesPath)
@@ -96,7 +112,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             labelsPath: String,
             numClasses: Int,
             featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> Array<FloatArray>
+            labelExtractor: (String, Int) -> FloatArray
         ): OnHeapDataset {
             return try {
                 val features = featuresExtractor(featuresPath)
@@ -117,7 +133,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
         @JvmStatic
         public fun create(
             featuresConsumer: () -> Array<FloatArray>,
-            labelConsumer: () -> Array<FloatArray>
+            labelConsumer: () -> FloatArray
         ): OnHeapDataset {
             return try {
                 val features = featuresConsumer()
@@ -138,12 +154,37 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
         @JvmStatic
         public fun create(
             features: Array<FloatArray>,
-            labels: Array<FloatArray>
+            labels: FloatArray
         ): OnHeapDataset {
             return try {
                 check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
                 OnHeapDataset(features, labels)
+            } catch (e: IOException) {
+                throw AssertionError(e)
+            }
+        }
+
+        /**
+         * Takes data from external data [features] and [labels]
+         * to create dataset [OnHeapDataset].
+         */
+        @JvmStatic
+        public fun create(
+            preprocessors: Preprocessing,
+            labels: FloatArray
+        ): OnHeapDataset {
+            return try {
+                val loading = preprocessors.imagePreprocessingStage.load
+                val xFiles = loading.prepareFileNames()
+                val numOfPixels: Int = 32 * 32 * 3
+
+                val x = Array(xFiles.size) { FloatArray(numOfPixels) { 0.0f } }
+                for (i in xFiles.indices) {
+                    x[i] = preprocessors.handleFile(xFiles[i]).first
+                }
+
+                OnHeapDataset(x, labels)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
@@ -161,29 +202,24 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): FloatArray {
+    override fun getY(idx: Int): Float {
         return y[idx]
-    }
-
-    /** Returns label as [Int] by index [idx]. */
-    override fun getLabel(idx: Int): Int {
-        val labelArray = y[idx]
-        return labelArray.indexOfFirst { it == labelArray.maxOrNull()!! }
     }
 
     // TODO: check that initial data are not shuffled or return void if are shuffled
     override fun shuffle(): OnHeapDataset {
-        val sortedData = x.zip(y)
+        /*val sortedData = x.zip(y)
         val shuffledData = sortedData.shuffled()
         val (x, y) = shuffledData.unzip()
 
-        return create({ x.toTypedArray() }, { y.toTypedArray() })
+        return create({ x.toTypedArray() }, { y.toTypedArray() })*/
+        TODO()
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
         return DataBatch(
-            copyToBatch(x, batchStart, batchLength),
-            copyToBatch(y, batchStart, batchLength),
+            copyXToBatch(x, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
             batchLength
         )
     }

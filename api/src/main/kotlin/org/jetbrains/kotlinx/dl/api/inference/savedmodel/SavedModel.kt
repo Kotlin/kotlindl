@@ -125,7 +125,7 @@ public open class SavedModel : InferenceModel() {
             var counter = 0
             for (i in 0 until dataset.xSize()) {
                 val predictedLabel = predict(dataset.getX(i))
-                if (predictedLabel == dataset.getLabel(i))
+                if (predictedLabel == dataset.getY(i).toInt())
                     counter++
             }
 

@@ -39,7 +39,7 @@ private fun loadImagesFromDirectory(
 }
 
 @Throws(IOException::class)
-fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArray> {
+fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelBuffer = ByteArray(labelCount)
@@ -66,15 +66,10 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
             }
     }
 
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
+    val floats = FloatArray(labelCount)
 
     for (i in 0 until labelCount) {
-        floats[i] =
-            OnHeapDataset.toOneHotVector(
-                numClasses,
-                labelBuffer[i]
-            )
+        floats[i] = OnHeapDataset.convertByteToFloat(labelBuffer[i])
     }
     return floats
 }

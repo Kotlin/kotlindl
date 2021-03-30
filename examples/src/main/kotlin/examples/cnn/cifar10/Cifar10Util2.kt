@@ -12,7 +12,7 @@ import java.io.IOException
 private const val DATASET_SIZE = 50000
 
 @Throws(IOException::class)
-fun extractCifar10LabelsAnsSort(pathToLabels: String, numClasses: Int): Array<FloatArray> {
+fun extractCifar10LabelsAnsSort(pathToLabels: String, numClasses: Int): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelSorter = mutableMapOf<String, Int>()
@@ -41,13 +41,11 @@ fun extractCifar10LabelsAnsSort(pathToLabels: String, numClasses: Int): Array<Fl
 
     val labelBuffer = sortedMap.values.toIntArray()
 
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
+    val floats = FloatArray(labelCount)
 
     for (i in 0 until labelCount) {
         floats[i] =
-            OnHeapDataset.toOneHotVector(
-                numClasses,
+            OnHeapDataset.convertByteToFloat(
                 labelBuffer[i].toByte()
             )
     }

@@ -17,11 +17,8 @@ public abstract class Dataset {
     /** Returns row by index [idx]. */
     public abstract fun getX(idx: Int): FloatArray
 
-    /** Returns label as [FloatArray] by index [idx]. */
-    public abstract fun getY(idx: Int): FloatArray
-
     /** Returns label as [Int] by index [idx]. */
-    public abstract fun getLabel(idx: Int): Int
+    public abstract fun getY(idx: Int): Float
 
     public abstract fun shuffle(): Dataset
 

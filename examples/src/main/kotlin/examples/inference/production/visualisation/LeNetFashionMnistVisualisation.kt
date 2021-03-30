@@ -74,8 +74,6 @@ fun main() {
 
         val trainImageLabel = train.getY(imageId)
 
-        val maxIdx = trainImageLabel.indexOfFirst { it == trainImageLabel.maxOrNull()!! }
-
-        println("Ground Truth: ${fashionMnistLabelEncoding[maxIdx]}")
+        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel]}")
     }
 }

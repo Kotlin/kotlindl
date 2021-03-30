@@ -26,7 +26,7 @@ fun main() {
         val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
         println("Predicted Label is: $prediction")
-        println("Correct Label is: " + train.getLabel(0))
+        println("Correct Label is: " + train.getY(0))
 
         val predictions = it.predictAll(test)
         println(predictions.toString())

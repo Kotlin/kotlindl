@@ -23,6 +23,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.defaultActivationName
+import org.jetbrains.kotlinx.dl.api.core.util.serializeLabelsToBuffer
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -288,44 +289,45 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
                         xBatchShape,
                         serializeToBuffer(batch.x)
                     ).use { batchImagesTensor ->
-                        Tensor.create(yBatchShape, serializeToBuffer(batch.y)).use { batchLabelsTensor ->
-                            Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
-                                .use { numberOfLossesTensor ->
-                                    Tensor.create(true).use { isTraining ->
-                                        val (lossValue, metricValue) = trainOnBatch(
-                                            targets,
-                                            batchImagesTensor,
-                                            batchLabelsTensor,
-                                            numberOfLossesTensor as Tensor<Float>,
-                                            isTraining as Tensor<Float>,
-                                            metricOp
-                                        )
-                                        if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
-                                            logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
-                                        }
-
-                                        averageTrainingLossAccum += lossValue
-                                        averageTrainingMetricAccum += metricValue
-                                        val batchTrainingEvent =
-                                            BatchTrainingEvent(
-                                                i,
-                                                batchCounter,
-                                                lossValue.toDouble(),
-                                                metricValue.toDouble()
+                        Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, amountOfClasses))
+                            .use { batchLabelsTensor ->
+                                Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
+                                    .use { numberOfLossesTensor ->
+                                        Tensor.create(true).use { isTraining ->
+                                            val (lossValue, metricValue) = trainOnBatch(
+                                                targets,
+                                                batchImagesTensor,
+                                                batchLabelsTensor,
+                                                numberOfLossesTensor as Tensor<Float>,
+                                                isTraining as Tensor<Float>,
+                                                metricOp
                                             )
-                                        trainingHistory.appendBatch(batchTrainingEvent)
+                                            if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                                                logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
+                                            }
 
-                                        logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+                                            averageTrainingLossAccum += lossValue
+                                            averageTrainingMetricAccum += metricValue
+                                            val batchTrainingEvent =
+                                                BatchTrainingEvent(
+                                                    i,
+                                                    batchCounter,
+                                                    lossValue.toDouble(),
+                                                    metricValue.toDouble()
+                                                )
+                                            trainingHistory.appendBatch(batchTrainingEvent)
 
-                                        callback.onTrainBatchEnd(
-                                            batchCounter,
-                                            trainBatchSize,
-                                            batchTrainingEvent,
-                                            trainingHistory
-                                        )
+                                            logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+
+                                            callback.onTrainBatchEnd(
+                                                batchCounter,
+                                                trainBatchSize,
+                                                batchTrainingEvent,
+                                                trainingHistory
+                                            )
+                                        }
                                     }
-                                }
-                        }
+                            }
                     }
                     batchCounter++
                 }
@@ -446,7 +448,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
                 imageShape,
                 serializeToBuffer(batch.x)
             ).use { testImagesTensor ->
-                Tensor.create(labelShape, serializeToBuffer(batch.y)).use { testLabelsTensor ->
+                Tensor.create(labelShape, serializeLabelsToBuffer(batch.y, amountOfClasses)).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
                         Tensor.create(false).use { isTraining ->
                             val lossAndMetricsTensors = session.runner()

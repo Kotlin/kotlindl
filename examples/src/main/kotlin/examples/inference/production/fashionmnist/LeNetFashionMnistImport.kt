@@ -5,7 +5,6 @@
 
 package examples.inference.production.fashionmnist
 
-import examples.inference.production.getLabel
 import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.datasets.fashionMnist
@@ -31,7 +30,7 @@ fun main() {
         for (imageId in 0..amountOfTestSet) {
             val prediction = it.predict(train.getX(imageId))
 
-            if (prediction == getLabel(train, imageId))
+            if (prediction == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)
         }
         println("Accuracy: $accuracy")

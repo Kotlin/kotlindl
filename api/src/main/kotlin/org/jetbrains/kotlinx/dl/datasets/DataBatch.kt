@@ -13,7 +13,7 @@ package org.jetbrains.kotlinx.dl.datasets
  */
 public data class DataBatch internal constructor(
     val x: Array<FloatArray>,
-    val y: Array<FloatArray>,
+    val y: FloatArray,
     val size: Int
 ) {
     /** */

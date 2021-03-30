@@ -67,7 +67,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
 /**
  * Extracts Fashion Mnist labels from [archivePath] with number of classes [numClasses].
  */
-public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray> {
+public fun extractLabels(archivePath: String, numClasses: Int): FloatArray {
     val archiveStream = DataInputStream(
         GZIPInputStream(
             FileInputStream(archivePath)
@@ -79,12 +79,10 @@ public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray
     println(String.format("Extracting %d labels from %s", labelCount, archivePath))
     val labelBuffer = ByteArray(labelCount)
     archiveStream.readFully(labelBuffer)
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
+    val floats = FloatArray(labelCount)
     for (i in 0 until labelCount) {
         floats[i] =
-            OnHeapDataset.toOneHotVector(
-                numClasses,
+            OnHeapDataset.convertByteToFloat(
                 labelBuffer[i]
             )
     }

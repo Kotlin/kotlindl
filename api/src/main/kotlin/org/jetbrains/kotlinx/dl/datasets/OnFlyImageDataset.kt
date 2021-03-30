@@ -17,7 +17,7 @@ import java.nio.FloatBuffer
  */
 public class OnFlyImageDataset internal constructor(
     private val preprocessing: Preprocessing, // TODO: maybe move to builder
-    private val y: Array<FloatArray>
+    private val y: FloatArray
 ) : Dataset() {
 
     private var xFiles: Array<File> // maybe move to constructor
@@ -44,10 +44,10 @@ public class OnFlyImageDataset internal constructor(
 
     // TODO: src argument could be removed as stupid
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    private fun copyToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
-        val dataForBatch = Array(length) { FloatArray(src[0].size) { 0.0f } }
+    private fun copyLabelsToBatch(src: FloatArray, start: Int, length: Int): FloatArray {
+        val dataForBatch = FloatArray(length) { 0.0f }
         for (i in start until start + length) {
-            dataForBatch[i - start] = src[i].copyOf() // Creates new copy for batch data
+            dataForBatch[i - start] = src[i]
         }
         return dataForBatch
     }
@@ -85,7 +85,7 @@ public class OnFlyImageDataset internal constructor(
         @JvmStatic
         public fun create(
             preprocessors: Preprocessing,
-            labels: Array<FloatArray>
+            labels: FloatArray
         ): OnFlyImageDataset {
             return try {
                 OnFlyImageDataset(preprocessors, labels)
@@ -107,14 +107,8 @@ public class OnFlyImageDataset internal constructor(
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): FloatArray {
+    override fun getY(idx: Int): Float {
         return y[idx]
-    }
-
-    /** Returns label as [Int] by index [idx]. */
-    override fun getLabel(idx: Int): Int {
-        val labelArray = y[idx]
-        return labelArray.indexOfFirst { it == labelArray.maxOrNull()!! }
     }
 
     // TODO: check that initial data are not shuffled or return void if are shuffled
@@ -125,7 +119,7 @@ public class OnFlyImageDataset internal constructor(
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
         return DataBatch(
             copyImagesToBatch(xFiles, batchStart, batchLength),
-            copyToBatch(y, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
             batchLength
         )
     }

@@ -71,3 +71,20 @@ public fun serializeToBuffer(src: Array<FloatArray>): FloatBuffer {
     return (buffer as Buffer).rewind() as FloatBuffer
 }
 
+/** Converts [src] to [FloatBuffer]. */
+public fun serializeLabelsToBuffer(src: FloatArray, amountOfClasses: Long): FloatBuffer {
+    val oneHotEncodedLabels = Array(src.size) {
+        FloatArray(amountOfClasses.toInt()) { 0.0f }
+    }
+    for (i in src.indices) {
+        val label = src[i]
+        oneHotEncodedLabels[i][label.toInt() - 1] = 1f // TODO: check that this is work for regression
+    }
+
+    val buffer = FloatBuffer.allocate(oneHotEncodedLabels.size * oneHotEncodedLabels[0].size)
+    for (element in oneHotEncodedLabels) {
+        buffer.put(element)
+    }
+    return (buffer as Buffer).rewind() as FloatBuffer
+}
+

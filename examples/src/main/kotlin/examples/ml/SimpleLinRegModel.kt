@@ -53,10 +53,10 @@ fun main() {
         return Array(data.size, init = init)
     }
 
-    fun extractY(): Array<FloatArray> {
-        val labels = Array(data.size) { FloatArray(1) { 0.0f } }
+    fun extractY(): FloatArray {
+        val labels = FloatArray(data.size) { 0.0f }
         for (i in labels.indices) {
-            labels[i][0] = data[i][0].toFloat()
+            labels[i] = data[i][0].toFloat()
         }
 
         return labels
