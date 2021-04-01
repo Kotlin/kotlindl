@@ -78,7 +78,11 @@ public fun serializeLabelsToBuffer(src: FloatArray, amountOfClasses: Long): Floa
     }
     for (i in src.indices) {
         val label = src[i]
-        oneHotEncodedLabels[i][label.toInt() - 1] = 1f // TODO: check that this is work for regression
+        val labelToIndexMapping = if (amountOfClasses == 1L) {
+            0 // for regression tasks
+        } else label.toInt() //TODO: should be implemented with the real OHE here
+        // TODO: classes should be numerated from [0.0 to amountOfClasses), need a require check on input data
+        oneHotEncodedLabels[i][labelToIndexMapping] = 1f // TODO: check that this is work for regression
     }
 
     val buffer = FloatBuffer.allocate(oneHotEncodedLabels.size * oneHotEncodedLabels[0].size)
