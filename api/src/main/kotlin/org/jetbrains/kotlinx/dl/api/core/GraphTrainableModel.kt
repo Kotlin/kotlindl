@@ -28,8 +28,8 @@ import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
-import org.jetbrains.kotlinx.dl.datasets.DataBatch
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.DataBatch
+import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.io.File

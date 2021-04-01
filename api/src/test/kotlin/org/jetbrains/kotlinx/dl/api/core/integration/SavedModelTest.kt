@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.jetbrains.kotlinx.dl.datasets.mnist
+import org.jetbrains.kotlinx.dl.dataset.mnist
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

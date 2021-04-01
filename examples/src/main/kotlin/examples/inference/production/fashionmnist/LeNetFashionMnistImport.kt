@@ -7,7 +7,7 @@ package examples.inference.production.fashionmnist
 
 import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"

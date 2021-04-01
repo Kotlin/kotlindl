@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
 import java.io.FileReader
 import java.util.*

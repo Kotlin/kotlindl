@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 

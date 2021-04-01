@@ -6,7 +6,7 @@
 package examples.cnn.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.IOException
 
 private const val DATASET_SIZE = 50000

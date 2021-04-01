@@ -20,9 +20,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits;
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
-import org.jetbrains.kotlinx.dl.datasets.EmbeddedDatasetsKt;
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset;
-import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
+import org.jetbrains.kotlinx.dl.dataset.EmbeddedDatasetsKt;
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset;
+import org.jetbrains.kotlinx.dl.dataset.handler.MnistUtilKt;
 
 import java.io.File;
 

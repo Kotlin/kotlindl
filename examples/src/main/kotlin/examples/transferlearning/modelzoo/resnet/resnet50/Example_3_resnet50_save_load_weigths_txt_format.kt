@@ -17,12 +17,12 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.datasets.image.ColorOrder
-import org.jetbrains.kotlinx.dl.datasets.preprocessors.ImageShape
-import org.jetbrains.kotlinx.dl.datasets.preprocessors.Preprocessing
-import org.jetbrains.kotlinx.dl.datasets.preprocessors.image.load
-import org.jetbrains.kotlinx.dl.datasets.preprocessors.imagePreprocessing
-import org.jetbrains.kotlinx.dl.datasets.preprocessors.preprocessingPipeline
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.imagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocessingPipeline
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"

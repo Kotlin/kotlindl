@@ -6,8 +6,8 @@
 package examples.cnn.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.IOException
 

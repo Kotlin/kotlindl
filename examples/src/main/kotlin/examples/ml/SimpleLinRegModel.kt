@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.datasets.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import kotlin.random.Random
 
 private const val SEED = 12L
