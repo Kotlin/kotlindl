@@ -5,19 +5,18 @@
 
 package examples.transferlearning
 
+import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -63,16 +62,9 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(getFileFromResource("datasets/vgg/image$i.jpg"))
 
-            val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
-
-            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
 
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

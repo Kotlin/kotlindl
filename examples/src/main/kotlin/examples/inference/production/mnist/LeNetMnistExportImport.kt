@@ -5,7 +5,6 @@
 
 package examples.inference.production.mnist
 
-import examples.inference.production.getLabel
 import examples.inference.production.lenet5
 import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -13,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.mnist
+import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
@@ -60,15 +59,15 @@ fun main() {
 
         val prediction = it.predict(train.getX(imageId1))
 
-        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
+        println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
         val prediction2 = it.predict(train.getX(imageId2))
 
-        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
+        println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
         val prediction3 = it.predict(train.getX(imageId3))
 
-        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+        println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
@@ -81,22 +80,22 @@ fun main() {
 
         val prediction = it.predict(train.getX(imageId1))
 
-        println("Prediction: $prediction Ground Truth: ${getLabel(train, imageId1)}")
+        println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
         val prediction2 = it.predict(train.getX(imageId2))
 
-        println("Prediction: $prediction2 Ground Truth: ${getLabel(train, imageId2)}")
+        println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
         val prediction3 = it.predict(train.getX(imageId3))
 
-        println("Prediction: $prediction3 Ground Truth: ${getLabel(train, imageId3)}")
+        println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
             val pred = it.predict(train.getX(imageId))
 
-            if (pred == getLabel(train, imageId))
+            if (pred == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)
         }
         println("Accuracy: $accuracy")

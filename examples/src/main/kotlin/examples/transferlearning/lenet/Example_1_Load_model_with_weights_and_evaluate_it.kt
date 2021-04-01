@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
 /**
@@ -55,7 +55,7 @@ fun main() {
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
 fun getJSONConfigFile(): File {
     val pathToConfig = "models/mnist/lenet/modelConfig.json"
-    val realPathToConfig = Dataset::class.java.classLoader.getResource(pathToConfig).path.toString()
+    val realPathToConfig = OnHeapDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
     return File(realPathToConfig)
 }
@@ -63,7 +63,7 @@ fun getJSONConfigFile(): File {
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
 fun getWeightsFile(): HdfFile {
     val pathToWeights = "models/mnist/lenet/mnist_weights_only.h5"
-    val realPathToWeights = Dataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    val realPathToWeights = OnHeapDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
     val file = File(realPathToWeights)
     return HdfFile(file)
 }

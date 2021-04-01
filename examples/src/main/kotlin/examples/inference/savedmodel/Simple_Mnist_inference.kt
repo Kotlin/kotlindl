@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.jetbrains.kotlinx.dl.datasets.mnist
+import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
@@ -26,7 +26,7 @@ fun main() {
         val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
         println("Predicted Label is: $prediction")
-        println("Correct Label is: " + train.getLabel(0))
+        println("Correct Label is: " + train.getY(0))
 
         val predictions = it.predictAll(test)
         println(predictions.toString())

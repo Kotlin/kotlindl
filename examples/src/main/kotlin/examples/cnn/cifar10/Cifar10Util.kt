@@ -6,8 +6,8 @@
 package examples.cnn.cifar10
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.IOException
 
@@ -17,14 +17,14 @@ private const val DATASET_SIZE = 50000
 fun extractCifar10Images(archiveName: String): Array<FloatArray> {
     val numOfPixels: Int = 32 * 32 * 3
 
-    return loadImagesFromZipArchive(
+    return loadImagesFromDirectory(
         numOfPixels,
         DATASET_SIZE,
         archiveName
     )
 }
 
-private fun loadImagesFromZipArchive(
+private fun loadImagesFromDirectory(
     numOfPixels: Int,
     subDatasetSize: Int,
     archiveName: String
@@ -39,7 +39,7 @@ private fun loadImagesFromZipArchive(
 }
 
 @Throws(IOException::class)
-fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArray> {
+fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelBuffer = ByteArray(labelCount)
@@ -59,21 +59,17 @@ fun extractCifar10Labels(pathToLabels: String, numClasses: Int): Array<FloatArra
 
     var cnt = 0
     csvReader().open(pathToLabels) {
-        readAllAsSequence().forEach { row ->
-            labelBuffer[cnt] = dictionary.getOrElse(row[1]) { 1 }.toByte()
-            cnt++
-        }
+        readAllAsSequence()
+            .forEach { row ->
+                labelBuffer[cnt] = dictionary.getOrElse(row[1]) { 1 }.toByte()
+                cnt++
+            }
     }
 
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
+    val floats = FloatArray(labelCount)
 
     for (i in 0 until labelCount) {
-        floats[i] =
-            Dataset.toOneHotVector(
-                numClasses,
-                labelBuffer[i]
-            )
+        floats[i] = OnHeapDataset.convertByteToFloat(labelBuffer[i])
     }
     return floats
 }

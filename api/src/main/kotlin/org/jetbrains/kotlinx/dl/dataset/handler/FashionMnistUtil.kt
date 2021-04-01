@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets.handlers
+package org.jetbrains.kotlinx.dl.dataset.handler
 
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.DataInputStream
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -32,7 +32,7 @@ public const val FASHION_TEST_LABELS_ARCHIVE: String = "datasets/fashionmnist/t1
 public fun extractFashionImages(archivePath: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            Dataset::class.java.classLoader.getResourceAsStream(archivePath)
+            OnHeapDataset::class.java.classLoader.getResourceAsStream(archivePath)
         )
     )
     val magic = archiveStream.readInt()
@@ -55,7 +55,7 @@ public fun extractFashionImages(archivePath: String): Array<FloatArray> {
     for (i in 0 until imageCount) {
         archiveStream.readFully(imageBuffer)
         images[i] =
-            Dataset.toNormalizedVector(
+            OnHeapDataset.toNormalizedVector(
                 imageBuffer
             )
     }
@@ -69,7 +69,7 @@ public fun extractFashionImages(archivePath: String): Array<FloatArray> {
 public fun extractFashionLabels(archivePath: String, numClasses: Int): Array<FloatArray> {
     val archiveStream = DataInputStream(
         GZIPInputStream(
-            Dataset::class.java.classLoader.getResourceAsStream(archivePath)
+            OnHeapDataset::class.java.classLoader.getResourceAsStream(archivePath)
         )
     )
     val magic = archiveStream.readInt()
@@ -82,7 +82,7 @@ public fun extractFashionLabels(archivePath: String, numClasses: Int): Array<Flo
         Array(labelCount) { FloatArray(numClasses) }
     for (i in 0 until labelCount) {
         floats[i] =
-            Dataset.toOneHotVector(
+            OnHeapDataset.toOneHotVector(
                 numClasses,
                 labelBuffer[i]
             )

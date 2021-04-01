@@ -20,9 +20,9 @@ public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = nul
 }
 
 public fun torchStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
-    val height = tensorShape[1].toInt()
-    val width = tensorShape[2].toInt()
-    val channels = tensorShape[3].toInt()
+    val height = tensorShape[0].toInt()
+    val width = tensorShape[1].toInt()
+    val channels = tensorShape[2].toInt()
 
     val mean = floatArrayOf(0.485f, 0.456f, 0.406f)
     val std = floatArrayOf(0.229f, 0.224f, 0.225f)
@@ -42,9 +42,9 @@ public fun torchStylePreprocessing(input: FloatArray, tensorShape: LongArray): F
 }
 
 public fun caffeStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
-    val height = tensorShape[1].toInt()
-    val width = tensorShape[2].toInt()
-    val channels = tensorShape[3].toInt()
+    val height = tensorShape[0].toInt()
+    val width = tensorShape[1].toInt()
+    val channels = tensorShape[2].toInt()
 
     val mean = floatArrayOf(103.939f, 116.779f, 123.68f)
 
@@ -62,9 +62,9 @@ public fun caffeStylePreprocessing(input: FloatArray, tensorShape: LongArray): F
 }
 
 public fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Array<FloatArray>> {
-    val height = tensorShape[1].toInt()
-    val width = tensorShape[2].toInt()
-    val channels = tensorShape[3].toInt()
+    val height = tensorShape[0].toInt()
+    val width = tensorShape[1].toInt()
+    val channels = tensorShape[2].toInt()
     val reshaped = Array(
         height
     ) { Array(width) { FloatArray(channels) } }

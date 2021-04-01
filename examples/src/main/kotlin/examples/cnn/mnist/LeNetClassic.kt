@@ -20,8 +20,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.datasets.handlers.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.datasets.mnist
+import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000

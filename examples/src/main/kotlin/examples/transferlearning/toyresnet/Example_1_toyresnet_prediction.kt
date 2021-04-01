@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -21,7 +21,7 @@ import java.util.*
 fun main() {
     val (train, test) = fashionMnist()
 
-    val jsonConfigFile = getResNetJSONConfigFile()
+    val jsonConfigFile = getToyResNetJSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     model.use {
@@ -33,7 +33,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getResNetWeightsFile()
+        val hdfFile = getToyResNetWeightsFile()
 
         it.loadWeights(hdfFile)
 
@@ -46,7 +46,7 @@ fun main() {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNetJSONConfigFile(): File {
+public fun getToyResNetJSONConfigFile(): File {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
@@ -57,7 +57,7 @@ private fun getResNetJSONConfigFile(): File {
 }
 
 /** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNetWeightsFile(): HdfFile {
+public fun getToyResNetWeightsFile(): HdfFile {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)

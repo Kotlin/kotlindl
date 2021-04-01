@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /**
  * This examples demonstrates the transfer learning concept:
@@ -34,11 +34,11 @@ import org.jetbrains.kotlinx.dl.datasets.fashionMnist
 fun main() {
     val (train, test) = fashionMnist()
 
-
     val jsonConfigFile = getJSONConfigFile()
     val (input, otherLayers) = Sequential.loadModelLayersFromConfiguration(jsonConfigFile)
 
     val layers = mutableListOf<Layer>()
+    layers.add(input)
     for (layer in otherLayers) {
         if (layer is Conv2D || layer is MaxPool2D) {
             layer.isTrainable = false
@@ -83,7 +83,7 @@ fun main() {
             activation = Activations.Linear
         )
     )
-    val model = Sequential.of(input, layers)
+    val model = Sequential.of(layers)
 
     model.use {
         it.compile(

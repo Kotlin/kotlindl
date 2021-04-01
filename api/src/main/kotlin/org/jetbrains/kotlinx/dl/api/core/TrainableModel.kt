@@ -17,7 +17,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -283,7 +284,7 @@ public abstract class TrainableModel : InferenceModel() {
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public fun fit(
-        dataset: Dataset,
+        dataset: OnHeapDataset,
         validationRate: Double,
         epochs: Int,
         trainBatchSize: Int,

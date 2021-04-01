@@ -20,9 +20,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits;
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
-import org.jetbrains.kotlinx.dl.datasets.Dataset;
-import org.jetbrains.kotlinx.dl.datasets.DatasetsKt;
-import org.jetbrains.kotlinx.dl.datasets.handlers.MnistUtilKt;
+import org.jetbrains.kotlinx.dl.dataset.EmbeddedDatasetsKt;
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset;
+import org.jetbrains.kotlinx.dl.dataset.handler.MnistUtilKt;
 
 import java.io.File;
 
@@ -38,10 +38,10 @@ public class LeNetClassic {
     public static final Integer TEST_BATCH_SIZE = 1000;
 
     public static void main(String[] args) {
-        Pair<Dataset, Dataset> result = DatasetsKt.mnist(new File("cache"));
+        Pair<OnHeapDataset, OnHeapDataset> result = EmbeddedDatasetsKt.mnist(new File("cache"));
 
-        Dataset train = result.component1();
-        Dataset test = result.component2();
+        OnHeapDataset train = result.component1();
+        OnHeapDataset test = result.component2();
 
         try (Sequential lenet5Classic = Sequential.of(
                 new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),

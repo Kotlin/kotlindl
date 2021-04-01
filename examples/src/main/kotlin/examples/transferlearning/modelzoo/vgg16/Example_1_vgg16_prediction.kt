@@ -10,13 +10,19 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.imagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocessingPipeline
 import java.io.File
+import java.net.URISyntaxException
+import java.net.URL
 
 
 /**
@@ -61,17 +67,17 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = object {}.javaClass.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
 
-            // TODO: getInputShape
-            val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
-
-            val inputData = modelLoader.preprocessInput(floatArray, tensorShape)
+            val inputData = modelLoader.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -80,6 +86,17 @@ fun main() {
 
             println(top5.toString())
         }
+    }
+}
+
+@Throws(URISyntaxException::class)
+fun getFileFromResource(fileName: String): File {
+    val classLoader: ClassLoader = object {}.javaClass.classLoader
+    val resource: URL? = classLoader.getResource(fileName)
+    return if (resource == null) {
+        throw IllegalArgumentException("file not found! $fileName")
+    } else {
+        File(resource.toURI())
     }
 }
 

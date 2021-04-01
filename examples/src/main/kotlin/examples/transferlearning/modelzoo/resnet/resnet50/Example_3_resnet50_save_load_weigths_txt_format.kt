@@ -5,7 +5,7 @@
 
 package examples.transferlearning.modelzoo.resnet.resnet50
 
-import io.jhdf.HdfFile
+import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -13,26 +13,27 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-import org.jetbrains.kotlinx.dl.datasets.Dataset
-import org.jetbrains.kotlinx.dl.datasets.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.imagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocessingPipeline
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
 private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
 
 fun main() {
-    val jsonConfigFile = getResNet50JSONConfigFile()
-    val model = Functional.loadModelConfiguration(jsonConfigFile)
+    val modelLoader =
+        ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_50)
+    val model = modelLoader.loadModel() as Functional
 
-    val imageNetClassLabels = prepareHumanReadableClassLabels()
+    val imageNetClassLabels = modelLoader.loadClassLabels()
 
     model.use {
         it.compile(
@@ -43,21 +44,24 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = getResNet50WeightsFile()
+        val hdfFile = modelLoader.loadWeights()
 
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
 
-            val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
+            val inputData = modelLoader.preprocessInput(preprocessing().first, model.inputDimensions)
 
-            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
@@ -136,16 +140,17 @@ Predicted object for image8.jpg is goldfish
         it.loadWeights(File(PATH_TO_MODEL))
 
         for (i in 1..8) {
-            val inputStream = Dataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val preprocessing: Preprocessing = preprocessingPipeline {
+                imagePreprocessing {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
 
-            val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
-
-            val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
+            val inputData = modelLoader.preprocessInput(preprocessing().first, model2.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
@@ -154,7 +159,12 @@ Predicted object for image8.jpg is goldfish
             println(top5.toString())
         }
 
-        /*
+        /* TODO: check it
+TOO SMALL, but correct signals, what is happened? something wrong with final logits?
+Different results are related to lossfunctions and logits applications at the end (need to check for all loaded models and recommend loss functions for training
+
+In prediction MAE usually is used, but for training is softmax is used and this is a root of difference
+
 
 Predicted object for image1.jpg is neck_brace
 {1=(neck_brace, 0.0012758446), 2=(jersey, 0.0012384964), 3=(lab_coat, 0.0010649567), 4=(Windsor_tie, 0.00103015), 5=(sweatshirt, 0.0010226701)}
@@ -179,27 +189,4 @@ Process finished with exit code 0
          */
     }
 }
-
-/** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNet50JSONConfigFile(): File {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val resnet50JSONModelPath = properties["resnet50JSONModelPath"] as String
-
-    return File(resnet50JSONModelPath)
-}
-
-/** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNet50WeightsFile(): HdfFile {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val resnet50h5WeightsPath = properties["resnet50h5WeightsPath"] as String
-
-    return HdfFile(File(resnet50h5WeightsPath))
-}
-
 

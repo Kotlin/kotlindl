@@ -31,10 +31,7 @@ import java.io.FileNotFoundException
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
-public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableModel(input, *layers) {
-    /** Input layer. */
-    public val inputLayer: Input = input
-
+public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     public companion object {
         /**
          * Creates the [Sequential] model.
@@ -44,18 +41,25 @@ public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableMode
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(input: Input, vararg layers: Layer): Sequential {
+        public fun of(vararg layers: Layer): Sequential {
+            // TODO: duplicates constructor
+            // TODO: duplicates Functional companion methods (but could not be easy refactored due to constructor calls, they could not be GraphTrainableModel
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+
+            // TODO: check that preprocessing is correct for input layer
             preProcessLayerNames(layers)
-            val seqModel = Sequential(input, *layers)
-            postProcessLayerNames(layers, seqModel)
-            return seqModel
+            val model = Sequential(*layers)
+            postProcessLayerNames(layers, model)
+            return model
         }
 
         /**
-         * Creates the [Sequential] model.
+         * Creates the [Functional] model.
          * @property [layers] The layers to describe the model design.
          * NOTE: First layer should be input layer.
-         * @return the [Sequential] model.
+         * @return the [Functional] model.
          */
         @JvmStatic
         public fun of(layers: List<Layer>): Sequential {
@@ -65,44 +69,9 @@ public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableMode
 
             val otherLayers = layers.subList(1, layers.size)
             preProcessLayerNames(otherLayers.toTypedArray())
-            val seqModel = Sequential(input, *otherLayers.toTypedArray())
-            postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
-            return seqModel
-        }
-
-        /**
-         * Creates the [Sequential] model.
-         *
-         * @property [input] The input layer with initial shapes.
-         * @property [layers] The layers to describe the model design.
-         * @return the [Sequential] model.
-         */
-        @JvmStatic
-        public fun of(input: Input, layers: List<Layer>): Sequential {
-            preProcessLayerNames(layers.toTypedArray())
-            val seqModel = Sequential(input, *layers.toTypedArray())
-            postProcessLayerNames(layers.toTypedArray(), seqModel)
-            return seqModel
-        }
-
-        private fun preProcessLayerNames(layers: Array<out Layer>) {
-            var cnt = 1
-            for (layer in layers) {
-                if (layer.name.isEmpty()) {
-                    val generatedLayerName = (layer::class.simpleName ?: return).toLowerCase() + "_" + cnt
-                    layer.name = generatedLayerName
-                    cnt++
-                }
-            }
-        }
-
-        private fun postProcessLayerNames(
-            layers: Array<out Layer>,
-            seqModel: Sequential
-        ) {
-            for (layer in layers) {
-                layer.parentModel = seqModel
-            }
+            val model = Sequential(*layers.toTypedArray())
+            postProcessLayerNames(otherLayers.toTypedArray(), model)
+            return model
         }
 
         /**
@@ -190,7 +159,7 @@ public class Sequential(input: Input, vararg layers: Layer) : GraphTrainableMode
         inputLayer.build(tf)
         var inputShape: Shape = inputLayer.computeOutputShape()
 
-        layers.forEach {
+        layers.filter { it !is Input }.forEach {
             it.build(tf, kGraph, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)

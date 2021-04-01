@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import kotlin.random.Random
 
 private const val SEED = 12L
@@ -53,16 +53,16 @@ fun main() {
         return Array(data.size, init = init)
     }
 
-    fun extractY(): Array<FloatArray> {
-        val labels = Array(data.size) { FloatArray(1) { 0.0f } }
+    fun extractY(): FloatArray {
+        val labels = FloatArray(data.size) { 0.0f }
         for (i in labels.indices) {
-            labels[i][0] = data[i][0].toFloat()
+            labels[i] = data[i][0].toFloat()
         }
 
         return labels
     }
 
-    val dataset = Dataset.create(
+    val dataset = OnHeapDataset.create(
         ::extractX,
         ::extractY
     )
@@ -80,8 +80,8 @@ fun main() {
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
-        println("Weights: " + it.getLayer("dense_1").weights[0].contentDeepToString())
-        println("Bias" + it.getLayer("dense_1").weights[1].contentDeepToString())
+        println("Weights: " + it.getLayer("dense_2").weights[0].contentDeepToString())
+        println("Bias" + it.getLayer("dense_2").weights[1].contentDeepToString())
         println("MAE: $mae")
     }
 }

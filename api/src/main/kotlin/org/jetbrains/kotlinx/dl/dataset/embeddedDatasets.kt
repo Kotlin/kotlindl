@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets
+package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
-import org.jetbrains.kotlinx.dl.datasets.handlers.*
+import org.jetbrains.kotlinx.dl.dataset.handler.*
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -30,7 +30,7 @@ import java.nio.file.StandardCopyOption
  * @return Train and test datasets. Each dataset includes X and Y data. X data are uint8 arrays of grayscale image data with shapes
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
-public fun mnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
+public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
     if (!cacheDirectory.exists()) cacheDirectory.mkdir()
 
     val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
@@ -38,7 +38,7 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
     val testXpath = loadFile(cacheDirectory, TEST_IMAGES_ARCHIVE).absolutePath
     val testYpath = loadFile(cacheDirectory, TEST_LABELS_ARCHIVE).absolutePath
 
-    return Dataset.createTrainAndTestDatasets(
+    return OnHeapDataset.createTrainAndTestDatasets(
         trainXpath,
         trainYpath,
         testXpath,
@@ -77,15 +77,15 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
  * @return Train and test datasets. Each dataset includes X and Y data. X data are uint8 arrays of grayscale image data with shapes
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
-public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<Dataset, Dataset> {
+public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
     if (!cacheDirectory.exists()) cacheDirectory.mkdir()
 
-    val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
-    val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
-    val testXpath = loadFile(cacheDirectory, TEST_IMAGES_ARCHIVE).absolutePath
-    val testYpath = loadFile(cacheDirectory, TEST_LABELS_ARCHIVE).absolutePath
+    val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
+    val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath
+    val testXpath = loadFile(cacheDirectory, FASHION_TEST_IMAGES_ARCHIVE).absolutePath
+    val testYpath = loadFile(cacheDirectory, FASHION_TEST_LABELS_ARCHIVE).absolutePath
 
-    return Dataset.createTrainAndTestDatasets(
+    return OnHeapDataset.createTrainAndTestDatasets(
         trainXpath,
         trainYpath,
         testXpath,

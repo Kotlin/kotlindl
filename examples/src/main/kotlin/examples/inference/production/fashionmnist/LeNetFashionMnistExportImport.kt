@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
@@ -73,7 +73,7 @@ fun main() {
         for (imageId in 0..amountOfTestSet) {
             val prediction = it.predict(train.getX(imageId))
 
-            if (prediction == getLabel(train, imageId))
+            if (prediction == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)
         }
         println("Accuracy: $accuracy")

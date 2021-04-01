@@ -19,14 +19,14 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
 import java.io.FileReader
 import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
-private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 500
+private const val EPOCHS = 5
+private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
@@ -122,7 +122,7 @@ private val vgg11 = Sequential.of(
         filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Elu,
+        activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
@@ -131,7 +131,7 @@ private val vgg11 = Sequential.of(
         filters = 256,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Elu,
+        activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
@@ -169,7 +169,7 @@ fun main() {
     val cifarImagesArchive = properties["cifarImagesArchive"] as String
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
-    val dataset = Dataset.create(
+    val dataset = OnHeapDataset.create(
         cifarImagesArchive,
         cifarLabelsArchive,
         NUM_LABELS,
@@ -188,7 +188,9 @@ fun main() {
 
         it.summary()
 
+        val start = System.currentTimeMillis()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        println("Training time: ${(System.currentTimeMillis() - start) / 1000f}")
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 

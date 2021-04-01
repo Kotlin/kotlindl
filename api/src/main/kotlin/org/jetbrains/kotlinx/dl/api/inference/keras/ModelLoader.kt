@@ -45,7 +45,7 @@ internal fun loadModelConfiguration(
     val input: Input = pair.first
     val layers = pair.second
 
-    return Sequential.of(input, layers.toList())
+    return Sequential.of(input, *layers.toList().toTypedArray())
 }
 
 /**

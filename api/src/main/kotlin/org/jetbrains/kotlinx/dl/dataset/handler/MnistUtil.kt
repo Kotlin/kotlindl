@@ -3,9 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.datasets.handlers
+package org.jetbrains.kotlinx.dl.dataset.handler
 
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.DataInputStream
 import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
@@ -57,7 +57,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
     for (i in 0 until imageCount) {
         archiveStream.readFully(imageBuffer)
         images[i] =
-            Dataset.toNormalizedVector(
+            OnHeapDataset.toNormalizedVector(
                 imageBuffer
             )
     }
@@ -67,7 +67,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
 /**
  * Extracts Fashion Mnist labels from [archivePath] with number of classes [numClasses].
  */
-public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray> {
+public fun extractLabels(archivePath: String, numClasses: Int): FloatArray {
     val archiveStream = DataInputStream(
         GZIPInputStream(
             FileInputStream(archivePath)
@@ -79,12 +79,10 @@ public fun extractLabels(archivePath: String, numClasses: Int): Array<FloatArray
     println(String.format("Extracting %d labels from %s", labelCount, archivePath))
     val labelBuffer = ByteArray(labelCount)
     archiveStream.readFully(labelBuffer)
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
+    val floats = FloatArray(labelCount)
     for (i in 0 until labelCount) {
         floats[i] =
-            Dataset.toOneHotVector(
-                numClasses,
+            OnHeapDataset.convertByteToFloat(
                 labelBuffer[i]
             )
     }

@@ -23,11 +23,13 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.defaultActivationName
+import org.jetbrains.kotlinx.dl.api.core.util.serializeLabelsToBuffer
+import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
-import org.jetbrains.kotlinx.dl.datasets.DataBatch
-import org.jetbrains.kotlinx.dl.datasets.Dataset
+import org.jetbrains.kotlinx.dl.dataset.DataBatch
+import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.io.File
@@ -38,7 +40,6 @@ import java.nio.FloatBuffer
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
  * Also, it provides training and inference features on this model.
  *
- * @property [inputLayer] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Functional model via sequence of [layers].
  */
@@ -48,6 +49,15 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
     /** The bunch of layers. */
     public val layers: List<Layer> = listOf(*layers)
+
+    public val inputLayer: Input
+        get() = layers[0] as Input
+
+    /** Returns input dimensions in order HWC (height, width, channels) */
+    public val inputDimensions: LongArray
+        get() {
+            return (layers[0] as Input).packedDims
+        }
 
     /** Layers indexed by name. */
     protected var layersByName: Map<String, Layer> = mapOf()
@@ -108,6 +118,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
 
+            // TODO: check that preprocessing is correct for input layer
             preProcessLayerNames(layers)
             val seqModel = GraphTrainableModel(*layers)
             postProcessLayerNames(layers, seqModel)
@@ -276,46 +287,47 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
                     Tensor.create(
                         xBatchShape,
-                        batch.x
+                        serializeToBuffer(batch.x)
                     ).use { batchImagesTensor ->
-                        Tensor.create(yBatchShape, batch.y).use { batchLabelsTensor ->
-                            Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
-                                .use { numberOfLossesTensor ->
-                                    Tensor.create(true).use { isTraining ->
-                                        val (lossValue, metricValue) = trainOnBatch(
-                                            targets,
-                                            batchImagesTensor,
-                                            batchLabelsTensor,
-                                            numberOfLossesTensor as Tensor<Float>,
-                                            isTraining as Tensor<Float>,
-                                            metricOp
-                                        )
-                                        if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
-                                            logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
-                                        }
-
-                                        averageTrainingLossAccum += lossValue
-                                        averageTrainingMetricAccum += metricValue
-                                        val batchTrainingEvent =
-                                            BatchTrainingEvent(
-                                                i,
-                                                batchCounter,
-                                                lossValue.toDouble(),
-                                                metricValue.toDouble()
+                        Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, amountOfClasses))
+                            .use { batchLabelsTensor ->
+                                Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
+                                    .use { numberOfLossesTensor ->
+                                        Tensor.create(true).use { isTraining ->
+                                            val (lossValue, metricValue) = trainOnBatch(
+                                                targets,
+                                                batchImagesTensor,
+                                                batchLabelsTensor,
+                                                numberOfLossesTensor as Tensor<Float>,
+                                                isTraining as Tensor<Float>,
+                                                metricOp
                                             )
-                                        trainingHistory.appendBatch(batchTrainingEvent)
+                                            if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                                                logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
+                                            }
 
-                                        logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+                                            averageTrainingLossAccum += lossValue
+                                            averageTrainingMetricAccum += metricValue
+                                            val batchTrainingEvent =
+                                                BatchTrainingEvent(
+                                                    i,
+                                                    batchCounter,
+                                                    lossValue.toDouble(),
+                                                    metricValue.toDouble()
+                                                )
+                                            trainingHistory.appendBatch(batchTrainingEvent)
 
-                                        callback.onTrainBatchEnd(
-                                            batchCounter,
-                                            trainBatchSize,
-                                            batchTrainingEvent,
-                                            trainingHistory
-                                        )
+                                            logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+
+                                            callback.onTrainBatchEnd(
+                                                batchCounter,
+                                                trainBatchSize,
+                                                batchTrainingEvent,
+                                                trainingHistory
+                                            )
+                                        }
                                     }
-                                }
-                        }
+                            }
                     }
                     batchCounter++
                 }
@@ -352,16 +364,20 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         xBatchShape: LongArray,
         yBatchShape: LongArray
     ) {
-        check(TensorShape(xBatchShape).numElements().toInt() == batch.x.capacity())
+        check(
+            TensorShape(xBatchShape).numElements().toInt() == batch.x.size
+        ) // TODO: batch.x.size -> need correctly calculate the capacity of batch
         {
             "The calculated [from the Sequential model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.x.capacity()
+                batch.x.size // TODO: batch.x.size -> need correctly calculate the capacity of batch
             }. Please, check input data."
         }
-        check(TensorShape(yBatchShape).numElements().toInt() == batch.y.capacity())
+        check(
+            TensorShape(yBatchShape).numElements().toInt() == batch.y.size
+        ) // TODO: batch.x.size -> need correctly calculate the capacity of batch
         {
             "The calculated [from the Sequential model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.y.capacity()
+                batch.y.size // TODO: batch.x.size -> need correctly calculate the capacity of batch
             }. " +
                     "\nPlease, check the input label data or correct amount of classes [amount of neurons] in last Dense layer, if you have a classification problem." +
                     "\nHighly likely, you have different amount of classes presented in data and described in model as desired output."
@@ -430,9 +446,9 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImagesTensor ->
-                Tensor.create(labelShape, batch.y).use { testLabelsTensor ->
+                Tensor.create(labelShape, serializeLabelsToBuffer(batch.y, amountOfClasses)).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
                         Tensor.create(false).use { isTraining ->
                             val lossAndMetricsTensors = session.runner()
@@ -497,7 +513,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImages ->
                 Tensor.create(0.0f).use { isTraining ->
                     val predictionsTensor = session.runner()
@@ -565,7 +581,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
 
             Tensor.create(
                 imageShape,
-                batch.x
+                serializeToBuffer(batch.x)
             ).use { testImages ->
                 val predictionsTensor = session.runner()
                     .fetch(predictionOp)
@@ -671,7 +687,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
             amountOfClasses
         )
 
-        batchValidation(batch, xBatchShape, yBatchShape)
+        //batchValidation(batch, xBatchShape, yBatchShape)
 
         return Pair(xBatchShape, yBatchShape)
     }

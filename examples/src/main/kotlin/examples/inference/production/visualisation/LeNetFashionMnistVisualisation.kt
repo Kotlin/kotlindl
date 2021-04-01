@@ -8,7 +8,7 @@ package examples.inference.production
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.datasets.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
@@ -74,8 +74,6 @@ fun main() {
 
         val trainImageLabel = train.getY(imageId)
 
-        val maxIdx = trainImageLabel.indexOfFirst { it == trainImageLabel.maxOrNull()!! }
-
-        println("Ground Truth: ${fashionMnistLabelEncoding[maxIdx]}")
+        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel]}")
     }
 }
