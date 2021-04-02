@@ -5,7 +5,6 @@
 
 package examples.transferlearning.modelzoo.resnet.resnet50
 
-
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses

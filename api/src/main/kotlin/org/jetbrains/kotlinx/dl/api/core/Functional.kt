@@ -159,6 +159,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.build(tf)
         var inputShape: Shape? = inputLayer.computeOutputShape()
 
+        fillOutputLayers(layers)
+        layers = topologicalSort(layers)
+
         layers.filter { it !is Input }.forEach {
             /*if (inputShape == null) {
                 inputShape = it.inboundLayers[0].outputShape.toShape()
@@ -210,6 +213,45 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
         isModelCompiled = true
+    }
+
+    private fun fillOutputLayers(layers: List<Layer>) {
+        layers.forEach { layer ->
+            val inboundLayers = layer.inboundLayers
+            inboundLayers.forEach {
+                if (!it.outboundLayers.contains(layer))
+                    it.outboundLayers.add(layer)
+            }
+        }
+    }
+
+    private fun topologicalSort(layers: List<Layer>): List<Layer> {
+        val visited = mutableMapOf<Layer, Boolean>()
+        layers.forEach { visited[it] = false }
+
+        val grayStack: Stack<Layer> = mutableListOf()
+
+        recursiveTopologicalSort(layers[0], grayStack, visited)
+
+
+        val sortedListOfLayers = mutableListOf<Layer>()
+        while (grayStack.isNotEmpty())
+            sortedListOfLayers.add(grayStack.pop()!!)
+
+        return sortedListOfLayers
+    }
+
+    // Recursive toplogical Sort
+    private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
+        val outboundLayers = node.outboundLayers
+        for (i in 0 until outboundLayers.size) {
+            val layer = outboundLayers[i]
+            if (!visited[layer]!!) {
+                recursiveTopologicalSort(layer, stack, visited)
+                visited[layer] = true;
+            }
+        }
+        stack.push(node);
     }
 
     private fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {

@@ -5,7 +5,6 @@
 
 package examples.transferlearning.modelzoo.resnet.resnet50
 
-
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations

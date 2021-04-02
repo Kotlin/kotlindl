@@ -48,7 +48,7 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     public val logger: KLogger = KotlinLogging.logger {}
 
     /** The bunch of layers. */
-    public val layers: List<Layer> = listOf(*layers)
+    public var layers: List<Layer> = listOf(*layers)
 
     public val inputLayer: Input
         get() = layers[0] as Input
