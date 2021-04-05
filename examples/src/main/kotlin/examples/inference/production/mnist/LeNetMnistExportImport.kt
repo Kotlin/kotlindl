@@ -6,7 +6,6 @@
 package examples.inference.production.mnist
 
 import examples.inference.production.lenet5
-import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -76,7 +75,7 @@ fun main() {
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(::mnistReshape)
+        it.reshape(*lenet5.inputDimensions)
 
         val prediction = it.predict(train.getX(imageId1))
 

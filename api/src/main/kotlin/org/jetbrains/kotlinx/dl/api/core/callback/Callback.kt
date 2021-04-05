@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.callback
 
-import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.history.*
 
 /**
@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.history.*
  */
 public open class Callback {
     /** Sequential model, accessible inside callback methods. */
-    internal lateinit var model: Sequential
+    internal lateinit var model: GraphTrainableModel
 
     /**
      * Called at the start of an epoch during training phase.

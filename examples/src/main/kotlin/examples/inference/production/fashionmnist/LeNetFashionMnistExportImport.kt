@@ -3,8 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.inference.production.fashionmnist
 
+import examples.inference.production.lenet5
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -14,7 +15,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
-private const val EPOCHS = 1
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
@@ -66,7 +67,7 @@ fun main() {
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(::mnistReshape)
+        it.reshape(28, 28, 1)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

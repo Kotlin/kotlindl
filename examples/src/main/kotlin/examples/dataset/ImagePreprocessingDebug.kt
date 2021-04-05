@@ -29,7 +29,6 @@ fun main() {
 
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
-    // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
     val imageDirectory =
         File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg")
 

@@ -5,7 +5,6 @@
 
 package examples.inference.production.fashionmnist
 
-import examples.inference.production.mnistReshape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
@@ -23,7 +22,7 @@ fun main() {
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(::mnistReshape)
+        it.reshape(28, 28, 1)
 
         var accuracy = 0.0
         val amountOfTestSet = 10000

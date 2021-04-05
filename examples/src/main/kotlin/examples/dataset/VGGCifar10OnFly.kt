@@ -173,7 +173,6 @@ fun main() {
     val cifarImagesArchive = properties["cifarImagesArchive"] as String
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
-    // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
             load {
@@ -205,6 +204,8 @@ fun main() {
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
     val dataset = OnFlyImageDataset.create(preprocessing, y)
 
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
     vgg11.use {
         it.compile(
             optimizer = Adam(),
@@ -215,12 +216,12 @@ fun main() {
         it.summary()
 
         val start = System.currentTimeMillis()
-        it.fit(dataset = dataset, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
         println("Training time: ${(System.currentTimeMillis() - start) / 1000f}")
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
-        val accuracy = it.evaluate(dataset = dataset, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
     }

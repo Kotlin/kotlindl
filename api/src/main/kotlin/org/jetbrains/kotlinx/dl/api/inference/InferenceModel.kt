@@ -8,10 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
-import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
-import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
+import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.tensorflow.Session
@@ -45,8 +42,11 @@ public open class InferenceModel : AutoCloseable {
     /** Output operand. */
     protected var output: Output = Output.ARGMAX
 
-    /** Function for conversion from flat float array to input tensor. */
-    protected lateinit var reshapeFunction: (FloatArray) -> Array<*>
+    /** Data shape for prediction. */
+    protected lateinit var shape: LongArray
+
+    protected val isShapeInitialized: Boolean
+        get() = ::shape.isInitialized
 
     /** Is true when model is initialized. */
     public var isModelInitialized: Boolean = false
@@ -90,11 +90,11 @@ public open class InferenceModel : AutoCloseable {
      * @return Predicted class index.
      */
     public open fun predict(inputData: FloatArray): Int {
-        require(::reshapeFunction.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
-        val preparedData = reshapeFunction(inputData)
-        val tensor = Tensor.create(preparedData)
+        val preparedData = serializeToBuffer(inputData)
+        val tensor = Tensor.create(shape, preparedData)
 
         tensor.use {
             val runner = session.runner()
@@ -116,15 +116,15 @@ public open class InferenceModel : AutoCloseable {
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     public open fun predictSoftly(inputData: FloatArray, predictionTensorName: String = ""): FloatArray {
-        require(::reshapeFunction.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
 
         require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
 
-        val preparedData = reshapeFunction(inputData)
-        val tensor = Tensor.create(preparedData)
+        val preparedData = serializeToBuffer(inputData)
+        val tensor = Tensor.create(shape, preparedData)
 
         tensor.use {
             val runner1 = session.runner()
@@ -158,8 +158,8 @@ public open class InferenceModel : AutoCloseable {
      *
      * @param reshapeFunction The approach to convert raw input data to multidimensional array of floats.
      */
-    public fun reshape(reshapeFunction: (FloatArray) -> Array<*>) {
-        this.reshapeFunction = reshapeFunction
+    public fun reshape(vararg dims: Long) {
+        this.shape = TensorShape(1, *dims).dims()
     }
 
     override fun toString(): String {

@@ -19,7 +19,7 @@ fun main() {
     SavedModel.load(PATH_TO_MODEL).use {
         println(it)
 
-        it.reshape(::reshapeInput)
+        it.reshape(28, 28, 1)
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 

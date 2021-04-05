@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.tensorflow.SavedModelBundle
@@ -36,10 +37,10 @@ public open class SavedModel : InferenceModel() {
     }
 
     override fun predict(inputData: FloatArray): Int {
-        require(reshapeFunction != null) { "Reshape functions is missed!" }
+        require(isShapeInitialized) { "Data shape is missed!" }
 
-        val preparedData = reshapeFunction(inputData)
-        val tensor = Tensor.create(preparedData)
+        val preparedData = serializeToBuffer(inputData)
+        val tensor = Tensor.create(shape, preparedData)
 
         tensor.use {
             val runner = session.runner()
@@ -59,10 +60,10 @@ public open class SavedModel : InferenceModel() {
      * @return Predicted class index.
      */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
-        require(reshapeFunction != null) { "Reshape functions is missed!" }
+        require(isShapeInitialized) { "Data shape is missed!" }
 
-        val preparedData = reshapeFunction(inputData)
-        val tensor = Tensor.create(preparedData)
+        val preparedData = serializeToBuffer(inputData)
+        val tensor = Tensor.create(shape, preparedData)
 
         tensor.use {
             val runner = session.runner()
@@ -140,7 +141,3 @@ public open class SavedModel : InferenceModel() {
         bundle.close()
     }
 }
-
-/*public fun prepareModelForInference(init: SavedModel.() -> Unit): SavedModel =
-    SavedModel()
-        .apply(init)*/

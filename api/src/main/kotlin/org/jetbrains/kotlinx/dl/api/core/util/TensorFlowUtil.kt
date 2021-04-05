@@ -72,6 +72,13 @@ public fun serializeToBuffer(src: Array<FloatArray>): FloatBuffer {
 }
 
 /** Converts [src] to [FloatBuffer]. */
+public fun serializeToBuffer(src: FloatArray): FloatBuffer {
+    val buffer = FloatBuffer.allocate(src.size)
+    buffer.put(src)
+    return (buffer as Buffer).rewind() as FloatBuffer
+}
+
+/** Converts [src] to [FloatBuffer]. */
 public fun serializeLabelsToBuffer(src: FloatArray, amountOfClasses: Long): FloatBuffer {
     val oneHotEncodedLabels = Array(src.size) {
         FloatArray(amountOfClasses.toInt()) { 0.0f }

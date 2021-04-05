@@ -26,7 +26,7 @@ private val model = Sequential.of(
     Dense(300, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
     Dense(3, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
-// TODO: failed on label preprocessing
+
 fun main() {
     data.shuffle()
 

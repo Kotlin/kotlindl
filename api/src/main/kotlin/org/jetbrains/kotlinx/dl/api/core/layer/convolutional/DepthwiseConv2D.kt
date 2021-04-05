@@ -49,6 +49,8 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * @property [name] Custom layer name.
  * @constructor Creates [DepthwiseConv2D] object.
  */
+// TODO: throw an exception if the NoGradient layer is not frozen before compilation (could be thrown in the compile method) as a part of final validation of appropriate architecture
+// add test for it (should failed on compilation)
 public class DepthwiseConv2D(
     public val kernelSize: LongArray = longArrayOf(3, 3),
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),

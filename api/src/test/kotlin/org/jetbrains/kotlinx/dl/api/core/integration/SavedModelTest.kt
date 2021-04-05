@@ -31,7 +31,7 @@ class SavedModelTest {
 
             val prediction = it.predict(train.getX(0))
 
-            assertEquals(train.getLabel(0), prediction)
+            assertEquals(train.getY(0), prediction)
 
             val predictions = it.predictAll(test)
 
@@ -51,7 +51,7 @@ class SavedModelTest {
 
             val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
-            assertEquals(train.getLabel(0), prediction)
+            assertEquals(train.getY(0), prediction)
 
             val predictions = it.predictAll(test, "Placeholder", "ArgMax")
 

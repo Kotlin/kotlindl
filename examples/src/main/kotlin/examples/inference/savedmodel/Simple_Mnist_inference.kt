@@ -19,7 +19,7 @@ fun main() {
     SavedModel.load(PATH_TO_MODEL).use {
         println(it)
 
-        it.reshape(::reshapeInput) // TODO: maybe pass here a Shape like in Sequential model, shape could a be set via setter or passed in predict method
+        it.reshape(28, 28, 1)
         it.input(Input.PLACEHOLDER)
         it.output(Output.ARGMAX)
 
@@ -35,10 +35,4 @@ fun main() {
     }
 }
 
-fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
-    val reshaped = Array(
-        1
-    ) { Array(28) { FloatArray(28) } }
-    for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-    return reshaped
-}
+

@@ -29,7 +29,6 @@ private const val TEST_BATCH_SIZE = 100
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
-// TODO: this example is failed
 /**
  * This is an CNN based on an implementation of LeNet-5 from classic paper.
  *
@@ -83,7 +82,8 @@ private val model = Sequential.of(
         name = "6"
     ),
     BatchNorm(
-        name = "7"
+        name = "7",
+        axis = arrayListOf(1)
     ),
     ActivationLayer(
         activation = Activations.Relu,
