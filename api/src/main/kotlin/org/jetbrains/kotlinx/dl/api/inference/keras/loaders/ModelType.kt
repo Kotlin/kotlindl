@@ -10,7 +10,7 @@ public enum class ModelType(public val modelName: String) {
     VGG_19("vgg19"),
     ResNet_50("resnet50"),
     ResNet_101("resnet101"),
-    ResNet_151("resnet151"),
+    ResNet_152("resnet151"),
     ResNet_50_v2("resnet50v2"),
     ResNet_101_v2("resnet101v2"),
     ResNet_151_v2("resnet151v2"),

@@ -32,7 +32,7 @@ import java.io.File
  */
 fun main() {
     val modelLoader =
-        ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_151)
+        ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_152)
     val model = modelLoader.loadModel() as Functional
 
     val imageNetClassLabels = modelLoader.loadClassLabels()

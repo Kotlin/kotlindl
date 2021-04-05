@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.dataset
+package examples.dataset.resnetcatdog
 
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.model.resnet50WithoutBatchNorm
+import org.jetbrains.kotlinx.dl.api.core.model.resnet101v2Light
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -57,7 +57,7 @@ fun main() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    resnet50WithoutBatchNorm(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
+    resnet101v2Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

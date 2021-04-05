@@ -7,8 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.model
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
-import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
@@ -16,13 +15,12 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
-import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 
-public fun resnet50(
+public fun resnet50Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -47,7 +45,7 @@ public fun resnet50(
 }
 
 /** Instantiates the ResNet101 architecture. */
-public fun resnet101(
+public fun resnet101Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -72,7 +70,7 @@ public fun resnet101(
 }
 
 /** Instantiates the ResNet152 architecture. */
-public fun resnet152(
+public fun resnet152Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -97,7 +95,7 @@ public fun resnet152(
 }
 
 /** Instantiates the ResNet50V2 architecture. */
-public fun resnet50v2(
+public fun resnet50v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -122,7 +120,7 @@ public fun resnet50v2(
 }
 
 /** Instantiates the ResNet50V2 architecture. */
-public fun resnet101v2(
+public fun resnet101v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -147,7 +145,7 @@ public fun resnet101v2(
 }
 
 /** Instantiates the ResNet152V2 architecture. */
-public fun resnet152v2(
+public fun resnet152v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
@@ -170,6 +168,7 @@ public fun resnet152v2(
         preact = true
     )
 }
+
 
 /**
  * A set of stacked residual blocks.
@@ -222,7 +221,7 @@ private fun stack2(
 ): Layer {
     var x = pointer
 
-    x = block2(x, filters, conv_shortcut = true, stride = stride1, name = name + "_block1", layerList = layerList)
+    x = block2(x, filters, conv_shortcut = true, name = name + "_block1", layerList = layerList)
     for (i in 2 until blocks) {
         x = block2(
             x,
@@ -253,15 +252,15 @@ private fun block1(
             strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
             dilations = longArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
-            kernelInitializer = GlorotUniform(),
-            biasInitializer = Zeros(),
+            kernelInitializer = HeNormal(),
+            biasInitializer = HeNormal(),
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(pointer)
         layerList.add(shortcut)
 
-        shortcut = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_0_bn")(shortcut)
-        layerList.add(shortcut)
+        /* shortcut = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_0_bn")(shortcut)
+         layerList.add(shortcut)*/
     } else {
         shortcut = pointer
     }
@@ -272,14 +271,14 @@ private fun block1(
         strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(pointer)
     layerList.add(x)
-    x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_1_bn")(x)
-    layerList.add(x)
+    /* x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_1_bn")(x)
+     layerList.add(x)*/
     x = ActivationLayer(activation = Activations.Relu, name = name + "_1_relu")(x)
     layerList.add(x)
 
@@ -289,14 +288,14 @@ private fun block1(
         strides = longArrayOf(1, 1, 1, 1),
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.SAME,
         name = name + "_2_conv"
     )(x)
     layerList.add(x)
-    x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_2_bn")(x)
-    layerList.add(x)
+    /*x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_2_bn")(x)
+    layerList.add(x)*/
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
     layerList.add(x)
 
@@ -306,14 +305,14 @@ private fun block1(
         strides = longArrayOf(1, 1, 1, 1),
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
     layerList.add(x)
-    x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_3_bn")(x)
-    layerList.add(x)
+    /*x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_3_bn")(x)
+    layerList.add(x)*/
 
     x = Add(name = name + "_add")(shortcut, x)
     layerList.add(x)
@@ -333,13 +332,13 @@ private fun block2(
     stride: Int = 1
 ): Layer {
     var x = pointer
-    val bnAxis = listOf(3)
+    /*val bnAxis = listOf(3)
     var preact = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_preact_bn")(x)
-    layerList.add(preact)
-    preact = ActivationLayer(activation = Activations.Relu, name = name + "_preact_relu")(preact)
+    layerList.add(preact)*/
+    val preact = ActivationLayer(activation = Activations.Relu, name = name + "_preact_relu")(x)
     layerList.add(preact)
 
-    var shortcut: Layer
+    val shortcut: Layer
 
     if (conv_shortcut) {
         shortcut = Conv2D(
@@ -348,8 +347,8 @@ private fun block2(
             strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
             dilations = longArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
-            kernelInitializer = GlorotUniform(),
-            biasInitializer = Zeros(),
+            kernelInitializer = HeNormal(),
+            biasInitializer = HeNormal(),
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(preact)
@@ -357,15 +356,14 @@ private fun block2(
     } else {
         shortcut = if (stride > 1) {
             val layer = MaxPool2D(
-                poolSize = intArrayOf(1, 3, 3, 1),
-                strides = intArrayOf(1, 2, 2, 1),
+                poolSize = intArrayOf(1, 1, 1, 1),
+                strides = intArrayOf(1, stride, stride, 1),
                 padding = ConvPadding.VALID,
-                name = "pool1_pool"
+                name = name + "_preact_maxpool"
             )(x)
             layerList.add(layer)
-            return layer
+            layer
         } else x
-
     }
 
     x = Conv2D(
@@ -375,15 +373,15 @@ private fun block2(
         useBias = false,
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(preact)
     layerList.add(x)
 
-    x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_1_bn")(x)
-    layerList.add(x)
+    /*x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_1_bn")(x)
+    layerList.add(x)*/
 
     x = ActivationLayer(activation = Activations.Relu, name = name + "_1_relu")(x)
     layerList.add(x)
@@ -398,14 +396,14 @@ private fun block2(
         dilations = longArrayOf(1, 1, 1, 1),
         useBias = true,
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = name + "_2_conv"
     )(x)
     layerList.add(x)
-    x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_2_bn")(x)
-    layerList.add(x)
+    /*x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_2_bn")(x)
+    layerList.add(x)*/
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
     layerList.add(x)
 
@@ -415,8 +413,8 @@ private fun block2(
         strides = longArrayOf(1, 1, 1, 1),
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
@@ -428,6 +426,7 @@ private fun block2(
     return x
 }
 
+
 private fun resnet(
     stackFn: (x: Layer, layerList: MutableList<Layer>) -> Layer,
     imageSize: Long = 224,
@@ -438,35 +437,33 @@ private fun resnet(
     preact: Boolean,
     layerList: MutableList<Layer>
 ): Functional {
-
-
     var x: Layer = Input(
         imageSize,
         imageSize,
         3,
         name = "input_1"
     )
-
     layerList.add(x)
 
     x = ZeroPadding2D(intArrayOf(3, 3, 3, 3), dataFormat = CHANNELS_LAST, name = "conv1_pad")(x)
     layerList.add(x)
+
     x = Conv2D(
         filters = 64,
         kernelSize = longArrayOf(7, 7),
         strides = longArrayOf(1, 2, 2, 1),
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         padding = ConvPadding.VALID,
         name = "conv1_conv"
     )(x)
     layerList.add(x)
 
     if (!preact) {
-        x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "conv1_bn")(x)
-        layerList.add(x)
+        /* x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "conv1_bn")(x)
+         layerList.add(x)*/
         x = ActivationLayer(activation = Activations.Relu, name = "conv1_relu")(x)
         layerList.add(x)
     }
@@ -484,8 +481,8 @@ private fun resnet(
     x = stackFn(x, layerList)
 
     if (preact) {
-        x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "post_bn")(x)
-        layerList.add(x)
+        /*x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "post_bn")(x)
+        layerList.add(x)*/
         x = ActivationLayer(activation = Activations.Relu, name = "post_relu")(x)
         layerList.add(x)
     }
@@ -495,8 +492,8 @@ private fun resnet(
     x = Dense(
         outputSize = numberOfClasses,
         activation = lastLayerActivation,
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = Zeros(),
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
         name = "predictions"
     )(x)
     layerList.add(x)
