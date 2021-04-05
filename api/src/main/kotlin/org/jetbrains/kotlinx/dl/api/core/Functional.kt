@@ -41,8 +41,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @property [layers] The layers to describe the model design.
          * @return the [Functional] model.
          */
+        // TODO: need to merge this method with fromLastLayer method in API to be more stable
         @JvmStatic
-        public fun of(vararg layers: Layer): GraphTrainableModel {
+        public fun of(vararg layers: Layer): Functional {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
@@ -56,12 +57,54 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         /**
          * Creates the [Functional] model.
+         *
+         * @property [input] The input layer with initial shapes.
+         * @property [layers] The layers to describe the model design.
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun fromFinalLayer(finalLayer: Layer): Functional {
+            require(finalLayer.inboundLayers.isNotEmpty()) { "Model should contain more than 1 layer!" }
+            val layers = mutableSetOf<Layer>()
+
+            layers.add(finalLayer)
+            addInboundNodes(finalLayer, layers)
+
+            return preprocessAndCreate(layers.toList())
+        }
+
+        private fun addInboundNodes(finalLayer: Layer, layers: MutableSet<Layer>) {
+            for (inboundNode in finalLayer.inboundLayers) {
+                if (!layers.contains(inboundNode)) {
+                    layers.add(inboundNode)
+                    addInboundNodes(inboundNode, layers)
+                }
+            }
+        }
+
+        /**
+         * Creates the [Functional] model.
          * @property [layers] The layers to describe the model design.
          * NOTE: First layer should be input layer.
          * @return the [Functional] model.
          */
         @JvmStatic
         public fun of(layers: List<Layer>): Functional {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+
+            return preprocessAndCreate(layers)
+        }
+
+        /**
+         * Creates the [Functional] model.
+         * @property [layers] The layers to describe the model design.
+         * NOTE: First layer should be input layer.
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        private fun preprocessAndCreate(layers: List<Layer>): Functional {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
