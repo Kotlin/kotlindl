@@ -22,6 +22,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 
+// TODO: remove layer list from parameters and usage
+
 public fun resnet50(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,

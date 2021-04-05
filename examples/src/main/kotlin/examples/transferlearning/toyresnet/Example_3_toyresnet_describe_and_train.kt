@@ -138,7 +138,7 @@ val dense_2 = Dense(
     biasInitializer = Constant(0.1f),
     name = "dense_2"
 )
-
+// TODO: write two variants of the Functional model description (with layer list and separate wiring like now and alternative like in resnet models where wiring and layer declaration in one place)
 private val model = Functional.of(
     input,
     conv2D_1(input),
