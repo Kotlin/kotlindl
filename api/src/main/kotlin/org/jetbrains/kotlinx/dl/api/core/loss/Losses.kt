@@ -11,7 +11,6 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.ReduceSum
 import org.tensorflow.op.math.Mean
-import java.lang.Boolean
 
 /**
  * Loss functions.
@@ -360,11 +359,11 @@ public class BinaryCrossEntropy(reductionType: ReductionType = ReductionType.SUM
         val epsilonOp = tf.constant(epsilon) as Operand<Float>
         val oneMinusEpsilonOp = tf.math.sub(oneOp, epsilonOp)
 
-        // TODO: Exception in thread "main" org.tensorflow.TensorFlowException: No gradient defined for op: ClipByValue
         // val clippedYPred = tf.clipByValue(yPred, epsilonOp, oneMinusEpsilonOp)
+        // This section commented due to missed gradients for clipByValue op
         val clippedYPred = tf.math.minimum(
-            oneMinusEpsilonOp,
-            tf.math.maximum(epsilonOp, yPred)
+            epsilonOp,
+            tf.math.maximum(oneMinusEpsilonOp, yPred)
         ) // probably takes 2 times memory for gradients instead of commented variant
 
         val right = tf.math.mul(yTrue, tf.math.log(tf.math.add(clippedYPred, epsilonOp)))
@@ -395,7 +394,7 @@ internal fun meanOfLosses(
     var totalLoss: Operand<Float> = tf.reduceSum(
         meanLoss,
         allAxes(tf, meanLoss),
-        ReduceSum.keepDims(Boolean.FALSE)
+        ReduceSum.keepDims(false)
     )
 
     if (reductionType == ReductionType.SUM_OVER_BATCH_SIZE) {

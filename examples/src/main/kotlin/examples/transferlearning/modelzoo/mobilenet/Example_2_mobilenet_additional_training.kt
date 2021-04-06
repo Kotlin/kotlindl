@@ -62,32 +62,23 @@ fun main() {
 
     layers.removeLast()
 
-    val newDenseLayer = Dense(
+    var x = Dense(
         name = "top_dense",
         kernelInitializer = GlorotUniform(),
         biasInitializer = GlorotUniform(),
         outputSize = 200,
         activation = Activations.Relu
-    )
-    newDenseLayer.inboundLayers.add(layers.last()) // bound to AveragePooling (TODO: better via API resnet(newDenseLayer))
-    layers.add(
-        newDenseLayer
-    )
+    )(layers.last())
 
-    val newDenseLayer2 = Dense(
+    x = Dense(
         name = "pred",
         kernelInitializer = GlorotUniform(),
         biasInitializer = GlorotUniform(),
         outputSize = 2,
         activation = Activations.Linear
-    )
-    newDenseLayer2.inboundLayers.add(layers.last())
+    )(x)
 
-    layers.add(
-        newDenseLayer2
-    )
-
-    val model2 = Functional.of(layers)
+    val model2 = Functional.fromFinalLayer(x)
 
     model2.use {
         it.compile(

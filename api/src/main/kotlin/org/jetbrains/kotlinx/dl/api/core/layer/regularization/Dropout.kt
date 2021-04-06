@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.regularization
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -20,17 +21,17 @@ import org.tensorflow.op.Ops
  * sum is unchanged at training time and inference time.
  *
  * NOTE: Import and export for this layer is not supported yet.
+ * NOTE: This layer used for inference purposes only.
  *
  * @property keepProbability The dropout rate, between 0 and 1. E.g. `rate=0.1` would drop out 10% of input units.
  * @property [name] Custom layer name.
  * @constructor Creates [Dropout] object.
  */
-// TODO: Dropout for inference only
 public class Dropout(
     private val keepProbability: Float = 0.1f,
     private val seed: Long = 12L,
     name: String = ""
-) : Layer(name) {
+) : Layer(name), NoGradients {
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         //left empty
@@ -52,7 +53,7 @@ public class Dropout(
              val probability = tf.math.add(
                  tf.math.mul(trainingFactor, tf.constant(keepProbability - 1.0f)),
                  tf.constant(1.0f)
-             ) // When training TODO: refactor because training factor is known
+             ) // When training
 
              val inputShape = input.asOutput().shape()
              val dims = mutableListOf<Long>()
@@ -66,7 +67,7 @@ public class Dropout(
 
              return tf.math.div(tf.math.mul(input, mask), probability)
          } else {*/
-            return input // TODO: double check that should be returned in Dropout
+        return input
         /* }*/
     }
 

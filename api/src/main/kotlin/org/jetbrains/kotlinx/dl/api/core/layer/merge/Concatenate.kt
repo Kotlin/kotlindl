@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
@@ -20,7 +21,7 @@ import org.tensorflow.op.Ops
 public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
-) : AbstractMerge("ConcatenateLayer", name) {
+) : AbstractMerge("ConcatenateLayer", name), NoGradients {
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
         val inputShapes = mutableListOf<TensorShape>()
         inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }

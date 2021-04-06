@@ -54,12 +54,13 @@ internal fun commonRelu(
     }
 
     if (clipMax) {
-        input2 =
-            tf.clipByValue( // TODO: maybe rewrite it via ops with gradients via maximum and etc due to missed grads for clibByValue
+        input2 = tf.math.minimum(tf.constant(0.0f) as Operand<Float>, tf.math.maximum(input2, tf.constant(maxValue!!)))
+        // original code replaced on composition of min and max calls due to missed gradients for clipByValue op
+        /*tf.clipByValue(
                 input2,
                 tf.constant(0.0f) as Operand<Float>,
                 tf.constant(maxValue!!)
-            )
+            )*/
     }
 
     if (alpha != 0.0f) input2 = tf.math.sub(input2, tf.math.mul(tf.constant(alpha), negativePart))

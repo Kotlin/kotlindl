@@ -200,7 +200,6 @@ fun main() {
         }
     }
 
-    // TODO: labels should have the same order like files, need to create a dictionary label-to-file
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
     val dataset = OnFlyImageDataset.create(preprocessing, y)
 

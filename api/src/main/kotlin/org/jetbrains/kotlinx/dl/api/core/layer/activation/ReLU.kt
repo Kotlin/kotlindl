@@ -30,7 +30,7 @@ public class ReLU(
     /** Negative slope coefficient. Should be >= 0. */
     public val negativeSlope: Float = 0.0f,
 
-    /** Threshold value for thresholded activation. */
+    /** Threshold value for threshold activation. */
     public val threshold: Float = 0.0f,
 
     name: String = ""

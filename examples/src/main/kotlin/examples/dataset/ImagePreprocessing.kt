@@ -14,26 +14,25 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.awt.Color
 import java.awt.Graphics
-import java.io.File
 import java.io.FileReader
+import java.net.URL
+import java.nio.file.Paths
 import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
+
 fun main() {
     val properties = Properties()
     val reader = FileReader("data.properties")
     properties.load(reader)
 
-    val cifarImagesArchive = properties["cifarImagesArchive"] as String
     val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
 
-    // TODO: standartize, center and normalize be careful in terms https://machinelearningmastery.com/how-to-normalize-center-and-standardize-images-with-the-imagedatagenerator-in-keras/
-    // TODO: remove this path to properties or change on resource input stream
-    val imageDirectory =
-        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg")
+    val resource: URL = ImagePreprocessing::class.java.getResource("/datasets/vgg")
+    val imageDirectory = Paths.get(resource.toURI()).toFile()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
@@ -68,7 +67,7 @@ fun main() {
         8
     )
 
-    val rawImage = batchIter.next().x[0]
+    val rawImage = batchIter.next().x[1]
 
     val frame = JFrame("Filters")
     frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(400, 400, 3)))
