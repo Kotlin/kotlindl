@@ -28,6 +28,7 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
 
+// TODO: move to tests
 private val model = Functional.of(
     input,
     conv2D_2(conv2D_1),

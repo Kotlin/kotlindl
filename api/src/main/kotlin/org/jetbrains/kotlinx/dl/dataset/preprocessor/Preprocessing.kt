@@ -18,6 +18,26 @@ public class Preprocessing {
 
     public lateinit var sharpeningStage: Sharpen
 
+    // TODO: rewrite correctly with all stages not only loading and resize
+    public val finalShape: ImageShape
+        get() {
+            return if (imagePreprocessingStage.isResizeInitialized && imagePreprocessingStage.isLoadInitialized) {
+                ImageShape(
+                    imagePreprocessingStage.resize.outputWidth.toLong(),
+                    imagePreprocessingStage.resize.outputHeight.toLong(),
+                    imagePreprocessingStage.load.imageShape!!.channels
+                )
+            } else if (imagePreprocessingStage.load.imageShape!!.width != null && imagePreprocessingStage.load.imageShape!!.height != null) {
+                ImageShape(
+                    imagePreprocessingStage.load.imageShape!!.width,
+                    imagePreprocessingStage.load.imageShape!!.height,
+                    imagePreprocessingStage.load.imageShape!!.channels
+                )
+            } else {
+                throw IllegalStateException("Final image shape is unclear. The resize operator should be initialized or imageShape with height, weight and channels should be initialized.")
+            } // TODO: add test for this cases
+        }
+
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
         val file = imagePreprocessingStage.load.pathToData
         require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
@@ -25,12 +45,14 @@ public class Preprocessing {
         return handleFile(file)
     }
 
+    // TODO: need a method a-la outputShape after preprocessing
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
         //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
         val filename = file.name
         var image = imagePreprocessingStage.load.fileToImage(file)
         var shape = imagePreprocessingStage.load.imageShape!!
-
+        // TODO: handle if height and width are missed in imageShape in load stage
+        // if both nulls write a warning to logs about possible mismatch
         if (imagePreprocessingStage.isCropInitialized) {
             val (croppedImage, croppedShape) = imagePreprocessingStage.crop.apply(image, shape)
             image = croppedImage

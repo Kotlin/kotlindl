@@ -15,21 +15,58 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 import java.io.FileReader
 import java.util.*
+
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 8
+private const val TEST_BATCH_SIZE = 16
+private const val NUM_CLASSES = 2
+private const val NUM_CHANNELS = 3L
+private const val IMAGE_SIZE = 224L
+private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 fun main() {
     val jsonConfigFile = getResNet50JSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
-    val data = prepareCustomDatasetFromPaths(
-        "C:\\Users\\zaleslaw\\Desktop\\diplodok_rex\\diplo_224_224",
-        "C:\\Users\\zaleslaw\\Desktop\\diplodok_rex\\rex_224_224"
-    )
+    val properties = Properties()
+    val reader = FileReader("data.properties")
+    properties.load(reader)
 
-    val (train, test) = data.split(0.8)
+    val catdogimages = properties["smallcatdogimages"] as String
+
+    val preprocessing: Preprocessing = preprocessingPipeline {
+        imagePreprocessing {
+            load {
+                pathToData = File(catdogimages)
+                imageShape = ImageShape(channels = NUM_CHANNELS)
+                colorMode = ColorOrder.BGR
+                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+            }
+            resize {
+                outputHeight = IMAGE_SIZE.toInt()
+                outputWidth = IMAGE_SIZE.toInt()
+                interpolation = InterpolationType.BILINEAR
+            }
+        }
+        sharpen {
+            modelType = ModelType.ResNet_50
+        }
+    }
+
+    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
     val hdfFile = getResNet50WeightsFile()
     val layers = mutableListOf<Layer>()
 
@@ -37,6 +74,10 @@ fun main() {
         layer.isTrainable = false
         layers.add(layer)
     }
+
+    val lastLayer = layers.last()
+    for (outboundLayer in lastLayer.inboundLayers)
+        outboundLayer.outboundLayers.remove(lastLayer)
 
     layers.removeLast()
 
@@ -47,7 +88,7 @@ fun main() {
         outputSize = 200,
         activation = Activations.Relu
     )
-    newDenseLayer.inboundLayers.add(layers.last()) // bound to AveragePooling (TODO: better via API resnet(newDenseLayer))
+    newDenseLayer.inboundLayers.add(layers.last())
     layers.add(
         newDenseLayer
     )
@@ -56,7 +97,7 @@ fun main() {
         name = "pred",
         kernelInitializer = GlorotUniform(),
         biasInitializer = GlorotUniform(),
-        outputSize = 2,
+        outputSize = NUM_CLASSES,
         activation = Activations.Linear
     )
     newDenseLayer2.inboundLayers.add(layers.last())
@@ -75,61 +116,20 @@ fun main() {
         )
 
         it.loadWeightsForFrozenLayers(hdfFile)
-        val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = 4).metrics[Metrics.ACCURACY]
+        val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBeforeTraining")
 
         it.fit(
             dataset = train,
-            batchSize = 8,
-            epochs = 10
+            batchSize = TRAINING_BATCH_SIZE,
+            epochs = EPOCHS
         )
 
-        val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 4).metrics[Metrics.ACCURACY]
+        val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy after training $accuracyAfterTraining")
     }
 
-}
-
-
-fun prepareCustomDatasetFromPaths(vararg paths: String): OnHeapDataset {
-    /*val listOfImages = mutableListOf<FloatArray>()
-    val listOfLabels = mutableListOf<FloatArray>()
-    val numberOfClasses = paths.size
-    var counter = 0
-
-    for (path in paths) {
-        File(path).walk().forEach {
-            try {
-                val rawImage = ImageConverter.toRawFloatArray(it)
-
-                val tensorShape = longArrayOf(
-                    224,
-                    224,
-                    3
-                )
-
-                val image = preprocessInput(rawImage, tensorShape, inputType = InputType.CAFFE)
-
-
-                listOfImages.add(image)
-                val label = FloatArray(numberOfClasses)
-                label[counter] = 1F
-                listOfLabels.add(label)
-            } catch (e: Exception) {
-                println("Skipping the following image $it")
-            }
-        }
-        counter += 1
-    }
-
-    val sortedData = listOfImages.zip(listOfLabels)
-    val shuffledData = sortedData.shuffled()
-    val (x, y) = shuffledData.unzip()
-
-    return OnHeapDataset.create({ x.toTypedArray() }, { y.toTypedArray() })*/
-    TODO()
-    // unimplemented
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */

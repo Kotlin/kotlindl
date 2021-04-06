@@ -6,18 +6,12 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
 import kotlin.math.truncate
 import kotlin.random.Random
 
-/**
- * Basic class to handle features [x] and labels [y].
- *
- * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
- */
 public class OnFlyImageDataset internal constructor(
     private var preprocessing: Preprocessing, // TODO: maybe move to builder
     labels: FloatArray?
@@ -29,23 +23,7 @@ public class OnFlyImageDataset internal constructor(
     init {
         val loading = preprocessing.imagePreprocessingStage.load
         xFiles = loading.prepareFileNames()
-        if (labels != null) {
-            y = labels
-        } else {
-            if (preprocessing.imagePreprocessingStage.load.labelGenerator != null) {
-                val labelGenerator = preprocessing.imagePreprocessingStage.load.labelGenerator as FromFolders
-                val mapping = labelGenerator.mapping
-
-                y = FloatArray(xFiles.size) { 0.0f }
-                for (i in xFiles.indices) {
-                    y[i] = (mapping[xFiles[i].parentFile.name]
-                        ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
-                }
-
-            } else {
-                throw IllegalStateException("Label generator should be defined for Loading stage of image preprocessing.")
-            }
-        }
+        y = labels ?: OnHeapDataset.prepareY(xFiles, preprocessing)
     }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
@@ -163,7 +141,6 @@ public class OnFlyImageDataset internal constructor(
         return y[idx]
     }
 
-    // TODO: check that initial data are not shuffled or return void if are shuffled
     override fun shuffle(): OnFlyImageDataset {
         xFiles.shuffle(Random(12L))
         y.shuffle(Random(12L))

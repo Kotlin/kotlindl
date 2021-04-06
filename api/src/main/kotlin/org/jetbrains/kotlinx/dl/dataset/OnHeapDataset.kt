@@ -6,9 +6,12 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
+import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
 import kotlin.math.truncate
+import kotlin.random.Random
 
 /**
  * Basic class to handle features [x] and labels [y].
@@ -177,17 +180,68 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             return try {
                 val loading = preprocessors.imagePreprocessingStage.load
                 val xFiles = loading.prepareFileNames()
-                val numOfPixels: Int = 32 * 32 * 3
 
-                val x = Array(xFiles.size) { FloatArray(numOfPixels) { 0.0f } }
-                for (i in xFiles.indices) {
-                    x[i] = preprocessors.handleFile(xFiles[i]).first
-                }
+                val x = prepareX(xFiles, preprocessors, preprocessors.finalShape.numberOfElements.toInt())
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
+        }
+
+        private fun prepareX(
+            xFiles: Array<File>,
+            preprocessors: Preprocessing,
+            numOfPixels: Int
+        ): Array<FloatArray> {
+            val x = Array(xFiles.size) { FloatArray(numOfPixels) { 0.0f } }
+            for (i in xFiles.indices) {
+                x[i] = preprocessors.handleFile(xFiles[i]).first
+            }
+            return x
+        }
+
+
+        /**
+         * Takes data from external data [features] and [labels]
+         * to create dataset [OnFlyImageDataset].
+         */
+        @JvmStatic
+        public fun create(
+            preprocessors: Preprocessing
+        ): OnHeapDataset {
+            return try {
+                val loading = preprocessors.imagePreprocessingStage.load
+                val xFiles = loading.prepareFileNames()
+                val numOfPixels = preprocessors.finalShape.numberOfElements.toInt()
+                val x = prepareX(xFiles, preprocessors, numOfPixels)
+                val y = prepareY(xFiles, preprocessors)
+
+                OnHeapDataset(x, y)
+            } catch (e: IOException) {
+                throw AssertionError(e)
+            }
+        }
+
+        internal fun prepareY(
+            xFiles: Array<File>,
+            preprocessors: Preprocessing,
+        ): FloatArray {
+            val y: FloatArray
+            if (preprocessors.imagePreprocessingStage.load.labelGenerator != null) {
+                val labelGenerator = preprocessors.imagePreprocessingStage.load.labelGenerator as FromFolders
+                val mapping = labelGenerator.mapping
+
+                y = FloatArray(xFiles.size) { 0.0f }
+                for (i in xFiles.indices) {
+                    y[i] = (mapping[xFiles[i].parentFile.name]
+                        ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
+                }
+
+            } else {
+                throw IllegalStateException("Label generator should be defined for Loading stage of image preprocessing.")
+            }
+            return y
         }
     }
 
@@ -206,14 +260,10 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
         return y[idx]
     }
 
-    // TODO: check that initial data are not shuffled or return void if are shuffled
     override fun shuffle(): OnHeapDataset {
-        /*val sortedData = x.zip(y)
-        val shuffledData = sortedData.shuffled()
-        val (x, y) = shuffledData.unzip()
-
-        return create({ x.toTypedArray() }, { y.toTypedArray() })*/
-        TODO()
+        x.shuffle(Random(12L))
+        y.shuffle(Random(12L))
+        return this
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {

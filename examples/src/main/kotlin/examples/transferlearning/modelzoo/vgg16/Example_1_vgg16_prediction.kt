@@ -46,7 +46,6 @@ import java.net.URL
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun main() {
-    // TODO: modelLoader rename
     val modelLoader = ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_16)
     val model = modelLoader.loadModel() as Sequential
 
