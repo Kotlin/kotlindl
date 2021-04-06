@@ -65,21 +65,63 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         @JvmStatic
         public fun fromFinalLayer(finalLayer: Layer): Functional {
             require(finalLayer.inboundLayers.isNotEmpty()) { "Model should contain more than 1 layer!" }
-            val layers = mutableSetOf<Layer>()
+            val layers = mutableSetOf<Layer>() // set of unique layers
 
             layers.add(finalLayer)
-            addInboundNodes(finalLayer, layers)
+            visitInboundNodes(finalLayer, layers)
 
             return preprocessAndCreate(layers.toList())
         }
 
-        private fun addInboundNodes(finalLayer: Layer, layers: MutableSet<Layer>) {
+        private fun visitInboundNodes(finalLayer: Layer, layers: MutableSet<Layer>) {
             for (inboundNode in finalLayer.inboundLayers) {
-                if (!layers.contains(inboundNode)) {
-                    layers.add(inboundNode)
-                    addInboundNodes(inboundNode, layers)
+                layers.add(inboundNode)
+                visitInboundNodes(inboundNode, layers)
+            }
+        }
+
+        private fun findInputLayer(layers: List<Layer>): Input {
+            val inputs = layers.filterIsInstance<Input>().toList()
+            require(inputs.size == 1) { "Model should contain only one layer with type Input. There is a ${inputs.size} input layers." }
+            return inputs[0]
+        }
+
+        private fun fillOutputLayers(layers: List<Layer>) {
+            layers.forEach { layer ->
+                val inboundLayers = layer.inboundLayers
+                inboundLayers.forEach {
+                    if (!it.outboundLayers.contains(layer))
+                        it.outboundLayers.add(layer)
                 }
             }
+        }
+
+        private fun topologicalSort(layers: List<Layer>, inputLayer: Input): List<Layer> {
+            val visited = mutableMapOf<Layer, Boolean>()
+            layers.forEach { visited[it] = false }
+
+            val grayStack: Stack<Layer> = mutableListOf()
+
+            recursiveTopologicalSort(inputLayer, grayStack, visited)
+
+            val sortedListOfLayers = mutableListOf<Layer>()
+            while (grayStack.isNotEmpty())
+                sortedListOfLayers.add(grayStack.pop()!!)
+
+            return sortedListOfLayers
+        }
+
+        // Recursive toplogical Sort
+        private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
+            val outboundLayers = node.outboundLayers
+            for (i in 0 until outboundLayers.size) {
+                val layer = outboundLayers[i]
+                if (!visited[layer]!!) {
+                    recursiveTopologicalSort(layer, stack, visited)
+                    visited[layer] = true;
+                }
+            }
+            stack.push(node)
         }
 
         /**
@@ -105,13 +147,15 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         private fun preprocessAndCreate(layers: List<Layer>): Functional {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
+            var layerList = layers
+            val inputLayer = findInputLayer(layerList)
 
-            val otherLayers = layers.subList(1, layers.size)
+            fillOutputLayers(layerList)
+            layerList = topologicalSort(layerList, inputLayer)
+
+            val otherLayers = layerList.subList(1, layerList.size)
             preProcessLayerNames(otherLayers.toTypedArray())
-            val model = Functional(*layers.toTypedArray())
+            val model = Functional(*layerList.toTypedArray())
             postProcessLayerNames(otherLayers.toTypedArray(), model)
             return model
         }
@@ -197,13 +241,8 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         //this.callback = callback
         //this.callback.model = this // TODO: cyclic reference
 
-        val inputLayer = layers[0] as Input
-
         inputLayer.build(tf)
         var inputShape: Shape? = inputLayer.computeOutputShape()
-
-        fillOutputLayers(layers)
-        layers = topologicalSort(layers)
 
         layers.filter { it !is Input }.forEach {
             /*if (inputShape == null) {
@@ -256,45 +295,6 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
         isModelCompiled = true
-    }
-
-    private fun fillOutputLayers(layers: List<Layer>) {
-        layers.forEach { layer ->
-            val inboundLayers = layer.inboundLayers
-            inboundLayers.forEach {
-                if (!it.outboundLayers.contains(layer))
-                    it.outboundLayers.add(layer)
-            }
-        }
-    }
-
-    private fun topologicalSort(layers: List<Layer>): List<Layer> {
-        val visited = mutableMapOf<Layer, Boolean>()
-        layers.forEach { visited[it] = false }
-
-        val grayStack: Stack<Layer> = mutableListOf()
-
-        recursiveTopologicalSort(layers[0], grayStack, visited)
-
-
-        val sortedListOfLayers = mutableListOf<Layer>()
-        while (grayStack.isNotEmpty())
-            sortedListOfLayers.add(grayStack.pop()!!)
-
-        return sortedListOfLayers
-    }
-
-    // Recursive toplogical Sort
-    private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
-        val outboundLayers = node.outboundLayers
-        for (i in 0 until outboundLayers.size) {
-            val layer = outboundLayers[i]
-            if (!visited[layer]!!) {
-                recursiveTopologicalSort(layer, stack, visited)
-                visited[layer] = true;
-            }
-        }
-        stack.push(node);
     }
 
     private fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {

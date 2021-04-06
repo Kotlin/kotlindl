@@ -16,6 +16,8 @@ public class Preprocessing {
 
     public lateinit var rescalingStage: Rescaling
 
+    public lateinit var sharpeningStage: Sharpen
+
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
         val file = imagePreprocessingStage.load.pathToData
         require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
@@ -51,13 +53,17 @@ public class Preprocessing {
             imagePreprocessingStage.save.imageToFile(filename, image, shape)
         }
 
-        val floatArray = OnHeapDataset.toRawVector(
+        var tensor = OnHeapDataset.toRawVector(
             imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
 
-        return if (::rescalingStage.isInitialized) {
-            Pair(rescalingStage.apply(floatArray), shape)
-        } else Pair(floatArray, shape)
+        if (::rescalingStage.isInitialized)
+            tensor = rescalingStage.apply(tensor, shape)
+
+        if (::sharpeningStage.isInitialized)
+            tensor = sharpeningStage.apply(tensor, shape)
+
+        return Pair(tensor, shape)
     }
 }
 
@@ -71,4 +77,8 @@ public fun Preprocessing.imagePreprocessing(block: ImagePreprocessing.() -> Unit
 
 public fun Preprocessing.rescale(block: Rescaling.() -> Unit) {
     rescalingStage = Rescaling().apply(block)
+}
+
+public fun Preprocessing.sharpen(block: Sharpen.() -> Unit) {
+    sharpeningStage = Sharpen().apply(block)
 }

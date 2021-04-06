@@ -48,6 +48,10 @@ public class ModelLoader(public val commonModelDirectory: File, public val model
         )
     }
 
+    public companion object {
+
+    }
+
     public fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): GraphTrainableModel {
         val jsonConfigFile = getJSONConfigFile(loadingMode)
         return when (modelType) {

@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 public interface Preprocessor {
-    public fun apply(data: FloatArray): FloatArray // move to shape
+    public fun apply(data: FloatArray, shape: ImageShape): FloatArray // move to shape
 }
 
 

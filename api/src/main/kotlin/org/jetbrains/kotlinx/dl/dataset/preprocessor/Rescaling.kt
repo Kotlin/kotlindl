@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 public class Rescaling(public var scalingCoefficient: Float = 255f) : Preprocessor {
-    override fun apply(data: FloatArray): FloatArray {
+    override fun apply(data: FloatArray, shape: ImageShape): FloatArray {
         for (i in data.indices) {
             data[i] = data[i] / scalingCoefficient
         }
