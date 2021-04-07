@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.util.tfMean
+import org.jetbrains.kotlinx.dl.api.core.util.TF
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -39,7 +39,7 @@ public class GlobalAvgPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tfMean(tf, input, tf.constant(intArrayOf(1, 2)))
+        return TF.mean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 
     override val weights: Map<String, Array<*>> get() = emptyMap()

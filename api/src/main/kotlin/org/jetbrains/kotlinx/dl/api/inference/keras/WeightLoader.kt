@@ -364,7 +364,7 @@ private fun fillBatchNormVariablesFromKeras(
         when (it.name) {
             "gamma:0" -> {
                 val gammaVariableName = batchNormGammaVarName(layerName)
-                val gammaShape = (model.getLayer(layerName) as BatchNorm).weightShapeArray
+                val gammaShape = (model.getLayer(layerName) as BatchNorm).gammaShapeArray!!
                 require(
                     gammaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Gamma shape in loaded data is ${dims.contentToString()}. Should be ${gammaShape.contentToString()}" }
@@ -372,7 +372,7 @@ private fun fillBatchNormVariablesFromKeras(
             }
             "beta:0" -> {
                 val betaVariableName = batchNormBetaVarName(layerName)
-                val betaShape = (model.getLayer(layerName) as BatchNorm).weightShapeArray
+                val betaShape = (model.getLayer(layerName) as BatchNorm).betaShapeArray!!
                 require(
                     betaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Beta shape in loaded data is ${dims.contentToString()}. Should be ${betaShape.contentToString()}" }
@@ -380,7 +380,7 @@ private fun fillBatchNormVariablesFromKeras(
             }
             "moving_mean:0" -> {
                 val movingMeanVariableName = batchNormMovingMeanVarName(layerName)
-                val movingMeanShape = (model.getLayer(layerName) as BatchNorm).weightShapeArray
+                val movingMeanShape = (model.getLayer(layerName) as BatchNorm).movingMeanShapeArray
                 require(
                     movingMeanShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Moving mean shape in loaded data is ${dims.contentToString()}. Should be ${movingMeanShape.contentToString()}" }
@@ -388,7 +388,7 @@ private fun fillBatchNormVariablesFromKeras(
             }
             "moving_variance:0" -> {
                 val movingVarianceVariableName = batchNormMovingVarianceVarName(layerName)
-                val movingVarianceShape = (model.getLayer(layerName) as BatchNorm).weightShapeArray
+                val movingVarianceShape = (model.getLayer(layerName) as BatchNorm).movingVarianceShapeArray
                 require(
                     movingVarianceShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Moving variance shape in loaded data is ${dims.contentToString()}. Should be ${movingVarianceShape.contentToString()}" }
