@@ -48,6 +48,7 @@ private const val LINEAR_ACCUMULATOR = "linear_accumulator"
  * @property [learningRatePower] A float value, must be less or equal to zero.
  * Controls how the learning rate decreases during training. Use zero for a fixed learning rate.
  * @property [l2ShrinkageRegularizationStrength] A float value, must be greater than or equal to zero.
+ * @property [initialAccumulatorValue] The starting value for accumulators. Only zero or positive values are allowed.
  * This differs from L2 above in that the L2 above is a stabilization penalty, whereas this L2 shrinkage is a magnitude penalty.
  * When input is sparse shrinkage will only happen on the active weights.
  */
@@ -57,11 +58,10 @@ public class Ftrl(
     private val l2RegularizationStrength: Float = 0.0f,
     private val learningRatePower: Float = -0.5f,
     private val l2ShrinkageRegularizationStrength: Float = 0.0f,
+    private var initialAccumulatorValue: Float = 0.0f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    /** The starting value for accumulators.
-    Only zero or positive values are allowed. */
-    private var initialAccumulatorValue = 0.0f // TODO: move to parameters.
+    /**  */
     private lateinit var learningRatePowerConst: Constant<Float>
     private lateinit var learningRateConst: Constant<Float>
     private lateinit var l1RegularizationStrengthConst: Constant<Float>
@@ -70,6 +70,7 @@ public class Ftrl(
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
+        require(initialAccumulatorValue >= 0.0f) { "Initial accumulator value $initialAccumulatorValue should be >= 0.0." }
         require(l1RegularizationStrength >= 0.0f) { "L1 Regularization Strength $l1RegularizationStrength should be >= 0.0." }
         require(l2RegularizationStrength >= 0.0f) { "L2 Regularization Strength $l2RegularizationStrength should be >= 0.0." }
         require(learningRatePower <= 0.0f) { "Learning rate power $learningRatePower should be <= 0.0." }
