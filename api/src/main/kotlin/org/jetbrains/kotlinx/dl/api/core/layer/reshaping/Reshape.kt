@@ -17,7 +17,6 @@ import kotlin.math.abs
 /**
  * Layer that reshapes inputs into the given shape.
  *
- * TODO: different calculation for targetShape size 1,2,3
  * @property [targetShape] Target shape. List of integers, does not include the samples dimension (batch size)
  * @property [name] Custom layer name.
  * @constructor Creates [Reshape] object.
@@ -31,8 +30,24 @@ public class Reshape(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
-        if (targetShape.size == 3) units = tf.constant(intArrayOf(-1, targetShape[0], targetShape[1], targetShape[2]))
-        else if (targetShape.size == 1) units = tf.constant(intArrayOf(-1, targetShape[0]))
+        units = when (targetShape.size) {
+            1 -> tf.constant(intArrayOf(-1, targetShape[0]))
+            2 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1]))
+            3 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1], targetShape[2]))
+            4 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1], targetShape[2], targetShape[3]))
+            5 -> tf.constant(
+                intArrayOf(
+                    -1,
+                    targetShape[0],
+                    targetShape[1],
+                    targetShape[2],
+                    targetShape[3],
+                    targetShape[4]
+                )
+            )
+            else -> throw UnsupportedOperationException("Reshaping for ${targetShape.size} is not supported yet!")
+        }
+
         fanIn = tensorShape.numElements().toInt()
         fanOut = amountOfNeuronsInFlattenLayer
     }
