@@ -67,7 +67,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         return inputShape
     }
 
-    override val weights: List<Array<*>> get() = emptyList()
+    override val weights: Map<String, Array<*>> get() = emptyMap()
 
     override val hasActivation: Boolean get() = false
 

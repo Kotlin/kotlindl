@@ -136,18 +136,19 @@ public abstract class Layer(public var name: String) {
     }
 
     /** Extract weights values by variable names. */
-    protected fun extractWeigths(variableNames: List<String>): List<Array<*>> {
+    protected fun extractWeights(variableNames: List<String>): Map<String, Array<*>> {
         val session = parentModel.session
         val runner = session.runner()
 
         for (variableName in variableNames) {
             runner.fetch(variableName)
         }
-        return runner.run().map { it.convertTensorToMultiDimArray() }.toList()
+        val weights = runner.run().map { it.convertTensorToMultiDimArray() }
+        return variableNames.zip(weights).toMap()
     }
 
     /** Returns layer's weights. */
-    public abstract val weights: List<Array<*>>
+    public abstract val weights: Map<String, Array<*>>
 
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean

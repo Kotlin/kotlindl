@@ -8,11 +8,9 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.junit.Ignore
 import org.junit.jupiter.api.Test
 
 internal class Conv2DTest : ConvLayerTest() {
-    @Ignore
     @Test
     fun conv2d() {
         val input = Array(1) {

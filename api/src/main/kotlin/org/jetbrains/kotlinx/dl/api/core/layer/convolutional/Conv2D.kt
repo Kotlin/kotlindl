@@ -146,10 +146,10 @@ public class Conv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
-    override val weights: List<Array<*>> get() = extractConv2DWeights()
+    override val weights: Map<String, Array<*>> get() = extractConv2DWeights()
 
-    private fun extractConv2DWeights(): List<Array<*>> {
-        return extractWeigths(defineVariableNames().toList())
+    private fun extractConv2DWeights(): Map<String, Array<*>> {
+        return extractWeights(defineVariableNames().toList())
     }
 
     /** Returns the shape of kernel weights. */

@@ -25,7 +25,7 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(::reshapeInput)
+            it.reshape(28, 28, 1)
             it.input(Input.PLACEHOLDER)
             it.output(Output.ARGMAX)
 
@@ -47,7 +47,7 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(::reshapeInput)
+            it.reshape(28, 28, 1)
 
             val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 

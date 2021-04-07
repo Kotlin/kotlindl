@@ -63,7 +63,7 @@ public class ReLU(
         return "ReLU(maxValue=$maxValue, negativeSlope=$negativeSlope, threshold=$threshold)"
     }
 
-    override val weights: List<Array<*>> get() = emptyList()
+    override val weights: Map<String, Array<*>> get() = emptyMap()
 
     override val hasActivation: Boolean get() = true
 

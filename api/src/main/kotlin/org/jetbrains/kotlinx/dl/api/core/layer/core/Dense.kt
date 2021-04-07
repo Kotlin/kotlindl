@@ -106,10 +106,10 @@ public class Dense(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override val weights: List<Array<*>> get() = extractDenseWeights()
+    override val weights: Map<String, Array<*>> get() = extractDenseWeights()
 
-    private fun extractDenseWeights(): List<Array<*>> {
-        return extractWeigths(defineVariableNames().toList())
+    private fun extractDenseWeights(): Map<String, Array<*>> {
+        return extractWeights(defineVariableNames().toList())
     }
 
     override val hasActivation: Boolean get() = true

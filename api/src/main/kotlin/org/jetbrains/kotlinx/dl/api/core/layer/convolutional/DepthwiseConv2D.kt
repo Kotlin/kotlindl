@@ -155,10 +155,10 @@ public class DepthwiseConv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
-    override val weights: List<Array<*>> get() = extractDepthConv2DWeights()
+    override val weights: Map<String, Array<*>> get() = extractDepthConv2DWeights()
 
-    private fun extractDepthConv2DWeights(): List<Array<*>> {
-        return extractWeigths(defineVariableNames().toList())
+    private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
+        return extractWeights(defineVariableNames().toList())
     }
 
     /** Returns the shape of kernel weights. */

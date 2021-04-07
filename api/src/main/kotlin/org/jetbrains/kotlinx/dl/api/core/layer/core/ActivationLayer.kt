@@ -43,7 +43,7 @@ public class ActivationLayer(
         return Activations.convert(activation).apply(tf, input, name)
     }
 
-    override val weights: List<Array<*>> get() = emptyList()
+    override val weights: Map<String, Array<*>> get() = emptyMap()
 
     override val hasActivation: Boolean get() = true
 

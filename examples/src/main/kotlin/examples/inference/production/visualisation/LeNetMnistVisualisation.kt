@@ -46,11 +46,11 @@ fun main() {
 
         val weights = it.layers[0].weights // first conv2d layer
 
-        drawFilters(weights[0], colorCoefficient = 10.0)
+        drawFilters(weights.values.toTypedArray()[0], colorCoefficient = 10.0)
 
         val weights2 = it.layers[2].weights // first conv2d layer
 
-        drawFilters(weights2[0], colorCoefficient = 10.0)
+        drawFilters(weights2.values.toTypedArray()[0], colorCoefficient = 10.0)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

@@ -135,21 +135,21 @@ internal class SequentialBasicTest : IntegrationTest() {
 
             // Prediction testing
             val label = it.predict(test.getX(0))
-            assertEquals(test.getLabel(0), label)
+            assertEquals(test.getY(0), label)
 
             val softPrediction = it.predictSoftly(test.getX(0))
 
             assertEquals(
-                test.getLabel(0),
+                test.getY(0),
                 softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! })
 
             // Test predict method with specified tensor name
             val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
-            assertEquals(test.getLabel(0), label2)
+            assertEquals(test.getY(0), label2)
 
             // Test predictAndGetActivations method
             val (label3, activations) = it.predictAndGetActivations(test.getX(0))
-            assertEquals(test.getLabel(0), label3)
+            assertEquals(test.getY(0), label3)
             assertEquals(3, activations.size)
 
             val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
@@ -167,7 +167,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
 
             var manualAccuracy = 0
-            predictions.forEachIndexed { index, lb -> if (lb == test.getLabel(index)) manualAccuracy++ }
+            predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
             assertTrue(manualAccuracy > 0.7)
         }
     }

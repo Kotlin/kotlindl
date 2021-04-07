@@ -148,7 +148,7 @@ class InferenceModelTest {
 
         val inferenceModel = InferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
         inferenceModel.use {
-            it.reshape(::mnistReshape)
+            it.reshape(28, 28, 1)
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
@@ -170,7 +170,7 @@ class InferenceModelTest {
 
         val inferenceModel = InferenceModel()
         inferenceModel.use {
-            it.reshape(::mnistReshape)
+            it.reshape(28, 28, 1)
 
             val exception =
                 Assertions.assertThrows(IllegalStateException::class.java) {
