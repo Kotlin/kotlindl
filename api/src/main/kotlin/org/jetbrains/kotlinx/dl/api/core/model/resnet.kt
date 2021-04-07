@@ -22,28 +22,23 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 
-// TODO: remove layer list from parameters and usage
-
 public fun resnet50(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack1(x, 64, 3, stride1 = 1, name = "conv2", layerList = layerList)
-        x = stack1(x, 128, 4, name = "conv3", layerList = layerList)
-        x = stack1(x, 256, 6, name = "conv4", layerList = layerList)
-        return stack1(x, 512, 3, name = "conv5", layerList = layerList)
+        x = stack1(x, 64, 3, stride1 = 1, name = "conv2")
+        x = stack1(x, 128, 4, name = "conv3")
+        x = stack1(x, 256, 6, name = "conv4")
+        return stack1(x, 512, 3, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = false
     )
 }
@@ -54,21 +49,18 @@ public fun resnet101(
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack1(x, 64, 3, stride1 = 1, name = "conv2", layerList = layerList)
-        x = stack1(x, 128, 4, name = "conv3", layerList = layerList)
-        x = stack1(x, 256, 23, name = "conv4", layerList = layerList)
-        return stack1(x, 512, 3, name = "conv5", layerList = layerList)
+        x = stack1(x, 64, 3, stride1 = 1, name = "conv2")
+        x = stack1(x, 128, 4, name = "conv3")
+        x = stack1(x, 256, 23, name = "conv4")
+        return stack1(x, 512, 3, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = false
     )
 }
@@ -79,21 +71,18 @@ public fun resnet152(
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack1(x, 64, 3, stride1 = 1, name = "conv2", layerList = layerList)
-        x = stack1(x, 128, 8, name = "conv3", layerList = layerList)
-        x = stack1(x, 256, 36, name = "conv4", layerList = layerList)
-        return stack1(x, 512, 3, name = "conv5", layerList = layerList)
+        x = stack1(x, 64, 3, stride1 = 1, name = "conv2")
+        x = stack1(x, 128, 8, name = "conv3")
+        x = stack1(x, 256, 36, name = "conv4")
+        return stack1(x, 512, 3, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = false
     )
 }
@@ -104,21 +93,18 @@ public fun resnet50v2(
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack2(x, 64, 3, name = "conv2", layerList = layerList)
-        x = stack2(x, 128, 4, name = "conv3", layerList = layerList)
-        x = stack2(x, 256, 6, name = "conv4", layerList = layerList)
-        return stack2(x, 512, 3, stride1 = 1, name = "conv5", layerList = layerList)
+        x = stack2(x, 64, 3, name = "conv2")
+        x = stack2(x, 128, 4, name = "conv3")
+        x = stack2(x, 256, 6, name = "conv4")
+        return stack2(x, 512, 3, stride1 = 1, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = true
     )
 }
@@ -129,21 +115,18 @@ public fun resnet101v2(
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack2(x, 64, 3, name = "conv2", layerList = layerList)
-        x = stack2(x, 128, 4, name = "conv3", layerList = layerList)
-        x = stack2(x, 256, 23, name = "conv4", layerList = layerList)
-        return stack2(x, 512, 3, stride1 = 1, name = "conv5", layerList = layerList)
+        x = stack2(x, 64, 3, name = "conv2")
+        x = stack2(x, 128, 4, name = "conv3")
+        x = stack2(x, 256, 23, name = "conv4")
+        return stack2(x, 512, 3, stride1 = 1, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = true
     )
 }
@@ -154,21 +137,18 @@ public fun resnet152v2(
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
-    val layerList = mutableListOf<Layer>()
-
-    val stackFn = fun(pointer: Layer, layerList: MutableList<Layer>): Layer {
+    val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
-        x = stack2(x, 64, 3, name = "conv2", layerList = layerList)
-        x = stack2(x, 128, 8, name = "conv3", layerList = layerList)
-        x = stack2(x, 256, 36, name = "conv4", layerList = layerList)
-        return stack2(x, 512, 3, stride1 = 1, name = "conv5", layerList = layerList)
+        x = stack2(x, 64, 3, name = "conv2")
+        x = stack2(x, 128, 8, name = "conv3")
+        x = stack2(x, 256, 36, name = "conv4")
+        return stack2(x, 512, 3, stride1 = 1, name = "conv5")
     }
     return resnet(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
         lastLayerActivation = lastLayerActivation,
-        layerList = layerList,
         preact = true
     )
 }
@@ -188,18 +168,16 @@ private fun stack1(
     blocks: Int,
     stride1: Int = 2,
     name: String,
-    layerList: MutableList<Layer>
 ): Layer {
     var x = pointer
 
-    x = block1(x, filters, stride = stride1, name = name + "_block1", layerList = layerList)
+    x = block1(x, filters, stride = stride1, name = name + "_block1")
     for (i in 2 until blocks + 1) {
         x = block1(
             x,
             filters,
             conv_shortcut = false,
-            name = name + "_block" + i,
-            layerList = layerList
+            name = name + "_block" + i
         )
     }
     return x
@@ -219,21 +197,19 @@ private fun stack2(
     filters: Int,
     blocks: Int,
     stride1: Int = 2,
-    name: String,
-    layerList: MutableList<Layer>
+    name: String
 ): Layer {
     var x = pointer
 
-    x = block2(x, filters, conv_shortcut = true, stride = stride1, name = name + "_block1", layerList = layerList)
+    x = block2(x, filters, conv_shortcut = true, stride = stride1, name = name + "_block1")
     for (i in 2 until blocks) {
         x = block2(
             x,
             filters,
-            name = name + "_block" + i,
-            layerList = layerList
+            name = name + "_block" + i
         )
     }
-    x = block2(x, filters, stride = stride1, name = name + "_block" + blocks, layerList = layerList)
+    x = block2(x, filters, stride = stride1, name = name + "_block" + blocks)
     return x
 }
 
@@ -243,7 +219,6 @@ private fun block1(
     kernelSize: Int = 3,
     conv_shortcut: Boolean = true,
     name: String,
-    layerList: MutableList<Layer>,
     stride: Int = 1
 ): Layer {
     var shortcut: Layer
@@ -260,10 +235,8 @@ private fun block1(
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(pointer)
-        layerList.add(shortcut)
 
         shortcut = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_0_bn")(shortcut)
-        layerList.add(shortcut)
     } else {
         shortcut = pointer
     }
@@ -279,11 +252,8 @@ private fun block1(
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(pointer)
-    layerList.add(x)
     x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_1_bn")(x)
-    layerList.add(x)
     x = ActivationLayer(activation = Activations.Relu, name = name + "_1_relu")(x)
-    layerList.add(x)
 
     x = Conv2D(
         filters = filters.toLong(),
@@ -296,11 +266,8 @@ private fun block1(
         padding = ConvPadding.SAME,
         name = name + "_2_conv"
     )(x)
-    layerList.add(x)
     x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_2_bn")(x)
-    layerList.add(x)
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
-    layerList.add(x)
 
     x = Conv2D(
         filters = (4 * filters).toLong(),
@@ -313,14 +280,10 @@ private fun block1(
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
-    layerList.add(x)
     x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = name + "_3_bn")(x)
-    layerList.add(x)
 
     x = Add(name = name + "_add")(shortcut, x)
-    layerList.add(x)
     x = ActivationLayer(activation = Activations.Relu, name = name + "_out")(x)
-    layerList.add(x)
 
     return x
 }
@@ -331,15 +294,12 @@ private fun block2(
     kernelSize: Int = 3,
     conv_shortcut: Boolean = false,
     name: String,
-    layerList: MutableList<Layer>,
     stride: Int = 1
 ): Layer {
     var x = pointer
     val bnAxis = listOf(3)
     var preact = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_preact_bn")(x)
-    layerList.add(preact)
     preact = ActivationLayer(activation = Activations.Relu, name = name + "_preact_relu")(preact)
-    layerList.add(preact)
 
     var shortcut: Layer
 
@@ -355,7 +315,6 @@ private fun block2(
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(preact)
-        layerList.add(shortcut)
     } else {
         shortcut = if (stride > 1) {
             val layer = MaxPool2D(
@@ -364,7 +323,6 @@ private fun block2(
                 padding = ConvPadding.VALID,
                 name = "pool1_pool"
             )(x)
-            layerList.add(layer)
             return layer
         } else x
 
@@ -382,16 +340,12 @@ private fun block2(
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(preact)
-    layerList.add(x)
 
     x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_1_bn")(x)
-    layerList.add(x)
 
     x = ActivationLayer(activation = Activations.Relu, name = name + "_1_relu")(x)
-    layerList.add(x)
 
     x = ZeroPadding2D(intArrayOf(1, 1, 1, 1), dataFormat = CHANNELS_LAST, name = name + "_2_pad")(x)
-    layerList.add(x)
 
     x = Conv2D(
         filters = filters.toLong(),
@@ -405,11 +359,8 @@ private fun block2(
         padding = ConvPadding.VALID,
         name = name + "_2_conv"
     )(x)
-    layerList.add(x)
     x = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_2_bn")(x)
-    layerList.add(x)
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
-    layerList.add(x)
 
     x = Conv2D(
         filters = (4 * filters).toLong(),
@@ -422,26 +373,21 @@ private fun block2(
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
-    layerList.add(x)
 
     x = Add(name = name + "_out")(shortcut, x)
-    layerList.add(x)
 
     return x
 }
 
 private fun resnet(
-    stackFn: (x: Layer, layerList: MutableList<Layer>) -> Layer,
+    stackFn: (x: Layer) -> Layer,
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
     lastLayerActivation: Activations = Activations.Linear,
     /** whether to use pre-activation or not
     (True for ResNetV2, False for ResNet and ResNeXt). */
-    preact: Boolean,
-    layerList: MutableList<Layer>
+    preact: Boolean
 ): Functional {
-
-
     var x: Layer = Input(
         imageSize,
         imageSize,
@@ -449,10 +395,8 @@ private fun resnet(
         name = "input_1"
     )
 
-    layerList.add(x)
-
     x = ZeroPadding2D(intArrayOf(3, 3, 3, 3), dataFormat = CHANNELS_LAST, name = "conv1_pad")(x)
-    layerList.add(x)
+
     x = Conv2D(
         filters = 64,
         kernelSize = longArrayOf(7, 7),
@@ -464,36 +408,28 @@ private fun resnet(
         padding = ConvPadding.VALID,
         name = "conv1_conv"
     )(x)
-    layerList.add(x)
 
     if (!preact) {
         x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "conv1_bn")(x)
-        layerList.add(x)
         x = ActivationLayer(activation = Activations.Relu, name = "conv1_relu")(x)
-        layerList.add(x)
     }
 
     x = ZeroPadding2D(intArrayOf(1, 1, 1, 1), dataFormat = CHANNELS_LAST, name = "pool1_pad")(x)
-    layerList.add(x)
     x = MaxPool2D(
         poolSize = intArrayOf(1, 3, 3, 1),
         strides = intArrayOf(1, 2, 2, 1),
         padding = ConvPadding.VALID,
         name = "pool1_pool"
     )(x)
-    layerList.add(x)
 
-    x = stackFn(x, layerList)
+    x = stackFn(x)
 
     if (preact) {
         x = BatchNorm(axis = listOf(3), epsilon = 1e-5, name = "post_bn")(x)
-        layerList.add(x)
         x = ActivationLayer(activation = Activations.Relu, name = "post_relu")(x)
-        layerList.add(x)
     }
 
     x = GlobalAvgPool2D(name = "avg_pool")(x)
-    layerList.add(x)
     x = Dense(
         outputSize = numberOfClasses,
         activation = lastLayerActivation,
@@ -501,9 +437,8 @@ private fun resnet(
         biasInitializer = Zeros(),
         name = "predictions"
     )(x)
-    layerList.add(x)
 
-    return Functional.of(layerList)
+    return Functional.of(x)
 }
 
 

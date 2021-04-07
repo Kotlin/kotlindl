@@ -41,18 +41,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @property [layers] The layers to describe the model design.
          * @return the [Functional] model.
          */
-        // TODO: need to merge this method with fromLastLayer method in API to be more stable
         @JvmStatic
         public fun of(vararg layers: Layer): Functional {
             require(layers.isNotEmpty()) { "Model should contain layers!" }
             val input = layers[0]
             require(input is Input) { "Model should start from the Input layer" }
 
-            // TODO: check that preprocessing is correct for input layer
-            preProcessLayerNames(layers)
-            val model = Functional(*layers)
-            postProcessLayerNames(layers, model)
-            return model
+            return preprocessAndCreate(layers.toList())
         }
 
         /**
@@ -75,8 +70,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         private fun visitInboundNodes(finalLayer: Layer, layers: MutableSet<Layer>) {
             for (inboundNode in finalLayer.inboundLayers) {
-                layers.add(inboundNode)
-                visitInboundNodes(inboundNode, layers)
+                if (!layers.contains(inboundNode)) {
+                    layers.add(inboundNode)
+                    visitInboundNodes(inboundNode, layers)
+                }
             }
         }
 
@@ -153,10 +150,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             fillOutputLayers(layerList)
             layerList = topologicalSort(layerList, inputLayer)
 
-            val otherLayers = layerList.subList(1, layerList.size)
-            preProcessLayerNames(otherLayers.toTypedArray())
+            preProcessLayerNames(layerList.toTypedArray())
             val model = Functional(*layerList.toTypedArray())
-            postProcessLayerNames(otherLayers.toTypedArray(), model)
+            postProcessLayerNames(layerList.toTypedArray(), model)
             return model
         }
 
