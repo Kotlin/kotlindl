@@ -49,8 +49,6 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * @property [name] Custom layer name.
  * @constructor Creates [DepthwiseConv2D] object.
  */
-// TODO: throw an exception if the NoGradient layer is not frozen before compilation (could be thrown in the compile method) as a part of final validation of appropriate architecture
-// add test for it (should failed on compilation)
 public class DepthwiseConv2D(
     public val kernelSize: LongArray = longArrayOf(3, 3),
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),
@@ -117,15 +115,14 @@ public class DepthwiseConv2D(
         var cols = inputShape.size(2)
         rows = convOutputLength(
             rows, kernelSize[0].toInt(), padding,
-            strides[1].toInt()
+            strides[1].toInt(), dilations[1].toInt()
         )
         cols = convOutputLength(
             cols, kernelSize[1].toInt(), padding,
-            strides[2].toInt()
+            strides[2].toInt(), dilations[2].toInt()
         )
 
         val outFilters = inputShape.size(3) * this.depthMultiplier
-        // TODO: make this calculation for others dimensions conv layers https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/keras/layers/convolutional.py#L224
         return Shape.make(inputShape.size(0), rows, cols, outFilters)
     }
 

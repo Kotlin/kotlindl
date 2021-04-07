@@ -182,6 +182,13 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     protected fun validateModelArchitecture() {
+        require(layers.none { it is NoGradients && it.isTrainable })
+        {
+            "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
+                    "But the following layers violates this rule: ${
+                        layers.filter { it is NoGradients && it.isTrainable }.forEach { println(it.name) }
+                    }"
+        }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         //   require(layers.last().hasActivation()) { "Last layer must have an activation function." }
 //        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }

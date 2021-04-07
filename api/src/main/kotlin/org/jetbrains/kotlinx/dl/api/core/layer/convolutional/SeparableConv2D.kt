@@ -141,14 +141,13 @@ public class SeparableConv2D(
         var cols = inputShape.size(2)
         rows = convOutputLength(
             rows, kernelSize[0].toInt(), padding,
-            strides[1].toInt()
+            strides[1].toInt(), dilations[1].toInt()
         )
         cols = convOutputLength(
             cols, kernelSize[1].toInt(), padding,
-            strides[2].toInt()
+            strides[2].toInt(), dilations[2].toInt()
         )
 
-        // TODO: make this calculation for others dimensions conv layers https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/keras/layers/convolutional.py#L224
         val shape = Shape.make(inputShape.size(0), rows, cols, filters)
         outputShape = TensorShape(shape)
         return shape
