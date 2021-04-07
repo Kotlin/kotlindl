@@ -15,6 +15,18 @@ import kotlin.math.abs
 public class TensorShape() {
     private lateinit var dims: LongArray
 
+    public companion object {
+        /** Returns first dimension from all dimensions [dims]. */
+        public fun head(vararg dims: Long): Long {
+            return dims[0]
+        }
+
+        /** Returns last dimensions (except first) from [dims]. */
+        public fun tail(vararg dims: Long): LongArray {
+            return dims.copyOfRange(1, dims.size)
+        }
+    }
+
     public constructor(shape: Shape) : this() {
         dims = dimsFromShape(shape)
     }
@@ -170,20 +182,8 @@ public class TensorShape() {
         return dims
     }
 
-    /** Returns first dimension from all dimensions [dims]. */
-    // TODO: to companion
-    public fun head(vararg dims: Long): Long {
-        return dims[0]
-    }
-
     public fun head(): Long {
         return dims[0]
-    }
-
-    /** Returns last dimensions (except first) from [dims]. */
-    // TODO: to companion
-    public fun tail(vararg dims: Long): LongArray {
-        return dims.copyOfRange(1, dims.size)
     }
 
     public fun tail(): LongArray {
