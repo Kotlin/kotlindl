@@ -21,11 +21,11 @@ import java.io.FileReader
 import java.util.*
 
 private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 64
+private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 64L
+private const val IMAGE_SIZE = 200L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 fun main() {

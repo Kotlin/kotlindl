@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.model
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
@@ -230,7 +231,7 @@ private fun block1(
             dilations = longArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
             kernelInitializer = HeNormal(),
-            biasInitializer = HeNormal(),
+            biasInitializer = HeUniform(),
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(pointer)
@@ -248,7 +249,7 @@ private fun block1(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(pointer)
@@ -262,7 +263,7 @@ private fun block1(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.SAME,
         name = name + "_2_conv"
     )(x)
@@ -277,7 +278,7 @@ private fun block1(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
@@ -312,7 +313,7 @@ private fun block2(
             dilations = longArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
             kernelInitializer = HeNormal(),
-            biasInitializer = HeNormal(),
+            biasInitializer = HeUniform(),
             padding = ConvPadding.VALID,
             name = name + "_0_conv"
         )(preact)
@@ -336,7 +337,7 @@ private fun block2(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = name + "_1_conv"
     )(preact)
@@ -355,7 +356,7 @@ private fun block2(
         useBias = true,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = name + "_2_conv"
     )(x)
@@ -369,7 +370,7 @@ private fun block2(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = name + "_3_conv"
     )(x)
@@ -404,7 +405,7 @@ private fun resnetLight(
         dilations = longArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         padding = ConvPadding.VALID,
         name = "conv1_conv"
     )(x)
@@ -434,7 +435,7 @@ private fun resnetLight(
         outputSize = numberOfClasses,
         activation = lastLayerActivation,
         kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
+        biasInitializer = HeUniform(),
         name = "predictions"
     )(x)
 

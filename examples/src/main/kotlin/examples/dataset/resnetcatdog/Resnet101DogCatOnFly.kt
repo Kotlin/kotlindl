@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.model.resnet101Light
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -21,11 +22,11 @@ import java.io.FileReader
 import java.util.*
 
 private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 64
+private const val TRAINING_BATCH_SIZE = 32
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 64L
+private const val IMAGE_SIZE = 100L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 fun main() {
@@ -59,7 +60,7 @@ fun main() {
 
     resnet101Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
         it.compile(
-            optimizer = Adam(),
+            optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
