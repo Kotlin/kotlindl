@@ -5,22 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
-import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
-import org.jetbrains.kotlinx.dl.api.core.metric.Metric
-import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
-import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.tensorflow.Operand
-import org.tensorflow.Shape
-import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -225,27 +214,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
-
-        validateModelArchitecture()
-
-        this.loss = loss
-        this.metric = metric
-        this.metrics = listOf(metric) // handle multiple metrics
-        this.optimizer = optimizer
-        //this.callback = callback
-        //this.callback.model = this // TODO: cyclic reference
-
+    override fun buildLayers() {
         inputLayer.build(tf)
-        var inputShape: Shape? = inputLayer.computeOutputShape()
+        inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            /*if (inputShape == null) {
-                inputShape = it.inboundLayers[0].outputShape.toShape()
-            }*/
-
             it.buildFromInboundLayers(tf, kGraph)
+
             val outputShape = it.computeOutputShapeFromInboundLayers()
             val dims = outputShape.dims()
 
@@ -255,45 +230,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = outputShape // it could be done inside computeOutputShapeMethods
+            it.outputShape = outputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
 
             logger.info { "${it.name}; outputShape: $outputShape $it" }
-
-            inputShape = null
         }
-
-        if (layers.last() is Dense) amountOfClasses = (layers.last() as Dense).outputSize.toLong()
-        else if (layers.last() is ActivationLayer) amountOfClasses =
-            (layers.last() as ActivationLayer).outputShape.tail().last() // valid for mobileNet/DenseNet
-
-
-        xOp = inputLayer.input
-        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
-        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
-            getDType(),
-            Placeholder.shape(Shape.scalar())
-        )
-
-        training = tf.withName("training").placeholder(
-            Boolean::class.javaObjectType,
-            Placeholder.shape(Shape.scalar())
-        )
-
-        yPredOp = forward(xOp, inputLayer)
-        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
-
-        predictionOp = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
-            else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
-        }
-
-        metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
-
-        isModelCompiled = true
     }
 
-    private fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
+    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
         var output: Operand<Float> = input
         val outputByLayerName = mutableMapOf<String, Operand<Float>>()
         val outputs = mutableListOf<Operand<Float>>()

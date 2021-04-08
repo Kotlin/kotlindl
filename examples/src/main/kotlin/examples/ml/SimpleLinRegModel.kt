@@ -24,7 +24,7 @@ private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
     Input(4),
-    Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
+    Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros(), name = "dense_2")
 )
 
 fun main() {
@@ -80,8 +80,8 @@ fun main() {
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
-        println("Weights: " + it.getLayer("dense_2").weights[0].contentDeepToString())
-        println("Bias" + it.getLayer("dense_2").weights[1].contentDeepToString())
+        println("Weights: " + it.getLayer("dense_2").weights["dense_2_dense_kernel"].contentDeepToString())
+        println("Bias: " + it.getLayer("dense_2").weights["dense_2_dense_bias"].contentDeepToString())
         println("MAE: $mae")
     }
 }

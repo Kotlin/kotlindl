@@ -5,21 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
-import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
-import org.jetbrains.kotlinx.dl.api.core.metric.Metric
-import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
 import org.tensorflow.Operand
 import org.tensorflow.Shape
-import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -143,19 +134,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
-
-        validateModelArchitecture()
-        amountOfClasses = if (layers.last() is Dense) (layers.last() as Dense).outputSize.toLong() else 1
-
-        this.loss = loss
-        this.metric = metric
-        this.metrics = listOf(metric) // handle multiple metrics
-        this.optimizer = optimizer
-        this.callback = callback
-        this.callback.model = this // TODO: cyclic reference
-
+    override fun buildLayers() {
         inputLayer.build(tf)
         var inputShape: Shape = inputLayer.computeOutputShape()
 
@@ -172,38 +151,13 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = tensorShape
+            it.outputShape = tensorShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
 
             logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
         }
-
-        xOp = inputLayer.input
-        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
-        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
-            getDType(),
-            Placeholder.shape(Shape.scalar())
-        )
-
-        training = tf.withName("training").placeholder(
-            Boolean::class.javaObjectType,
-            Placeholder.shape(Shape.scalar())
-        )
-
-        yPredOp = forward(xOp)
-        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
-
-        predictionOp = when (loss) {
-            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
-            else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
-        }
-
-        metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
-
-        isModelCompiled = true
     }
 
-    private fun forward(input: Operand<Float>): Operand<Float> {
+    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
         var out: Operand<Float> = input
         for (layer in layers) {
             out = layer.forward(tf, out, training, numberOfLossesOp)

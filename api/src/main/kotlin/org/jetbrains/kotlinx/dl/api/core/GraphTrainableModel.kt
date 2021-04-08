@@ -12,19 +12,19 @@ import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
 import org.jetbrains.kotlinx.dl.api.core.metric.EvaluationResult
 import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
-import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
-import org.jetbrains.kotlinx.dl.api.core.util.defaultActivationName
-import org.jetbrains.kotlinx.dl.api.core.util.serializeLabelsToBuffer
-import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
+import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
@@ -32,6 +32,7 @@ import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.FloatBuffer
@@ -43,7 +44,7 @@ import java.nio.FloatBuffer
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Functional model via sequence of [layers].
  */
-public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
+public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     /** Logger for Sequential model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
@@ -105,45 +106,6 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     public companion object {
-        /**
-         * Creates the [GraphTrainableModel] model.
-         *
-         * @property [input] The input layer with initial shapes.
-         * @property [layers] The layers to describe the model design.
-         * @return the [GraphTrainableModel] model.
-         */
-        @JvmStatic
-        public fun of(vararg layers: Layer): GraphTrainableModel {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
-
-            // TODO: check that preprocessing is correct for input layer
-            preProcessLayerNames(layers)
-            val seqModel = GraphTrainableModel(*layers)
-            postProcessLayerNames(layers, seqModel)
-            return seqModel
-        }
-
-        /**
-         * Creates the [GraphTrainableModel] model.
-         * @property [layers] The layers to describe the model design.
-         * NOTE: First layer should be input layer.
-         * @return the [GraphTrainableModel] model.
-         */
-        @JvmStatic
-        public fun of(layers: List<Layer>): GraphTrainableModel {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
-
-            val otherLayers = layers.subList(1, layers.size)
-            preProcessLayerNames(otherLayers.toTypedArray())
-            val seqModel = GraphTrainableModel(*layers.toTypedArray())
-            postProcessLayerNames(otherLayers.toTypedArray(), seqModel)
-            return seqModel
-        }
-
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
             var cnt = 1
             for (layer in layers) {
@@ -170,7 +132,52 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     }
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        TODO("Should be overridden!")
+        check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
+
+        validateModelArchitecture()
+
+        amountOfClasses = when (layers.last()::class) {
+            Dense::class -> (layers.last() as Dense).outputSize.toLong()
+            ActivationLayer::class -> (layers.last() as ActivationLayer).outputShape.tail()
+                .last()  // valid for mobileNet/DenseNet
+            else -> 1
+        }
+
+        this.loss = loss
+        this.metric = metric
+        this.metrics = listOf(metric)
+        this.optimizer = optimizer
+
+        // callback binding
+        this.callback = callback
+        this.callback.model = this
+
+        buildLayers()
+
+        xOp = inputLayer.input
+        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
+        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
+            getDType(),
+            Placeholder.shape(Shape.scalar())
+        )
+
+        training = tf.withName("training").placeholder(
+            Boolean::class.javaObjectType,
+            Placeholder.shape(Shape.scalar())
+        )
+
+        yPredOp = forward(xOp, inputLayer)
+        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+
+        predictionOp = when (loss) {
+            is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
+            else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
+        }
+
+        metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
+
+        isModelCompiled = true
     }
 
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric, callback: Callback) {
@@ -193,6 +200,10 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         //   require(layers.last().hasActivation()) { "Last layer must have an activation function." }
 //        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
     }
+
+    protected abstract fun buildLayers()
+
+    protected abstract fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float>
 
     override fun fit(
         trainingDataset: Dataset,
@@ -697,23 +708,6 @@ public open class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
         //batchValidation(batch, xBatchShape, yBatchShape)
 
         return Pair(xBatchShape, yBatchShape)
-    }
-
-    private fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        var output: Operand<Float> = input
-        val outputByLayerName = mutableMapOf<String, Operand<Float>>()
-        val outputs = mutableListOf<Operand<Float>>()
-        outputs.add(input)
-        outputByLayerName[inputLayer.name] = input
-        for (layer in layers) {
-            for (inboundLayer in layer.inboundLayers) {
-                outputs.add(outputByLayerName[inboundLayer.name]!!)
-            }
-            output = layer.forward(tf, outputs, training, numberOfLossesOp)
-            outputByLayerName[layer.name] = output
-            outputs.clear()
-        }
-        return output
     }
 
     private fun calculateXShape(batchSize: Int): LongArray {
