@@ -165,7 +165,11 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return out
     }
 
-    public override fun summary(stringLayerNameTypeSize: Int, stringOutputShapeSize: Int): List<String> {
+    public override fun summary(
+        stringLayerNameTypeSize: Int,
+        stringOutputShapeSize: Int,
+        stringParamSize: Int
+    ): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("=================================================================")

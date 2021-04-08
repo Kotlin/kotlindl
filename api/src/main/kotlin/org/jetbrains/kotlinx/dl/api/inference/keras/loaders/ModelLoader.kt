@@ -57,12 +57,12 @@ public class ModelLoader(public val commonModelDirectory: File, public val model
         return when (modelType) {
             ModelType.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)
             ModelType.VGG_19 -> Sequential.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_50 -> Functional.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_101 -> Functional.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_152 -> Functional.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_50_v2 -> Functional.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_101_v2 -> Functional.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_151_v2 -> Functional.loadModelConfiguration(jsonConfigFile)
+            ModelType.ResNet_50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
         }

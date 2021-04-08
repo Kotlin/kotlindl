@@ -314,7 +314,11 @@ public abstract class TrainableModel : InferenceModel() {
      *
      * @return list of layer descriptions.
      */
-    public abstract fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String>
+    public abstract fun summary(
+        stringLayerNameTypeSize: Int = 40,
+        stringOutputShapeSize: Int = 26,
+        stringParamSize: Int = 14
+    ): List<String>
 
     override fun toString(): String {
         return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"

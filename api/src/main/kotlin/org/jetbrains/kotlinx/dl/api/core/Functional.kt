@@ -317,14 +317,18 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
-    public override fun summary(stringLayerNameTypeSize: Int, stringOutputShapeSize: Int): List<String> {
+    public override fun summary(
+        stringLayerNameTypeSize: Int,
+        stringOutputShapeSize: Int,
+        stringParamSize: Int
+    ): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
-        logger.info("=================================================================")
+        logger.info("==========================================================================================================")
         logger.info("Model: Functional")
-        logger.info("_________________________________________________________________")
-        logger.info("Layer (type)                 Output Shape              Param #   ")
-        logger.info("=================================================================")
+        logger.info("__________________________________________________________________________________________________________")
+        logger.info("Layer (type)                           Output Shape              Param #       Connected to               ")
+        logger.info("==========================================================================================================")
 
         var totalTrainableParams = 0
         var totalFrozenParams = 0
@@ -333,22 +337,47 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         for (l in layers) {
             if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
-            val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
-            layerDescriptions.add(layerDescription)
-            logger.info(layerDescription)
-            logger.info("_________________________________________________________________")
+            val inboundLayerNames = l.inboundLayers.map { it.name }.toTypedArray()
+
+            if (inboundLayerNames.isNotEmpty()) {
+                val layerDescription = createHeaderFunctionalLayerDescription(
+                    l,
+                    inboundLayerNames[0],
+                    stringLayerNameTypeSize,
+                    stringOutputShapeSize,
+                    stringParamSize
+                )
+                layerDescriptions.add(layerDescription)
+                logger.info(layerDescription)
+
+                inboundLayerNames.drop(1).forEach {
+                    val yetOneRowForInboundNode = createNextRowInFunctionalLayerDescription(
+                        it,
+                        stringLayerNameTypeSize + stringOutputShapeSize + stringParamSize
+                    )
+                    layerDescriptions.add(yetOneRowForInboundNode)
+                    logger.info(yetOneRowForInboundNode)
+                }
+
+            } else {
+                val layerDescription = createSimpleLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
+                layerDescriptions.add(layerDescription)
+                logger.info(layerDescription)
+            }
+
+            logger.info("__________________________________________________________________________________________________________")
         }
 
-        logger.info("=================================================================")
+        logger.info("==========================================================================================================")
         logger.info("Total trainable params: $totalTrainableParams")
         logger.info("Total frozen params: $totalFrozenParams")
         logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
-        logger.info("=================================================================")
+        logger.info("==========================================================================================================")
 
         return layerDescriptions
     }
 
-    private fun createLayerDescription(
+    private fun createSimpleLayerDescription(
         l: Layer,
         stringLayerNameTypeSize: Int,
         stringOutputShapeSize: Int
@@ -369,6 +398,57 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
 
         stringBuilder.append(l.paramCount)
+
+        return stringBuilder.toString()
+    }
+
+    private fun createHeaderFunctionalLayerDescription(
+        l: Layer,
+        inboundNodeName: String,
+        stringLayerNameTypeSize: Int,
+        stringOutputShapeSize: Int,
+        stringParamSize: Int
+    ): String {
+        val firstPart = "${l.name}(${l::class.simpleName})"
+
+        val stringBuilder = StringBuilder(firstPart)
+        for (i in 1 until stringLayerNameTypeSize - firstPart.length) {
+            stringBuilder.append(" ")
+        }
+
+        val secondPart = l.outputShape.toString()
+
+        stringBuilder.append(secondPart)
+
+        for (i in 0 until stringOutputShapeSize - secondPart.length) {
+            stringBuilder.append(" ")
+        }
+
+        val thirdPart = l.paramCount.toString()
+
+        stringBuilder.append(thirdPart)
+
+        for (i in 0 until stringParamSize - thirdPart.length) {
+            stringBuilder.append(" ")
+        }
+
+        stringBuilder.append(inboundNodeName)
+
+        return stringBuilder.toString()
+    }
+
+    private fun createNextRowInFunctionalLayerDescription(
+        inboundNodeName: String,
+        stringTabSize: Int
+    ): String {
+        val firstPart = ""
+
+        val stringBuilder = StringBuilder(firstPart)
+        for (i in 1 until stringTabSize) {
+            stringBuilder.append(" ")
+        }
+
+        stringBuilder.append(inboundNodeName)
 
         return stringBuilder.toString()
     }

@@ -196,7 +196,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
                     "But the following layers violates this rule: ${
-                        layers.filter { it is NoGradients && it.isTrainable }.forEach { println(it.name) }
+                        layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
+                            .contentDeepToString()
                     }"
         }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
@@ -866,10 +867,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true
-    }
-
-    override fun summary(stringLayerNameTypeSize: Int, stringOutputShapeSize: Int): List<String> {
-        TODO("Not yet implemented")
     }
 
     private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
