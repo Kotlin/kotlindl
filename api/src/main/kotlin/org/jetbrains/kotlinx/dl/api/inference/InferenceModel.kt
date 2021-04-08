@@ -52,6 +52,9 @@ public open class InferenceModel : AutoCloseable {
     public var isModelInitialized: Boolean = false
         internal set
 
+    /** Model name. */
+    public var name: String? = null
+
     /** Logger. */
     private val logger = KotlinLogging.logger {}
 
@@ -162,9 +165,10 @@ public open class InferenceModel : AutoCloseable {
         this.shape = TensorShape(1, *dims).dims()
     }
 
-    override fun toString(): String {
-        return "Model contains $kGraph"
+    public fun graphToString(): String {
+        return kGraph.toString()
     }
+
 
     /** Closes internal resources: session and kGraph. */
     override fun close() {
@@ -414,5 +418,9 @@ public open class InferenceModel : AutoCloseable {
         }
 
         return result
+    }
+
+    override fun toString(): String {
+        return "InferenceModel(name=$name)"
     }
 }

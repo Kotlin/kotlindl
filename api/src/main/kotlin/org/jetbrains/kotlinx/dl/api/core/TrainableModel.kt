@@ -41,8 +41,8 @@ public abstract class TrainableModel : InferenceModel() {
     /** List of metrics for evaluation phase. */
     protected var metrics: List<Metric> = listOf(Accuracy())
 
-    /** Amount of classes for classification tasks. -1 is a default value for regression tasks. */
-    public var amountOfClasses: Long = -1
+    /** Number of classes for classification tasks. -1 is a default value for regression tasks. */
+    public var numberOfClasses: Long = -1
 
     /** Is true when model is compiled. */
     public var isModelCompiled: Boolean = false
@@ -315,4 +315,8 @@ public abstract class TrainableModel : InferenceModel() {
      * @return list of layer descriptions.
      */
     public abstract fun summary(stringLayerNameTypeSize: Int = 30, stringOutputShapeSize: Int = 26): List<String>
+
+    override fun toString(): String {
+        return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"
+    }
 }

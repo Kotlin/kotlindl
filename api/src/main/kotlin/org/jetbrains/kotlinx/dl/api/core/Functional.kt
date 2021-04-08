@@ -295,12 +295,12 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         saveVariables(pathToModelDirectory, saveOptimizerState)
     }
 
-    private fun saveModel(pathToModelDirectory: String) {
+    private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean = true) {
         val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
         this.saveModelConfiguration(
             jsonConfig,
-            isKerasFullyCompatible = true
-        ) // TODO: propogate or remove this parameter
+            isKerasFullyCompatible = isKerasFullyCompatible
+        )
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {

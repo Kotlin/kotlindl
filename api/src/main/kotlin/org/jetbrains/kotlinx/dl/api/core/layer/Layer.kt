@@ -31,7 +31,7 @@ public abstract class Layer(public var name: String) {
     public lateinit var outputShape: TensorShape
 
     /** Model where this layer is used. */
-    public lateinit var parentModel: TrainableModel
+    public var parentModel: TrainableModel? = null
 
     /** Returns number of input parameters. */
     protected var fanIn: Int = Int.MIN_VALUE
@@ -137,7 +137,9 @@ public abstract class Layer(public var name: String) {
 
     /** Extract weights values by variable names. */
     protected fun extractWeights(variableNames: List<String>): Map<String, Array<*>> {
-        val session = parentModel.session
+        require(parentModel != null) { "Layer $name is not related to any model!" }
+
+        val session = parentModel!!.session
         val runner = session.runner()
 
         for (variableName in variableNames) {
