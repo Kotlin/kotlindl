@@ -14,7 +14,6 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.ReduceSum
 import org.tensorflow.op.math.Mean
-import java.lang.Boolean
 
 /**
  * Metrics.
@@ -175,7 +174,7 @@ internal fun meanOfMetrics(
     var totalMetric: Operand<Float> = tf.reduceSum(
         meanMetric,
         allAxes(tf, meanMetric),
-        ReduceSum.keepDims(Boolean.FALSE)
+        ReduceSum.keepDims(false)
     )
 
     if (reductionType == ReductionType.SUM_OVER_BATCH_SIZE) {

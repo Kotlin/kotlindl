@@ -32,14 +32,14 @@ internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
  * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
  */
-public class ModelLoader(public val commonModelDirectory: File, public val modelType: ModelType) {
+public class ModelZoo(public val commonModelDirectory: File, public val modelType: ModelType) {
     private val modelDirectory = "/" + modelType.modelName
     private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
     private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
     private val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
     private val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
 
-    /** Logger for ModelLoader model. */
+    /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {

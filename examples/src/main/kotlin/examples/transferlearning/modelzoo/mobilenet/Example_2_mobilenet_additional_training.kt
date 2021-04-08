@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -43,9 +43,9 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * Model predicts on a few images located in resources.
  */
 fun main() {
-    val modelLoader =
-        ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNet)
-    val model = modelLoader.loadModel() as Functional
+    val modelZoo =
+        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNet)
+    val model = modelZoo.loadModel() as Functional
 
     val properties = Properties()
     val reader = FileReader("data.properties")
@@ -75,7 +75,7 @@ fun main() {
     val dataset = OnHeapDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val hdfFile = modelLoader.loadWeights()
+    val hdfFile = modelZoo.loadWeights()
 
     model.use {
         it.layers.last().isTrainable = true

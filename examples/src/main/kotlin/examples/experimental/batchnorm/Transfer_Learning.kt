@@ -31,8 +31,6 @@ import java.io.File
 fun main() {
     val (train, test) = fashionMnist()
 
-    val hdfFile = getWeightsFile()
-
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 

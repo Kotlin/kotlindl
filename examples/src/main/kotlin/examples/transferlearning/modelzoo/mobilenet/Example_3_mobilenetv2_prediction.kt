@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelLoader
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
@@ -30,11 +30,11 @@ import java.io.File
  * Model predicts on a few images located in resources.
  */
 fun main() {
-    val modelLoader =
-        ModelLoader(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNetv2)
-    val model = modelLoader.loadModel() as Functional
+    val modelZoo =
+        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNetv2)
+    val model = modelZoo.loadModel() as Functional
 
-    val imageNetClassLabels = modelLoader.loadClassLabels()
+    val imageNetClassLabels = modelZoo.loadClassLabels()
 
     model.use {
         it.compile(
@@ -45,7 +45,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = modelLoader.loadWeights()
+        val hdfFile = modelZoo.loadWeights()
 
         it.loadWeights(hdfFile)
 
@@ -60,7 +60,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelLoader.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

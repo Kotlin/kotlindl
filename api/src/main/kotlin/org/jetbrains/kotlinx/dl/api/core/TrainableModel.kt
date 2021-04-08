@@ -30,7 +30,7 @@ public abstract class TrainableModel : InferenceModel() {
     protected var optimizer: Optimizer = SGD(0.2f)
 
     /** Loss function. */
-    var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
+    public var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
 
     /** Callback. */
     protected var callback: Callback = Callback()

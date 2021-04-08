@@ -17,7 +17,7 @@ private const val PATH_TO_MODEL = "savedmodels/lenet5"
  * NOTE: The example requires the saved model in the appropriate directory (run LeNetMnistExportImport.kt firstly).
  */
 fun main() {
-    val (train, test) = mnist()
+    val (train, _) = mnist()
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 

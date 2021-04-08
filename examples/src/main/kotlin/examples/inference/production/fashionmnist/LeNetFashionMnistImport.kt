@@ -17,7 +17,7 @@ private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
  * NOTE: The example requires the saved model in the appropriate directory (run LeNetFashionMnistExportImport.kt firstly).
  */
 fun main() {
-    val (train, test) = fashionMnist()
+    val (train, _) = fashionMnist()
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
