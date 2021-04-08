@@ -248,6 +248,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return output
     }
 
+    // TODO: check do we need a separate saving and cover by tests
     override fun save(
         modelDirectory: File,
         savingFormat: SavingFormat,

@@ -479,7 +479,7 @@ private fun fillLayerWeights(
             it.name,
             hdfFile,
             model,
-            //TODO: add (it as Dense).useBias,
+            (it as Dense).useBias,
             layerPaths
         )
         Conv2D::class -> fillConv2DVariables(
@@ -658,7 +658,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     this.isModelInitialized = true
 }
 
-enum class MissedWeightsStrategy {
+public enum class MissedWeightsStrategy {
     INITIALIZE,
     LOAD_NEW_FORMAT
 }
@@ -843,6 +843,7 @@ private fun fillDenseVariables(
     name: String,
     hdfFile: HdfFile,
     model: GraphTrainableModel,
+    useBias: Boolean,
     layerPaths: LayerPaths?
 ) {
     val kernelDataPathTemplate: String
@@ -858,13 +859,14 @@ private fun fillDenseVariables(
     }
 
     val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-
     val kernelVariableName = denseKernelVarName(name)
-    val biasVariableName = denseBiasVarName(name)
-
     model.fillVariable(kernelVariableName, kernelData)
-    model.fillVariable(biasVariableName, biasData)
+
+    if (useBias) {
+        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
+        val biasVariableName = denseBiasVarName(name)
+        model.fillVariable(biasVariableName, biasData)
+    }
 }
 
 
