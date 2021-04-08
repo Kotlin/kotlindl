@@ -153,7 +153,7 @@ fun main() {
         name = "dense_2"
     )(x)
 
-    val model = Functional.fromFinalLayer(x)
+    val model = Functional.fromOutput(x)
 
     val (train, test) = fashionMnist()
 

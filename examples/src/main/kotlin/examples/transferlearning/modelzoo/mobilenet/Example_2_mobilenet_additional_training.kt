@@ -119,7 +119,7 @@ fun main() {
         activation = Activations.Linear
     )(x)
 
-    val model2 = Functional.fromFinalLayer(x)
+    val model2 = Functional.fromOutput(x)
 
     model2.use {
         it.compile(

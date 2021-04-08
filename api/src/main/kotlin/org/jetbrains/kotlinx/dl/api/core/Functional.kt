@@ -32,11 +32,23 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         public fun of(vararg layers: Layer): Functional {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
+            layerValidation(layers.toList())
 
             return preprocessAndCreate(layers.toList())
+        }
+
+
+        /**
+         * Creates the [Functional] model.
+         * @property [layers] The layers to describe the model design.
+         * NOTE: First layer should be input layer.
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(layers: List<Layer>): Functional {
+            layerValidation(layers)
+
+            return preprocessAndCreate(layers)
         }
 
         /**
@@ -47,7 +59,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun fromFinalLayer(finalLayer: Layer): Functional {
+        public fun fromOutput(finalLayer: Layer): Functional {
             require(finalLayer.inboundLayers.isNotEmpty()) { "Model should contain more than 1 layer!" }
             val layers = mutableSetOf<Layer>() // set of unique layers
 
@@ -97,7 +109,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             return sortedListOfLayers
         }
 
-        // Recursive toplogical Sort
+        // Recursive topological Sort
         private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
             val outboundLayers = node.outboundLayers
             for (i in 0 until outboundLayers.size) {
@@ -116,22 +128,6 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * NOTE: First layer should be input layer.
          * @return the [Functional] model.
          */
-        @JvmStatic
-        public fun of(layers: List<Layer>): Functional {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
-
-            return preprocessAndCreate(layers)
-        }
-
-        /**
-         * Creates the [Functional] model.
-         * @property [layers] The layers to describe the model design.
-         * NOTE: First layer should be input layer.
-         * @return the [Functional] model.
-         */
-        @JvmStatic
         private fun preprocessAndCreate(layers: List<Layer>): Functional {
             var layerList = layers
             val inputLayer = findInputLayer(layerList)
@@ -141,7 +137,6 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             preProcessLayerNames(layerList.toTypedArray())
             val model = Functional(*layerList.toTypedArray())
-            postProcessLayerNames(layerList.toTypedArray(), model)
             return model
         }
 

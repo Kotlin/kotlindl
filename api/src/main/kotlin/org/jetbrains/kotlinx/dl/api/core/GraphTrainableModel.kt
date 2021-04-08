@@ -120,13 +120,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             }
         }
 
-        internal fun postProcessLayerNames(
-            layers: Array<out Layer>,
-            seqModel: GraphTrainableModel
-        ) {
-            for (layer in layers) {
-                layer.parentModel = seqModel
-            }
+        internal fun layerValidation(layers: List<Layer>) {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
         }
     }
 

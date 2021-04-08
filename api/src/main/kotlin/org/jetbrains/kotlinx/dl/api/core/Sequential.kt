@@ -33,17 +33,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         public fun of(vararg layers: Layer): Sequential {
-            // TODO: duplicates constructor
-            // TODO: duplicates Functional companion methods (but could not be easy refactored due to constructor calls, they could not be GraphTrainableModel
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
+            layerValidation(layers.toList())
 
-            // TODO: check that preprocessing is correct for input layer
             preProcessLayerNames(layers)
-            val model = Sequential(*layers)
-            postProcessLayerNames(layers, model)
-            return model
+            return Sequential(*layers)
         }
 
         /**
@@ -54,15 +47,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         public fun of(layers: List<Layer>): Sequential {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
+            layerValidation(layers.toList())
 
-            val otherLayers = layers.subList(1, layers.size)
-            preProcessLayerNames(otherLayers.toTypedArray())
-            val model = Sequential(*layers.toTypedArray())
-            postProcessLayerNames(otherLayers.toTypedArray(), model)
-            return model
+            preProcessLayerNames(layers.toTypedArray())
+            return Sequential(*layers.toTypedArray())
         }
 
         /**

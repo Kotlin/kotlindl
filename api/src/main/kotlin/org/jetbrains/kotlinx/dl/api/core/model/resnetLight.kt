@@ -439,7 +439,7 @@ private fun resnetLight(
         name = "predictions"
     )(x)
 
-    return Functional.fromFinalLayer(x)
+    return Functional.fromOutput(x)
 }
 
 
