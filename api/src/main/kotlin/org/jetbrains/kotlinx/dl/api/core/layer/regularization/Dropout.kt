@@ -34,7 +34,7 @@ public class Dropout(
 ) : Layer(name), NoGradients {
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        //left empty
+        isTrainable = false
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

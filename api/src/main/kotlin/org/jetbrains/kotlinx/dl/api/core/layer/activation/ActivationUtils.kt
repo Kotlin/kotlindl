@@ -54,7 +54,7 @@ internal fun commonRelu(
     }
 
     if (clipMax) {
-        input2 = tf.math.minimum(tf.constant(0.0f) as Operand<Float>, tf.math.maximum(input2, tf.constant(maxValue!!)))
+        input2 = tf.math.minimum(tf.constant(maxValue!!) as Operand<Float>, tf.math.maximum(input2, tf.constant(0.0f)))
         // original code replaced on composition of min and max calls due to missed gradients for clipByValue op
         /*tf.clipByValue(
                 input2,

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 
-private const val PATH_TO_MODEL = "src/main/resources/models/savedmodel"
+private const val PATH_TO_MODEL = "src/test/resources/savedmodel"
 
 class SavedModelTest {
     @Test
@@ -31,7 +31,7 @@ class SavedModelTest {
 
             val prediction = it.predict(train.getX(0))
 
-            assertEquals(train.getY(0), prediction)
+            assertEquals(train.getY(0), prediction.toFloat())
 
             val predictions = it.predictAll(test)
 
@@ -51,7 +51,7 @@ class SavedModelTest {
 
             val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
-            assertEquals(train.getY(0), prediction)
+            assertEquals(train.getY(0), prediction.toFloat())
 
             val predictions = it.predictAll(test, "Placeholder", "ArgMax")
 
@@ -59,14 +59,6 @@ class SavedModelTest {
             assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
             assertTrue(it.evaluate(test, Metrics.MAE).isNaN())
         }
-    }
-
-    fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
-        val reshaped = Array(
-            1
-        ) { Array(28) { FloatArray(28) } }
-        for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-        return reshaped
     }
 }
 

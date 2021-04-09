@@ -509,7 +509,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 imageShape,
                 serializeToBuffer(batch.x)
             ).use { testImages ->
-                Tensor.create(0.0f).use { isTraining ->
+                Tensor.create(false).use { isTraining ->
                     val predictionsTensor = session.runner()
                         .fetch(predictionOp)
                         .feed(xOp.asOutput(), testImages)

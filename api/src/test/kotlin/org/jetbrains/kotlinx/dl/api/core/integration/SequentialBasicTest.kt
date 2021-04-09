@@ -135,21 +135,22 @@ internal class SequentialBasicTest : IntegrationTest() {
 
             // Prediction testing
             val label = it.predict(test.getX(0))
-            assertEquals(test.getY(0), label)
+            assertEquals(test.getY(0), label.toFloat())
 
             val softPrediction = it.predictSoftly(test.getX(0))
 
             assertEquals(
                 test.getY(0),
-                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! })
+                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
+            )
 
             // Test predict method with specified tensor name
             val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
-            assertEquals(test.getY(0), label2)
+            assertEquals(test.getY(0), label2.toFloat())
 
             // Test predictAndGetActivations method
             val (label3, activations) = it.predictAndGetActivations(test.getX(0))
-            assertEquals(test.getY(0), label3)
+            assertEquals(test.getY(0), label3.toFloat())
             assertEquals(3, activations.size)
 
             val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
@@ -510,8 +511,8 @@ internal class SequentialBasicTest : IntegrationTest() {
     }
 
     @Test
-    fun incorrectAmountOfClassesInTheLastDenseLayer() {
-        val testModelWithSmallAmountOfClasses = Sequential.of(
+    fun incorrectNumberOfClassesInTheLastDenseLayer() {
+        val testModelWithSmallNumberOfClasses = Sequential.of(
             Input(
                 IMAGE_SIZE,
                 IMAGE_SIZE,
@@ -567,7 +568,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         val (train, test) = mnist()
 
-        testModelWithSmallAmountOfClasses.use {
+        testModelWithSmallNumberOfClasses.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
             val exception =

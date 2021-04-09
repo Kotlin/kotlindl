@@ -44,7 +44,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 
     val inputLayer = when (this::class) {
         Sequential::class -> (this as Sequential).inputLayer
-        Functional::class -> (this as Functional).layers[0] as Input
+        Functional::class -> (this as Functional).inputLayer
         else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
     }
 
@@ -173,7 +173,7 @@ private fun createKerasDense(layer: Dense, isKerasFullyCompatible: Boolean): Ker
         dtype = DATATYPE_FLOAT32,
         units = layer.outputSize,
         name = layer.name,
-        use_bias = true,
+        use_bias = layer.useBias,
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible)
@@ -327,7 +327,7 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
         padding = convertPadding(layer.padding),
         name = layer.name,
-        use_bias = true
+        use_bias = layer.useBias
     )
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
 }

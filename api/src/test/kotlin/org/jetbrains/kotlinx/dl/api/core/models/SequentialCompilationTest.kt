@@ -101,7 +101,7 @@ internal class SequentialModelTest {
         correctTestModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             val layerDescriptions = it.summary()
-            assertTrue(layerDescriptions[1].contentEquals("conv2d_1(Conv2D)             [None, 28, 28, 32]        832"))
+            assertTrue(layerDescriptions[1].contentEquals("conv2d_1(Conv2D)                       [None, 28, 28, 32]        832"))
 
             assertTrue(
                 it.kGraph().toString().contentEquals(
@@ -161,6 +161,7 @@ internal class SequentialModelTest {
                             "Name: Assign_dense_2_dense_bias; Type: Assign; Out #tensors:  1\n" +
                             "Name: Placeholder; Type: Placeholder; Out #tensors:  1\n" +
                             "Name: numberOfLosses; Type: Placeholder; Out #tensors:  1\n" +
+                            "Name: training; Type: Placeholder; Out #tensors:  1\n" +
                             "Name: Conv2d; Type: Conv2D; Out #tensors:  1\n" +
                             "Name: BiasAdd; Type: BiasAdd; Out #tensors:  1\n" +
                             "Name: Relu; Type: Relu; Out #tensors:  1\n" +
@@ -368,7 +369,15 @@ internal class SequentialModelTest {
                             "Name: Assign; Type: Assign; Out #tensors:  1\n" +
                             "Name: Mul_1; Type: Mul; Out #tensors:  1\n" +
                             "Name: Assign_1; Type: Assign; Out #tensors:  1\n" +
-                            "Name: default_output; Type: Softmax; Out #tensors:  1\n"
+                            "Name: default_output; Type: Softmax; Out #tensors:  1\n" +
+                            "Name: Const_44; Type: Const; Out #tensors:  1\n" +
+                            "Name: ArgMax; Type: ArgMax; Out #tensors:  1\n" +
+                            "Name: Const_45; Type: Const; Out #tensors:  1\n" +
+                            "Name: ArgMax_1; Type: ArgMax; Out #tensors:  1\n" +
+                            "Name: Equal; Type: Equal; Out #tensors:  1\n" +
+                            "Name: Cast_4; Type: Cast; Out #tensors:  1\n" +
+                            "Name: Const_46; Type: Const; Out #tensors:  1\n" +
+                            "Name: Mean; Type: Mean; Out #tensors:  1\n"
                 )
             )
         }
@@ -389,21 +398,23 @@ internal class SequentialModelTest {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             assertTrue(correctTestModel.isModelCompiled)
 
-            assertEquals(it.layers[0].paramCount, 832)
-            assertEquals(it.layers[1].paramCount, 0)
-            assertEquals(it.layers[2].paramCount, 51264)
-            assertEquals(it.layers[3].paramCount, 0)
+            assertEquals(it.layers[0].paramCount, 0)
+            assertEquals(it.layers[1].paramCount, 832)
+            assertEquals(it.layers[2].paramCount, 0)
+            assertEquals(it.layers[3].paramCount, 51264)
             assertEquals(it.layers[4].paramCount, 0)
-            assertEquals(it.layers[5].paramCount, 1606144)
-            assertEquals(it.layers[6].paramCount, 5130)
+            assertEquals(it.layers[5].paramCount, 0)
+            assertEquals(it.layers[6].paramCount, 1606144)
+            assertEquals(it.layers[7].paramCount, 5130)
 
-            assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
-            assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
-            assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
-            assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
-            assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 3136))
-            assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 512))
-            assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 10))
+            assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 1))
+            assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
+            assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
+            assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
+            assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
+            assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 3136))
+            assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 512))
+            assertArrayEquals(it.layers[7].outputShape.dims(), longArrayOf(-1, 10))
         }
     }
 
@@ -576,7 +587,7 @@ internal class SequentialModelTest {
                 )
             }
             assertEquals(
-                "The last dimensions (except first = -1) of shape of layer maxpool2d_13 contains zero or negative dimension values: [-1, 0, 0, 128].\n" +
+                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [-1, 0, 0, 128].\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem.",
                 exception.message
             )
@@ -613,9 +624,9 @@ internal class SequentialModelTest {
             )
         )
 
-        assertEquals(model.layers[1].name, "conv2d_1")
-        assertEquals(model.layers[2].name, "maxpool2d_2")
-        assertEquals(model.layers[3].name, "flatten_3")
-        assertEquals(model.layers[4].name, "dense_4")
+        assertEquals(model.layers[1].name, "conv2d_2")
+        assertEquals(model.layers[2].name, "maxpool2d_3")
+        assertEquals(model.layers[3].name, "flatten_4")
+        assertEquals(model.layers[4].name, "dense_5")
     }
 }

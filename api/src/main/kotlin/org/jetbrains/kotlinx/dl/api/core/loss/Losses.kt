@@ -362,8 +362,8 @@ public class BinaryCrossEntropy(reductionType: ReductionType = ReductionType.SUM
         // val clippedYPred = tf.clipByValue(yPred, epsilonOp, oneMinusEpsilonOp)
         // This section commented due to missed gradients for clipByValue op
         val clippedYPred = tf.math.minimum(
-            epsilonOp,
-            tf.math.maximum(oneMinusEpsilonOp, yPred)
+            oneMinusEpsilonOp,
+            tf.math.maximum(epsilonOp, yPred)
         ) // probably takes 2 times memory for gradients instead of commented variant
 
         val right = tf.math.mul(yTrue, tf.math.log(tf.math.add(clippedYPred, epsilonOp)))
