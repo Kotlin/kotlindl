@@ -31,7 +31,8 @@ internal class SquaredHingeTest {
 
             assertEquals(
                 0.16666667f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +57,8 @@ internal class SquaredHingeTest {
 
             assertEquals(
                 0.6666667f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +83,8 @@ internal class SquaredHingeTest {
 
             assertEquals(
                 0.3640625f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +105,8 @@ internal class SquaredHingeTest {
 
             assertEquals(
                 0.728125f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

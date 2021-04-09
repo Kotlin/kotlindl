@@ -31,7 +31,8 @@ internal class MAETest {
 
             assertEquals(
                 0.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +57,8 @@ internal class MAETest {
 
             assertEquals(
                 0.16666667f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +83,8 @@ internal class MAETest {
 
             assertEquals(
                 5.5f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +105,8 @@ internal class MAETest {
 
             assertEquals(
                 11.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

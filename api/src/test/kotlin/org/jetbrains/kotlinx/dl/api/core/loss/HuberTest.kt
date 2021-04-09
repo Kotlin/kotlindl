@@ -31,7 +31,8 @@ internal class HuberTest {
 
             assertEquals(
                 0.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +57,8 @@ internal class HuberTest {
 
             assertEquals(
                 0.083333336f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +83,8 @@ internal class HuberTest {
 
             assertEquals(
                 0.10416668f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +105,8 @@ internal class HuberTest {
 
             assertEquals(
                 0.20833334f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

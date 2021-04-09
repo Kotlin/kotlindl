@@ -33,7 +33,8 @@ internal class BinaryCrossEntropyTest {
 
             assertEquals(
                 3.8333097f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -54,7 +55,8 @@ internal class BinaryCrossEntropyTest {
 
             assertEquals(
                 7.6666193f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

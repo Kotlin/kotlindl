@@ -31,7 +31,8 @@ internal class HingeTest {
 
             assertEquals(
                 0.16666667f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +57,8 @@ internal class HingeTest {
 
             assertEquals(
                 0.33333334f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +83,8 @@ internal class HingeTest {
 
             assertEquals(
                 0.50625f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +105,8 @@ internal class HingeTest {
 
             assertEquals(
                 1.0125f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

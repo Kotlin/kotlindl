@@ -31,7 +31,8 @@ internal class MSLETest {
 
             assertEquals(
                 0.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +57,8 @@ internal class MSLETest {
 
             assertEquals(
                 0.080073185f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +83,8 @@ internal class MSLETest {
 
             assertEquals(
                 1.4370323f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +105,8 @@ internal class MSLETest {
 
             assertEquals(
                 2.874065f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }

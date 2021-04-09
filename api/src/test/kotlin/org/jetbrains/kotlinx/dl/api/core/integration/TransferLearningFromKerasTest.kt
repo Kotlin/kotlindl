@@ -100,7 +100,7 @@ class TransferLearningTest : IntegrationTest() {
         assertEquals(
             "Weights for the loaded Conv2D layer conv2d_12 are not found in .h5 file! \n" +
                     "h5 weight file contains weights for the following list of layers: [conv2d, conv2d_1, dense, dense_1, dense_2, flatten, max_pooling2d, max_pooling2d_1]\n" +
-                    "Double-check your loaded configuration which contains layers with the following names: [conv2d_12, max_pooling2d_96, conv2d_1, max_pooling2d_1, flatten, dense, dense_1, dense_2].",
+                    "Double-check your loaded configuration which contains layers with the following names: [input, conv2d_12, max_pooling2d_96, conv2d_1, max_pooling2d_1, flatten, dense, dense_1, dense_2].",
             exception.message
         )
     }

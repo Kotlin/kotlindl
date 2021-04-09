@@ -12,6 +12,8 @@ import org.tensorflow.EagerSession
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+internal const val EPS: Float = 1e-2f
+
 internal class PoissonTest {
     @Test
     fun zeroTest() {
@@ -31,7 +33,8 @@ internal class PoissonTest {
 
             assertEquals(
                 -1.5041842f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -56,7 +59,8 @@ internal class PoissonTest {
 
             assertEquals(
                 0.41463676f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -81,7 +85,8 @@ internal class PoissonTest {
 
             assertEquals(
                 -3.3066044f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
@@ -102,7 +107,8 @@ internal class PoissonTest {
 
             assertEquals(
                 -6.613209f,
-                operand.asOutput().tensor().floatValue()
+                operand.asOutput().tensor().floatValue(),
+                EPS
             )
         }
     }
