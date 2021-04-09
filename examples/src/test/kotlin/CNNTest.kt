@@ -3,12 +3,18 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+import examples.cnn.mnist.denseOnly
+import examples.cnn.mnist.lenetClassic
 import org.junit.jupiter.api.Test
 
 class CNNTest {
     @Test
-    fun denseOnlyMnist() {
-        // DenseOnlyMnist.main()
+    fun denseOnlyTest() {
+        denseOnly()
     }
 
+    @Test
+    fun lenetClassicTest() {
+        lenetClassic()
+    }
 }

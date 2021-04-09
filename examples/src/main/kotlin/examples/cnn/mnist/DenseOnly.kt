@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
-private const val EPOCHS = 10
+private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 
 /**
@@ -33,7 +33,7 @@ private val model = Sequential.of(
     Dense(10, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
-fun main() {
+internal fun denseOnly() {
     val (train, test) = mnist()
 
     model.use {
@@ -46,3 +46,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = denseOnly()

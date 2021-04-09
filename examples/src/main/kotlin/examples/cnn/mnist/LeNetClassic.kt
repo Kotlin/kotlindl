@@ -91,7 +91,7 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-fun main() {
+internal fun lenetClassic() {
     val (train, test) = mnist()
 
     lenet5Classic.use {
@@ -110,4 +110,6 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = lenetClassic()
 
