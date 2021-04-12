@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -43,9 +42,10 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {
-        if (!commonModelDirectory.exists()) throw FileNotFoundException(
-            "Directory ${commonModelDirectory.name} is not found."
-        )
+        if (!commonModelDirectory.exists()) {
+            val created = commonModelDirectory.mkdir()
+            if (!created) throw Exception("Directory ${commonModelDirectory.absolutePath} could not be created! Create this directory manually.")
+        }
     }
 
     public companion object {

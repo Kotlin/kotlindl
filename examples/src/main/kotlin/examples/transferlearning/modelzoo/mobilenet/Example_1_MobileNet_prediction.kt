@@ -30,9 +30,9 @@ import java.io.File
  *
  * Model predicts on a few images located in resources.
  */
-fun main() {
+fun mobilenetPrediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNet)
+        ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
@@ -71,3 +71,5 @@ fun main() {
         }
     }
 }
+
+fun main() = mobilenetPrediction()

@@ -31,7 +31,10 @@ import java.nio.file.StandardCopyOption
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) cacheDirectory.mkdir()
+    if (!cacheDirectory.exists()) {
+        val created = cacheDirectory.mkdir()
+        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+    }
 
     val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
@@ -78,7 +81,10 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) cacheDirectory.mkdir()
+    if (!cacheDirectory.exists()) {
+        val created = cacheDirectory.mkdir()
+        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+    }
 
     val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath

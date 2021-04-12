@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.lenet
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -24,7 +24,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
  *
  * NOTE: Model and weights are resources in api module.
  */
-fun main() {
+fun loadModelWithoutWeightsInitAndEvaluate() {
     val (train, test) = fashionMnist()
 
     val jsonConfigFile = getJSONConfigFile()
@@ -45,6 +45,7 @@ fun main() {
     }
 }
 
+fun main() = loadModelWithoutWeightsInitAndEvaluate()
 
 
 

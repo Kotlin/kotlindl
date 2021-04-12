@@ -84,12 +84,3 @@ val lenet5 = Sequential.of(
         name = "dense_8"
     )
 )
-
-
-fun mnistReshape(image: FloatArray): Array<Array<Array<FloatArray>>> {
-    val reshaped = Array(
-        1
-    ) { Array(28) { Array(28) { FloatArray(1) } } }
-    for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
-    return reshaped
-}

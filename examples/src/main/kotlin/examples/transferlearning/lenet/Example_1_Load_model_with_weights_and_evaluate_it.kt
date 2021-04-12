@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.lenet
 
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
@@ -28,7 +28,7 @@ import java.io.File
  *
  * NOTE: Model and weights are resources in api module.
  */
-fun main() {
+fun loadModelWithWeightsAndEvaluate() {
     val (train, test) = fashionMnist()
 
     val jsonConfigFile = getJSONConfigFile()
@@ -51,6 +51,8 @@ fun main() {
         println("Accuracy training $accuracy")
     }
 }
+
+fun main() = loadModelWithWeightsAndEvaluate()
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
 fun getJSONConfigFile(): File {

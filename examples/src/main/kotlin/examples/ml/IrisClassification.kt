@@ -27,7 +27,7 @@ private val model = Sequential.of(
     Dense(3, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
-fun main() {
+fun irisClassification() {
     data.shuffle()
 
     val dataset = OnHeapDataset.create(
@@ -49,6 +49,7 @@ fun main() {
     }
 }
 
+fun main() = irisClassification()
 
 fun extractX(): Array<FloatArray> {
     val init: (index: Int) -> FloatArray = { index ->

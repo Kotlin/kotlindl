@@ -42,9 +42,9 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  *
  * Model predicts on a few images located in resources.
  */
-fun main() {
+fun mobilenetWithAdditionalTraining() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.MobileNet)
+        ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     val properties = Properties()
@@ -145,3 +145,5 @@ fun main() {
         println("Accuracy after training $accuracyAfterTraining")
     }
 }
+
+fun main() = mobilenetWithAdditionalTraining()

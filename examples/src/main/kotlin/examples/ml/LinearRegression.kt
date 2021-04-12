@@ -27,7 +27,7 @@ private val model = Sequential.of(
     Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros(), name = "dense_2")
 )
 
-fun main() {
+fun linearRegression() {
     val rnd = Random(SEED)
     val data = Array(10000) { doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0) }
     for (i in data.indices) {
@@ -85,5 +85,7 @@ fun main() {
         println("MAE: $mae")
     }
 }
+
+fun main() = linearRegression()
 
 
