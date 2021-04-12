@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val EPOCHS = 2
-private const val TRAINING_BATCH_SIZE = 2000
+private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -81,8 +81,7 @@ private val model = Sequential.of(
     )
 )
 
-
-fun main() {
+fun modernLenet() {
     val (train, test) = mnist()
 
     model.use {
@@ -114,3 +113,5 @@ fun main() {
         println("Accuracy after: $accuracy")
     }
 }
+
+fun main() = modernLenet()

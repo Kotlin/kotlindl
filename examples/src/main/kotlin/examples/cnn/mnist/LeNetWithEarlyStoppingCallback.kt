@@ -94,8 +94,7 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-
-fun main() {
+fun lenetWithEarlyStoppingCallback() {
     val (train, test) = mnist()
 
     lenet5Classic.use {
@@ -124,3 +123,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = lenetWithEarlyStoppingCallback()

@@ -49,7 +49,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 64,
@@ -62,7 +63,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
@@ -84,7 +86,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 256,
@@ -106,7 +109,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
@@ -128,7 +132,8 @@ private val vgg11 = Sequential.of(
     ),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        strides = intArrayOf(1, 2, 2, 1),
+        padding = ConvPadding.SAME
     ),
     Flatten(),
     Dense(
@@ -151,7 +156,7 @@ private val vgg11 = Sequential.of(
     )
 )
 
-fun main() {
+fun vgg() {
     val (train, test) = fashionMnist()
 
     vgg11.use {
@@ -168,3 +173,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = vgg()

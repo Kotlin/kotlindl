@@ -91,7 +91,7 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-fun main() {
+fun lenetWithAlternativeLossFunction() {
     val (train, test) = mnist()
 
     val (newTrain, validation) = train.split(0.95)
@@ -121,3 +121,5 @@ fun main() {
         println(accuracyByEpoch.contentToString())
     }
 }
+
+fun main() = lenetWithAlternativeLossFunction()

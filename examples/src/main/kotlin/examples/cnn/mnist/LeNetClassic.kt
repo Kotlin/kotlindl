@@ -91,7 +91,7 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-internal fun lenetClassic() {
+fun lenetClassic() {
     val (train, test) = mnist()
 
     lenet5Classic.use {

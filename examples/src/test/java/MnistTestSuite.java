@@ -3,18 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import examples.cnn.mnist.denseOnly
-import examples.cnn.mnist.lenetClassic
-import org.junit.jupiter.api.Test
+import org.junit.Test;
 
-class CNNTest {
-    @Test
-    fun denseOnlyTest() {
-        denseOnly()
-    }
+public class MnistTestSuite {
+    public static final String[] EMPTY_ARGS = new String[0];
 
     @Test
-    fun lenetClassicTest() {
-        lenetClassic()
+    public void lenetClassicTest() {
+        LeNetClassic.main(EMPTY_ARGS);
     }
 }

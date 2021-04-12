@@ -156,7 +156,7 @@ private val vgg11 = Sequential.of(
     )
 )
 
-fun main() {
+fun vgg() {
     val (train, test) = mnist()
 
     vgg11.use {
@@ -171,3 +171,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = vgg()

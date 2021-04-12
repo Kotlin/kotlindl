@@ -33,7 +33,7 @@ private val model = Sequential.of(
     Dense(10, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
-internal fun denseOnly() {
+fun denseOnly() {
     val (train, test) = mnist()
 
     model.use {

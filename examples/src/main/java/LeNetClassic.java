@@ -30,7 +30,7 @@ import java.io.File;
  * This example demonstrates the ability to define and train LeNet-5 model in Java.
  */
 public class LeNetClassic {
-    public static final Integer EPOCHS = 3;
+    public static final Integer EPOCHS = 2;
     public static final Integer TRAINING_BATCH_SIZE = 1000;
     public static final Long NUM_CHANNELS = 1L;
     public static final Long IMAGE_SIZE = 28L;
@@ -57,7 +57,7 @@ public class LeNetClassic {
 
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY, new Callback());
-            lenet5Classic.summary(30, 26, 14);
+            lenet5Classic.summary(40, 26, 14);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE);
 
             Double accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE).getMetrics().get(Metrics.ACCURACY);
