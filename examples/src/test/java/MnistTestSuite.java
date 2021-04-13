@@ -3,7 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class MnistTestSuite {
     public static final String[] EMPTY_ARGS = new String[0];
