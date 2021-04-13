@@ -33,7 +33,7 @@ import java.io.File
  *
  * No new layers are added.
  */
-fun main() {
+fun resnet50prediction() {
     val modelZoo =
         ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_50)
     val model = modelZoo.loadModel() as Functional
@@ -76,4 +76,4 @@ fun main() {
     }
 }
 
-
+fun main() = resnet50prediction()

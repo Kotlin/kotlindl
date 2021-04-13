@@ -30,7 +30,7 @@ import java.io.File
  *
  * Model predicts on a few images located in resources.
  */
-fun main() {
+fun resnet101v2prediction() {
     val modelZoo =
         ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_101_v2)
     val model = modelZoo.loadModel() as Functional
@@ -71,5 +71,7 @@ fun main() {
         }
     }
 }
+
+fun main() = resnet101v2prediction()
 
 

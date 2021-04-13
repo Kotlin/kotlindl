@@ -8,11 +8,15 @@ package org.jetbrains.kotlinx.dl.dataset
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.handler.*
-import java.io.File
+import java.io.*
 import java.net.URL
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+
 
 /**
  * Loads the [MNIST dataset](http://yann.lecun.com/exdb/mnist/).
@@ -102,6 +106,93 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
     )
 }
 
+
+/** Path to train images archive of Mnist Dataset. */
+private const val CIFAR_10_IMAGES_ARCHIVE: String = "datasets/cifar10/images.zip"
+
+/** Path to train labels archive of Mnist Dataset. */
+private const val CIFAR_10_LABELS_ARCHIVE: String = "datasets/cifar10/trainLabels.csv"
+
+/** Returns paths to images and its labels for the Cifar'10 dataset. */
+public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, String> {
+    if (!cacheDirectory.exists()) {
+        val created = cacheDirectory.mkdir()
+        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+    }
+
+    val pathToLabel = loadFile(cacheDirectory, CIFAR_10_LABELS_ARCHIVE).absolutePath
+
+    val datasetDirectory = File(cacheDirectory.absolutePath + "/datasets/cifar10")
+    val toFolder = datasetDirectory.toPath()
+
+    val imageDataDirectory = File(cacheDirectory.absolutePath + "/datasets/cifar10/images")
+    if (!imageDataDirectory.exists()) {
+        val created = imageDataDirectory.mkdir()
+        if (!created) throw Exception("Directory ${imageDataDirectory.absolutePath} could not be created! Create this directory manually.")
+
+        val pathToImageArchive = loadFile(cacheDirectory, CIFAR_10_IMAGES_ARCHIVE)
+        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
+        val deleted = pathToImageArchive.delete()
+        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+    }
+
+    return Pair(imageDataDirectory.toPath().toAbsolutePath().toString(), pathToLabel)
+}
+
+/** Path to train images archive of Mnist Dataset. */
+private const val CAT_DOG_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
+
+/** Returns paths to images for the CatDogs dataset. */
+// TODO: name should reflect that dataset is downloaded and cached
+public fun catDogsDatasetPath(cacheDirectory: File = File("cache")): String {
+    if (!cacheDirectory.exists()) {
+        val created = cacheDirectory.mkdir()
+        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+    }
+
+    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/catdogs")
+    val toFolder = imageDirectory.toPath()
+
+    if (!imageDirectory.exists()) {
+        val created = imageDirectory.mkdir()
+        if (!created) throw Exception("Directory ${imageDirectory.absolutePath} could not be created! Create this directory manually.")
+
+        val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_IMAGES_ARCHIVE)
+        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
+        val deleted = pathToImageArchive.delete()
+        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+    }
+
+    return toFolder.toAbsolutePath().toString()
+}
+
+/** Path to train images archive of Mnist Dataset. */
+private const val CAT_DOG_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
+
+/** Returns paths to images for the CatDogs dataset. */
+// TODO: name should reflect that dataset is downloaded and cached
+public fun catDogsSmallDatasetPath(cacheDirectory: File = File("cache")): String {
+    if (!cacheDirectory.exists()) {
+        val created = cacheDirectory.mkdir()
+        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+    }
+    // TODO: refactor
+    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/small_catdogs")
+    val toFolder = imageDirectory.toPath()
+
+    if (!imageDirectory.exists()) {
+        val created = imageDirectory.mkdir()
+        if (!created) throw Exception("Directory ${imageDirectory.absolutePath} could not be created! Create this directory manually.")
+
+        val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_SMALL_IMAGES_ARCHIVE)
+        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
+        val deleted = pathToImageArchive.delete()
+        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+    }
+
+    return toFolder.toAbsolutePath().toString()
+}
+
 /** Downloads a file from a URL if it not already in the cache. */
 private fun loadFile(
     cacheDirectory: File,
@@ -112,7 +203,7 @@ private fun loadFile(
     val urlString = "$AWS_S3_URL/$relativePathToFile"
     val file = File(fileName)
 
-    file.parentFile.mkdirs(); // Will create parent directories if not exists
+    file.parentFile.mkdirs() // Will create parent directories if not exists
 
     if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
         val inputStream = URL(urlString).openStream()
@@ -121,3 +212,48 @@ private fun loadFile(
 
     return File(fileName)
 }
+
+/** Creates file structure archived in zip file with all directories and sub-directories */
+@Throws(IOException::class)
+internal fun extractImagesFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path) {
+    val bufferSize = 4096
+    val zipFile = ZipFile(zipArchivePath.toFile())
+    val entries = zipFile.entries()
+
+    while (entries.hasMoreElements()) {
+        val entry = entries.nextElement() as ZipEntry
+        var currentEntry = entry.name
+        currentEntry = currentEntry.replace('\\', '/')
+
+        val destFile = File(toFolder.toFile(), currentEntry)
+
+        val destinationParent = destFile.parentFile
+        destinationParent.mkdirs()
+
+        if (!entry.isDirectory && !destFile.exists()) {
+            val inputStream = BufferedInputStream(
+                zipFile.getInputStream(entry)
+            )
+            var currentByte: Int
+            // establish buffer for writing file
+            val data = ByteArray(bufferSize)
+
+            // write the current file to disk
+            val fos = FileOutputStream(destFile)
+            val dest = BufferedOutputStream(
+                fos,
+                bufferSize
+            )
+
+            // read and write until last byte is encountered
+            while (inputStream.read(data, 0, bufferSize).also { currentByte = it } != -1) {
+                dest.write(data, 0, currentByte)
+            }
+            dest.flush()
+            dest.close()
+            inputStream.close()
+        }
+    }
+    zipFile.close()
+}
+

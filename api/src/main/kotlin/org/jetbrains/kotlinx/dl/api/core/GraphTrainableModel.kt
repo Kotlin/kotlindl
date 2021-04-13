@@ -36,6 +36,8 @@ import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.FloatBuffer
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
@@ -793,6 +795,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     private fun saveGraphDef(pathToModelDirectory: String) {
         val file = File("$pathToModelDirectory/graph.pb")
+        Files.createDirectories(Paths.get(pathToModelDirectory))
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 

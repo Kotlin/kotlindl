@@ -45,7 +45,7 @@ import java.net.URL
  * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
-fun main() {
+fun vgg16prediction() {
     val modelZoo = ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_16)
     val model = modelZoo.loadModel() as Sequential
 
@@ -87,6 +87,8 @@ fun main() {
         }
     }
 }
+
+fun main() = vgg16prediction()
 
 @Throws(URISyntaxException::class)
 fun getFileFromResource(fileName: String): File {

@@ -3,9 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning
+package examples.transferlearning.modelzoo.vgg16
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses

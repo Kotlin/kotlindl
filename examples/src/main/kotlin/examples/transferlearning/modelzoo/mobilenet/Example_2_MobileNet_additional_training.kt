@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.catDogsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -24,8 +25,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 8
@@ -47,11 +46,7 @@ fun mobilenetWithAdditionalTraining() {
         ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val catdogimages = properties["smallcatdogimages"] as String
+    val catdogimages = catDogsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.dataset
+package examples.cnn.catdog
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -20,6 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.catDogsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -27,8 +28,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
 private const val EPOCHS = 3
@@ -168,11 +167,7 @@ private val vgg11 = Sequential.of(
 )
 
 fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val catdogimages = properties["catdogimages"] as String
+    val catdogimages = catDogsDatasetPath()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {

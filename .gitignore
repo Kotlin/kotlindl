@@ -13,3 +13,5 @@
 /examples/build/
 /examples/out/
 /cache/
+/examples/cache/
+/pretrainedModels/

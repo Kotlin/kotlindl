@@ -3,13 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.dataset.resnetcatdog
+package examples.cnn.catdog
 
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.model.resnet50Light
+import org.jetbrains.kotlinx.dl.api.core.model.resnet101v2Light
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.catDogsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -17,23 +18,17 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 64
+private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 64L
+private const val IMAGE_SIZE = 200L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
-fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val catdogimages = properties["catdogimages"] as String
+fun resnet101v2onCatDogDataset() {
+    val catdogimages = catDogsDatasetPath()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
@@ -57,7 +52,7 @@ fun main() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    resnet50Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
+    resnet101v2Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -76,3 +71,4 @@ fun main() {
     }
 }
 
+fun main() = resnet101v2onCatDogDataset()

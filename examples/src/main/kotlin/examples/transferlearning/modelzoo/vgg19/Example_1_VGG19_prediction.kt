@@ -43,7 +43,7 @@ import java.io.File
  * @see <a href="https://keras.io/api/applications/vgg/#vgg19-function">
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
-fun main() {
+fun vgg19prediction() {
     val modelZoo = ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_19)
     val model = modelZoo.loadModel() as Sequential
 
@@ -84,5 +84,7 @@ fun main() {
         }
     }
 }
+
+fun main() = vgg19prediction()
 
 

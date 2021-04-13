@@ -81,7 +81,7 @@ private val model = Sequential.of(
     )
 )
 
-fun main() {
+fun lenetMnistWithCustomCallback() {
     val (train, test) = mnist()
 
     model.use {
@@ -162,3 +162,5 @@ class CustomCallback : Callback() {
         println("Test begins")
     }
 }
+
+fun main() = lenetMnistWithCustomCallback()

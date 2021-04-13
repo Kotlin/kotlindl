@@ -20,13 +20,12 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
-private const val EPOCHS = 5
-private const val TRAINING_BATCH_SIZE = 64
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 128
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
 private const val NUM_CHANNELS = 3L
@@ -161,13 +160,8 @@ private val vgg11 = Sequential.of(
     )
 )
 
-fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val cifarImagesArchive = properties["cifarImagesArchive"] as String
-    val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
+fun vgg() {
+    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val dataset = OnHeapDataset.create(
         cifarImagesArchive,
@@ -199,3 +193,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = vgg()

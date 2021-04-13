@@ -21,12 +21,11 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
 private const val EPOCHS = 1
@@ -166,12 +165,7 @@ private val vgg11 = Sequential.of(
 )
 
 fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val cifarImagesArchive = properties["cifarImagesArchive"] as String
-    val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
+    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {

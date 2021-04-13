@@ -5,7 +5,6 @@
 
 package examples.transferlearning.modelzoo.resnet.resnet50
 
-import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
@@ -16,7 +15,9 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.catDogsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -24,8 +25,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 8
@@ -35,15 +34,12 @@ private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
-fun main() {
-    val jsonConfigFile = getResNet50JSONConfigFile()
-    val model = Functional.loadModelConfiguration(jsonConfigFile)
+fun resnet50additionalTraining() {
+    val modelZoo =
+        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_50)
+    val model = modelZoo.loadModel() as Functional
 
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val catdogimages = properties["smallcatdogimages"] as String
+    val catdogimages = catDogsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocessingPipeline {
         imagePreprocessing {
@@ -67,7 +63,7 @@ fun main() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val hdfFile = getResNet50WeightsFile()
+    val hdfFile = modelZoo.loadWeights()
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {
@@ -129,29 +125,8 @@ fun main() {
 
         println("Accuracy after training $accuracyAfterTraining")
     }
-
 }
 
-/** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNet50JSONConfigFile(): File {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val resnet50JSONModelPath = properties["resnet50JSONModelPath"] as String
-
-    return File(resnet50JSONModelPath)
-}
-
-/** Returns .h5 file with model weights, saved from Keras 2.x. */
-private fun getResNet50WeightsFile(): HdfFile {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val resnet50h5WeightsPath = properties["resnet50h5WeightsPath"] as String
-
-    return HdfFile(File(resnet50h5WeightsPath))
-}
+fun main() = resnet50additionalTraining()
 
 
