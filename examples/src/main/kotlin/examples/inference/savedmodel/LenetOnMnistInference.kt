@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
-fun main() {
+fun lenetOnMnistInference() {
     val (train, test) = mnist()
 
     SavedModel.load(PATH_TO_MODEL).use {
@@ -28,9 +28,12 @@ fun main() {
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
 
-        val predictions = it.predictAll(test, "Placeholder", "ArgMax")
+        val predictions = it.predictAll(test)
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")
     }
 }
+
+fun main() = lenetOnMnistInference()
+

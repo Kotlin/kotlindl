@@ -752,16 +752,19 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         when (writingMode) {
             WritingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
+                Files.createDirectories(modelDirectory.toPath())
                 modelDirectory.mkdir()
             }
             WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
+                Files.createDirectories(modelDirectory.toPath())
                 modelDirectory.mkdir()
             }
             WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
+                    Files.createDirectories(modelDirectory.toPath())
                     modelDirectory.mkdir()
                 }
             }
@@ -814,6 +817,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         val modelWeights = modelWeightsExtractorRunner.run()
 
+        Files.createDirectories(Paths.get(pathToModelDirectory))
         val file = File("$pathToModelDirectory/variableNames.txt")
 
         file.bufferedWriter().use { variableNamesFile ->
@@ -846,6 +850,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(!isModelInitialized) { "The model is initialized already." }
 
+        Files.createDirectories(modelDirectory.toPath())
         // Load variables names
         val file = File("${modelDirectory.absolutePath}/variableNames.txt")
 

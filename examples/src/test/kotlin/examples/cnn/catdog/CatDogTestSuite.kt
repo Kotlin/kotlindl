@@ -5,8 +5,10 @@
 
 package examples.cnn.catdog
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled
 class CatDogTestSuite {
     @Test
     fun resnet50onCatDogDatasetTest() {

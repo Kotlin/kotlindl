@@ -3,21 +3,21 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production.fashionmnist
+package examples.inference.mnist
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
-private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
+private const val PATH_TO_MODEL = "savedmodels/lenet5"
 
 /**
  * Inference model is used here, separately from model training code to illustrate the ability to load model graph and weights to start prediction process.
  *
- * NOTE: The example requires the saved model in the appropriate directory (run LeNetFashionMnistExportImport.kt firstly).
+ * NOTE: The example requires the saved model in the appropriate directory (run LeNetMnistExportImport.kt firstly).
  */
 fun main() {
-    val (train, _) = fashionMnist()
+    val (train, _) = mnist()
 
     val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
@@ -33,13 +33,5 @@ fun main() {
                 accuracy += (1.0 / amountOfTestSet)
         }
         println("Accuracy: $accuracy")
-
-        val amountOfOps = 1000
-        val start = System.currentTimeMillis()
-        for (i in 0..amountOfOps) {
-            it.predict(train.getX(i % 50000))
-        }
-        println("Time, s: ${(System.currentTimeMillis() - start) / 1000f}")
-        println("Throughput, op/s: ${amountOfOps / ((System.currentTimeMillis() - start) / 1000f)}")
     }
 }

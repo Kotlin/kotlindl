@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production.mnist
+package examples.inference.mnist
 
 import examples.inference.production.lenet5
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -28,7 +28,7 @@ private const val TEST_BATCH_SIZE = 1000
  *
  * It saves all the data to the project root directory.
  */
-fun main() {
+fun lenetOnMnistDatasetExportImportToTxt() {
     val (train, test) = mnist()
 
     val (newTrain, validation) = train.split(0.95)
@@ -100,3 +100,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = lenetOnMnistDatasetExportImportToTxt()

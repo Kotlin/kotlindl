@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production.fashionmnist
+package examples.inference.fashionmnist
 
 import examples.inference.production.lenet5
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -41,7 +41,7 @@ private val fashionMnistLabelEncoding = mapOf(
  *
  * It saves all the data to the project root directory.
  */
-fun main() {
+fun lenetOnFashionMnistExportImportToTxt() {
     val (train, test) = fashionMnist()
 
     val (newTrain, validation) = train.split(0.95)
@@ -80,3 +80,5 @@ fun main() {
         println("Accuracy: $accuracy")
     }
 }
+
+fun main() = lenetOnFashionMnistExportImportToTxt()
