@@ -32,7 +32,7 @@ import java.io.File
  */
 fun mobilenetPrediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNet)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()

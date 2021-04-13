@@ -127,8 +127,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 
     val imageDataDirectory = File(cacheDirectory.absolutePath + "/datasets/cifar10/images")
     if (!imageDataDirectory.exists()) {
-        val created = imageDataDirectory.mkdir()
-        if (!created) throw Exception("Directory ${imageDataDirectory.absolutePath} could not be created! Create this directory manually.")
+        Files.createDirectories(imageDataDirectory.toPath())
 
         val pathToImageArchive = loadFile(cacheDirectory, CIFAR_10_IMAGES_ARCHIVE)
         extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
@@ -154,8 +153,7 @@ public fun catDogsDatasetPath(cacheDirectory: File = File("cache")): String {
     val toFolder = imageDirectory.toPath()
 
     if (!imageDirectory.exists()) {
-        val created = imageDirectory.mkdir()
-        if (!created) throw Exception("Directory ${imageDirectory.absolutePath} could not be created! Create this directory manually.")
+        Files.createDirectories(imageDirectory.toPath())
 
         val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_IMAGES_ARCHIVE)
         extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
@@ -181,8 +179,7 @@ public fun catDogsSmallDatasetPath(cacheDirectory: File = File("cache")): String
     val toFolder = imageDirectory.toPath()
 
     if (!imageDirectory.exists()) {
-        val created = imageDirectory.mkdir()
-        if (!created) throw Exception("Directory ${imageDirectory.absolutePath} could not be created! Create this directory manually.")
+        Files.createDirectories(imageDirectory.toPath())
 
         val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_SMALL_IMAGES_ARCHIVE)
         extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)

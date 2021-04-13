@@ -35,7 +35,7 @@ import java.io.File
  */
 fun resnet50prediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.ResNet_50)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()

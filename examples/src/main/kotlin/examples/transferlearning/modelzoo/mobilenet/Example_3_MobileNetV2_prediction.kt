@@ -31,7 +31,7 @@ import java.io.File
  */
 fun mobilenetv2Prediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNetv2)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNetv2)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()

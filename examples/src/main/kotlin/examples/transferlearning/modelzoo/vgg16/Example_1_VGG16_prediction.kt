@@ -46,7 +46,7 @@ import java.net.URL
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun vgg16prediction() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_16)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_16)
     val model = modelZoo.loadModel() as Sequential
 
     val imageNetClassLabels = modelZoo.loadClassLabels()

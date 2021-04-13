@@ -44,7 +44,7 @@ import java.io.File
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun vgg19prediction() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("savedmodels/keras_models"), modelType = ModelType.VGG_19)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
     val model = modelZoo.loadModel() as Sequential
 
     val imageNetClassLabels = modelZoo.loadClassLabels()

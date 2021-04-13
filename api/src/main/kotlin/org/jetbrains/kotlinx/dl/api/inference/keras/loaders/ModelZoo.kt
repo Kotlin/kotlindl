@@ -43,8 +43,7 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
 
     init {
         if (!commonModelDirectory.exists()) {
-            val created = commonModelDirectory.mkdir()
-            if (!created) throw Exception("Directory ${commonModelDirectory.absolutePath} could not be created! Create this directory manually.")
+            Files.createDirectories(commonModelDirectory.toPath())
         }
     }
 

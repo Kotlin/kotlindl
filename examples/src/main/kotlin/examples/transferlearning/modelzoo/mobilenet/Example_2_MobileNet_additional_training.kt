@@ -43,7 +43,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun mobilenetWithAdditionalTraining() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("pretrainedModels"), modelType = ModelType.MobileNet)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     val catdogimages = catDogsSmallDatasetPath()
