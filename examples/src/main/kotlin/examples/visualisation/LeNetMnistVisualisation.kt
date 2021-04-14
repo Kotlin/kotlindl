@@ -5,9 +5,9 @@
 
 package examples.visualisation
 
+import examples.inference.lenet5
 import examples.inference.production.drawActivations
 import examples.inference.production.drawFilters
-import examples.inference.production.lenet5
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -27,7 +27,7 @@ fun main() {
 
     val imageId = 1
 
-    lenet5.use {
+    lenet5().use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

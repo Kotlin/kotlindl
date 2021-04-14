@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.inference
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
@@ -24,7 +24,10 @@ private const val SEED = 12L
 private val kernelInitializer = GlorotNormal(SEED)
 private val biasInitializer = GlorotUniform(SEED)
 
-val lenet5 = Sequential.of(
+/**
+ * Returns classic LeNet-5 model with minor improvements (Sigmoid activation -> ReLU activation, AvgPool layer -> MaxPool layer).
+ */
+fun lenet5(): Sequential = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,

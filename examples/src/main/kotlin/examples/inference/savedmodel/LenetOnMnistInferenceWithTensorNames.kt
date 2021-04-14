@@ -17,7 +17,7 @@ fun lenetOnMnistInferenceWithTensorNames() {
     val (train, test) = mnist()
 
     SavedModel.load(PATH_TO_MODEL).use {
-        println(it)
+        println(it.kGraph.toString())
 
         it.reshape(28, 28, 1)
         it.input(Input.PLACEHOLDER)

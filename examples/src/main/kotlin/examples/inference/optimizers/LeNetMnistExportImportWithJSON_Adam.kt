@@ -5,7 +5,7 @@
 
 package examples.inference.optimizers
 
-import examples.inference.production.lenet5
+import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -35,7 +35,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
 
     val optimizer = Adam()
 
-    lenet5.use {
+    lenet5().use {
         it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
         it.summary()

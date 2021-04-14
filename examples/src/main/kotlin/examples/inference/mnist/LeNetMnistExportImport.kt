@@ -5,7 +5,7 @@
 
 package examples.inference.mnist
 
-import examples.inference.production.lenet5
+import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -36,6 +36,8 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     val imageId1 = 0
     val imageId2 = 1
     val imageId3 = 2
+
+    val lenet5 = lenet5()
 
     lenet5.use {
         it.compile(

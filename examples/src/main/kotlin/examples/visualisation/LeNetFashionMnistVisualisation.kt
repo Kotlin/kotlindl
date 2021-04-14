@@ -5,6 +5,7 @@
 
 package examples.inference.production
 
+import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -37,7 +38,7 @@ fun main() {
 
     val (newTrain, validation) = train.split(0.95)
 
-    lenet5.use {
+    lenet5().use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

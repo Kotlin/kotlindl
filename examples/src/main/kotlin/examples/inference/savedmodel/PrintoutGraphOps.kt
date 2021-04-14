@@ -12,7 +12,7 @@ private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel
 fun printOutGraphOps() {
     val model = SavedModel.load(PATH_TO_MODEL)
 
-    println(model.toString())
+    println(model.kGraph.toString())
 }
 
 fun main() = printOutGraphOps()
