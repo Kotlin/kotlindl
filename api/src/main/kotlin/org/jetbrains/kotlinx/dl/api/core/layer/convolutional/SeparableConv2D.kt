@@ -54,7 +54,9 @@ private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
- * @constructor Creates [DepthwiseConv2D] object.
+ * @constructor Creates [SeparableConv2D] object.
+ *
+ * @since 0.2
  */
 public class SeparableConv2D(
     public val filters: Long = 32,

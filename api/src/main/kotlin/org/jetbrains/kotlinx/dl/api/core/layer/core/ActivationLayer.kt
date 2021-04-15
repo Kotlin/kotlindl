@@ -19,12 +19,13 @@ import org.tensorflow.op.Ops
  * @property [activation] Activation function.
  * @property [name] Custom layer name.
  * @constructor Creates [Dense] object.
+ *
+ * @since 0.2
  */
 public class ActivationLayer(
     public val activation: Activations = Activations.Relu,
     name: String = ""
 ) : Layer(name) {
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         //left empty
     }

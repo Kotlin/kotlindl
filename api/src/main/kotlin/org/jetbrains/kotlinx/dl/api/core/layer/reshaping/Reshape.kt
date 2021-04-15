@@ -17,9 +17,15 @@ import kotlin.math.abs
 /**
  * Layer that reshapes inputs into the given shape.
  *
+ * Input shape: `(batch_size,) + any shape`.
+ *
+ * Output shape: `(batch_size,) + target_shape`.
+ *
  * @property [targetShape] Target shape. List of integers, does not include the samples dimension (batch size)
  * @property [name] Custom layer name.
  * @constructor Creates [Reshape] object.
+ *
+ * @since 0.2
  */
 public class Reshape(
     public val targetShape: List<Int>,

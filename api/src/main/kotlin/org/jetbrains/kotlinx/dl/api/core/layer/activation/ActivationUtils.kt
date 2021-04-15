@@ -11,22 +11,26 @@ import org.tensorflow.op.Ops
 
 /**
  * Rectified linear unit.
+ *
  * With default values, it returns element-wise `max(x, 0)`.
  * Otherwise, it follows:
  * `f(x) = max_value` for `x >= max_value`,
  * `f(x) = x` for `threshold <= x < max_value`,
  * `f(x) = alpha * (x - threshold)` otherwise.
+ *
+ * @param [tf] Namespace to build ops.
+ * @param [input] A tensor or variable.
+ * @param [alpha] A scalar, slope of negative section.
+ * @param [maxValue] Saturation threshold.
+ * @param [threshold] Threshold value for the activation.
+ *
+ * @return TensorFlow Operand.
  */
 internal fun commonRelu(
-    /** Namespace to build ops. */
     tf: Ops,
-    /** A tensor or variable. */
     input: Operand<Float>,
-    /** A scalar, slope of negative section. */
     alpha: Float = 0.0f,
-    /** Saturation threshold. */
     maxValue: Float? = null,
-    /** Threshold value for thresholded activation. */
     threshold: Float = 0.0f
 ): Operand<Float> {
     var input2 = input

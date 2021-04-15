@@ -16,6 +16,8 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 
 /**
+ * This layer is responsible for the input shape of the built model.
+ *
  * First and required layer in [org.jetbrains.kotlinx.dl.api.core.Sequential.of] method.
  *
  * @property [name] Custom layer name.

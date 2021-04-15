@@ -34,6 +34,8 @@ import org.tensorflow.op.core.Variable
  * @property [movingVarianceInitializer] Initializer for the moving variance.
  * @property [name] Custom layer name.
  * @constructor Creates [BatchNorm] object.
+ *
+ * @since 0.2
  */
 public class BatchNorm(
     public val axis: List<Int> = arrayListOf(3),

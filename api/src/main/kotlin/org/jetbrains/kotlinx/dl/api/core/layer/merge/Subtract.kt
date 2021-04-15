@@ -11,7 +11,8 @@ import org.tensorflow.op.Ops
 /**
  * Layer that subtracts inputs, following from the previous.
  *
- * It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape), (```inputs[i-1] - inputs[i]```), also of the same shape.
+ * It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape),
+ * (```inputs[i-1] - inputs[i]```), also of the same shape.
  */
 public class Subtract(name: String = "") : AbstractMerge("SubtractLayer", name) {
     override fun mergeFunction(

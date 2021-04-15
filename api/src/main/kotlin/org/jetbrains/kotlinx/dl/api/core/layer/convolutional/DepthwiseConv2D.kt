@@ -48,6 +48,7 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
  * @constructor Creates [DepthwiseConv2D] object.
+ * @since 0.2
  */
 public class DepthwiseConv2D(
     public val kernelSize: LongArray = longArrayOf(3, 3),

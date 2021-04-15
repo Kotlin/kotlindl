@@ -14,7 +14,12 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- * Zero-padding layer, which adds zeros on sides of image
+ * Zero-padding layer for 2D input (e.g. picture).
+ *
+ * This layer can add rows and columns of zeros at the top, bottom, left and right side of an image tensor.
+ *
+ * @property [padding] 4 numbers  interpreted as `(top_pad, bottom_pad, left_pad, right_pad)`.
+ *
  * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2765)
  */
 public class ZeroPadding2D : Layer {
@@ -24,11 +29,11 @@ public class ZeroPadding2D : Layer {
 
     /**
      * Constructs an instance of ZeroPadding2D layer
-     * @param[padding] symmetric padding applied to width and height (same on all sides)
-     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * @param [padding] symmetric padding applied to width and height (same on all sides)
+     * @param [dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
      * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
      * input to this layer
-     * @param[name] layer name
+     * @param [name] layer name
      */
     public constructor(
         padding: Int,
@@ -42,12 +47,12 @@ public class ZeroPadding2D : Layer {
 
     /**
      * Constructs an instance of ZeroPadding2D layer
-     * @param[padding] pair of padding values - [padding.first] represents vertical padding (applied to top and
+     * @param [padding] pair of padding values - [padding.first] represents vertical padding (applied to top and
      * bottom of image, and [padding.last] is horizontal padding (left and right sides)
-     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * @param [dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
      * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
      * input to this layer
-     * @param[name] layer name
+     * @param [name] layer name
      */
     public constructor(
         padding: Pair<Int, Int>,
@@ -61,16 +66,16 @@ public class ZeroPadding2D : Layer {
 
     /**
      * Constructs an instance of ZeroPadding2D layer
-     * @param[padding] list of padding values. Size of list must be equal to 4. Those list values maps to
+     * @param [padding] list of padding values. Size of list must be equal to 4. Those list values maps to
      * the following paddings:
      * padding[0] -> top padding,
      * padding[1] -> bottom padding,
      * padding[2] -> left padding,
      * padding[3] -> right padding
-     * @param[dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
+     * @param [dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
      * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
      * input to this layer
-     * @param[name] layer name
+     * @param [name] layer name
      */
     public constructor(padding: IntArray, dataFormat: String?, name: String = "") : super(name) {
         require(padding.size == 4)

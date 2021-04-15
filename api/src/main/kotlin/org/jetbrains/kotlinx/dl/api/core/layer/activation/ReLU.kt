@@ -22,20 +22,18 @@ import org.tensorflow.op.Ops
  * f(x) = x if threshold <= x < maxValue
  * f(x) = negativeSlope * (x - threshold) otherwise
  * ```
+ * @property [maxValue] Maximum activation value. Should be >= 0.
+ * @property [negativeSlope] Negative slope coefficient. Should be >= 0.
+ * @property [threshold] Threshold value for threshold activation.
+ * @constructor Creates [ReLU] object.
+ * @since 0.2
  */
 public class ReLU(
-    /** Maximum activation value. Should be >= 0. */
     public val maxValue: Float? = null,
-
-    /** Negative slope coefficient. Should be >= 0. */
     public val negativeSlope: Float = 0.0f,
-
-    /** Threshold value for threshold activation. */
     public val threshold: Float = 0.0f,
-
     name: String = ""
 ) : Layer(name) {
-
     init {
         require(negativeSlope >= 0.0f) { "Negative slope $negativeSlope should be >= 0.0." }
         require(maxValue == null || maxValue >= 0.0f) { "Max value $maxValue should be >= 0.0." }
