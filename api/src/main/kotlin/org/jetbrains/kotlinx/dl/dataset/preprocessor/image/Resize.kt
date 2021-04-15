@@ -9,6 +9,23 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 
+/**
+ * This image preprocessor defines the Resize operation.
+ *
+ * Resize operations creates new image with the following sizes:
+ *  - resizedWidth = [outputWidth]
+ *  - resizedHeight = [outputHeight]
+ *
+ * The final image quality depends on the following tunable parameters: [interpolation], [renderingSpeed], [enableAntialiasing].
+ *
+ * @property [outputWidth] The output width.
+ * @property [outputHeight] The output height.
+ * @property [interpolation] Interpolation algorithm.
+ * @property [renderingSpeed] Speed of preprocessing.
+ * @property [enableAntialiasing] The image will be cropped from the right by the given number of pixels.
+ *
+ * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
+ */
 public class Resize(
     public var outputWidth: Int = 100,
     public var outputHeight: Int = 100,

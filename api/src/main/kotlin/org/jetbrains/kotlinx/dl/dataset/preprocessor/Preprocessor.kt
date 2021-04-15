@@ -5,8 +5,18 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+/**
+ * Basic interface for the data preprocessing.
+ *
+ * It operates on [FloatArray].
+ */
 public interface Preprocessor {
-    public fun apply(data: FloatArray, shape: ImageShape): FloatArray // move to shape
+    /**
+     * Transforms [data] with [inputShape] to the new data with the same shape.
+     *
+     * @return Transformed data.
+     */
+    public fun apply(data: FloatArray, inputShape: ImageShape): FloatArray // move to shape
 }
 
 

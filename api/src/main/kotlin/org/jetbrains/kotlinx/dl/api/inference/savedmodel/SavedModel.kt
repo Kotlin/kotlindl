@@ -75,7 +75,7 @@ public open class SavedModel : InferenceModel() {
     }
 
     /**
-     * Predicts labels for all [images].
+     * Predicts labels for all observation in [dataset].
      *
      * NOTE: Slow method, executed on client side, not in TensorFlow.
      *
@@ -93,7 +93,7 @@ public open class SavedModel : InferenceModel() {
     }
 
     /**
-     * Predicts labels for all [images].
+     * Predicts labels for all observation in [dataset].
      *
      * NOTE: Slow method, executed on client side, not in TensorFlow.
      *

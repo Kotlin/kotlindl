@@ -5,25 +5,25 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
+/**
+ * Different Neural Networks were trained on ImageNet dataset with different image preprocessing.
+ * The main types of preprocessing widely used in keras.applications are presented in this enumeration.
+ */
 public enum class InputType {
     /**
-     * caffe: will convert the images from RGB to BGR,
-    then will zero-center each color channel with
-    respect to the ImageNet dataset,
-    without scaling.
+     * This preprocessing will convert the images from RGB to BGR,
+     * then will zero-center each color channel with respect to the ImageNet dataset, without scaling.
      */
     CAFFE,
 
     /**
-     * will scale pixels between -1 and 1,
-    sample-wise.
+     * This preprocessing will scale pixels between -1 and 1, sample-wise.
      */
     TF,
 
     /**
-     * will scale pixels between 0 and 1 and then
-    will normalize each channel with respect to the
-    ImageNet dataset.
+     * This preprocessing will scale pixels between 0 and 1,
+     * then will normalize each channel with respect to the ImageNet dataset.
      */
     TORCH
 }

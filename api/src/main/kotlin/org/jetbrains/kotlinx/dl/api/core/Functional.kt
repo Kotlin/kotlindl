@@ -125,7 +125,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                 val layer = outboundLayers[i]
                 if (!visited[layer]!!) {
                     recursiveTopologicalSort(layer, stack, visited)
-                    visited[layer] = true;
+                    visited[layer] = true
                 }
             }
             stack.push(node)

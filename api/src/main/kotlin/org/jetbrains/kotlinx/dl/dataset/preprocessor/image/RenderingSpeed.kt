@@ -5,7 +5,16 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+/**
+ * The speed of single file preprocessing could be tuned via this setting.
+ */
 public enum class RenderingSpeed {
-    FAST, SLOW, MEDIUM
+    /** */
+    FAST,
 
+    /** */
+    SLOW,
+
+    /** */
+    MEDIUM
 }

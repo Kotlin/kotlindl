@@ -16,6 +16,8 @@ import kotlin.random.Random
 /**
  * Basic class to handle features [x] and labels [y].
  *
+ * It loads the whole data from disk to the Heap Memory.
+ *
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  */
 public class OnHeapDataset internal constructor(private val x: Array<FloatArray>, private val y: FloatArray) :
@@ -60,7 +62,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             return ret
         }
 
-        /** Creates binary vector with size [numClasses] from [label]. */
+        /** Creates float [label]. */
         @JvmStatic
         public fun convertByteToFloat(label: Byte): Float {
             return (label.toInt() and 0xFF).toFloat()
@@ -169,7 +171,7 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
         }
 
         /**
-         * Takes data from external data [features] and [labels]
+         * Use [preprocessors] and [labels] to prepare data
          * to create dataset [OnHeapDataset].
          */
         @JvmStatic
@@ -203,8 +205,8 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
 
 
         /**
-         * Takes data from external data [features] and [labels]
-         * to create dataset [OnFlyImageDataset].
+         * Use [preprocessors] to prepare data
+         * to create dataset [OnHeapDataset].
          */
         @JvmStatic
         public fun create(

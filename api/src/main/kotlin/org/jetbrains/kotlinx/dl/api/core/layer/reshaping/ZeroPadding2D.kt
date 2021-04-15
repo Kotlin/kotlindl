@@ -49,8 +49,8 @@ public class ZeroPadding2D : Layer {
      * Constructs an instance of ZeroPadding2D layer
      * @param [padding] pair of padding values - [padding.first] represents vertical padding (applied to top and
      * bottom of image, and [padding.last] is horizontal padding (left and right sides)
-     * @param [dataFormat] one of [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST]
-     * or [org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST], depending on dataFormat of
+     * @param [dataFormat] one of [CHANNELS_FIRST]
+     * or [CHANNELS_LAST], depending on dataFormat of
      * input to this layer
      * @param [name] layer name
      */

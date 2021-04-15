@@ -10,12 +10,18 @@ import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.Companion.imageToBy
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
 import java.io.File
 
+/**
+ * The data preprocessing pipeline presented as Kotlin DSL on receivers.
+ *
+ * Could be used to handle directory of images or one image file.
+ */
 public class Preprocessing {
     // TODO: maybe it should be list of imageStages https://proandroiddev.com/writing-dsls-in-kotlin-part-2-cd9dcd0c4715 для целей расширения DSL кастомными классами
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
     public lateinit var rescalingStage: Rescaling
 
+    // TODO: use this stage correctly in the image additional training
     public lateinit var sharpeningStage: Sharpen
 
     // TODO: rewrite correctly with all stages not only loading and resize
@@ -38,6 +44,7 @@ public class Preprocessing {
             } // TODO: add test for this cases
         }
 
+    /** Preprocessing one image file via described preprocessing pipeline. */
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
         val file = imagePreprocessingStage.load.pathToData
         require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
@@ -89,18 +96,22 @@ public class Preprocessing {
     }
 }
 
+/** */
 public fun preprocessingPipeline(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
 
+/** */
 public fun Preprocessing.imagePreprocessing(block: ImagePreprocessing.() -> Unit) {
     imagePreprocessingStage = ImagePreprocessing().apply(block)
 }
 
+/** */
 public fun Preprocessing.rescale(block: Rescaling.() -> Unit) {
     rescalingStage = Rescaling().apply(block)
 }
 
+/** */
 public fun Preprocessing.sharpen(block: Sharpen.() -> Unit) {
     sharpeningStage = Sharpen().apply(block)
 }

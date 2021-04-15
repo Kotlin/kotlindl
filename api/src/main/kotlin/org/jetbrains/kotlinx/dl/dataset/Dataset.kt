@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset
 
 import kotlin.math.min
 
+/** Just abstract Dataset. */
 public abstract class Dataset {
     /** Splits datasets on two sub-datasets according [splitRatio].*/
     public abstract fun split(splitRatio: Double): Pair<Dataset, Dataset>
@@ -20,6 +21,7 @@ public abstract class Dataset {
     /** Returns label as [Int] by index [idx]. */
     public abstract fun getY(idx: Int): Float
 
+    /** Shuffles the dataset. */
     public abstract fun shuffle(): Dataset
 
     /**
@@ -41,6 +43,7 @@ public abstract class Dataset {
         }
     }
 
+    /** Creates data batch that starts from [batchStart] with length [batchLength]. */
     protected abstract fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch
 
 

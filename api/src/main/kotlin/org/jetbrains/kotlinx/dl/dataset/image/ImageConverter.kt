@@ -55,6 +55,7 @@ public class ImageConverter {
             return imageToByteArray(image, colorOrder)
         }
 
+        /** */
         public fun toBufferedImage(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): BufferedImage {
             return getImage(inputStream)
         }
@@ -81,6 +82,7 @@ public class ImageConverter {
             return res
         }
 
+        /** Converts [image] with [colorOrder] to the 3D array. */
         public fun imageTo3DFloatArray(
             image: BufferedImage,
             colorOrder: ColorOrder = ColorOrder.BGR
@@ -157,9 +159,5 @@ public enum class ColorOrder {
     RGB,
 
     /** Blue, green, red. */
-    BGR,
-
-    RGBA,
-
-    GREYSCALE
+    BGR
 }

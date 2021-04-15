@@ -11,6 +11,11 @@ import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
 
+/**
+ * Common preprocessing functions for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+ *
+ * It takes [floatArray] as input with shape [tensorShape] and calls specific preprocessing according chosen [inputType].
+ */
 public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = null, inputType: InputType): FloatArray {
     return when (inputType) {
         InputType.TF -> floatArray.map { it / 127.5f - 1 }.toFloatArray()
@@ -19,6 +24,7 @@ public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray? = nul
     }
 }
 
+/** Torch-style preprocessing. */
 public fun torchStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
     val height = tensorShape[0].toInt()
     val width = tensorShape[1].toInt()
@@ -41,6 +47,7 @@ public fun torchStylePreprocessing(input: FloatArray, tensorShape: LongArray): F
     return reshape3DTo1D(reshapedInput, height * width * channels)
 }
 
+/** Caffe-style preprocessing. */
 public fun caffeStylePreprocessing(input: FloatArray, tensorShape: LongArray): FloatArray {
     val height = tensorShape[0].toInt()
     val width = tensorShape[1].toInt()
@@ -61,6 +68,7 @@ public fun caffeStylePreprocessing(input: FloatArray, tensorShape: LongArray): F
     return reshape3DTo1D(reshapedInput, height * width * channels)
 }
 
+/** Reshapes [inputData] according [tensorShape]. */
 public fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Array<FloatArray>> {
     val height = tensorShape[0].toInt()
     val width = tensorShape[1].toInt()
@@ -82,6 +90,7 @@ public fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Ar
     return reshaped
 }
 
+/** Returns top-5 labels for the given [floatArray] encoded with mapping [imageNetClassLabels]. */
 public fun predictTop5Labels(
     it: TrainableModel,
     floatArray: FloatArray,
@@ -101,6 +110,7 @@ public fun predictTop5Labels(
     return top5
 }
 
+/** Forms mapping of class label to class name for the ImageNet dataset. */
 public fun prepareHumanReadableClassLabels(): MutableMap<Int, String> {
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 

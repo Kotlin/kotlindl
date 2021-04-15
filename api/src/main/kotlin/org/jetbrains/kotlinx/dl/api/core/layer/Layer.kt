@@ -130,6 +130,7 @@ public abstract class Layer(public var name: String) {
         return variable
     }
 
+    /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
     public operator fun invoke(vararg layers: Layer): Layer {
         inboundLayers = layers.toMutableList()
         return this

@@ -13,7 +13,26 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-public class Rotate(public var degrees: Float = 90f) : ImagePreprocessor {
+/**
+ * This image preprocessor defines the Rotate operation.
+ *
+ * It rotates the input image on [degrees].
+ *
+ * The final image quality depends on the following tunable parameters: [interpolation], [renderingSpeed], [enableAntialiasing].
+ *
+ * @property [degrees] The rotation angle.
+ * @property [interpolation] Interpolation algorithm.
+ * @property [renderingSpeed] Speed of preprocessing.
+ * @property [enableAntialiasing] The image will be cropped from the right by the given number of pixels.
+ *
+ * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
+ */
+public class Rotate(
+    public var degrees: Float = 90f,
+    public var interpolation: InterpolationType = InterpolationType.BICUBIC,
+    public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
+    public var enableAntialiasing: Boolean = true
+) : ImagePreprocessor {
     override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
         val width: Int = inputShape.width!!.toInt()
         val height: Int = inputShape.height!!.toInt()
@@ -30,7 +49,6 @@ public class Rotate(public var degrees: Float = 90f) : ImagePreprocessor {
         minY = centerByY.also { maxY = it }
 
         val theta = Math.toRadians(degrees.toDouble())
-
 
         var i = 0
         while (i < rect.size) {
@@ -56,15 +74,24 @@ public class Rotate(public var degrees: Float = 90f) : ImagePreprocessor {
 
         val g2d = rotatedImage.createGraphics()
 
-        g2d.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON
-        )
+        val renderingHint = when (interpolation) {
+            InterpolationType.BILINEAR -> RenderingHints.VALUE_INTERPOLATION_BILINEAR
+            InterpolationType.NEAREST -> RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+            InterpolationType.BICUBIC -> RenderingHints.VALUE_INTERPOLATION_BICUBIC
+        }
 
-        g2d.setRenderingHint(
-            RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_BICUBIC
-        )
+        val renderingSpeed = when (renderingSpeed) {
+            RenderingSpeed.FAST -> RenderingHints.VALUE_RENDER_SPEED
+            RenderingSpeed.SLOW -> RenderingHints.VALUE_RENDER_QUALITY
+            RenderingSpeed.MEDIUM -> RenderingHints.VALUE_RENDER_DEFAULT
+        }
+
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, renderingHint)
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, renderingSpeed)
+
+        if (enableAntialiasing) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        }
 
         //Rotate the image
         val affineTransform = AffineTransform()

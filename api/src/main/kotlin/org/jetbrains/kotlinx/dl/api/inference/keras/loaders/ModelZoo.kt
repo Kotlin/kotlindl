@@ -30,6 +30,8 @@ internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
  *
  * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
+ *
+ * @since 0.2
  */
 public class ModelZoo(public val commonModelDirectory: File, public val modelType: ModelType) {
     private val modelDirectory = "/" + modelType.modelName
@@ -47,10 +49,12 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
         }
     }
 
-    public companion object {
-
-    }
-
+    /**
+     * Loads model configuration without weights.
+     *
+     * @param [loadingMode] Strategy of existing model use-case handling.
+     * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
+     */
     public fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): GraphTrainableModel {
         val jsonConfigFile = getJSONConfigFile(loadingMode)
         return when (modelType) {
@@ -74,6 +78,7 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
         return model
     }
 
+    /** Forms mapping of class label to class name for the ImageNet dataset. */
     public fun loadClassLabels(): MutableMap<Int, String> {
         val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 
@@ -95,10 +100,21 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
 
     }
 
+    /**
+     * Loads model weights.
+     *
+     * @param [loadingMode] Strategy of existing model use-case handling.
+     * @return Compiled model with initialized weights.
+     */
     public fun loadWeights(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): HdfFile {
         return getWeightsFile(loadingMode)
     }
 
+    /**
+     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+     *
+     * It takes [floatArray] as input with shape [tensorShape] and applied the specific preprocessing according chosen [modelType].
+     */
     public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray): FloatArray {
         return when (modelType) {
             ModelType.VGG_16 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)

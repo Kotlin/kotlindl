@@ -45,6 +45,7 @@ public open class InferenceModel : AutoCloseable {
     /** Data shape for prediction. */
     protected lateinit var shape: LongArray
 
+    /** Is true when shape is initialized. */
     protected val isShapeInitialized: Boolean
         get() = ::shape.isInitialized
 
@@ -157,14 +158,15 @@ public open class InferenceModel : AutoCloseable {
     }
 
     /**
-     * Chain-like setter to set up [reshapeFunction] function.
+     * Chain-like setter to set up input shape.
      *
-     * @param reshapeFunction The approach to convert raw input data to multidimensional array of floats.
+     * @param dims The input shape.
      */
     public fun reshape(vararg dims: Long) {
         this.shape = TensorShape(1, *dims).dims()
     }
 
+    /** Forms the graph description in string format. */
     public fun graphToString(): String {
         return kGraph.toString()
     }

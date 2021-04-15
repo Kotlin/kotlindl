@@ -11,13 +11,21 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
-
+/**
+ * This image preprocessor defines the Save operation.
+ *
+ * It saves the input image to the [dirLocation].
+ *
+ * @property [dirLocation] Could be link to the file or directory.
+ * // TODO: add more docs
+ *
+ * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
+ */
 public class Save(
     public var dirLocation: File? = null,
     // TODO: add filenameStrategy: keepName, counter, withPrefix
 // TODO: add filetype: PNG or JPG
 ) : ImagePreprocessor {
-
     @Throws(IOException::class)
     internal fun imageToFile(filename: String, image: BufferedImage, shape: ImageShape): File {
         val outputFile: File = if (dirLocation!!.isDirectory) {

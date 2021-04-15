@@ -15,7 +15,19 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.toList
 
-
+/**
+ * This image preprocessor defines the Loading operation.
+ *
+ * Describes the initial phase of data and its labels loading.
+ * Could be applied to one file or whole directory.
+ *
+ * @property [pathToData] The image will be cropped from the top by the given number of pixels.
+ * @property [imageShape] The shape of input image. If height and width are different for different images, need to skip the filling of these properties of [ImageShape].
+ * @property [labelGenerator] A way to generate labels.
+ * @property [colorMode] Color mode.
+ *
+ * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
+ */
 public class Loading(
     public var pathToData: File? = null,
     public var imageShape: ImageShape? = null,
@@ -32,7 +44,8 @@ public class Loading(
         return ImageConverter.imageTo3DFloatArray(image)
     }*/
 
-    public fun prepareFileNames(): Array<File> {
+    /** Returns array of files found in the [pathToData] directory. */
+    internal fun prepareFileNames(): Array<File> {
         return Files.walk(pathToData!!.toPath())
             .filter { path: Path -> Files.isRegularFile(path) }
             .filter { path: Path -> path.toString().endsWith(".jpg") || path.toString().endsWith(".png") }

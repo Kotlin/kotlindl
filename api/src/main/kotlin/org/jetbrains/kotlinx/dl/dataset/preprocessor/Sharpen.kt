@@ -9,10 +9,14 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 
-/** Applies the final image preprocessing that is specific for each of available models trained on ImageNet. */
+/**
+ * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelType].
+ *
+ * @property [modelType] One the supported models pre-trained on ImageNet.
+ */
 public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Preprocessor {
-    override fun apply(data: FloatArray, shape: ImageShape): FloatArray {
-        val tensorShape = longArrayOf(shape.width!!, shape.height!!, shape.channels)
+    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
+        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
         return when (modelType) {
             ModelType.VGG_16 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             ModelType.VGG_19 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)

@@ -105,10 +105,6 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
     return kerasLayer
 }
 
-public class Data(
-
-)
-
 private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,

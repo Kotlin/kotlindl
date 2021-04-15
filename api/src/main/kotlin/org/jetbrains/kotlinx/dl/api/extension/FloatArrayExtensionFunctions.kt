@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.extension
 
 // TODO: add the same method but with 3d channel navigation
+/** */
 public fun FloatArray.set3D(
     rowIndex: Int,
     columnIndex: Int,
@@ -17,14 +18,17 @@ public fun FloatArray.set3D(
     this[width * rowIndex * channels + columnIndex * channels + channelIndex] = value
 }
 
+/** */
 public fun FloatArray.get3D(rowIndex: Int, columnIndex: Int, channelIndex: Int, width: Int, channels: Int): Float {
     return this[width * rowIndex * channels + columnIndex * channels + channelIndex]
 }
 
+/** */
 public fun FloatArray.set2D(rowIndex: Int, columnIndex: Int, width: Int, value: Float) {
     this[width * rowIndex + columnIndex] = value
 }
 
+/** */
 public fun FloatArray.get2D(rowIndex: Int, columnIndex: Int, width: Int): Float {
     return this[width * rowIndex + columnIndex]
 }

@@ -12,12 +12,19 @@ import java.nio.FloatBuffer
 import kotlin.math.truncate
 import kotlin.random.Random
 
+/**
+ * This dataset keeps all data on disk and generates batches on-fly according [preprocessing] pipeline.
+ *
+ * @param [preprocessing] The preprocessing pipeline.
+ * @param [labels] Also it could keep labels, if it could be preprocessed separately and passed to this parameter. If it's missed, it will try to generate labels on-fly according
+ * [org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator].
+ */
 public class OnFlyImageDataset internal constructor(
-    private var preprocessing: Preprocessing, // TODO: maybe move to builder
+    private var preprocessing: Preprocessing,
     labels: FloatArray?
 ) : Dataset() {
+    private var xFiles: Array<File>
 
-    private var xFiles: Array<File> // maybe move to constructor
     private var y: FloatArray
 
     init {
@@ -41,7 +48,6 @@ public class OnFlyImageDataset internal constructor(
         return preprocessing.handleFile(file).first
     }
 
-    // TODO: src argument could be removed as stupid
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyLabelsToBatch(src: FloatArray, start: Int, length: Int): FloatArray {
         val dataForBatch = FloatArray(length) { 0.0f }
@@ -94,7 +100,7 @@ public class OnFlyImageDataset internal constructor(
         }
 
         /**
-         * Takes data from external data [features] and [labels]
+         * Use [preprocessors] and [labels] to prepare data
          * to create dataset [OnFlyImageDataset].
          */
         @JvmStatic
@@ -110,7 +116,7 @@ public class OnFlyImageDataset internal constructor(
         }
 
         /**
-         * Takes data from external data [features] and [labels]
+         * Use [preprocessors] to prepare data
          * to create dataset [OnFlyImageDataset].
          */
         @JvmStatic

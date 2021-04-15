@@ -90,20 +90,20 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
     val firstLayer = sequentialConfig.config!!.layers!!.first()
     val inputLayerName =
         if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = sequentialConfig.config!!.layers!!.first().config!!.batch_input_shape
+    val batchInputShape = sequentialConfig.config.layers!!.first().config!!.batch_input_shape
 
     // TODO: write more universal code here
     when (batchInputShape!!.size) {
         3 -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 name = inputLayerName
             )
         }
         4 -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 batchInputShape[3]?.toLong()!!,
                 name = inputLayerName
@@ -111,7 +111,7 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
         }
         else -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 batchInputShape[3]?.toLong()!!,
                 name = inputLayerName
@@ -139,7 +139,7 @@ private fun convertToSequentialLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+        LAYER_AVERAGE_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
@@ -205,21 +205,21 @@ internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer>
     val batchInputShape =
         firstLayer.config!!.batch_input_shape
     val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
+        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config.name ?: "input" else "input"
 
     // TODO: write more universal code here
     val size = batchInputShape!!.size
     when (size) {
         3 -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 name = inputLayerName
             )
         }
         4 -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 batchInputShape[3]?.toLong()!!,
                 name = inputLayerName
@@ -227,7 +227,7 @@ internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer>
         }
         else -> {
             input = Input(
-                batchInputShape!![1]?.toLong()!!,
+                batchInputShape[1]?.toLong()!!,
                 batchInputShape[2]?.toLong()!!,
                 batchInputShape[3]?.toLong()!!,
                 name = inputLayerName
@@ -269,7 +269,7 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVGERAGE_POOLING_2D -> createAvgPooling2D(
+        LAYER_AVERAGE_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
@@ -292,7 +292,7 @@ private fun convertToLayer(
         )
         LAYER_CONCATENATE -> createConcatenateLayer(
             kerasLayer.config!!,
-            kerasLayer.config!!.name!!
+            kerasLayer.config.name!!
         )
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!

@@ -9,7 +9,20 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 
-
+/**
+ * This image preprocessor defines the Crop operation.
+ *
+ * Crop operations creates new image with the following sizes:
+ *  - croppedWidth = initialWidth - [left] - [right]
+ *  - croppedHeight = initialHeight - [top] - [bottom]
+ *
+ * @property [top] The image will be cropped from the top by the given number of pixels.
+ * @property [bottom] The image will be cropped from the bottom by the given number of pixels.
+ * @property [left] The image will be cropped from the left by the given number of pixels.
+ * @property [right] The image will be cropped from the right by the given number of pixels.
+ *
+ * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
+ */
 public class Cropping(
     public var top: Int = 1,
     public var bottom: Int = 1,
