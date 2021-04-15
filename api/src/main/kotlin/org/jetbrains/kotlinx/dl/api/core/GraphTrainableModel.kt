@@ -40,19 +40,19 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 /**
- * Sequential model groups a linear stack of layers into a TensorFlow Model.
+ * [GraphTrainableModel] model groups a linear stack of layers into a graph-based TensorFlow Model.
  * Also, it provides training and inference features on this model.
  *
- * @property [layers] the layers to describe the model design.
- * @constructor Creates a Functional model via sequence of [layers].
+ * @constructor Creates a [GraphTrainableModel] model via sequence of [layers].
  */
 public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
-    /** Logger for Sequential model. */
+    /** Logger for the model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
-    /** The bunch of layers. */
+    /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
 
+    /** First layer that is responsible for the input shape of the Neural Network. */
     public val inputLayer: Input
         get() = layers[0] as Input
 
@@ -66,29 +66,30 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     protected var layersByName: Map<String, Layer> = mapOf()
 
     /** TensorFlow operand for prediction phase. */
-    protected lateinit var yPredOp: Operand<Float>
+    private lateinit var yPredOp: Operand<Float>
 
     /** TensorFlow loss operand. */
     protected lateinit var lossOp: Operand<Float>
 
     /** TensorFlow prediction operand. */
-    protected lateinit var predictionOp: Operand<Float>
+    private lateinit var predictionOp: Operand<Float>
 
     /** TensorFlow prediction operand. */
-    protected lateinit var metricOp: Operand<Float>
+    private lateinit var metricOp: Operand<Float>
 
     /** A list of targets to be optimized. */
     protected lateinit var targets: List<Operand<Float>>
 
     /** TensorFlow operand for X data. */
-    protected lateinit var xOp: Operand<Float>
+    private lateinit var xOp: Operand<Float>
 
     /** TensorFlow operand for Y data. */
-    protected lateinit var yTrueOp: Operand<Float>
+    private lateinit var yTrueOp: Operand<Float>
 
     /** TensorFlow operand for batch size data. */
     protected lateinit var numberOfLossesOp: Operand<Float>
 
+    /** TensorFlow operand for switching between training and inference modes. */
     protected lateinit var training: Operand<Boolean>
 
     init {
@@ -110,7 +111,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         session = Session(kGraph.tfGraph)
     }
 
-    public companion object {
+    /** Helper method for preprocessing layer names and layer validation. */
+    internal companion object {
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
             var cnt = 1
             for (layer in layers) {
@@ -191,7 +193,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         compile(optimizer, loss, Metrics.convert(metric), callback)
     }
 
-    protected fun validateModelArchitecture() {
+    /** Validates architecture. */
+    private fun validateModelArchitecture() {
         require(layers.none { it is NoGradients && it.isTrainable })
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
@@ -201,12 +204,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     }"
         }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
-        //   require(layers.last().hasActivation()) { "Last layer must have an activation function." }
-//        require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
+        //  require(layers.last().hasActivation()) { "Last layer must have an activation function." }
+        //  require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
     }
 
+    /** Common method for building the initial part of the model static graph layer by layer via calling build() method on each layer in correct order. */
     protected abstract fun buildLayers()
 
+    /** Forms forward path as a part of the model static graph layer by layer via calling forward() method on each layer in correct order. */
     protected abstract fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float>
 
     override fun fit(
@@ -802,6 +807,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         file.writeBytes(kGraph.tfGraph.toGraphDef())
     }
 
+    /** Saves variables and optimizer state if [saveOptimizerState] is enabled in txt format to the [pathToModelDirectory] directory.*/
     protected fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
         val modelWeightsExtractorRunner = session.runner()
 

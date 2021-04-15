@@ -5,5 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
 
+/**
+ * This [LabelGenerator] is responsible for extracting labels from the names of folders where the images of the appropriate class are located.
+ * It keeps the [mapping] name of classes to int numbers.
+ */
 public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator {
 }

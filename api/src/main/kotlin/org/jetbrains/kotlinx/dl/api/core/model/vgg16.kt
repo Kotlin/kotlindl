@@ -16,7 +16,18 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 
-
+/**
+ * Instantiates the VGG16 model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1409.1556">
+ *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
+ * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">
+ *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
+ */
 public fun vgg16(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,

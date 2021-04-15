@@ -21,6 +21,18 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 
+/**
+ * Instantiates the ResNet50 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet50Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -42,7 +54,18 @@ public fun resnet50Light(
     )
 }
 
-/** Instantiates the ResNet101 architecture. */
+/**
+ * Instantiates the ResNet101 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet101Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -64,7 +87,18 @@ public fun resnet101Light(
     )
 }
 
-/** Instantiates the ResNet152 architecture. */
+/**
+ * Instantiates the ResNet152 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet152Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -86,7 +120,18 @@ public fun resnet152Light(
     )
 }
 
-/** Instantiates the ResNet50V2 architecture. */
+/**
+ * Instantiates the ResNet50V2 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet50v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -108,7 +153,18 @@ public fun resnet50v2Light(
     )
 }
 
-/** Instantiates the ResNet50V2 architecture. */
+/**
+ * Instantiates the ResNet101V2 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet101v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -130,7 +186,18 @@ public fun resnet101v2Light(
     )
 }
 
-/** Instantiates the ResNet152V2 architecture. */
+/**
+ * Instantiates the ResNet152V2 architecture without BatchNorm layers as a Functional model.
+ *
+ * @param [imageSize] Height = width of image.
+ * @param [numberOfClasses] Number of neurons in the last layer (usually, Dense layer).
+ * @param [lastLayerActivation] Activation for last layer (usually, Dense layer).
+ *
+ * @see <a href="https://arxiv.org/abs/1512.03385">
+ *     Deep Residual Learning for Image Recognition.</a>
+ * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
+ *    High-Performance Large-Scale Image Recognition Without Normalization</a>
+ */
 public fun resnet152v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
@@ -156,11 +223,11 @@ public fun resnet152v2Light(
 /**
  * A set of stacked residual blocks.
  *
- *  x: input tensor.
-filters: integer, filters of the bottleneck layer in a block.
-blocks: integer, blocks in the stacked blocks.
-stride1: default 2, stride of the first layer in the first block.
-name: string, stack label.
+ *  @param [pointer]: input tensor.
+ *  @param [filters]: filters of the bottleneck layer in a block.
+ *  @param [blocks]: blocks in the stacked blocks.
+ *  @param [stride1]: default 2, stride of the first layer in the first block.
+ *  @param [name]: string, stack label.
  */
 private fun stack1(
     pointer: Layer,
@@ -186,11 +253,11 @@ private fun stack1(
 /**
  * A set of stacked residual blocks.
  *
- *  x: input tensor.
-filters: integer, filters of the bottleneck layer in a block.
-blocks: integer, blocks in the stacked blocks.
-stride1: default 2, stride of the first layer in the first block.
-name: string, stack label.
+ *  @param [pointer]: input tensor.
+ *  @param [filters]: filters of the bottleneck layer in a block.
+ *  @param [blocks]: blocks in the stacked blocks.
+ *  @param [stride1]: default 2, stride of the first layer in the first block.
+ *  @param [name]: string, stack label.
  */
 private fun stack2(
     pointer: Layer,

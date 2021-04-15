@@ -14,8 +14,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 /**
- * Sequential model groups a linear stack of layers into a TensorFlow Model.
- * Also, it provides training and inference features on this model.
+ * A Functional model is defined as a directed graph of layers.
  *
  * @property [inputLayer] the input layer with initial shapes.
  * @property [layers] the layers to describe the model design.
@@ -26,8 +25,12 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          *
-         * @property [input] The input layer with initial shapes.
-         * @property [layers] The layers to describe the model design.
+         * @param [layers] The layers to describe the model design.
+         * All connections between the layers must be established and form an acyclic directed graph.
+         * Layers could be ordered in free way.
+         *
+         * NOTE: First layer should be input layer.
+         *
          * @return the [Functional] model.
          */
         @JvmStatic
@@ -40,8 +43,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         /**
          * Creates the [Functional] model.
-         * @property [layers] The layers to describe the model design.
+         *
+         * @param [layers] The layers to describe the model design.
+         * All connections between the layers must be established and form an acyclic directed graph.
+         * Layers could be ordered in free way.
+         *
          * NOTE: First layer should be input layer.
+         *
          * @return the [Functional] model.
          */
         @JvmStatic
@@ -54,8 +62,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          *
-         * @property [input] The input layer with initial shapes.
-         * @property [layers] The layers to describe the model design.
+         * @param [finalLayer] This layer specifies the output tensors that represent the outputs of this model.
+         * All connections between the layers must be established and form an acyclic directed graph.
+         *
          * @return the [Functional] model.
          */
         @JvmStatic
@@ -144,7 +153,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * Loads a [Functional] model from json file with model configuration.
          *
          * @param [configuration] File in .json format, containing the [Functional] model.
-         * @return Non-compiled and non-trained Sequential model.
+         * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
         public fun loadModelConfiguration(configuration: File): Functional {
@@ -157,7 +166,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * Loads a [Functional] model layers from json file with model configuration.
          *
          * @param [configuration] File in .json format, containing the [Functional] model.
-         * @return Pair of <input layer; list of layers>.
+         * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
         public fun loadModelLayersFromConfiguration(configuration: File): MutableList<Layer> {
@@ -171,7 +180,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
-         * @return Non-compiled and non-trained Sequential model.
+         * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
         public fun loadDefaultModelConfiguration(modelDirectory: File): Functional {
@@ -192,7 +201,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          *
          * @param [modelDirectory] Directory, containing file 'modelConfig.json'.
          * @throws [FileNotFoundException] If 'modelConfig.json' file is not found.
-         * @return Pair of <input layer; list of layers>.
+         * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
         public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): MutableList<Layer> {

@@ -15,8 +15,7 @@ public class Cropping(
     public var bottom: Int = 1,
     public var left: Int = 1,
     public var right: Int = 1
-) :
-    ImagePreprocessor {
+) : ImagePreprocessor {
     override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
         val croppedImageShape =
             ImageShape(

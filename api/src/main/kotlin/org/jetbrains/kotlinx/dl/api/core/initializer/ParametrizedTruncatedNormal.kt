@@ -10,7 +10,14 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.random.ParameterizedTruncatedNormal
 
 /**
+ * Initializer that generates a parametrized truncated normal distribution.
  *
+ * @property [mean] Mean of the random values to generate.
+ * @property [stdev] Standard deviation of the random values to generate.
+ * @property [p1] The minimum cutoff. May be -infinity.
+ * @property [p2] The maximum cutoff. May be +infinity, and must be more than the minval
+ * @property [seed] Used to create random seeds.
+ * @constructor Creates a [ParametrizedTruncatedNormal] initializer.
  */
 public class ParametrizedTruncatedNormal(
     private val mean: Float = 0.0f,
