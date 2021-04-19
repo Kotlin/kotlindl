@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm2
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -29,6 +29,7 @@ private const val TEST_BATCH_SIZE = 100
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
+
 /**
  * This is an CNN based on an implementation of LeNet-5 from classic paper.
  *
@@ -45,12 +46,17 @@ private val model = Sequential.of(
         filters = 32,
         kernelSize = longArrayOf(3, 3),
         strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
+        activation = Activations.Linear,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME,
         name = "1"
     ),
+    BatchNorm2(
+        name = "7",
+        axis = arrayListOf(3)
+    ),
+    ActivationLayer(activation = Activations.Relu, name = "activation_7"),
     MaxPool2D(
         poolSize = intArrayOf(1, 2, 2, 1),
         strides = intArrayOf(1, 2, 2, 1),
@@ -81,10 +87,7 @@ private val model = Sequential.of(
         biasInitializer = Constant(0.1f),
         name = "6"
     ),
-    BatchNorm(
-        name = "7",
-        axis = arrayListOf(1)
-    ),
+
     ActivationLayer(
         activation = Activations.Relu,
         name = "8"

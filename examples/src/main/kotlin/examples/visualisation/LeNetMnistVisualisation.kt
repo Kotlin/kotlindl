@@ -6,8 +6,6 @@
 package examples.visualisation
 
 import examples.inference.lenet5
-import examples.inference.production.drawActivations
-import examples.inference.production.drawFilters
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -44,11 +42,11 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val weights = it.layers[0].weights // first conv2d layer
+        val weights = it.layers[1].weights // first conv2d layer
 
         drawFilters(weights.values.toTypedArray()[0], colorCoefficient = 10.0)
 
-        val weights2 = it.layers[2].weights // first conv2d layer
+        val weights2 = it.layers[3].weights // first conv2d layer
 
         drawFilters(weights2.values.toTypedArray()[0], colorCoefficient = 10.0)
 

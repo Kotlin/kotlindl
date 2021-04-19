@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.inference.production
+package examples.visualisation
 
 import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -55,11 +55,11 @@ fun main() {
 
         val imageId = 0
 
-        val weights = it.layers[0].weights // first conv2d layer
+        val weights = it.layers[1].weights // first conv2d layer
 
         drawFilters(weights.values.toTypedArray()[0], colorCoefficient = 10.0)
 
-        val weights2 = it.layers[2].weights // first conv2d layer
+        val weights2 = it.layers[3].weights // first conv2d layer
 
         drawFilters(weights2.values.toTypedArray()[0], colorCoefficient = 12.0)
 
@@ -75,6 +75,6 @@ fun main() {
 
         val trainImageLabel = train.getY(imageId)
 
-        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel]}")
+        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel.toInt()]}")
     }
 }
