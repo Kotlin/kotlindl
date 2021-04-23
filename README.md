@@ -11,7 +11,7 @@ for inference, and leveraging transfer learning for tweaking existing pre-traine
 This project aims to make Deep Learning easier for JVM developers, and to simplify deploying deep learning models
  in JVM production environments. 
  
- Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
+Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
 ```kotlin
 private const val EPOCHS = 3
@@ -76,30 +76,23 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
-fun main() {
-    val (train, test) = Dataset.createTrainAndTestDatasets(
-        TRAIN_IMAGES_ARCHIVE,
-        TRAIN_LABELS_ARCHIVE,
-        TEST_IMAGES_ARCHIVE,
-        TEST_LABELS_ARCHIVE,
-        NUMBER_OF_CLASSES,
-        ::extractImages,
-        ::extractLabels
-    )
 
+fun main() {
+    val (train, test) = mnist()
+    
     lenet5Classic.use {
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-
+    
         it.summary()
-
+    
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
-
+    
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
+    
         println("Accuracy: $accuracy")
     }
 }
@@ -119,11 +112,10 @@ fun main() {
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-
 ## TensorFlow Engine
 KotlinDL is built on top of TensorFlow 1.15 Java API. The Java API for TensorFlow 2.+ has recently had first public
- release, and this project will be switching to it in the nearest future. This, however, does not affect the high-level 
- API. 
+release, and this project will be switching to it in the nearest future. This, however, does not affect the high-level 
+API. 
 
 ## Limitations
 Currently, only a limited set of deep learning architectures is supported. Here's the list of available layers: 
@@ -134,6 +126,15 @@ Currently, only a limited set of deep learning architectures is supported. Here'
 - Conv2D()
 - MaxPool2D()
 - AvgPool2D()   
+- BatchNorm
+- ActivationLayer
+- DepthwiseConv2D
+- SeparableConv2D
+- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
+- GlobalAvgPool2D
+- Cropping2D
+- Reshape
+- ZeroPadding2D 
 
 KotlinDL supports model inference in JVM backend applications, Android support is coming in later releases.  
 
@@ -141,7 +142,6 @@ KotlinDL supports model inference in JVM backend applications, Android support i
 To use KotlinDL in your project, you need to add the following dependency to your `build.gradle` file:
 ```kotlin
    repositories {
-      jcenter()
       mavenCentral()
    }
    
@@ -149,7 +149,9 @@ To use KotlinDL in your project, you need to add the following dependency to you
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.1.1. 
+The latest KotlinDL version is 0.2.0-alpha-1. 
+The latest stable KotlinDL version is 0.1.1. 
+
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
 ## Working with KotlinDL in Jupyter Notebook
@@ -271,7 +273,7 @@ task fatJar(type: Jar) {
 ## Reporting issues/Support
 
 Please use [GitHub issues](https://github.com/JetBrains/KotlinDL/issues) for filing feature requests and bug reports. 
-You are also welcome to join [#deeplearning channel](https://kotlinlang.slack.com/archives/C01DZU7PW73) in the Kotlin Slack.
+You are also welcome to join [#kotlindl channel](https://kotlinlang.slack.com/archives/C01DZU7PW73) in the Kotlin Slack.
 
 ## Code of Conduct
 This project and the corresponding community is governed by the [JetBrains Open Source and Community Code of Conduct](https://confluence.jetbrains.com/display/ALL/JetBrains+Open+Source+and+Community+Code+of+Conduct). Please make sure you read it. 
