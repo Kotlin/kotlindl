@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm2
+import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -52,7 +52,7 @@ private val model = Sequential.of(
         padding = ConvPadding.SAME,
         name = "1"
     ),
-    BatchNorm2(
+    BatchNorm(
         name = "7",
         axis = arrayListOf(3)
     ),

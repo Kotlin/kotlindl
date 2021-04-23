@@ -12,4 +12,9 @@ class VGG19TestSuite {
     fun vgg19predictionTest() {
         vgg19prediction()
     }
+
+    @Test
+    fun vgg19additionalTrainingTest() {
+        vgg19additionalTrainingTest()
+    }
 }

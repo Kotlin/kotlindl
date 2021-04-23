@@ -5,17 +5,7 @@ already of the same size, and grayscale only.
 With built-in functionality we can convert the [Fashion MNIST image archives](https://github.com/zalandoresearch/fashion-mnist#get-the-data) into a Dataset object that we can use for model training.    
 
 ```kotlin
-val (train, test) = Dataset.createTrainAndTestDatasets(
-    trainFeaturesPath = "datasets/mnist/train-images-idx3-ubyte.gz",
-    trainLabelsPath = "datasets/mnist/train-labels-idx1-ubyte.gz",
-    testFeaturesPath = "datasets/mnist/t10k-images-idx3-ubyte.gz",
-    testLabelsPath = "datasets/mnist/t10k-labels-idx1-ubyte.gz",
-    numClasses = 10,
-    ::extractImages,
-    ::extractLabels
-)
-
-val (newTrain, validation) = train.split(splitRatio = 0.95)
+val (train, test) = fashionMnist()
 ```
 
 You may also notice that we are splitting the data into three sets. First, we have the train and the test sets. We won't be touching 
@@ -37,17 +27,16 @@ model.use {
 
     // You can think of the training process as "fitting" the model to describe the given data :)
     it.fit(
-        dataset = newTrain,
+        dataset = train,
         epochs = 10,
         batchSize = 100
     )
 
-    val accuracy = it.evaluate(dataset = validation, batchSize = 100).metrics[Metrics.ACCURACY]
+    val accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
     println("Accuracy: $accuracy")
     it.save(File("src/model/my_model"))
 }
-
 ```
 
 Here are some important parameters that we need to pass to the `fit` method:
@@ -58,14 +47,14 @@ Once the model has been trained, it's important to evaluate its performance on t
 check how it generalizes to the new data. 
 
 ```kotlin
-val accuracy = it.evaluate(dataset = validation,
+val accuracy = it.evaluate(dataset = test,
     batchSize = 100).metrics[Metrics.ACCURACY]
 
 println("Accuracy: $accuracy")
 ```
 
 ```
-Accuracy: 0.9806665182113647
+Accuracy: 0.8821001648902893
 ```
 
 ---
@@ -78,7 +67,7 @@ The results are nondeterministic, and you may have a slightly different Accuracy
 Once we are happy with the model's evaluation metric, we can save the model for future use in the production environment.  
 
 ```kotlin
-it.save(File("src/model/my_model"))
+it.save(File("model/my_model"), writingMode = WritingMode.OVERRIDE)
 ```
 
 And just like that we have trained, evaluated, and saved a deep learning model that we can now use to generate

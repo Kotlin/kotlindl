@@ -13,21 +13,15 @@ To load the model simply use the path to it, tell it how incoming images should 
 and call the `predict` method on them.
 
 ```kotlin
-fun reshapeInput(inputData: FloatArray): Array<Array<FloatArray>> {
-    val reshaped = Array(
-        1
-    ) { Array(28) { FloatArray(28) } }
-    for (i in inputData.indices) reshaped[0][i / 28][i % 28] = inputData[i]
-    return reshaped
-}
-
 fun main() {
-    InferenceModel.load(File(PATH_TO_MODEL)).use {
-        it.reshape(::reshapeInput)
-        val prediction = it.predict(test.getX(0))
-        val actualLabel = test.getLabel(0)
+    val (train, test) = fashionMnist()
 
-        println("Predicted label is: $prediction. This corresponds to class ${stringLabels[prediction]}.")
+    InferenceModel.load(File(PATH_TO_MODEL)).use {
+        it.reshape(28, 28, 1)
+        val prediction = it.predict(test.getX(0))
+        val actualLabel = test.getY(0)
+        
+        println("Predicted label is: $prediction. This corresponds to class ${labelsMap[prediction]}.")
         println("Actual label is: $actualLabel.")
     }
 }

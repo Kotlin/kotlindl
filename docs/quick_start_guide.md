@@ -10,40 +10,28 @@ in [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.
     * If you're using Gradle as build system, add the following to the `build.gradle` file:
     ```kotlin
    repositories {
-       jcenter()
-       maven {
-           url  "https://kotlin.bintray.com/kotlin-datascience"
-       }
+       mavenCentral()
    }
    
    dependencies {
-       implementation 'org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
     ```  
    * For `build.gradle.kts`: 
    ```kotlin
    repositories {
-       jcenter()
-       maven(url = "https://kotlin.bintray.com/kotlin-datascience")
+       mavenCentral()
    }
        
    dependencies {
-       implementation ("org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]")
+       implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
    }
    ```   
    * If your project is built with Maven, add Kotlin DL to your `pom.xml`: 
    ```xml
-   <repositories>
-       <repository>
-           <id>jcenter</id>
-           <name>jcenter</name>
-           <url>https://kotlin.bintray.com/kotlin-datascience</url>
-       </repository>
-   </repositories>
-   
    <dependency>
-     <groupId>org.jetbrains.kotlin-deeplearning</groupId>
-     <artifactId>api</artifactId>
+     <groupId>org.jetbrains.kotlinx</groupId>
+     <artifactId>kotlin-deeplearning-api</artifactId>
      <version>[KOTLIN-DL-VERSION]</version>
      <type>pom</type>
    </dependency>

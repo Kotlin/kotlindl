@@ -1,11 +1,11 @@
-If you have a model that has been trained in Python with [Keras](https://keras.io), and you need to embed it in a 
+If you have a model has been trained in Python with [Keras](https://keras.io), and you need to embed it in a 
 JVM application, KotlinDL can help you with that.
 
 In this tutorial you'll learn how you should save your Keras model so that it's compatible with KotlinDL, what 
 architectures are currently supported, and how to load and run inference with such model from your JVM project. 
   
 ### Supported architectures
-KotlinDL 0.1 preview supports limited number of deep learning architectures. As the project evolved, we will be expanding 
+KotlinDL 0.2 supports a limited number of deep learning architectures. As the project evolved, we will be expanding 
 the list of supported architectures.
 
 Currently, the following layers are supported: 
@@ -16,6 +16,15 @@ Currently, the following layers are supported:
 - Conv2D()
 - MaxPool2D()
 - AvgPool2D()   
+- BatchNorm
+- ActivationLayer
+- DepthwiseConv2D
+- SeparableConv2D
+- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
+- GlobalAvgPool2D
+- Cropping2D
+- Reshape
+- ZeroPadding2D
 
 ### Saving a trained Keras model 
 For the purposes of this tutorial, we'll train a simple convolutional neural network that can classify 
@@ -114,16 +123,15 @@ val labelsMap = mapOf(
 val imageArray = ImageConverter.toNormalizedFloatArray(File(PATH_TO_IMAGE))
 
 fun main() {
-    val JSONConfig = File(PATH_TO_MODEL_JSON)
+    val modelConfig = File(PATH_TO_MODEL_JSON)
     val weights = File(PATH_TO_WEIGHTS)
 
-    val model = Sequential.loadModelConfiguration(JSONConfig)
+    val model = Sequential.loadModelConfiguration(modelConfig)
 
     model.use {
         it.compile(Adam(), Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY)
 
-        val hdfFile = HdfFile(weights)
-        it.loadWeights(hdfFile)
+        it.loadWeights(HdfFile(weights))
 
         val prediction = it.predict(imageArray)
         println("Predicted label is: $prediction. This corresponds to class ${labelsMap[prediction]}.")
