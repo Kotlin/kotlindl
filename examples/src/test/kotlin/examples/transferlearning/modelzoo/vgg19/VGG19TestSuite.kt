@@ -15,6 +15,6 @@ class VGG19TestSuite {
 
     @Test
     fun vgg19additionalTrainingTest() {
-        vgg19additionalTrainingTest()
+        vgg19additionalTraining()
     }
 }
