@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -533,7 +534,7 @@ private fun convertMode(mode: String): Mode {
     }
 }
 
-private fun convertToActivation(activation: String): Activations {
+private fun convertToActivation(activation: String): Activation {
     return when (activation) {
         ACTIVATION_RELU -> Activations.Relu
         ACTIVATION_SIGMOID -> Activations.Sigmoid

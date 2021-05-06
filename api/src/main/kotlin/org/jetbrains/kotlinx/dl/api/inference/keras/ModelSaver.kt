@@ -9,6 +9,7 @@ import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -255,7 +256,7 @@ private fun convertPadding(padding: ConvPadding): KerasPadding {
     }
 }
 
-private fun convertToKerasActivation(activation: Activations): String? {
+private fun convertToKerasActivation(activation: Activation): String? {
     return when (activation) {
         Activations.Relu -> ACTIVATION_RELU
         Activations.Sigmoid -> ACTIVATION_SIGMOID
@@ -271,6 +272,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.SoftSign -> ACTIVATION_SOFTSIGN
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
+        else -> null
     }
 }
 
