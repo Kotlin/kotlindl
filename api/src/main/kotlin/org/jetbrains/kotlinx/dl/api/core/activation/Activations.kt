@@ -17,6 +17,7 @@ public object Activations {
      *
      * NOTE: Doing nothing useful. Returns to ancient times of linear perceptron.
      */
+    @JvmField
     public val Linear: Activation = activationLayer { _, features -> features }
 
     /**
@@ -34,6 +35,7 @@ public object Activations {
      * assumed to be zero. The sigmoid function always returns a value between 0 and 1.
      *
      */
+    @JvmField
     public val Sigmoid: Activation = activationLayer { tf, features -> tf.math.sigmoid(features) }
 
     /**
@@ -44,6 +46,7 @@ public object Activations {
      * tanh(x) = sinh(x)/cosh(x) = ((exp(x) - exp(-x))/(exp(x) + exp(-x)))
      * ```
      */
+    @JvmField
     public val Tanh: Activation = activationLayer { tf, features -> tf.math.tanh(features) }
 
     /**
@@ -52,6 +55,7 @@ public object Activations {
      * With default values, this returns the standard ReLU activation:
      * `max(x, 0)`, the element-wise maximum of 0 and the input tensor.
      */
+    @JvmField
     public val Relu: Activation = activationLayer { tf, features -> tf.nn.relu(features) }
 
     /**
@@ -63,6 +67,7 @@ public object Activations {
      * @see <a href="http://www.cs.utoronto.ca/~kriz/conv-cifar10-aug2010.pdf">
      *     Convolutional Deep Belief Networks on CIFAR-10. A. Krizhevsky</a>
      */
+    @JvmField
     public val Relu6: Activation = activationLayer { tf, features -> tf.nn.relu6(features) }
 
     /**
@@ -89,6 +94,7 @@ public object Activations {
      * @see <a href="https://arxiv.org/abs/1511.07289">Fast and Accurate Deep Network Learning by Exponential Linear Units
      * (ELUs) (Clevert et al, 2016)</a>
      */
+    @JvmField
     public val Elu: Activation = activationLayer { tf, features -> tf.nn.elu(features) }
 
     /**
@@ -114,6 +120,7 @@ public object Activations {
      *
      * @see <a href="https://arxiv.org/abs/1706.02515">Klambauer et al., 2017</a>
      */
+    @JvmField
     public val Selu: Activation = activationLayer { tf, features -> tf.nn.selu(features) }
 
     /**
@@ -130,11 +137,13 @@ public object Activations {
      * softmax[i, j] = exp(logits[i, j]) / sum_j(exp(logits[i, j]))
      * ```
      */
+    @JvmField
     public val Softmax: Activation = activationLayer { tf, features -> tf.nn.softmax(features) }
 
     /**
      *
      */
+    @JvmField
     public val LogSoftmax: Activation = activationLayer { tf, features -> tf.nn.logSoftmax(features) }
 
     /**
@@ -145,6 +154,7 @@ public object Activations {
      * exp(x)
      * ```
      */
+    @JvmField
     public val Exponential: Activation = activationLayer { tf, features -> tf.math.exp(features) }
 
     /**
@@ -155,6 +165,7 @@ public object Activations {
      * softplus(x) = log(exp(x) + 1)
      * ```
      */
+    @JvmField
     public val SoftPlus: Activation = activationLayer { tf, features ->
         tf.math.log(tf.math.add(tf.math.exp(features), tf.constant(1.0f)))
     }
@@ -167,6 +178,7 @@ public object Activations {
      * softsign(x) = x / (abs(x) + 1)
      * ```
      */
+    @JvmField
     public val SoftSign: Activation = activationLayer { tf, features -> tf.nn.softsign(features) }
 
     /**
@@ -180,6 +192,7 @@ public object Activations {
      * ```
      * A faster approximation of the sigmoid activation.
      */
+    @JvmField
     public val HardSigmoid: Activation = activationLayer { tf, features ->
         val point2: Operand<Float> = tf.constant(0.2f)
         val point5: Operand<Float> = tf.constant(0.5f)
@@ -201,6 +214,7 @@ public object Activations {
      *
      * @see <a href="https://arxiv.org/abs/1710.05941">Ramachandran et al., 2017</a>
      */
+    @JvmField
     public val Swish: Activation = activationLayer { tf, features -> tf.math.mul(features, tf.math.sigmoid(features)) }
 
     private inline fun activationLayer(crossinline operation: (Ops, Operand<Float>) -> Operand<Float>) =
