@@ -11,15 +11,13 @@ import org.tensorflow.op.Ops
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
  */
-public enum class Activations {
+public object Activations {
     /**
      * Linear unit. Returns unmodified input.
      *
      * NOTE: Doing nothing useful. Returns to ancient times of linear perceptron.
-     *
-     * Calls [LinearActivation] under the hood.
      */
-    Linear,
+    public val Linear: Activation = activationLayer { _, features -> features }
 
     /**
      * Sigmoid activation function.
@@ -35,10 +33,8 @@ public enum class Activations {
      * NOTE: Sigmoid is equivalent to a 2-element Softmax, where the second element is
      * assumed to be zero. The sigmoid function always returns a value between 0 and 1.
      *
-     * Calls [SigmoidActivation] under the hood.
-     *
      */
-    Sigmoid,
+    public val Sigmoid: Activation = activationLayer { tf, features -> tf.math.sigmoid(features) }
 
     /**
      * Hyperbolic tangent activation function.
@@ -47,32 +43,27 @@ public enum class Activations {
      * ```
      * tanh(x) = sinh(x)/cosh(x) = ((exp(x) - exp(-x))/(exp(x) + exp(-x)))
      * ```
-     *
-     * Calls [TanhActivation] under the hood.
      */
-    Tanh,
+    public val Tanh: Activation = activationLayer { tf, features -> tf.math.tanh(features) }
 
     /**
      * Rectified linear unit (ReLU).
      *
      * With default values, this returns the standard ReLU activation:
      * `max(x, 0)`, the element-wise maximum of 0 and the input tensor.
-     *
-     * Calls [ReluActivation] under the hood.
      */
-    Relu,
+    public val Relu: Activation = activationLayer { tf, features -> tf.nn.relu(features) }
 
     /**
      * Computes Rectified Linear 6:
      * ```
      * min(max(features, 0), 6)
      * ```
-     * Calls [Relu6Activation] under the hood.
      *
      * @see <a href="http://www.cs.utoronto.ca/~kriz/conv-cifar10-aug2010.pdf">
      *     Convolutional Deep Belief Networks on CIFAR-10. A. Krizhevsky</a>
      */
-    Relu6,
+    public val Relu6: Activation = activationLayer { tf, features -> tf.nn.relu6(features) }
 
     /**
      * Exponential Linear Unit.
@@ -95,12 +86,10 @@ public enum class Activations {
      * Saturation means a small derivative which decreases the variation
      * and the information that is propagated to the next layer.
      *
-     * Calls [EluActivation] under the hood.
-     *
      * @see <a href="https://arxiv.org/abs/1511.07289">Fast and Accurate Deep Network Learning by Exponential Linear Units
      * (ELUs) (Clevert et al, 2016)</a>
      */
-    Elu,
+    public val Elu: Activation = activationLayer { tf, features -> tf.nn.elu(features) }
 
     /**
      * Scaled Exponential Linear Unit (SELU).
@@ -123,11 +112,9 @@ public enum class Activations {
      * and the number of input units is "large enough"
      * (see reference paper for more information).
      *
-     * Calls [SeluActivation] under the hood.
-     *
      * @see <a href="https://arxiv.org/abs/1706.02515">Klambauer et al., 2017</a>
      */
-    Selu,
+    public val Selu: Activation = activationLayer { tf, features -> tf.nn.selu(features) }
 
     /**
      * Softmax converts a real vector to a vector of categorical probabilities.
@@ -137,14 +124,18 @@ public enum class Activations {
      * layer of a classification network because the result could be interpreted as
      * a probability distribution.
      *
-     * Calls [SoftmaxActivation] under the hood.
+     * For each batch `i` and class `j` we have
+     *
+     * ```
+     * softmax[i, j] = exp(logits[i, j]) / sum_j(exp(logits[i, j]))
+     * ```
      */
-    Softmax,
+    public val Softmax: Activation = activationLayer { tf, features -> tf.nn.softmax(features) }
 
     /**
      *
      */
-    LogSoftmax,
+    public val LogSoftmax: Activation = activationLayer { tf, features -> tf.nn.logSoftmax(features) }
 
     /**
      * Exponential activation function.
@@ -153,10 +144,8 @@ public enum class Activations {
      * ```
      * exp(x)
      * ```
-     *
-     * Calls [ExponentialActivation] under the hood.
      */
-    Exponential,
+    public val Exponential: Activation = activationLayer { tf, features -> tf.math.exp(features) }
 
     /**
      * Softplus activation function.
@@ -165,10 +154,10 @@ public enum class Activations {
      * ```
      * softplus(x) = log(exp(x) + 1)
      * ```
-     *
-     * Calls [SoftPlusActivation] under the hood.
      */
-    SoftPlus,
+    public val SoftPlus: Activation = activationLayer { tf, features ->
+        tf.math.log(tf.math.add(tf.math.exp(features), tf.constant(1.0f)))
+    }
 
     /***
      * Softsign activation function.
@@ -177,10 +166,8 @@ public enum class Activations {
      * ```
      * softsign(x) = x / (abs(x) + 1)
      * ```
-     *
-     * Calls [SoftSignActivation] under the hood.
      */
-    SoftSign,
+    public val SoftSign: Activation = activationLayer { tf, features -> tf.nn.softsign(features) }
 
     /**
      * Hard sigmoid activation function.
@@ -192,10 +179,13 @@ public enum class Activations {
      * if -2.5 <= x <= 2.5: return 0.2 * x + 0.5
      * ```
      * A faster approximation of the sigmoid activation.
-     *
-     * Calls [HardSigmoidActivation] under the hood.
      */
-    HardSigmoid,
+    public val HardSigmoid: Activation = activationLayer { tf, features ->
+        val point2: Operand<Float> = tf.constant(0.2f)
+        val point5: Operand<Float> = tf.constant(0.5f)
+
+        tf.math.add(tf.math.mul(features, point2), point5)
+    }
 
     /**
      * Swish activation function.
@@ -209,151 +199,12 @@ public enum class Activations {
      * or outperforms ReLU on deep networks, it is unbounded above and
      * bounded below.
      *
-     * Calls [SwishActivation] under the hood.
-     *
      * @see <a href="https://arxiv.org/abs/1710.05941">Ramachandran et al., 2017</a>
      */
-    Swish;
+    public val Swish: Activation = activationLayer { tf, features -> tf.math.mul(features, tf.math.sigmoid(features)) }
 
-    public companion object {
-        /**
-         * Converts [activationType] to the appropriate [Activation] sub-class.
-         */
-        public fun convert(activationType: Activations): Activation {
-            return when (activationType) {
-                Sigmoid -> SigmoidActivation()
-                Linear -> LinearActivation()
-                Tanh -> TanhActivation()
-                Relu -> ReluActivation()
-                Relu6 -> Relu6Activation()
-                Elu -> EluActivation()
-                Selu -> SeluActivation()
-                Softmax -> SoftmaxActivation()
-                LogSoftmax -> LogSoftmaxActivation()
-                Exponential -> ExponentialActivation()
-                SoftPlus -> SoftPlusActivation()
-                SoftSign -> SoftSignActivation()
-                HardSigmoid -> HardSigmoidActivation()
-                Swish -> SwishActivation()
-            }
+    private inline fun activationLayer(crossinline operation: (Ops, Operand<Float>) -> Operand<Float>) =
+        object : Activation {
+            override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = operation(tf, features)
         }
-    }
-}
-
-/**
- * @see [Activations.Linear]
- */
-public class LinearActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
-        return features
-    }
-}
-
-/**
- * @see [Activations.Sigmoid]
- */
-public class SigmoidActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sigmoid(features)
-}
-
-/**
- * @see [Activations.Relu]
- */
-public class ReluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu(features)
-}
-
-/**
- * @see [Activations.Relu6]
- */
-public class Relu6Activation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu6(features)
-}
-
-/**
- * @see [Activations.Tanh]
- */
-public class TanhActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
-}
-
-/**
- * @see [Activations.Elu]
- */
-public class EluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.elu(features)
-}
-
-/**
- * @see [Activations.Selu]
- */
-public class SeluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.selu(features)
-}
-
-/**
- * Internal class, wrapping TensorFlow operand
- * ```
- * tf.nn.softmax
- * ```
- *
- * For each batch `i` and class `j` we have
- *
- * ```
- * softmax[i, j] = exp(logits[i, j]) / sum_j(exp(logits[i, j]))
- * ```
- *
- * @see [Activations.Softmax] for explanation.
- */
-public class SoftmaxActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softmax(features)
-}
-
-/**
- * @see [Activations.LogSoftmax]
- */
-public class LogSoftmaxActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.logSoftmax(features)
-}
-
-/**
- * @see [Activations.Exponential]
- */
-public class ExponentialActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.exp(features)
-}
-
-/**
- * @see [Activations.SoftPlus]
- */
-public class SoftPlusActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
-        tf.math.log(tf.math.add(tf.math.exp(features), tf.constant(1.0f)))
-}
-
-/**
- * @see [Activations.SoftSign]
- */
-public class SoftSignActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softsign(features)
-}
-
-/**
- * @see [Activations.HardSigmoid]
- */
-public class HardSigmoidActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
-        val point2: Operand<Float> = tf.constant(0.2f)
-        val point5: Operand<Float> = tf.constant(0.5f)
-
-        return tf.math.add(tf.math.mul(features, point2), point5)
-    }
-}
-
-/**
- * @see [Activations.Swish]
- */
-public class SwishActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
-        tf.math.mul(features, tf.math.sigmoid(features))
 }

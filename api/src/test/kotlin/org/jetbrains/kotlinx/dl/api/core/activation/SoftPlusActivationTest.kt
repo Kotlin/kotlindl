@@ -17,6 +17,6 @@ internal class SoftPlusActivationTest : ActivationTest() {
             10.000046f
         )
 
-        assertActivationFunction(SoftPlusActivation(), input, actual, expected)
+        assertActivationFunction(Activations.SoftPlus, input, actual, expected)
     }
 }

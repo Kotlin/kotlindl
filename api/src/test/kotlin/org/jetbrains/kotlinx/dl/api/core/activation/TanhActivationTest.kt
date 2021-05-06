@@ -17,6 +17,6 @@ internal class TanhActivationTest : ActivationTest() {
             1.0f, 1.0f
         )
 
-        assertActivationFunction(TanhActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Tanh, input, actual, expected)
     }
 }

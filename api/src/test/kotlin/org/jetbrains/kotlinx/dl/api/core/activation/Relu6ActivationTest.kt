@@ -17,6 +17,6 @@ internal class Relu6ActivationTest : ActivationTest() {
             6.0f, 6.0f
         )
 
-        assertActivationFunction(Relu6Activation(), input, actual, expected)
+        assertActivationFunction(Activations.Relu6, input, actual, expected)
     }
 }

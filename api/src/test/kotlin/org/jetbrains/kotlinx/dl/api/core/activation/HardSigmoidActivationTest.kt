@@ -17,6 +17,6 @@ internal class HardSigmoidActivationTest : ActivationTest() {
             2.5f, 20.5f
         )
 
-        assertActivationFunction(HardSigmoidActivation(), input, actual, expected)
+        assertActivationFunction(Activations.HardSigmoid, input, actual, expected)
     }
 }

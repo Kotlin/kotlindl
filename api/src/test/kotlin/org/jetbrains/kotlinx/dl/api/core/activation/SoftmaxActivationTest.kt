@@ -17,6 +17,6 @@ internal class SoftmaxActivationTest : ActivationTest() {
             0.08557693f, 0.2326222f, 0.63233274f
         )
 
-        assertActivationFunction(SoftmaxActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Softmax, input, actual, expected)
     }
 }

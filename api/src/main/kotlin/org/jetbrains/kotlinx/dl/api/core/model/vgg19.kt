@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.model
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
@@ -31,7 +32,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 public fun vgg19(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear
+    lastLayerActivation: Activation = Activations.Linear
 ): Sequential {
     return Sequential.of(
         Input(

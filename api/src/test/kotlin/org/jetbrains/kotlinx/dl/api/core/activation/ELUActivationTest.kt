@@ -17,6 +17,6 @@ internal class ELUActivationTest : ActivationTest() {
             10f, 100f
         )
 
-        assertActivationFunction(EluActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Elu, input, actual, expected)
     }
 }

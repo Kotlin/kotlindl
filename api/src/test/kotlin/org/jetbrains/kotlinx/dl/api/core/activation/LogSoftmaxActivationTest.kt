@@ -17,6 +17,6 @@ internal class LogSoftmaxActivationTest : ActivationTest() {
             -90.0f, 0.0f
         )
 
-        assertActivationFunction(LogSoftmaxActivation(), input, actual, expected)
+        assertActivationFunction(Activations.LogSoftmax, input, actual, expected)
     }
 }

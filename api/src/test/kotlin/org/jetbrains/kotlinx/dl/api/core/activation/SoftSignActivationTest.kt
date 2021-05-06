@@ -17,6 +17,6 @@ internal class SoftSignActivationTest : ActivationTest() {
             0.90909094f, 0.990099f
         )
 
-        assertActivationFunction(SoftSignActivation(), input, actual, expected)
+        assertActivationFunction(Activations.SoftSign, input, actual, expected)
     }
 }

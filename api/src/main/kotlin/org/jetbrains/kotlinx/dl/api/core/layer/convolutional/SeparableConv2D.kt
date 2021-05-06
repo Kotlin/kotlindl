@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
@@ -63,7 +64,7 @@ public class SeparableConv2D(
     public val kernelSize: LongArray = longArrayOf(3, 3),
     public val strides: LongArray = longArrayOf(1, 1, 1, 1),
     public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
-    public val activation: Activations = Activations.Relu,
+    public val activation: Activation = Activations.Relu,
     public val depthMultiplier: Int = 1,
     public val depthwiseInitializer: Initializer = HeNormal(),
     public val pointwiseInitializer: Initializer = HeNormal(),
@@ -188,7 +189,7 @@ public class SeparableConv2D(
             output = tf.nn.biasAdd(output, bias)
         }
 
-        return Activations.convert(activation).apply(tf, output, name)
+        return activation.apply(tf, output, name)
     }
 
     override val weights: Map<String, Array<*>> get() = extractDepthConv2DWeights()

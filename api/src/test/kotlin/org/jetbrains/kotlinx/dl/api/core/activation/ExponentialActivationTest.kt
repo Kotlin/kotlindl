@@ -17,6 +17,6 @@ internal class ExponentialActivationTest : ActivationTest() {
             22026.467f
         )
 
-        assertActivationFunction(ExponentialActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Exponential, input, actual, expected)
     }
 }

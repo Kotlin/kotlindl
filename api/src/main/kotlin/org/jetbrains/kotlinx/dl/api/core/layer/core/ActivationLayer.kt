@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
@@ -23,7 +24,7 @@ import org.tensorflow.op.Ops
  * @since 0.2
  */
 public class ActivationLayer(
-    public val activation: Activations = Activations.Relu,
+    public val activation: Activation = Activations.Relu,
     name: String = ""
 ) : Layer(name) {
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
@@ -41,7 +42,7 @@ public class ActivationLayer(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return Activations.convert(activation).apply(tf, input, name)
+        return activation.apply(tf, input, name)
     }
 
     override val weights: Map<String, Array<*>> get() = emptyMap()

@@ -17,6 +17,6 @@ internal class SwishActivationTest : ActivationTest() {
             9.999546f, 100.0f
         )
 
-        assertActivationFunction(SwishActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Swish, input, actual, expected)
     }
 }

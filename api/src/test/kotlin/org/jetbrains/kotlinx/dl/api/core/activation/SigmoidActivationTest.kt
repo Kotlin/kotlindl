@@ -17,6 +17,6 @@ internal class SigmoidActivationTest : ActivationTest() {
             0.99752736f, 0.999089f, 0.99966455f, 0.9998766f, 0.9999546f
         )
 
-        assertActivationFunction(SigmoidActivation(), input, actual, expected)
+        assertActivationFunction(Activations.Sigmoid, input, actual, expected)
     }
 }

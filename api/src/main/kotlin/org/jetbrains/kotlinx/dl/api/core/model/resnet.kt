@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.model
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.activation.Activation
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
@@ -37,7 +38,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 public fun resnet50(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -70,7 +71,7 @@ public fun resnet50(
 public fun resnet101(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -103,7 +104,7 @@ public fun resnet101(
 public fun resnet152(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -136,7 +137,7 @@ public fun resnet152(
 public fun resnet50v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -169,7 +170,7 @@ public fun resnet50v2(
 public fun resnet101v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -202,7 +203,7 @@ public fun resnet101v2(
 public fun resnet152v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
         var x = pointer
@@ -450,7 +451,7 @@ private fun resnet(
     stackFn: (x: Layer) -> Layer,
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
-    lastLayerActivation: Activations = Activations.Linear,
+    lastLayerActivation: Activation = Activations.Linear,
     /** whether to use pre-activation or not
     (True for ResNetV2, False for ResNet and ResNeXt). */
     preact: Boolean
