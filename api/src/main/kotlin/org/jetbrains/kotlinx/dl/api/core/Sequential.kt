@@ -160,11 +160,11 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     ): List<String> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
-        logger.info("=================================================================")
+        logger.info("===========================================================================")
         logger.info("Model: Sequential")
-        logger.info("_________________________________________________________________")
-        logger.info("Layer (type)                 Output Shape              Param #   ")
-        logger.info("=================================================================")
+        logger.info("___________________________________________________________________________")
+        logger.info("Layer (type)                           Output Shape              Param #   ")
+        logger.info("===========================================================================")
 
         var totalTrainableParams = 0
         var totalFrozenParams = 0
@@ -176,14 +176,14 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
             layerDescriptions.add(layerDescription)
             logger.info(layerDescription)
-            logger.info("_________________________________________________________________")
+            logger.info("___________________________________________________________________________")
         }
 
-        logger.info("=================================================================")
+        logger.info("===========================================================================")
         logger.info("Total trainable params: $totalTrainableParams")
         logger.info("Total frozen params: $totalFrozenParams")
         logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
-        logger.info("=================================================================")
+        logger.info("===========================================================================")
 
         return layerDescriptions
     }

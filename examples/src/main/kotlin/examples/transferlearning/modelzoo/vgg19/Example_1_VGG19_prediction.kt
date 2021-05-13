@@ -86,5 +86,3 @@ fun vgg19prediction() {
 }
 
 fun main() = vgg19prediction()
-
-
