@@ -91,7 +91,6 @@ fun mobilenetWithAdditionalTraining() {
         layers.add(layer)
     }
 
-    //TODO: remove top N layers procedure with all boundary lines to previous recursively (util or helper function)
     val lastLayer = layers.last()
     for (outboundLayer in lastLayer.inboundLayers)
         outboundLayer.outboundLayers.remove(lastLayer)

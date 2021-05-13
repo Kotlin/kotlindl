@@ -49,12 +49,15 @@ public class BatchNorm(
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
 ) : Layer(name), NoGradients {
-
     private lateinit var weightShape: Shape
     private var gamma: Variable<Float>? = null
     private var beta: Variable<Float>? = null
     private lateinit var movingMean: Variable<Float>
     private lateinit var movingVariance: Variable<Float>
+
+    init {
+        isTrainable = false
+    }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices

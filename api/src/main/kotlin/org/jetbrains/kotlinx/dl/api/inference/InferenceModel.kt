@@ -9,6 +9,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.tensorflow.Session
@@ -43,7 +44,8 @@ public open class InferenceModel : AutoCloseable {
     protected var output: Output = Output.ARGMAX
 
     /** Data shape for prediction. */
-    protected lateinit var shape: LongArray
+    public lateinit var shape: LongArray
+        private set
 
     /** Is true when shape is initialized. */
     protected val isShapeInitialized: Boolean
@@ -136,10 +138,9 @@ public open class InferenceModel : AutoCloseable {
                 .fetch(fetchTensorName)
                 .run()[0]
 
-            val arr = Array(1) { FloatArray(10) { 0.0f } }
-            result1.copyTo(arr)
+            val arr = result1.convertTensorToMultiDimArray()
 
-            return arr[0]
+            return arr[0] as FloatArray
         }
     }
 

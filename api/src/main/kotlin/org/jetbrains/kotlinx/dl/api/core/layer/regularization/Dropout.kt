@@ -32,7 +32,6 @@ public class Dropout(
     private val seed: Long = 12L,
     name: String = ""
 ) : Layer(name), NoGradients {
-
     init {
         isTrainable = false
     }
