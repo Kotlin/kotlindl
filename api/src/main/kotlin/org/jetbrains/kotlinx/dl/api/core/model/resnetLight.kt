@@ -33,10 +33,10 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
  * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
  *    High-Performance Large-Scale Image Recognition Without Normalization</a>
  */
-// TODO: add number of input channels to be applied to the mnist and fashion mnist datasets
 public fun resnet50Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -50,6 +50,7 @@ public fun resnet50Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -70,6 +71,7 @@ public fun resnet50Light(
 public fun resnet101Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -83,6 +85,7 @@ public fun resnet101Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -103,6 +106,7 @@ public fun resnet101Light(
 public fun resnet152Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -116,6 +120,7 @@ public fun resnet152Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -136,6 +141,7 @@ public fun resnet152Light(
 public fun resnet50v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -149,6 +155,7 @@ public fun resnet50v2Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -169,6 +176,7 @@ public fun resnet50v2Light(
 public fun resnet101v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -182,6 +190,7 @@ public fun resnet101v2Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -202,6 +211,7 @@ public fun resnet101v2Light(
 public fun resnet152v2Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -215,6 +225,7 @@ public fun resnet152v2Light(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -452,6 +463,7 @@ private fun resnetLight(
     stackFn: (x: Layer) -> Layer,
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
     /** whether to use pre-activation or not
     (True for ResNetV2, False for ResNet and ResNeXt). */
@@ -460,7 +472,7 @@ private fun resnetLight(
     var x: Layer = Input(
         imageSize,
         imageSize,
-        3,
+        numberOfInputChannels,
         name = "input_1"
     )
 

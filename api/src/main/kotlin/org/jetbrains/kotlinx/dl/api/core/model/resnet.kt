@@ -37,6 +37,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 public fun resnet50(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -50,6 +51,7 @@ public fun resnet50(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -70,6 +72,7 @@ public fun resnet50(
 public fun resnet101(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -83,6 +86,7 @@ public fun resnet101(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -103,6 +107,7 @@ public fun resnet101(
 public fun resnet152(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -116,6 +121,7 @@ public fun resnet152(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = false
     )
@@ -136,6 +142,7 @@ public fun resnet152(
 public fun resnet50v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -149,6 +156,7 @@ public fun resnet50v2(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -169,6 +177,7 @@ public fun resnet50v2(
 public fun resnet101v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -182,6 +191,7 @@ public fun resnet101v2(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -202,6 +212,7 @@ public fun resnet101v2(
 public fun resnet152v2(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
 ): Functional {
     val stackFn = fun(pointer: Layer): Layer {
@@ -215,6 +226,7 @@ public fun resnet152v2(
         stackFn = stackFn,
         imageSize = imageSize,
         numberOfClasses = numberOfClasses,
+        numberOfInputChannels = numberOfInputChannels,
         lastLayerActivation = lastLayerActivation,
         preact = true
     )
@@ -450,6 +462,7 @@ private fun resnet(
     stackFn: (x: Layer) -> Layer,
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear,
     /** whether to use pre-activation or not
     (True for ResNetV2, False for ResNet and ResNeXt). */
@@ -458,7 +471,7 @@ private fun resnet(
     var x: Layer = Input(
         imageSize,
         imageSize,
-        3,
+        numberOfInputChannels,
         name = "input_1"
     )
 

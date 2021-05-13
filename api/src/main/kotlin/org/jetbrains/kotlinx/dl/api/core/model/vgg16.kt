@@ -31,13 +31,14 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 public fun vgg16(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
+    numberOfInputChannels: Long = 3,
     lastLayerActivation: Activations = Activations.Linear
 ): Sequential {
     return Sequential.of(
         Input(
             imageSize,
             imageSize,
-            3
+            numberOfInputChannels
         ),
         // Block #1
         Conv2D(
