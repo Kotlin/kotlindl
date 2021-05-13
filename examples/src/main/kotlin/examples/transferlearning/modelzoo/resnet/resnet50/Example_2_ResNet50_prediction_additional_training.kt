@@ -41,8 +41,8 @@ fun resnet50additionalTraining() {
 
     val catdogimages = catDogsSmallDatasetPath()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(catdogimages)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
@@ -55,8 +55,10 @@ fun resnet50additionalTraining() {
                 interpolation = InterpolationType.BILINEAR
             }
         }
-        sharpen {
-            modelType = ModelType.ResNet_50
+        transformTensor {
+            sharpen {
+                modelType = ModelType.ResNet_50
+            }
         }
     }
 

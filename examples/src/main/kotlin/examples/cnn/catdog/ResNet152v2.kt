@@ -30,8 +30,8 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 fun resnet152v2OnCatDogDataset() {
     val catdogimages = catDogsDatasetPath()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(catdogimages)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
@@ -44,8 +44,10 @@ fun resnet152v2OnCatDogDataset() {
                 interpolation = InterpolationType.BILINEAR
             }
         }
-        rescale {
-            scalingCoefficient = 255f
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
         }
     }
 

@@ -60,8 +60,8 @@ fun vgg19additionalTraining() {
 
     val catdogimages = catDogsSmallDatasetPath()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(catdogimages)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
@@ -74,9 +74,12 @@ fun vgg19additionalTraining() {
                 interpolation = InterpolationType.BILINEAR
             }
         }
-        sharpen {
-            modelType = ModelType.VGG_19
+        transformTensor {
+            sharpen {
+                modelType = ModelType.VGG_19
+            }
         }
+
     }
 
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()

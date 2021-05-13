@@ -169,8 +169,8 @@ private val vgg11 = Sequential.of(
 fun main() {
     val catdogimages = catDogsDatasetPath()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(catdogimages)
                 imageShape = ImageShape(channels = 3)
@@ -183,8 +183,10 @@ fun main() {
                 interpolation = InterpolationType.NEAREST
             }
         }
-        rescale {
-            scalingCoefficient = 255f
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
         }
     }
 

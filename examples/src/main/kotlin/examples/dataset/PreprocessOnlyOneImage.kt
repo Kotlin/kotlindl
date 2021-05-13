@@ -24,8 +24,8 @@ fun main() {
     val preprocessedImagesDirectory =
         File("C:\\Users\\zaleslaw\\processedImages")
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = image
                 imageShape = ImageShape(224, 224, 3)
@@ -49,8 +49,10 @@ fun main() {
                 dirLocation = preprocessedImagesDirectory
             }
         }
-        rescale {
-            scalingCoefficient = 255f
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
         }
     }
 

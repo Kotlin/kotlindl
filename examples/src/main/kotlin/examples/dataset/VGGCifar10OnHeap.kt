@@ -167,16 +167,18 @@ private val vgg11 = Sequential.of(
 fun main() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(cifarImagesArchive)
                 imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
                 colorMode = ColorOrder.BGR
             }
         }
-        rescale {
-            scalingCoefficient = 255f
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
         }
     }
 

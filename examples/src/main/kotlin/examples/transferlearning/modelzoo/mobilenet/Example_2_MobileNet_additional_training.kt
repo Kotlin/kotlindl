@@ -48,8 +48,8 @@ fun mobilenetWithAdditionalTraining() {
 
     val catdogimages = catDogsSmallDatasetPath()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = File(catdogimages)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
@@ -62,8 +62,10 @@ fun mobilenetWithAdditionalTraining() {
                 interpolation = InterpolationType.BILINEAR
             }
         }
-        sharpen {
-            modelType = ModelType.MobileNet
+        transformTensor {
+            sharpen {
+                modelType = ModelType.MobileNet
+            }
         }
     }
 

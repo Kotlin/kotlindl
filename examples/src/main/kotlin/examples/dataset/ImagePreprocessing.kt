@@ -34,8 +34,8 @@ fun main() {
     val resource: URL = ImagePreprocessing::class.java.getResource("/datasets/vgg")
     val imageDirectory = Paths.get(resource.toURI()).toFile()
 
-    val preprocessing: Preprocessing = preprocessingPipeline {
-        imagePreprocessing {
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
             load {
                 pathToData = imageDirectory
                 imageShape = ImageShape(224, 224, 3)
@@ -56,8 +56,10 @@ fun main() {
                 interpolation = InterpolationType.NEAREST
             }
         }
-        rescale {
-            scalingCoefficient = 255f
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
         }
     }
 

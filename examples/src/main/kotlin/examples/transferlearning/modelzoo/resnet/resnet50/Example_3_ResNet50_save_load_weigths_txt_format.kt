@@ -22,8 +22,8 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.imagePreprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocessingPipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
@@ -50,8 +50,8 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocessingPipeline {
-                imagePreprocessing {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
                     load {
                         pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                         imageShape = ImageShape(224, 224, 3)
@@ -89,8 +89,8 @@ fun main() {
         for (i in 1..8) {
             it.reshape(224, 224, 3)
 
-            val preprocessing: Preprocessing = preprocessingPipeline {
-                imagePreprocessing {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
                     load {
                         pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                         imageShape = ImageShape(224, 224, 3)
@@ -123,8 +123,8 @@ fun main() {
         it.loadWeights(File(PATH_TO_MODEL))
 
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocessingPipeline {
-                imagePreprocessing {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
                     load {
                         pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                         imageShape = ImageShape(224, 224, 3)

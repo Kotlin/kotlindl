@@ -16,13 +16,9 @@ import java.io.File
  * Could be used to handle directory of images or one image file.
  */
 public class Preprocessing {
-    // TODO: maybe it should be list of imageStages https://proandroiddev.com/writing-dsls-in-kotlin-part-2-cd9dcd0c4715 для целей расширения DSL кастомными классами
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
-    public lateinit var rescalingStage: Rescaling
-
-    // TODO: use this stage correctly in the image additional training
-    public lateinit var sharpeningStage: Sharpen
+    public lateinit var tensorPreprocessingStage: TensorPreprocessing
 
     // TODO: rewrite correctly with all stages not only loading and resize
     public val finalShape: ImageShape
@@ -41,7 +37,7 @@ public class Preprocessing {
                 )
             } else {
                 throw IllegalStateException("Final image shape is unclear. The resize operator should be initialized or imageShape with height, weight and channels should be initialized.")
-            } // TODO: add test for this cases
+            }
         }
 
     /** Preprocessing one image file via described preprocessing pipeline. */
@@ -86,32 +82,27 @@ public class Preprocessing {
             imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
 
-        if (::rescalingStage.isInitialized)
-            tensor = rescalingStage.apply(tensor, shape)
+        if (tensorPreprocessingStage.isRescalingInitialized)
+            tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
 
-        if (::sharpeningStage.isInitialized)
-            tensor = sharpeningStage.apply(tensor, shape)
+        if (tensorPreprocessingStage.isSharpenInitialized)
+            tensor = tensorPreprocessingStage.sharpen.apply(tensor, shape)
 
         return Pair(tensor, shape)
     }
 }
 
 /** */
-public fun preprocessingPipeline(init: Preprocessing.() -> Unit): Preprocessing =
+public fun preprocess(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
 
 /** */
-public fun Preprocessing.imagePreprocessing(block: ImagePreprocessing.() -> Unit) {
+public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {
     imagePreprocessingStage = ImagePreprocessing().apply(block)
 }
 
 /** */
-public fun Preprocessing.rescale(block: Rescaling.() -> Unit) {
-    rescalingStage = Rescaling().apply(block)
-}
-
-/** */
-public fun Preprocessing.sharpen(block: Sharpen.() -> Unit) {
-    sharpeningStage = Sharpen().apply(block)
+public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) {
+    tensorPreprocessingStage = TensorPreprocessing().apply(block)
 }
