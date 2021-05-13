@@ -257,7 +257,6 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return output
     }
 
-    // TODO: check do we need a separate saving and cover by tests
     override fun save(
         modelDirectory: File,
         savingFormat: SavingFormat,
@@ -266,8 +265,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-        //TODO: work wrong for cases in resnet50_prediction_save_load
-        // check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        if (saveOptimizerState) {
+            check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        }
 
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {

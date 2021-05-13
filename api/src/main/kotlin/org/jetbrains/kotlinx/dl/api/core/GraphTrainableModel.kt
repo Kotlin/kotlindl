@@ -751,7 +751,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-        check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        if (saveOptimizerState) {
+            check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        }
 
         val pathToModelDirectory = modelDirectory.absolutePath
         when (writingMode) {

@@ -320,7 +320,7 @@ private fun createGlobalAvgPooling2D(
 ): Layer {
     return GlobalAvgPool2D(
         name = name
-    )// TODO: write correct filling
+    )
 }
 
 private fun createAddLayer(
