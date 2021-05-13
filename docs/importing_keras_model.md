@@ -1,12 +1,10 @@
-If you have a model has been trained in Python with [Keras](https://keras.io), and you need to embed it in a 
-JVM application, KotlinDL can help you with that.
+KotlinDL is a great library that can help you embed models that have been trained in Python with [Keras](https://keras.io) into JVM applications.
 
-In this tutorial you'll learn how you should save your Keras model so that it's compatible with KotlinDL, what 
-architectures are currently supported, and how to load and run inference with such model from your JVM project. 
+In this tutorial, we’ll explain how to save your Keras model so that it's compatible with KotlinDL, 
+specify which architectures are currently supported, and demonstrate how to load and run an inference with such a model from your JVM project. 
   
 ### Supported architectures
-KotlinDL 0.2 supports a limited number of deep learning architectures. As the project evolved, we will be expanding 
-the list of supported architectures.
+KotlinDL 0.2 supports a limited number of deep learning architectures. As the project evolves, we will expand the list of supported architectures.
 
 Currently, the following layers are supported: 
 - Input()
@@ -27,20 +25,20 @@ Currently, the following layers are supported:
 - ZeroPadding2D
 
 ### Saving a trained Keras model 
-For the purposes of this tutorial, we'll train a simple convolutional neural network that can classify 
-images from the CIFAR-10 dataset in Python, and then load it with KotlinDL.
+For this tutorial, we'll train a simple convolutional neural network that can classify images 
+from the CIFAR-10 dataset in Python and then load it with KotlinDL.
 
 ---
 **About CIFAR-10**
 
-The [CIFAR-10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html) consists of 60000 32x32 colour images in 10 
-classes, with 6000 images per class. Here are some examples: 
+The [CIFAR-10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html) consists of 60,000 32x32 color images in 10 classes, with 6,000 images per class. 
+Here are some examples: 
 
 ![](images/cifar.png)
 
 --- 
  
-Here's how we define the neural network that we will train and use the resulting model: 
+Here's how we define the convolutional neural network that we will train: 
 ```python
 model = models.Sequential(
 [
@@ -55,7 +53,7 @@ model = models.Sequential(
 ])
 ```
 
-Here's the model's architecture: 
+And here's the model's architecture:
 
 ```
 Model: "sequential"
@@ -83,9 +81,9 @@ Trainable params: 122,570
 Non-trainable params: 0
 ```
 
-You can find a Jupyter notebook with Python code used to train this model [here](CIFAR-10.ipynb). 
+You can find a Jupyter notebook with the Python code used to train this model [here](CIFAR-10.ipynb). 
 
-Once this model is trained, it's important to properly save it so that we could load it from KotlinDL:
+Once this model has been trained, it's important to save it properly so we can load it from KotlinDL:
 ```python
 model.save('keras-cifar-10/weights', save_format='h5')
 
@@ -95,16 +93,18 @@ with open("keras-cifar-10/model.json", "w") as json_file:
 ```
 
 We need to save two things:
-1) **model weights**: the result of the training. Make sure to specify `save_format='h5'`. This will save the model to disk in 
- HDF5 format as opposed to the default SavedModel format. KotlinDL requires HDF5 format to properly load model's weights.
-2) **model architecture** as a JSON file. 
+1) **model weights** – This is the result of the training. Make sure to specify `save_format='h5'`, which will save the model to disk in the HDF5 format as opposed to the default SavedModel format. 
+KotlinDL requires the HDF5 format to load the model’s weights properly.
 
-### Loading the model and running inference
-Once you have the HDF5 and JSON model files, you can load and use the model from your project.  Note, that whatever 
-preprocessing has been done to the images before training the model, needs to be done before running inference as well.
+2) **model architecture** – Save this as a JSON file. 
 
-In this case we only normalized the pixel values before training, and KotlinDL provides a convenient method to read an 
- image straight into a normalized array, so you don't have to do it manually - `ImageConverter.toNormalizedFloatArray()`. 
+### Loading the model and running the inference task
+Once you have the HDF5 and JSON model files, you can load and use the model from your project. 
+Note that any preprocessing that has been done to the images before training the model also needs to be done before running the inference task.
+
+In this case we only normalized the pixel values before training, 
+and KotlinDL provides a convenient method for reading an image straight into a normalized array, 
+so you don't have to do it manually:  `ImageConverter.toNormalizedFloatArray()`. 
 
 ```kotlin
 val labelsMap = mapOf(
@@ -139,9 +139,9 @@ fun main() {
 }
 ```
 
-As you can see, loading and using a model trained with Keras is quite simple. If the architecture is supported, all 
-you need to do is save the weights and JSON configuration after training, load it from KotlinDL, and make sure to 
-preprocess your data before running the inference exactly the same way it was preprocessed for training.  
+As you can see, loading and using a model trained with Keras is quite simple. 
+If the architecture is supported, all you need to do is save the weights and JSON configuration after training, 
+load it from KotlinDL, and make sure to preprocess your data again before running the inference task.
 
 
 

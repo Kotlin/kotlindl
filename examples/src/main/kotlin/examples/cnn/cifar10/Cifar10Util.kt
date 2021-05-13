@@ -14,7 +14,7 @@ import java.io.IOException
 private const val DATASET_SIZE = 50000
 
 @Throws(IOException::class)
-fun extractCifar10Images(archiveName: String): Array<FloatArray> {
+public fun extractCifar10Images(archiveName: String): Array<FloatArray> {
     val numOfPixels: Int = 32 * 32 * 3
 
     return loadImagesFromDirectory(
@@ -39,7 +39,7 @@ private fun loadImagesFromDirectory(
 }
 
 @Throws(IOException::class)
-fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArray {
+public fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelBuffer = ByteArray(labelCount)

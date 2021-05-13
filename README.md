@@ -3,13 +3,11 @@
 [![Kotlin](https://img.shields.io/badge/kotlin-1.4.32-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
-KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). Under the 
- hood it is using TensorFlow Java API. 
-KotlinDL offers simple APIs for training deep learning models from scratch, importing existing Keras models 
-for inference, and leveraging transfer learning for tweaking existing pre-trained models to your tasks. 
+KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
+Under the hood, it uses TensorFlow Java API. KotlinDL offers simple APIs for training deep learning models from scratch, 
+importing existing Keras models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
-This project aims to make Deep Learning easier for JVM developers, and to simplify deploying deep learning models
- in JVM production environments. 
+This project aims to make Deep Learning easier for JVM developers and simplify deploying deep learning models in JVM production environments.
  
 Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
@@ -113,12 +111,13 @@ fun main() {
 - [License](#license)
 
 ## TensorFlow Engine
-KotlinDL is built on top of TensorFlow 1.15 Java API. The Java API for TensorFlow 2.+ has recently had first public
-release, and this project will be switching to it in the nearest future. This, however, does not affect the high-level 
-API. 
+KotlinDL is built on top of the TensorFlow 1.15 Java API. 
+The Java API for TensorFlow 2.+ has recently had its first public release, and this project will be switching to it in the nearest future. 
+This, however, does not affect the high-level API.
 
 ## Limitations
-Currently, only a limited set of deep learning architectures is supported. Here's the list of available layers: 
+Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
+ 
 - Input()
 - Flatten()
 - Dense()
@@ -136,10 +135,10 @@ Currently, only a limited set of deep learning architectures is supported. Here'
 - Reshape
 - ZeroPadding2D 
 
-KotlinDL supports model inference in JVM backend applications, Android support is coming in later releases.  
+KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.  
 
 ## How to configure KotlinDL in your project
-To use KotlinDL in your project, you need to add the following dependency to your `build.gradle` file:
+To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
 ```kotlin
    repositories {
       mavenCentral()
@@ -155,19 +154,19 @@ The latest stable KotlinDL version is 0.1.1.
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
 ## Working with KotlinDL in Jupyter Notebook
-You can work with KotlinDL interactively in Jupyter Notebook with Kotlin kernel. To do so, add the following dependency 
-in your notebook: 
+You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the following dependency in your notebook: 
 
 ```
    @file:Repository("https://kotlin.bintray.com/kotlin-datascience")
    @file:DependsOn("org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]")
 ```
 
-For more details on how to install Jupyter Notebook and add Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
+For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
 
 ## Examples and tutorials
-You do not need to have any prior deep learning experience to start using KotlinDL. We are working on including extensive 
-documentation to help you get started. At this point, feel free to check out the following tutorials:
+You do not need to have any prior deep learning experience to start using KotlinDL. 
+We are working on including extensive documentation to help you get started. 
+At this point, please feel free to check out the following tutorials we have prepared:
 - [Quick Start Guide](docs/quick_start_guide.md) 
 - [Creating your first neural network](docs/create_your_first_nn.md)
 - [Training a model](docs/training_a_model.md)
@@ -179,30 +178,30 @@ For more inspiration, take a look at the [code examples](examples) in this repo.
 
 ## Running KotlinDL on GPU
 
-To enable the training and inference on GPU, please read this [TensorFlow GPU Support page](https://www.tensorflow.org/install/gpu)
-  and install the CUDA framework to enable calculations on a GPU device.
+To enable the training and inference on a GPU, please read this [TensorFlow GPU Support page](https://www.tensorflow.org/install/gpu) 
+and install the CUDA framework to enable calculations on a GPU device.
 
 Note that only NVIDIA devices are supported.
 
-You will also need to add the following dependencies in your project if you wish to leverage GPU: 
+You will also need to add the following dependencies in your project if you wish to leverage a GPU: 
 
 ```
   compile 'org.tensorflow:libtensorflow:1.15.0'_
   compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
 ```
 
-On Windows the following distributions are required:
+On Windows, the following distributions are required:
 - CUDA cuda_10.0.130_411.31_win10
 - [cudnn-10.0](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
 ## Logging
 
-By default, the API module uses [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from specific logger implementation.
+By default, the API module uses the [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from the specific logger implementation.
 
-You could use any widely known JVM logging library with [Simple Logging Facade for Java (SLF4J)](http://www.slf4j.org/) implementation such as Logback or Log4j/Log4j2.
+You could use any widely known JVM logging library with a [Simple Logging Facade for Java (SLF4J)](http://www.slf4j.org/) implementation such as Logback or Log4j/Log4j2.
 
-You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2
+You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```
   compile 'org.apache.logging.log4j:log4j-api:2.14.0'
@@ -226,7 +225,7 @@ You will also need to add the following dependencies and configuration file ``lo
 
 ```
 
-or the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project if you wish to use Logback
+If you wish to use Logback, include the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project
 
 ```
   compile 'ch.qos.logback:logback-classic:1.2.3'
@@ -245,19 +244,22 @@ or the following dependency and configuration file ``logback.xml`` to ``src/reso
     </root>
 </configuration>
 ```
-These configuration files could be found in the Examples module.
+These configuration files can be found in the `examples` module.
 
 ## Fat Jar issue
 
-There is a known StackOverflow [question](https://stackoverflow.com/questions/47477069/issue-running-tensorflow-with-java/52003343) and TensorFlow [issue](https://github.com/tensorflow/tensorflow/issues/30488) with Fat Jar creation and execution (on Amazon EC2 instances, for example).
+There is a known Stack Overflow [question](https://stackoverflow.com/questions/47477069/issue-running-tensorflow-with-java/52003343) 
+and TensorFlow [issue](https://github.com/tensorflow/tensorflow/issues/30488) with Fat Jar creation and execution on Amazon EC2 instances.
 
 ```
 java.lang.UnsatisfiedLinkError: /tmp/tensorflow_native_libraries-1562914806051-0/libtensorflow_jni.so: libtensorflow_framework.so.1: cannot open shared object file: No such file or directory
 ```
 
-Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of Tensorflow 1.14, it was not fully fixed and requires an additional line in the build script
+Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of TensorFlow 1.14, 
+it was not fully fixed and required an additional line in the build script.
 
-One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a Tensorflow version specification to the Jar's Manifest. Below you could find an example of Gradle build task for Fat Jar creation.
+One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a TensorFlow version specification to the Jar's Manifest. 
+Below you can find an example of a Gradle build task for Fat Jar creation.
 
 ```
 task fatJar(type: Jar) {
@@ -273,10 +275,10 @@ task fatJar(type: Jar) {
 ## Reporting issues/Support
 
 Please use [GitHub issues](https://github.com/JetBrains/KotlinDL/issues) for filing feature requests and bug reports. 
-You are also welcome to join [#kotlindl channel](https://kotlinlang.slack.com/messages/kotlindl/) in the Kotlin Slack.
+You are also welcome to join the [#kotlindl channel](https://kotlinlang.slack.com/messages/kotlindl/) in the Kotlin Slack.
 
 ## Code of Conduct
-This project and the corresponding community is governed by the [JetBrains Open Source and Community Code of Conduct](https://confluence.jetbrains.com/display/ALL/JetBrains+Open+Source+and+Community+Code+of+Conduct). Please make sure you read it. 
+This project and the corresponding community are governed by the [JetBrains Open Source and Community Code of Conduct](https://confluence.jetbrains.com/display/ALL/JetBrains+Open+Source+and+Community+Code+of+Conduct). Please make sure you read it. 
 
 ## License
 KotlinDL is licensed under the [Apache 2.0 License](LICENSE).

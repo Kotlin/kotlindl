@@ -12,8 +12,8 @@ Features:
 * Added Reshape layer
 * Added Cropping2D layer
 * Added ZeroPadding2D layer
-* Added NoGradients interface to indicate layers whose weights cannot be updated during training due to the lack of gradients in tensorflow.
-* Added ModelZoo with the following models:
+* Added NoGradients interface to indicate layers whose weights cannot be updated during training due to the lack of gradients in TensorFlow
+* Added Model Zoo with the following models:
     * VGG'16
     * VGG'19
     * ResNet50
@@ -24,8 +24,8 @@ Features:
     * ResNet152V2
     * MobileNet
     * MobileNetV2
-* Added ImageNet related preprocessing for each of the ModelZoo supported models: available in ModelZoo object and as a `sharpen` stage in image preprocessing DSL
-* Added model descriptions for models from ModelZoo (excluding MobileNet) designed with Functional API in _org.jetbrains.kotlinx.dl.api.core.model_ package
+* Added ImageNet related preprocessing for each of the ModelZoo supported models: available in ModelZoo object and as a `sharpen` stage in the image preprocessing DSL
+* Added model descriptions for models from ModelZoo (excluding MobileNet) designed with the Functional API in _org.jetbrains.kotlinx.dl.api.core.model_ package
 * Added two implementations of the Dataset class: OnFlyImageDataset and OnHeapDataset
 * Added topological sort for layers as nodes in the DAG model representation
 * Added `shuffle` function support for both Dataset implementations
@@ -36,43 +36,43 @@ Features:
     * Rotate
     * Rescale
     * Save
-* Implemented the label generation on the fly from the names of image folders
+* Implemented label generation on the fly from the names of image folders
 * Implemented `summary` method for the Functional API
-* Added embedded datasets support (MNIST, FashionMNIST, Cifar'10, Cat & Dogs)
+* Added embedded datasets support (MNIST, FashionMNIST, Cifar'10, Cats & Dogs)
 
 Bugs:
 * Fixed a bug with BGR and RGB preprocessing in examples
 * Fixed missed `useBias` field in convolutional layers
 
 Internals improvements:
-* Refactored: both, Sequential and Functional models now inherit GraphTrainableModel class
+* Refactored: both Sequential and Functional models now inherit the GraphTrainableModel class
 * Completed the Klaxon migration from 5.0.1 to 5.5
-* Removed useless lables and data transformations before sending to `Tensor.create(...)`
+* Removed useless labels and data transformations before sending to  `Tensor.create(...)`
 
 Infrastructure:
-* Loaded weights and json configurations of ModelZoo models to S3 storage
-* Added a TC build for the examples
+* Loaded the weights and JSON configurations of ModelZoo models to S3 storage
+* Added a TeamCity build for the examples
 * Loaded embedded datasets to S3 storage
 * Removed dependencies from `jcenter`
-* Moved to the MavenCentral
+* Moved an artifact to the Maven Central Repository
 * Changed the groupId and artifactId
-* Reduced the size of the downloaded `api` artifact from 65 MB to 650 KB due to resources clean up and model and datasets migration to the S3 storage
+* Reduced the size of the downloaded `api` artifact from 65 MB to 650 KB by cleaning up resources and migrating the model and datasets to the S3 storage
 
 Docs:
-* Updated all tutorials
-* Updated Readme.md
+* Updated all the tutorials
+* Updated the Readme.md
 
 Examples:
-* Renamed all example's packages
-* Examples were regrouped between packages in the new manner
-* Added examples for training all ResNet models from scratch on the Cat&Dog dataset
+* Renamed all the example's packages
+* Regrouped examples between packages
+* Added examples for training all ResNet models from scratch on the Cats & Dogs dataset
 * Tuned hyper-parameters in all examples with VGG-like architecture to achieve convergence
 * Added examples for the Image Preprocessing DSL
-* Added examples for all ModelZoo available models, including additional training on the subset of Cat&Dogs dataset
+* Added examples for all available ModelZoo models, including additional training on the subset of the Cats & Dogs dataset
 * Added ToyResNet examples (trained on the FashionMnist dataset)
 
 Tests:
-* Converted all examples to the integration tests via refactoring of `main` functions
+* Converted all examples to integration tests by refactoring `main` functions
 
 # 0.1.1 (01/02/2021)
 Features:

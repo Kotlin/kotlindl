@@ -66,15 +66,15 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * | Label | Description |
  * |:-----:|-------------|
  * |   0   | T-shirt/top |
- * |   1   | Trouser     |
+ * |   1   | Trousers     |
  * |   2   | Pullover    |
  * |   3   | Dress       |
  * |   4   | Coat        |
- * |   5   | Sandal      |
+ * |   5   | Sandals      |
  * |   6   | Shirt       |
- * |   7   | Sneaker     |
+ * |   7   | Sneakers     |
  * |   8   | Bag         |
- * |   9   | Ankle boot  |
+ * |   9   | Ankle boots  |
  *
  * NOTE: The copyright for Fashion-MNIST is held by Zalando SE.
  * Fashion-MNIST is licensed under the [MIT license](https://github.com/zalandoresearch/fashion-mnist/blob/master/LICENSE).

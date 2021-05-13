@@ -1,13 +1,12 @@
 # Quick Start Guide
 
-Whether you want to add Kotlin DL into your project, or experiment with it in a Jupyter Notebook, first you'll need to 
-set up appropriate dependencies.  
+Whether you want to add Kotlin DL to your project or experiment with it in a Jupyter Notebook, 
+first you'll need to set up the appropriate dependencies.  
 
 ## Working with Kotlin DL in an IDE
-1. Open a Kotlin project where you want to use Kotlin DL, or create a new Kotlin project in IntelliJ IDEA as described 
-in [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.html).
+1. Open a Kotlin project where you want to use Kotlin DL, or create a new Kotlin project in IntelliJ IDEA as described in the [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.html).
 2. Add the Kotlin DL dependency to your project's build file. 
-    * If you're using Gradle as build system, add the following to the `build.gradle` file:
+    * If you're using Gradle as the build system, add the following to the `build.gradle` file:
     ```kotlin
    repositories {
        mavenCentral()
@@ -37,31 +36,31 @@ in [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.
    </dependency>
    ```
  
-You can also take advantage of Kotlin DL functionality in any existing Java project, even if you have no other Kotlin 
-code in it yet. Check out [these instructions](https://kotlinlang.org/docs/tutorials/mixing-java-kotlin-intellij.html#adding-kotlin-source-code-to-an-existing-java-project) 
-on how to add Kotlin code  in your existing Java code base. 
+You can use the Kotlin DL functionality in any existing Java project, even if you don’t have any other Kotlin code in it yet. 
+Check out [these instructions](https://kotlinlang.org/docs/tutorials/mixing-java-kotlin-intellij.html#adding-kotlin-source-code-to-an-existing-java-project) 
+on how to add Kotlin code to your existing Java codebase. 
   
 That's it! Now you're ready to [build your first neural network](create_your_first_nn.md). 
 
 ## Working with Kotlin DL in a Jupyter Notebook
-If you want to experiment with Kotlin DL, and use it interactively, you can choose to work with it in 
-a [Jupyter Notebook](https://jupyter.org). In this case, you will need to install Jupyter itself, add the 
+If you want to experiment with Kotlin DL, and use it interactively, you can choose to work with it in a [Jupyter Notebook](https://jupyter.org). 
+In this case, you will need to install Jupyter, add the 
 [Kotlin kernel](https://github.com/Kotlin/kotlin-jupyter), and set up the Kotlin DL dependency in the notebook. 
-Here are step-by-step instructions that will help you get set:
+Here are step-by-step instructions to help you get started:
 
-1. To set up Jupyter Notebook itself, first you need to have [Python](https://www.python.org/) installed on your machine. 
-2. Then, the easiest way to get started is to install [Anaconda distribution](https://www.anaconda.com/products/individual) that includes Jupyter Notebook. 
+1. To set up Jupyter Notebook, you need to first have [Python](https://www.python.org/) installed on your machine. 
+2. The next step is to install the [Anaconda distribution](https://www.anaconda.com/products/individual) that includes Jupyter Notebook. 
 3. For the Kotlin kernel to work, make sure you have Java v.8 or later installed. 
-4. Once you do, add the Kotlin Kernel to Jupyter Notebook with the following command: 
+4. Once installed, add the Kotlin Kernel to Jupyter Notebook with the following command: 
 
     ```conda install -c jetbrains kotlin-jupyter-kernel```
-5. Start your Jupyter Notebook from the command line with `jupyter notebook`
-6. Once Jupyter Notebook starts and opens in your browser, you can create a new Kotlin notebook from the UI. 
+5. Start your Jupyter Notebook from the command line using `jupyter notebook`
+6. Once Jupyter Notebook is open in your browser, you can create a new Kotlin notebook from the UI. 
 7. In your new Kotlin notebook, add a dependency for Kotlin DL:
     ```
    @file:Repository("https://kotlin.bintray.com/kotlin-datascience")
    @file:DependsOn("org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]")
    ```
 
-All set! Next, you can start [building your first neural network](create_your_first_nn.md).
+You are now all set! Next, you can start [building your first neural network](create_your_first_nn.md).
  

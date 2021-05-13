@@ -33,6 +33,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
  * @see <a href="https://arxiv.org/pdf/2102.06171.pdf">
  *    High-Performance Large-Scale Image Recognition Without Normalization</a>
  */
+// TODO: add number of input channels to be applied to the mnist and fashion mnist datasets
 public fun resnet50Light(
     imageSize: Long = 224,
     numberOfClasses: Int = 10,
