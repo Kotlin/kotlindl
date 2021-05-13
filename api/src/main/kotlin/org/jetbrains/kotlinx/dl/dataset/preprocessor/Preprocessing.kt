@@ -82,11 +82,13 @@ public class Preprocessing {
             imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
 
-        if (tensorPreprocessingStage.isRescalingInitialized)
-            tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
+        if (::tensorPreprocessingStage.isInitialized) {
+            if (tensorPreprocessingStage.isRescalingInitialized)
+                tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
 
-        if (tensorPreprocessingStage.isSharpenInitialized)
-            tensor = tensorPreprocessingStage.sharpen.apply(tensor, shape)
+            if (tensorPreprocessingStage.isSharpenInitialized)
+                tensor = tensorPreprocessingStage.sharpen.apply(tensor, shape)
+        }
 
         return Pair(tensor, shape)
     }
