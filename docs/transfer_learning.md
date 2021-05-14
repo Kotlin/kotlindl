@@ -27,24 +27,26 @@ You can do so via the Image Preprocessing Pipeline description, and building a d
 Here's code that will go through a folder structure received via ```catDogsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
 
 ```kotlin
-val catdogimages = catDogsSmallDatasetPath()
+val dogsVsCatsDatasetPath = catDogsSmallDatasetPath()
 
-val preprocessing: Preprocessing = preprocessingPipeline {
-    imagePreprocessing {
-         load {
-            pathToData = File(catdogimages)
-            imageShape = ImageShape(channels = 3)
+val preprocessing: Preprocessing = preprocess {
+    transformImage {
+        load {
+            pathToData = File(dogsVsCatsDatasetPath)
+            imageShape = ImageShape(channels = NUM_CHANNELS)
             colorMode = ColorOrder.BGR
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-         }
-         resize {
-            outputHeight = 224
-            outputWidth = 224
+        }
+        resize {
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
             interpolation = InterpolationType.BILINEAR
-         }
+        }
     }
-    sharpen {
-        modelType = ModelType.VGG_19
+    transformTensor {
+        sharpen {
+            modelType = ModelType.VGG_19
+        }
     }
 }
 

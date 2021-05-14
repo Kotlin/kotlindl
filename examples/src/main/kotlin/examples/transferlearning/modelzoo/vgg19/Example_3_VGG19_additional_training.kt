@@ -56,12 +56,12 @@ fun vgg19additionalTraining() {
     val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
     val model = modelZoo.loadModel() as Sequential
 
-    val catdogimages = dogsCatsSmallDatasetPath()
+    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {
             load {
-                pathToData = File(catdogimages)
+                pathToData = File(dogsVsCatsDatasetPath)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
                 colorMode = ColorOrder.BGR
                 labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
@@ -77,7 +77,6 @@ fun vgg19additionalTraining() {
                 modelType = ModelType.VGG_19
             }
         }
-
     }
 
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()

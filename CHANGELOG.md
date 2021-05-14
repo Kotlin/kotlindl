@@ -1,4 +1,4 @@
-# 0.2.0 (01/05/2021)
+# 0.2.0 (17/05/2021)
 Features:
 * Added [support for Functional API](https://github.com/JetBrains/KotlinDL/issues/23)
 * Added [BatchNorm layer](https://github.com/JetBrains/KotlinDL/issues/34) for inference

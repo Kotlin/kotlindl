@@ -51,7 +51,7 @@ fun main() {
                 colorMode = ColorOrder.BGR
             }
             rotate {
-                degrees = 30f
+                degrees = 60f
             }
             crop {
                 left = 12
@@ -60,8 +60,8 @@ fun main() {
                 bottom = 12
             }
             resize {
-                outputWidth = 400
-                outputHeight = 400
+                outputWidth = 300
+                outputHeight = 300
                 interpolation = InterpolationType.NEAREST
             }
         }
@@ -81,7 +81,7 @@ fun main() {
     val rawImage = batchIter.next().x[1]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(400, 400, 3)))
+    frame.contentPane.add(ImagesJPanel(rawImage, ImageShape(300, 300, 3)))
     frame.setSize(1000, 1000)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
