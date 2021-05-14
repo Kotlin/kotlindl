@@ -3,14 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.cnn.catdog
+package examples.cnn.dogscats
 
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.model.resnet152v2Light
+import org.jetbrains.kotlinx.dl.api.core.model.resnet152Light
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.catDogsDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -27,13 +27,13 @@ private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 200L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
-fun resnet152v2OnCatDogDataset() {
-    val catdogimages = catDogsDatasetPath()
+fun resnet152onDogsVsCatsDataset() {
+    val dogsVsCatsDatasetPath = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {
             load {
-                pathToData = File(catdogimages)
+                pathToData = File(dogsVsCatsDatasetPath)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
                 colorMode = ColorOrder.BGR
                 labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
@@ -54,7 +54,7 @@ fun resnet152v2OnCatDogDataset() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    resnet152v2Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
+    resnet152Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -73,4 +73,4 @@ fun resnet152v2OnCatDogDataset() {
     }
 }
 
-fun main() = resnet152v2OnCatDogDataset()
+fun main() = resnet152onDogsVsCatsDataset()

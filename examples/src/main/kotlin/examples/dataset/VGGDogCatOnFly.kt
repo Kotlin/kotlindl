@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.cnn.catdog
+package examples.cnn.dogscats
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.catDogsDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -167,7 +167,7 @@ private val vgg11 = Sequential.of(
 )
 
 fun main() {
-    val catdogimages = catDogsDatasetPath()
+    val catdogimages = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {

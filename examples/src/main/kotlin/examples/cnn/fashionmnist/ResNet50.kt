@@ -18,7 +18,7 @@ private const val NUM_CLASSES = 10
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
-fun resnet50onCatDogDataset() {
+fun resnet50OnFashionMnistDataset() {
     val (train, test) = fashionMnist()
 
     resnet50Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES, numberOfInputChannels = NUM_CHANNELS).use {
@@ -40,4 +40,4 @@ fun resnet50onCatDogDataset() {
     }
 }
 
-fun main() = resnet50onCatDogDataset()
+fun main() = resnet50OnFashionMnistDataset()

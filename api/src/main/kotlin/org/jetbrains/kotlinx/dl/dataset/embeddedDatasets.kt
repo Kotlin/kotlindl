@@ -138,24 +138,23 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
     return Pair(imageDataDirectory.toPath().toAbsolutePath().toString(), pathToLabel)
 }
 
-/** Path to train images archive of Mnist Dataset. */
-private const val CAT_DOG_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
+/** Path to the Dogs-vs-Cats dataset. */
+private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
 
-/** Returns paths to images for the CatDogs dataset. */
-// TODO: name should reflect that dataset is downloaded and cached
-public fun catDogsDatasetPath(cacheDirectory: File = File("cache")): String {
+/** Returns path to images of the Dogs-vs-Cats dataset. */
+public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String {
     if (!cacheDirectory.exists()) {
         val created = cacheDirectory.mkdir()
         if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
     }
 
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/catdogs")
+    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/dogs-vs-cats")
     val toFolder = imageDirectory.toPath()
 
     if (!imageDirectory.exists()) {
         Files.createDirectories(imageDirectory.toPath())
 
-        val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_IMAGES_ARCHIVE)
+        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE)
         extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
         val deleted = pathToImageArchive.delete()
         if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
@@ -164,24 +163,23 @@ public fun catDogsDatasetPath(cacheDirectory: File = File("cache")): String {
     return toFolder.toAbsolutePath().toString()
 }
 
-/** Path to train images archive of Mnist Dataset. */
-private const val CAT_DOG_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
+/** Path to the subset of Dogs-vs-Cats dataset. */
+private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
-/** Returns paths to images for the CatDogs dataset. */
-// TODO: name should reflect that dataset is downloaded and cached
-public fun catDogsSmallDatasetPath(cacheDirectory: File = File("cache")): String {
+/** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
+public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String {
     if (!cacheDirectory.exists()) {
         val created = cacheDirectory.mkdir()
         if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
     }
-    // TODO: refactor
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/small_catdogs")
+
+    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/small-dogs-vs-cats")
     val toFolder = imageDirectory.toPath()
 
     if (!imageDirectory.exists()) {
         Files.createDirectories(imageDirectory.toPath())
 
-        val pathToImageArchive = loadFile(cacheDirectory, CAT_DOG_SMALL_IMAGES_ARCHIVE)
+        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE)
         extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
         val deleted = pathToImageArchive.delete()
         if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")

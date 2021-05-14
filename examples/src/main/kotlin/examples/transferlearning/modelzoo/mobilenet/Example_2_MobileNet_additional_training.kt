@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.catDogsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -46,7 +46,7 @@ fun mobilenetWithAdditionalTraining() {
         ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
-    val catdogimages = catDogsSmallDatasetPath()
+    val catdogimages = dogsCatsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {

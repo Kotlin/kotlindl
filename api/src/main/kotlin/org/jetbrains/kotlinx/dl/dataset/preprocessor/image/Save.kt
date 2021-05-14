@@ -21,9 +21,7 @@ import javax.imageio.ImageIO
  * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Save(
-    public var dirLocation: File? = null,
-    // TODO: add filenameStrategy: keepName, counter, withPrefix
-    // TODO: add filetype: PNG or JPG
+    public var dirLocation: File? = null
 ) : ImagePreprocessor {
     @Throws(IOException::class)
     internal fun imageToFile(filename: String, image: BufferedImage, shape: ImageShape): File {

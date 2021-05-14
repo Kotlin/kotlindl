@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.cnn.catdog
+package examples.cnn.dogscats
 
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -12,31 +12,31 @@ import org.junit.jupiter.api.Test
 class CatDogTestSuite {
     @Test
     fun resnet50onCatDogDatasetTest() {
-        resnet50onCatDogDataset()
+        resnet50onDogsVsCatsDataset()
     }
 
     @Test
     fun resnet50v2onCatDogDatasetTest() {
-        resnet50v2onCatDogDataset()
+        resnet50v2onDogsVsCatsDataset()
     }
 
     @Test
     fun resnet101onCatDogDatasetTest() {
-        resnet101onCatDogDataset()
+        resnet101onDogsVsCatsDataset()
     }
 
     @Test
     fun resnet101v2onCatDogDatasetTest() {
-        resnet101v2onCatDogDataset()
+        resnet101v2onDogsVsCatsDataset()
     }
 
     @Test
     fun resnet152onCatDogDatasetTest() {
-        resnet152onCatDogDataset()
+        resnet152onDogsVsCatsDataset()
     }
 
     @Test
     fun resnet152v2OnCatDogDatasetTest() {
-        resnet152v2OnCatDogDataset()
+        resnet152v2onDogsVsCatsDataset()
     }
 }

@@ -33,7 +33,7 @@ public class Loading(
     public var imageShape: ImageShape? = null,
     public var labelGenerator: LabelGenerator? = null,
     /** Keep channels in the given order after loading. */
-    public var colorMode: ColorOrder = ColorOrder.BGR // TODO: extract to the separate to BGR/RGB mode conversion before rescaling on floatArray, for example
+    public var colorMode: ColorOrder = ColorOrder.BGR
 ) : ImagePreprocessor {
     internal fun fileToImage(file: File): BufferedImage {
         return ImageConverter.toBufferedImage(file.inputStream(), colorOrder = colorMode)

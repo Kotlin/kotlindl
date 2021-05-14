@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.catDogsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -39,7 +39,7 @@ fun resnet50additionalTraining() {
         ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
     val model = modelZoo.loadModel() as Functional
 
-    val catdogimages = catDogsSmallDatasetPath()
+    val catdogimages = dogsCatsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {

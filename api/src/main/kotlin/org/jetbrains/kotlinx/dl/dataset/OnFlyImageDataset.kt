@@ -138,8 +138,7 @@ public class OnFlyImageDataset internal constructor(
 
     /** Returns row by index [idx]. */
     override fun getX(idx: Int): FloatArray {
-        TODO()
-        //return xFiles[idx] // TODO: convert file to image and apply all preprocessors
+        return applyImagePreprocessing(xFiles[idx])
     }
 
     /** Returns label as [FloatArray] by index [idx]. */

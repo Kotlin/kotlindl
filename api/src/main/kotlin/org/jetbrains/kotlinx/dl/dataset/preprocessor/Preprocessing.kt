@@ -20,7 +20,6 @@ public class Preprocessing {
 
     public lateinit var tensorPreprocessingStage: TensorPreprocessing
 
-    // TODO: rewrite correctly with all stages not only loading and resize
     public val finalShape: ImageShape
         get() {
             return if (imagePreprocessingStage.isResizeInitialized && imagePreprocessingStage.isLoadInitialized) {
@@ -48,13 +47,11 @@ public class Preprocessing {
         return handleFile(file)
     }
 
-    // TODO: need a method a-la outputShape after preprocessing
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        //TODO: call stage if initialized and used, should be implemented an empty stage, which returns just Image or just the same floatArray
         val filename = file.name
         var image = imagePreprocessingStage.load.fileToImage(file)
         var shape = imagePreprocessingStage.load.imageShape!!
-        // TODO: handle if height and width are missed in imageShape in load stage
+
         // if both nulls write a warning to logs about possible mismatch
         if (imagePreprocessingStage.isCropInitialized) {
             val (croppedImage, croppedShape) = imagePreprocessingStage.crop.apply(image, shape)
