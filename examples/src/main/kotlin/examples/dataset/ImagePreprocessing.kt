@@ -5,10 +5,10 @@
 
 package examples.dataset
 
-import examples.cnn.cifar10.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*

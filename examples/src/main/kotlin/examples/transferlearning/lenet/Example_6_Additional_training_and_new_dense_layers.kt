@@ -114,7 +114,8 @@ fun additionalTrainingAndNewTopDenseLayers() {
     }
 }
 
-fun main() = additionalTrainingAndNewTopDenseLayers()
+/** */
+fun main(): Unit = additionalTrainingAndNewTopDenseLayers()
 
 
 

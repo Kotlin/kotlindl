@@ -103,4 +103,5 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     }
 }
 
-fun main() = lenetOnMnistDatasetExportImportToTxt()
+/** */
+fun main(): Unit = lenetOnMnistDatasetExportImportToTxt()

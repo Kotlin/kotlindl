@@ -21,6 +21,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
+import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10Images
+import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10Labels
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -194,4 +196,5 @@ fun vgg() {
     }
 }
 
-fun main() = vgg()
+/** */
+fun main(): Unit = vgg()

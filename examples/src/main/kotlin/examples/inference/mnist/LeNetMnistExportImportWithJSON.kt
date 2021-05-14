@@ -101,4 +101,5 @@ fun lenetOnMnistExportImportToJson() {
     }
 }
 
-fun main() = lenetOnMnistExportImportToJson()
+/** */
+fun main(): Unit = lenetOnMnistExportImportToJson()

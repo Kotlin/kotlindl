@@ -45,7 +45,8 @@ fun loadModelWithoutWeightsInitAndEvaluate() {
     }
 }
 
-fun main() = loadModelWithoutWeightsInitAndEvaluate()
+/** */
+fun main(): Unit = loadModelWithoutWeightsInitAndEvaluate()
 
 
 

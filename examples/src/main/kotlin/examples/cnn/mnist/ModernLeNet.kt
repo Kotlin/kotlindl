@@ -114,4 +114,5 @@ fun modernLenet() {
     }
 }
 
-fun main() = modernLenet()
+/** */
+fun main(): Unit = modernLenet()

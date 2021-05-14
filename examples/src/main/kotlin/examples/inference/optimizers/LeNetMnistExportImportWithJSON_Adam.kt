@@ -125,4 +125,5 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
     }
 }
 
-fun main() = lenetOnMnistExportImportToJSONWithAdamOptimizerState()
+/** */
+fun main(): Unit = lenetOnMnistExportImportToJSONWithAdamOptimizerState()

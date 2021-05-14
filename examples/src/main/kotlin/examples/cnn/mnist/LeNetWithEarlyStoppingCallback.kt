@@ -33,12 +33,6 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
 
-/**
- * This is an CNN based on an implementation of LeNet-5 from classic paper trained with EarlyStopping callback.
- *
- * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
- *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
- */
 private val lenet5Classic = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -94,6 +88,12 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
+/**
+ * This is an CNN based on an implementation of LeNet-5 from classic paper trained with EarlyStopping callback.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
+ *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ */
 fun lenetWithEarlyStoppingCallback() {
     val (train, test) = mnist()
 
@@ -124,4 +124,5 @@ fun lenetWithEarlyStoppingCallback() {
     }
 }
 
-fun main() = lenetWithEarlyStoppingCallback()
+/** */
+fun main(): Unit = lenetWithEarlyStoppingCallback()

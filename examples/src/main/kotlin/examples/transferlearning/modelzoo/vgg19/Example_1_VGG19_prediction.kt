@@ -85,4 +85,5 @@ fun vgg19prediction() {
     }
 }
 
-fun main() = vgg19prediction()
+/** */
+fun main(): Unit = vgg19prediction()

@@ -58,7 +58,8 @@ fun additionalTraining() {
     }
 }
 
-fun main() = additionalTraining()
+/** */
+fun main(): Unit = additionalTraining()
 
 
 

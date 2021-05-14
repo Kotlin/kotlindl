@@ -35,5 +35,6 @@ fun lenetOnMnistInference() {
     }
 }
 
-fun main() = lenetOnMnistInference()
+/** */
+fun main(): Unit = lenetOnMnistInference()
 

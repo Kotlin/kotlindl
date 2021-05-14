@@ -27,11 +27,8 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
-val heNormal = HeNormal(SEED)
+private val heNormal = HeNormal(SEED)
 
-/**
- * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
- */
 private val vgg11 = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -156,6 +153,9 @@ private val vgg11 = Sequential.of(
     )
 )
 
+/**
+ * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
+ */
 fun vgg() {
     val (train, test) = mnist()
 
@@ -172,4 +172,5 @@ fun vgg() {
     }
 }
 
-fun main() = vgg()
+/** */
+fun main(): Unit = vgg()

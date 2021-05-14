@@ -88,8 +88,10 @@ fun vgg16prediction() {
     }
 }
 
-fun main() = vgg16prediction()
+/** */
+fun main(): Unit = vgg16prediction()
 
+/** Converts resource string path to the file. */
 @Throws(URISyntaxException::class)
 fun getFileFromResource(fileName: String): File {
     val classLoader: ClassLoader = object {}.javaClass.classLoader

@@ -40,4 +40,5 @@ fun resnet50OnFashionMnistDataset() {
     }
 }
 
-fun main() = resnet50OnFashionMnistDataset()
+/** */
+fun main(): Unit = resnet50OnFashionMnistDataset()

@@ -111,5 +111,6 @@ fun lenetClassic() {
     }
 }
 
-fun main() = lenetClassic()
+/** */
+fun main(): Unit = lenetClassic()
 

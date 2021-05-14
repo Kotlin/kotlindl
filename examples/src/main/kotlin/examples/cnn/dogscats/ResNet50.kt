@@ -73,4 +73,5 @@ fun resnet50onDogsVsCatsDataset() {
     }
 }
 
-fun main() = resnet50onDogsVsCatsDataset()
+/** */
+fun main(): Unit = resnet50onDogsVsCatsDataset()

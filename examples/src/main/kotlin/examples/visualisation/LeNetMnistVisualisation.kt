@@ -6,8 +6,6 @@
 package examples.visualisation
 
 import examples.inference.lenet5
-import examples.inference.production.drawActivations
-import examples.inference.production.drawFilters
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam

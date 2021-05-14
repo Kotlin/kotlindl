@@ -129,6 +129,7 @@ fun resnet50additionalTraining() {
     }
 }
 
-fun main() = resnet50additionalTraining()
+/** */
+fun main(): Unit = resnet50additionalTraining()
 
 

@@ -86,6 +86,7 @@ fun linearRegression() {
     }
 }
 
-fun main() = linearRegression()
+/** */
+fun main(): Unit = linearRegression()
 
 

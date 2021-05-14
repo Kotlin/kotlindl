@@ -28,12 +28,6 @@ private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
-/**
- * This is an CNN based on an implementation of LeNet-5 from classic paper trained with custom callback.
- *
- * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
- *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
- */
 private val model = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -81,6 +75,12 @@ private val model = Sequential.of(
     )
 )
 
+/**
+ * This is an CNN based on an implementation of LeNet-5 from classic paper trained with custom callback.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
+ *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ */
 fun lenetMnistWithCustomCallback() {
     val (train, test) = mnist()
 
@@ -102,9 +102,7 @@ fun lenetMnistWithCustomCallback() {
     }
 }
 
-/**
- *
- */
+/** Simple custom Callback object. */
 class CustomCallback : Callback() {
     override fun onEpochBegin(epoch: Int, logs: TrainingHistory) {
         println("Epoch $epoch begins.")
@@ -163,4 +161,5 @@ class CustomCallback : Callback() {
     }
 }
 
-fun main() = lenetMnistWithCustomCallback()
+/** */
+fun main(): Unit = lenetMnistWithCustomCallback()

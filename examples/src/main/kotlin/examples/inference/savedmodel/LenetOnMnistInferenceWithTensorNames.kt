@@ -35,7 +35,8 @@ fun lenetOnMnistInferenceWithTensorNames() {
     }
 }
 
-fun main() = lenetOnMnistInferenceWithTensorNames()
+/** */
+fun main(): Unit = lenetOnMnistInferenceWithTensorNames()
 
 
 

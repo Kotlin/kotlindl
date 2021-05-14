@@ -69,7 +69,8 @@ fun additionalTrainingAndPartialFreezingAndPartialInitialization() {
     }
 }
 
-fun main() = additionalTrainingAndPartialFreezingAndPartialInitialization()
+/** */
+fun main(): Unit = additionalTrainingAndPartialFreezingAndPartialInitialization()
 
 
 

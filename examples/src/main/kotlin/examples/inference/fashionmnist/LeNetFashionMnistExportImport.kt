@@ -81,4 +81,5 @@ fun lenetOnFashionMnistExportImportToTxt() {
     }
 }
 
-fun main() = lenetOnFashionMnistExportImportToTxt()
+/** */
+fun main(): Unit = lenetOnFashionMnistExportImportToTxt()

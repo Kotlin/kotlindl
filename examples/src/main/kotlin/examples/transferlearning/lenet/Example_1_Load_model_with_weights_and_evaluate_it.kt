@@ -52,7 +52,8 @@ fun loadModelWithWeightsAndEvaluate() {
     }
 }
 
-fun main() = loadModelWithWeightsAndEvaluate()
+/** */
+fun main(): Unit = loadModelWithWeightsAndEvaluate()
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
 fun getJSONConfigFile(): File {

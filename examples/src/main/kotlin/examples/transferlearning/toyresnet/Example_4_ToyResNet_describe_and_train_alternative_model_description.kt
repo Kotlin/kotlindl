@@ -122,7 +122,7 @@ fun main() {
         name = "conv2D_7"
     )(x)
 
-    val add_1 = Add(name = "add_1")(add, x)
+    val add1 = Add(name = "add_1")(add, x)
 
     x = Conv2D(
         filters = 64,
@@ -133,7 +133,7 @@ fun main() {
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.VALID,
         name = "conv2D_8"
-    )(add_1)
+    )(add1)
 
     x = GlobalAvgPool2D(name = "globalAvgPool2D")(x)
 

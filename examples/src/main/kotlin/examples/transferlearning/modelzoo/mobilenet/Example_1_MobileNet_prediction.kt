@@ -72,4 +72,5 @@ fun mobilenetPrediction() {
     }
 }
 
-fun main() = mobilenetPrediction()
+/** */
+fun main(): Unit = mobilenetPrediction()

@@ -76,4 +76,5 @@ fun resnet50prediction() {
     }
 }
 
-fun main() = resnet50prediction()
+/** */
+fun main(): Unit = resnet50prediction()

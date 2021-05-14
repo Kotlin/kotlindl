@@ -27,11 +27,8 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
-val heNormal = HeNormal(SEED)
+private val heNormal = HeNormal(SEED)
 
-/**
- * This model is an implementation of VGG'11 model for FashionMnist Dataset.
- */
 private val vgg11 = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -156,6 +153,9 @@ private val vgg11 = Sequential.of(
     )
 )
 
+/**
+ * This model is an implementation of VGG'11 model for FashionMnist Dataset.
+ */
 fun vgg() {
     val (train, test) = fashionMnist()
 
@@ -174,4 +174,5 @@ fun vgg() {
     }
 }
 
-fun main() = vgg()
+/** */
+fun main(): Unit = vgg()

@@ -71,5 +71,6 @@ fun mobilenetv2Prediction() {
     }
 }
 
-fun main() = mobilenetv2Prediction()
+/** */
+fun main(): Unit = mobilenetv2Prediction()
 

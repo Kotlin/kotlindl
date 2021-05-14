@@ -66,7 +66,8 @@ fun additionalTrainingAndFreezing() {
     }
 }
 
-fun main() = additionalTrainingAndFreezing()
+/** */
+fun main(): Unit = additionalTrainingAndFreezing()
 
 
 

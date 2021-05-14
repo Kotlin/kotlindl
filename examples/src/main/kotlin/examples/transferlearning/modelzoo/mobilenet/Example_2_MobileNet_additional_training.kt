@@ -142,4 +142,5 @@ fun mobilenetWithAdditionalTraining() {
     }
 }
 
-fun main() = mobilenetWithAdditionalTraining()
+/** */
+fun main(): Unit = mobilenetWithAdditionalTraining()

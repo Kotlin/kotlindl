@@ -39,13 +39,13 @@ private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
 
-val input = Input(
+internal val input = Input(
     IMAGE_SIZE,
     IMAGE_SIZE,
     NUM_CHANNELS,
     name = "input_1"
 )
-val conv2D_1 = Conv2D(
+internal val conv2D_1 = Conv2D(
     filters = 32,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -55,7 +55,7 @@ val conv2D_1 = Conv2D(
     padding = ConvPadding.VALID,
     name = "conv2D_1"
 )
-val conv2D_2 = Conv2D(
+internal val conv2D_2 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -65,13 +65,13 @@ val conv2D_2 = Conv2D(
     padding = ConvPadding.VALID,
     name = "conv2D_2"
 )
-val maxPool2D = MaxPool2D(
+internal val maxPool2D = MaxPool2D(
     poolSize = intArrayOf(1, 3, 3, 1),
     strides = intArrayOf(1, 3, 3, 1),
     padding = ConvPadding.VALID,
     name = "maxPool2D"
 )
-val conv2D_4 = Conv2D(
+internal val conv2D_4 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -81,7 +81,7 @@ val conv2D_4 = Conv2D(
     padding = ConvPadding.SAME,
     name = "conv2D_4"
 )
-val conv2D_5 = Conv2D(
+internal val conv2D_5 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -91,8 +91,8 @@ val conv2D_5 = Conv2D(
     padding = ConvPadding.SAME,
     name = "conv2D_5"
 )
-val add = Add(name = "add")
-val conv2D_6 = Conv2D(
+internal val add = Add(name = "add")
+internal val conv2D_6 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -102,7 +102,7 @@ val conv2D_6 = Conv2D(
     padding = ConvPadding.SAME,
     name = "conv2D_6"
 )
-val conv2D_7 = Conv2D(
+internal val conv2D_7 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -112,8 +112,8 @@ val conv2D_7 = Conv2D(
     padding = ConvPadding.SAME,
     name = "conv2D_7"
 )
-val add_1 = Add(name = "add_1")
-val conv2D_8 = Conv2D(
+internal val add_1 = Add(name = "add_1")
+internal val conv2D_8 = Conv2D(
     filters = 64,
     kernelSize = longArrayOf(3, 3),
     strides = longArrayOf(1, 1, 1, 1),
@@ -123,15 +123,15 @@ val conv2D_8 = Conv2D(
     padding = ConvPadding.VALID,
     name = "conv2D_8"
 )
-val globalAvgPool2D = GlobalAvgPool2D(name = "globalAvgPool2D")
-val dense_1 = Dense(
+internal val globalAvgPool2D = GlobalAvgPool2D(name = "globalAvgPool2D")
+internal val dense_1 = Dense(
     outputSize = 256,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = Constant(0.1f),
     name = "dense_1"
 )
-val dense_2 = Dense(
+internal val dense_2 = Dense(
     outputSize = NUMBER_OF_CLASSES,
     activation = Activations.Linear,
     kernelInitializer = HeNormal(SEED),

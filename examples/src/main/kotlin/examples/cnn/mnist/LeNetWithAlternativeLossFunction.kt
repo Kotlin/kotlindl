@@ -122,4 +122,5 @@ fun lenetWithAlternativeLossFunction() {
     }
 }
 
-fun main() = lenetWithAlternativeLossFunction()
+/** */
+fun main(): Unit = lenetWithAlternativeLossFunction()

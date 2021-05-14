@@ -139,6 +139,7 @@ fun vgg19additionalTraining() {
     }
 }
 
-fun main() = vgg19additionalTraining()
+/** */
+fun main(): Unit = vgg19additionalTraining()
 
 

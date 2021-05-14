@@ -9,10 +9,14 @@ import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
+/**
+ * Prints the TensorFlow graph as a sequence of TensorFlow operands.
+ */
 fun printOutGraphOps() {
     val model = SavedModel.load(PATH_TO_MODEL)
 
     println(model.kGraph.toString())
 }
 
-fun main() = printOutGraphOps()
+/** */
+fun main(): Unit = printOutGraphOps()
