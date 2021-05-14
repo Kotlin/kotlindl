@@ -380,7 +380,7 @@ private fun block2(
     var preact = BatchNorm(axis = bnAxis, epsilon = 1e-5, name = name + "_preact_bn")(x)
     preact = ActivationLayer(activation = Activations.Relu, name = name + "_preact_relu")(preact)
 
-    var shortcut: Layer
+    val shortcut: Layer
 
     if (conv_shortcut) {
         shortcut = Conv2D(

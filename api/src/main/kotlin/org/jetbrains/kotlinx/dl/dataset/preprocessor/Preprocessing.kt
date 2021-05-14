@@ -16,10 +16,13 @@ import java.io.File
  * Could be used to handle directory of images or one image file.
  */
 public class Preprocessing {
+    /** This stage describes the process of image loading and transformation before converting to tensor. */
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
+    /** This stage describes the process of data transformation after converting to tensor. */
     public lateinit var tensorPreprocessingStage: TensorPreprocessing
 
+    /** Returns the final shape of data when image preprocessing is applied to the image. */
     public val finalShape: ImageShape
         get() {
             return if (imagePreprocessingStage.isResizeInitialized && imagePreprocessingStage.isLoadInitialized) {
@@ -39,7 +42,7 @@ public class Preprocessing {
             }
         }
 
-    /** Preprocessing one image file via described preprocessing pipeline. */
+    /** Applies the preprocessing pipeline to the specific image file. */
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
         val file = imagePreprocessingStage.load.pathToData
         require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }

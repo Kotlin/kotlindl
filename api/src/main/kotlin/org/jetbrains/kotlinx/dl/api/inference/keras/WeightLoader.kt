@@ -628,7 +628,7 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: GraphTra
 public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
     weightPaths: List<LayerPaths>,
-    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE // TODO: undocumented behaviour
+    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -658,6 +658,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     this.isModelInitialized = true
 }
 
+// TODO: Refactor and add documentation
 public enum class MissedWeightsStrategy {
     INITIALIZE,
     LOAD_NEW_FORMAT
@@ -869,7 +870,7 @@ private fun fillDenseVariables(
     }
 }
 
-
+/** Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
 public open class LayerPaths(public val layerName: String)
 
 /**
@@ -887,6 +888,13 @@ public class LayerConvOrDensePaths(
     public val biasPath: String
 ) : LayerPaths(layerName)
 
+/**
+ * Contains [layerName], [depthwiseKernelPath],  [pointwiseKernelPath], [biasPath] for [SeparableConv2D] layer, found in hdf5 file via
+ * ```
+ * recursivePrintGroupInHDF5File()
+ * ```
+ * function call.
+ */
 public class LayerSeparableConv2DPaths(
     layerName: String,
     /** */
@@ -897,6 +905,13 @@ public class LayerSeparableConv2DPaths(
     public val biasPath: String
 ) : LayerPaths(layerName)
 
+/**
+ * Contains [layerName], [gammaPath],  [betaPath], [movingMeanPath], [movingVariancePath] for [BatchNorm] layer, found in hdf5 file via
+ * ```
+ * recursivePrintGroupInHDF5File()
+ * ```
+ * function call.
+ */
 public class LayerBatchNormPaths(
     layerName: String,
     /** */

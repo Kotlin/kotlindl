@@ -300,7 +300,7 @@ private fun block1(
     name: String,
     stride: Int = 1
 ): Layer {
-    var shortcut: Layer
+    val shortcut: Layer
 
     if (conv_shortcut) {
         shortcut = Conv2D(

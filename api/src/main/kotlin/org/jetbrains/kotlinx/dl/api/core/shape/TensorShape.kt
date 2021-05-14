@@ -182,10 +182,12 @@ public class TensorShape() {
         return dims
     }
 
+    /** Returns the head dimension. */
     public fun head(): Long {
         return dims[0]
     }
 
+    /** Returns the tail dimension. */
     public fun tail(): LongArray {
         return dims.copyOfRange(1, dims.size)
     }
@@ -214,10 +216,12 @@ public class TensorShape() {
         return dims.contentHashCode()
     }
 
+    /** Makes a copy of TensorShape object. */
     public fun clone(): TensorShape {
         return TensorShape(dims)
     }
 
+    /** Check the fact that two shapes has the same values at the same dimensions except one with index [except]. */
     public fun almostEqual(tensorShape: TensorShape, except: Int): Boolean {
         var almostEqual = true
         for (i in 0 until tensorShape.numDimensions()) {
