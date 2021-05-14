@@ -35,6 +35,7 @@ Features:
     * Resize
     * Rotate
     * Rescale
+    * Sharpen
     * Save
 * Implemented label generation on the fly from the names of image folders
 * Implemented `summary` method for the Functional API
