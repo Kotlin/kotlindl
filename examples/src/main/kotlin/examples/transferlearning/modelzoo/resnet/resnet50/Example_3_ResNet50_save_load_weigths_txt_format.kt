@@ -29,6 +29,19 @@ import java.io.File
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
 private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
 
+/**
+ * This examples demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ * - Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.
+ * - It saves all the data to the project root directory.
+ * - The first [InferenceModel] is created via graph and weights loading.
+ * - Model again predicts on a few images located in resources.
+ * - The second [Functional] model is created via JSON configuration and weights loading.
+ * - Model again predicts on a few images located in resources.
+ */
 fun main() {
     val modelZoo =
         ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)

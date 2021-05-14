@@ -13,16 +13,12 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /**
  * This examples demonstrates the weird inference case:
+ * - Weights are not loaded, but initialized via initialized defined in configuration, configuration is loaded from .json file.
+ * - Model is evaluated after loading to obtain accuracy value.
+ * - No additional training.
+ * - No new layers are added.
  *
- * Weights are not loaded, but initialized via initialized defined in configuration, configuration is loaded from .json file.
- *
- * Model is evaluated after loading to obtain accuracy value.
- *
- * No additional training.
- *
- * No new layers are added.
- *
- * NOTE: Model and weights are resources in api module.
+ * NOTE: Model and weights are resources in `examples` module.
  */
 fun loadModelWithoutWeightsInitAndEvaluate() {
     val (train, test) = fashionMnist()

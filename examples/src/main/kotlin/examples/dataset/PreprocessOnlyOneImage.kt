@@ -17,9 +17,18 @@ import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * This example shows how to do image preprocessing using [Preprocessing] for only one image.
+ *
+ * Also we use the [JPanel] to visualise (a back part of the pigeon should be displayed).
+ *
+ * It includes:
+ * - image preprocessing
+ * - image visualisation
+ */
 fun main() {
     val image =
-        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg\\image1.jpg")
+        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg\\image2.jpg")
 
     val preprocessedImagesDirectory =
         File("C:\\Users\\zaleslaw\\processedImages")

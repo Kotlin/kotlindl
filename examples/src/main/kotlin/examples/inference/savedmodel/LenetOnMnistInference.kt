@@ -13,6 +13,11 @@ import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
+/**
+ * This examples demonstrates running [SavedModel] for prediction on [mnist] dataset.
+ *
+ * It uses enum-based tensor names to get access to input/output tensors in TensorFlow static graph.
+ */
 fun lenetOnMnistInference() {
     val (train, test) = mnist()
 

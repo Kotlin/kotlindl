@@ -162,6 +162,16 @@ private val vgg11 = Sequential.of(
     )
 )
 
+/**
+ * This example shows how to do image classification from scratch, starting from Cifar'10 dataset image files, using [vgg11] model.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - dataset splitting
+ * - model compilation
+ * - model training
+ * - model evaluation
+ */
 fun vgg() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 

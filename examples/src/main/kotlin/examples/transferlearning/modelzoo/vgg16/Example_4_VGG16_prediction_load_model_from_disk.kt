@@ -22,16 +22,11 @@ import java.util.*
 
 /**
  * This examples demonstrates the inference concept on VGG'16 model:
- *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
- *
- * No additional training.
- *
- * No new layers are added.
- *
- * NOTE: The specific image preprocessing is not implemented yet (see Keras for more details).
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in VGG'16 during training on ImageNet dataset) is applied to images before prediction.
+ * - No additional training.
+ * - No new layers are added.
  *
  * @see <a href="https://drive.google.com/drive/folders/1283PvmF8TykZ70NVbLr1-gW0I6Y2rQ6Q">
  *     VGG'16 weights and model could be loaded here.</a>

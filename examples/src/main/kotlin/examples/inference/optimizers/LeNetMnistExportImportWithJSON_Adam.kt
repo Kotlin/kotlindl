@@ -22,11 +22,15 @@ private const val TRAINING_BATCH_SIZE = 1000
 private const val TEST_BATCH_SIZE = 1000
 
 /**
- * This examples demonstrates model, model weights and optimizer weights export and import back.
- *
- * Models is exported in json format, weights are exported in custom (txt) format.
- *
- * It saves all the data to the project root directory.
+ * This examples demonstrates model, model weights, and optimizer weights export and import back:
+ * - Model is exported in Keras-style JSON format; weights are exported in custom (txt) format.
+ * - Model is trained on Mnist dataset.
+ * - It saves all the data to the project root directory.
+ * - The first [Sequential] model is created via JSON configuration, weights, and optimizer state loading.
+ * - After loading model is trained again with the same optimizer with frozen Conv2D layers. Only weights in Dense layers can be updated.
+ * - The second [Sequential] model is created via JSON configuration and weights loading.
+ * - After loading model is trained again with the same optimizer with frozen Conv2D layers. Only weights in Dense layers can be updated.
+ * - Results of two training (with restored optimizer state and without) could be compared via accuracy comparison.
  */
 fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
     val (train, test) = mnist()

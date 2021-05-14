@@ -18,6 +18,17 @@ private const val NUM_CLASSES = 10
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
+/**
+ * This example shows how to do image classification from scratch using pre-made [resnet50Light] model, without leveraging pre-trained weights.
+ * We demonstrate the workflow on the FashionMnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - usage of pre-defined model from [org.jetbrains.kotlinx.dl.api.core.model] package
+ * - model compilation
+ * - model training
+ * - model evaluation
+ */
 fun resnet50OnFashionMnistDataset() {
     val (train, test) = fashionMnist()
 

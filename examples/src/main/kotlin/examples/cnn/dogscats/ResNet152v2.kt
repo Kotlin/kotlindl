@@ -27,6 +27,22 @@ private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 200L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
+/**
+This example shows how to do image classification from scratch using pre-made [resnet152v2Light] model, without leveraging pre-trained weights.
+ * We demonstrate the workflow on the Kaggle Cats vs Dogs binary classification dataset.
+ *
+ * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - preprocessing DSL declaration
+ * - [OnFlyImageDataset] dataset creation
+ * - dataset splitting
+ * - usage of pre-made model from [org.jetbrains.kotlinx.dl.api.core.model] package
+ * - model compilation
+ * - model training
+ * - model evaluation
+ */
 fun resnet152v2onDogsVsCatsDataset() {
     val dogsVsCatsDatasetPath = dogsCatsDatasetPath()
 

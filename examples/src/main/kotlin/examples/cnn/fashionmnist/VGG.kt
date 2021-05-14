@@ -29,6 +29,9 @@ private const val SEED = 12L
 
 private val heNormal = HeNormal(SEED)
 
+/**
+ * This model is an implementation of VGG'11 model for FashionMnist Dataset.
+ */
 private val vgg11 = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -154,7 +157,14 @@ private val vgg11 = Sequential.of(
 )
 
 /**
- * This model is an implementation of VGG'11 model for FashionMnist Dataset.
+ * This example shows how to do image classification from scratch using [vgg11], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the FashionMnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - model compilation
+ * - model training
+ * - model evaluation
  */
 fun vgg() {
     val (train, test) = fashionMnist()

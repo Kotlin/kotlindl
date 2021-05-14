@@ -164,7 +164,22 @@ private val vgg11 = Sequential.of(
     )
 )
 
-/** */
+/**
+ * This example shows how to do image classification from scratch using [vgg11] model, without leveraging pre-trained weights.
+ * We demonstrate the workflow on the Cifar'10 classification dataset.
+ *
+ * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - preprocessing DSL declaration
+ * - [OnFlyImageDataset] dataset creation
+ * - dataset splitting
+ * - model compilation
+ * - model training
+ * - model export
+ * - model evaluation
+ */
 fun main() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 

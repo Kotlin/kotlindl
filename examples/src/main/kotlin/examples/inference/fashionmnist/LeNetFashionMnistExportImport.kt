@@ -33,13 +33,12 @@ private val fashionMnistLabelEncoding = mapOf(
 )
 
 /**
- * This examples demonstrates model and model weights export and import back.
- *
- * Models is exported as graph in .pb format, weights are exported in custom (txt) format.
- *
- * Model is trained on FashionMnist dataset.
- *
- * It saves all the data to the project root directory.
+ * This examples demonstrates model and model weights export and import back:
+ * - Model is exported as graph in .pb format, weights are exported in custom (txt) format.
+ * - Model is trained on FashionMnist dataset.
+ * - It saves all the data to the project root directory.
+ * - [InferenceModel] is created via graph and weights loading.
+ * - [InferenceModel] is reshaped and evaluated on first 10'000 images.
  */
 fun lenetOnFashionMnistExportImportToTxt() {
     val (train, test) = fashionMnist()

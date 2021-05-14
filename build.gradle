@@ -8,7 +8,7 @@ apply plugin: "io.codearte.nexus-staging"
 
 allprojects {
     group = 'org.jetbrains.kotlinx'
-    version = '0.2.0-alpha-1'
+    version = '0.2.0-alpha-2'
 
     apply plugin: "maven"
     apply plugin: "kotlin"

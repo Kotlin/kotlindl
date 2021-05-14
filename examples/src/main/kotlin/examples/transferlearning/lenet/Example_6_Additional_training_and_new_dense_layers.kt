@@ -22,14 +22,11 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /**
  * This examples demonstrates the transfer learning concept:
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Conv2D layer are added to the new Neural Network, its weights are frozen.
+ * - Flatten and new Dense layers are added and initialized via defined initializers.
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Conv2D layer are added to the new Neural Network, its weights are frozen.
- *
- * Flatten and new Dense layers are added and initialized via defined initializers.
- *
- * NOTE: Model and weights are resources in api module.
+ * NOTE: Model and weights are resources in `examples` module.
  */
 fun additionalTrainingAndNewTopDenseLayers() {
     val (train, test) = fashionMnist()

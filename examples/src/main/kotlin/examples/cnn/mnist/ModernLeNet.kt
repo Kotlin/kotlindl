@@ -29,12 +29,12 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 
 /**
- * This is an CNN based on an implementation of LeNet-5 from classic paper.
+ * This is an CNN based on an implementation of LeNet-5 from classic paper, but with a few minor changes to improve performance.
  *
  * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
  *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
  */
-private val model = Sequential.of(
+private val modernLeNet = Sequential.of(
     Input(
         IMAGE_SIZE,
         IMAGE_SIZE,
@@ -81,10 +81,21 @@ private val model = Sequential.of(
     )
 )
 
+/**
+ * This example shows how to do image classification from scratch using [modernLeNet], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the Mnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - model compilation
+ * - model summary (including TensorFlow graph operands)
+ * - model training
+ * - model evaluation
+ */
 fun modernLenet() {
     val (train, test) = mnist()
 
-    model.use {
+    modernLeNet.use {
         it.compile(
             optimizer = SGD(learningRate = 0.1f),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

@@ -24,11 +24,13 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on ResNet'151 model:
- *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
+ * This examples demonstrates the inference concept on ResNet'152 model:
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in ResNet'152 during training on ImageNet dataset) is applied to images before prediction.
+ * - No additional training.
+ * - No new layers are added.
  */
 fun resnet152prediction() {
     val modelZoo =

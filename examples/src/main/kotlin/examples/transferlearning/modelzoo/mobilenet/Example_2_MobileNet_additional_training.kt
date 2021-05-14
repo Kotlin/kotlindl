@@ -35,11 +35,16 @@ private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
- * This examples demonstrates the inference concept on MobileNet model:
+ * This examples demonstrates the transfer learning concept on MobileNet model:
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
+ * - New Dense layers are added and initialized via defined initializers.
+ * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
+ * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to images before prediction via [Sharpen] stage.
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
+ * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun mobilenetWithAdditionalTraining() {
     val modelZoo =

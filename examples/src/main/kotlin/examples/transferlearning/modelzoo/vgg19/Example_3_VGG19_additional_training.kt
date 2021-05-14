@@ -35,17 +35,15 @@ private const val TEST_BATCH_SIZE = 16
 private const val EPOCHS = 2
 
 /**
- * This examples demonstrates the inference concept on VGG'19 model:
+ * This examples demonstrates the transfer learning concept on VGG'19 model:
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
+ * - New Dense layers are added and initialized via defined initializers.
+ * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
- *
- * No additional training.
- *
- * No new layers are added.
- *
- * NOTE: The specific image preprocessing is not implemented yet (see Keras for more details).
+ * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  *
  * @see <a href="https://drive.google.com/drive/folders/1P1BlCNXdeXo_9u6mxYnm-N_gbOn_VhUA">
  *     VGG'19 weights and model could be loaded here.</a>

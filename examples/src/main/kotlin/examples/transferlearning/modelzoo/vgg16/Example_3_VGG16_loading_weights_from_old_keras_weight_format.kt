@@ -30,17 +30,14 @@ import java.util.*
 
 /**
  * This examples demonstrates the inference concept on VGG'16 model and weights loading from outdated or custom weights schema in .h5 file:
- * Also recursivePrintGroupInHDF5File() is helpful to discover hidden schema and paths.
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in VGG'16 during training on ImageNet dataset) is applied to images before prediction.
+ * - No additional training.
+ * - No new layers are added.
  *
- * Model predicts on a few images located in resources.
- *
- * No additional training.
- *
- * No new layers are added.
- *
- * NOTE: The specific image preprocessing is not implemented yet (see Keras for more details).
+ * NOTE: Also recursivePrintGroupInHDF5File() is helpful to discover hidden schema and paths.
  *
  * @see <a href="https://drive.google.com/drive/folders/1loUL_iNZ_98UwB7YXvQ2DrqVcBfg7E3w">
  *     VGG'16 weights in old format and model could be loaded here.</a>

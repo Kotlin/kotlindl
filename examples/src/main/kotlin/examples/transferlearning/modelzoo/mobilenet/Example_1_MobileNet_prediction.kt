@@ -25,12 +25,12 @@ import java.io.File
 
 /**
  * This examples demonstrates the inference concept on MobileNet model:
- *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to images before prediction.
  */
-fun mobilenetPrediction() {
+fun mobileNetPrediction() {
     val modelZoo =
         ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
     val model = modelZoo.loadModel() as Functional
@@ -73,4 +73,4 @@ fun mobilenetPrediction() {
 }
 
 /** */
-fun main(): Unit = mobilenetPrediction()
+fun main(): Unit = mobileNetPrediction()

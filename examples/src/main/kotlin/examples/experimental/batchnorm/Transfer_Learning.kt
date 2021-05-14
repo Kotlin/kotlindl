@@ -18,15 +18,14 @@ import java.io.File
 /**
  * This examples demonstrates the inference concept:
  *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model is evaluated after loading to obtain accuracy value.
- *
- * No additional training.
- *
- * No new layers are added.
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model is evaluated after loading to obtain accuracy value.
+ * - No additional training.
+ * - No new layers are added.
  *
  * NOTE: Model and weights are resources in api module.
+ *
+ * We demonstrate the workflow on the FashionMnist classification dataset.
  */
 fun main() {
     val (train, test) = fashionMnist()

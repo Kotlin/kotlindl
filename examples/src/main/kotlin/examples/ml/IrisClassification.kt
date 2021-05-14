@@ -27,6 +27,16 @@ private val model = Sequential.of(
     Dense(3, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros())
 )
 
+/**
+ * This example shows how to do classification from scratch, starting from static Iris dataset, using simple Dense-based [model].
+ *
+ * It includes:
+ * - dataset creation
+ * - dataset splitting
+ * - model compilation
+ * - model training
+ * - model evaluation
+ */
 fun irisClassification() {
     data.shuffle()
 

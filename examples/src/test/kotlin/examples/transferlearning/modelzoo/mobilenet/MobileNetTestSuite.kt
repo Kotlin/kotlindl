@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 class MobileNetTestSuite {
     @Test
     fun mobilenetPredictionTest() {
-        mobilenetPrediction()
+        mobileNetPrediction()
     }
 
     @Test
@@ -20,6 +20,6 @@ class MobileNetTestSuite {
 
     @Test
     fun mobilenetv2PredictionTest() {
-        mobilenetv2Prediction()
+        mobileNetV2Prediction()
     }
 }

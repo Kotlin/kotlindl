@@ -25,16 +25,11 @@ import java.util.*
 
 /**
  * This examples demonstrates the inference concept on VGG'16 model and weights loading from KotlinDL txt format:
- *
- * Weights are loaded from txt files, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
- *
- * No additional training.
- *
- * No new layers are added.
- *
- * NOTE: The specific image preprocessing is not implemented yet (see Keras for more details).
+ * - Weights are loaded from txt files, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in VGG'16 during training on ImageNet dataset) is applied to images before prediction.
+ * - No additional training.
+ * - No new layers are added.
  *
  * @see <a href="https://drive.google.com/drive/folders/1TkshZWtMKP-_oeJPvCl5dZKqxHzxwfRg">
  *     VGG'16 weights in txt format and model could be loaded here.</a>

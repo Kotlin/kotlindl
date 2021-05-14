@@ -23,7 +23,16 @@ import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
-
+/**
+ * This example shows how to do image preprocessing from scratch using [Preprocessing].
+ *
+ * Also we use the [JPanel] to visualise (rotated pigeon should be displayed).
+ *
+ * It includes:
+ * - dataset creation from images located in resource folder
+ * - image preprocessing
+ * - image visualisation
+ */
 fun main() {
     val properties = Properties()
     val reader = FileReader("data.properties")

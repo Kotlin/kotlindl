@@ -21,6 +21,9 @@ private const val TEST_BATCH_SIZE = 1000
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 
+/**
+ * This is a simple model based on Dense layers only.
+ */
 private val model = Sequential.of(
     Input(784),
     Dense(1024, Activations.Relu, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros()),
@@ -31,7 +34,14 @@ private val model = Sequential.of(
 )
 
 /**
- * This is a simple model based on Dense layers only.
+ * This example shows how to do image classification from scratch using [model], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the Mnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - model compilation
+ * - model training
+ * - model evaluation
  */
 fun denseOnly() {
     val (train, test) = mnist()

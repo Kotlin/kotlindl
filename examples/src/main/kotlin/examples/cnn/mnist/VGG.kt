@@ -29,6 +29,9 @@ private const val SEED = 12L
 
 private val heNormal = HeNormal(SEED)
 
+/**
+ * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
+ */
 private val vgg11 = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -153,8 +156,17 @@ private val vgg11 = Sequential.of(
     )
 )
 
+
 /**
- * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
+ * This example shows how to do image classification from scratch using [vgg11], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the Mnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - model compilation
+ * - model summary
+ * - model training
+ * - model evaluation
  */
 fun vgg() {
     val (train, test) = mnist()

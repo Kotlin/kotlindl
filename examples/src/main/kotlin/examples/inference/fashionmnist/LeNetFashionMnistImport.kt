@@ -14,7 +14,7 @@ private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 /**
  * Inference model is used here, separately from model training code to illustrate the ability to load model graph and weights to start prediction process.
  *
- * NOTE: The example requires the saved model in the appropriate directory (run LeNetFashionMnistExportImport.kt firstly).
+ * NOTE: The example requires the saved model in the appropriate directory (run [lenetOnFashionMnistExportImportToTxt] firstly).
  */
 fun main() {
     val (train, _) = fashionMnist()

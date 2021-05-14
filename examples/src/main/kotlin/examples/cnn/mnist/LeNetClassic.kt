@@ -91,6 +91,17 @@ private val lenet5Classic = Sequential.of(
     )
 )
 
+/**
+ * This example shows how to do image classification from scratch using [lenet5Classic], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the Mnist classification dataset.
+ *
+ * It includes:
+ * - dataset loading from S3
+ * - model compilation
+ * - model summary
+ * - model training
+ * - model evaluation
+ */
 fun lenetClassic() {
     val (train, test) = mnist()
 

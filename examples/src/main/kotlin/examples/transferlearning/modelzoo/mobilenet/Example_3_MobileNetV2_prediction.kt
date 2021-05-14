@@ -23,13 +23,13 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on MobileNetv2 model:
- *
- * Weights are loaded from .h5 file, configuration is loaded from .json file.
- *
- * Model predicts on a few images located in resources.
+ * This examples demonstrates the inference concept on MobileNetV2 model:
+ * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
  */
-fun mobilenetv2Prediction() {
+fun mobileNetV2Prediction() {
     val modelZoo =
         ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNetv2)
     val model = modelZoo.loadModel() as Functional
@@ -72,5 +72,5 @@ fun mobilenetv2Prediction() {
 }
 
 /** */
-fun main(): Unit = mobilenetv2Prediction()
+fun main(): Unit = mobileNetV2Prediction()
 

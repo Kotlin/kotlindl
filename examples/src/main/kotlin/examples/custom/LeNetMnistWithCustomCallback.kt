@@ -28,6 +28,12 @@ private const val TEST_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
 
+/**
+ * This is an CNN based on an implementation of LeNet-5 from classic paper trained with custom callback.
+ *
+ * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
+ *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ */
 private val model = Sequential.of(
     Input(
         IMAGE_SIZE,
@@ -76,10 +82,16 @@ private val model = Sequential.of(
 )
 
 /**
- * This is an CNN based on an implementation of LeNet-5 from classic paper trained with custom callback.
+ * This example shows how to do image classification from scratch using [model], without leveraging pre-trained weights or a pre-made model.
+ * We demonstrate the workflow on the Mnist classification dataset.
  *
- * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
- *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ * It includes:
+ * - dataset loading from S3
+ * - callback definition [CustomCallback]
+ * - model compilation with [CustomCallback]
+ * - TensorFlow graph printing
+ * - model training
+ * - model evaluation
  */
 fun lenetMnistWithCustomCallback() {
     val (train, test) = mnist()

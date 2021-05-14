@@ -27,6 +27,17 @@ private val model = Sequential.of(
     Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros(), name = "dense_2")
 )
 
+/**
+ * This example shows how to do regression from scratch, starting from generated dataset, using simple Dense-based [model] with 1 neuron.
+ *
+ * It includes:
+ * - dataset creation
+ * - dataset splitting
+ * - model compilation
+ * - model training
+ * - model evaluation
+ * - model weights printing
+ */
 fun linearRegression() {
     val rnd = Random(SEED)
     val data = Array(10000) { doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0) }
