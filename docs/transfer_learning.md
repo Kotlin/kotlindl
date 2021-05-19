@@ -27,7 +27,7 @@ You can do so via the Image Preprocessing Pipeline description, and building a d
 Here's code that will go through a folder structure received via ```catDogsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
 
 ```kotlin
-val dogsVsCatsDatasetPath = catDogsSmallDatasetPath()
+val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
 val preprocessing: Preprocessing = preprocess {
     transformImage {
