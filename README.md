@@ -158,7 +158,7 @@ You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin ker
 
 ```
    @file:Repository("https://kotlin.bintray.com/kotlin-datascience")
-   @file:DependsOn("org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]")
+   @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
 ```
 
 For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
