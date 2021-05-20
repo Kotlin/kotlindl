@@ -57,10 +57,9 @@ Here are step-by-step instructions to help you get started:
 5. Start your Jupyter Notebook from the command line using `jupyter notebook`
 6. Once Jupyter Notebook is open in your browser, you can create a new Kotlin notebook from the UI. 
 7. In your new Kotlin notebook, add a dependency for Kotlin DL:
-    ```
-   @file:Repository("https://kotlin.bintray.com/kotlin-datascience")
-   @file:DependsOn("org.jetbrains.kotlin-deeplearning:api:[KOTLIN-DL-VERSION]")
-   ```
+```
+   @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
+```
 
 You are now all set! Next, you can start [building your first neural network](create_your_first_nn.md).
  

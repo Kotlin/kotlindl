@@ -157,7 +157,6 @@ For more details, as well as for `pom.xml` and `build.gradle.kts` examples, plea
 You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the following dependency in your notebook: 
 
 ```
-   @file:Repository("https://kotlin.bintray.com/kotlin-datascience")
    @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
 ```
 
