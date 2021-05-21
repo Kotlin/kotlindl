@@ -13,6 +13,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val activity_regularizer: ActivityRegularizer? = null,
     @Json(serializeNull = false)
+    val alpha: Double? = null,
+    @Json(serializeNull = false)
     val axis: Any? = null,
     @Json(serializeNull = false)
     var batch_input_shape: List<Int?>? = null,
