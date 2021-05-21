@@ -8,95 +8,88 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.tensorflow.Graph
-import org.tensorflow.Session
-import org.tensorflow.Shape
+import org.tensorflow.*
 import org.tensorflow.op.Ops
 
-// TODO: tests should start from variable initialization in Graph mode only. Looks like eager mode does not support variables
-// We could tests without variables only
+internal typealias FloatConv2DTensor = Array<Array<Array<FloatArray>>>
+
 open class ConvLayerTest {
-    protected fun assertActivationFunction(
+
+    protected fun assertTensorsEquals(
         layer: Layer,
-        input: Array<Array<Array<FloatArray>>>,
-        actual: Array<Array<Array<FloatArray>>>,
-        expected: Array<Array<Array<FloatArray>>>
+        input: FloatConv2DTensor,
+        expected: FloatConv2DTensor
     ) {
-        val inputSize = input.size
-        val inputShape = Shape.make(inputSize.toLong())
+        val actual = expected.copyZeroed()
 
-        Graph().use { g ->
-            Session(g).use { session ->
-                val tf = Ops.create(g)
-                val kGraph = KGraph(g.toGraphDef())
-                val inputOp = tf.constant(input)
+        Graph().use { graph ->
+            Session(graph).use { session ->
+                val tf = Ops.create(graph)
+                KGraph(graph.toGraphDef()).use { kGraph ->
 
+                    val inputOp = tf.constant(input)
+                    val isTraining = tf.constant(true)
+                    val numberOfLosses = tf.constant(1.0f)
 
-                layer.build(tf, kGraph, inputShape)
+                    layer.build(tf, kGraph, input.getShape())
+                    val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+                    kGraph.initializeGraphVariables(session)
+                    val outputTensor = session.runner().fetch(output).run().first()
+                    val outputTensorShape = shapeFromDims(*outputTensor.shape())
+                    outputTensor.copyTo(actual)
 
-                val isTraining = tf.constant(true)
-                val numberOfLosses = tf.constant(1.0f)
-                val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
-
-                val expectedShape = Shape.make(
-                    inputSize.toLong()
-                )
-
-                val actualShape = shapeFromDims(*output.shape())
-                assertEquals(expectedShape, actualShape)
-
-                output.copyTo(actual)
-
-                for (i in expected.indices) {
-                    for (j in expected[i].indices) {
-                        for (k in expected[i][j].indices) {
-                            Assertions.assertArrayEquals(
-                                expected[i][j][k],
-                                actual[i][j][k],
-                                EPS
-                            )
-                        }
-
-                    }
+                    assertEquals(expected.getShape(), outputTensorShape)
+                    assertTensorsEquals(expected, actual)
                 }
+            }
+        }
+    }
 
+    protected fun assertTensorsEquals(
+        expected: FloatConv2DTensor,
+        actual: FloatConv2DTensor
+    ) {
+        for (i in expected.indices) {
+            for (j in expected[i].indices) {
+                for (k in expected[i][j].indices) {
+                    assertArrayEquals(
+                        expected[i][j][k],
+                        actual[i][j][k],
+                        EPS
+                    )
+                }
+            }
+        }
+    }
+
+    protected fun createFloatConv2DTensor(
+        batchSize: Int,
+        rows: Int,
+        cols: Int,
+        channels: (Pair<Int, Int>) -> FloatArray
+    ): FloatConv2DTensor =
+        Array(batchSize) {
+            Array(rows) { r ->
+                Array(cols) { c ->
+                    channels(Pair(r, c))
+                }
             }
         }
 
+    protected fun allChannelsSame(channels: Int, value: Float): (Pair<Int, Int>) -> FloatArray =
+        { FloatArray(channels) { value } }
 
+    private fun FloatConv2DTensor.getShape(): Shape = Shape.make(
+        this.size.toLong(),
+        this[0].size.toLong(),
+        this[0][0].size.toLong(),
+        this[0][0][0].size.toLong()
+    )
 
-       /* EagerSession.create().use {
-            val tf = Ops.create(it)
-            val inputOp = tf.constant(input)
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
-            val isTraining = tf.constant(true)
-            val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
-
-            val expectedShape = Shape.make(
-                inputSize.toLong()
-            )
-
-            val actualShape = shapeFromDims(*output.shape())
-            assertEquals(expectedShape, actualShape)
-
-            output.copyTo(actual)
-
-            for (i in expected.indices) {
-                for (j in expected[i].indices) {
-                    for (k in expected[i][j].indices) {
-                        Assertions.assertArrayEquals(
-                            expected[i][j][k],
-                            actual[i][j][k],
-                            EPS
-                        )
-                    }
-
-                }
-            }
-        }*/
-    }
+    private fun FloatConv2DTensor.copyZeroed() =
+        createFloatConv2DTensor(this.size, this[0].size, this[0][0].size) {
+            FloatArray(this[0][0][0].size)
+        }
 }
-

@@ -5,54 +5,45 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
+import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
+import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv2DTest : ConvLayerTest() {
+
     @Test
-    fun conv2d() {
-        /*val input = Array(1) {
-            Array(2) {
-                Array(2) {
-                    FloatArray(1)
-                }
-            }
-        }
+    fun zeroedInputTensorWithDefaultValues() {
+        val input = createFloatConv2DTensor(batchSize = 1, rows = 3, cols = 3, allChannelsSame(1, 0.0f))
+        val expected = createFloatConv2DTensor(batchSize = 1, rows = 3, cols = 3, allChannelsSame(32, 0.0f))
 
-        for (i in 0..1)
-            for (j in 0..1)
-                input[0][i][j][0] = 1.0f
-
-
-        val expected = Array(1) {
-            Array(2) {
-                Array(2) {
-                    FloatArray(1)
-                }
-            }
-        }
-
-        for (i in 0..1)
-            for (j in 0..1)
-                expected[0][i][j][0] = 1.0f
-
-        val actual = Array(1) {
-            Array(2) {
-                Array(2) {
-                    FloatArray(1)
-                }
-            }
-        }
-
-        for (i in 0..1)
-            for (j in 0..1)
-                actual[0][i][j][0] = 1.0f
-
-
-        assertActivationFunction(
-            Conv2D(name = "TestConv2D_1", filters = 1, kernelInitializer = HeNormal(12L), biasInitializer = Zeros()),
+        assertTensorsEquals(
+            Conv2D(
+                name = "TestConv2D_1",
+                biasInitializer = Zeros()
+            ),
             input,
-            actual,
             expected
-        )*/
+        )
+    }
+
+    @Test
+    fun constantInputTensorWithValidPadding() {
+        val input = createFloatConv2DTensor(batchSize = 1, rows = 3, cols = 3, allChannelsSame(1, 1.0f))
+        val expected = createFloatConv2DTensor(batchSize = 1, rows = 2, cols = 2, allChannelsSame(16, 4.0f))
+
+        assertTensorsEquals(
+            Conv2D(
+                name = "TestConv2D_2",
+                filters = 16,
+                kernelInitializer = Constant(1.0f),
+                biasInitializer = Zeros(),
+                kernelSize = longArrayOf(2, 2),
+                padding = ConvPadding.VALID
+            ),
+            input,
+            expected
+        )
     }
 }

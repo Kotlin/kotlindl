@@ -63,8 +63,8 @@ public class Conv2D(
     private var bias: Variable<Float>? = null
 
     // weight tensor shapes
-    private lateinit var biasShape: Shape
     private lateinit var kernelShape: Shape
+    private lateinit var biasShape: Shape
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
