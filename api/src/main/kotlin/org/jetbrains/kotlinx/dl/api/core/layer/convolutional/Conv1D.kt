@@ -45,6 +45,8 @@ private const val EXTRA_DIM = 1L
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
  * @constructor Creates [Conv1D] object.
+ *
+ * @since 0.3
  */
 public class Conv1D(
     public val filters: Long = 32,
