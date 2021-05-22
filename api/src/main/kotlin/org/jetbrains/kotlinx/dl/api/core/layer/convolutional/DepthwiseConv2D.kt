@@ -137,12 +137,7 @@ public class DepthwiseConv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
-
+        val tfPadding = padding.tfRepresentation
         val options: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
         var output: Operand<Float> =
             tf.nn.depthwiseConv2dNative(
@@ -175,11 +170,7 @@ public class DepthwiseConv2D(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(depthwiseKernelShape)) + numElementsInShape(
-            shapeToLongArray(
-                biasShape
-            )
-        )).toInt()
+        get() = (depthwiseKernelShape.numElements() + biasShape.numElements()).toInt()
 
     override fun toString(): String {
         return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, useBias=$useBias, depthwiseKernel=$depthwiseKernel, bias=$bias, biasShape=$biasShape, depthwiseKernelShape=$depthwiseKernelShape)"

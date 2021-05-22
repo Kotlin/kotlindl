@@ -65,11 +65,7 @@ public class AvgPool2D(
             stridesLongList.add(it.toLong())
         }
 
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
+        val tfPadding = padding.tfRepresentation
 
         return tf.nn.avgPool(
             input,
