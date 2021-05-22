@@ -137,7 +137,7 @@ public class DepthwiseConv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = padding.tfRepresentation
+        val tfPadding = padding.tfInternal
         val options: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
         var output: Operand<Float> =
             tf.nn.depthwiseConv2dNative(

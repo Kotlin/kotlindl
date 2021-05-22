@@ -165,7 +165,7 @@ public class SeparableConv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = padding.tfRepresentation
+        val tfPadding = padding.tfInternal
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
 
         val depthwiseOutput: Operand<Float> =

@@ -65,7 +65,7 @@ public class AvgPool2D(
             stridesLongList.add(it.toLong())
         }
 
-        val tfPadding = padding.tfRepresentation
+        val tfPadding = padding.tfInternal
 
         return tf.nn.avgPool(
             input,

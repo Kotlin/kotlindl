@@ -160,7 +160,7 @@ public open class Conv2DImpl(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = paddingInternal.tfRepresentation
+        val tfPadding = paddingInternal.tfInternal
         val options: Conv2d.Options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
         var output: Operand<Float> = tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), tfPadding, options)
 
@@ -208,13 +208,10 @@ public open class Conv2DImpl(
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal)
         if (useBiasInternal) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal)
     }
+}
 
-    protected companion object {
-        @JvmStatic
-        protected fun assertArraySize(array: LongArray, size: Int, name: String) {
-            if (array.size != size) {
-                throw IllegalArgumentException("$name is expected to have size equal $size")
-            }
-        }
+private fun assertArraySize(array: LongArray, size: Int, name: String) {
+    if (array.size != size) {
+        throw IllegalArgumentException("$name is expected to have size equal $size")
     }
 }

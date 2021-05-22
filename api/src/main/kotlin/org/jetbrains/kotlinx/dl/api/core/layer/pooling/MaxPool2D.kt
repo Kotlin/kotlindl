@@ -54,7 +54,7 @@ public class MaxPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = padding.tfRepresentation
+        val tfPadding = padding.tfInternal
 
         return tf.nn.maxPool(
             input,
