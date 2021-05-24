@@ -20,7 +20,7 @@ internal class ELUTest : ActivationLayerTest() {
     }
 
     @Test
-    fun alphaParametrizedELU() {
+    fun positiveAlphaParametrizedELU() {
         val alpha = 2.42f
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
         val expected = floatArrayOf(-2.2995f, -1.5297f,  0.0f,  2.0f)
@@ -29,7 +29,7 @@ internal class ELUTest : ActivationLayerTest() {
     }
 
     @Test
-    fun eluWithNegativeAlpha() {
+    fun negativeAlphaParametrizedELU() {
         val alpha = -3.14f
 
         assertThrows(IllegalArgumentException::class.java) {
@@ -38,7 +38,7 @@ internal class ELUTest : ActivationLayerTest() {
     }
 
     @Test
-    fun eluWithZeroAlpha() {
+    fun zeroAlphaELU() {
         val alpha = 0.0f
 
         assertThrows(IllegalArgumentException::class.java) {
