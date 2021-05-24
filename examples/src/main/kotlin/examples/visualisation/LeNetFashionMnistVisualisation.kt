@@ -59,6 +59,9 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
+        val fashionPlots = List(3) { tileImagePlot(it, test, model::predict) }
+        columnPlot(fashionPlots, 3, 256).show()
+
         val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 

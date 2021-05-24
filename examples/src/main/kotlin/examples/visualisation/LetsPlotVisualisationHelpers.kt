@@ -25,7 +25,7 @@ private val FEATURE_MAP_THEME = geomTile(showLegend = false) +
             .axisTextBlank()
             .axisTicksBlank()
 
-fun composePlots(plots: Iterable<Plot>, columns: Int, imageSize: Int): GGBunch =
+fun columnPlot(plots: Iterable<Plot>, columns: Int, imageSize: Int): GGBunch =
     gggrid(plots, columns, imageSize, imageSize, fit = true)
 
 fun featureMapPlot(xSize: Int, ySize: Int, f: (Int, Int) -> Float): Plot {
@@ -44,7 +44,7 @@ fun featureMapPlot(xSize: Int, ySize: Int, f: (Int, Int) -> Float): Plot {
 fun featureMapPlot(imageSize: Int, f: (Int, Int) -> Float): Plot =
     featureMapPlot(imageSize, imageSize, f)
 
-fun mnistNumberPlot(sampleNumber: Int, dataset: Dataset, predict: (FloatArray) -> Int? = { null }): Plot {
+fun tileImagePlot(sampleNumber: Int, dataset: Dataset, predict: (FloatArray) -> Int? = { null }): Plot {
 
     val imageSize = 28
     val imageData = dataset.getX(sampleNumber)
@@ -61,18 +61,17 @@ fun mnistNumberPlot(sampleNumber: Int, dataset: Dataset, predict: (FloatArray) -
 
 @Suppress("UNCHECKED_CAST")
 fun filtersPlot(conv2DLayer: Conv2D, imageSize: Int = 64, columns: Int = 8): GGBunch {
+
     val weights = conv2DLayer.weights.values.toTypedArray()[0] as TensorImageData
-    val sizes = extractXYIOSizes(weights, intArrayOf(1, 0, 2, 3))
 
-    val plots = List(sizes[2]) { i ->
-        List(sizes[3]) { o ->
-            featureMapPlot(sizes[0], sizes[1]) { x, y ->
-                weights[y][x][i][o]
-            }
+    val xyio = extractXYIOSizes(weights, intArrayOf(1, 0, 2, 3))
+
+    val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
+        featureMapPlot(xyio[0], xyio[1]) { x, y ->
+            weights[y][x][i][o]
         }
-    }.flatten()
-
-    return composePlots(plots, columns, imageSize)
+    }
+    return columnPlot(plots, columns, imageSize)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -86,19 +85,19 @@ fun modelActivationOnLayersPlot(
     val activationArrays = activations.mapNotNull { it as? TensorImageData }
 
     return activationArrays.map { weights ->
-        val sizes = extractXYIOSizes(weights, intArrayOf(2, 1, 0, 3))
+        val xyio = extractXYIOSizes(weights, intArrayOf(2, 1, 0, 3))
 
-        val plots = List(sizes[2]) { i ->
-            List(sizes[3]) { o ->
-                featureMapPlot(sizes[0], sizes[1]) { x, y ->
-                    weights[i][y][x][o]
-                }
+        val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
+            featureMapPlot(xyio[0], xyio[1]) { x, y ->
+                weights[i][y][x][o]
             }
-        }.flatten()
-
-        composePlots(plots, columns, imageSize)
+        }
+        columnPlot(plots, columns, imageSize)
     }
 }
+
+internal fun inputsOutputsPlots(inputs: Int, outputs: Int, f: (Int, Int) -> Plot) =
+    List(inputs) { i -> List(outputs) { o -> f(i, o) } }.flatten()
 
 internal fun extractXYIOSizes(inputData: TensorImageData, permute: IntArray = intArrayOf(0, 1, 2, 3)): IntArray =
     with(IntArray(4)) {
