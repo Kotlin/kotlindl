@@ -6,6 +6,7 @@
 package examples.visualisation
 
 import examples.inference.lenet5
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -38,14 +39,19 @@ fun main() {
 
     val (newTrain, validation) = train.split(0.95)
 
-    lenet5().use {
-        it.compile(
+    val sampleIndex = 42
+    val x = test.getX(sampleIndex)
+    val y = test.getY(sampleIndex).toInt()
+
+    lenet5().use { model ->
+
+        model.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
-        it.fit(
+        model.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
             epochs = EPOCHS,
@@ -53,28 +59,21 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val imageId = 0
-
-        val weights = it.layers[1].weights // first conv2d layer
-
-        drawFilters(weights.values.toTypedArray()[0], colorCoefficient = 10.0)
-
-        val weights2 = it.layers[3].weights // first conv2d layer
-
-        drawFilters(weights2.values.toTypedArray()[0], colorCoefficient = 12.0)
-
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
+        val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 
-        val (prediction, activations) = it.predictAndGetActivations(train.getX(imageId))
+        val fstConv2D = model.layers[1] as Conv2D
+        val sndConv2D = model.layers[3] as Conv2D
 
+        filtersPlot(fstConv2D, columns = 16).show()
+        filtersPlot(sndConv2D, columns = 16).show()
+
+        val layersActivations = modelActivationOnLayersPlot(model, x)
+        val prediction = model.predict(x)
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
+        println("Ground Truth: ${fashionMnistLabelEncoding[y]}")
 
-        drawActivations(activations)
-
-        val trainImageLabel = train.getY(imageId)
-
-        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel.toInt()]}")
+        layersActivations[0].show()
+        layersActivations[1].show()
     }
 }
