@@ -12,10 +12,21 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Base class for all layer class representing activation functions.
+ *
+ * By default it is marked as __not trainable__ layer with no extra
+ * parameters and weights but having the activation on it.
+ *
+ * By default it defines returning the output with the same shape
+ * as the input Operand
+ *
+ * @param [name] Layer name. Would be changed if empty during model compilation.
+ */
 public abstract class AbstractActivationLayer(name: String) : Layer(name) {
 
     init {
-        this.isTrainable = false
+        isTrainable = false
     }
 
     public abstract fun forward(
