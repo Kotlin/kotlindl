@@ -29,7 +29,7 @@ import org.tensorflow.op.Ops
 public class ELU(
     public val alpha: Float = 1.0f,
     name: String = ""
-) : Activation(name) {
+) : AbstractActivationLayer(name) {
     init {
         require(alpha > 0.0f) { "Alpha $alpha should be > 0.0." }
     }
