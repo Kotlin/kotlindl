@@ -28,7 +28,7 @@ fun main() {
 
         it.reshape(::reshapeInput)
 
-        val prediction = it.predict(train.getX(0))
+        val prediction = it.predict(train.getX(0), "ReLU114_Output_0")
 
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getLabel(0))

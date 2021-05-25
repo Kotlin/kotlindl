@@ -47,6 +47,15 @@ public open class OnnxModel : AutoCloseable {
         return predLabel
     }
 
+    public fun predict(inputData: FloatArray, output: String): Int {
+        val preparedData = reshapeFunction(inputData)
+        val tensor = OnnxTensor.createTensor(env, preparedData)
+        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor), setOf(output))
+        val outputProbs = output[0].value as Array<FloatArray>
+        val predLabel = pred(outputProbs[0])
+        return predLabel
+    }
+
     /**
      * Find the maximum probability and return it's index.
      *
