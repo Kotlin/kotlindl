@@ -6,12 +6,15 @@
 package examples.visualisation
 
 import jetbrains.letsPlot.GGBunch
-import jetbrains.letsPlot.geom.geomTile
+import jetbrains.letsPlot.geom.geomRaster
 import jetbrains.letsPlot.gggrid
 import jetbrains.letsPlot.ggplot
 import jetbrains.letsPlot.intern.Plot
+import jetbrains.letsPlot.intern.Scale
 import jetbrains.letsPlot.label.ggtitle
+import jetbrains.letsPlot.scale.scaleFillBrewer
 import jetbrains.letsPlot.scale.scaleFillGrey
+import jetbrains.letsPlot.scale.scaleFillHue
 import jetbrains.letsPlot.theme
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
@@ -19,16 +22,23 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 
 internal typealias TensorImageData = Array<Array<Array<FloatArray>>>
 
-private val FEATURE_MAP_THEME = geomTile(showLegend = false) +
-        scaleFillGrey() +
+private val FEATURE_MAP_THEME =
+        geomRaster(showLegend = false) +
         theme().axisTitleBlank()
             .axisTextBlank()
             .axisTicksBlank()
 
+class PlotFill(val scale: Scale) {
+    companion object {
+        val GRAY = PlotFill(scaleFillGrey())
+        val HUE = PlotFill(scaleFillHue())
+    }
+}
+
 fun columnPlot(plots: Iterable<Plot>, columns: Int, imageSize: Int): GGBunch =
     gggrid(plots, columns, imageSize, imageSize, fit = true)
 
-fun featureMapPlot(xSize: Int, ySize: Int, f: (Int, Int) -> Float): Plot {
+fun featureMapPlot(xSize: Int, ySize: Int, plotFill: PlotFill, f: (Int, Int) -> Float): Plot {
 
     val gridX = List(xSize) { List(ySize) { it } }.flatten()
     val gridY = List(ySize) { y -> List(xSize) { y } }.flatten()
@@ -38,36 +48,46 @@ fun featureMapPlot(xSize: Int, ySize: Int, f: (Int, Int) -> Float): Plot {
         x = gridX
         y = gridY
         fill = gridZ
-    } + FEATURE_MAP_THEME
+    } + FEATURE_MAP_THEME + plotFill.scale
 }
 
-fun featureMapPlot(imageSize: Int, f: (Int, Int) -> Float): Plot =
-    featureMapPlot(imageSize, imageSize, f)
+fun featureMapPlot(imageSize: Int, plotFill: PlotFill, f: (Int, Int) -> Float): Plot =
+    featureMapPlot(imageSize, imageSize, plotFill, f)
 
-fun tileImagePlot(sampleNumber: Int, dataset: Dataset, predict: (FloatArray) -> Int? = { null }): Plot {
-
+fun mnistImagePlot(
+    sampleNumber: Int,
+    dataset: Dataset,
+    predict: (FloatArray) -> Int? = { null },
+    plotFill: PlotFill = PlotFill.GRAY,
+    labelEncoding: (Int) -> Any? = { it }
+): Plot {
     val imageSize = 28
     val imageData = dataset.getX(sampleNumber)
-    val imageLabel = dataset.getY(sampleNumber).toInt()
-    val predictedLabel = predict(imageData)
+    val imageLabel = dataset.getY(sampleNumber).toInt().run(labelEncoding)
+    val predictedLabel = predict(imageData)?.run(labelEncoding)
     val title = if (predictedLabel == null) {
         "Real label: $imageLabel"
     } else {
         "Real label: $imageLabel | Predicted label: $predictedLabel"
     }
 
-    return featureMapPlot(imageSize) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
+    return featureMapPlot(imageSize, plotFill) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
 }
 
 @Suppress("UNCHECKED_CAST")
-fun filtersPlot(conv2DLayer: Conv2D, imageSize: Int = 64, columns: Int = 8): GGBunch {
+fun filtersPlot(
+    conv2DLayer: Conv2D,
+    plotFill: PlotFill = PlotFill.GRAY,
+    imageSize: Int = 64,
+    columns: Int = 8
+): GGBunch {
 
     val weights = conv2DLayer.weights.values.toTypedArray()[0] as TensorImageData
 
     val xyio = extractXYIOSizes(weights, intArrayOf(1, 0, 2, 3))
 
     val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
-        featureMapPlot(xyio[0], xyio[1]) { x, y ->
+        featureMapPlot(xyio[0], xyio[1], plotFill) { x, y ->
             weights[y][x][i][o]
         }
     }
@@ -78,8 +98,9 @@ fun filtersPlot(conv2DLayer: Conv2D, imageSize: Int = 64, columns: Int = 8): GGB
 fun modelActivationOnLayersPlot(
     model: TrainableModel,
     x: FloatArray,
+    plotFill: PlotFill = PlotFill.GRAY,
     imageSize: Int = 64,
-    columns: Int = 8
+    columns: Int = 8,
 ): List<GGBunch> {
     val activations = model.predictAndGetActivations(x).second
     val activationArrays = activations.mapNotNull { it as? TensorImageData }
@@ -88,7 +109,7 @@ fun modelActivationOnLayersPlot(
         val xyio = extractXYIOSizes(weights, intArrayOf(2, 1, 0, 3))
 
         val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
-            featureMapPlot(xyio[0], xyio[1]) { x, y ->
+            featureMapPlot(xyio[0], xyio[1], plotFill) { x, y ->
                 weights[i][y][x][o]
             }
         }
