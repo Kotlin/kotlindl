@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -64,18 +65,19 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 }
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
-    val kerasLayer = when (layer::class) {
-        Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
-        Flatten::class -> createKerasFlatten(layer as Flatten)
-        MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
-        AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
-        Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
-        ZeroPadding2D::class -> createKerasZeroPadding2D(layer as ZeroPadding2D)
-        Input::class -> createKerasInput(layer as Input)
-        BatchNorm::class -> createKerasBatchNorm(layer as BatchNorm, isKerasFullyCompatible)
-        ActivationLayer::class -> createKerasActivationLayer(layer as ActivationLayer)
-        Add::class -> createKerasAddLayer(layer as Add)
-        GlobalAvgPool2D::class -> createKerasGlobalAveragePooling2DLayer(layer as GlobalAvgPool2D)
+    val kerasLayer = when (layer) {
+        is Conv2D -> createKerasConv2D(layer, isKerasFullyCompatible)
+        is Flatten -> createKerasFlatten(layer)
+        is MaxPool2D -> createKerasMaxPooling2D(layer)
+        is AvgPool2D -> createKerasAvgPooling2D(layer)
+        is Dense -> createKerasDense(layer, isKerasFullyCompatible)
+        is ZeroPadding2D -> createKerasZeroPadding2D(layer)
+        is Input -> createKerasInput(layer)
+        is BatchNorm -> createKerasBatchNorm(layer, isKerasFullyCompatible)
+        is ActivationLayer -> createKerasActivationLayer(layer)
+        is Add -> createKerasAddLayer(layer)
+        is GlobalAvgPool2D -> createKerasGlobalAveragePooling2DLayer(layer)
+        is Softmax -> createKerasSoftmaxLayer(layer)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
 
@@ -128,6 +130,15 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        axis = layer.axis,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_SOFTMAX, config = configX)
 }
 
 private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boolean): KerasLayer {

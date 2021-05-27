@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -155,6 +156,7 @@ private fun convertToSequentialLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
 }
@@ -411,6 +413,18 @@ private fun createELULayer(config: LayerConfig, name: String): Layer {
     return ELU(
         alpha = config.alpha!!.toFloat(),
         name = name
+    )
+}
+
+private fun createSoftmaxLayer(config: LayerConfig, name: String): Layer {
+    val axis = when(config.axis) {
+        is Int -> listOf(config.axis)
+        is List<*> -> config.axis as List<Int>
+        else -> throw IllegalArgumentException("Axis must be an integer or a list of integers")
+    }
+    return Softmax(
+        name = name,
+        axis = axis
     )
 }
 
