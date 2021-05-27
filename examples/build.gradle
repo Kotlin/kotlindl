@@ -25,5 +25,8 @@ compileTestKotlin {
 
 test {
     useJUnitPlatform()
+    // set heap size for the test JVM(s)
+    minHeapSize = "1024m"
+    maxHeapSize = "8g"
 }
 

@@ -19,10 +19,12 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
-import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10Images
-import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10Labels
+import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -175,13 +177,23 @@ private val vgg11 = Sequential.of(
 fun vgg() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
-    val dataset = OnHeapDataset.create(
-        cifarImagesArchive,
-        cifarLabelsArchive,
-        NUM_LABELS,
-        ::extractCifar10Images,
-        ::extractCifar10Labels
-    )
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
+            load {
+                pathToData = File(cifarImagesArchive)
+                imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
+                colorMode = ColorOrder.BGR
+            }
+        }
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
+        }
+    }
+
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
+    val dataset = OnFlyImageDataset.create(preprocessing, y)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
