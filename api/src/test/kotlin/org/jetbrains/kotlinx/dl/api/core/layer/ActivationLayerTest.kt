@@ -15,7 +15,10 @@ import org.tensorflow.Graph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+internal const val IRRELEVANT_INPUT_SIZE = 8
+
 open class ActivationLayerTest {
+
     protected fun assertActivationFunction(
         layer: Layer,
         input: FloatArray,
@@ -48,5 +51,18 @@ open class ActivationLayerTest {
                 EPS
             )
         }
+    }
+
+    protected fun assertActivationFunctionSameOutputShape(
+        layer: Layer,
+        input: FloatArray,
+        expected: FloatArray
+    ) = assertActivationFunction(layer, input, FloatArray(input.size), expected)
+
+    protected fun assertActivationFunctionIrrelevantInputOutput(
+        layer: Layer
+    ) {
+        val irrelevantArrayData = FloatArray(IRRELEVANT_INPUT_SIZE)
+        assertActivationFunctionSameOutputShape(layer, irrelevantArrayData, irrelevantArrayData)
     }
 }

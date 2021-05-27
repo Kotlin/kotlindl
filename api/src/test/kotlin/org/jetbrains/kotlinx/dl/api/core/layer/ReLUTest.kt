@@ -10,36 +10,27 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-private const val DATA_SIZE = 4
-
 internal class ReLUTest : ActivationLayerTest() {
     @Test
     fun defaultRelu() {
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
         val expected = floatArrayOf(0.0f, 0.0f, 0.0f, 2.0f)
-        val actual = floatArrayOf(0.0f, 0.0f, 0.0f, 0.0f)
 
-        assertActivationFunction(ReLU(), input, actual, expected)
+        assertActivationFunctionSameOutputShape(ReLU(), input, expected)
     }
 
     @Test
     fun reluWithMaxValue() {
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
         val expected = floatArrayOf(0.0f, 0.0f, 0.0f, 1.0f)
-        val actual = floatArrayOf(0.0f, 0.0f, 0.0f, 0.0f)
 
-        assertActivationFunction(ReLU(maxValue = 1.0f), input, actual, expected)
+        assertActivationFunctionSameOutputShape(ReLU(maxValue = 1.0f), input, expected)
     }
 
     @Test
     fun reluWithNegativeSlope() {
-        val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
-        val expected = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
-        val actual = floatArrayOf(0.0f, 0.0f, 0.0f, 0.0f)
-
-
         val exception = Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            assertActivationFunction(ReLU(negativeSlope = 1.0f), input, actual, expected)
+            assertActivationFunctionIrrelevantInputOutput(ReLU(negativeSlope = 1.0f))
         }
         assertEquals(
             "Should be returned the LeakyRelu, but it's not supported in KotlinDL yet!",
@@ -51,8 +42,7 @@ internal class ReLUTest : ActivationLayerTest() {
     fun reluWithThreshold() {
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
         val expected = floatArrayOf(0.0f, 0.0f, 0.0f, 2.0f)
-        val actual = floatArrayOf(0.0f, 0.0f, 0.0f, 0.0f)
 
-        assertActivationFunction(ReLU(threshold = 1.5f), input, actual, expected)
+        assertActivationFunctionSameOutputShape(ReLU(threshold = 1.5f), input, expected)
     }
 }
