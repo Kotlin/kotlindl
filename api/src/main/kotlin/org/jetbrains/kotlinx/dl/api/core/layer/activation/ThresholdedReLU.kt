@@ -21,7 +21,7 @@ import org.tensorflow.op.Ops
  * @since 0.3
  */
 public class ThresholdedReLU(
-    private val threshold: Float = 1.0f,
+    public val threshold: Float = 1.0f,
     name: String = ""
 ) : AbstractActivationLayer(name) {
 
