@@ -172,7 +172,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
 
         yPredOp = forward(xOp, inputLayer)
-        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         predictionOp = when (loss) {
@@ -184,6 +184,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         isModelCompiled = true
     }
+
+    private fun buildLossFunction(loss: LossFunction): Operand<Float> {
+        val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        var totalLoss = basicLoss
+        return totalLoss
+    }
+
 
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric, callback: Callback) {
         compile(optimizer, Losses.convert(loss), metric, callback)
