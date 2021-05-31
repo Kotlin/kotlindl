@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
@@ -38,8 +39,11 @@ private const val BIAS_VARIABLE_NAME = "dense_bias"
  *
  * @property [outputSize] Dimensionality of the output space.
  * @property [activation] Activation function.
- * @property [kernelInitializer] Initializer function for the weight matrix.
+ * @property [kernelInitializer] Initializer function for the 'kernel' weights matrix.
  * @property [biasInitializer] Initializer function for the bias.
+ * @property [kernelRegularizer] Regularizer function applied to the `kernel` weights matrix.
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
  * @constructor Creates [Dense] object.
@@ -49,6 +53,9 @@ public class Dense(
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val kernelRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name) {
@@ -68,7 +75,7 @@ public class Dense(
         fanOut = outputSize
 
         val (kernelVariableName, biasVariableName) = defineVariableNames()
-        createDepthwiseConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
+        createDenseVariables(tf, kernelVariableName, biasVariableName, kGraph)
     }
 
     private fun defineVariableNames(): Pair<String, String> {
@@ -79,7 +86,7 @@ public class Dense(
         }
     }
 
-    private fun createDepthwiseConv2DVariables(
+    private fun createDenseVariables(
         tf: Ops,
         kernelVariableName: String,
         biasVariableName: String,
@@ -88,8 +95,8 @@ public class Dense(
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer)
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer, biasRegularizer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

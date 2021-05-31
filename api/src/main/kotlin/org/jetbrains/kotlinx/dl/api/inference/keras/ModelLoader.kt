@@ -30,6 +30,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L1
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
@@ -423,6 +427,8 @@ private fun createBatchNorm(config: LayerConfig, name: String): Layer {
         scale = config.scale!! as Boolean,
         gammaInitializer = convertToInitializer(config.gamma_initializer!!),
         betaInitializer = convertToInitializer(config.beta_initializer!!),
+        gammaRegularizer = convertToRegularizer(config.gamma_regularizer),
+        betaRegularizer = convertToRegularizer(config.beta_regularizer),
         movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
         movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!),
         name = name
@@ -435,8 +441,28 @@ private fun createDense(config: LayerConfig, name: String): Dense {
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
         name = name
     )
+}
+
+private fun convertToRegularizer(regularizer: KerasRegularizer?): Regularizer? {
+    return if (regularizer != null) {
+        val l1 = regularizer.config!!.l1
+        val l2 = regularizer.config!!.l2
+        if (l1 != 0.0 && l2 != 0.0) {
+            L2L1(l1!!.toFloat(), l2!!.toFloat())
+        } else if (l1 == 0.0 && l2 != 0.0) {
+            L2(l2!!.toFloat())
+        } else if (l1 != 0.0 && l2 == 0.0) {
+            L1(l1!!.toFloat())
+        } else {
+            null
+        }
+    } else {
+        null
+    }
 }
 
 private fun convertToInitializer(initializer: KerasInitializer): Initializer {
@@ -641,6 +667,8 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -675,6 +703,8 @@ private fun createDepthwiseConv2D(
         depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
         depthMultiplier = config.depth_multiplier!!,
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -711,6 +741,9 @@ private fun createSeparableConv2D(
         pointwiseInitializer = convertToInitializer(config.pointwise_initializer!!),
         depthMultiplier = config.depth_multiplier!!,
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
+        pointwiseRegularizer = convertToRegularizer(config.pointwise_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name

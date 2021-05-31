@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
@@ -41,6 +42,9 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  * @property [activation] Activation function.
  * @property [kernelInitializer] An initializer for the convolution kernel
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [kernelRegularizer] Regularizer function applied to the `kernel` weights matrix.
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
@@ -54,6 +58,9 @@ public class Conv2D(
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val kernelRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
@@ -103,8 +110,8 @@ public class Conv2D(
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {

@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
@@ -30,6 +31,8 @@ import org.tensorflow.op.core.Variable
  * @property [scale]  If True, multiply by gamma. If False, gamma is not used.
  * @property [gammaInitializer]  Initializer for the gamma weight.
  * @property [betaInitializer] Initializer for the beta weight.
+ * @property [gammaRegularizer] Optional regularizer for the gamma weight.
+ * @property [betaRegularizer] Optional regularizer for the beta weight.
  * @property [movingMeanInitializer] Initializer for the moving mean.
  * @property [movingVarianceInitializer] Initializer for the moving variance.
  * @property [name] Custom layer name.
@@ -45,6 +48,8 @@ public class BatchNorm(
     public val scale: Boolean = true,
     public val gammaInitializer: Initializer = Ones(),
     public val betaInitializer: Initializer = Zeros(),
+    public val gammaRegularizer: Regularizer? = null,
+    public val betaRegularizer: Regularizer? = null,
     public val movingMeanInitializer: Initializer = Zeros(),
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
@@ -72,20 +77,34 @@ public class BatchNorm(
 
             isTrainable = false // TODO: add isTrainable to addWeight method as a flag
 
-            movingMean = addWeight(tf, kGraph, movingMeanVariableName, movingMean, movingMeanInitializer)
+            movingMean = addWeight(
+                tf,
+                kGraph,
+                movingMeanVariableName,
+                movingMean,
+                movingMeanInitializer,
+                null
+            )
             movingVariance =
-                addWeight(tf, kGraph, movingVarianceVariableName, movingVariance, movingVarianceInitializer)
+                addWeight(
+                    tf,
+                    kGraph,
+                    movingVarianceVariableName,
+                    movingVariance,
+                    movingVarianceInitializer,
+                    null
+                )
 
             if (scale) {
                 val gammaVariableName = batchNormGammaVarName(name)
                 gamma = tf.withName(gammaVariableName).variable(weightShape, getDType())
-                gamma = addWeight(tf, kGraph, gammaVariableName, gamma!!, gammaInitializer)
+                gamma = addWeight(tf, kGraph, gammaVariableName, gamma!!, gammaInitializer, gammaRegularizer)
             }
 
             if (center) {
                 val betaVariableName = batchNormBetaVarName(name)
                 beta = tf.withName(betaVariableName).variable(weightShape, getDType())
-                beta = addWeight(tf, kGraph, betaVariableName, beta!!, betaInitializer)
+                beta = addWeight(tf, kGraph, betaVariableName, beta!!, betaInitializer, betaRegularizer)
             }
         }
     }
