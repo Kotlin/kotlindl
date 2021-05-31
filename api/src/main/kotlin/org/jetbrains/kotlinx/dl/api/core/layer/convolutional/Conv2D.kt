@@ -94,7 +94,7 @@ public class Conv2D(
     }
 }
 
-public open class Conv2DImpl(
+public abstract class Conv2DImpl(
     private val filtersInternal: Long,
     private val kernelSizeInternal: LongArray,
     private val stridesInternal: LongArray,
@@ -125,7 +125,7 @@ public open class Conv2DImpl(
         biasShape = Shape.make(filtersInternal)
 
         // should be calculated before addWeight because it's used in calculation,
-        // need to rewrite addWEight to avoid strange behaviour calculate fanIn, fanOut
+        // need to rewrite addWeight to avoid strange behaviour calculate fanIn, fanOut
         val inputDepth = lastElement // amount of channels
         val outputDepth = filtersInternal // amount of channels for the next layer
 
@@ -160,9 +160,9 @@ public open class Conv2DImpl(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = paddingInternal.tfInternal
+        val paddingName = paddingInternal.paddingName
         val options: Conv2d.Options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
-        var output: Operand<Float> = tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), tfPadding, options)
+        var output: Operand<Float> = tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingName, options)
 
         if (useBiasInternal) {
             output = tf.nn.biasAdd(output, bias)

@@ -54,13 +54,13 @@ public class MaxPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = padding.tfInternal
+        val paddingName = padding.paddingName
 
         return tf.nn.maxPool(
             input,
             tf.constant(poolSize),
             tf.constant(strides),
-            tfPadding
+            paddingName
         )
     }
 
