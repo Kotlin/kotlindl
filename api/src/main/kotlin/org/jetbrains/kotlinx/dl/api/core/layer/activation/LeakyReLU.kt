@@ -13,8 +13,8 @@ import org.tensorflow.op.Ops
  *
  * It allows a small gradient when the unit is not active:
  * ```
- * f(x) = x,                        if x >= 0
- * f(x) = negativeSlope * x         if x < 0
+ * f(x) = x,                if x >= 0
+ * f(x) = alpha * x         if x < 0
  * ```
  * @property [alpha] Negative slope coefficient. Should be >= 0.
  * @constructor Creates [LeakyReLU] object.
