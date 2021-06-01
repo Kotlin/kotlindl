@@ -14,7 +14,6 @@ import org.tensorflow.op.linalg.Qr
 
 /**
  * Initializer that generates an orthogonal matrix.
- *
  * @property [gain] Multiplicative factor to apply to the orthogonal matrix.
  * @property [seed] Used to create random seeds.
  * @constructor Creates a [Orthogonal] initializer.
@@ -31,16 +30,19 @@ public class Orthogonal(
         shape: Operand<Int>,
         name: String
     ): Operand<Float> {
-        val dimsShape = shape.asOutput().shape().numDimensions()
-        require(dimsShape>2) { "The numDimensions should greater than 2" }
+        val dimsShape = shape.asOutput().shape().size(0)
+        require(dimsShape>=2) { "The tensor to initialize must be at least two-dimensional" }
 
         // Flatten the input shape with the last dimension remaining
         // its original shape so it works for conv2d
         var numRows:Long = 1
-        for (i in 0 until dimsShape-1){
-            numRows*=shape.asOutput().shape().size(i)
+        var i:Int = 0
+        while (i < dimsShape - 1) {
+            numRows *= shape.asOutput().shape().size(i)
+            i++
         }
-        val numCols = shape.asOutput().shape().size(dimsShape)
+
+        val numCols = shape.asOutput().shape().size(i-1)
         val flatShape: Shape = Shape.make(Math.max(numRows,numCols),Math.min(numRows,numCols))
         val seeds = longArrayOf(seed, 0L)
 
