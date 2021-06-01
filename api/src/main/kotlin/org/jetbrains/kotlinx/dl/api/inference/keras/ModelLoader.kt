@@ -21,6 +21,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool3D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
@@ -163,6 +164,9 @@ private fun convertToLayer(
             kerasLayer.config!!.name!!
         )
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
+        LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
+            kerasLayer.config!!.name!!
+        )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 }
@@ -269,7 +273,58 @@ private fun convertToLayer(
     kerasLayer: KerasLayer,
     layersByName: MutableMap<String, Layer>
 ): Layer {
-    val layer = convertToLayer(kerasLayer)
+    val layer = when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOLING_2D -> createMaxPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_AVERAGE_POOLING_2D -> createAvgPooling2D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
+        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
+        LAYER_SUBTRACT -> createSubtractLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
+        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
+        LAYER_MULTIPLY -> createMultiplyLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_CONCATENATE -> createConcatenateLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
+        LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
+            kerasLayer.config!!.name!!
+        )
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
+    }
 
     val inboundLayers = mutableListOf<Layer>()
     if (kerasLayer.class_name != LAYER_INPUT) {
@@ -298,6 +353,14 @@ private fun createGlobalAvgPooling1D(
     name: String
 ): Layer {
     return GlobalAvgPool1D(
+        name = name
+    )
+}
+
+private fun createGlobalAvgPooling3D(
+    name: String
+): Layer {
+    return GlobalAvgPool3D(
         name = name
     )
 }
