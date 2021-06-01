@@ -50,7 +50,7 @@ public open class L2L1(public val l1: Float = 0f, public val l2: Float = 0f) : R
  *
  * ```loss = l1 * reduceSum(abs(x))```
  */
-public class L1(public val value: Float = DEFAULT_PENALTY) : L2L1(l1 = value)
+public class L1(value: Float = DEFAULT_PENALTY) : L2L1(l1 = value)
 
 /**
  * A regularizer that applies a L2 regularization penalty.
@@ -59,11 +59,4 @@ public class L1(public val value: Float = DEFAULT_PENALTY) : L2L1(l1 = value)
  *
  * ```loss = l2 * reduce_sum(square(x))```
  */
-public class L2(public val value: Float = DEFAULT_PENALTY) : L2L1(l2 = value)
-
-/** Default regularizer. */
-public class NoRegularizer() : Regularizer() {
-    override fun apply(tf: Ops, input: Operand<Float>): Operand<Float> {
-        return input
-    }
-}
+public class L2(value: Float = DEFAULT_PENALTY) : L2L1(l2 = value)

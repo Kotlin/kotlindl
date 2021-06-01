@@ -443,6 +443,7 @@ private fun createDense(config: LayerConfig, name: String): Dense {
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         name = name
     )
 }
@@ -669,6 +670,7 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -705,6 +707,7 @@ private fun createDepthwiseConv2D(
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -743,6 +746,7 @@ private fun createSeparableConv2D(
         biasInitializer = convertToInitializer(config.bias_initializer!!),
         depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
         pointwiseRegularizer = convertToRegularizer(config.pointwise_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
