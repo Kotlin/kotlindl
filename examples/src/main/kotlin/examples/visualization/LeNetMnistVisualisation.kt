@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.visualisation
+package examples.visualization
 
 import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
@@ -11,6 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.visualization.letsplot.*
+import org.jetbrains.kotlinx.dl.visualization.swing.*
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
@@ -47,7 +49,7 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val numbersPlots = List(3) { mnistImagePlot(it, test, model::predict) }
+        val numbersPlots = List(3) { flattenImagePlot(it, test, model::predict) }
         columnPlot(numbersPlots, 3, 256).show()
 
         val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -56,15 +58,24 @@ fun main() {
         val fstConv2D = model.layers[1] as Conv2D
         val sndConv2D = model.layers[3] as Conv2D
 
+        // lets-plot approach
         filtersPlot(fstConv2D, columns = 16).show()
         filtersPlot(sndConv2D, columns = 16).show()
 
+        // swing approach
+        drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
+        drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
+
         val layersActivations = modelActivationOnLayersPlot(model, x)
-        val prediction = model.predict(x)
+        val (prediction, activations) = model.predictAndGetActivations(x)
         println("Prediction: $prediction")
         println("Ground Truth: $y")
 
+        // lets-plot approach
         layersActivations[0].show()
         layersActivations[1].show()
+
+        // swing approach
+        drawActivations(activations)
     }
 }
