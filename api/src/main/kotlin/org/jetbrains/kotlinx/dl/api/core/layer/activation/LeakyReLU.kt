@@ -26,7 +26,7 @@ public class LeakyReLU(
 ) : AbstractActivationLayer(name) {
     init {
         require(alpha >= 0.0f) {
-            "Negative slope coefficient $alpha should be >= 0.0."
+            "Alpha $alpha should be >= 0.0."
         }
     }
 
@@ -35,5 +35,5 @@ public class LeakyReLU(
     }
 
     override fun toString(): String =
-        "LeakyReLU(negativeSlope=$alpha)"
+        "LeakyReLU(alpha=$alpha)"
 }

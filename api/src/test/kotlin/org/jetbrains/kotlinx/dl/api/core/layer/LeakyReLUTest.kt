@@ -37,7 +37,7 @@ internal class LeakyReLUTest : ActivationLayerTest() {
         }
 
         assertEquals(
-            "Negative slope coefficient -1.0 should be >= 0.0.",
+            "Alpha -1.0 should be >= 0.0.",
             exception.message
         )
     }
