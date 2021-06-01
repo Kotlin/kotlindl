@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -153,6 +154,7 @@ private fun convertToSequentialLayer(
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
@@ -285,6 +287,7 @@ private fun convertToLayer(
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
@@ -420,6 +423,13 @@ private fun createELULayer(config: LayerConfig, name: String): Layer {
 private fun createLeakyReLULayer(config: LayerConfig, name: String): Layer {
     return LeakyReLU(
         alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer {
+    return ThresholdedReLU(
+        theta = config.theta!!.toFloat(),
         name = name
     )
 }
