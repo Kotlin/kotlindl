@@ -26,18 +26,18 @@ internal class ThresholdedReLUTest : ActivationLayerTest() {
         val expected = floatArrayOf(0.0f, 0.0f, 0.0f, 3.5f, 1.0f)
 
         assertActivationFunctionSameOutputShape(
-            ThresholdedReLU(threshold = 0.5f), input, expected
+            ThresholdedReLU(theta = 0.5f), input, expected
         )
     }
 
     @Test
     fun withNegativeThreshold() {
         val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            assertActivationFunctionIrrelevantInputOutput(ThresholdedReLU(threshold = -1.0f))
+            assertActivationFunctionIrrelevantInputOutput(ThresholdedReLU(theta = -1.0f))
         }
 
         assertEquals(
-            "Threshold -1.0 should be >= 0.0.",
+            "Theta -1.0 should be >= 0.0.",
             exception.message
         )
     }

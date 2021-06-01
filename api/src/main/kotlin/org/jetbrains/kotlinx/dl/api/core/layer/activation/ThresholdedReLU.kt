@@ -13,26 +13,27 @@ import org.tensorflow.op.Ops
  *
  * It follows:
  * ```
- * f(x) = x,        if x > threshold
- * f(x) = 0,        otherwise
+ * f(x) = x,        if x > theta
+ * f(x) = 0         otherwise
  * ```
- * @property [threshold] Threshold value for threshold activation.
+ * @property [theta] Threshold value for activation.
  * @constructor Creates [ThresholdedReLU] object.
+ *
  * @since 0.3
  */
 public class ThresholdedReLU(
-    public val threshold: Float = 1.0f,
+    public val theta: Float = 1.0f,
     name: String = ""
 ) : AbstractActivationLayer(name) {
 
     init {
-        require(threshold >= 0.0f) { "Threshold $threshold should be >= 0.0." }
+        require(theta >= 0.0f) { "Theta $theta should be >= 0.0." }
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
-        return commonRelu(tf, input = input, threshold = threshold)
+        return commonRelu(tf, input = input, threshold = theta)
     }
 
     override fun toString(): String =
-        "ThresholdedReLU(theta=$threshold)"
+        "ThresholdedReLU(theta=$theta)"
 }

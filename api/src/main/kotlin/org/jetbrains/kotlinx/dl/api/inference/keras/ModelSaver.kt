@@ -135,7 +135,7 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
 private fun createKerasThresholdedReLULayer(layer: ThresholdedReLU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        threshold = layer.threshold.toDouble(),
+        theta = layer.theta.toDouble(),
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_THRESHOLDED_RELU, config = configX)

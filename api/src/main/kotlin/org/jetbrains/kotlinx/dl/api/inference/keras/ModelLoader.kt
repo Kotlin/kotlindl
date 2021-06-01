@@ -419,7 +419,7 @@ private fun createELULayer(config: LayerConfig, name: String): Layer {
 
 private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer {
     return ThresholdedReLU(
-        threshold = config.threshold!!.toFloat(),
+        theta = config.theta!!.toFloat(),
         name = name
     )
 }
