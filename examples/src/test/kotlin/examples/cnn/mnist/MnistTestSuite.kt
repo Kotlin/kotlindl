@@ -6,7 +6,7 @@
 package examples.cnn.mnist
 import examples.cnn.mnist.advanced.lenetWithAlternativeLossFunction
 import examples.cnn.mnist.advanced.lenetWithEarlyStoppingCallback
-import examples.cnn.mnist.advanced.modernLenetWithRegulairsers
+import examples.cnn.mnist.advanced.modernLenetWithRegularizers
 import org.junit.jupiter.api.Test
 
 class MnistTestSuite {
@@ -36,8 +36,8 @@ class MnistTestSuite {
     }
 
     @Test
-    fun modernLenetWithRegulairsersTest() {
-        modernLenetWithRegulairsers()
+    fun modernLenetWithRegularizersTest() {
+        modernLenetWithRegularizers()
     }
 
     @Test

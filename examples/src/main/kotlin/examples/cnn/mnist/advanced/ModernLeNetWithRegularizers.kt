@@ -5,10 +5,8 @@
 
 package examples.cnn.mnist.advanced
 
-import examples.cnn.mnist.modernLenet
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
@@ -73,7 +71,7 @@ private val modernLeNet = Sequential.of(
         outputSize = 512,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Constant(0.1f),
+        biasInitializer = HeNormal(SEED),
         kernelRegularizer = L2L1(),
         biasRegularizer = L2L1(),
     ),
@@ -81,7 +79,7 @@ private val modernLeNet = Sequential.of(
         outputSize = NUMBER_OF_CLASSES,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(SEED),
-        biasInitializer = Constant(0.1f),
+        biasInitializer = HeNormal(SEED),
         kernelRegularizer = L2L1(),
         biasRegularizer = L2L1(),
     )
@@ -98,7 +96,7 @@ private val modernLeNet = Sequential.of(
  * - model training
  * - model evaluation
  */
-fun modernLenetWithRegulairsers() {
+fun modernLenetWithRegularizers() {
     val (train, test) = mnist()
 
     modernLeNet.use {
@@ -132,4 +130,4 @@ fun modernLenetWithRegulairsers() {
 }
 
 /** */
-fun main(): Unit = modernLenet()
+fun main(): Unit = modernLenetWithRegularizers()

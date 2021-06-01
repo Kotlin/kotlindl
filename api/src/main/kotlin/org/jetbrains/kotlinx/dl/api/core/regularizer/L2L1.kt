@@ -10,7 +10,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /** Default penalty. */
-public const val DEFAULT_PENALTY: Float = 0.01f
+public const val DEFAULT_PENALTY: Float = 0.00001f
 
 /**
  * A regularizer that applies both L1 and L2 regularization penalties.
