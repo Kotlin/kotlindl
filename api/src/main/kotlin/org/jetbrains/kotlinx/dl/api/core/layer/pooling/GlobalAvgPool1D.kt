@@ -14,19 +14,13 @@ import org.tensorflow.op.Ops
 
 /**
  * Global average pooling operation for temporal data.
- *
  * NOTE: Works with tensors which must have rank 3 (batch, steps, features).
- *
  * Input shape: 3D tensor with shape `(batch_size, steps, features)`.
- *
  * Output shape: 2D tensor with shape `(batch_size, features)`.
- *
  * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool1D] object.
- *
  */
-
-class GlobalAvgPool1D(
+public class GlobalAvgPool1D(
         name: String = ""
 ) : Layer(name) {
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) { }
@@ -36,8 +30,10 @@ class GlobalAvgPool1D(
     }
 
     override fun forward(tf: Ops, input: Operand<Float>, isTraining: Operand<Boolean>, numberOfLosses: Operand<Float>?): Operand<Float> {
-        var stepAxis = 1                //if dataFormat == "channels_last", it will be 2 if "channels_first"
-        return TF.mean(tf, input, tf.constant(stepAxis))        //mask == None
+        // TODO support for different dataFormat("channel_last", "channel_first")
+        var stepAxis = 1
+        // TODO support for masking
+        return TF.mean(tf, input, tf.constant(stepAxis))
     }
 
     override val weights: Map<String, Array<*>> get() = emptyMap()

@@ -10,9 +10,7 @@ import org.tensorflow.Graph
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 
-
 open class PoolLayerTest {
-
     protected fun assertGlobalAvgPool1DEquals(
         layer: Layer,
         input:Array<Array<FloatArray>>,
@@ -21,7 +19,6 @@ open class PoolLayerTest {
         val actual = Array(expected.size) {FloatArray(expected[0].size) { 0.toFloat() } }
         assertPoolingLayer(layer,input, expected,actual,::assertGlobalAvgPool1DEquals)
     }
-
 
     private fun assertPoolingLayer(
         layer: Layer,
@@ -50,7 +47,6 @@ open class PoolLayerTest {
             assertEquals(expectedShape, actualShape)
             assertEqual(expected,actual)
         }
-
     }
 
     private fun assertGlobalAvgPool1DEquals(
