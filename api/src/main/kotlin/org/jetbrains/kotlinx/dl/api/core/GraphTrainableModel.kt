@@ -179,7 +179,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
         }
-
         metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
         isModelCompiled = true
@@ -188,7 +187,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun buildLossFunction(loss: LossFunction): Operand<Float> {
         val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         var totalLoss = basicLoss
-        return totalLoss
+        kGraph.variableRegularizers.forEach { (variable, regularizer) ->
+            run {
+                totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable))
+            }
+        }
+        return tf.withName(TRAINING_LOSS).identity(totalLoss)
     }
 
 

@@ -35,7 +35,8 @@ public open class L2L1(public val l1: Float = 0f, public val l2: Float = 0f) : R
             }
 
             if (l2 != 0f) {
-                val reduceSum = tf.reduceSum(tf.math.square(input), allAxes(tf, input))
+                // used math.mul instead square due to Gradient crashes
+                val reduceSum = tf.reduceSum(tf.math.mul(input, input), allAxes(tf, input))
                 regularization = tf.math.add(regularization, tf.math.mul(tf.constant(l2), reduceSum))
             }
         }

@@ -121,7 +121,7 @@ public abstract class Layer(public var name: String) {
         name: String,
         variable: Variable<Float>,
         initializer: Initializer,
-        kernelRegularizer: Regularizer? = null
+        regularizer: Regularizer? = null
     ): Variable<Float> {
         // require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
         // require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
@@ -129,6 +129,7 @@ public abstract class Layer(public var name: String) {
         val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
         kGraph.addLayerVariable(variable, isTrainable)
         kGraph.addInitializer(name, initOp)
+        if (regularizer != null) kGraph.addVariableRegularizer(variable, regularizer)
         return variable
     }
 

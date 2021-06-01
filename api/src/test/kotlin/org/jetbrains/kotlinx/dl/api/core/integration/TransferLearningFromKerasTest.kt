@@ -6,7 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.core.integration
 
 import io.jhdf.HdfFile
+import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -269,13 +271,15 @@ class TransferLearningTest : IntegrationTest() {
 
             it.loadWeights(hdfFile)
 
+            it.save(File("/graph"), savingFormat = SavingFormat.TF_GRAPH, writingMode = WritingMode.OVERRIDE)
+
             val conv2DKernelWeights =
                 it.getLayer("conv2d").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(conv2DKernelWeights[0][0][0][0], 0.06445057f)
+            assertEquals(0.06105182f, conv2DKernelWeights[0][0][0][0])
 
             val conv2DKernelWeights1 =
                 it.getLayer("conv2d_1").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(conv2DKernelWeights1[0][0][0][0], 0.027743129f)
+            assertEquals(0.032438572f, conv2DKernelWeights1[0][0][0][0])
         }
     }
 
