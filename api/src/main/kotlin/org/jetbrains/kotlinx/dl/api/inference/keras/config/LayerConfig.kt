@@ -15,6 +15,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val alpha: Double? = null,
     @Json(serializeNull = false)
+    val alpha_initializer: KerasInitializer? = null,
+    @Json(serializeNull = false)
     val axis: Any? = null,
     @Json(serializeNull = false)
     var batch_input_shape: List<Int?>? = null,
@@ -116,6 +118,8 @@ internal data class LayerConfig(
     val seed: Any? = null,
     @Json(serializeNull = false)
     val scale: Any? = null,
+    @Json(serializeNull = false)
+    val shared_axes: List<Int>? = null,
     @Json(serializeNull = false)
     val sparse: Boolean? = null,
     @Json(serializeNull = false)

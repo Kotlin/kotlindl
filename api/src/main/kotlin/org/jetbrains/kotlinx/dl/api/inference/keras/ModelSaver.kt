@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -74,6 +75,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         Input::class -> createKerasInput(layer as Input)
         BatchNorm::class -> createKerasBatchNorm(layer as BatchNorm, isKerasFullyCompatible)
         ActivationLayer::class -> createKerasActivationLayer(layer as ActivationLayer)
+        PReLU::class -> createKerasPReLULayer(layer as PReLU, isKerasFullyCompatible)
         Add::class -> createKerasAddLayer(layer as Add)
         GlobalAvgPool2D::class -> createKerasGlobalAveragePooling2DLayer(layer as GlobalAvgPool2D)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
@@ -128,6 +130,16 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha_initializer = convertToKerasInitializer(layer.alphaInitializer, isKerasFullyCompatible),
+        shared_axes = layer.sharedAxes?.toList(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_PRELU, config = configX)
 }
 
 private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boolean): KerasLayer {
