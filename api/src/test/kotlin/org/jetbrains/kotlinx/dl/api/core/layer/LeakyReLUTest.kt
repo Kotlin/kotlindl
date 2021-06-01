@@ -26,14 +26,14 @@ internal class LeakyReLUTest : ActivationLayerTest() {
         val expected = floatArrayOf(-2.0f, -4.0f, 0.0f, 3.5f, 1.0f)
 
         assertActivationFunctionSameOutputShape(
-            LeakyReLU(negativeSlope = 2.0f), input, expected
+            LeakyReLU(alpha = 2.0f), input, expected
         )
     }
 
     @Test
     fun withInvalidNegativeSlope() {
         val exception = Assertions.assertThrows(IllegalArgumentException::class.java) {
-            assertActivationFunctionIrrelevantInputOutput(LeakyReLU(negativeSlope = -1.0f))
+            assertActivationFunctionIrrelevantInputOutput(LeakyReLU(alpha = -1.0f))
         }
 
         assertEquals(

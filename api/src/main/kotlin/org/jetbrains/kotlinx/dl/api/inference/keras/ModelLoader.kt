@@ -419,7 +419,7 @@ private fun createELULayer(config: LayerConfig, name: String): Layer {
 
 private fun createLeakyReLULayer(config: LayerConfig, name: String): Layer {
     return LeakyReLU(
-        negativeSlope = config.negative_slope!!.toFloat(),
+        alpha = config.alpha!!.toFloat(),
         name = name
     )
 }

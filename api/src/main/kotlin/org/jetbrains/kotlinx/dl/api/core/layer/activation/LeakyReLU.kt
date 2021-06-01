@@ -16,24 +16,24 @@ import org.tensorflow.op.Ops
  * f(x) = x,                        if x >= 0
  * f(x) = negativeSlope * x         if x < 0
  * ```
- * @property [negativeSlope] Negative slope coefficient. Should be >= 0.
+ * @property [alpha] Negative slope coefficient. Should be >= 0.
  * @constructor Creates [LeakyReLU] object.
  * @since 0.3
  */
 public class LeakyReLU(
-    public val negativeSlope: Float = 0.3f,
+    public val alpha: Float = 0.3f,
     name: String = ""
 ) : AbstractActivationLayer(name) {
     init {
-        require(negativeSlope >= 0.0f) {
-            "Negative slope coefficient $negativeSlope should be >= 0.0."
+        require(alpha >= 0.0f) {
+            "Negative slope coefficient $alpha should be >= 0.0."
         }
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
-        return commonRelu(tf, input = input, alpha = negativeSlope)
+        return commonRelu(tf, input = input, alpha = alpha)
     }
 
     override fun toString(): String =
-        "LeakyReLU(negativeSlope=$negativeSlope)"
+        "LeakyReLU(negativeSlope=$alpha)"
 }

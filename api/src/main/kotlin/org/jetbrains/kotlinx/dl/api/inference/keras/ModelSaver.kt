@@ -135,7 +135,7 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
 private fun createKerasLeakyReLU(layer: LeakyReLU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        negative_slope = layer.negativeSlope.toDouble(),
+        alpha = layer.alpha.toDouble(),
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_LEAKY_RELU, config = configX)
