@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -77,6 +78,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         Input::class -> createKerasInput(layer as Input)
         BatchNorm::class -> createKerasBatchNorm(layer as BatchNorm, isKerasFullyCompatible)
         ActivationLayer::class -> createKerasActivationLayer(layer as ActivationLayer)
+        ThresholdedReLU::class -> createKerasThresholdedReLULayer(layer as ThresholdedReLU)
         Add::class -> createKerasAddLayer(layer as Add)
         GlobalAvgPool2D::class -> createKerasGlobalAveragePooling2DLayer(layer as GlobalAvgPool2D)
         DepthwiseConv2D::class -> createKerasDepthwiseConv2D(layer as DepthwiseConv2D, isKerasFullyCompatible)
@@ -134,6 +136,15 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasThresholdedReLULayer(layer: ThresholdedReLU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        theta = layer.theta.toDouble(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_THRESHOLDED_RELU, config = configX)
 }
 
 private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boolean): KerasLayer {
