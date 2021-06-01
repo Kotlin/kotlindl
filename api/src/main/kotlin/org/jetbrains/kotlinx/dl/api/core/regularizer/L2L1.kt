@@ -23,7 +23,7 @@ public const val DEFAULT_PENALTY: Float = 0.01f
  *
  * ```loss = l2 * reduce_sum(square(x))```
  */
-public open class L2L1(public val l1: Float = 0f, public val l2: Float = 0f) : Regularizer() {
+public open class L2L1(public val l1: Float = DEFAULT_PENALTY, public val l2: Float = DEFAULT_PENALTY) : Regularizer() {
     override fun apply(tf: Ops, input: Operand<Float>): Operand<Float> {
         var regularization: Operand<Float> = tf.constant(0.0f)
         if (l1 == 0f && l2 == 0f) {
