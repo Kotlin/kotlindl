@@ -38,7 +38,7 @@ private const val EXTRA_DIM = 1L
  * @property [strides] Three numbers specifying stride of the pooling
  * operation for each dimension of input tensor.
  * NOTE: Specifying stride value != 1 is incompatible with specifying `dilation` value != 1.
- * @property [dilation] Three numbers specifying the dilation rate to use for
+ * @property [dilations] Three numbers specifying the dilation rate to use for
  * dilated convolution sequence dimensions of input tensor.
  * @property [activation] Activation function.
  * @property [kernelInitializer] An initializer for the convolution kernel
@@ -54,7 +54,7 @@ public class Conv1D(
     public val filters: Long = 32,
     public val kernelSize: Long = 3,
     public val strides: LongArray = longArrayOf(1, 1, 1),
-    public val dilation: LongArray = longArrayOf(1, 1, 1),
+    public val dilations: LongArray = longArrayOf(1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
@@ -65,7 +65,7 @@ public class Conv1D(
     filtersInternal = filters,
     kernelSizeInternal = longArrayOf(1, kernelSize),
     stridesInternal = longArrayOf(strides[0], 1, strides[1], strides[2]),
-    dilationsInternal = longArrayOf(dilation[0], 1, dilation[1], dilation[2]),
+    dilationsInternal = longArrayOf(dilations[0], 1, dilations[1], dilations[2]),
     activationInternal = activation,
     kernelInitializerInternal = kernelInitializer,
     biasInitializerInternal = biasInitializer,
@@ -90,7 +90,7 @@ public class Conv1D(
 
     override fun toString(): String {
         return "Conv2D(filters=$filters, kernelSize=$kernelSize, strides=$strides, " +
-                "dilation=$dilation, activation=$activation, kernelInitializer=$kernelInitializer, " +
+                "dilation=$dilations, activation=$activation, kernelInitializer=$kernelInitializer, " +
                 "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding)"
     }
 }

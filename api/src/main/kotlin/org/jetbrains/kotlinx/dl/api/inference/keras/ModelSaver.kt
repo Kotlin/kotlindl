@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -71,6 +72,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
     val kerasLayer = when (layer::class) {
+        Conv1D::class -> createKerasConv1D(layer as Conv1D, isKerasFullyCompatible)
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
@@ -356,6 +358,22 @@ private fun createKerasConcatenate(layer: Concatenate): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
+}
+
+private fun createKerasConv1D(layer: Conv1D, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = listOf(layer.kernelSize.toInt()),
+        strides = listOf(layer.strides[1].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        padding = convertPadding(layer.padding),
+        name = layer.name,
+        use_bias = layer.useBias
+    )
+    return KerasLayer(class_name = LAYER_CONV1D, config = configX)
 }
 
 private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): KerasLayer {
