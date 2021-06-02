@@ -31,7 +31,7 @@ import org.tensorflow.op.core.Variable
  * @property [sharedAxes] The axes along which to share learnable parameters.
  */
 public class PReLU(
-    public val alphaInitializer: Initializer = HeNormal(),
+    public val alphaInitializer: Initializer = Zeros(),
     public val sharedAxes: IntArray? = null,
     name: String = ""
 ) : AbstractActivationLayer(name) {
