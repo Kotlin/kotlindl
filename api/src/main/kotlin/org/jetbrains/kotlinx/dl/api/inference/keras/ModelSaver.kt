@@ -24,10 +24,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
@@ -88,6 +85,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         SeparableConv2D::class -> createSeparableConv2D(layer as SeparableConv2D, isKerasFullyCompatible)
         Concatenate::class -> createKerasConcatenate(layer as Concatenate)
         GlobalAvgPool1D::class -> createKerasGlobalAveragePooling1DLayer(layer as GlobalAvgPool1D)
+        GlobalMaxPool1D::class -> createKerasGlobalMaxPool1D(layer as GlobalMaxPool1D)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
 
@@ -131,6 +129,15 @@ private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): Kera
             name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool1D(layer: GlobalMaxPool1D): KerasLayer {
+    val configX = LayerConfig(
+        data_format = layer.dataFormat,
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
 }
 
 private fun createKerasAddLayer(layer: Add): KerasLayer {
