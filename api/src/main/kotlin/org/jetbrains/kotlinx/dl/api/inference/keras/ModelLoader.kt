@@ -13,7 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -24,6 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
@@ -153,10 +156,13 @@ private fun convertToSequentialLayer(
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
 }
@@ -285,6 +291,8 @@ private fun convertToLayer(
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
@@ -303,6 +311,7 @@ private fun convertToLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 
@@ -326,6 +335,14 @@ private fun createGlobalAvgPooling2D(
 ): Layer {
     return GlobalAvgPool2D(
         name = name
+    )
+}
+
+private fun createGlobalAvgPooling1D(
+        name: String
+): Layer {
+    return GlobalAvgPool1D(
+            name = name
     )
 }
 
@@ -421,6 +438,20 @@ private fun createPReLULayer(config: LayerConfig, name: String): Layer {
     return PReLU(
         alphaInitializer = convertToInitializer(config.alpha_initializer!!),
         sharedAxes = config.shared_axes!!.toIntArray(),
+        name = name
+    )
+}
+
+private fun createLeakyReLULayer(config: LayerConfig, name: String): Layer {
+    return LeakyReLU(
+        alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer {
+    return ThresholdedReLU(
+        theta = config.theta!!.toFloat(),
         name = name
     )
 }

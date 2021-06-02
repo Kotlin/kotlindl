@@ -36,7 +36,12 @@ internal fun commonRelu(
     var input2 = input
     var negativePart: Operand<Float> = tf.nn.relu(input2) // fake init
     if (alpha != 0.0f) {
-        if (maxValue == null && threshold == 0.0f) throw UnsupportedOperationException("Should be returned the LeakyRelu, but it's not supported in KotlinDL yet!")
+        if (maxValue == null && threshold == 0.0f) {
+            // LeakyReLU
+            val greaterThanZero = tf.math.greater(input2, tf.constant(0.0f))
+            val negativeActivation = tf.math.mul(tf.constant(alpha), input2)
+            return tf.where3(greaterThanZero, input2, negativeActivation)
+        }
         negativePart = if (threshold != 0.0f)
             tf.nn.relu(tf.math.add(tf.math.mul(input2, tf.constant(-1.0f)), tf.constant(threshold)))
         else

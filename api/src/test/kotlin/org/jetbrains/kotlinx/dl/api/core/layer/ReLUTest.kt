@@ -6,8 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class ReLUTest : ActivationLayerTest() {
@@ -29,13 +27,10 @@ internal class ReLUTest : ActivationLayerTest() {
 
     @Test
     fun reluWithNegativeSlope() {
-        val exception = Assertions.assertThrows(UnsupportedOperationException::class.java) {
-            assertActivationFunctionIrrelevantInputOutput(ReLU(negativeSlope = 1.0f))
-        }
-        assertEquals(
-            "Should be returned the LeakyRelu, but it's not supported in KotlinDL yet!",
-            exception.message
-        )
+        val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
+        val expected = floatArrayOf(-6.0f, -2.0f, 0.0f, 2.0f)
+
+        assertActivationFunctionSameOutputShape(ReLU(negativeSlope = 2.0f), input, expected)
     }
 
     @Test
