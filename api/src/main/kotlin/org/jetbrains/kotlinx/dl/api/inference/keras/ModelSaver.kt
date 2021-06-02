@@ -229,6 +229,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
             RandomUniform::class -> convertToRandomUniform(initializer as RandomUniform)
+            Identity::class -> convertToIdentity(initializer as Identity)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
@@ -242,6 +243,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> INITIALIZER_HE_UNIFORM
             LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
             LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
+            Identity::class -> INITIALIZER_IDENTITY
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
         config = KerasInitializerConfig(seed = 12)
@@ -268,6 +270,15 @@ private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String,
             mode = convertMode(initializer.mode),
             distribution = convertDistribution(initializer.distribution)
         )
+    )
+}
+
+private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig>{
+    return Pair(
+            INITIALIZER_IDENTITY,
+            KerasInitializerConfig(
+                    gain = initializer.gain.toDouble()
+            )
     )
 }
 
