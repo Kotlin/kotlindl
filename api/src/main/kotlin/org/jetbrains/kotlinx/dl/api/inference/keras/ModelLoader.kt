@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -130,6 +131,7 @@ private fun convertToSequentialLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -264,6 +266,7 @@ private fun convertToLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -645,6 +648,35 @@ private fun createFlatten(name: String): Flatten {
 
 private fun createReshape(config: LayerConfig, name: String): Reshape {
     return Reshape(name = name, targetShape = config.target_shape!!)
+}
+
+private fun createConv1D(config: LayerConfig, name: String): Conv1D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }[0]
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(3)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(3)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = 1
+
+    return Conv1D(
+        filters = config.filters!!.toLong(),
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
 }
 
 private fun createConv2D(config: LayerConfig, name: String): Conv2D {

@@ -12,8 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -149,10 +148,9 @@ public class BatchNorm(
 
     override val paramCount: Int
         get() {
-            var paramCount =
-                numElementsInShape(shapeToLongArray(weightShape)) + numElementsInShape(shapeToLongArray(weightShape))
-            if (scale) paramCount += numElementsInShape(shapeToLongArray(weightShape))
-            if (center) paramCount += numElementsInShape(shapeToLongArray(weightShape))
+            var paramCount = weightShape.numElements() + weightShape.numElements()
+            if (scale) paramCount += weightShape.numElements()
+            if (center) paramCount += weightShape.numElements()
             return paramCount.toInt()
         }
 

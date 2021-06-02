@@ -165,12 +165,7 @@ public class SeparableConv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
-
+        val paddingName = padding.paddingName
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
 
         val depthwiseOutput: Operand<Float> =
@@ -178,7 +173,7 @@ public class SeparableConv2D(
                 input,
                 depthwiseKernel,
                 strides.toMutableList(),
-                tfPadding,
+                paddingName,
                 depthwiseConv2DOptions
             )
 
@@ -213,15 +208,7 @@ public class SeparableConv2D(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(depthwiseKernelShape)) + numElementsInShape(
-            shapeToLongArray(
-                pointwiseKernelShape
-            )
-        ) + numElementsInShape(
-            shapeToLongArray(
-                biasShape
-            )
-        )).toInt()
+        get() = (depthwiseKernelShape.numElements() + pointwiseKernelShape.numElements() + biasShape.numElements()).toInt()
 
     override fun toString(): String {
         return "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"
