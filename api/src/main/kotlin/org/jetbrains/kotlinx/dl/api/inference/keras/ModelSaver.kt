@@ -25,6 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -86,6 +87,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         DepthwiseConv2D::class -> createKerasDepthwiseConv2D(layer as DepthwiseConv2D, isKerasFullyCompatible)
         SeparableConv2D::class -> createSeparableConv2D(layer as SeparableConv2D, isKerasFullyCompatible)
         Concatenate::class -> createKerasConcatenate(layer as Concatenate)
+        GlobalAvgPool1D::class -> createKerasGlobalAveragePooling1DLayer(layer as GlobalAvgPool1D)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
 
@@ -121,6 +123,14 @@ private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): Kera
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_2D, config = configX)
+}
+
+private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): KerasLayer {
+    val configX = LayerConfig(
+            dtype = DATATYPE_FLOAT32,
+            name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
 }
 
 private fun createKerasAddLayer(layer: Add): KerasLayer {
