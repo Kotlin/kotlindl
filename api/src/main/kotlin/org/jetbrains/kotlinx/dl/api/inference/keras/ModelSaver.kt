@@ -24,10 +24,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
@@ -73,6 +70,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
     val kerasLayer = when (layer::class) {
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
+        MaxPool1D::class -> createKerasMaxPool1D(layer as MaxPool1D)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
         AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
         Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
@@ -310,6 +308,18 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
     }
+}
+
+private fun createKerasMaxPool1D(layer: MaxPool1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        pool_size = listOf(layer.poolSize),
+        strides = listOf(layer.strides ?: layer.poolSize),
+        padding = convertPadding(layer.padding),
+        data_format = layer.dataFormat,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_MAX_POOL_1D, config = configX)
 }
 
 private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
