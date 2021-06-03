@@ -22,11 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool3D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
@@ -80,6 +76,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Conv2D -> createKerasConv2D(layer, isKerasFullyCompatible)
         is Flatten -> createKerasFlatten(layer)
         is MaxPool2D -> createKerasMaxPooling2D(layer)
+        is MaxPool3D -> createKerasMaxPooling3D(layer)
         is AvgPool2D -> createKerasAvgPooling2D(layer)
         is Dense -> createKerasDense(layer, isKerasFullyCompatible)
         is ZeroPadding2D -> createKerasZeroPadding2D(layer)
@@ -434,6 +431,20 @@ private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
         strides = strides
     )
     return KerasLayer(class_name = LAYER_MAX_POOLING_2D, config = configX)
+}
+
+private fun createKerasMaxPooling3D(layer: MaxPool3D): KerasLayer {
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
+    val strides = mutableListOf(layer.strides?.get(1) ?: layer.poolSize[1], layer.strides?.get(3) ?: layer.poolSize[3])
+    val configX = LayerConfig(
+        data_format = layer.dataFormat,
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = convertPadding(layer.padding),
+        pool_size = poolSize,
+        strides = strides
+    )
+    return KerasLayer(class_name = LAYER_MAX_POOLING_3D, config = configX)
 }
 
 private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
