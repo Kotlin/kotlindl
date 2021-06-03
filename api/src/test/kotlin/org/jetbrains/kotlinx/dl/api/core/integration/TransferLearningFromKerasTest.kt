@@ -6,9 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.integration
 
 import io.jhdf.HdfFile
-import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -270,8 +268,6 @@ class TransferLearningTest : IntegrationTest() {
             )
 
             it.loadWeights(hdfFile)
-
-            it.save(File("/graph"), savingFormat = SavingFormat.TF_GRAPH, writingMode = WritingMode.OVERRIDE)
 
             val conv2DKernelWeights =
                 it.getLayer("conv2d").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
