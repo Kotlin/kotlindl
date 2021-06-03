@@ -12,7 +12,10 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -23,6 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
@@ -131,6 +135,7 @@ private fun convertToSequentialLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -155,10 +160,13 @@ private fun convertToSequentialLayer(
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
 }
@@ -262,6 +270,7 @@ private fun convertToLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -286,6 +295,8 @@ private fun convertToLayer(
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
@@ -304,6 +315,7 @@ private fun convertToLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 
@@ -327,6 +339,14 @@ private fun createGlobalAvgPooling2D(
 ): Layer {
     return GlobalAvgPool2D(
         name = name
+    )
+}
+
+private fun createGlobalAvgPooling1D(
+        name: String
+): Layer {
+    return GlobalAvgPool1D(
+            name = name
     )
 }
 
@@ -414,6 +434,20 @@ private fun createReLULayer(config: LayerConfig, name: String): Layer {
 private fun createELULayer(config: LayerConfig, name: String): Layer {
     return ELU(
         alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createLeakyReLULayer(config: LayerConfig, name: String): Layer {
+    return LeakyReLU(
+        alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer {
+    return ThresholdedReLU(
+        theta = config.theta!!.toFloat(),
         name = name
     )
 }
@@ -506,6 +540,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
+        INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }
@@ -641,6 +676,35 @@ private fun createFlatten(name: String): Flatten {
 
 private fun createReshape(config: LayerConfig, name: String): Reshape {
     return Reshape(name = name, targetShape = config.target_shape!!)
+}
+
+private fun createConv1D(config: LayerConfig, name: String): Conv1D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }[0]
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(3)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(3)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = 1
+
+    return Conv1D(
+        filters = config.filters!!.toLong(),
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
 }
 
 private fun createConv2D(config: LayerConfig, name: String): Conv2D {

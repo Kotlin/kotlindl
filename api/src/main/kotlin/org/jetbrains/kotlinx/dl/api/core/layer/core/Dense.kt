@@ -13,8 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeToLongArray
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -122,7 +121,7 @@ public class Dense(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
+        get() = (kernelShape.numElements() + biasShape.numElements()).toInt()
 
     /** Returns the shape of kernel weights. */
     public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()

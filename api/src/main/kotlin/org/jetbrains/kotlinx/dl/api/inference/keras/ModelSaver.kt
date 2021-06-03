@@ -12,14 +12,21 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -67,6 +74,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
     val kerasLayer = when (layer::class) {
+        Conv1D::class -> createKerasConv1D(layer as Conv1D, isKerasFullyCompatible)
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
@@ -76,6 +84,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         Input::class -> createKerasInput(layer as Input)
         BatchNorm::class -> createKerasBatchNorm(layer as BatchNorm, isKerasFullyCompatible)
         ActivationLayer::class -> createKerasActivationLayer(layer as ActivationLayer)
+        LeakyReLU::class -> createKerasLeakyReLU(layer as LeakyReLU);
+        ThresholdedReLU::class -> createKerasThresholdedReLULayer(layer as ThresholdedReLU)
         Add::class -> createKerasAddLayer(layer as Add)
         Maximum::class -> createKerasMaximumLayer(layer as Maximum)
         Minimum::class -> createKerasMinimumLayer(layer as Minimum)
@@ -83,6 +93,10 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         Multiply::class -> createKerasMultiplyLayer(layer as Multiply)
         Average::class -> createKerasAverageLayer(layer as Average)
         GlobalAvgPool2D::class -> createKerasGlobalAveragePooling2DLayer(layer as GlobalAvgPool2D)
+        DepthwiseConv2D::class -> createKerasDepthwiseConv2D(layer as DepthwiseConv2D, isKerasFullyCompatible)
+        SeparableConv2D::class -> createSeparableConv2D(layer as SeparableConv2D, isKerasFullyCompatible)
+        Concatenate::class -> createKerasConcatenate(layer as Concatenate)
+        GlobalAvgPool1D::class -> createKerasGlobalAveragePooling1DLayer(layer as GlobalAvgPool1D)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
 
@@ -118,6 +132,14 @@ private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): Kera
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_2D, config = configX)
+}
+
+private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): KerasLayer {
+    val configX = LayerConfig(
+            dtype = DATATYPE_FLOAT32,
+            name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
 }
 
 private fun createKerasAddLayer(layer: Add): KerasLayer {
@@ -175,6 +197,24 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasLeakyReLU(layer: LeakyReLU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha = layer.alpha.toDouble(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_LEAKY_RELU, config = configX)
+}
+
+private fun createKerasThresholdedReLULayer(layer: ThresholdedReLU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        theta = layer.theta.toDouble(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_THRESHOLDED_RELU, config = configX)
 }
 
 private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boolean): KerasLayer {
@@ -253,6 +293,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
             RandomUniform::class -> convertToRandomUniform(initializer as RandomUniform)
+            Identity::class -> convertToIdentity(initializer as Identity)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
@@ -266,6 +307,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> INITIALIZER_HE_UNIFORM
             LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
             LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
+            Identity::class -> INITIALIZER_IDENTITY
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
         config = KerasInitializerConfig(seed = 12)
@@ -292,6 +334,15 @@ private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String,
             mode = convertMode(initializer.mode),
             distribution = convertDistribution(initializer.distribution)
         )
+    )
+}
+
+private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig>{
+    return Pair(
+            INITIALIZER_IDENTITY,
+            KerasInitializerConfig(
+                    gain = initializer.gain.toDouble()
+            )
     )
 }
 
@@ -375,6 +426,31 @@ private fun createKerasFlatten(layer: Flatten): KerasLayer {
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
 }
 
+private fun createKerasConcatenate(layer: Concatenate): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        axis = layer.axis,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
+}
+
+private fun createKerasConv1D(layer: Conv1D, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = listOf(layer.kernelSize.toInt()),
+        strides = listOf(layer.strides[1].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        padding = convertPadding(layer.padding),
+        name = layer.name,
+        use_bias = layer.useBias
+    )
+    return KerasLayer(class_name = LAYER_CONV1D, config = configX)
+}
+
 private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): KerasLayer {
     val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
     val configX = LayerConfig(
@@ -393,6 +469,40 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         use_bias = layer.useBias
     )
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
+}
+
+private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean) : KerasLayer {
+    val configX = LayerConfig(
+        kernel_size = layer.kernelSize.map { it.toInt() },
+        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        depthwise_initializer = convertToKerasInitializer(layer.depthwiseInitializer, isKerasFullyCompatible),
+        depth_multiplier = layer.depthMultiplier,
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        padding = convertPadding(layer.padding),
+        use_bias = layer.useBias,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_DEPTHWISE_CONV2D, configX)
+}
+
+private fun createSeparableConv2D(layer: SeparableConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = layer.kernelSize.map { it.toInt() },
+        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        depthwise_initializer = convertToKerasInitializer(layer.depthwiseInitializer, isKerasFullyCompatible),
+        pointwise_initializer = convertToKerasInitializer(layer.pointwiseInitializer, isKerasFullyCompatible),
+        depth_multiplier = layer.depthMultiplier,
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        padding = convertPadding(layer.padding),
+        use_bias = layer.useBias,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_SEPARABLE_CONV2D, config = configX)
 }
 
 private fun createKerasZeroPadding2D(layer: ZeroPadding2D): KerasLayer {

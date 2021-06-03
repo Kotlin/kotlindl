@@ -131,6 +131,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val trainable: Boolean? = true,
     @Json(serializeNull = false)
+    val theta: Double? = null,
+    @Json(serializeNull = false)
     val threshold: Double? = null,
     @Json(serializeNull = false)
     val unit_forget_bias: Boolean? = null,
