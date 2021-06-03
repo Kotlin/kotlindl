@@ -50,9 +50,9 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
         }
     }
 
-    val inputLayer = when (this::class) {
-        Sequential::class -> (this as Sequential).inputLayer
-        Functional::class -> (this as Functional).inputLayer
+    val inputLayer = when (this) {
+        is Sequential -> this.inputLayer
+        is Functional -> this.inputLayer
         else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
     }
 
@@ -232,29 +232,29 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
     val className: String
     val config: KerasInitializerConfig
     if (isKerasFullyCompatible) {
-        val (_className, _config) = when (initializer::class) {
-            GlorotUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            GlorotNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            HeNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            HeUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
-            RandomUniform::class -> convertToRandomUniform(initializer as RandomUniform)
-            Identity::class -> convertToIdentity(initializer as Identity)
+        val (_className, _config) = when (initializer) {
+            is GlorotUniform -> convertToVarianceScaling(initializer as VarianceScaling)
+            is GlorotNormal -> convertToVarianceScaling(initializer as VarianceScaling)
+            is HeNormal -> convertToVarianceScaling(initializer as VarianceScaling)
+            is HeUniform -> convertToVarianceScaling(initializer as VarianceScaling)
+            is LeCunNormal -> convertToVarianceScaling(initializer as VarianceScaling)
+            is LeCunUniform -> convertToVarianceScaling(initializer as VarianceScaling)
+            is RandomUniform -> convertToRandomUniform(initializer)
+            is Identity -> convertToIdentity(initializer)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
         className = _className
         config = _config
     } else {
-        className = when (initializer::class) {
-            GlorotUniform::class -> INITIALIZER_GLOROT_UNIFORM
-            GlorotNormal::class -> INITIALIZER_GLOROT_NORMAL
-            HeNormal::class -> INITIALIZER_HE_NORMAL
-            HeUniform::class -> INITIALIZER_HE_UNIFORM
-            LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
-            LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
-            Identity::class -> INITIALIZER_IDENTITY
+        className = when (initializer) {
+            is GlorotUniform -> INITIALIZER_GLOROT_UNIFORM
+            is GlorotNormal -> INITIALIZER_GLOROT_NORMAL
+            is HeNormal -> INITIALIZER_HE_NORMAL
+            is HeUniform -> INITIALIZER_HE_UNIFORM
+            is LeCunNormal -> INITIALIZER_LECUN_NORMAL
+            is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
+            is Identity -> INITIALIZER_IDENTITY
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
         config = KerasInitializerConfig(seed = 12)
