@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
@@ -44,6 +45,9 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * The total number of depthwise convolution output channels will be equal to `numberOfChannels * depthMultiplier`.
  * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [depthwiseRegularizer] Regularizer function applied to the depthwise kernel matrix.
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
@@ -58,6 +62,9 @@ public class DepthwiseConv2D(
     public val depthMultiplier: Int = 1,
     public val depthwiseInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val depthwiseRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
@@ -111,8 +118,15 @@ public class DepthwiseConv2D(
         depthwiseKernel = tf.withName(kernelVariableName).variable(depthwiseKernelShape, getDType())
         if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        depthwiseKernel = addWeight(tf, kGraph, kernelVariableName, depthwiseKernel, depthwiseInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+        depthwiseKernel = addWeight(
+            tf,
+            kGraph,
+            kernelVariableName,
+            depthwiseKernel,
+            depthwiseInitializer,
+            depthwiseRegularizer
+        )
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
