@@ -26,10 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
@@ -78,6 +75,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Flatten -> createKerasFlatten(layer)
         is MaxPool2D -> createKerasMaxPooling2D(layer)
         is AvgPool2D -> createKerasAvgPooling2D(layer)
+        is AvgPool3D -> createAvgPool3D(layer)
         is Dense -> createKerasDense(layer, isKerasFullyCompatible)
         is ZeroPadding2D -> createKerasZeroPadding2D(layer)
         is Input -> createKerasInput(layer)
@@ -362,6 +360,18 @@ private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
         strides = strides
     )
     return KerasLayer(class_name = LAYER_AVG_POOLING_2D, config = configX)
+}
+
+private fun createAvgPool3D(layer: AvgPool3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        pool_size = layer.poolSize.toList(),
+        strides = layer.strides?.toList() ?: layer.poolSize.toList(),
+        padding = convertPadding(layer.padding),
+        data_format = layer.dataFormat,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_AVG_POOL_3D, config = configX)
 }
 
 private fun createKerasFlatten(layer: Flatten): KerasLayer {

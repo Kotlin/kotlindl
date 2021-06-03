@@ -26,10 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -150,6 +147,7 @@ private fun convertToSequentialLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOL_3D -> createAvgPool3D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -286,6 +284,7 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOL_3D -> createAvgPool3D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -646,6 +645,16 @@ private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
     addedOnesStrides[3] = 1
 
     return AvgPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+}
+
+private fun createAvgPool3D(config: LayerConfig, name: String): Layer {
+    return AvgPool3D(
+        poolSize = config.pool_size!!.toIntArray(),
+        strides = config.strides?.toIntArray() ?: config.pool_size.toIntArray(),
+        padding = convertPadding(config.padding!!),
+        dataFormat = config.data_format!!,
+        name = name
+    )
 }
 
 private fun convertPadding(padding: KerasPadding): ConvPadding {
