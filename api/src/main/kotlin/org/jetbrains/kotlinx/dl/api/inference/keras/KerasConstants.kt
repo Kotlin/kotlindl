@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 // Keras layers
+internal const val LAYER_CONV1D: String = "Conv1D"
 internal const val LAYER_CONV2D: String = "Conv2D"
 internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_SEPARABLE_CONV2D: String = "SeparableConv2D"
@@ -24,6 +25,8 @@ internal const val LAYER_BATCH_NORM: String = "BatchNormalization"
 internal const val LAYER_ACTIVATION: String = "Activation"
 internal const val LAYER_RELU: String = "ReLU"
 internal const val LAYER_ELU: String = "ELU"
+internal const val LAYER_LEAKY_RELU: String = "LeakyReLU"
+internal const val LAYER_THRESHOLDED_RELU = "ThresholdedReLU"
 internal const val LAYER_LSTM: String = "LSTM"
 internal const val LAYER_DROPOUT: String = "Dropout"
 internal const val LAYER_ADD: String = "Add"
@@ -34,6 +37,7 @@ internal const val LAYER_MAXIMUM: String = "Maximum"
 internal const val LAYER_MINIMUM: String = "Minimum"
 internal const val LAYER_CONCATENATE: String = "Concatenate"
 internal const val LAYER_GLOBAL_AVG_POOLING_2D: String = "GlobalAveragePooling2D"
+internal const val LAYER_GLOBAL_AVG_POOLING_1D: String = "GlobalAveragePooling1D"
 internal const val LAYER_SOFTMAX: String = "Softmax"
 
 // Keras data types
@@ -44,8 +48,8 @@ internal const val INITIALIZER_GLOROT_UNIFORM: String = "GlorotUniform"
 internal const val INITIALIZER_GLOROT_NORMAL: String = "GlorotNormal"
 internal const val INITIALIZER_HE_UNIFORM: String = "HeUniform"
 internal const val INITIALIZER_HE_NORMAL: String = "HeNormal"
-internal const val INITIALIZER_LECUN_UNIFORM: String = "LeCunUniform"
-internal const val INITIALIZER_LECUN_NORMAL: String = "LeCunNormal"
+internal const val INITIALIZER_LECUN_UNIFORM: String = "LecunUniform"
+internal const val INITIALIZER_LECUN_NORMAL: String = "LecunNormal"
 internal const val INITIALIZER_ZEROS: String = "Zeros"
 internal const val INITIALIZER_ONES: String = "Ones"
 internal const val INITIALIZER_RANDOM_NORMAL: String = "RandomNormal"
@@ -53,6 +57,7 @@ internal const val INITIALIZER_RANDOM_UNIFORM: String = "RandomUniform"
 internal const val INITIALIZER_TRUNCATED_NORMAL: String = "TruncatedNormal"
 internal const val INITIALIZER_CONSTANT: String = "Constant"
 internal const val INITIALIZER_VARIANCE_SCALING: String = "VarianceScaling"
+internal const val INITIALIZER_IDENTITY: String = "Identity"
 
 // Keras activations
 internal const val ACTIVATION_RELU: String = "relu"
