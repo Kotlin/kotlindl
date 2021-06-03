@@ -12,7 +12,10 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -22,7 +25,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.Conv2d.dilations
-import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
 
 private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
@@ -82,6 +84,9 @@ public class Conv2D(
     activationInternal = activation,
     kernelInitializerInternal = kernelInitializer,
     biasInitializerInternal = biasInitializer,
+    kernelRegularizerInternal = kernelRegularizer,
+    biasRegularizerInternal = biasRegularizer,
+    activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
     kernelVariableName = KERNEL_VARIABLE_NAME,
@@ -109,6 +114,9 @@ public abstract class Conv2DImpl(
     private val activationInternal: Activations,
     private val kernelInitializerInternal: Initializer,
     private val biasInitializerInternal: Initializer,
+    private val kernelRegularizerInternal: Regularizer? = null,
+    private val biasRegularizerInternal: Regularizer? = null,
+    private val activityRegularizerInternal: Regularizer? = null,
     private val paddingInternal: ConvPadding,
     private val useBiasInternal: Boolean,
     private val kernelVariableName: String,
@@ -212,8 +220,9 @@ public abstract class Conv2DImpl(
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         if (useBiasInternal) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal)
-        if (useBiasInternal) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal)
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
+        if (useBiasInternal) bias =
+            addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
     }
 }
 

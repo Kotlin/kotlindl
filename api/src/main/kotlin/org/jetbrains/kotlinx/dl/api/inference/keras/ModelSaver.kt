@@ -12,8 +12,8 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -450,6 +450,9 @@ private fun createKerasConv1D(layer: Conv1D, isKerasFullyCompatible: Boolean): K
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
         padding = convertPadding(layer.padding),
         name = layer.name,
         use_bias = layer.useBias
