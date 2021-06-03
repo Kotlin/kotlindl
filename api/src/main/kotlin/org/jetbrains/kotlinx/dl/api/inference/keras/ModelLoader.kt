@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
@@ -162,6 +163,7 @@ private fun convertToSequentialLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
@@ -445,6 +447,18 @@ private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer
     return ThresholdedReLU(
         theta = config.theta!!.toFloat(),
         name = name
+    )
+}
+
+private fun createSoftmaxLayer(config: LayerConfig, name: String): Layer {
+    val axis = when(config.axis) {
+        is Int -> listOf(config.axis)
+        is List<*> -> config.axis as List<Int>
+        else -> throw IllegalArgumentException("Axis must be an integer or a list of integers")
+    }
+    return Softmax(
+        name = name,
+        axis = axis
     )
 }
 
