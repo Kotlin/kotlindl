@@ -10,7 +10,6 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
-import java.lang.IllegalArgumentException
 
 /**
  * Max pooling operation for 1D temporal data (e.g. audio, timeseries).
@@ -20,9 +19,10 @@ import java.lang.IllegalArgumentException
  * @property [poolSize] Size of the temporal pooling window.
  * @property [strides] The amount of shift for pooling window in each pooling step. If
  * `null`, it will default to [poolSize].
- * @property [padding] Padding strategy; either of `ConvPadding.VALID` which means no padding, or
- * `ConvPadding.SAME` which means padding the input equally such that the output has the same dimension as the input.
- * @property [dataFormat] Data format of input; either of `CHANNELS_LAST`, or `CHANNELS_FIRST`.
+ * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no padding, or
+ * [ConvPadding.SAME] which means padding the input equally such that the output has the same dimension
+ * as the input.
+ * @property [dataFormat] Data format of input; can be either of [CHANNELS_LAST], or [CHANNELS_FIRST].
  */
 public class MaxPool1D(
     public val poolSize: Int = 2,
@@ -45,7 +45,7 @@ public class MaxPool1D(
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
-            "The padding should be either \"ConvPadding.VALID\" or \"ConvPadding.SAME\"."
+            "The padding should be either ${ConvPadding.VALID} or ${ConvPadding.SAME}."
         }
     }
 
@@ -84,11 +84,7 @@ public class MaxPool1D(
          */
         tfPoolSize[expandAxis-1] = poolSize
         tfStrides[expandAxis-1] = strides ?: poolSize
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            else -> throw IllegalArgumentException("Padding value is invalid!")
-        }
+        val tfPadding = padding.paddingName
 
         val maxPool = tf.nn.maxPool(
             tfInput,

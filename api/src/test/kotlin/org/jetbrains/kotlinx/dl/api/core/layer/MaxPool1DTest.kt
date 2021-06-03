@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool1D
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeToIntArray
+import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -60,7 +60,7 @@ internal class MaxPool1DTest {
             val expectedShape = intArrayOf(input.size, 2, input[0][0].size)
             Assertions.assertArrayEquals(
                 expectedShape,
-                shapeToIntArray(output.shape())
+                output.shape().toIntArray()
             )
 
             // Check output values are correct.
@@ -123,7 +123,7 @@ internal class MaxPool1DTest {
             val expectedShape = intArrayOf(input.size, input[0].size, 1)
             Assertions.assertArrayEquals(
                 expectedShape,
-                shapeToIntArray(output.shape())
+                output.shape().toIntArray()
             )
 
             // Check output values are correct.
@@ -186,7 +186,7 @@ internal class MaxPool1DTest {
             val expectedShape = intArrayOf(input.size, input[0].size, input[0][0].size)
             Assertions.assertArrayEquals(
                 expectedShape,
-                shapeToIntArray(output.shape())
+                output.shape().toIntArray()
             )
 
             // Check output values are correct.
@@ -245,7 +245,7 @@ internal class MaxPool1DTest {
             val expectedShape = intArrayOf(input.size, 2, input[0][0].size)
             Assertions.assertArrayEquals(
                 expectedShape,
-                shapeToIntArray(output.shape())
+                output.shape().toIntArray()
             )
 
             // Check output values are correct.
