@@ -25,10 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -141,6 +138,7 @@ private fun convertToSequentialLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOL_1D -> createAvgPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_AVG_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -276,6 +274,7 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOL_1D -> createAvgPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_AVG_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -614,6 +613,16 @@ private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     addedOnesStrides[3] = 1
 
     return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+}
+
+private fun createAvgPool1D(config: LayerConfig, name: String): Layer {
+    return AvgPool1D(
+        poolSize = config.pool_size!![0],
+        strides = config.strides!![0],
+        padding = convertPadding(config.padding!!),
+        dataFormat = config.data_format!!,
+        name = name
+    )
 }
 
 private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {

@@ -25,10 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
@@ -76,6 +73,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool2D::class -> createKerasMaxPooling2D(layer as MaxPool2D)
+        AvgPool1D::class -> createKerasAvgPool1D(layer as AvgPool1D)
         AvgPool2D::class -> createKerasAvgPooling2D(layer as AvgPool2D)
         Dense::class -> createKerasDense(layer as Dense, isKerasFullyCompatible)
         ZeroPadding2D::class -> createKerasZeroPadding2D(layer as ZeroPadding2D)
@@ -337,6 +335,18 @@ private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
         strides = strides
     )
     return KerasLayer(class_name = LAYER_MAX_POOLING_2D, config = configX)
+}
+
+private fun createKerasAvgPool1D(layer: AvgPool1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        pool_size = listOf(layer.poolSize),
+        strides = listOf(layer.strides ?: layer.poolSize),
+        padding = convertPadding(layer.padding),
+        data_format = layer.dataFormat,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_AVG_POOL_1D, config = configX)
 }
 
 private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
