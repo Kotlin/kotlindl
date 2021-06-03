@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -68,6 +69,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
     val kerasLayer = when (layer::class) {
+        Conv1D::class -> createKerasConv1D(layer as Conv1D, isKerasFullyCompatible)
         Conv2D::class -> createKerasConv2D(layer as Conv2D, isKerasFullyCompatible)
         Flatten::class -> createKerasFlatten(layer as Flatten)
         MaxPool1D::class -> createKerasMaxPool1D(layer as MaxPool1D)
@@ -225,6 +227,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             LeCunNormal::class -> convertToVarianceScaling(initializer as VarianceScaling)
             LeCunUniform::class -> convertToVarianceScaling(initializer as VarianceScaling)
             RandomUniform::class -> convertToRandomUniform(initializer as RandomUniform)
+            Identity::class -> convertToIdentity(initializer as Identity)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
 
@@ -238,6 +241,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             HeUniform::class -> INITIALIZER_HE_UNIFORM
             LeCunNormal::class -> INITIALIZER_LECUN_NORMAL
             LeCunUniform::class -> INITIALIZER_LECUN_UNIFORM
+            Identity::class -> INITIALIZER_IDENTITY
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
         }
         config = KerasInitializerConfig(seed = 12)
@@ -264,6 +268,15 @@ private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String,
             mode = convertMode(initializer.mode),
             distribution = convertDistribution(initializer.distribution)
         )
+    )
+}
+
+private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig>{
+    return Pair(
+            INITIALIZER_IDENTITY,
+            KerasInitializerConfig(
+                    gain = initializer.gain.toDouble()
+            )
     )
 }
 
@@ -366,6 +379,22 @@ private fun createKerasConcatenate(layer: Concatenate): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
+}
+
+private fun createKerasConv1D(layer: Conv1D, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = listOf(layer.kernelSize.toInt()),
+        strides = listOf(layer.strides[1].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        padding = convertPadding(layer.padding),
+        name = layer.name,
+        use_bias = layer.useBias
+    )
+    return KerasLayer(class_name = LAYER_CONV1D, config = configX)
 }
 
 private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): KerasLayer {

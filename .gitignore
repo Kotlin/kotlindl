@@ -14,5 +14,6 @@
 /examples/out/
 /cache/
 /examples/cache/
+/api/cache/
 /pretrainedModels/
 /examples/savedmodels/

@@ -8,16 +8,16 @@ package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 /**
  * Type of padding.
  */
-public enum class ConvPadding {
+public enum class ConvPadding(internal val paddingName: String) {
     /**
      * Results in padding evenly to the left/right or up/down of the input such that output has the same
      * height/width dimension as the input.
      */
-    SAME,
+    SAME("SAME"),
 
-    /** No padding. */
-    VALID,
+    /** No padding. Results in smaller output size for `kernelSize > 1` */
+    VALID("VALID"),
 
     /** Full padding. For Keras compatibility goals. */
-    FULL
+    FULL("FULL");
 }
