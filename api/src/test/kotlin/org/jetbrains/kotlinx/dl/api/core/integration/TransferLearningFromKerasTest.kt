@@ -41,6 +41,15 @@ private val realPathToConfigWithWrongJSON =
 private const val pathToWeights = "inference/lenet/mnist_weights_only.h5"
 private val realPathToWeights = TransferLearningTest::class.java.classLoader.getResource(pathToWeights).path.toString()
 
+private const val pathToConfigWithRegularizers = "inference/lenet/regularizers/modelConfig.json"
+private val realPathToConfigRegularizers =
+    TransferLearningTest::class.java.classLoader.getResource(pathToConfigWithRegularizers).path.toString()
+
+private const val pathToWeightsRegularizers = "inference/lenet/regularizers/mnist_weights_only.h5"
+private val realPathToWeightsRegularizers =
+    TransferLearningTest::class.java.classLoader.getResource(pathToWeightsRegularizers).path.toString()
+
+
 class TransferLearningTest : IntegrationTest() {
     /** Loads configuration with default initializers for the last Dense layer from Keras. But Zeros initializer (default initializers for bias) is not supported yet. */
     /*@Test
@@ -239,6 +248,34 @@ class TransferLearningTest : IntegrationTest() {
             val conv2DKernelWeights1 =
                 it.getLayer("conv2d_1").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
             assertEquals(conv2DKernelWeights1[0][0][0][0], 0.027743129f)
+        }
+    }
+
+    @Test
+    fun loadModelConfigAndWeightsFromKerasWithRegularizers() {
+        val jsonConfigFile = File(realPathToConfigRegularizers)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeightsRegularizers)
+        val hdfFile = HdfFile(file)
+        recursivePrintGroupInHDF5File(hdfFile, hdfFile)
+
+        testModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            it.loadWeights(hdfFile)
+
+            val conv2DKernelWeights =
+                it.getLayer("conv2d").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.06105182f, conv2DKernelWeights[0][0][0][0])
+
+            val conv2DKernelWeights1 =
+                it.getLayer("conv2d_1").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.032438572f, conv2DKernelWeights1[0][0][0][0])
         }
     }
 

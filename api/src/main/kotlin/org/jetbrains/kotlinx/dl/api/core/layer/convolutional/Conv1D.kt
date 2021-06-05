@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
@@ -43,6 +44,9 @@ private const val EXTRA_DIM = 1L
  * @property [activation] Activation function.
  * @property [kernelInitializer] An initializer for the convolution kernel
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [kernelRegularizer] Regularizer function applied to the `kernel` weights matrix.
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
@@ -58,6 +62,9 @@ public class Conv1D(
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val kernelRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = "",
@@ -69,6 +76,9 @@ public class Conv1D(
     activationInternal = activation,
     kernelInitializerInternal = kernelInitializer,
     biasInitializerInternal = biasInitializer,
+    kernelRegularizerInternal = kernelRegularizer,
+    biasRegularizerInternal = biasRegularizer,
+    activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
     kernelVariableName = KERNEL_VARIABLE_NAME,

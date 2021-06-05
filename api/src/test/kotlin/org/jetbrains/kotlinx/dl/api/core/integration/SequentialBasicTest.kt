@@ -20,7 +20,10 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
+import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -507,6 +510,87 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.05)
             }
         }
+    }
 
+    @Test
+    fun lenetWithRegularization() {
+        val testModel = Sequential.of(
+            Input(
+                IMAGE_SIZE,
+                IMAGE_SIZE,
+                NUM_CHANNELS
+            ),
+            Conv2D(
+                filters = 32,
+                kernelSize = longArrayOf(5, 5),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = HeNormal(SEED),
+                biasInitializer = HeNormal(SEED),
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1)
+            ),
+            Conv2D(
+                filters = 64,
+                kernelSize = longArrayOf(5, 5),
+                strides = longArrayOf(1, 1, 1, 1),
+                activation = Activations.Relu,
+                kernelInitializer = HeNormal(SEED),
+                biasInitializer = HeNormal(SEED),
+                padding = ConvPadding.SAME
+            ),
+            MaxPool2D(
+                poolSize = intArrayOf(1, 2, 2, 1),
+                strides = intArrayOf(1, 2, 2, 1)
+            ),
+            Flatten(), // 3136
+            Dense(
+                outputSize = 512,
+                activation = Activations.Relu,
+                kernelInitializer = HeNormal(SEED),
+                biasInitializer = HeNormal(SEED),
+                kernelRegularizer = L2L1(),
+                biasRegularizer = L2L1(),
+            ),
+            Dense(
+                outputSize = NUMBER_OF_CLASSES,
+                activation = Activations.Linear,
+                kernelInitializer = HeNormal(SEED),
+                biasInitializer = HeNormal(SEED),
+                kernelRegularizer = L2L1(),
+                biasRegularizer = L2L1(),
+            )
+        )
+
+        val (train, test) = mnist()
+
+        testModel.use {
+            it.compile(
+                optimizer = SGD(learningRate = 0.1f),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Accuracy()
+            )
+
+            it.summary()
+
+            val trainingHistory =
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = 1000)
+
+            assertEquals(trainingHistory.batchHistory.size, 60)
+            assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
+            assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
+            assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
+            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+
+            // Evaluation testing
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.05)
+            }
+        }
     }
 }
