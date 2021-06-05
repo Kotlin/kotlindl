@@ -186,8 +186,10 @@ internal class SequentialModelTest {
                             "Name: Activation_dense_2; Type: Identity; Out #tensors:  1\n" +
                             "Name: SoftmaxCrossEntropyWithLogits; Type: SoftmaxCrossEntropyWithLogits; Out #tensors:  2\n" +
                             "Name: Const_23; Type: Const; Out #tensors:  1\n" +
-                            "Name: default_training_loss; Type: Mean; Out #tensors:  1\n" +
+                            "Name: Mean; Type: Mean; Out #tensors:  1\n" +
+                            "Name: default_training_loss; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/OnesLike; Type: OnesLike; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Shape; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Const; Type: Const; Out #tensors:  1\n" +
                             "Name: Gradients/Const_1; Type: Const; Out #tensors:  1\n" +
@@ -222,9 +224,9 @@ internal class SequentialModelTest {
                             "Name: Gradients/Const_7/Const; Type: Const; Out #tensors:  1\n" +
                             "Name: Gradients/ExpandDims_1; Type: ExpandDims; Out #tensors:  1\n" +
                             "Name: Gradients/Multiply_2; Type: Mul; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Identity_1; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Identity_2; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_3; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_3; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_4; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/BroadcastGradientArgs; Type: BroadcastGradientArgs; Out #tensors:  2\n" +
@@ -234,10 +236,10 @@ internal class SequentialModelTest {
                             "Name: Gradients/Reshape_2; Type: Reshape; Out #tensors:  1\n" +
                             "Name: Gradients/MatMul; Type: MatMul; Out #tensors:  1\n" +
                             "Name: Gradients/MatMul_1; Type: MatMul; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity_3; Type: Identity; Out #tensors:  1\n" +
-                            "Name: Gradients/ReluGrad; Type: ReluGrad; Out #tensors:  1\n" +
                             "Name: Gradients/Identity_4; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/ReluGrad; Type: ReluGrad; Out #tensors:  1\n" +
                             "Name: Gradients/Identity_5; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_6; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_5; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_6; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/BroadcastGradientArgs_1; Type: BroadcastGradientArgs; Out #tensors:  2\n" +
@@ -250,19 +252,19 @@ internal class SequentialModelTest {
                             "Name: Gradients/Shape_7; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Reshape_5; Type: Reshape; Out #tensors:  1\n" +
                             "Name: Gradients/MaxPoolGradV2; Type: MaxPoolGradV2; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity_6; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_7; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/ReluGrad_1; Type: ReluGrad; Out #tensors:  1\n" +
                             "Name: Gradients/BiasAddGrad; Type: BiasAddGrad; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity_7; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_8; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_8; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Conv2DBackpropInput; Type: Conv2DBackpropInput; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_9; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Conv2DBackpropFilter; Type: Conv2DBackpropFilter; Out #tensors:  1\n" +
                             "Name: Gradients/MaxPoolGradV2_1; Type: MaxPoolGradV2; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity_8; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_9; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/ReluGrad_2; Type: ReluGrad; Out #tensors:  1\n" +
                             "Name: Gradients/BiasAddGrad_1; Type: BiasAddGrad; Out #tensors:  1\n" +
-                            "Name: Gradients/Identity_9; Type: Identity; Out #tensors:  1\n" +
+                            "Name: Gradients/Identity_10; Type: Identity; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_10; Type: Shape; Out #tensors:  1\n" +
                             "Name: Gradients/Conv2DBackpropInput_1; Type: Conv2DBackpropInput; Out #tensors:  1\n" +
                             "Name: Gradients/Shape_11; Type: Shape; Out #tensors:  1\n" +
@@ -377,7 +379,7 @@ internal class SequentialModelTest {
                             "Name: Equal; Type: Equal; Out #tensors:  1\n" +
                             "Name: Cast_4; Type: Cast; Out #tensors:  1\n" +
                             "Name: Const_46; Type: Const; Out #tensors:  1\n" +
-                            "Name: Mean; Type: Mean; Out #tensors:  1\n"
+                            "Name: Mean_1; Type: Mean; Out #tensors:  1\n"
                 )
             )
         }

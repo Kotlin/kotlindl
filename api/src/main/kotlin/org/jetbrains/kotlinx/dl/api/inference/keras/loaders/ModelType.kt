@@ -42,4 +42,25 @@ public enum class ModelType(public val modelName: String) {
 
     /** */
     MobileNetv2("mobilenetv2"),
+
+    /** */
+    Inception("inception"),
+
+    /** */
+    Xception("xception"),
+
+    /** */
+    DenseNet121("densenet121"),
+
+    /** */
+    DenseNet169("densenet169"),
+
+    /** */
+    DenseNet201("densenet201"),
+
+    /** */
+    NASNetMobile("nasnetmobile"),
+
+    /** */
+    NASNetLarge("nasnetlarge"),
 }
