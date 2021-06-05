@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
-import org.jetbrains.kotlinx.dl.api.core.util.TRAINING_LOSS
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
@@ -135,7 +134,7 @@ public class SoftmaxCrossEntropyWithLogits(reductionType: ReductionType = Reduct
     ): Operand<Float> {
         val batchLoss = tf.nn.softmaxCrossEntropyWithLogits(yPred, yTrue)
 
-        return tf.withName(TRAINING_LOSS).math.mean(batchLoss.loss(), tf.constant(0))
+        return tf.math.mean(batchLoss.loss(), tf.constant(0))
     }
 }
 
@@ -415,7 +414,7 @@ internal fun meanOfLosses(
         )
     }
 
-    return tf.withName(TRAINING_LOSS).identity(totalLoss)
+    return totalLoss
 }
 
 internal fun safeMean(tf: Ops, loss: Operand<Float>, numElements: Operand<Float>): Operand<Float> {
