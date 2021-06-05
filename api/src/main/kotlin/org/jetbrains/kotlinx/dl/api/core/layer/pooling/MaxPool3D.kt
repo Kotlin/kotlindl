@@ -23,7 +23,7 @@ import java.util.*
  * @property [name] Custom layer name.
  * @constructor Creates [MaxPool2D] object.
  */
-class MaxPool3D(
+public class MaxPool3D(
     public val dataFormat: String = CHANNELS_LAST,
     public var poolSize: IntArray = intArrayOf(1, 2, 2, 2, 1),
     public var strides: IntArray? = null,
