@@ -11,7 +11,7 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val activation: String? = null,
     @Json(serializeNull = false)
-    val activity_regularizer: ActivityRegularizer? = null,
+    val activity_regularizer: KerasRegularizer? = null,
     @Json(serializeNull = false)
     val alpha: Double? = null,
     @Json(serializeNull = false)
@@ -88,6 +88,8 @@ internal data class LayerConfig(
     val padding: KerasPadding? = null,
     @Json(serializeNull = false)
     val pointwise_initializer: KerasInitializer? = null,
+    @Json(serializeNull = false)
+    val pointwise_regularizer: KerasRegularizer? = null,
     @Json(serializeNull = false)
     val noise_shape: List<Any>? = null,
     @Json(serializeNull = false)

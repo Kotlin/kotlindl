@@ -11,14 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
@@ -30,6 +24,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L1
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
@@ -127,6 +125,7 @@ private fun convertToSequentialLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -157,8 +156,9 @@ private fun convertToSequentialLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
 }
@@ -262,6 +262,7 @@ private fun convertToLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = when (kerasLayer.class_name) {
+        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -306,8 +307,8 @@ private fun convertToLayer(
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 
@@ -335,10 +336,10 @@ private fun createGlobalAvgPooling2D(
 }
 
 private fun createGlobalAvgPooling1D(
-        name: String
+    name: String
 ): Layer {
     return GlobalAvgPool1D(
-            name = name
+        name = name
     )
 }
 
@@ -451,6 +452,18 @@ private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer
     )
 }
 
+private fun createSoftmaxLayer(config: LayerConfig, name: String): Layer {
+    val axis = when (config.axis) {
+        is Int -> listOf(config.axis)
+        is List<*> -> config.axis as List<Int>
+        else -> throw IllegalArgumentException("Axis must be an integer or a list of integers")
+    }
+    return Softmax(
+        name = name,
+        axis = axis
+    )
+}
+
 private fun createBatchNorm(config: LayerConfig, name: String): Layer {
     return BatchNorm(
         axis = config.axis!! as List<Int>,
@@ -460,6 +473,8 @@ private fun createBatchNorm(config: LayerConfig, name: String): Layer {
         scale = config.scale!! as Boolean,
         gammaInitializer = convertToInitializer(config.gamma_initializer!!),
         betaInitializer = convertToInitializer(config.beta_initializer!!),
+        gammaRegularizer = convertToRegularizer(config.gamma_regularizer),
+        betaRegularizer = convertToRegularizer(config.beta_regularizer),
         movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
         movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!),
         name = name
@@ -472,8 +487,29 @@ private fun createDense(config: LayerConfig, name: String): Dense {
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         name = name
     )
+}
+
+private fun convertToRegularizer(regularizer: KerasRegularizer?): Regularizer? {
+    return if (regularizer != null) {
+        val l1 = regularizer.config!!.l1
+        val l2 = regularizer.config!!.l2
+        if (l1 != 0.0 && l2 != 0.0) {
+            L2L1(l1!!.toFloat(), l2!!.toFloat())
+        } else if (l1 == 0.0 && l2 != 0.0) {
+            L2(l2!!.toFloat())
+        } else if (l1 != 0.0 && l2 == 0.0) {
+            L1(l1!!.toFloat())
+        } else {
+            null
+        }
+    } else {
+        null
+    }
 }
 
 private fun convertToInitializer(initializer: KerasInitializer): Initializer {
@@ -516,6 +552,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
+        INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }
@@ -653,6 +690,38 @@ private fun createReshape(config: LayerConfig, name: String): Reshape {
     return Reshape(name = name, targetShape = config.target_shape!!)
 }
 
+private fun createConv1D(config: LayerConfig, name: String): Conv1D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }[0]
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(3)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(3)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = 1
+
+    return Conv1D(
+        filters = config.filters!!.toLong(),
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
+}
+
 private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
@@ -678,6 +747,9 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -712,6 +784,9 @@ private fun createDepthwiseConv2D(
         depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
         depthMultiplier = config.depth_multiplier!!,
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name
@@ -748,6 +823,10 @@ private fun createSeparableConv2D(
         pointwiseInitializer = convertToInitializer(config.pointwise_initializer!!),
         depthMultiplier = config.depth_multiplier!!,
         biasInitializer = convertToInitializer(config.bias_initializer!!),
+        depthwiseRegularizer = convertToRegularizer(config.depthwise_regularizer),
+        pointwiseRegularizer = convertToRegularizer(config.pointwise_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!,
         name = name

@@ -11,7 +11,11 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.conv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -24,6 +28,7 @@ import org.tensorflow.op.nn.Conv2d.dilations
 import kotlin.math.roundToInt
 
 private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
+
 private const val BIAS_VARIABLE_NAME = "conv2d_bias"
 
 /**
@@ -31,16 +36,27 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  *
  * This layer creates a convolution kernel that is convolved (actually cross-correlated)
  * with the layer input to produce a tensor of outputs.
- * Finally, if `activation` is applied to the outputs as well.
+ * Finally, the `activation` is applied to the outputs as well.
+ *
+ * It expects input data of size `(N, H, W, C)` where
+ * ```
+ * N - batch size
+ * H - height
+ * W - width
+ * C - number of channels
+ * ```
  *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.
- * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
+ * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilations` value != 1.
  * @property [dilations] Four numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
  * @property [activation] Activation function.
  * @property [kernelInitializer] An initializer for the convolution kernel
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [kernelRegularizer] Regularizer function applied to the `kernel` weights matrix.
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
@@ -54,8 +70,57 @@ public class Conv2D(
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val kernelRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
+    name: String = ""
+) : Conv2DImpl(
+    filtersInternal = filters,
+    kernelSizeInternal = kernelSize,
+    stridesInternal = strides,
+    dilationsInternal = dilations,
+    activationInternal = activation,
+    kernelInitializerInternal = kernelInitializer,
+    biasInitializerInternal = biasInitializer,
+    kernelRegularizerInternal = kernelRegularizer,
+    biasRegularizerInternal = biasRegularizer,
+    activityRegularizerInternal = activityRegularizer,
+    paddingInternal = padding,
+    useBiasInternal = useBias,
+    kernelVariableName = KERNEL_VARIABLE_NAME,
+    biasVariableName = BIAS_VARIABLE_NAME,
+    name = name
+) {
+    init {
+        assertArraySize(kernelSize, 2, "kernelSize")
+        assertArraySize(strides, 4, "strides")
+        assertArraySize(dilations, 4, "dilations")
+    }
+
+    override fun toString(): String {
+        return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
+                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding)"
+    }
+}
+
+public abstract class Conv2DImpl(
+    private val filtersInternal: Long,
+    private val kernelSizeInternal: LongArray,
+    private val stridesInternal: LongArray,
+    private val dilationsInternal: LongArray,
+    private val activationInternal: Activations,
+    private val kernelInitializerInternal: Initializer,
+    private val biasInitializerInternal: Initializer,
+    private val kernelRegularizerInternal: Regularizer? = null,
+    private val biasRegularizerInternal: Regularizer? = null,
+    private val activityRegularizerInternal: Regularizer? = null,
+    private val paddingInternal: ConvPadding,
+    private val useBiasInternal: Boolean,
+    private val kernelVariableName: String,
+    private val biasVariableName: String,
     name: String = ""
 ) : Layer(name) {
     // weight tensors
@@ -63,63 +128,43 @@ public class Conv2D(
     private var bias: Variable<Float>? = null
 
     // weight tensor shapes
-    private lateinit var biasShape: Shape
-    private lateinit var kernelShape: Shape
+    protected lateinit var kernelShape: Shape
+    protected lateinit var biasShape: Shape
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        kernelShape = shapeFromDims(*kernelSize, lastElement, filters)
-        biasShape = Shape.make(filters)
+        kernelShape = shapeFromDims(*kernelSizeInternal, lastElement, filtersInternal)
+        biasShape = Shape.make(filtersInternal)
 
-        // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
-        // calculate fanIn, fanOut
+        // should be calculated before addWeight because it's used in calculation,
+        // need to rewrite addWeight to avoid strange behaviour calculate fanIn, fanOut
         val inputDepth = lastElement // amount of channels
-        val outputDepth = filters // amount of channels for the next layer
+        val outputDepth = filtersInternal // amount of channels for the next layer
 
-        fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
-        fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
+        fanIn = (inputDepth * kernelSizeInternal[0] * kernelSizeInternal[1]).toInt()
+        fanOut = ((outputDepth * kernelSizeInternal[0] * kernelSizeInternal[1] /
+                (stridesInternal[0].toDouble() * stridesInternal[1])).roundToInt())
 
         val (kernelVariableName, biasVariableName) = defineVariableNames()
         createConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
-    }
-
-    private fun defineVariableNames(): Pair<String, String> {
-        return if (name.isNotEmpty()) {
-            Pair(conv2dKernelVarName(name), conv2dBiasVarName(name))
-        } else {
-            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
-        }
-    }
-
-    private fun createConv2DVariables(
-        tf: Ops,
-        kernelVariableName: String,
-        biasVariableName: String,
-        kGraph: KGraph
-    ) {
-        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(
-            rows, kernelSize[0].toInt(), padding,
-            strides[1].toInt(), dilations[1].toInt()
+            rows, kernelSizeInternal[0].toInt(), paddingInternal,
+            stridesInternal[1].toInt(), dilationsInternal[1].toInt()
         )
         cols = convOutputLength(
-            cols, kernelSize[1].toInt(), padding,
-            strides[2].toInt(), dilations[2].toInt()
+            cols, kernelSizeInternal[1].toInt(), paddingInternal,
+            stridesInternal[2].toInt(), dilationsInternal[2].toInt()
         )
 
-        val shape = Shape.make(inputShape.size(0), rows, cols, filters)
+        val shape = Shape.make(inputShape.size(0), rows, cols, filtersInternal)
         outputShape = TensorShape(shape)
         return shape
     }
@@ -130,26 +175,15 @@ public class Conv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
+        val paddingName = paddingInternal.paddingName
+        val options: Conv2d.Options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
+        var output: Operand<Float> = tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingName, options)
 
-        val options: Conv2d.Options = dilations(dilations.toList()).dataFormat("NHWC")
-        var output: Operand<Float> = tf.nn.conv2d(input, kernel, strides.toMutableList(), tfPadding, options)
-
-        if (useBias) {
+        if (useBiasInternal) {
             output = tf.nn.biasAdd(output, bias)
         }
 
-        return Activations.convert(activation).apply(tf, output, name)
-    }
-
-    override val weights: Map<String, Array<*>> get() = extractConv2DWeights()
-
-    private fun extractConv2DWeights(): Map<String, Array<*>> {
-        return extractWeights(defineVariableNames().toList())
+        return Activations.convert(activationInternal).apply(tf, output, name)
     }
 
     /** Returns the shape of kernel weights. */
@@ -158,12 +192,42 @@ public class Conv2D(
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
+    override val weights: Map<String, Array<*>> get() = extractConv2DWeights()
+
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(kernelShape)) + numElementsInShape(shapeToLongArray(biasShape))).toInt()
+        get() = (kernelShape.numElements() + biasShape.numElements()).toInt()
 
-    override fun toString(): String {
-        return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, padding=$padding)"
+    private fun extractConv2DWeights(): Map<String, Array<*>> {
+        return extractWeights(defineVariableNames().toList())
+    }
+
+    private fun defineVariableNames(): Pair<String, String> {
+        return if (name.isNotEmpty()) {
+            Pair(conv2dKernelVarName(name), conv2dBiasVarName(name))
+        } else {
+            Pair(kernelVariableName, biasVariableName)
+        }
+    }
+
+    private fun createConv2DVariables(
+        tf: Ops,
+        kernelVariableName: String,
+        biasVariableName: String,
+        kGraph: KGraph
+    ) {
+        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
+        if (useBiasInternal) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
+
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
+        if (useBiasInternal) bias =
+            addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
+    }
+}
+
+private fun assertArraySize(array: LongArray, size: Int, name: String) {
+    if (array.size != size) {
+        throw IllegalArgumentException("$name is expected to have size equal $size")
     }
 }

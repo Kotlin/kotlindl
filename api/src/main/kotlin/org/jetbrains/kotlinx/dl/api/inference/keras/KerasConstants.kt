@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 // Keras layers
+internal const val LAYER_CONV1D: String = "Conv1D"
 internal const val LAYER_CONV2D: String = "Conv2D"
 internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_SEPARABLE_CONV2D: String = "SeparableConv2D"
@@ -38,6 +39,7 @@ internal const val LAYER_CONCATENATE: String = "Concatenate"
 internal const val LAYER_GLOBAL_AVG_POOLING_2D: String = "GlobalAveragePooling2D"
 internal const val LAYER_GLOBAL_AVG_POOLING_1D: String = "GlobalAveragePooling1D"
 internal const val LAYER_GLOBAL_MAX_POOL_1D: String = "GlobalMaxPooling1D"
+internal const val LAYER_SOFTMAX: String = "Softmax"
 
 // Keras data types
 internal const val DATATYPE_FLOAT32: String = "float32"
@@ -47,8 +49,8 @@ internal const val INITIALIZER_GLOROT_UNIFORM: String = "GlorotUniform"
 internal const val INITIALIZER_GLOROT_NORMAL: String = "GlorotNormal"
 internal const val INITIALIZER_HE_UNIFORM: String = "HeUniform"
 internal const val INITIALIZER_HE_NORMAL: String = "HeNormal"
-internal const val INITIALIZER_LECUN_UNIFORM: String = "LeCunUniform"
-internal const val INITIALIZER_LECUN_NORMAL: String = "LeCunNormal"
+internal const val INITIALIZER_LECUN_UNIFORM: String = "LecunUniform"
+internal const val INITIALIZER_LECUN_NORMAL: String = "LecunNormal"
 internal const val INITIALIZER_ZEROS: String = "Zeros"
 internal const val INITIALIZER_ONES: String = "Ones"
 internal const val INITIALIZER_RANDOM_NORMAL: String = "RandomNormal"
@@ -56,6 +58,7 @@ internal const val INITIALIZER_RANDOM_UNIFORM: String = "RandomUniform"
 internal const val INITIALIZER_TRUNCATED_NORMAL: String = "TruncatedNormal"
 internal const val INITIALIZER_CONSTANT: String = "Constant"
 internal const val INITIALIZER_VARIANCE_SCALING: String = "VarianceScaling"
+internal const val INITIALIZER_IDENTITY: String = "Identity"
 
 // Keras activations
 internal const val ACTIVATION_RELU: String = "relu"

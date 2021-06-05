@@ -68,6 +68,13 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
             ModelType.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
         }
     }
 
@@ -113,21 +120,10 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
     /**
      * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
      *
-     * It takes [floatArray] as input with shape [tensorShape] and applied the specific preprocessing according chosen [modelType].
+     * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according given [modelType].
      */
-    public fun preprocessInput(floatArray: FloatArray, tensorShape: LongArray): FloatArray {
-        return when (modelType) {
-            ModelType.VGG_16 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
-            ModelType.VGG_19 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_50 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_101 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_152 -> preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_50_v2 -> preprocessInput(floatArray, inputType = InputType.TF)
-            ModelType.ResNet_101_v2 -> preprocessInput(floatArray, inputType = InputType.TF)
-            ModelType.ResNet_151_v2 -> preprocessInput(floatArray, inputType = InputType.TF)
-            ModelType.MobileNet -> preprocessInput(floatArray, inputType = InputType.TF)
-            ModelType.MobileNetv2 -> preprocessInput(floatArray, inputType = InputType.TF)
-        }
+    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+        return preprocessInput(data, tensorShape, modelType)
     }
 
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
@@ -160,6 +156,33 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
         }
 
         return HdfFile(File(fileName))
+    }
+}
+
+/**
+ * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+ *
+ * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according chosen [modelType].
+ */
+public fun preprocessInput(data: FloatArray, tensorShape: LongArray, modelType: ModelType): FloatArray {
+    return when (modelType) {
+        ModelType.VGG_16 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.VGG_19 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_50 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_101 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_152 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_50_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.ResNet_101_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.ResNet_151_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.MobileNet -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.MobileNetv2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.Inception -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.Xception -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.DenseNet121 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+        ModelType.DenseNet169 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+        ModelType.DenseNet201 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+        ModelType.NASNetMobile -> preprocessInput(data, tensorShape, inputType = InputType.TF)
+        ModelType.NASNetLarge -> preprocessInput(data, tensorShape, inputType = InputType.TF)
     }
 }
 

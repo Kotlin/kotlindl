@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
@@ -51,6 +52,10 @@ private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
  * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
  * @property [pointwiseInitializer] An initializer for the pointwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [depthwiseRegularizer] Regularizer function applied to the `depthwise` kernel matrix.
+ * @property [pointwiseRegularizer] Regularizer function applied to the `pointwise` kernel matrix
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
@@ -68,6 +73,10 @@ public class SeparableConv2D(
     public val depthwiseInitializer: Initializer = HeNormal(),
     public val pointwiseInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val depthwiseRegularizer: Regularizer? = null,
+    public val pointwiseRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
@@ -137,9 +146,23 @@ public class SeparableConv2D(
         pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
         if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        depthwiseKernel = addWeight(tf, kGraph, depthwiseKernelVariableName, depthwiseKernel, depthwiseInitializer)
-        pointwiseKernel = addWeight(tf, kGraph, pointwiseKernelVariableName, pointwiseKernel, pointwiseInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+        depthwiseKernel = addWeight(
+            tf,
+            kGraph,
+            depthwiseKernelVariableName,
+            depthwiseKernel,
+            depthwiseInitializer,
+            depthwiseRegularizer
+        )
+        pointwiseKernel = addWeight(
+            tf,
+            kGraph,
+            pointwiseKernelVariableName,
+            pointwiseKernel,
+            pointwiseInitializer,
+            pointwiseRegularizer
+        )
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -165,12 +188,7 @@ public class SeparableConv2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
-
+        val paddingName = padding.paddingName
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
 
         val depthwiseOutput: Operand<Float> =
@@ -178,7 +196,7 @@ public class SeparableConv2D(
                 input,
                 depthwiseKernel,
                 strides.toMutableList(),
-                tfPadding,
+                paddingName,
                 depthwiseConv2DOptions
             )
 
@@ -213,15 +231,7 @@ public class SeparableConv2D(
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (numElementsInShape(shapeToLongArray(depthwiseKernelShape)) + numElementsInShape(
-            shapeToLongArray(
-                pointwiseKernelShape
-            )
-        ) + numElementsInShape(
-            shapeToLongArray(
-                biasShape
-            )
-        )).toInt()
+        get() = (depthwiseKernelShape.numElements() + pointwiseKernelShape.numElements() + biasShape.numElements()).toInt()
 
     override fun toString(): String {
         return "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"

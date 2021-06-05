@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 
@@ -17,17 +16,6 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
-        return when (modelType) {
-            ModelType.VGG_16 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            ModelType.VGG_19 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_50 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_101 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_152 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            ModelType.ResNet_50_v2 -> preprocessInput(data, inputType = InputType.TF)
-            ModelType.ResNet_101_v2 -> preprocessInput(data, inputType = InputType.TF)
-            ModelType.ResNet_151_v2 -> preprocessInput(data, inputType = InputType.TF)
-            ModelType.MobileNet -> preprocessInput(data, inputType = InputType.TF)
-            ModelType.MobileNetv2 -> preprocessInput(data, inputType = InputType.TF)
-        }
+        return preprocessInput(data, tensorShape, modelType)
     }
 }
