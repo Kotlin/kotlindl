@@ -156,11 +156,9 @@ private fun convertToSequentialLayer(
         LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
-            kerasLayer.config!!.name!!
-        )
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
     }
 }
@@ -306,10 +304,8 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
-            kerasLayer.config!!.name!!
-        )
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
+        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 
@@ -328,18 +324,16 @@ private fun convertToLayer(
     return layer
 }
 
-private fun createGlobalAvgPooling2D(
-    name: String
-): Layer {
+private fun createGlobalAvgPooling2D(config: LayerConfig, name: String): Layer {
     return GlobalAvgPool2D(
+        dataFormat = config.data_format!!,
         name = name
     )
 }
 
-private fun createGlobalAvgPooling1D(
-    name: String
-): Layer {
+private fun createGlobalAvgPooling1D(config: LayerConfig, name: String): Layer {
     return GlobalAvgPool1D(
+        dataFormat = config.data_format!!,
         name = name
     )
 }
