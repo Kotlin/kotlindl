@@ -10,6 +10,8 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
@@ -36,8 +38,7 @@ private const val EXTRA_DIM = 1L
  *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
  * @property [kernelSize] Long number, specifying the width of the 1D convolution window.
- * @property [strides] Three numbers specifying stride of the pooling
- * operation for each dimension of input tensor.
+ * @property [strides] Three numbers specifying the strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying stride value != 1 is incompatible with specifying `dilation` value != 1.
  * @property [dilations] Three numbers specifying the dilation rate to use for
  * dilated convolution sequence dimensions of input tensor.
@@ -85,7 +86,16 @@ public class Conv1D(
     biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ) {
+    init {
+        assertArraySize(strides, 3, "strides")
+        assertArraySize(dilations, 3, "dilations")
+    }
+
     private val squeezeAxis = Squeeze.axis(listOf(EXTRA_DIM))
+
+    override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 1)
+
+    override fun biasVarName(name: String): String = convBiasVarName(name, dim = 1)
 
     override fun forward(
         tf: Ops,
@@ -99,8 +109,9 @@ public class Conv1D(
     }
 
     override fun toString(): String {
-        return "Conv2D(filters=$filters, kernelSize=$kernelSize, strides=$strides, " +
+        return "Conv1D(filters=$filters, kernelSize=$kernelSize, strides=$strides, " +
                 "dilation=$dilations, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding)"
+                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
     }
 }

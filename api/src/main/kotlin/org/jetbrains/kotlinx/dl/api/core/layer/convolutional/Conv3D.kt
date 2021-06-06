@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -9,39 +9,40 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.nn.Conv2d.dilations
+import org.tensorflow.op.nn.Conv3d.dilations
 
-private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
+private const val KERNEL_VARIABLE_NAME = "conv3d_kernel"
 
-private const val BIAS_VARIABLE_NAME = "conv2d_bias"
+private const val BIAS_VARIABLE_NAME = "conv3d_bias"
 
 /**
- * 2D convolution layer (e.g. spatial convolution over images).
+ * 3D convolution layer (e.g. spatial convolution over video frames or 3D images).
  *
  * This layer creates a convolution kernel that is convolved (actually cross-correlated)
  * with the layer input to produce a tensor of outputs.
  * Finally, the `activation` is applied to the outputs as well.
  *
- * It expects input data of size `(N, H, W, C)` where
+ * It expects input data of size `(N, D, H, W, C)` where
  * ```
  * N - batch size
+ * D - depth
  * H - height
  * W - width
  * C - number of channels
  * ```
  *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
- * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
- * @property [strides] Four numbers, specifying the strides of the pooling operation for each dimension of input tensor.
+ * @property [kernelSize] Three long numbers, specifying the height and width of the 3D convolution cube.
+ * @property [strides] Five numbers, specifying the strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilations` value != 1.
- * @property [dilations] Four numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
+ * @property [dilations] Five numbers, specifying the dilation rate to use for dilated convolution for each dimension of input tensor.
  * @property [activation] Activation function.
  * @property [kernelInitializer] An initializer for the convolution kernel
  * @property [biasInitializer] An initializer for the bias vector.
@@ -51,13 +52,13 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
- * @constructor Creates [Conv2D] object.
+ * @constructor Creates [Conv3D] object.
  */
-public class Conv2D(
+public class Conv3D(
     public val filters: Long = 32,
-    public val kernelSize: LongArray = longArrayOf(3, 3),
-    public val strides: LongArray = longArrayOf(1, 1, 1, 1),
-    public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
+    public val kernelSize: LongArray = longArrayOf(3, 3, 3),
+    public val strides: LongArray = longArrayOf(1, 1, 1, 1, 1),
+    public val dilations: LongArray = longArrayOf(1, 1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
@@ -67,7 +68,7 @@ public class Conv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Conv2DImpl(
+) : AbstractConv(
     filtersInternal = filters,
     kernelSizeInternal = kernelSize,
     stridesInternal = strides,
@@ -85,84 +86,58 @@ public class Conv2D(
     name = name
 ) {
     init {
-        assertArraySize(kernelSize, 2, "kernelSize")
-        assertArraySize(strides, 4, "strides")
-        assertArraySize(dilations, 4, "dilations")
+        assertArraySize(kernelSize, 3, "kernelSize")
+        assertArraySize(strides, 5, "strides")
+        assertArraySize(dilations, 5, "dilations")
     }
 
     override fun toString(): String {
-        return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+        return "Conv3D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
                 "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
     }
 
-    override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)
+    override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 3)
 
-    override fun biasVarName(name: String): String = convBiasVarName(name, dim = 2)
-}
+    override fun biasVarName(name: String): String = convBiasVarName(name, dim = 3)
 
-public abstract class Conv2DImpl(
-    filtersInternal: Long,
-    kernelSizeInternal: LongArray,
-    stridesInternal: LongArray,
-    dilationsInternal: LongArray,
-    activationInternal: Activations,
-    kernelInitializerInternal: Initializer,
-    biasInitializerInternal: Initializer,
-    kernelRegularizerInternal: Regularizer?,
-    biasRegularizerInternal: Regularizer?,
-    activityRegularizerInternal: Regularizer?,
-    paddingInternal: ConvPadding,
-    useBiasInternal: Boolean,
-    kernelVariableName: String,
-    biasVariableName: String,
-    name: String
-) : AbstractConv(
-    filtersInternal = filtersInternal,
-    kernelSizeInternal = kernelSizeInternal,
-    stridesInternal = stridesInternal,
-    dilationsInternal = dilationsInternal,
-    activationInternal = activationInternal,
-    kernelInitializerInternal = kernelInitializerInternal,
-    biasInitializerInternal = biasInitializerInternal,
-    kernelRegularizerInternal = kernelRegularizerInternal,
-    biasRegularizerInternal = biasRegularizerInternal,
-    activityRegularizerInternal = activityRegularizerInternal,
-    paddingInternal = paddingInternal,
-    useBiasInternal = useBiasInternal,
-    kernelVariableName = kernelVariableName,
-    biasVariableName = biasVariableName,
-    name = name
-) {
     override fun convImplementation(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
-        return tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+        val options = dilations(dilationsInternal.toList()).dataFormat("NDHWC")
+        return tf.nn.conv3d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
     }
 
     protected override fun calculateOutputShape(inputShape: Shape): Shape {
         val batchSize = inputShape.size(0)
-        val rowsCount = inputShape.size(1)
-        val colsCount = inputShape.size(2)
+        val depthsCount = inputShape.size(1)
+        val rowsCount = inputShape.size(2)
+        val colsCount = inputShape.size(3)
 
-        val rows = convOutputLength(
-            rowsCount,
+        val depths = convOutputLength(
+            depthsCount,
             kernelSizeInternal[0].toInt(),
             paddingInternal,
             stridesInternal[1].toInt(),
             dilationsInternal[1].toInt()
         )
-        val cols = convOutputLength(
-            colsCount,
+        val rows = convOutputLength(
+            rowsCount,
             kernelSizeInternal[1].toInt(),
             paddingInternal,
             stridesInternal[2].toInt(),
             dilationsInternal[2].toInt()
         )
+        val cols = convOutputLength(
+            colsCount,
+            kernelSizeInternal[2].toInt(),
+            paddingInternal,
+            stridesInternal[3].toInt(),
+            dilationsInternal[3].toInt()
+        )
 
-        return Shape.make(batchSize, rows, cols, filtersInternal)
+        return Shape.make(batchSize, depths, rows, cols, filtersInternal)
     }
 }
