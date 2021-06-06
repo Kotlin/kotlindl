@@ -147,6 +147,7 @@ private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): Kera
 
 private fun createKerasGlobalAveragePooling3DLayer(layer: GlobalAvgPool3D): KerasLayer {
     val configX = LayerConfig(
+        data_format = layer.dataFormat,
         dtype = DATATYPE_FLOAT32,
         name = layer.name
     )

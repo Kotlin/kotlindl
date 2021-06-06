@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.util.TF
+import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -21,13 +22,17 @@ import org.tensorflow.op.Ops
  * @constructor Creates [GlobalAvgPool3D] object.
  */
 public class GlobalAvgPool3D(
+    public val dataFormat: String = CHANNELS_LAST,
     name: String = ""
 ):Layer(name) {
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) { }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        //TODO support for dataFormat
-        return Shape.make(inputShape.size(0), inputShape.size(4))
+        if(dataFormat == CHANNELS_LAST) {
+            return Shape.make(inputShape.size(0), inputShape.size(4))
+        }else{
+            return Shape.make(inputShape.size(0),inputShape.size(1))
+        }
     }
 
     override fun forward(
@@ -36,8 +41,11 @@ public class GlobalAvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        //TODO support for dataFormat
-        return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
+        if(dataFormat== CHANNELS_LAST) {
+            return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
+        }else{
+            return TF.mean(tf, input, tf.constant(intArrayOf(2, 3, 4)))
+        }
     }
 
     override val weights: Map<String, Array<*>> get() = emptyMap()
@@ -47,6 +55,6 @@ public class GlobalAvgPool3D(
     override val paramCount: Int get() = 0
 
     override fun toString(): String {
-        return "GlobalAvgPool3D(name=$name)"
+        return "GlobalAvgPool3D(dataFormat = $dataFormat,name=$name)"
     }
 }
