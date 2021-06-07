@@ -29,14 +29,21 @@ public class GlobalAvgPool1D(
         return Shape.make(inputShape.size(0), inputShape.size(2))
     }
 
-    override fun forward(tf: Ops, input: Operand<Float>, isTraining: Operand<Boolean>, numberOfLosses: Operand<Float>?): Operand<Float> {
+    override fun forward(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         // TODO support for different dataFormat("channel_last", "channel_first")
         var stepAxis = 1
         // TODO support for masking
         return TF.mean(tf, input, tf.constant(stepAxis))
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 

@@ -175,8 +175,12 @@ private fun convertToSequentialLayer(
 internal fun loadFunctionalModelConfiguration(
     configuration: File
 ): Functional {
-    return Functional.of(loadFunctionalModelLayers(configuration).toList())
+    val functionalConfig = loadSerializedModel(configuration)
+    return deserializeFunctionalModel(functionalConfig)
 }
+
+internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
+    Functional.of(loadFunctionalModelLayers(functionalConfig).toList())
 
 /**
  * Loads a [Functional] model layers from json file with model configuration.
@@ -186,24 +190,7 @@ internal fun loadFunctionalModelConfiguration(
  * @param jsonConfigFile File containing model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer> {
-    val functionalConfig = try {
-        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-        Klaxon()
-            .converter(PaddingConverter())
-            .parse<KerasModel>(jsonString)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        try {
-            Klaxon()
-                .converter(PaddingConverter())
-                .parse<KerasModel>(jsonConfigFile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
-        }
-    }
-
+internal fun loadFunctionalModelLayers(functionalConfig: KerasModel?): MutableList<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
@@ -257,6 +244,23 @@ internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer>
     }
 
     return layers
+}
+
+internal fun loadSerializedModel(jsonConfigFile: File) = try {
+    val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
+    Klaxon()
+        .converter(PaddingConverter())
+        .parse<KerasModel>(jsonString)
+} catch (e: Exception) {
+    e.printStackTrace()
+    try {
+        Klaxon()
+            .converter(PaddingConverter())
+            .parse<KerasModel>(jsonConfigFile)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
+    }
 }
 
 private fun convertToLayer(

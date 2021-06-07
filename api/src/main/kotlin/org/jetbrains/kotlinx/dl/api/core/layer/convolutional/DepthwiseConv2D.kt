@@ -13,7 +13,10 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -169,7 +172,9 @@ public class DepthwiseConv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
-    override val weights: Map<String, Array<*>> get() = extractDepthConv2DWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractDepthConv2DWeights()
+        set(value) = assignWeights(value)
 
     private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
         return extractWeights(defineVariableNames().toList())
