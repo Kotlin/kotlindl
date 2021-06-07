@@ -466,9 +466,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             return deserializedModel
         } else {
             deserializedModel.compile(
-                optimizer = optimizer,
-                loss = loss,
-                metric = metric
+                optimizer = this.optimizer,
+                loss = this.loss,
+                metric = this.metric
             )
 
             deserializedModel.layers.forEach {

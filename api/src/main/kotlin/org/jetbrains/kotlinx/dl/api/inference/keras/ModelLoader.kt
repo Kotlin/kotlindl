@@ -40,10 +40,15 @@ import java.io.File
  * @param [configuration] File containing model configuration.
  * @return Non-compiled and non-trained Sequential model.
  */
-internal fun loadModelConfiguration(
+internal fun loadSequentialModelConfiguration(
     configuration: File
 ): Sequential {
-    val pair = loadSequentialModelLayers(configuration)
+    val sequentialConfig = loadSerializedModel(configuration)
+    return deserializeSequentialModel(sequentialConfig)
+}
+
+internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequential {
+    val pair = loadSequentialModelLayers(sequentialConfig)
     val input: Input = pair.first
     val layers = pair.second
 
@@ -55,30 +60,13 @@ internal fun loadModelConfiguration(
  *
  * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
  *
- * @param jsonConfigFile File containing model configuration.
+ * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
-    val sequentialConfig = try {
-        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-        Klaxon()
-            .converter(PaddingConverter())
-            .parse<KerasModel>(jsonString)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        try {
-            Klaxon()
-                .converter(PaddingConverter())
-                .parse<KerasModel>(jsonConfigFile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
-        }
-    }
-
+internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
     val layers = mutableListOf<Layer>()
 
-    (sequentialConfig as KerasModel).config!!.layers!!.forEach {
+    (config as KerasModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it)
@@ -89,10 +77,10 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
 
     val input: Input
 
-    val firstLayer = sequentialConfig.config!!.layers!!.first()
+    val firstLayer = config.config!!.layers!!.first()
     val inputLayerName =
         if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = sequentialConfig.config.layers!!.first().config!!.batch_input_shape
+    val batchInputShape = config.config.layers!!.first().config!!.batch_input_shape
 
     // TODO: write more universal code here
     when (batchInputShape!!.size) {
@@ -201,16 +189,16 @@ internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
  *
  * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Functional model.
  *
- * @param jsonConfigFile File containing model configuration.
+ * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(functionalConfig: KerasModel?): MutableList<Layer> {
+internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
     val input: Input
 
-    val firstLayer = (functionalConfig as KerasModel).config!!.layers!!.first()
+    val firstLayer = (config as KerasModel).config!!.layers!!.first()
     val batchInputShape =
         firstLayer.config!!.batch_input_shape
     val inputLayerName =
@@ -247,7 +235,7 @@ internal fun loadFunctionalModelLayers(functionalConfig: KerasModel?): MutableLi
     layers.add(input)
     layersByNames[input.name] = input
 
-    functionalConfig.config!!.layers!!.forEach {
+    config.config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it, layersByNames)

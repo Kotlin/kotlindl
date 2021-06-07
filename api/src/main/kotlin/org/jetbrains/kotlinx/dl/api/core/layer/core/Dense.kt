@@ -114,7 +114,7 @@ public class Dense(
 
     override var weights: Map<String, Array<*>>
         get() = extractDenseWeights()
-        set(value) = assignWeights(weights)
+        set(value) = assignWeights(value)
 
     private fun extractDenseWeights(): Map<String, Array<*>> {
         return extractWeights(defineVariableNames().toList())

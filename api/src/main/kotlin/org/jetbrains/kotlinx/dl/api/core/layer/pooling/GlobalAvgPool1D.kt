@@ -21,9 +21,9 @@ import org.tensorflow.op.Ops
  * @constructor Creates [GlobalAvgPool1D] object.
  */
 public class GlobalAvgPool1D(
-        name: String = ""
+    name: String = ""
 ) : Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) { }
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         return Shape.make(inputShape.size(0), inputShape.size(2))

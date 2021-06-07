@@ -360,7 +360,12 @@ public open class InferenceModel : AutoCloseable {
         data: Any,
         assignOpName: String
     ) {
-        Tensor.create(data).use { tensor ->
+        var tensorData = data
+        if (data is Array<*> && data.isArrayOf<Float>()) {
+            tensorData = (data as Array<Float>).toFloatArray()
+        }
+
+        Tensor.create(tensorData).use { tensor ->
             session.runner()
                 .feed(initializerName, tensor)
                 .addTarget(assignOpName)

@@ -194,7 +194,7 @@ public abstract class Conv2DImpl(
 
     override var weights: Map<String, Array<*>>
         get() = extractConv2DWeights()
-        set(value) = assignWeights(weights)
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
 
