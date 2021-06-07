@@ -437,6 +437,7 @@ private fun createELULayer(config: LayerConfig, name: String): Layer {
 private fun createPReLULayer(config: LayerConfig, name: String): Layer {
     return PReLU(
         alphaInitializer = convertToInitializer(config.alpha_initializer!!),
+        alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
         sharedAxes = config.shared_axes!!.toIntArray(),
         name = name
     )

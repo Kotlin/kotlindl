@@ -202,6 +202,7 @@ private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean)
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         alpha_initializer = convertToKerasInitializer(layer.alphaInitializer, isKerasFullyCompatible),
+        alpha_regularizer = convertToKerasRegularizer(layer.alphaRegularizer, isKerasFullyCompatible),
         shared_axes = layer.sharedAxes?.toList(),
         name = layer.name
     )

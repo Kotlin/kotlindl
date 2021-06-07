@@ -17,6 +17,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val alpha_initializer: KerasInitializer? = null,
     @Json(serializeNull = false)
+    val alpha_regularizer: KerasRegularizer? = null,
+    @Json(serializeNull = false)
     val axis: Any? = null,
     @Json(serializeNull = false)
     var batch_input_shape: List<Int?>? = null,
