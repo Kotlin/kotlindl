@@ -326,14 +326,12 @@ private fun convertToLayer(
 
 private fun createGlobalAvgPooling2D(config: LayerConfig, name: String): Layer {
     return GlobalAvgPool2D(
-        dataFormat = config.data_format!!,
         name = name
     )
 }
 
 private fun createGlobalAvgPooling1D(config: LayerConfig, name: String): Layer {
     return GlobalAvgPool1D(
-        dataFormat = config.data_format!!,
         name = name
     )
 }

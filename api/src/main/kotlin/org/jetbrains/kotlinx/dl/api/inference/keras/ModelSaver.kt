@@ -125,7 +125,6 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
 
 private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): KerasLayer {
     val configX = LayerConfig(
-        data_format = layer.dataFormat,
         dtype = DATATYPE_FLOAT32,
         name = layer.name
     )
@@ -134,7 +133,6 @@ private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): Kera
 
 private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): KerasLayer {
     val configX = LayerConfig(
-        data_format = layer.dataFormat,
         dtype = DATATYPE_FLOAT32,
         name = layer.name
     )

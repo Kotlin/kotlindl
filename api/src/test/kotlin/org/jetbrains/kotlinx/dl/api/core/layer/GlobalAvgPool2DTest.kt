@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.junit.jupiter.api.Test
 
 internal class GlobalAvgPool2DTest : PoolLayerTest() {
@@ -49,18 +48,6 @@ internal class GlobalAvgPool2DTest : PoolLayerTest() {
             floatArrayOf(0.5f/6, 20.0f/6, 8.0f/6, 6.0f/6)
         )
         val expectedShapeArray = longArrayOf(inputShapeArray[0], inputShapeArray[3])
-        assertGlobalPoolEquals(layer, input, expected, inputShapeArray, expectedShapeArray)
-        assertLayerComputedOutputShape(layer, inputShapeArray, expectedShapeArray)
-    }
-
-    @Test
-    fun withChannelsFirstDataFormat() {
-        val layer = GlobalAvgPool2D(dataFormat = CHANNELS_FIRST)
-        val expected = arrayOf(
-            floatArrayOf(16.5f/12, 5.0f/12),
-            floatArrayOf(14.0f/12, 20.5f/12)
-        )
-        val expectedShapeArray = longArrayOf(inputShapeArray[0], inputShapeArray[1])
         assertGlobalPoolEquals(layer, input, expected, inputShapeArray, expectedShapeArray)
         assertLayerComputedOutputShape(layer, inputShapeArray, expectedShapeArray)
     }
