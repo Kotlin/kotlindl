@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test
 
 internal class GlobalAvgPooling2DTest : PoolLayerTest() {
     @Test
-    fun globalAvgPool2DTest(){
-        val input = Array(2,{ Array(4, { Array(5, { FloatArray(3) { 0f } }) }) })
-        val expected = Array(2, {FloatArray(3) { 0f } })
-        assertGlobalAvgPool2DEquals(GlobalAvgPool2D(),input, expected )
+    fun globalAvgPool2DTest() {
+        val input = Array(2, { Array(4, { Array(5, { FloatArray(3) { 0f } }) }) })
+        val expected = Array(2, { FloatArray(3) { 0f } })
+        assertGlobalAvgPool2DEquals(GlobalAvgPool2D(), input, expected)
     }
 }

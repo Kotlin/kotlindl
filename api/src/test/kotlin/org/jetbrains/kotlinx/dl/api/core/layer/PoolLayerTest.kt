@@ -14,44 +14,56 @@ import org.tensorflow.op.core.Constant
 open class PoolLayerTest {
     protected fun assertGlobalAvgPool1DEquals(
         layer: Layer,
-        input:Array<Array<FloatArray>>,
+        input: Array<Array<FloatArray>>,
         expected: Array<FloatArray>,
     ) {
-        val actual = Array(expected.size) {FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer,input, expected,actual,::assertGlobalAvgPoolEquals){tf,tensor -> tf.constant(tensor.cast3DArray())}
+        val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
+        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+            tf.constant(
+                tensor.cast3DArray()
+            )
+        }
     }
 
     protected fun assertGlobalAvgPool2DEquals(
         layer: Layer,
-        input:Array<Array<Array<FloatArray>>>,
+        input: Array<Array<Array<FloatArray>>>,
         expected: Array<FloatArray>,
     ) {
-        val actual = Array(expected.size) {FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer,input, expected,actual,::assertGlobalAvgPoolEquals){tf,tensor -> tf.constant(tensor.cast4DArray())}
+        val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
+        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+            tf.constant(
+                tensor.cast4DArray()
+            )
+        }
     }
 
     protected fun assertGlobalAvgPool3DEquals(
         layer: Layer,
-        input:Array<Array<Array<Array<FloatArray>>>>,
+        input: Array<Array<Array<Array<FloatArray>>>>,
         expected: Array<FloatArray>,
     ) {
-        val actual = Array(expected.size) {FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer,input, expected,actual,::assertGlobalAvgPoolEquals){tf,tensor -> tf.constant(tensor.cast5DArray())}
+        val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
+        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+            tf.constant(
+                tensor.cast5DArray()
+            )
+        }
     }
 
     private fun assertPoolingLayer(
         layer: Layer,
-        input:Array<*>,
+        input: Array<*>,
         expected: Array<*>,
-        actual:Array<*>,
-        assertEqual: (Array<*>, Array<*>)->Unit,
-        constProducer:(Ops, Array<*>) -> Constant<Float>
-    ){
+        actual: Array<*>,
+        assertEqual: (Array<*>, Array<*>) -> Unit,
+        constProducer: (Ops, Array<*>) -> Constant<Float>
+    ) {
         val inputSize = input.size
         val inputShape = Shape.make(inputSize.toLong())
         EagerSession.create().use {
             val tf = Ops.create(it)
-            val inputOp = constProducer(tf,input)
+            val inputOp = constProducer(tf, input)
             layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
@@ -62,13 +74,13 @@ open class PoolLayerTest {
             val actualShape = shapeFromDims(*output.shape())
             output.copyTo(actual)
             assertEquals(expectedShape, actualShape)
-            assertEqual(expected,actual)
+            assertEqual(expected, actual)
         }
     }
 
     private fun assertGlobalAvgPoolEquals(
-        expected:  Array<*>,
-        actual:  Array<*>
+        expected: Array<*>,
+        actual: Array<*>
     ) {
         val expectedTensor = expected.cast2DArray()
         val actualTensor = actual.cast2DArray()
