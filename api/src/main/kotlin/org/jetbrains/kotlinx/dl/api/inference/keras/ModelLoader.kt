@@ -115,6 +115,7 @@ private fun convertToLayer(
     return when (kerasLayer.class_name) {
         LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CONV3D -> createConv3D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
@@ -783,6 +784,42 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     addedOnesDilation[3] = 1
 
     return Conv2D(
+        filters = config.filters!!.toLong(),
+        kernelSize = kernelSize,
+        strides = addedOnesStrides,
+        dilations = addedOnesDilation,
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+        name = name
+    )
+}
+
+private fun createConv3D(config: LayerConfig, name: String): Conv3D {
+    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
+    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+
+    val addedOnesStrides = LongArray(5)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = strides[2]
+    addedOnesStrides[4] = 1
+
+    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
+    val addedOnesDilation = LongArray(5)
+    addedOnesDilation[0] = 1
+    addedOnesDilation[1] = dilation[0]
+    addedOnesDilation[2] = dilation[1]
+    addedOnesDilation[3] = dilation[2]
+    addedOnesDilation[4] = 1
+
+    return Conv3D(
         filters = config.filters!!.toLong(),
         kernelSize = kernelSize,
         strides = addedOnesStrides,
