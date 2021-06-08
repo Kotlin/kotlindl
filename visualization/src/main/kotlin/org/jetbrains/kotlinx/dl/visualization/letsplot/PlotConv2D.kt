@@ -22,10 +22,10 @@ fun filtersPlot(
     @Suppress("UNCHECKED_CAST")
     val weights = conv2DLayer.weights.values.toTypedArray()[0] as TensorImageData
 
-    val xyio = extractXYIOSizes(weights, FILTER_LAYERS_PERMUTATION)
+    val XYInOut = extractXYInputOutputAxeSizes(weights, FILTER_LAYERS_PERMUTATION)
 
-    val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
-        xyPlot(xyio[0], xyio[1], plotFill) { x, y ->
+    val plots = inputsOutputsPlots(XYInOut[2], XYInOut[3]) { i, o ->
+        xyPlot(XYInOut[0], XYInOut[1], plotFill) { x, y ->
             weights[y][x][i][o]
         }
     }
@@ -44,10 +44,10 @@ fun modelActivationOnLayersPlot(
     val activationArrays = activations.mapNotNull { it as? TensorImageData }
 
     return activationArrays.map { weights ->
-        val xyio = extractXYIOSizes(weights, ACTIVATION_LAYERS_PERMUTATION)
+        val XYInOut = extractXYInputOutputAxeSizes(weights, ACTIVATION_LAYERS_PERMUTATION)
 
-        val plots = inputsOutputsPlots(xyio[2], xyio[3]) { i, o ->
-            xyPlot(xyio[0], xyio[1], plotFill) { x, y ->
+        val plots = inputsOutputsPlots(XYInOut[2], XYInOut[3]) { i, o ->
+            xyPlot(XYInOut[0], XYInOut[1], plotFill) { x, y ->
                 weights[i][y][x][o]
             }
         }

@@ -12,7 +12,7 @@ internal typealias TensorImageData = Array<Array<Array<FloatArray>>>
 internal fun inputsOutputsPlots(inputs: Int, outputs: Int, f: (Int, Int) -> Plot) =
     List(inputs) { i -> List(outputs) { o -> f(i, o) } }.flatten()
 
-internal fun extractXYIOSizes(inputData: TensorImageData, permute: IntArray = intArrayOf(0, 1, 2, 3)): IntArray =
+internal fun extractXYInputOutputAxeSizes(inputData: TensorImageData, permute: IntArray = intArrayOf(0, 1, 2, 3)): IntArray =
     with(IntArray(4)) {
         this[permute[0]] = inputData.size // default xSize
         this[permute[1]] = inputData[0].size // default ySize
