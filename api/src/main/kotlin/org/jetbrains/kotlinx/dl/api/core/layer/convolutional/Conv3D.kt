@@ -53,6 +53,8 @@ private const val BIAS_VARIABLE_NAME = "conv3d_bias"
  * @property [name] Custom layer name.
  * @property [useBias] If true the layer uses a bias vector.
  * @constructor Creates [Conv3D] object.
+ *
+ * @since 0.3
  */
 public class Conv3D(
     public val filters: Long = 32,
