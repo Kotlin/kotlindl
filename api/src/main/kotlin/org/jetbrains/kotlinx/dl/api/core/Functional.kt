@@ -7,8 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
 import java.io.FileNotFoundException
@@ -214,7 +213,8 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadFunctionalModelLayers(configuration)
+            val functionalConfig = loadSerializedModel(configuration)
+            return loadFunctionalModelLayers(functionalConfig)
         }
     }
 
@@ -456,5 +456,28 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         stringBuilder.append(inboundNodeName)
 
         return stringBuilder.toString()
+    }
+
+    /** Returns a copy of this model. */
+    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Functional {
+        val serializedModel = serializeModel(true)
+        val deserializedModel = deserializeFunctionalModel(serializedModel)
+        if (!copyWeights) {
+            return deserializedModel
+        } else {
+            deserializedModel.compile(
+                optimizer = this.optimizer,
+                loss = this.loss,
+                metric = this.metric
+            )
+
+            deserializedModel.layers.forEach {
+                it.weights = this.getLayer(it.name).weights
+            }
+
+            deserializedModel.isModelInitialized = true
+
+            return deserializedModel
+        }
     }
 }

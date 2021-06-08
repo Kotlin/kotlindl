@@ -31,17 +31,20 @@ import java.io.File
  * - Special preprocessing (used in VGG'19 during training on ImageNet dataset) is applied to images before prediction.
  * - No additional training.
  * - No new layers are added.
+ * - Model copied and used for prediction.
  *
  * @see <a href="https://arxiv.org/abs/1409.1556">
  *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
  * @see <a href="https://keras.io/api/applications/vgg/#vgg19-function">
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
-fun vgg19prediction() {
+fun vgg19copyModelPrediction() {
     val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
     val model = modelZoo.loadModel() as Sequential
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
+
+    var copiedModel: Sequential
 
     model.use {
         it.compile(
@@ -56,6 +59,31 @@ fun vgg19prediction() {
 
         it.loadWeights(hdfFile)
 
+        copiedModel = it.copy(copyWeights = true)
+
+        for (i in 1..8) {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
+
+            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+
+            val res = it.predict(inputData)
+            println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
+
+            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+
+            println(top5.toString())
+        }
+    }
+
+    copiedModel.use {
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
                 transformImage {
@@ -80,4 +108,4 @@ fun vgg19prediction() {
 }
 
 /** */
-fun main(): Unit = vgg19prediction()
+fun main(): Unit = vgg19copyModelPrediction()

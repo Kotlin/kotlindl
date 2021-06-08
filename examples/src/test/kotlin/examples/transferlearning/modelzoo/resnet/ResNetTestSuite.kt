@@ -6,6 +6,7 @@
 package examples.transferlearning.modelzoo.resnet
 
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50additionalTraining
+import examples.transferlearning.modelzoo.resnet.resnet50.resnet50copyModelPrediction
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50prediction
 import org.junit.jupiter.api.Test
 
@@ -18,6 +19,11 @@ class ResNetTestSuite {
     @Test
     fun resnet50additionalTrainingTest() {
         resnet50additionalTraining()
+    }
+
+    @Test
+    fun resnet50copyModelPredictionTest() {
+        resnet50copyModelPrediction()
     }
 
     @Test

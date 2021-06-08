@@ -39,6 +39,16 @@ import java.io.File
  * @param isKerasFullyCompatible If true, it generates fully Keras-compatible configuration.
  */
 public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
+    val kerasModel = serializeModel(isKerasFullyCompatible)
+
+    val jsonString2 = Klaxon()
+        .converter(PaddingConverter())
+        .toJsonString(kerasModel)
+
+    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
+}
+
+internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean): KerasModel {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {
         run {
@@ -59,13 +69,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
         listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
 
     val config = KerasModelConfig(name = "", layers = kerasLayers)
-    val kerasModel = KerasModel(config = config)
-
-    val jsonString2 = Klaxon()
-        .converter(PaddingConverter())
-        .toJsonString(kerasModel)
-
-    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
+    return KerasModel(config = config)
 }
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
@@ -133,8 +137,8 @@ private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): Kera
 
 private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): KerasLayer {
     val configX = LayerConfig(
-            dtype = DATATYPE_FLOAT32,
-            name = layer.name
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
 }
@@ -343,12 +347,12 @@ private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String,
     )
 }
 
-private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig>{
+private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig> {
     return Pair(
-            INITIALIZER_IDENTITY,
-            KerasInitializerConfig(
-                    gain = initializer.gain.toDouble()
-            )
+        INITIALIZER_IDENTITY,
+        KerasInitializerConfig(
+            gain = initializer.gain.toDouble()
+        )
     )
 }
 
@@ -480,7 +484,7 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
 }
 
-private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean) : KerasLayer {
+private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
     val configX = LayerConfig(
         kernel_size = layer.kernelSize.map { it.toInt() },
         strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
