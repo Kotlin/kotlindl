@@ -197,4 +197,5 @@ internal fun Array<*>.cast3DArray(): Array<Array<FloatArray>> = this.map { it.ca
 /** Cast Array<*> to Array<Array<Array<FloatArray>>> when sure about its dimensions */
 internal fun Array<*>.cast4DArray(): Array<Array<Array<FloatArray>>> = this.map { it.castArrayDim().cast3DArray() }.toTypedArray()
 
+/** Cast Array<*> to Array<Array<Array<Array<FloatArray>>>> when sure about its dimensions */
 internal fun Array<*>.cast5DArray(): Array<Array<Array<Array<FloatArray>>>> = this.map { it.castArrayDim().cast4DArray() }.toTypedArray()

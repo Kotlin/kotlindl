@@ -13,10 +13,13 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
+import java.lang.IllegalArgumentException
 
 internal typealias FloatConv1DTensor = Array<Array<FloatArray>>
 
 internal typealias FloatConv2DTensor = Array<Array<Array<FloatArray>>>
+
+internal typealias FloatConv3DTensor = Array<Array<Array<Array<FloatArray>>>>
 
 internal typealias AnyDTensor = Array<*>
 
@@ -42,6 +45,16 @@ open class ConvLayerTest {
             ::assertFloatConv2DTensorsEquals) { tf, tensor -> tf.constant(tensor.cast4DArray()) }
     }
 
+    protected fun assertFloatConv3DTensorsEquals(
+        layer: Layer,
+        input: FloatConv3DTensor,
+        expected: FloatConv3DTensor
+    ) {
+        val actual = expected.copyZeroed()
+        assertTensorsEquals(layer, input, expected, actual,
+            ::assertFloatConv3DTensorsEquals) { tf, tensor -> tf.constant(tensor.cast5DArray()) }
+    }
+
     protected fun createFloatConv1DTensor(
         batchSize: Long,
         size: Long,
@@ -59,11 +72,24 @@ open class ConvLayerTest {
     ): FloatConv2DTensor =
         getFloatArrayOfShape(Shape.make(batchSize, height, width, channels), initValue).cast4DArray()
 
+    protected fun createFloatConv3DTensor(
+        batchSize: Long,
+        depth: Long,
+        height: Long,
+        width: Long,
+        channels: Long,
+        initValue: Float
+    ): FloatConv3DTensor =
+        getFloatArrayOfShape(Shape.make(batchSize, depth, height, width, channels), initValue).cast5DArray()
+
     private fun FloatConv1DTensor.copyZeroed(): FloatConv1DTensor =
         getFloatArrayOfShape(getShapeOfArray(this)).cast3DArray()
 
     private fun FloatConv2DTensor.copyZeroed(): FloatConv2DTensor =
         getFloatArrayOfShape(getShapeOfArray(this)).cast4DArray()
+
+    private fun FloatConv3DTensor.copyZeroed(): FloatConv3DTensor =
+        getFloatArrayOfShape(getShapeOfArray(this)).cast5DArray()
 
     private fun assertTensorsEquals(
         layer: Layer,
@@ -127,4 +153,29 @@ open class ConvLayerTest {
             }
         }
     }
+
+    private fun assertFloatConv3DTensorsEquals(
+        expected: AnyDTensor,
+        actual: AnyDTensor
+    ) {
+        val expectedTensor = expected.cast5DArray()
+        val actualTensor = actual.cast5DArray()
+        val msg = "Expected ${expectedTensor.contentDeepToString()} " +
+                "to equal ${actualTensor.contentDeepToString()}"
+        for (i in expectedTensor.indices) {
+            for (j in expectedTensor[i].indices) {
+                for (k in expectedTensor[i][j].indices) {
+                    for (l in expectedTensor[i][j][k].indices) {
+                        assertArrayEquals(expectedTensor[i][j][k][l], actualTensor[i][j][k][l], EPS, msg)
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun Array<*>.sum(): Float = fold(0.0f) { acc, arr -> when(arr) {
+        is FloatArray -> arr.sum() + acc
+        is Array<*> -> arr.sum() + acc
+        else -> throw IllegalArgumentException("Cannot sum array other than Array of FloatArray")
+    } }
 }
