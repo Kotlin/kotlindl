@@ -22,17 +22,13 @@ import org.tensorflow.op.Ops
  * @constructor Creates [GlobalAvgPool3D] object.
  */
 public class GlobalAvgPool3D(
-    public val dataFormat: String = CHANNELS_LAST,
     name: String = ""
 ):Layer(name) {
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) { }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        if(dataFormat == CHANNELS_LAST) {
-            return Shape.make(inputShape.size(0), inputShape.size(4))
-        }else{
-            return Shape.make(inputShape.size(0),inputShape.size(1))
-        }
+        // TODO add dataFormat support
+        return Shape.make(inputShape.size(0), inputShape.size(4))
     }
 
     override fun forward(
@@ -41,11 +37,8 @@ public class GlobalAvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        if(dataFormat== CHANNELS_LAST) {
-            return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
-        }else{
-            return TF.mean(tf, input, tf.constant(intArrayOf(2, 3, 4)))
-        }
+        // TODO add dataFormat support
+        return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
     }
 
     override val weights: Map<String, Array<*>> get() = emptyMap()
@@ -55,6 +48,6 @@ public class GlobalAvgPool3D(
     override val paramCount: Int get() = 0
 
     override fun toString(): String {
-        return "GlobalAvgPool3D(dataFormat = $dataFormat,name=$name)"
+        return "GlobalAvgPool3D(name=$name)"
     }
 }

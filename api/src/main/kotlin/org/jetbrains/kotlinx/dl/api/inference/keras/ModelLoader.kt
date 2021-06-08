@@ -165,7 +165,6 @@ private fun convertToLayer(
         )
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
-            kerasLayer.config!!,
             kerasLayer.config!!.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
@@ -322,7 +321,6 @@ private fun convertToLayer(
         )
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D( kerasLayer.config!!.name!! )
         LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
-            kerasLayer.config!!,
             kerasLayer.config!!.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
@@ -360,11 +358,9 @@ private fun createGlobalAvgPooling1D(
 }
 
 private fun createGlobalAvgPooling3D(
-    config:LayerConfig,
     name: String
 ): Layer {
     return GlobalAvgPool3D(
-        dataFormat = config.data_format!!,
         name = name
     )
 }
