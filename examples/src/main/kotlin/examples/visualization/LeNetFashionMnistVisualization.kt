@@ -45,15 +45,15 @@ fun main() {
     val x = test.getX(sampleIndex)
     val y = test.getY(sampleIndex).toInt()
 
-    lenet5().use { model ->
+    lenet5().use {
 
-        model.compile(
+        it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
-        model.fit(
+        it.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
             epochs = EPOCHS,
@@ -63,18 +63,18 @@ fun main() {
 
         val fashionPlots = List(3) { imageIndex ->
             flattenImagePlot(imageIndex, test,
-                predict = model::predict,
+                predict = it::predict,
                 labelEncoding = fashionMnistLabelEncoding::get,
                 plotFill = PlotFill.GRAY
             )
         }
         columnPlot(fashionPlots, 3, 256).show()
 
-        val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 
-        val fstConv2D = model.layers[1] as Conv2D
-        val sndConv2D = model.layers[3] as Conv2D
+        val fstConv2D = it.layers[1] as Conv2D
+        val sndConv2D = it.layers[3] as Conv2D
 
         // lets-plot approach
         filtersPlot(fstConv2D, columns = 16).show()
@@ -84,8 +84,8 @@ fun main() {
         drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
         drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
 
-        val layersActivations = modelActivationOnLayersPlot(model, x)
-        val (prediction, activations) = model.predictAndGetActivations(x)
+        val layersActivations = modelActivationOnLayersPlot(it, x)
+        val (prediction, activations) = it.predictAndGetActivations(x)
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
         println("Ground Truth: ${fashionMnistLabelEncoding[y]}")
 

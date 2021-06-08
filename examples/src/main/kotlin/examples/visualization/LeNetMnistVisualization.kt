@@ -31,17 +31,17 @@ fun main() {
     val x = test.getX(sampleIndex)
     val y = test.getY(sampleIndex).toInt()
 
-    lenet5().use { model ->
+    lenet5().use {
 
-        model.compile(
+        it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
-        model.summary()
+        it.summary()
 
-        model.fit(
+        it.fit(
             dataset = train,
             validationRate = 0.1,
             epochs = EPOCHS,
@@ -49,14 +49,16 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val numbersPlots = List(3) { flattenImagePlot(it, test, model::predict) }
+        val numbersPlots = List(3) { imageIndex ->
+            flattenImagePlot(imageIndex, test, it::predict)
+        }
         columnPlot(numbersPlots, 3, 256).show()
 
-        val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 
-        val fstConv2D = model.layers[1] as Conv2D
-        val sndConv2D = model.layers[3] as Conv2D
+        val fstConv2D = it.layers[1] as Conv2D
+        val sndConv2D = it.layers[3] as Conv2D
 
         // lets-plot approach
         filtersPlot(fstConv2D, columns = 16).show()
@@ -66,8 +68,8 @@ fun main() {
         drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
         drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
 
-        val layersActivations = modelActivationOnLayersPlot(model, x)
-        val (prediction, activations) = model.predictAndGetActivations(x)
+        val layersActivations = modelActivationOnLayersPlot(it, x)
+        val (prediction, activations) = it.predictAndGetActivations(x)
         println("Prediction: $prediction")
         println("Ground Truth: $y")
 
