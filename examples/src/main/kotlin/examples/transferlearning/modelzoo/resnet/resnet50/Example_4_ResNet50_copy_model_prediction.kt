@@ -30,6 +30,7 @@ import java.io.File
  * - No additional training.
  * - No new layers are added.
  * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
+ * - Model copied and used for prediction.
  */
 fun resnet50copyModelPrediction() {
     val modelZoo =
@@ -55,17 +56,6 @@ fun resnet50copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
-        copiedModel.layers.forEach { layer ->
-            run {
-                val weights = copiedModel.getLayer(layer.name).weights
-                weights.forEach { (varName, arr) ->
-                    val assert = arr.contentDeepEquals(it.getLayer(layer.name).weights[varName])
-
-                    println("${layer.name} for $varName weights are equal: $assert")
-                }
-            }
-        }
-
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
                 transformImage {
@@ -89,8 +79,6 @@ fun resnet50copyModelPrediction() {
     }
 
     copiedModel.use {
-
-
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
                 transformImage {

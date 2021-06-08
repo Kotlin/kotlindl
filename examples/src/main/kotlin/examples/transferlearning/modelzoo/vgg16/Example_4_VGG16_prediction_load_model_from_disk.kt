@@ -28,8 +28,6 @@ import java.util.*
  * - No additional training.
  * - No new layers are added.
  *
- * @see <a href="https://drive.google.com/drive/folders/1283PvmF8TykZ70NVbLr1-gW0I6Y2rQ6Q">
- *     VGG'16 weights and model could be loaded here.</a>
  * @see <a href="https://arxiv.org/abs/1409.1556">
  *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
  * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">

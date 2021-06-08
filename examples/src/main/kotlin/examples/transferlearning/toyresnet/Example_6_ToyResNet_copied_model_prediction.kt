@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
-/** Just loading ToyResNet trained in Keras. */
+/** Just loading ToyResNet trained in Keras, making a copy and using for prediction. */
 fun main() {
     val (train, test) = fashionMnist()
 
@@ -33,34 +33,18 @@ fun main() {
 
         it.loadWeights(hdfFile)
         copiedModel = it.copy(copyWeights = true)
-        //println(it.kGraph)
-
-        copiedModel.use {
-            //println(copiedModel.kGraph)
-
-            copiedModel.layers.forEach { layer ->
-                run {
-                    val weights = copiedModel.getLayer(layer.name).weights
-                    weights.forEach { (varName, arr) ->
-                        val assert = arr.contentDeepEquals(it.getLayer(layer.name).weights[varName])
-
-                        println("${layer.name} for $varName weights are equal: $assert")
-                    }
-
-                }
-            }
-
-            // copiedModel.summary()
-            val accuracy = copiedModel.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
-
-            println("Accuracy before: $accuracy")
-        }
 
         val accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
 
         println("Accuracy before: $accuracy")
     }
 
+    copiedModel.use {
+        copiedModel.summary()
+        val accuracy = copiedModel.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
+
+        println("Accuracy before: $accuracy")
+    }
 }
 
 

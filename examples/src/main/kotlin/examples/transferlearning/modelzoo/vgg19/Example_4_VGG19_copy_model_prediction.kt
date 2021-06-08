@@ -31,9 +31,8 @@ import java.io.File
  * - Special preprocessing (used in VGG'19 during training on ImageNet dataset) is applied to images before prediction.
  * - No additional training.
  * - No new layers are added.
+ * - Model copied and used for prediction.
  *
- * @see <a href="https://drive.google.com/drive/folders/1P1BlCNXdeXo_9u6mxYnm-N_gbOn_VhUA">
- *     VGG'19 weights and model could be loaded here.</a>
  * @see <a href="https://arxiv.org/abs/1409.1556">
  *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
  * @see <a href="https://keras.io/api/applications/vgg/#vgg19-function">
@@ -61,17 +60,6 @@ fun vgg19copyModelPrediction() {
         it.loadWeights(hdfFile)
 
         copiedModel = it.copy(copyWeights = true)
-
-        copiedModel.layers.forEach { layer ->
-            run {
-                val weights = copiedModel.getLayer(layer.name).weights
-                weights.forEach { (varName, arr) ->
-                    val assert = arr.contentDeepEquals(it.getLayer(layer.name).weights[varName])
-
-                    println("${layer.name} for $varName weights are equal: $assert")
-                }
-            }
-        }
 
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
