@@ -95,7 +95,9 @@ public abstract class AbstractConv(
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
-    override val weights: Map<String, Array<*>> get() = extractConvWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractConvWeights()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
 
