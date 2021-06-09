@@ -435,9 +435,8 @@ private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
 
 private fun createKerasMaxPooling3D(layer: MaxPool3D): KerasLayer {
     val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
-    val strides = mutableListOf(layer.strides?.get(1) ?: layer.poolSize[1], layer.strides?.get(3) ?: layer.poolSize[3])
+    val strides = mutableListOf(layer.strides[1] , layer.strides[3])
     val configX = LayerConfig(
-        data_format = layer.dataFormat,
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
         padding = convertPadding(layer.padding),

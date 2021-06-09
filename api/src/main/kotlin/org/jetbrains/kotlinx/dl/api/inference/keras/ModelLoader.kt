@@ -720,7 +720,7 @@ private fun createMaxPooling3D(config: LayerConfig, name: String): MaxPool3D {
     addedOnesStrides[3] = strides[2]
     addedOnesStrides[4] = 1
 
-    return MaxPool3D(config.data_format!!,addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+    return MaxPool3D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
 private fun convertPadding(padding: KerasPadding): ConvPadding {
