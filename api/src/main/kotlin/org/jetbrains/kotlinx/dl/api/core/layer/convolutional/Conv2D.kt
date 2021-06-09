@@ -143,7 +143,7 @@ public abstract class Conv2DImpl(
         return tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
     }
 
-    protected override fun calculateOutputShape(inputShape: Shape): Shape {
+    protected override fun defineOutputShape(inputShape: Shape): Shape {
         val batchSize = inputShape.size(0)
         val rowsCount = inputShape.size(1)
         val colsCount = inputShape.size(2)

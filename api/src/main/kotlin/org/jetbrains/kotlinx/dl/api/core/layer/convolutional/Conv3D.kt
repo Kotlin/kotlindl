@@ -112,7 +112,7 @@ public class Conv3D(
         return tf.nn.conv3d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
     }
 
-    protected override fun calculateOutputShape(inputShape: Shape): Shape {
+    protected override fun defineOutputShape(inputShape: Shape): Shape {
         val batchSize = inputShape.size(0)
         val depthsCount = inputShape.size(1)
         val rowsCount = inputShape.size(2)

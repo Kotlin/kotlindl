@@ -44,8 +44,6 @@ public abstract class AbstractConv(
     protected lateinit var kernelShape: Shape
     protected lateinit var biasShape: Shape
 
-    // NDHWC conv3d
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
         val lastElement = inputShape.size(inputShape.numDimensions() - 1)
@@ -68,7 +66,7 @@ public abstract class AbstractConv(
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        val shape = calculateOutputShape(inputShape)
+        val shape = defineOutputShape(inputShape)
         outputShape = TensorShape(shape)
         return shape
     }
@@ -133,7 +131,7 @@ public abstract class AbstractConv(
 
     protected abstract fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float>
 
-    protected abstract fun calculateOutputShape(inputShape: Shape): Shape
+    protected abstract fun defineOutputShape(inputShape: Shape): Shape
 }
 
 internal fun assertArraySize(array: LongArray, size: Int, name: String) {
