@@ -142,6 +142,7 @@ private fun convertToLayer(
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -449,6 +450,15 @@ private fun createReLULayer(config: LayerConfig, name: String): Layer {
 private fun createELULayer(config: LayerConfig, name: String): Layer {
     return ELU(
         alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createPReLULayer(config: LayerConfig, name: String): Layer {
+    return PReLU(
+        alphaInitializer = convertToInitializer(config.alpha_initializer!!),
+        alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
+        sharedAxes = config.shared_axes!!.toIntArray(),
         name = name
     )
 }

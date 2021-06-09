@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
@@ -85,6 +86,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Input -> createKerasInput(layer)
         is BatchNorm -> createKerasBatchNorm(layer, isKerasFullyCompatible)
         is ActivationLayer -> createKerasActivationLayer(layer)
+        is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
         is LeakyReLU -> createKerasLeakyReLU(layer)
         is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
         is Add -> createKerasAddLayer(layer)
@@ -208,6 +210,17 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha_initializer = convertToKerasInitializer(layer.alphaInitializer, isKerasFullyCompatible),
+        alpha_regularizer = convertToKerasRegularizer(layer.alphaRegularizer),
+        shared_axes = layer.sharedAxes?.toList(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_PRELU, config = configX)
 }
 
 private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
