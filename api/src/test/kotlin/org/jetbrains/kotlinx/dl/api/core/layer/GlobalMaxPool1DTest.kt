@@ -7,8 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalMaxPool1D
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeToIntArray
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
+import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -49,58 +48,11 @@ internal class GlobalMaxPool1DTest {
             val expectedShape = intArrayOf(input.size, input[0][0].size)
             Assertions.assertArrayEquals(
                 expectedShape,
-                shapeToIntArray(output.shape())
+                output.shape().toIntArray()
             )
 
             // Check output values are correct.
             val actual = Array(input.size) { FloatArray(input[0][0].size) }
-            output.tensor().copyTo(actual)
-            for (i in expected.indices) {
-                Assertions.assertArrayEquals(
-                    expected[i],
-                    actual[i]
-                )
-            }
-        }
-    }
-
-    @Test
-    fun withDataFormat() {
-        val input = arrayOf(
-            arrayOf(
-                floatArrayOf(1.0f, -2.0f, 3.0f),
-                floatArrayOf(0.5f, 2.0f, 5.0f)
-            ),
-            arrayOf(
-                floatArrayOf(5.0f, 3.0f, 1.0f),
-                floatArrayOf(6.0f, -2.5f, 4.0f),
-            )
-        )
-        val expected = arrayOf(
-            floatArrayOf(3.0f, 5.0f),
-            floatArrayOf(5.0f, 6.0f)
-        )
-        val layer = GlobalMaxPool1D(dataFormat = CHANNELS_FIRST)
-
-        EagerSession.create().use {
-            val tf = Ops.create()
-            val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
-
-            val inputOp = tf.constant(input)
-            val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-
-            // Check output shape is correct.
-            val expectedShape = intArrayOf(input.size, input[0].size)
-            Assertions.assertArrayEquals(
-                expectedShape,
-                shapeToIntArray(output.shape())
-            )
-
-            // Check output values are correct.
-            val actual = Array(input.size) { FloatArray(input[0].size) }
             output.tensor().copyTo(actual)
             for (i in expected.indices) {
                 Assertions.assertArrayEquals(

@@ -314,7 +314,6 @@ private fun createGlobalAvgPooling3D(
 
 private fun createGlobalMaxPool1D(config: LayerConfig, name: String): Layer {
     return GlobalMaxPool1D(
-        dataFormat = config.data_format!!,
         name = name
     )
 }
