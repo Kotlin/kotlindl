@@ -65,21 +65,19 @@ public class AvgPool2D(
             stridesLongList.add(it.toLong())
         }
 
-        val tfPadding = when (padding) {
-            ConvPadding.SAME -> "SAME"
-            ConvPadding.VALID -> "VALID"
-            ConvPadding.FULL -> "FULL"
-        }
+        val paddingName = padding.paddingName
 
         return tf.nn.avgPool(
             input,
             poolSizeLongList,
             stridesLongList,
-            tfPadding
+            paddingName
         )
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 

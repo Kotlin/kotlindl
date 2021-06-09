@@ -172,18 +172,30 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
 
         yPredOp = forward(xOp, inputLayer)
-        lossOp = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, tf, lossOp)
 
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
         }
-
         metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
 
         isModelCompiled = true
     }
+
+    private fun buildLossFunction(loss: LossFunction): Operand<Float> {
+        val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
+        var totalLoss = basicLoss
+        // TODO: probably regularization output should be divided on numberOfLossesOp and changed together with loss before averaging
+        kGraph.variableRegularizers.forEach { (variable, regularizer) ->
+            run {
+                totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable))
+            }
+        }
+        return tf.withName(TRAINING_LOSS).identity(totalLoss)
+    }
+
 
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric, callback: Callback) {
         compile(optimizer, Losses.convert(loss), metric, callback)

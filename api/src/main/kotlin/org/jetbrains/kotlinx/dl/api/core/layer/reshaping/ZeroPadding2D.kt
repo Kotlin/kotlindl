@@ -118,7 +118,9 @@ public class ZeroPadding2D : Layer {
         return tf.pad(input, paddingOperand, constantValue)
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 
