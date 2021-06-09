@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class MaxPool3DTest {
 
-    private val input = Array(1) {
+    private val inputArr = Array(1) {
         Array(
             30
         ) {
@@ -26,15 +26,51 @@ internal class MaxPool3DTest {
         }
     }
 
-    private val inputShape: Shape = Shape.make(
-        input.size.toLong(),
-        input[0].size.toLong(),
-        input[0][0].size.toLong(),
-        input[0][0][0].size.toLong(),
-        input[0][0][0][0].size.toLong(),
+    private val inputNumeric = arrayOf(
+        arrayOf(
+            arrayOf(
+                arrayOf(
+                    floatArrayOf(1.0f, -2.0f, 3.0f),
+                    floatArrayOf(0.5f, 2.0f, 5.0f),
+                    floatArrayOf(-1.0f, 3.0f, 2.0f),
+                    floatArrayOf(1.5f, -1.0f, 0.5f)
+                ),
+                arrayOf(
+                    floatArrayOf(-1.0f, 2.0f, -2.0f),
+                    floatArrayOf(2.5f, 3.0f, 1.0f),
+                    floatArrayOf(-2.0f, 3.0f, 2.5f),
+                    floatArrayOf(-3.0f, 1.0f, 1.5f)
+                ),
+            ),
+            arrayOf(
+                arrayOf(
+                    floatArrayOf(1.0f, 3.0f, 1.0f),
+                    floatArrayOf(6.0f, -2.5f, 4.0f),
+                    floatArrayOf(7.0f, 0.0f, 5.0f),
+                    floatArrayOf(1.0f, 2.0f, 4.0f)
+                ),
+                arrayOf(
+                    floatArrayOf(7.0f, -3.0f, 2.0f),
+                    floatArrayOf(1.0f, 2.0f, 2.0f),
+                    floatArrayOf(3.0f, 5.0f, -2.0f),
+                    floatArrayOf(3.0f, -1.0f, 0.0f)
+                ),
+            ),
+        ),
     )
 
-    private fun assertMaxPool3D(layer: Layer, expected: Array<Array<Array<Array<FloatArray>>>>) {
+    private fun assertMaxPool3D(
+        layer: Layer,
+        expected: Array<Array<Array<Array<FloatArray>>>>,
+        input: Array<Array<Array<Array<FloatArray>>>> = inputArr
+    ) {
+        val inputShape: Shape = Shape.make(
+            input.size.toLong(),
+            input[0].size.toLong(),
+            input[0][0].size.toLong(),
+            input[0][0][0].size.toLong(),
+            input[0][0][0][0].size.toLong(),
+        )
         EagerSession.create().use {
             val tf = Ops.create()
             layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
@@ -65,7 +101,6 @@ internal class MaxPool3DTest {
                     }
                 }
             }
-
             output.copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
@@ -101,10 +136,10 @@ internal class MaxPool3DTest {
     fun poolSizeTest() {
         var expected = Array(1) {
             Array(
-                10
+                14
             ) {
-                Array(10) {
-                    Array(10) {
+                Array(14) {
+                    Array(14) {
                         FloatArray(3, { 0f })
                     }
                 }
@@ -115,7 +150,7 @@ internal class MaxPool3DTest {
     }
 
     @Test
-    fun strideSizeTest(){
+    fun strideSizeTest() {
         var expected = Array(1) {
             Array(
                 8
@@ -127,7 +162,53 @@ internal class MaxPool3DTest {
                 }
             }
         }
-        val layer = MaxPool3D(strides = intArrayOf(1,4,4,4,1))
+        val layer = MaxPool3D(strides = intArrayOf(1, 4, 4, 4, 1))
         assertMaxPool3D(layer, expected)
+    }
+
+    @Test
+    fun defaultNumericInputTest() {
+        val expected = arrayOf(
+            arrayOf(
+                arrayOf(
+                    arrayOf(
+                        floatArrayOf(7.0f, 3.0f, 5.0f),
+                        floatArrayOf(7.0f, 5.0f, 5.0f),
+                    ),
+                ),
+            ),
+        )
+        val layer = MaxPool3D()
+        assertMaxPool3D(layer, expected, inputNumeric)
+    }
+
+    @Test
+    fun poolSizeNumericInputTest() {
+        val expected = arrayOf(
+            arrayOf(
+                arrayOf(
+                    arrayOf(
+                        floatArrayOf(7.0f, 5.0f, 5.0f),
+                    ),
+                ),
+            ),
+        )
+        val layer = MaxPool3D(poolSize = intArrayOf(1, 2, 2, 3, 1))
+        assertMaxPool3D(layer, expected, inputNumeric)
+    }
+
+    @Test
+    fun strideNumericInputTest() {
+        val expected = arrayOf(
+            arrayOf(
+                arrayOf(
+                    arrayOf(
+                        floatArrayOf(7.0f, 3.0f, 5.0f),
+                    ),
+                ),
+            ),
+        )
+        val layer = MaxPool3D(strides = intArrayOf(1, 3, 3, 3, 1))
+        assertMaxPool3D(layer, expected, inputNumeric)
     }
 }

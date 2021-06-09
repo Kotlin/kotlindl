@@ -27,21 +27,21 @@ public class MaxPool3D(
     public var strides: IntArray = intArrayOf(1, 2, 2, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
-) : Layer(name){
+) : Layer(name) {
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // TODO add dataFormat support
-        var len_dim1:Long = inputShape.size(1)
-        var len_dim2:Long = inputShape.size(2)
-        var len_dim3:Long = inputShape.size(3)
+        var len_dim1: Long = inputShape.size(1)
+        var len_dim2: Long = inputShape.size(2)
+        var len_dim3: Long = inputShape.size(3)
 
         len_dim1 = convOutputLength(len_dim1, poolSize[1], padding, strides[1])
         len_dim2 = convOutputLength(len_dim2, poolSize[2], padding, strides[2])
         len_dim3 = convOutputLength(len_dim3, poolSize[3], padding, strides[3])
 
-        return Shape.make(inputShape.size(0), len_dim1,len_dim2,len_dim3,inputShape.size(4))
+        return Shape.make(inputShape.size(0), len_dim1, len_dim2, len_dim3, inputShape.size(4))
     }
 
     override fun forward(
@@ -54,12 +54,14 @@ public class MaxPool3D(
         val paddingName = padding.paddingName
         var tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray();
         var tfStrides = Arrays.stream(strides).asLongStream().toArray();
-        var tfInput:Operand<Float> = input
-        var output = tf.nn.maxPool3d(tfInput,tfPoolSize.toList(), tfStrides.toList(), paddingName,  )
+        var tfInput: Operand<Float> = input
+        var output = tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
         return output
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 
