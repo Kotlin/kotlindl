@@ -98,7 +98,6 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is SeparableConv2D -> createSeparableConv2D(layer, isKerasFullyCompatible)
         is Concatenate -> createKerasConcatenate(layer)
         is GlobalAvgPool1D -> createKerasGlobalAveragePooling1DLayer(layer)
-        is GlobalMaxPool1D -> createKerasGlobalMaxPool1D(layer)
         is Softmax -> createKerasSoftmaxLayer(layer)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
