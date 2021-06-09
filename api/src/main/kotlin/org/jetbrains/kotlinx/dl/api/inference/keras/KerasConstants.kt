@@ -58,6 +58,7 @@ internal const val INITIALIZER_TRUNCATED_NORMAL: String = "TruncatedNormal"
 internal const val INITIALIZER_CONSTANT: String = "Constant"
 internal const val INITIALIZER_VARIANCE_SCALING: String = "VarianceScaling"
 internal const val INITIALIZER_IDENTITY: String = "Identity"
+internal const val INITIALIZER_ORTHOGONAL:String = "Orthogonal"
 
 // Keras activations
 internal const val ACTIVATION_RELU: String = "relu"
