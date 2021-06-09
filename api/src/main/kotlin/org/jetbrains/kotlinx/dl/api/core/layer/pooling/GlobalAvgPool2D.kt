@@ -44,7 +44,9 @@ public class GlobalAvgPool2D(
         return TF.mean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 

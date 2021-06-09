@@ -1,23 +1,11 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
-import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
-import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
-import org.jetbrains.kotlinx.dl.api.core.initializer.Identity
-import org.jetbrains.kotlinx.dl.api.core.initializer.LeCunNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.LeCunUniform
-import org.jetbrains.kotlinx.dl.api.core.initializer.RandomNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.RandomUniform
-import org.jetbrains.kotlinx.dl.api.core.initializer.TruncatedNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
-import org.junit.jupiter.api.Test
-import java.io.File
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.Test
+import java.io.File
 
 private const val INITALIZER_PATH = "src/test/resources/inference/keras/ModelLoader/initializer_identity.json"
 
@@ -26,7 +14,7 @@ class ModelLoaderTest {
     fun `load initializers from file`(){
         val initializerFile = File(INITALIZER_PATH)
 
-        val modelConfiguration = loadModelConfiguration(initializerFile)
+        val modelConfiguration = loadSequentialModelConfiguration(initializerFile)
 
         assertEquals(14, modelConfiguration.layers.size)
         with(modelConfiguration.layers){

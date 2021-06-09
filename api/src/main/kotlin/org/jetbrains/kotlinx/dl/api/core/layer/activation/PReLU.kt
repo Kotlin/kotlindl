@@ -45,8 +45,9 @@ public class PReLU(
     private lateinit var alpha: Variable<Float>
     private val alphaVariableName = if (name.isNotEmpty()) name + "_" + "alpha" else "alpha"
 
-    override val weights: Map<String, Array<*>>
+    override var weights: Map<String, Array<*>>
         get() = extractWeights(listOf(alphaVariableName))
+        set(value) = assignWeights(value)
     override val paramCount: Int
         get() = alphaShape.numElements().toInt()
 

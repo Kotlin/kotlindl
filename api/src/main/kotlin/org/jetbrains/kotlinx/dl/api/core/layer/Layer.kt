@@ -153,14 +153,21 @@ public abstract class Layer(public var name: String) {
         return variableNames.zip(weights).toMap()
     }
 
-    /** Returns layer's weights. */
-    public abstract val weights: Map<String, Array<*>>
+    /** Extract weights values by variable names. */
+    protected fun assignWeights(weights: Map<String, Array<*>>) {
+        require(parentModel != null) { "Layer $name is not related to any model!" }
+
+        for (variableName in weights.keys) {
+            parentModel!!.assignVariable(variableName, weights[variableName]!!)
+        }
+    }
+
+    /** Layer's weights. */
+    public abstract var weights: Map<String, Array<*>>
 
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean
 
     /** Returns amount of neurons. */
     public abstract val paramCount: Int
-
-    // apply
 }
