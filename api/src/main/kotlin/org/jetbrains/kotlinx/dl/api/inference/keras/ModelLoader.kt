@@ -503,6 +503,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
+        INITIALIZER_ORTHOGONAL -> Orthogonal( seed = seed, gain = initializer.config.gain!!.toFloat() )
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
