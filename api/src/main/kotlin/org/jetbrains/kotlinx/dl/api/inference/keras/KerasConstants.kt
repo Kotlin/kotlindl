@@ -38,6 +38,7 @@ internal const val LAYER_MINIMUM: String = "Minimum"
 internal const val LAYER_CONCATENATE: String = "Concatenate"
 internal const val LAYER_GLOBAL_AVG_POOLING_2D: String = "GlobalAveragePooling2D"
 internal const val LAYER_GLOBAL_AVG_POOLING_1D: String = "GlobalAveragePooling1D"
+internal const val LAYER_GLOBAL_AVG_POOLING_3D: String = "GlobalAveragePooling3D"
 internal const val LAYER_SOFTMAX: String = "Softmax"
 
 // Keras data types
