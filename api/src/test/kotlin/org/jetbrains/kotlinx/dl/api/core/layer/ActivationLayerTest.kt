@@ -8,16 +8,47 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.tensorflow.EagerSession
-import org.tensorflow.Graph
-import org.tensorflow.Shape
+import org.tensorflow.*
 import org.tensorflow.op.Ops
 
 internal const val IRRELEVANT_INPUT_SIZE = 8
 
 open class ActivationLayerTest {
+
+    protected fun assertActivationFunction2D(
+        layer: Layer,
+        input: Array<FloatArray>,
+        expectedShape: Shape,
+        expected: Array<FloatArray>
+    ) {
+        EagerSession.create().use {
+            val tf = Ops.create(it)
+            val inputOp = tf.constant(input)
+            val inputShape = inputOp.asOutput().shape()
+            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            val isTraining = tf.constant(true)
+            val numberOfLosses = tf.constant(1.0f)
+
+            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses)
+            val actualShape = shapeFromDims(*output.asOutput().tensor().shape())
+            assertEquals(expectedShape, actualShape)
+
+            assert2DArrayEquals(
+                expected,
+                output.to2DArray(),
+                EPS
+            )
+        }
+    }
+
+    private fun assert2DArrayEquals(expected: Array<FloatArray>, actual: Array<FloatArray>, eps: Float) {
+        expected.zip(actual).forEach { (expectedElement, actualElement) ->
+            assertArrayEquals(expectedElement, actualElement, eps)
+        }
+    }
+
 
     protected fun assertActivationFunction(
         layer: Layer,
@@ -45,7 +76,7 @@ open class ActivationLayerTest {
 
             output.copyTo(actual)
 
-            Assertions.assertArrayEquals(
+            assertArrayEquals(
                 expected,
                 actual,
                 EPS
@@ -65,4 +96,14 @@ open class ActivationLayerTest {
         val irrelevantArrayData = FloatArray(IRRELEVANT_INPUT_SIZE)
         assertActivationFunctionSameOutputShape(layer, irrelevantArrayData, irrelevantArrayData)
     }
+}
+
+private fun Operand<Float>.to2DArray(): Array<FloatArray> = asOutput().tensor().to2DArray()
+
+private fun Tensor<Float>.to2DArray(): Array<FloatArray> {
+    require(numDimensions() == 2)
+    val shape = shape()
+    val array: Array<FloatArray> = Array(shape[0].toInt()) {FloatArray(shape[1].toInt())}
+    copyTo(array)
+    return array
 }

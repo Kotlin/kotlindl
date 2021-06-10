@@ -39,8 +39,6 @@ import java.util.*
  *
  * NOTE: Also recursivePrintGroupInHDF5File() is helpful to discover hidden schema and paths.
  *
- * @see <a href="https://drive.google.com/drive/folders/1loUL_iNZ_98UwB7YXvQ2DrqVcBfg7E3w">
- *     VGG'16 weights in old format and model could be loaded here.</a>
  * @see <a href="https://arxiv.org/abs/1409.1556">
  *     Very Deep Convolutional Networks for Large-Scale Image Recognition (ICLR 2015).</a>
  * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">

@@ -87,7 +87,9 @@ public class Reshape(
         return tf.reshape(input, units)
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 

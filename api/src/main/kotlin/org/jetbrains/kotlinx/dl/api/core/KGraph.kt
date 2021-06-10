@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
 import org.tensorflow.Operand
@@ -34,6 +35,9 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
 
     /** A list of variables to train. */
     private val layerVariables: MutableMap<Variable<Float>, Boolean> = mutableMapOf()
+
+    /** A list of variables to train. */
+    internal val variableRegularizers: MutableMap<Variable<Float>, Regularizer> = mutableMapOf()
 
     /** A list of optimizers' variables. */
     private val optimizerVariables: MutableList<Variable<Float>> = mutableListOf()
@@ -80,6 +84,17 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     public fun addLayerVariable(variable: Variable<Float>, isTrainable: Boolean) {
         check(!layerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
         layerVariables[variable] = isTrainable
+    }
+
+    /**
+     * Adds a variable used in layer to the pool of tracked variables.
+     *
+     * @param variable Variable to track in KGraph.
+     * @param isTrainable When passed isTrainable = true, the KGraph automatically adds new variables to the tracked collection of graph variables.
+     */
+    public fun addVariableRegularizer(variable: Variable<Float>, regularizer: Regularizer) {
+        check(!variableRegularizers.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
+        variableRegularizers[variable] = regularizer
     }
 
     /**
