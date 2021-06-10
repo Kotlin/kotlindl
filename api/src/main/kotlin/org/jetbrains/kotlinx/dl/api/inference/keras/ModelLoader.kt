@@ -617,11 +617,14 @@ private fun convertToActivation(activation: String): Activations {
 }
 
 private fun createMaxPool1D(config: LayerConfig, name: String): Layer {
+    val poolSize = config.pool_size!!
+    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
+    val strides = config.strides!!
+    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), 1)
     return MaxPool1D(
-        poolSize = config.pool_size!![0],
-        strides = config.strides!![0],
+        poolSize = addedOnesPoolSize,
+        strides = addedOnesStrides,
         padding = convertPadding(config.padding!!),
-        dataFormat = config.data_format!!,
         name = name
     )
 }
