@@ -17,4 +17,9 @@ class VGG19TestSuite {
     fun vgg19additionalTrainingTest() {
         vgg19additionalTraining()
     }
+
+    @Test
+    fun vgg19copyModelPredictionTest() {
+        vgg19copyModelPrediction()
+    }
 }

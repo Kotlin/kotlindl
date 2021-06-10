@@ -12,23 +12,21 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
-import org.jetbrains.kotlinx.dl.api.core.layer.merge.Concatenate
+import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
 import java.io.File
 
@@ -39,6 +37,16 @@ import java.io.File
  * @param isKerasFullyCompatible If true, it generates fully Keras-compatible configuration.
  */
 public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKerasFullyCompatible: Boolean = false) {
+    val kerasModel = serializeModel(isKerasFullyCompatible)
+
+    val jsonString2 = Klaxon()
+        .converter(PaddingConverter())
+        .toJsonString(kerasModel)
+
+    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
+}
+
+internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean): KerasModel {
     val kerasLayers = mutableListOf<KerasLayer>()
     this.layers.forEach {
         run {
@@ -59,13 +67,7 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
         listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
 
     val config = KerasModelConfig(name = "", layers = kerasLayers)
-    val kerasModel = KerasModel(config = config)
-
-    val jsonString2 = Klaxon()
-        .converter(PaddingConverter())
-        .toJsonString(kerasModel)
-
-    jsonConfigFile.writeText(jsonString2, Charsets.UTF_8)
+    return KerasModel(config = config)
 }
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
@@ -81,10 +83,18 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Input -> createKerasInput(layer)
         is BatchNorm -> createKerasBatchNorm(layer, isKerasFullyCompatible)
         is ActivationLayer -> createKerasActivationLayer(layer)
+        is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
         is LeakyReLU -> createKerasLeakyReLU(layer)
         is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
         is Add -> createKerasAddLayer(layer)
+        is Maximum -> createKerasMaximumLayer(layer as Maximum)
+        is Minimum -> createKerasMinimumLayer(layer as Minimum)
+        is Subtract -> createKerasSubtractLayer(layer as Subtract)
+        is Multiply -> createKerasMultiplyLayer(layer as Multiply)
+        is Average -> createKerasAverageLayer(layer as Average)
+        is GlobalMaxPool1D -> createKerasGlobalMaxPool1D(layer)
         is GlobalAvgPool2D -> createKerasGlobalAveragePooling2DLayer(layer)
+        is GlobalAvgPool3D -> createKerasGlobalAveragePooling3DLayer(layer)
         is DepthwiseConv2D -> createKerasDepthwiseConv2D(layer, isKerasFullyCompatible)
         is SeparableConv2D -> createSeparableConv2D(layer, isKerasFullyCompatible)
         is Concatenate -> createKerasConcatenate(layer)
@@ -129,10 +139,26 @@ private fun createKerasGlobalAveragePooling2DLayer(layer: GlobalAvgPool2D): Kera
 
 private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): KerasLayer {
     val configX = LayerConfig(
-            dtype = DATATYPE_FLOAT32,
-            name = layer.name
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool1D(layer: GlobalMaxPool1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
+}
+
+private fun createKerasGlobalAveragePooling3DLayer(layer: GlobalAvgPool3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_3D, config = configX)
 }
 
 private fun createKerasAddLayer(layer: Add): KerasLayer {
@@ -143,6 +169,46 @@ private fun createKerasAddLayer(layer: Add): KerasLayer {
     return KerasLayer(class_name = LAYER_ADD, config = configX)
 }
 
+private fun createKerasSubtractLayer(layer: Subtract): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_SUBTRACT, config = configX)
+}
+
+private fun createKerasMinimumLayer(layer: Minimum): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_MINIMUM, config = configX)
+}
+
+private fun createKerasMaximumLayer(layer: Maximum): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_MAXIMUM, config = configX)
+}
+
+private fun createKerasAverageLayer(layer: Average): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_AVERAGE, config = configX)
+}
+
+private fun createKerasMultiplyLayer(layer: Multiply): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_MULTIPLY, config = configX)
+}
+
 private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
@@ -150,6 +216,17 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha_initializer = convertToKerasInitializer(layer.alphaInitializer, isKerasFullyCompatible),
+        alpha_regularizer = convertToKerasRegularizer(layer.alphaRegularizer),
+        shared_axes = layer.sharedAxes?.toList(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_PRELU, config = configX)
 }
 
 private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
@@ -195,6 +272,9 @@ private fun createKerasBatchNorm(layer: BatchNorm, isKerasFullyCompatible: Boole
             layer.movingVarianceInitializer,
             isKerasFullyCompatible
         ),
+        beta_regularizer = convertToKerasRegularizer(layer.betaRegularizer),
+        gamma_regularizer = convertToKerasRegularizer(layer.gammaRegularizer),
+        //activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
     )
     return KerasLayer(class_name = LAYER_BATCH_NORM, config = configX)
 }
@@ -221,9 +301,23 @@ private fun createKerasDense(layer: Dense, isKerasFullyCompatible: Boolean): Ker
         use_bias = layer.useBias,
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
-        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible)
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
     )
     return KerasLayer(class_name = LAYER_DENSE, config = configX)
+}
+
+private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegularizer? {
+    return if (regularizer != null) {
+        val className = "L1L2"
+        regularizer as L2L1
+        val config = KerasRegularizerConfig(l1 = regularizer.l1.toDouble(), l2 = regularizer.l2.toDouble())
+        KerasRegularizer(class_name = className, config = config)
+    } else {
+        null
+    }
 }
 
 private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer? {
@@ -282,12 +376,12 @@ private fun convertToVarianceScaling(initializer: VarianceScaling): Pair<String,
     )
 }
 
-private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig>{
+private fun convertToIdentity(initializer: Identity): Pair<String, KerasInitializerConfig> {
     return Pair(
-            INITIALIZER_IDENTITY,
-            KerasInitializerConfig(
-                    gain = initializer.gain.toDouble()
-            )
+        INITIALIZER_IDENTITY,
+        KerasInitializerConfig(
+            gain = initializer.gain.toDouble()
+        )
     )
 }
 
@@ -401,6 +495,9 @@ private fun createKerasConv1D(layer: Conv1D, isKerasFullyCompatible: Boolean): K
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
         padding = convertPadding(layer.padding),
         name = layer.name,
         use_bias = layer.useBias
@@ -418,6 +515,9 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
         padding = convertPadding(layer.padding),
         name = layer.name,
         use_bias = layer.useBias
@@ -425,7 +525,7 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
 }
 
-private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean) : KerasLayer {
+private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
     val configX = LayerConfig(
         kernel_size = layer.kernelSize.map { it.toInt() },
         strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),

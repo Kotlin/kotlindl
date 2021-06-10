@@ -12,7 +12,11 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
@@ -51,6 +55,10 @@ private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
  * @property [depthwiseInitializer] An initializer for the depthwise kernel matrix.
  * @property [pointwiseInitializer] An initializer for the pointwise kernel matrix.
  * @property [biasInitializer] An initializer for the bias vector.
+ * @property [depthwiseRegularizer] Regularizer function applied to the `depthwise` kernel matrix.
+ * @property [pointwiseRegularizer] Regularizer function applied to the `pointwise` kernel matrix
+ * @property [biasRegularizer] Regularizer function applied to the `bias` vector.
+ * @property [activityRegularizer] Regularizer function applied to the output of the layer (its "activation").
  * @property [padding] The padding method, either 'valid' or 'same' or 'full'.
  * @property [useBias] If true the layer uses a bias vector.
  * @property [name] Custom layer name.
@@ -68,6 +76,10 @@ public class SeparableConv2D(
     public val depthwiseInitializer: Initializer = HeNormal(),
     public val pointwiseInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
+    public val depthwiseRegularizer: Regularizer? = null,
+    public val pointwiseRegularizer: Regularizer? = null,
+    public val biasRegularizer: Regularizer? = null,
+    public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
@@ -137,9 +149,23 @@ public class SeparableConv2D(
         pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
         if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        depthwiseKernel = addWeight(tf, kGraph, depthwiseKernelVariableName, depthwiseKernel, depthwiseInitializer)
-        pointwiseKernel = addWeight(tf, kGraph, pointwiseKernelVariableName, pointwiseKernel, pointwiseInitializer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer)
+        depthwiseKernel = addWeight(
+            tf,
+            kGraph,
+            depthwiseKernelVariableName,
+            depthwiseKernel,
+            depthwiseInitializer,
+            depthwiseRegularizer
+        )
+        pointwiseKernel = addWeight(
+            tf,
+            kGraph,
+            pointwiseKernelVariableName,
+            pointwiseKernel,
+            pointwiseInitializer,
+            pointwiseRegularizer
+        )
+        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -190,7 +216,9 @@ public class SeparableConv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
-    override val weights: Map<String, Array<*>> get() = extractDepthConv2DWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractDepthConv2DWeights()
+        set(value) = assignWeights(value)
 
     private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
         return extractWeights(defineVariableNames().toList())
