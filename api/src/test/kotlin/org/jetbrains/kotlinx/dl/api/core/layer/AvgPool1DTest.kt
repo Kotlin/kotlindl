@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool1D
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -81,70 +80,6 @@ internal class AvgPool1DTest {
     }
 
     @Test
-    fun withDataFormat() {
-        val input = arrayOf(
-            arrayOf(
-                floatArrayOf(1.0f, -2.0f, 3.0f),
-                floatArrayOf(0.5f, 2.0f, 5.0f),
-                floatArrayOf(-1.0f, 3.0f, 2.0f),
-                floatArrayOf(1.5f, -1.0f, 0.5f)
-            ),
-            arrayOf(
-                floatArrayOf(5.0f, 3.0f, 1.0f),
-                floatArrayOf(6.0f, -2.5f, 4.0f),
-                floatArrayOf(7.0f, 0.0f, 5.0f),
-                floatArrayOf(1.0f, 2.0f, 4.0f)
-            ),
-        )
-        val expected = arrayOf(
-            arrayOf(
-                floatArrayOf(-0.5f),
-                floatArrayOf(1.25f),
-                floatArrayOf(1.0f),
-                floatArrayOf(0.25f)
-            ),
-            arrayOf(
-                floatArrayOf(4.0f),
-                floatArrayOf(1.75f),
-                floatArrayOf(3.5f),
-                floatArrayOf(1.5f)
-            )
-        )
-        val layer = AvgPool1D(dataFormat = CHANNELS_FIRST)
-
-        EagerSession.create().use {
-            val tf = Ops.create()
-            val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
-
-            val inputOp = tf.constant(input)
-            val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-
-            // Check output shape is correct.
-            val expectedShape = intArrayOf(input.size, input[0].size, 1)
-            Assertions.assertArrayEquals(
-                expectedShape,
-                output.shape().toIntArray()
-            )
-
-            // Check output values are correct.
-            val actual = Array(input.size) { Array(input[0].size) { FloatArray(1) } }
-            output.tensor().copyTo(actual)
-            for (i in expected.indices) {
-                for (j in expected[i].indices) {
-                    Assertions.assertArrayEquals(
-                        expected[i][j],
-                        actual[i][j],
-                        EPS
-                    )
-                }
-            }
-        }
-    }
-
-    @Test
     fun withPaddingAndStride() {
         val input = arrayOf(
             arrayOf(
@@ -174,7 +109,7 @@ internal class AvgPool1DTest {
                 floatArrayOf(1.0f, 2.0f, 4.0f)
             )
         )
-        val layer = AvgPool1D(strides = 1, padding = ConvPadding.SAME)
+        val layer = AvgPool1D(strides = longArrayOf(1, 1, 1), padding = ConvPadding.SAME)
 
         EagerSession.create().use {
             val tf = Ops.create()
@@ -234,7 +169,7 @@ internal class AvgPool1DTest {
                 floatArrayOf(14.0f/3, -0.5f/3, 13.0f/3),
             )
         )
-        val layer = AvgPool1D(poolSize = 3, strides = 1)
+        val layer = AvgPool1D(poolSize = longArrayOf(1, 3, 1), strides = longArrayOf(1, 1, 1))
 
         EagerSession.create().use {
             val tf = Ops.create()

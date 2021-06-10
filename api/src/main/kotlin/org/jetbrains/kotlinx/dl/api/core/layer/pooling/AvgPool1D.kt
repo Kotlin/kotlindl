@@ -9,8 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -21,19 +19,17 @@ import org.tensorflow.op.core.Squeeze
  *
  * Downsamples the input by taking the average over a temporal window of size [poolSize].
  *
- * @property [poolSize] Size of the temporal pooling window.
+ * @property [poolSize] Size of the temporal pooling window for each dimension of input.
  * @property [strides] The amount of shift for pooling window in each pooling step. If
  * `null`, it will default to [poolSize].
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no
  * padding, or [ConvPadding.SAME] which means padding the input equally such that the output
  * has the same dimension as the input.
- * @property [dataFormat] Data format of input; can be either of [CHANNELS_LAST] or [CHANNELS_FIRST].
  */
 public class AvgPool1D(
-    public val poolSize: Int = 2,
-    public val strides: Int? = null,
+    public val poolSize: LongArray = longArrayOf(1, 2, 1),
+    public val strides: LongArray? = null,
     public val padding: ConvPadding = ConvPadding.VALID,
-    public val dataFormat: String = CHANNELS_LAST,
     name: String = ""
 ) : Layer(name) {
 
@@ -41,12 +37,17 @@ public class AvgPool1D(
         get() = false
     override val paramCount: Int
         get() = 0
-    override val weights: Map<String, Array<*>>
+    override var weights: Map<String, Array<*>>
         get() = emptyMap()
+        set(value) = assignWeights(value)
 
     init {
-        require(dataFormat == CHANNELS_LAST || dataFormat == CHANNELS_FIRST) {
-            "The dataFormat should be either of \"$CHANNELS_LAST\" or \"$CHANNELS_FIRST\"."
+        require(poolSize.size == 3) {
+            "The poolSize should be an array of size 3."
+        }
+
+        require(strides == null || strides.size == 3) {
+            "The strides should be either `null` or an array of size 3."
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
@@ -57,14 +58,10 @@ public class AvgPool1D(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        var steps = if(dataFormat == CHANNELS_LAST) inputShape.size(1) else inputShape.size(2)
+        var steps = inputShape.size(1)
         val strideValue = strides ?: poolSize
-        steps = convOutputLength(steps, poolSize, padding, strideValue)
-        return if (dataFormat == CHANNELS_LAST) {
-            Shape.make(inputShape.size(0), steps, inputShape.size(2))
-        } else {
-            Shape.make(inputShape.size(0), inputShape.size(1), steps)
-        }
+        steps = convOutputLength(steps, poolSize[1].toInt(), padding, strideValue[1].toInt())
+        return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
     override fun forward(
@@ -73,12 +70,13 @@ public class AvgPool1D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val expandAxis = if (dataFormat == CHANNELS_LAST) 2 else 3
+        val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))
         val tfPoolSize = longArrayOf(1, 1, 1, 1)
         val tfStrides = longArrayOf(1, 1, 1, 1)
-        tfPoolSize[expandAxis-1] = poolSize.toLong()
-        tfStrides[expandAxis-1] = (strides ?: poolSize).toLong()
+        tfPoolSize[expandAxis-1] = poolSize[1]
+        val strideValue = strides ?: poolSize
+        tfStrides[expandAxis-1] = strideValue[1]
         val tfPadding = padding.paddingName
 
         val avgPool = tf.nn.avgPool(
@@ -91,5 +89,5 @@ public class AvgPool1D(
     }
 
     override fun toString(): String =
-        "AvgPool1D(poolSize=$poolSize, strides=$strides, padding=$padding, dataFormat=$dataFormat)"
+        "AvgPool1D(poolSize=$poolSize, strides=$strides, padding=$padding)"
 }
