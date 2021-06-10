@@ -33,15 +33,15 @@ public class MaxPool3D(
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // TODO add dataFormat support
-        var len_dim1: Long = inputShape.size(1)
-        var len_dim2: Long = inputShape.size(2)
-        var len_dim3: Long = inputShape.size(3)
+        var lenDim1: Long = inputShape.size(1)
+        var lenDim2: Long = inputShape.size(2)
+        var lenDim3: Long = inputShape.size(3)
 
-        len_dim1 = convOutputLength(len_dim1, poolSize[1], padding, strides[1])
-        len_dim2 = convOutputLength(len_dim2, poolSize[2], padding, strides[2])
-        len_dim3 = convOutputLength(len_dim3, poolSize[3], padding, strides[3])
+        lenDim1 = convOutputLength(lenDim1, poolSize[1], padding, strides[1])
+        lenDim2 = convOutputLength(lenDim2, poolSize[2], padding, strides[2])
+        lenDim3 = convOutputLength(lenDim3, poolSize[3], padding, strides[3])
 
-        return Shape.make(inputShape.size(0), len_dim1, len_dim2, len_dim3, inputShape.size(4))
+        return Shape.make(inputShape.size(0), lenDim1, lenDim2, lenDim3, inputShape.size(4))
     }
 
     override fun forward(
