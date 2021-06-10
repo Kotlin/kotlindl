@@ -457,12 +457,12 @@ private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
 }
 
 private fun createAvgPool3D(layer: AvgPool3D): KerasLayer {
+    val strideValue = layer.strides ?: layer.poolSize
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        pool_size = layer.poolSize.toList(),
-        strides = layer.strides?.toList() ?: layer.poolSize.toList(),
+        pool_size = layer.poolSize.slice(1..3).map { it.toInt() },
+        strides = strideValue.slice(1..3).map { it.toInt() },
         padding = convertPadding(layer.padding),
-        data_format = layer.dataFormat,
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_AVG_POOL_3D, config = configX)

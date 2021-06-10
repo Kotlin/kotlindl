@@ -9,31 +9,26 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.nn.AvgPool3d
 
 /**
  * Average pooling operation for 3D data (e.g. video, spatio-temporal).
  *
  * Downsamples the input by taking the average over a window of size [poolSize].
  *
- * @property [poolSize] Size of the pooling window.
+ * @property [poolSize] Size of the pooling window for each dimension of input.
  * @property [strides] The amount of shift for pooling window in each pooling step. If
  * `null`, it will default to [poolSize].
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no
  * padding, or [ConvPadding.SAME] which means padding the input equally such that the output
  * has the same dimension as the input.
- * @property [dataFormat] Data format of input; can be either of [CHANNELS_LAST] or [CHANNELS_FIRST].
  */
 public class AvgPool3D(
-    public val poolSize: IntArray = intArrayOf(2, 2, 2),
-    public val strides: IntArray? = null,
+    public val poolSize: LongArray = longArrayOf(1, 2, 2, 2, 1),
+    public val strides: LongArray? = null,
     public val padding: ConvPadding = ConvPadding.VALID,
-    public val dataFormat: String = CHANNELS_LAST,
     name: String = ""
 ) : Layer(name) {
 
@@ -41,46 +36,36 @@ public class AvgPool3D(
         get() = false
     override val paramCount: Int
         get() = 0
-    override val weights: Map<String, Array<*>>
+    override var weights: Map<String, Array<*>>
         get() = emptyMap()
+        set(value) = assignWeights(value)
 
     init {
-        require(dataFormat == CHANNELS_LAST || dataFormat == CHANNELS_FIRST) {
-            "The dataFormat should be either \"$CHANNELS_LAST\" or \"$CHANNELS_FIRST\"."
+        require(poolSize.size == 5) {
+            "The poolSize should be an array of size 5."
+        }
+
+        require(strides == null || strides.size ==5) {
+            "The strides should be either `null` or an array of size 5."
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
             "The padding should be either ${ConvPadding.VALID} or ${ConvPadding.SAME}."
-        }
-
-        require(poolSize.size == 3) {
-            "The length of poolSize array should be 3."
-        }
-
-        require(strides == null || strides.size == 3) {
-            "The strides should be either `null` or an array of length 3."
         }
     }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        val axis1 = if (dataFormat == CHANNELS_LAST) 1 else 2
-        var dim1 = inputShape.size(axis1)
-        var dim2 = inputShape.size(axis1 + 1)
-        var dim3 = inputShape.size(axis1 + 2)
-        val strides1 = strides?.get(0) ?: poolSize[0]
-        val strides2 = strides?.get(1) ?: poolSize[1]
-        val strides3 = strides?.get(2) ?: poolSize[2]
-        dim1 = convOutputLength(dim1, poolSize[0], padding, strides1)
-        dim2 = convOutputLength(dim2, poolSize[1], padding, strides2)
-        dim3 = convOutputLength(dim3, poolSize[3], padding, strides3)
+        var dim1 = inputShape.size(1)
+        var dim2 = inputShape.size(2)
+        var dim3 = inputShape.size(3)
+        val strideValue = strides ?: poolSize
+        dim1 = convOutputLength(dim1, poolSize[1].toInt(), padding, strideValue[1].toInt())
+        dim2 = convOutputLength(dim2, poolSize[2].toInt(), padding, strideValue[2].toInt())
+        dim3 = convOutputLength(dim3, poolSize[3].toInt(), padding, strideValue[3].toInt())
 
-        return if (dataFormat == CHANNELS_LAST) {
-            Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
-        } else {
-            Shape.make(inputShape.size(0), inputShape.size(1), dim1, dim2, dim3)
-        }
+        return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
 
     override fun forward(
@@ -89,25 +74,16 @@ public class AvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPoolSize = longArrayOf(1, poolSize[0].toLong(), poolSize[1].toLong(), poolSize[2].toLong(), 1)
-        val tfStrides = longArrayOf(
-            1,
-            (strides?.get(0) ?: poolSize[0]).toLong(),
-            (strides?.get(1) ?: poolSize[1]).toLong(),
-            (strides?.get(2) ?: poolSize[2]).toLong(),
-            1
-        )
+        val strideValue = strides ?: poolSize
         val tfPadding = padding.paddingName
-        val tfDataFormat = if (dataFormat == CHANNELS_LAST) "NDHWC" else "NCDHW"
         return tf.nn.avgPool3d(
             input,
-            tfPoolSize.toList(),
-            tfStrides.toList(),
-            tfPadding,
-            AvgPool3d.dataFormat(tfDataFormat)
+            poolSize.toList(),
+            strideValue.toList(),
+            tfPadding
         )
     }
 
     override fun toString(): String =
-        "AvgPool3D(poolSize=$poolSize, strides=$strides, padding=$padding, dataFormat=$dataFormat)"
+        "AvgPool3D(poolSize=$poolSize, strides=$strides, padding=$padding)"
 }

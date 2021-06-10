@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool3D
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
-import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -113,74 +112,9 @@ internal class AvgPool3DTest {
         }
     }
 
-    /**
-     * TODO: the following test, i.e. testing with `dataFormat = CHANNELS_FIRST` fails with
-     *  the following error:
-     *      "Default Pooling3DOp only supports NDHWC on device type CPU"
-     *  This should be investigated further.
-     */
-    /*
-    @Test
-    fun withDataFormat() {
-        val layer = AvgPool3D(dataFormat = CHANNELS_FIRST)
-        val expected = arrayOf(
-            arrayOf(
-                arrayOf(
-                    arrayOf(
-                        floatArrayOf(8.0f/8),
-                        floatArrayOf(12.0f/8)
-                    )
-                ),
-                arrayOf(
-                    arrayOf(
-                        floatArrayOf(1.5f/8),
-                        floatArrayOf(12.5f/8)
-                    )
-                )
-            )
-        )
-
-        EagerSession.create().use {
-            val tf = Ops.create()
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
-
-            val inputOp = tf.constant(input)
-            val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-
-            // Check output shape is correct.
-            val expectedShape = intArrayOf(input.size, input[0].size, 1, 2, 1)
-            Assertions.assertArrayEquals(
-                expectedShape,
-                output.shape().toIntArray()
-            )
-
-            // Check output values are correct.
-            val actual = Array(input.size) {
-                Array(input[0].size) { Array(1) { Array(2) { FloatArray(1) } } }
-            }
-            output.tensor().copyTo(actual)
-            for (i in expected.indices) {
-                for (j in expected[i].indices) {
-                    for (k in expected[i][j].indices) {
-                        for (l in expected[i][j][k].indices) {
-                            Assertions.assertArrayEquals(
-                                expected[i][j][k][l],
-                                actual[i][j][k][l],
-                                EPS
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-    */
-
     @Test
     fun withPaddingAndStride() {
-        val layer = AvgPool3D(strides = intArrayOf(1, 1, 1), padding = ConvPadding.SAME)
+        val layer = AvgPool3D(strides = longArrayOf(1, 1, 1, 1, 1), padding = ConvPadding.SAME)
         val expected = arrayOf(
             arrayOf(
                 arrayOf(
@@ -260,7 +194,7 @@ internal class AvgPool3DTest {
 
     @Test
     fun withPoolSizeAndStride() {
-        val layer = AvgPool3D(poolSize = intArrayOf(2, 2, 3), strides = intArrayOf(1, 1, 1))
+        val layer = AvgPool3D(poolSize = longArrayOf(1, 2, 2, 3, 1), strides = longArrayOf(1, 1, 1, 1, 1))
         val expected = arrayOf(
             arrayOf(
                 arrayOf(

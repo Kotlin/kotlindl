@@ -653,11 +653,14 @@ private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
 }
 
 private fun createAvgPool3D(config: LayerConfig, name: String): Layer {
+    val poolSize = config.pool_size!!
+    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), poolSize[1].toLong(), poolSize[2].toLong(), 1)
+    val strides = config.strides!!
+    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), strides[1].toLong(), strides[2].toLong(), 1)
     return AvgPool3D(
-        poolSize = config.pool_size!!.toIntArray(),
-        strides = config.strides?.toIntArray() ?: config.pool_size.toIntArray(),
+        poolSize = addedOnesPoolSize,
+        strides = addedOnesStrides,
         padding = convertPadding(config.padding!!),
-        dataFormat = config.data_format!!,
         name = name
     )
 }
