@@ -22,11 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool3D
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
@@ -95,6 +91,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Subtract -> createKerasSubtractLayer(layer as Subtract)
         is Multiply -> createKerasMultiplyLayer(layer as Multiply)
         is Average -> createKerasAverageLayer(layer as Average)
+        is GlobalMaxPool1D -> createKerasGlobalMaxPool1D(layer)
         is GlobalAvgPool2D -> createKerasGlobalAveragePooling2DLayer(layer)
         is GlobalAvgPool3D -> createKerasGlobalAveragePooling3DLayer(layer)
         is DepthwiseConv2D -> createKerasDepthwiseConv2D(layer, isKerasFullyCompatible)
@@ -145,6 +142,14 @@ private fun createKerasGlobalAveragePooling1DLayer(layer: GlobalAvgPool1D): Kera
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOLING_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool1D(layer: GlobalMaxPool1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
 }
 
 private fun createKerasGlobalAveragePooling3DLayer(layer: GlobalAvgPool3D): KerasLayer {
