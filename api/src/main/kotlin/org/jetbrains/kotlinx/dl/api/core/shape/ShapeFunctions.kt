@@ -140,8 +140,8 @@ internal fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): Flo
     return result
 }
 
-/** 
- * Get shape of array of arrays (of arrays...) of Array of elems of any type. 
+/**
+ * Get shape of array of arrays (of arrays...) of Array of elems of any type.
  * If the most inner array does not have any elements its size is missed in result */
 internal fun getShapeOfArray(data: Array<*>): Shape {
     fun appendPrimitiveArraySize(size: Int, acc: MutableList<Long>): LongArray {
@@ -196,3 +196,5 @@ internal fun Array<*>.cast3DArray(): Array<Array<FloatArray>> = this.map { it.ca
 
 /** Cast Array<*> to Array<Array<Array<FloatArray>>> when sure about its dimensions */
 internal fun Array<*>.cast4DArray(): Array<Array<Array<FloatArray>>> = this.map { it.castArrayDim().cast3DArray() }.toTypedArray()
+
+internal fun Array<*>.cast5DArray(): Array<Array<Array<Array<FloatArray>>>> = this.map { it.castArrayDim().cast4DArray() }.toTypedArray()

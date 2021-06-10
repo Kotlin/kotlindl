@@ -37,10 +37,15 @@ import java.io.File
  * @param [configuration] File containing model configuration.
  * @return Non-compiled and non-trained Sequential model.
  */
-internal fun loadModelConfiguration(
+internal fun loadSequentialModelConfiguration(
     configuration: File
 ): Sequential {
-    val pair = loadSequentialModelLayers(configuration)
+    val sequentialConfig = loadSerializedModel(configuration)
+    return deserializeSequentialModel(sequentialConfig)
+}
+
+internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequential {
+    val pair = loadSequentialModelLayers(sequentialConfig)
     val input: Input = pair.first
     val layers = pair.second
 
@@ -52,33 +57,16 @@ internal fun loadModelConfiguration(
  *
  * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Sequential model.
  *
- * @param jsonConfigFile File containing model configuration.
+ * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, MutableList<Layer>> {
-    val sequentialConfig = try {
-        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-        Klaxon()
-            .converter(PaddingConverter())
-            .parse<KerasModel>(jsonString)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        try {
-            Klaxon()
-                .converter(PaddingConverter())
-                .parse<KerasModel>(jsonConfigFile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
-        }
-    }
-
+internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
     val layers = mutableListOf<Layer>()
 
-    (sequentialConfig as KerasModel).config!!.layers!!.forEach {
+    (config as KerasModel).config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToSequentialLayer(it)
+                val layer = convertToLayer(it)
                 layers.add(layer)
             }
         }
@@ -86,10 +74,10 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
 
     val input: Input
 
-    val firstLayer = sequentialConfig.config!!.layers!!.first()
+    val firstLayer = config.config!!.layers!!.first()
     val inputLayerName =
         if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = sequentialConfig.config.layers!!.first().config!!.batch_input_shape
+    val batchInputShape = config.config.layers!!.first().config!!.batch_input_shape
 
     // TODO: write more universal code here
     when (batchInputShape!!.size) {
@@ -121,7 +109,7 @@ internal fun loadSequentialModelLayers(jsonConfigFile: File): Pair<Input, Mutabl
     return Pair(input, layers)
 }
 
-private fun convertToSequentialLayer(
+private fun convertToLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
@@ -151,15 +139,34 @@ private fun convertToSequentialLayer(
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
+        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
+        LAYER_SUBTRACT -> createSubtractLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
+        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
+        LAYER_MULTIPLY -> createMultiplyLayer(
+            kerasLayer.config!!.name!!
+        )
+        LAYER_CONCATENATE -> createConcatenateLayer(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
         LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
             kerasLayer.config!!.name!!
         )
-        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
-        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported for Sequential model!")
+        LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
+            kerasLayer.config!!.name!!
+        )
+        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 }
 
@@ -173,41 +180,28 @@ private fun convertToSequentialLayer(
 internal fun loadFunctionalModelConfiguration(
     configuration: File
 ): Functional {
-    return Functional.of(loadFunctionalModelLayers(configuration).toList())
+    val functionalConfig = loadSerializedModel(configuration)
+    return deserializeFunctionalModel(functionalConfig)
 }
+
+internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
+    Functional.of(loadFunctionalModelLayers(functionalConfig).toList())
 
 /**
  * Loads a [Functional] model layers from json file with model configuration.
  *
  * NOTE: This method is useful in transfer learning, when you need to manipulate on layers before building the Functional model.
  *
- * @param jsonConfigFile File containing model configuration.
+ * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer> {
-    val functionalConfig = try {
-        val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
-        Klaxon()
-            .converter(PaddingConverter())
-            .parse<KerasModel>(jsonString)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        try {
-            Klaxon()
-                .converter(PaddingConverter())
-                .parse<KerasModel>(jsonConfigFile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
-        }
-    }
-
+internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
     val input: Input
 
-    val firstLayer = (functionalConfig as KerasModel).config!!.layers!!.first()
+    val firstLayer = (config as KerasModel).config!!.layers!!.first()
     val batchInputShape =
         firstLayer.config!!.batch_input_shape
     val inputLayerName =
@@ -244,7 +238,7 @@ internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer>
     layers.add(input)
     layersByNames[input.name] = input
 
-    functionalConfig.config!!.layers!!.forEach {
+    config.config!!.layers!!.forEach {
         run {
             if (!it.class_name.equals("InputLayer")) {
                 val layer = convertToLayer(it, layersByNames)
@@ -257,60 +251,28 @@ internal fun loadFunctionalModelLayers(jsonConfigFile: File): MutableList<Layer>
     return layers
 }
 
+internal fun loadSerializedModel(jsonConfigFile: File) = try {
+    val jsonString = jsonConfigFile.readText(Charsets.UTF_8)
+    Klaxon()
+        .converter(PaddingConverter())
+        .parse<KerasModel>(jsonString)
+} catch (e: Exception) {
+    e.printStackTrace()
+    try {
+        Klaxon()
+            .converter(PaddingConverter())
+            .parse<KerasModel>(jsonConfigFile)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw IllegalArgumentException("JSON file: ${jsonConfigFile.name} contains invalid JSON. The model configuration could not be loaded from this file.")
+    }
+}
+
 private fun convertToLayer(
     kerasLayer: KerasLayer,
     layersByName: MutableMap<String, Layer>
 ): Layer {
-    val layer = when (kerasLayer.class_name) {
-        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
-        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOLING_2D -> createMaxPooling2D(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_AVG_POOL_1D -> createAvgPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_AVERAGE_POOLING_2D -> createAvgPooling2D(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
-        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
-        LAYER_SUBTRACT -> createSubtractLayer(
-            kerasLayer.config!!.name!!
-        )
-        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
-        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
-        LAYER_MULTIPLY -> createMultiplyLayer(
-            kerasLayer.config!!.name!!
-        )
-        LAYER_CONCATENATE -> createConcatenateLayer(
-            kerasLayer.config!!,
-            kerasLayer.config.name!!
-        )
-        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
-            kerasLayer.config!!.name!!
-        )
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
-        else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
-    }
+    val layer = convertToLayer(kerasLayer)
 
     val inboundLayers = mutableListOf<Layer>()
     if (kerasLayer.class_name != LAYER_INPUT) {
@@ -339,6 +301,20 @@ private fun createGlobalAvgPooling1D(
     name: String
 ): Layer {
     return GlobalAvgPool1D(
+        name = name
+    )
+}
+
+private fun createGlobalAvgPooling3D(
+    name: String
+): Layer {
+    return GlobalAvgPool3D(
+        name = name
+    )
+}
+
+private fun createGlobalMaxPool1D(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool1D(
         name = name
     )
 }
@@ -427,6 +403,15 @@ private fun createReLULayer(config: LayerConfig, name: String): Layer {
 private fun createELULayer(config: LayerConfig, name: String): Layer {
     return ELU(
         alpha = config.alpha!!.toFloat(),
+        name = name
+    )
+}
+
+private fun createPReLULayer(config: LayerConfig, name: String): Layer {
+    return PReLU(
+        alphaInitializer = convertToInitializer(config.alpha_initializer!!),
+        alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
+        sharedAxes = config.shared_axes!!.toIntArray(),
         name = name
     )
 }
@@ -544,6 +529,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
+        INITIALIZER_ORTHOGONAL -> Orthogonal( seed = seed, gain = initializer.config.gain!!.toFloat() )
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")

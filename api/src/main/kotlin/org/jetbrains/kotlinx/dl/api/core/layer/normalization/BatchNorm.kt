@@ -152,7 +152,9 @@ public class BatchNorm(
         else xNorm
     }
 
-    override val weights: Map<String, Array<*>> get() = extractBatchNormWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractBatchNormWeights()
+        set(value) = assignWeights(value)
 
     private fun extractBatchNormWeights(): Map<String, Array<*>> {
         val variableNames = mutableListOf<String>()

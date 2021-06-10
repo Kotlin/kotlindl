@@ -281,6 +281,39 @@ public open class InferenceModel : AutoCloseable {
         }
     }
 
+    /**
+     * Assigns variable data from multidimensional array.
+     *
+     * @param [variableName] Name of variable to load state.
+     * @param [data] Variable data.
+     */
+    // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
+    internal fun assignVariable(variableName: String, data: Array<*>) {
+        val operation = kGraph.tfGraph.operation(variableName)
+        check(operation != null) { "Operation $variableName is not found in static graph." }
+
+        val initializerName = defaultInitializerOpName(variableName)
+        val assignOpName = defaultAssignOpName(variableName)
+
+        val initOp = kGraph.tfGraph.operation(initializerName)
+        check(initOp != null) {
+            "Operation $initializerName is not found in static graph.\n" +
+                    "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+        }
+
+        val assignOp = kGraph.tfGraph.operation(assignOpName)
+        check(assignOp != null) { "Operation $assignOp is not found in static graph." }
+
+        val shape = operation.output<Float>(0).shape()
+        val tensorShape = TensorShape(shape)
+
+        populateVariable(initializerName, data, assignOpName)
+
+        logger.debug { "Loading the variable $variableName data" }
+        logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
+        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+    }
+
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
         inferenceGraphInitialization(pathToModelDirectory)
         loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
@@ -327,7 +360,12 @@ public open class InferenceModel : AutoCloseable {
         data: Any,
         assignOpName: String
     ) {
-        Tensor.create(data).use { tensor ->
+        var tensorData = data
+        if (data is Array<*> && data.isArrayOf<Float>()) {
+            tensorData = (data as Array<Float>).toFloatArray()
+        }
+
+        Tensor.create(tensorData).use { tensor ->
             session.runner()
                 .feed(initializerName, tensor)
                 .addTarget(assignOpName)
@@ -421,6 +459,13 @@ public open class InferenceModel : AutoCloseable {
         }
 
         return result
+    }
+
+    /**
+     * Returns copied inference model.
+     */
+    public open fun copy(): InferenceModel {
+        TODO()
     }
 
     override fun toString(): String {

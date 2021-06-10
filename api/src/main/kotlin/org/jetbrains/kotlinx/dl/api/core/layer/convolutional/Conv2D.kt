@@ -192,7 +192,9 @@ public abstract class Conv2DImpl(
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
 
-    override val weights: Map<String, Array<*>> get() = extractConv2DWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractConv2DWeights()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
 
