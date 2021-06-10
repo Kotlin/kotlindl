@@ -131,7 +131,7 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVG_POOL_3D -> createAvgPool3D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -652,7 +652,7 @@ private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
     return AvgPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
-private fun createAvgPool3D(config: LayerConfig, name: String): Layer {
+private fun createAvgPool3DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), poolSize[1].toLong(), poolSize[2].toLong(), 1)
     val strides = config.strides!!
