@@ -123,6 +123,10 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_MAX_POOLING_3D -> createMaxPooling3D(
+            kerasLayer.config!!,
+            kerasLayer.config.name!!
+        )
         LAYER_AVG_POOLING_2D -> createAvgPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -272,7 +276,6 @@ private fun convertToLayer(
     layersByName: MutableMap<String, Layer>
 ): Layer {
     val layer = convertToLayer(kerasLayer)
-
     val inboundLayers = mutableListOf<Layer>()
     if (kerasLayer.class_name != LAYER_INPUT) {
         val inboundNodes = kerasLayer.inbound_nodes!! as List<List<List<Any>>>
@@ -649,6 +652,26 @@ private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
     addedOnesStrides[3] = 1
 
     return AvgPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+}
+
+private fun createMaxPooling3D(config: LayerConfig, name: String): MaxPool3D {
+    val poolSize = config.pool_size!!.toIntArray()
+    val addedOnesPoolSize = IntArray(5)
+    addedOnesPoolSize[0] = 1
+    addedOnesPoolSize[1] = poolSize[0]
+    addedOnesPoolSize[2] = poolSize[1]
+    addedOnesPoolSize[3] = poolSize[2]
+    addedOnesPoolSize[0] = 1
+
+    val strides = config.strides!!.toIntArray()
+    val addedOnesStrides = IntArray(5)
+    addedOnesStrides[0] = 1
+    addedOnesStrides[1] = strides[0]
+    addedOnesStrides[2] = strides[1]
+    addedOnesStrides[3] = strides[2]
+    addedOnesStrides[4] = 1
+
+    return MaxPool3D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
 private fun convertPadding(padding: KerasPadding): ConvPadding {
