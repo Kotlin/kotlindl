@@ -444,16 +444,14 @@ private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {
 }
 
 private fun createKerasAvgPool1D(layer: AvgPool1D): KerasLayer {
-    val strideValue = layer.strides ?: layer.poolSize
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         pool_size = listOf(layer.poolSize[1].toInt()),
-        strides = listOf(strideValue[1].toInt()),
+        strides = listOf(layer.strides[1].toInt()),
         padding = convertPadding(layer.padding),
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_AVG_POOL_1D, config = configX)
-
 }
 
 private fun createKerasMaxPooling3D(layer: MaxPool3D): KerasLayer {

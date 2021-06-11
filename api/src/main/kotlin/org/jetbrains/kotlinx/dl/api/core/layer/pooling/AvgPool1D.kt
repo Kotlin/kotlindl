@@ -20,15 +20,14 @@ import org.tensorflow.op.core.Squeeze
  * Downsamples the input by taking the average over a temporal window of size [poolSize].
  *
  * @property [poolSize] Size of the temporal pooling window for each dimension of input.
- * @property [strides] The amount of shift for pooling window in each pooling step. If
- * `null`, it will default to [poolSize].
+ * @property [strides] The amount of shift for pooling window per each input dimension in each pooling step.
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no
  * padding, or [ConvPadding.SAME] which means padding the input equally such that the output
  * has the same dimension as the input.
  */
 public class AvgPool1D(
     public val poolSize: LongArray = longArrayOf(1, 2, 1),
-    public val strides: LongArray? = null,
+    public val strides: LongArray = longArrayOf(1, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
@@ -46,8 +45,8 @@ public class AvgPool1D(
             "The poolSize should be an array of size 3."
         }
 
-        require(strides == null || strides.size == 3) {
-            "The strides should be either `null` or an array of size 3."
+        require(strides.size == 3) {
+            "The strides should be an array of size 3."
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
@@ -59,8 +58,7 @@ public class AvgPool1D(
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var steps = inputShape.size(1)
-        val strideValue = strides ?: poolSize
-        steps = convOutputLength(steps, poolSize[1].toInt(), padding, strideValue[1].toInt())
+        steps = convOutputLength(steps, poolSize[1].toInt(), padding, strides[1].toInt())
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
@@ -75,8 +73,7 @@ public class AvgPool1D(
         val tfPoolSize = longArrayOf(1, 1, 1, 1)
         val tfStrides = longArrayOf(1, 1, 1, 1)
         tfPoolSize[expandAxis-1] = poolSize[1]
-        val strideValue = strides ?: poolSize
-        tfStrides[expandAxis-1] = strideValue[1]
+        tfStrides[expandAxis-1] = strides[1]
         val tfPadding = padding.paddingName
 
         val avgPool = tf.nn.avgPool(
