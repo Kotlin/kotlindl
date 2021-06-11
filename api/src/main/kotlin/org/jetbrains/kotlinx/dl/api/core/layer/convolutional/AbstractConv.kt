@@ -46,16 +46,15 @@ public abstract class AbstractConv(
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
-        val lastElement = inputShape.size(inputShape.numDimensions() - 1)
+        val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        kernelShape = shapeFromDims(*kernelSizeInternal, lastElement, filtersInternal)
-        biasShape = Shape.make(filtersInternal)
+        computeMatricesShapes(numberOfChannels)
 
         // should be calculated before addWeight because it's used in calculation,
         // need to rewrite addWeight to avoid strange behaviour calculate fanIn, fanOut
-        val inputDepth = lastElement // number of input channels
-        val outputDepth = filtersInternal // number of output channels
+        val inputDepth = getInputDepth(numberOfChannels) // number of input channels
+        val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
 
         fanIn = (inputDepth * multiply(*kernelSizeInternal)).toInt()
         fanOut = ((outputDepth * multiply(*kernelSizeInternal)).toDouble() /
@@ -120,6 +119,15 @@ public abstract class AbstractConv(
 
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
         if (useBiasInternal) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
+    }
+
+    protected open fun getInputDepth(numberOfChannels: Long): Long = numberOfChannels
+
+    protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal
+
+    protected open fun computeMatricesShapes(numberOfChannels: Long) {
+        kernelShape = shapeFromDims(*kernelSizeInternal, numberOfChannels, filtersInternal)
+        biasShape = Shape.make(filtersInternal)
     }
 
     protected abstract fun kernelVarName(name: String): String
