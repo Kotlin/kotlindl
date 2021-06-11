@@ -179,7 +179,6 @@ internal class AvgPool3DTest {
                 for (j in expected[i].indices) {
                     for (k in expected[i][j].indices) {
                         for (l in expected[i][j][k].indices) {
-                            println("$i $j $k $l")
                             Assertions.assertArrayEquals(
                                 expected[i][j][k][l],
                                 actual[i][j][k][l],

@@ -19,15 +19,14 @@ import org.tensorflow.op.Ops
  * Downsamples the input by taking the average over a window of size [poolSize].
  *
  * @property [poolSize] Size of the pooling window for each dimension of input.
- * @property [strides] The amount of shift for pooling window in each pooling step. If
- * `null`, it will default to [poolSize].
+ * @property [strides] The amount of shift for pooling window per each input dimension in each pooling step.
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no
  * padding, or [ConvPadding.SAME] which means padding the input equally such that the output
  * has the same dimension as the input.
  */
 public class AvgPool3D(
     public val poolSize: LongArray = longArrayOf(1, 2, 2, 2, 1),
-    public val strides: LongArray? = null,
+    public val strides: LongArray = longArrayOf(1, 2, 2, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
@@ -45,8 +44,8 @@ public class AvgPool3D(
             "The poolSize should be an array of size 5."
         }
 
-        require(strides == null || strides.size ==5) {
-            "The strides should be either `null` or an array of size 5."
+        require(strides.size == 5) {
+            "The strides should be an array of size 5."
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
@@ -60,10 +59,9 @@ public class AvgPool3D(
         var dim1 = inputShape.size(1)
         var dim2 = inputShape.size(2)
         var dim3 = inputShape.size(3)
-        val strideValue = strides ?: poolSize
-        dim1 = convOutputLength(dim1, poolSize[1].toInt(), padding, strideValue[1].toInt())
-        dim2 = convOutputLength(dim2, poolSize[2].toInt(), padding, strideValue[2].toInt())
-        dim3 = convOutputLength(dim3, poolSize[3].toInt(), padding, strideValue[3].toInt())
+        dim1 = convOutputLength(dim1, poolSize[1].toInt(), padding, strides[1].toInt())
+        dim2 = convOutputLength(dim2, poolSize[2].toInt(), padding, strides[2].toInt())
+        dim3 = convOutputLength(dim3, poolSize[3].toInt(), padding, strides[3].toInt())
 
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
@@ -74,12 +72,11 @@ public class AvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val strideValue = strides ?: poolSize
         val tfPadding = padding.paddingName
         return tf.nn.avgPool3d(
             input,
             poolSize.toList(),
-            strideValue.toList(),
+            strides.toList(),
             tfPadding
         )
     }
