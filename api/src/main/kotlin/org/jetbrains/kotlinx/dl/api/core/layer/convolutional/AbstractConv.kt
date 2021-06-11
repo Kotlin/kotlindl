@@ -83,8 +83,7 @@ public abstract class AbstractConv(
             output = tf.nn.biasAdd(output, bias)
         }
 
-        val activated = Activations.convert(activationInternal).apply(tf, output, name)
-        return activityRegularizerInternal?.apply(tf, activated) ?: activated
+        return Activations.convert(activationInternal).apply(tf, output, name)
     }
 
     /** Returns the shape of kernel weights. */
