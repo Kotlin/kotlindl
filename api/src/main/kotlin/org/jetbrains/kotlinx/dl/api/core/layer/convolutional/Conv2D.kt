@@ -85,9 +85,9 @@ public class Conv2D(
     name = name
 ) {
     init {
-        assertArraySize(kernelSize, 2, "kernelSize")
-        assertArraySize(strides, 4, "strides")
-        assertArraySize(dilations, 4, "dilations")
+        requireArraySize(kernelSize, 2, "kernelSize")
+        requireArraySize(strides, 4, "strides")
+        requireArraySize(dilations, 4, "dilations")
     }
 
     override fun toString(): String {

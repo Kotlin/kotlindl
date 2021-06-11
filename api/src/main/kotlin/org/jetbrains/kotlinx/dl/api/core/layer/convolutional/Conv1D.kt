@@ -87,8 +87,8 @@ public class Conv1D(
     name = name
 ) {
     init {
-        assertArraySize(strides, 3, "strides")
-        assertArraySize(dilations, 3, "dilations")
+        requireArraySize(strides, 3, "strides")
+        requireArraySize(dilations, 3, "dilations")
     }
 
     private val squeezeAxis = Squeeze.axis(listOf(EXTRA_DIM))

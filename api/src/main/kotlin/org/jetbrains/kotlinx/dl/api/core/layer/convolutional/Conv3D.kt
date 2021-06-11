@@ -88,9 +88,9 @@ public class Conv3D(
     name = name
 ) {
     init {
-        assertArraySize(kernelSize, 3, "kernelSize")
-        assertArraySize(strides, 5, "strides")
-        assertArraySize(dilations, 5, "dilations")
+        requireArraySize(kernelSize, 3, "kernelSize")
+        requireArraySize(strides, 5, "strides")
+        requireArraySize(dilations, 5, "dilations")
     }
 
     override fun toString(): String {
