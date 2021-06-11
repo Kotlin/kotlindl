@@ -214,7 +214,7 @@ class SequentialInferenceTest {
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
             if (accuracy != null) {
                 println("Accuracy is $accuracy")
-                assertTrue(accuracy > 0.5)
+                assertTrue(accuracy > 0.2)
             }
 
             it.save(
