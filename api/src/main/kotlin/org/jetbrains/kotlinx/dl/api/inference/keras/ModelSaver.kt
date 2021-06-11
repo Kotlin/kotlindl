@@ -429,11 +429,10 @@ private fun convertToKerasActivation(activation: Activations): String? {
 }
 
 private fun createKerasMaxPool1D(layer: MaxPool1D): KerasLayer {
-    val strideValue = layer.strides ?: layer.poolSize
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         pool_size = listOf(layer.poolSize[1].toInt()),
-        strides = listOf(strideValue[1].toInt()),
+        strides = listOf(layer.strides[1].toInt()),
         padding = convertPadding(layer.padding),
         name = layer.name
     )
