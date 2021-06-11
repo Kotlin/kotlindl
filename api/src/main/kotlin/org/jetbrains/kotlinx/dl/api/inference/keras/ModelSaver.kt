@@ -75,6 +75,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Conv1D -> createKerasConv1D(layer, isKerasFullyCompatible)
         is Conv2D -> createKerasConv2D(layer, isKerasFullyCompatible)
         is Flatten -> createKerasFlatten(layer)
+        is MaxPool1D -> createKerasMaxPool1D(layer)
         is MaxPool2D -> createKerasMaxPooling2D(layer)
         is MaxPool3D -> createKerasMaxPooling3D(layer)
         is AvgPool2D -> createKerasAvgPooling2D(layer)
@@ -426,6 +427,17 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
     }
+}
+
+private fun createKerasMaxPool1D(layer: MaxPool1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        pool_size = listOf(layer.poolSize[1].toInt()),
+        strides = listOf(layer.strides[1].toInt()),
+        padding = convertPadding(layer.padding),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_MAX_POOL_1D, config = configX)
 }
 
 private fun createKerasMaxPooling2D(layer: MaxPool2D): KerasLayer {

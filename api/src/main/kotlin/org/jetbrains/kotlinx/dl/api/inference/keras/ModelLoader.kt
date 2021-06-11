@@ -119,6 +119,7 @@ private fun convertToLayer(
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
         LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOL_1D -> createMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOLING_2D -> createMaxPooling2D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -616,6 +617,19 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SWISH -> Activations.Swish
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
+}
+
+private fun createMaxPool1D(config: LayerConfig, name: String): Layer {
+    val poolSize = config.pool_size!!
+    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
+    val strides = config.strides!!
+    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), 1)
+    return MaxPool1D(
+        poolSize = addedOnesPoolSize,
+        strides = addedOnesStrides,
+        padding = convertPadding(config.padding!!),
+        name = name
+    )
 }
 
 private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
