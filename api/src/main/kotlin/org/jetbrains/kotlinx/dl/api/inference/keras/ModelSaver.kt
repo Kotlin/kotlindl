@@ -76,6 +76,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Conv2D -> createKerasConv2D(layer, isKerasFullyCompatible)
         is Flatten -> createKerasFlatten(layer)
         is MaxPool2D -> createKerasMaxPooling2D(layer)
+        is MaxPool3D -> createKerasMaxPooling3D(layer)
         is AvgPool1D -> createKerasAvgPool1D(layer)
         is AvgPool2D -> createKerasAvgPooling2D(layer)
         is Dense -> createKerasDense(layer, isKerasFullyCompatible)
@@ -452,6 +453,20 @@ private fun createKerasAvgPool1D(layer: AvgPool1D): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_AVG_POOL_1D, config = configX)
+
+}
+
+private fun createKerasMaxPooling3D(layer: MaxPool3D): KerasLayer {
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
+    val strides = mutableListOf(layer.strides[1] , layer.strides[3])
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = convertPadding(layer.padding),
+        pool_size = poolSize,
+        strides = strides
+    )
+    return KerasLayer(class_name = LAYER_MAX_POOLING_3D, config = configX)
 }
 
 private fun createKerasAvgPooling2D(layer: AvgPool2D): KerasLayer {
