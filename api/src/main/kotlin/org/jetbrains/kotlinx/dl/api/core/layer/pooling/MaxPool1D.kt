@@ -46,7 +46,7 @@ public class MaxPool1D(
         }
 
         require(strides.size == 3) {
-            "The strides should be either `null` or an array of size 3."
+            "The strides should be an array of size 3."
         }
 
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
