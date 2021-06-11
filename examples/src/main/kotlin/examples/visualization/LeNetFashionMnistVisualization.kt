@@ -65,7 +65,7 @@ fun main() {
             flattenImagePlot(imageIndex, test,
                 predict = it::predict,
                 labelEncoding = fashionMnistLabelEncoding::get,
-                plotFill = PlotFill.GRAY
+                plotFeature = PlotFeature.GRAY
             )
         }
         columnPlot(fashionPlots, 3, 256).show()

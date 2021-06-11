@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
+import jetbrains.letsPlot.Figure
 import jetbrains.letsPlot.GGBunch
 import jetbrains.letsPlot.gggrid
 import jetbrains.letsPlot.ggplot
@@ -12,10 +13,29 @@ import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.label.ggtitle
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 
-fun columnPlot(plots: Iterable<Plot>, columns: Int, imageSize: Int): GGBunch =
+/**
+ * Column plot arranges the given iterable of plots in specified number of columns and
+ * creates a single figure from all given plots
+ *
+ * @param plots that are arranged into single figure
+ * @param columns specifies the number of columns in which the plots are arranged
+ * @param imageSize is a height and width of the single plot in returned plots figure
+ * @return a [Figure] with all given plots
+ */
+fun columnPlot(plots: Iterable<Plot>, columns: Int, imageSize: Int): Figure =
     gggrid(plots, columns, imageSize, imageSize, fit = true)
 
-fun xyPlot(xSize: Int, ySize: Int, plotFill: PlotFill, f: (Int, Int) -> Float): Plot {
+/**
+ * Create a tile plot with weights from specified function `f(x, y)` that specifies the
+ * intensity of the single tile on the plot `(x, y)` position.
+ *
+ * @param xSize size of X domain of `f` function as a range [0, xSize)
+ * @param ySize size of Y domain of `f` function as a range [0, ySize)
+ * @param plotFeature filling colors of the created plot
+ * @param f function that is plotted
+ * @return [Plot] for specified function on defined domain
+ */
+fun xyPlot(xSize: Int, ySize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Plot {
 
     val gridX = List(xSize) { List(ySize) { it } }.flatten()
     val gridY = List(ySize) { y -> List(xSize) { y } }.flatten()
@@ -25,18 +45,42 @@ fun xyPlot(xSize: Int, ySize: Int, plotFill: PlotFill, f: (Int, Int) -> Float): 
         x = gridX
         y = gridY
         fill = gridZ
-    } + FEATURE_MAP_THEME + plotFill.scale
+    } + FEATURE_MAP_THEME + plotFeature.scale
 }
 
-fun xyPlot(imageSize: Int, plotFill: PlotFill, f: (Int, Int) -> Float): Plot =
-    xyPlot(imageSize, imageSize, plotFill, f)
+/**
+ * Create a tile plot with weights from specified function `f(x, y)` that specifies the
+ * intensity of the single tile on the plot `(x, y)` position.
+ *
+ * @param imageSize size of X and Y domains of `f` function as a range [0, imageSize)
+ * @param plotFeature filling colors of the created plot
+ * @param f function that is plotted
+ * @return [Plot] for specified function on defined domain
+ */
+fun xyPlot(imageSize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Plot =
+    xyPlot(imageSize, imageSize, plotFeature, f)
 
+/**
+ * Create a [xyPlot] for image data given as array of the following intensities of the
+ * plot tiles. Function intended to use with the inputs images from some [Dataset] for
+ * model as it offers to plot extra label that the specified image is labeled by (and
+ * additionally supports plotting some predicted label when model prediction is given)
+ *
+ * @param sampleNumber index of sample in [dataset] to be plotted
+ * @param dataset that contains the input data to be plotted as model input image and base label
+ * @param predict function that can define the label based on model input
+ * Defaults to no predict function so no model predict label is plotted.
+ * @param labelEncoding mapping from output label number to some human readable label that is plotted.
+ * Defaults to identity function.
+ * @param plotFeature filling colors of the created plot
+ * @return [Plot] representing model sample with prediction label if available
+ */
 fun flattenImagePlot(
-    sampleNumber: Int,
-    dataset: Dataset,
-    predict: (FloatArray) -> Int? = { null },
-    plotFill: PlotFill = PlotFill.GRAY,
-    labelEncoding: (Int) -> Any? = { it }
+        sampleNumber: Int,
+        dataset: Dataset,
+        predict: (FloatArray) -> Int? = { null },
+        labelEncoding: (Int) -> Any? = { it },
+        plotFeature: PlotFeature = PlotFeature.GRAY
 ): Plot {
     val imageSize = 28
     val imageData = dataset.getX(sampleNumber)
@@ -48,5 +92,5 @@ fun flattenImagePlot(
         "Real label: $imageLabel | Predicted label: $predictedLabel"
     }
 
-    return xyPlot(imageSize, plotFill) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
+    return xyPlot(imageSize, plotFeature) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
 }

@@ -11,10 +11,20 @@ import jetbrains.letsPlot.scale.scaleFillGrey
 import jetbrains.letsPlot.scale.scaleFillHue
 import jetbrains.letsPlot.theme
 
-class PlotFill(val scale: Scale) {
+/**
+ * PlotFeature represents the filling options for plots that defines its color scale.
+ * Used mainly with predefined scales that are available as properties of companion
+ * object but can be parametrized with some custom [Scale] for filling from lets-plot
+ * library.
+ *
+ * @property scale defining the feature of color scale for plot
+ * @constructor Create [PlotFeature] with defined scale
+ */
+class PlotFeature(val scale: Scale) {
+
     companion object {
-        val GRAY = PlotFill(scaleFillGrey())
-        val HUE = PlotFill(scaleFillHue())
+        val GRAY = PlotFeature(scaleFillGrey())
+        val HUE = PlotFeature(scaleFillHue())
     }
 }
 
