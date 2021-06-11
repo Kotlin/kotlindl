@@ -116,12 +116,10 @@ public abstract class AbstractConv(
         kGraph: KGraph
     ) {
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
+        if (useBiasInternal) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
-        if (useBiasInternal) {
-            bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-            bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
-        }
+        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
+        if (useBiasInternal) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
     }
 
     protected abstract fun kernelVarName(name: String): String
