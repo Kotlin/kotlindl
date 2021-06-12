@@ -1,5 +1,15 @@
+/*
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.dataset.sound.wav
 
+/**
+ * Wav file format representing the specification of the WAV file that is saved in its metadata header.
+ *
+ * @param buffer from which the format data is read
+ */
 public class WavFileFormat(buffer: ByteArray) {
 
     public val numChannels: Int = readLittleEndian(buffer, 2, 2).toInt()
@@ -41,8 +51,7 @@ public class WavFileFormat(buffer: ByteArray) {
         }
     }
 
-    override fun toString(): String {
-        return "WavFileFormat(numChannels=$numChannels, sampleRate=$sampleRate, blockAlign=$blockAlign, " +
+    override fun toString(): String =
+        "WavFileFormat(numChannels=$numChannels, sampleRate=$sampleRate, blockAlign=$blockAlign, " +
                 "bytesPerSample=$bytesPerSample, floatScale=$floatScale, floatOffset=$floatOffset)"
-    }
 }

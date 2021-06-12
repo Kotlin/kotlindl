@@ -1,35 +1,13 @@
+/*
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.dataset.sound.wav
 
 import java.lang.Exception
 
 /**
- * WavFile-specific exception class.
+ * WavFile-specific exception class that represents error in reading WAV file caused by its format.
  */
-class WavFileException : Exception {
-    /**
-     * Create a new WavFile-specific exception.
-     */
-    constructor() : super() {}
-
-    /**
-     * Create a new WavFile-specific exception with a given message.
-     *
-     * @param message the message
-     */
-    constructor(message: String?) : super(message) {}
-
-    /**
-     * Create a new WavFile-specific exception with a message and throwable exception.
-     *
-     * @param message the message
-     * @param cause the cause
-     */
-    constructor(message: String?, cause: Throwable?) : super(message, cause) {}
-
-    /**
-     * Create a new WavFile-specific exception with a throwable exception.
-     *
-     * @param cause the cause
-     */
-    constructor(cause: Throwable?) : super(cause) {}
-}
+public class WavFileException(message: String) : Exception(message)
