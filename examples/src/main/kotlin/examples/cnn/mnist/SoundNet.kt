@@ -57,10 +57,8 @@ private fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array
     )
 
 /**
- * This is an CNN based on an implementation of LeNet-5 from classic paper, but with a few minor changes to improve performance.
- *
- * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
- *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
+ * This is an CNN that uses only 1D parts for convolutions and max pooling of the input sound data.
+ * This network should achieve ~65% of accuracy on test data from FSDD.
  */
 private val soundNet = Sequential.of(
     Input(
@@ -114,7 +112,7 @@ private val soundNet = Sequential.of(
  * - model evaluation
  */
 fun soundNet() {
-    val (train, test) = freeSpokenDigits().split(0.9)
+    val (train, test) = freeSpokenDigits()
 
     soundNet.use {
         it.compile(

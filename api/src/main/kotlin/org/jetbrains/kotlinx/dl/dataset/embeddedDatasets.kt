@@ -115,9 +115,28 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
 
 public const val FSDD_SOUND_DATA_SIZE: Long = 20480
 
+/**
+ * Loads the [Free Spoken Digits Dataset](https://github.com/Jakobovski/free-spoken-digit-dataset).
+ * This is a dataset of wav sound files of the 10 digits spoken by different people many times each.
+ * The test set officially consists of the first 10% of the recordings. Recordings numbered 0-4 (inclusive)
+ * are in the test and 5-49 are in the training set.
+ * As the input data files have two channels of data there is two times more samples than input files.
+ *
+ * Free Spoken Digits Dataset dataset is made available under the terms of the
+ * [Creative Commons Attribution-ShareAlike 4.0 International.](https://creativecommons.org/licenses/by-sa/4.0/)
+ *
+ * @param [cacheDirectory] Cache directory to cached models and datasets.
+ * @param [maxTestIndex] Index of max sample to be selected to test part of data.
+ *
+ * @return Train and test datasets. Each dataset includes X and Y data. X data are float arrays of sound data with shapes
+ * (num_samples, FSDD_SOUND_DATA_SIZE) where FSDD_SOUND_DATA_SIZE is at least as long as the longest input sequence and all
+ * sequences are padded with zeros to have equal length. Y data float arrays of digit labels (integers in range 0-9)
+ * with shapes (num_samples,).
+ */
 public fun freeSpokenDigits(
-    cacheDirectory: File = File("cache")
-): OnHeapDataset {
+    cacheDirectory: File = File("cache"),
+    maxTestIndex: Int = 5
+): Pair<OnHeapDataset, OnHeapDataset> {
     val path = freeSpokenDigitDatasetPath(cacheDirectory)
     val dataset = File(path).listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
@@ -126,17 +145,44 @@ public fun freeSpokenDigits(
     require(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
         "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"
     }
-    val data = dataset.map { it.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())) }.toTypedArray()
-    val labels = dataset.map { it.second }.toTypedArray().toFloatArray()
-    return OnHeapDataset(data, labels).shuffle()
+    val data = dataset.map(::extractDataWithIndex)
+    val labels = dataset.map(::extractLabelWithIndex)
+
+    val (trainData, testData) = data.divideToTrainAndTest(maxTestIndex)
+    val (trainLabels, testLabels) = labels.divideToTrainAndTest(maxTestIndex)
+    return Pair(
+        OnHeapDataset(trainData, trainLabels.toFloatArray()),
+        OnHeapDataset(testData, testLabels.toFloatArray())
+    )
 }
 
-private fun extractWavFileSamples(file: File): List<Pair<FloatArray, Float>> =
+/**
+ * Extract wav file samples from given file and return a list of data from all its
+ * channels as a triple of (channel_data, label, sample_index)
+ *
+ * @param file to read from the sound data
+ * @return list of triples (channel_data, label, sample_index) from all channels from file
+ */
+private fun extractWavFileSamples(file: File): List<Triple<FloatArray, Float, Int>> =
     WavFile(file).use {
         val data = it.readRemainingFrames()
-        val label = file.name.split("_")[0].toFloat()
-        data.map { channel -> Pair(channel, label) }
+        val parts = file.name.split("_")
+        val label = parts[0].toFloat()
+        val index = parts[2].split(".")[0].toInt()
+        data.map { channel -> Triple(channel, label, index) }
     }
+
+private fun extractDataWithIndex(data: Triple<FloatArray, Float, Int>): Pair<FloatArray, Int> =
+    Pair(data.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())), data.third)
+
+private fun extractLabelWithIndex(data: Triple<FloatArray, Float, Int>): Pair<Float, Int> =
+    Pair(data.second, data.third)
+
+private inline fun <reified T> List<Pair<T, Int>>.divideToTrainAndTest(maxTestIndex: Int): Pair<Array<T>, Array<T>> {
+    val test = filter { it.second < maxTestIndex }.map { it.first }.toTypedArray()
+    val train = filter { it.second >= maxTestIndex }.map { it.first }.toTypedArray()
+    return Pair(train, test)
+}
 
 /** Path to train images archive of Mnist Dataset. */
 private const val CIFAR_10_IMAGES_ARCHIVE: String = "datasets/cifar10/images.zip"
@@ -174,23 +220,31 @@ private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
 public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
-    datasetPath(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE, "/datasets/dogs-vs-cats")
+    unzipDatasetPath(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE, "/datasets/dogs-vs-cats")
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
-    datasetPath(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, "/datasets/small-dogs-vs-cats")
+    unzipDatasetPath(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, "/datasets/small-dogs-vs-cats")
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): String =
-    datasetPath(cacheDirectory, FSDD_SOUNDS_ARCHIVE, "/datasets/free-spoken-digit")
+    unzipDatasetPath(cacheDirectory, FSDD_SOUNDS_ARCHIVE, "/datasets/free-spoken-digit")
 
-private fun datasetPath(cacheDirectory: File, archiveRelativePath: String, dirRelativePath: String): String {
+/**
+ * Download the compressed dataset from external source, decompress the file and remove the downloaded file.
+ *
+ * @param cacheDirectory where the downloaded files are stored
+ * @param archiveRelativePath relative path do download the archive from
+ * @param dirRelativePath dir to store the downloaded archive temporarily and decompress its data
+ * @return absolute path string to directory where dataset is decompressed
+ */
+private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, dirRelativePath: String): String {
     if (!cacheDirectory.exists()) {
         val created = cacheDirectory.mkdir()
         if (!created) {
