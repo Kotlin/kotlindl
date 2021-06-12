@@ -120,7 +120,8 @@ public const val FSDD_SOUND_DATA_SIZE: Long = 20480
  * This is a dataset of wav sound files of the 10 digits spoken by different people many times each.
  * The test set officially consists of the first 10% of the recordings. Recordings numbered 0-4 (inclusive)
  * are in the test and 5-49 are in the training set.
- * As the input data files have two channels of data there is two times more samples than input files.
+ * As the input data files have different number of channels of data we split every input file into separate samples
+ * that are threaten as separate samples with the same label.
  *
  * Free Spoken Digits Dataset dataset is made available under the terms of the
  * [Creative Commons Attribution-ShareAlike 4.0 International.](https://creativecommons.org/licenses/by-sa/4.0/)
