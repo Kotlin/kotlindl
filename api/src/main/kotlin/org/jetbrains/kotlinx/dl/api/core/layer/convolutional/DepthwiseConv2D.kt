@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
@@ -135,11 +136,10 @@ public class DepthwiseConv2D(
         return Shape.make(batchSize, rows, cols, filters)
     }
 
-    override fun toString(): String {
-        return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+    override fun toString(): String =
+        "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, " +
                 "depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, " +
                 "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=$biasShape, " +
                 "depthwiseKernelShape=$kernelShape)"
-    }
 }

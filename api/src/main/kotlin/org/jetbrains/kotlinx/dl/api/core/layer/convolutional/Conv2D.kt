@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -67,57 +68,6 @@ public class Conv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Conv2DImpl(
-    filters = filters,
-    kernelSize = kernelSize,
-    strides = strides,
-    dilations = dilations,
-    activation = activation,
-    kernelInitializer = kernelInitializer,
-    biasInitializer = biasInitializer,
-    kernelRegularizer = kernelRegularizer,
-    biasRegularizer = biasRegularizer,
-    activityRegularizer = activityRegularizer,
-    padding = padding,
-    useBias = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
-    name = name
-) {
-    init {
-        requireArraySize(kernelSize, 2, "kernelSize")
-        requireArraySize(strides, 4, "strides")
-        requireArraySize(dilations, 4, "dilations")
-    }
-
-    override fun toString(): String {
-        return "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
-                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
-    }
-
-    override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)
-
-    override fun biasVarName(name: String): String = convBiasVarName(name, dim = 2)
-}
-
-public abstract class Conv2DImpl(
-    filters: Long,
-    kernelSize: LongArray,
-    strides: LongArray,
-    dilations: LongArray,
-    activation: Activations,
-    kernelInitializer: Initializer,
-    biasInitializer: Initializer,
-    kernelRegularizer: Regularizer?,
-    biasRegularizer: Regularizer?,
-    activityRegularizer: Regularizer?,
-    padding: ConvPadding,
-    useBias: Boolean,
-    kernelVariableName: String,
-    biasVariableName: String,
-    name: String
 ) : AbstractConv(
     filtersInternal = filters,
     kernelSizeInternal = kernelSize,
@@ -131,10 +81,16 @@ public abstract class Conv2DImpl(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = kernelVariableName,
-    biasVariableName = biasVariableName,
+    kernelVariableName = KERNEL_VARIABLE_NAME,
+    biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ) {
+    init {
+        requireArraySize(kernelSize, 2, "kernelSize")
+        requireArraySize(strides, 4, "strides")
+        requireArraySize(dilations, 4, "dilations")
+    }
+
     override fun convImplementation(
         tf: Ops,
         input: Operand<Float>
@@ -165,4 +121,14 @@ public abstract class Conv2DImpl(
 
         return Shape.make(batchSize, rows, cols, filtersInternal)
     }
+
+    override fun toString(): String =
+        "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
+                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
+
+    override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)
+
+    override fun biasVarName(name: String): String = convBiasVarName(name, dim = 2)
 }

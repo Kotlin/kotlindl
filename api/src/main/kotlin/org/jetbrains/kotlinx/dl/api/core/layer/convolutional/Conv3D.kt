@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
@@ -93,13 +94,6 @@ public class Conv3D(
         requireArraySize(dilations, 5, "dilations")
     }
 
-    override fun toString(): String {
-        return "Conv3D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
-                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
-    }
-
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 3)
 
     override fun biasVarName(name: String): String = convBiasVarName(name, dim = 3)
@@ -142,4 +136,10 @@ public class Conv3D(
 
         return Shape.make(batchSize, depths, rows, cols, filtersInternal)
     }
+
+    override fun toString(): String =
+        "Conv3D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
+                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }

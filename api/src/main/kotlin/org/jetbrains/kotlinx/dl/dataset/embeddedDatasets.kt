@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.handler.*
+import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
 import java.io.*
 import java.net.URL
 import java.nio.file.Files
@@ -16,6 +17,12 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.io.File
+
+import java.io.IOException
+
+import java.io.FileOutputStream
+import java.lang.IllegalStateException
 
 
 /**
@@ -106,6 +113,30 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
     )
 }
 
+public const val FSDD_SOUND_DATA_SIZE: Long = 20480
+
+public fun freeSpokenDigits(
+    cacheDirectory: File = File("cache")
+): OnHeapDataset {
+    val path = freeSpokenDigitDatasetPath(cacheDirectory)
+    val dataset = File(path).listFiles()?.flatMap(::extractWavFileSamples)
+        ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
+    val maxDataSize = dataset.map { it.first.size }.maxOrNull()
+        ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
+    require(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
+        "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"
+    }
+    val data = dataset.map { it.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())) }.toTypedArray()
+    val labels = dataset.map { it.second }.toTypedArray().toFloatArray()
+    return OnHeapDataset(data, labels).shuffle()
+}
+
+private fun extractWavFileSamples(file: File): List<Pair<FloatArray, Float>> =
+    WavFile(file).use {
+        val data = it.readRemainingFrames()
+        val label = file.name.split("_")[0].toFloat()
+        data.map { channel -> Pair(channel, label) }
+    }
 
 /** Path to train images archive of Mnist Dataset. */
 private const val CIFAR_10_IMAGES_ARCHIVE: String = "datasets/cifar10/images.zip"
@@ -130,7 +161,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
         Files.createDirectories(imageDataDirectory.toPath())
 
         val pathToImageArchive = loadFile(cacheDirectory, CIFAR_10_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
+        extractFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
         val deleted = pathToImageArchive.delete()
         if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
     }
@@ -142,65 +173,72 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
-public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
-
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/dogs-vs-cats")
-    val toFolder = imageDirectory.toPath()
-
-    if (!imageDirectory.exists()) {
-        Files.createDirectories(imageDirectory.toPath())
-
-        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
-        val deleted = pathToImageArchive.delete()
-        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
-    }
-
-    return toFolder.toAbsolutePath().toString()
-}
+public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
+    datasetPath(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE, "/datasets/dogs-vs-cats")
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
-public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String {
+public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
+    datasetPath(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, "/datasets/small-dogs-vs-cats")
+
+/** Path to the subset of Dogs-vs-Cats dataset. */
+private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/data.zip"
+
+/** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
+public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): String =
+    datasetPath(cacheDirectory, FSDD_SOUNDS_ARCHIVE, "/datasets/free-spoken-digit")
+
+private fun datasetPath(cacheDirectory: File, archiveRelativePath: String, dirRelativePath: String): String {
     if (!cacheDirectory.exists()) {
         val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+        if (!created) {
+            throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
+        }
     }
 
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/small-dogs-vs-cats")
-    val toFolder = imageDirectory.toPath()
+    val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
+    val toFolder = dataDirectory.toPath()
 
-    if (!imageDirectory.exists()) {
-        Files.createDirectories(imageDirectory.toPath())
+    if (!dataDirectory.exists()) {
+        Files.createDirectories(dataDirectory.toPath())
 
-        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
-        val deleted = pathToImageArchive.delete()
-        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+        val pathToArchive = loadFile(cacheDirectory, archiveRelativePath)
+        extractFromZipArchiveToFolder(pathToArchive.toPath(), toFolder)
+        val deleted = pathToArchive.delete()
+        if (!deleted) {
+            throw Exception("Archive ${pathToArchive.absolutePath} could not be deleted! Create this archive manually.")
+        }
     }
 
     return toFolder.toAbsolutePath().toString()
 }
 
-/** Downloads a file from a URL if it not already in the cache. */
+/**
+ * Downloads a file from a URL if it not already in the cache. By default the download location
+ * is defined as the concatenation of [AWS_S3_URL] and [relativePathToFile] but can be defined
+ * as an arbitrary file location to download file from *
+ *
+ * @param cacheDirectory where the downloaded file is stored
+ * @param relativePathToFile where the downloaded file is stored in [cacheDirectory] and which can
+ * define the location of file to be downloaded
+ * @param loadingMode of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
+ * @param urlLocation source of location of file to be downloaded based on the [relativePathToFile]]
+ * @return downloaded [File] on local file system
+ */
 private fun loadFile(
     cacheDirectory: File,
     relativePathToFile: String,
-    loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+    loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
+    urlLocation: (String) -> String = { "$AWS_S3_URL/$it" }
 ): File {
     val fileName = cacheDirectory.absolutePath + "/" + relativePathToFile
-    val urlString = "$AWS_S3_URL/$relativePathToFile"
     val file = File(fileName)
-
     file.parentFile.mkdirs() // Will create parent directories if not exists
 
     if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
+        val urlString = urlLocation(relativePathToFile)
         val inputStream = URL(urlString).openStream()
         Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
     }
@@ -210,8 +248,7 @@ private fun loadFile(
 
 /** Creates file structure archived in zip file with all directories and sub-directories */
 @Throws(IOException::class)
-internal fun extractImagesFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path) {
-    val bufferSize = 4096
+internal fun extractFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path, bufferSize: Int = 4096) {
     val zipFile = ZipFile(zipArchivePath.toFile())
     val entries = zipFile.entries()
 
@@ -251,4 +288,3 @@ internal fun extractImagesFromZipArchiveToFolder(zipArchivePath: Path, toFolder:
     }
     zipFile.close()
 }
-

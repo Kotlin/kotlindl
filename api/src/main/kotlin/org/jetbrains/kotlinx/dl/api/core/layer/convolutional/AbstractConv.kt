@@ -139,10 +139,4 @@ public abstract class AbstractConv(
     protected abstract fun defineOutputShape(inputShape: Shape): Shape
 }
 
-internal fun requireArraySize(array: LongArray, size: Int, name: String) {
-    if (array.size != size) {
-        throw IllegalArgumentException("$name is expected to have size equal $size")
-    }
-}
-
 private fun multiply(vararg values: Long) = values.fold(1L, Long::times)

@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -41,14 +42,8 @@ public class MaxPool1D(
         set(value) = assignWeights(value)
 
     init {
-        require(poolSize.size == 3) {
-            "The poolSize should be an array of size 3."
-        }
-
-        require(strides.size == 3) {
-            "The strides should be an array of size 3."
-        }
-
+        requireArraySize(poolSize, 3, "poolSize")
+        requireArraySize(strides, 3, "strides")
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
             "The padding should be either ${ConvPadding.VALID} or ${ConvPadding.SAME}."
         }
@@ -88,19 +83,18 @@ public class MaxPool1D(
          * However, it seems it does not work for the case of "channels_first". So, instead
          * we are choosing to set the value of pool size and strides based on the data format.
          */
-        tfPoolSize[expandAxis-1] = poolSize[1].toInt()
-        tfStrides[expandAxis-1] = strides[1].toInt()
-        val tfPadding = padding.paddingName
+        tfPoolSize[expandAxis - 1] = poolSize[1].toInt()
+        tfStrides[expandAxis - 1] = strides[1].toInt()
 
         val maxPool = tf.nn.maxPool(
             tfInput,
             tf.constant(tfPoolSize),
             tf.constant(tfStrides),
-            tfPadding
+            padding.paddingName
         )
         return tf.squeeze(maxPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 
     override fun toString(): String =
-        "MaxPool1D(poolSize=$poolSize, strides=$strides, padding=$padding)"
+        "MaxPool1D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
 }

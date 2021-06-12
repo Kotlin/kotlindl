@@ -82,6 +82,4 @@ public class AvgPool2D(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-
 }
