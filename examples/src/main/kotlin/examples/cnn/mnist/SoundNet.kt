@@ -29,6 +29,15 @@ private const val TEST_BATCH_SIZE = 512
 private const val NUM_CHANNELS = 1L
 private const val SEED = 12L
 
+/**
+ * Create a single building block for the SoundNet to simplify its structure.
+ * Single block consists of two identical [Conv1D] layers followed by [MaxPool1D].
+ *
+ * @param filters number of filters in conv layers
+ * @param kernelSize in conv layers
+ * @param poolStride stride for pooling in maxpool layer
+ * @return array of layers to be registered in [Sequential] as vararg
+ */
 private fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array<Layer> =
     arrayOf(
         Conv1D(

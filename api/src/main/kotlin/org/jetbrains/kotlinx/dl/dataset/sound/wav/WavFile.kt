@@ -18,9 +18,11 @@ private const val RIFF_CHUNK_ID: Long = 0x46464952
 private const val RIFF_TYPE_ID: Long = 0x45564157
 
 /**
- * Class for reading WAV audio files.
+ * Class for reading WAV audio files. The file opened as WAV file can be read
+ * only once and the following reading procedures will result in reading empty buffer.
  *
- * Based on code written by [Andrew Greensted](http://www.labbookpages.co.uk/).
+ * Based on code written by [Andrew Greensted](http://www.labbookpages.co.uk/)
+ * but modified to more Kotlin idiomatic way with only read option for simplicity.
  */
 public class WavFile(
     file: File,
@@ -32,10 +34,13 @@ public class WavFile(
         CLOSED
     }
 
+    /** Remaining frames that can be read to some external buffer from WAV file */
     public val remainingFrames: Long get() = frames - frameCounter
 
+    /** File format specification with values from [WavFileFormat] */
     public val format: WavFileFormat
 
+    /** Number of frames present in full WAV file */
     public val frames: Long
 
     private var ioState = IOState.READING
@@ -102,6 +107,12 @@ public class WavFile(
         inputStream.close()
     }
 
+    /**
+     * Read all remaining frames from WAV file and return them as an array of
+     * results for each of the channels of input file.
+     *
+     * @return Array with sound data for each channel
+     */
     public fun readRemainingFrames(): Array<FloatArray> {
         val count = remainingFrames
         if (count > Int.MAX_VALUE) {
@@ -121,8 +132,6 @@ public class WavFile(
      * @param count the number of frames to read
      * @param offset the buffer offset to read from
      * @return the number of frames read
-     * @throws IOException Signals that an I/O exception has occurred
-     * @throws WavFileException a WavFile-specific exception
      */
     public fun readFrames(returnBuffer: Array<FloatArray>, count: Int, offset: Int = 0): Int {
         var myOffset = offset
