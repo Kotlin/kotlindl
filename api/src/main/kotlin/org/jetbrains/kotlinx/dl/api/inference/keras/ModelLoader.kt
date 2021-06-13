@@ -124,6 +124,7 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
+        LAYER_AVG_POOL_1D -> createAvgPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOLING_3D -> createMaxPooling3D(
             kerasLayer.config!!,
             kerasLayer.config.name!!
@@ -648,6 +649,19 @@ private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     addedOnesStrides[3] = 1
 
     return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
+}
+
+private fun createAvgPool1D(config: LayerConfig, name: String): Layer {
+    val poolSize = config.pool_size!!
+    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
+    val strides = config.strides!!
+    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), 1)
+    return AvgPool1D(
+        poolSize = addedOnesPoolSize,
+        strides = addedOnesStrides,
+        padding = convertPadding(config.padding!!),
+        name = name
+    )
 }
 
 private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
