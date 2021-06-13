@@ -88,7 +88,7 @@ public class Conv3D(
     kernelVariableName = KERNEL_VARIABLE_NAME,
     biasVariableName = BIAS_VARIABLE_NAME,
     name = name
-), NoGradients {
+) {
     init {
         requireArraySize(kernelSize, 3, "kernelSize")
         requireArraySize(strides, 5, "strides")
