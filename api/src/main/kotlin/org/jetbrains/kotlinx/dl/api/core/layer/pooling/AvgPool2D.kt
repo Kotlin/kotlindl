@@ -31,7 +31,7 @@ public class AvgPool2D(
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var rows = inputShape.size(1)
