@@ -5,6 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import io.jhdf.HdfFile
+import io.jhdf.api.Dataset
+import org.jetbrains.kotlinx.dl.api.core.shape.cast2D
+import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.handler.*
@@ -42,10 +46,7 @@ import java.lang.IllegalStateException
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
@@ -92,10 +93,7 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath
@@ -112,6 +110,58 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
         ::extractLabels
     )
 }
+
+/** Path to H5 file of Mnist 3D Dataset. */
+public const val MNIST_3D_DATASET: String = "datasets/mnist-3d/dataset.h5"
+
+/**
+ * Loads the [MNIST 3D dataset](https://www.kaggle.com/daavoo/3d-mnist).
+ * This is a dataset of 10,000 16x16x16 grayscale 3D images of the 10 digits,
+ * along with a test set of 2,000 3D images.
+ *
+ * NOTE: Yann LeCun and Corinna Cortes hold the copyright of MNIST dataset,
+ * which is a derivative work from original NIST datasets.
+ * MNIST dataset is made available under the terms of the
+ * [Creative Commons Attribution-Share Alike 3.0 license.](https://creativecommons.org/licenses/by-sa/3.0/)
+ * MNIST 3D dataset was created by [daavoo](https://github.com/daavoo) as a transformation of
+ * original MNIST dataset to 3D images to provide simple example of working with 3D images.
+ *
+ * @param [cacheDirectory] Cache directory to cached models and datasets.
+ *
+ * @return Train and test datasets. Each dataset includes X and Y data.
+ * X data are float arrays of grayscale image data with shapes (num_samples, 16, 16, 16).
+ * Y data float arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
+ */
+public fun mnist3D(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
+    cacheDirectory.existsOrMkdirs()
+
+    return HdfFile(loadFile(cacheDirectory, MNIST_3D_DATASET)).use {
+
+        val (trainData, trainLabels) = it.extractMnist3DDataset("train")
+        val (testData, testLabels) = it.extractMnist3DDataset("test")
+
+        Pair(
+            OnHeapDataset.create(trainData, trainLabels),
+            OnHeapDataset.create(testData, testLabels)
+        )
+    }
+}
+
+/** Extract mnist3d X data from HD5 file [dataset] */
+private fun extractMnist3DData(dataset: Dataset) =
+    dataset.data.castArray().cast2D<DoubleArray>()
+        .map { it.map(Double::toFloat).toFloatArray() }.toTypedArray()
+
+/** Extract mnist3d Y labels from HD5 file [dataset] */
+private fun extractMnist3DLabels(dataset: Dataset) =
+    (dataset.data as LongArray).map(Long::toFloat).toFloatArray()
+
+/** Extract mnist3d data and labels from HD5 file under specified [label] */
+private fun HdfFile.extractMnist3DDataset(label: String): Pair<Array<FloatArray>, FloatArray> =
+    Pair(
+        extractMnist3DData(getDatasetByPath("X_$label")),
+        extractMnist3DLabels(getDatasetByPath("y_$label"))
+    )
 
 public const val FSDD_SOUND_DATA_SIZE: Long = 20480
 
@@ -138,6 +188,8 @@ public fun freeSpokenDigits(
     cacheDirectory: File = File("cache"),
     maxTestIndex: Int = 5
 ): Pair<OnHeapDataset, OnHeapDataset> {
+    cacheDirectory.existsOrMkdirs()
+
     val path = freeSpokenDigitDatasetPath(cacheDirectory)
     val dataset = File(path).listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
@@ -153,8 +205,8 @@ public fun freeSpokenDigits(
     val (trainLabels, testLabels) = labels.splitToTrainAndTestByIndex(maxTestIndex)
 
     return Pair(
-        OnHeapDataset(trainData, trainLabels.toFloatArray()),
-        OnHeapDataset(testData, testLabels.toFloatArray())
+        OnHeapDataset.create(trainData, trainLabels.toFloatArray()),
+        OnHeapDataset.create(testData, testLabels.toFloatArray())
     )
 }
 
@@ -194,10 +246,7 @@ private const val CIFAR_10_LABELS_ARCHIVE: String = "datasets/cifar10/trainLabel
 
 /** Returns paths to images and its labels for the Cifar'10 dataset. */
 public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, String> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val pathToLabel = loadFile(cacheDirectory, CIFAR_10_LABELS_ARCHIVE).absolutePath
 
@@ -248,12 +297,7 @@ public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): Str
  * @return absolute path string to directory where dataset is decompressed
  */
 private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, dirRelativePath: String): String {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) {
-            throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-        }
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
     val toFolder = dataDirectory.toPath()
@@ -342,4 +386,13 @@ internal fun extractFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path,
         }
     }
     zipFile.close()
+}
+
+internal fun File.existsOrMkdirs() {
+    if (!exists()) {
+        val created = mkdirs()
+        if (!created) {
+            throw Exception("Directory $absolutePath could not be created! Create this directory manually.")
+        }
+    }
 }

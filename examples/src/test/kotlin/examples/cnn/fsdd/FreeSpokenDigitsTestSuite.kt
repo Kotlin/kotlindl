@@ -5,7 +5,6 @@
 
 package examples.cnn.fsdd
 
-import examples.cnn.mnist.soundNet
 import org.junit.jupiter.api.Test
 
 class FreeSpokenDigitsTestSuite {

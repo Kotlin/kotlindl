@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
+import kotlin.math.roundToInt
 import kotlin.math.truncate
 import kotlin.random.Random
 
@@ -275,4 +277,75 @@ public class OnHeapDataset internal constructor(private val x: Array<FloatArray>
             batchLength
         )
     }
+
+    override fun toString(): String = buildStringRepr(x.partialToString(), y.partialToString())
+
+    public fun fullToString(): String = buildStringRepr(x.contentDeepToString(), y.contentToString())
+
+    private fun buildStringRepr(xString: String, yString: String): String =
+        "OnHeapDataset(\nx ${x.shape} =\n${xString},\ny [${y.size}] =\n${yString}\n)"
+}
+
+/**
+ * Create String representation of `FloatArray` where only a part of the data is printed to String.
+ *
+ * @param maxSize max number of elements of array present in its string representation
+ * @param lowPercent percent of data of [maxSize] to be printed from the beginning of array data.
+ * Rest will be obtained from the tail of the array in order matching the order in array
+ * @return string representation of [FloatArray] in format like
+ * `[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, ..., 18.0, 19.0]`
+ */
+private fun FloatArray.partialToString(maxSize: Int = 10, lowPercent: Double = 0.8): String {
+    if (size <= maxSize) {
+        return contentToString()
+    }
+
+    val lowCount = (lowPercent * maxSize).roundToInt()
+    val upStart = size - maxSize - 1
+
+    return Array(maxSize + 1) {
+        when {
+            it < lowCount -> this[it]
+            it > lowCount -> this[upStart + it]
+            else -> "..."
+        }
+    }.joinToString(prefix = "[", postfix = "]", separator = ", ")
+}
+
+/**
+ * Create String representation of `Array<FloatArray>` where only a part of the data is printed to String.
+ *
+ * @param maxSize max number of elements of array present in its string representation
+ * @param lowPercent percent of data of [maxSize] to be printed from the beginning of array data.
+ * Rest will be obtained from the tail of the array in order matching the order in array
+ * @return string representation of [FloatArray] in format like
+ * `[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, ..., 48.0, 49.0],
+ *   [100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 107.0, ..., 148.0, 149.0],
+ *   [200.0, 201.0, 202.0, 203.0, 204.0, 205.0, 206.0, 207.0, ..., 248.0, 249.0],
+ *   [300.0, 301.0, 302.0, 303.0, 304.0, 305.0, 306.0, 307.0, ..., 348.0, 349.0],
+ *   [400.0, 401.0, 402.0, 403.0, 404.0, 405.0, 406.0, 407.0, ..., 448.0, 449.0],
+ *   [500.0, 501.0, 502.0, 503.0, 504.0, 505.0, 506.0, 507.0, ..., 548.0, 549.0],
+ *   [600.0, 601.0, 602.0, 603.0, 604.0, 605.0, 606.0, 607.0, ..., 648.0, 649.0],
+ *   [700.0, 701.0, 702.0, 703.0, 704.0, 705.0, 706.0, 707.0, ..., 748.0, 749.0],
+ *   ...,
+ *   [4800.0, 4801.0, 4802.0, 4803.0, 4804.0, 4805.0, 4806.0, 4807.0, ..., 4848.0, 4849.0],
+ *   [4900.0, 4901.0, 4902.0, 4903.0, 4904.0, 4905.0, 4906.0, 4907.0, ..., 4948.0, 4949.0]]`
+ */
+private fun Array<FloatArray>.partialToString(maxSize: Int = 10, lowPercent: Double = 0.8): String {
+    if (size <= maxSize) {
+        return joinToString(prefix = "[", postfix = "]", separator = ",\n ") {
+            it.partialToString(maxSize, lowPercent)
+        }
+    }
+
+    val lowCount = (lowPercent * maxSize).roundToInt()
+    val upStart = size - maxSize - 1
+
+    return Array(maxSize + 1) {
+        when {
+            it < lowCount -> this[it].partialToString(maxSize, lowPercent)
+            it > lowCount -> this[upStart + it].partialToString(maxSize, lowPercent)
+            else -> "..."
+        }
+    }.joinToString(prefix = "[", postfix = "]", separator = ",\n ")
 }

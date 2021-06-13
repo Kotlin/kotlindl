@@ -167,6 +167,9 @@ internal fun getShapeOfArray(data: Array<*>): Shape {
     return shapeFromDims(*collectDims(data, mutableListOf()))
 }
 
+/** Shape property of standard JVM array for better readability of code */
+internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
+
 /**
  * Create an array of arrays (of arrays...) of Floats with specified [shape] and
  * initialized with given [initValue]. When the number of dimensions in result tensor
@@ -186,16 +189,20 @@ internal fun getFloatArrayOfShape(shape: Shape, initValue: Float = 0.0f): Array<
     }
 }
 
-internal fun Any?.castArrayDim(): Array<*> = this as Array<*>
+internal fun Any?.castArray(): Array<*> = this as Array<*>
 
-/** Cast Array<*> to Array<FloatArray> when sure about its dimensions */
-internal fun Array<*>.cast2DArray(): Array<FloatArray> = this.map { it as FloatArray }.toTypedArray()
+/** Cast Array<*> to Array<T> when sure about its dimensions where usually T is [FloatArray] */
+internal inline fun <reified T> Array<*>.cast2D(): Array<T> =
+    this.map { it as T }.toTypedArray()
 
-/** Cast Array<*> to Array<Array<FloatArray>> when sure about its dimensions */
-internal fun Array<*>.cast3DArray(): Array<Array<FloatArray>> = this.map { it.castArrayDim().cast2DArray() }.toTypedArray()
+/** Cast Array<*> to Array<Array<T>> when sure about its dimensions where usually T is [FloatArray] */
+internal inline fun <reified T> Array<*>.cast3D(): Array<Array<T>> =
+    this.map { it.castArray().cast2D<T>() }.toTypedArray()
 
-/** Cast Array<*> to Array<Array<Array<FloatArray>>> when sure about its dimensions */
-internal fun Array<*>.cast4DArray(): Array<Array<Array<FloatArray>>> = this.map { it.castArrayDim().cast3DArray() }.toTypedArray()
+/** Cast Array<*> to Array<Array<Array<T>>> when sure about its dimensions where usually T is [FloatArray] */
+internal inline fun <reified T> Array<*>.cast4D(): Array<Array<Array<T>>> =
+    this.map { it.castArray().cast3D<T>() }.toTypedArray()
 
-/** Cast Array<*> to Array<Array<Array<Array<FloatArray>>>> when sure about its dimensions */
-internal fun Array<*>.cast5DArray(): Array<Array<Array<Array<FloatArray>>>> = this.map { it.castArrayDim().cast4DArray() }.toTypedArray()
+/** Cast Array<*> to Array<Array<Array<Array<T>>>> when sure about its dimensions where usually T is [FloatArray] */
+internal inline fun <reified T> Array<*>.cast5D(): Array<Array<Array<Array<T>>>> =
+    this.map { it.castArray().cast4D<T>() }.toTypedArray()
