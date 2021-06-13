@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.*
@@ -87,11 +88,12 @@ public class Conv3D(
     kernelVariableName = KERNEL_VARIABLE_NAME,
     biasVariableName = BIAS_VARIABLE_NAME,
     name = name
-) {
+), NoGradients {
     init {
         requireArraySize(kernelSize, 3, "kernelSize")
         requireArraySize(strides, 5, "strides")
         requireArraySize(dilations, 5, "dilations")
+        isTrainable = false
     }
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 3)

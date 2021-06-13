@@ -113,7 +113,7 @@ private val soundNet = Sequential.of(
 /**
  * This example shows how to do audio classification from scratch using only Conv1D layers (without Conv2D)
  * and dense layers on the example of some toy network.
- * We demonstrate the workflow on the free spoken digits dataset.
+ * We demonstrate the workflow on the Free Spoken Digits Dataset.
  *
  * It includes:
  * - dataset loading from S3
