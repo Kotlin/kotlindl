@@ -143,14 +143,15 @@ public fun freeSpokenDigits(
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
     val maxDataSize = dataset.map { it.first.size }.maxOrNull()
         ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
-    require(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
+    check(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
         "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"
     }
-    val data = dataset.map(::extractDataWithIndex)
+    val data = dataset.map(::extractPaddedDataWithIndex)
     val labels = dataset.map(::extractLabelWithIndex)
 
-    val (trainData, testData) = data.divideToTrainAndTest(maxTestIndex)
-    val (trainLabels, testLabels) = labels.divideToTrainAndTest(maxTestIndex)
+    val (trainData, testData) = data.splitToTrainAndTestByIndex(maxTestIndex)
+    val (trainLabels, testLabels) = labels.splitToTrainAndTestByIndex(maxTestIndex)
+
     return Pair(
         OnHeapDataset(trainData, trainLabels.toFloatArray()),
         OnHeapDataset(testData, testLabels.toFloatArray())
@@ -173,13 +174,13 @@ private fun extractWavFileSamples(file: File): List<Triple<FloatArray, Float, In
         data.map { channel -> Triple(channel, label, index) }
     }
 
-private fun extractDataWithIndex(data: Triple<FloatArray, Float, Int>): Pair<FloatArray, Int> =
-    Pair(data.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())), data.third)
+private fun extractPaddedDataWithIndex(dataLabelIndex: Triple<FloatArray, Float, Int>): Pair<FloatArray, Int> =
+    Pair(dataLabelIndex.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())), dataLabelIndex.third)
 
-private fun extractLabelWithIndex(data: Triple<FloatArray, Float, Int>): Pair<Float, Int> =
-    Pair(data.second, data.third)
+private fun extractLabelWithIndex(dataLabelIndex: Triple<FloatArray, Float, Int>): Pair<Float, Int> =
+    Pair(dataLabelIndex.second, dataLabelIndex.third)
 
-private inline fun <reified T> List<Pair<T, Int>>.divideToTrainAndTest(maxTestIndex: Int): Pair<Array<T>, Array<T>> {
+private inline fun <reified T> List<Pair<T, Int>>.splitToTrainAndTestByIndex(maxTestIndex: Int): Pair<Array<T>, Array<T>> {
     val test = filter { it.second < maxTestIndex }.map { it.first }.toTypedArray()
     val train = filter { it.second >= maxTestIndex }.map { it.first }.toTypedArray()
     return Pair(train, test)
@@ -230,7 +231,7 @@ private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdo
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
     unzipDatasetPath(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, "/datasets/small-dogs-vs-cats")
 
-/** Path to the subset of Dogs-vs-Cats dataset. */
+/** Path to the Free Spoken Digits Dataset. */
 private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
@@ -238,7 +239,8 @@ public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): Str
     unzipDatasetPath(cacheDirectory, FSDD_SOUNDS_ARCHIVE, "/datasets/free-spoken-digit")
 
 /**
- * Download the compressed dataset from external source, decompress the file and remove the downloaded file.
+ * Download the compressed dataset from external source, decompress the file and remove the downloaded file
+ * but leave the decompressed data from dataset.
  *
  * @param cacheDirectory where the downloaded files are stored
  * @param archiveRelativePath relative path do download the archive from
@@ -279,21 +281,19 @@ private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, 
  * @param relativePathToFile where the downloaded file is stored in [cacheDirectory] and which can
  * define the location of file to be downloaded
  * @param loadingMode of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
- * @param urlLocation source of location of file to be downloaded based on the [relativePathToFile]]
  * @return downloaded [File] on local file system
  */
 private fun loadFile(
     cacheDirectory: File,
     relativePathToFile: String,
-    loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
-    urlLocation: (String) -> String = { "$AWS_S3_URL/$it" }
+    loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
 ): File {
     val fileName = cacheDirectory.absolutePath + "/" + relativePathToFile
     val file = File(fileName)
     file.parentFile.mkdirs() // Will create parent directories if not exists
 
     if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-        val urlString = urlLocation(relativePathToFile)
+        val urlString = "$AWS_S3_URL/$relativePathToFile"
         val inputStream = URL(urlString).openStream()
         Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
     }

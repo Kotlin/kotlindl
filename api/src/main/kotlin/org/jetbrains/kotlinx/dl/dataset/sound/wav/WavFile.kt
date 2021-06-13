@@ -125,7 +125,9 @@ public class WavFile(
         }
         val buffer = Array(format.numChannels) { FloatArray(count.toInt()) }
         val readCount = readFrames(buffer, count.toInt())
-        require(readCount == count.toInt()) { "Internal error: Should read all remaining data from wav file." }
+        check(readCount == count.toInt()) {
+            "Internal error: Should read all remaining data from wav file."
+        }
         return buffer
     }
 

@@ -44,9 +44,4 @@ class MnistTestSuite {
     fun vggTest() {
         vgg()
     }
-
-    @Test
-    fun soundNetTest() {
-        soundNet()
-    }
 }

@@ -35,7 +35,7 @@ private const val SEED = 12L
  *
  * @param filters number of filters in conv layers
  * @param kernelSize in conv layers
- * @param poolStride stride for pooling in maxpool layer
+ * @param poolStride stride for poolSize and stride in maxpooling layer
  * @return array of layers to be registered in [Sequential] as vararg
  */
 private fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array<Layer> =
@@ -67,7 +67,8 @@ private fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array
 
 /**
  * This is an CNN that uses only 1D parts for convolutions and max pooling of the input sound data.
- * This network should achieve ~65% of accuracy on test data from FSDD.
+ * This network should achieve ~65% of accuracy on test data from FSDD after 20 epochs and ~85% after
+ * 100 epochs.
  */
 private val soundNet = Sequential.of(
     Input(
@@ -131,6 +132,7 @@ fun soundNet() {
         )
 
         it.init()
+
         var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before: $accuracy")
 
