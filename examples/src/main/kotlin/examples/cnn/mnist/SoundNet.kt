@@ -23,9 +23,9 @@ import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.tensorflow.op.nn.MaxPool
 
-private const val EPOCHS = 20
-private const val TRAINING_BATCH_SIZE = 256
-private const val TEST_BATCH_SIZE = 512
+private const val EPOCHS = 10
+private const val TRAINING_BATCH_SIZE = 500
+private const val TEST_BATCH_SIZE = 500
 private const val NUM_CHANNELS = 1L
 private const val SEED = 12L
 
@@ -67,7 +67,7 @@ private fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array
 
 /**
  * This is an CNN that uses only 1D parts for convolutions and max pooling of the input sound data.
- * This network should achieve ~65% of accuracy on test data from FSDD after 20 epochs and ~85% after
+ * This network should achieve ~55% of accuracy on test data from FSDD after 10 epochs and ~85% after
  * 100 epochs.
  */
 private val soundNet = Sequential.of(
