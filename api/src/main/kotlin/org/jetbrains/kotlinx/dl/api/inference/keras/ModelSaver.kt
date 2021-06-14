@@ -12,10 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -28,6 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
+import org.tensorflow.op.nn.Elu
 import java.io.File
 
 /**
@@ -86,6 +84,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Input -> createKerasInput(layer)
         is BatchNorm -> createKerasBatchNorm(layer, isKerasFullyCompatible)
         is ActivationLayer -> createKerasActivationLayer(layer)
+        is ELU -> createKerasELU(layer)
+        is ReLU -> createKerasReLU(layer)
         is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
         is LeakyReLU -> createKerasLeakyReLU(layer)
         is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
@@ -219,6 +219,26 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
+}
+
+private fun createKerasReLU(layer: ReLU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        max_value = layer.maxValue?.toDouble(),
+        negative_slope = layer.negativeSlope.toDouble(),
+        threshold = layer.threshold.toDouble(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_RELU, config = configX)
+}
+
+private fun createKerasELU(layer: ELU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha = layer.alpha.toDouble(),
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_ELU, config = configX)
 }
 
 private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean): KerasLayer {
