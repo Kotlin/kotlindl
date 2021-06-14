@@ -12,7 +12,12 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -25,7 +30,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
-import org.tensorflow.op.nn.Elu
 import java.io.File
 
 /**
