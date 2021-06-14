@@ -18,7 +18,7 @@ open class PoolLayerTest {
         expected: Array<FloatArray>,
     ) {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+        assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
                 tensor.cast3DArray()
             )
@@ -31,7 +31,7 @@ open class PoolLayerTest {
         expected: Array<FloatArray>,
     ) {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+        assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
                 tensor.cast4DArray()
             )
@@ -44,14 +44,14 @@ open class PoolLayerTest {
         expected: Array<FloatArray>,
     ) {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
-        assertPoolingLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
+        assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
                 tensor.cast5DArray()
             )
         }
     }
 
-    private fun assertPoolingLayer(
+    private fun assertPoolLayer(
         layer: Layer,
         input: Array<*>,
         expected: Array<*>,

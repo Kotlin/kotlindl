@@ -113,35 +113,35 @@ private fun convertToLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
-        LAYER_CONV1D -> createConv1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CONV2D -> createConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_SEPARABLE_CONV2D -> createSeparableConv2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_FLATTEN -> createFlatten(kerasLayer.config!!.name!!)
-        LAYER_RESHAPE -> createReshape(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOL_1D -> createMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOLING_2D -> createMaxPooling2D(
+        LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOL_1D -> createMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOL_2D -> createMaxPool2DLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVG_POOL_1D -> createAvgPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOLING_3D -> createMaxPooling3D(
+        LAYER_AVG_POOL_1D -> createAvgPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_MAX_POOL_3D -> createMaxPool3DLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVG_POOLING_2D -> createAvgPooling2D(
+        LAYER_AVG_POOL_2D -> createAvgPool2DLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_AVERAGE_POOLING_2D -> createAvgPooling2D(
+        LAYER_AVG_POOL_2D -> createAvgPool2DLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
         LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DENSE -> createDense(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_2D -> createZeroPadding2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_2D -> createCropping2D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_BATCH_NORM -> createBatchNorm(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DENSE -> createDenseLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNormLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -164,12 +164,12 @@ private fun convertToLayer(
             kerasLayer.config!!,
             kerasLayer.config.name!!
         )
-        LAYER_GLOBAL_AVG_POOLING_2D -> createGlobalAvgPooling2D(
+        LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(
             kerasLayer.config!!.name!!
         )
-        LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
-        LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
+        LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
+        LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(
             kerasLayer.config!!.name!!
         )
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
@@ -294,7 +294,7 @@ private fun convertToLayer(
     return layer
 }
 
-private fun createGlobalAvgPooling2D(
+private fun createGlobalAvgPool2DLayer(
     name: String
 ): Layer {
     return GlobalAvgPool2D(
@@ -302,7 +302,7 @@ private fun createGlobalAvgPooling2D(
     )
 }
 
-private fun createGlobalAvgPooling1D(
+private fun createGlobalAvgPool1DLayer(
     name: String
 ): Layer {
     return GlobalAvgPool1D(
@@ -310,7 +310,7 @@ private fun createGlobalAvgPooling1D(
     )
 }
 
-private fun createGlobalAvgPooling3D(
+private fun createGlobalAvgPool3DLayer(
     name: String
 ): Layer {
     return GlobalAvgPool3D(
@@ -318,7 +318,7 @@ private fun createGlobalAvgPooling3D(
     )
 }
 
-private fun createGlobalMaxPool1D(config: LayerConfig, name: String): Layer {
+private fun createGlobalMaxPool1DLayer(config: LayerConfig, name: String): Layer {
     return GlobalMaxPool1D(
         name = name
     )
@@ -447,7 +447,7 @@ private fun createSoftmaxLayer(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createBatchNorm(config: LayerConfig, name: String): Layer {
+private fun createBatchNormLayer(config: LayerConfig, name: String): Layer {
     return BatchNorm(
         axis = config.axis!! as List<Int>,
         momentum = config.momentum!!,
@@ -464,7 +464,7 @@ private fun createBatchNorm(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createDense(config: LayerConfig, name: String): Dense {
+private fun createDenseLayer(config: LayerConfig, name: String): Layer {
     return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -533,7 +533,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
             maxVal = initializer.config.maxval!!.toFloat()
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
-        INITIALIZER_VARIANCE_SCALING -> convertVarianceScaling(initializer)
+        INITIALIZER_VARIANCE_SCALING -> convertVarianceScalingInitializer(initializer)
         INITIALIZER_ORTHOGONAL -> Orthogonal( seed = seed, gain = initializer.config.gain!!.toFloat() )
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
@@ -541,7 +541,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
     }
 }
 
-private fun convertVarianceScaling(initializer: KerasInitializer): Initializer {
+private fun convertVarianceScalingInitializer(initializer: KerasInitializer): Initializer {
     val seed = if (initializer.config!!.seed != null) {
         initializer.config.seed!!.toLong()
     } else 12L
@@ -621,7 +621,7 @@ private fun convertToActivation(activation: String): Activations {
     }
 }
 
-private fun createMaxPool1D(config: LayerConfig, name: String): Layer {
+private fun createMaxPool1DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
     val strides = config.strides!!
@@ -634,7 +634,7 @@ private fun createMaxPool1D(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
+private fun createMaxPool2DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -652,7 +652,7 @@ private fun createMaxPooling2D(config: LayerConfig, name: String): MaxPool2D {
     return MaxPool2D(addedOnesPoolSize, addedOnesStrides, padding = convertPadding(config.padding!!), name = name)
 }
 
-private fun createAvgPool1D(config: LayerConfig, name: String): Layer {
+private fun createAvgPool1DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
     val strides = config.strides!!
@@ -665,7 +665,7 @@ private fun createAvgPool1D(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createAvgPooling2D(config: LayerConfig, name: String): AvgPool2D {
+private fun createAvgPool2DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -696,7 +696,7 @@ private fun createAvgPool3DLayer(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createMaxPooling3D(config: LayerConfig, name: String): MaxPool3D {
+private fun createMaxPool3DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(5)
     addedOnesPoolSize[0] = 1
@@ -725,15 +725,15 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
     }
 }
 
-private fun createFlatten(name: String): Flatten {
+private fun createFlattenLayer(name: String): Layer {
     return Flatten(name = name)
 }
 
-private fun createReshape(config: LayerConfig, name: String): Reshape {
+private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
     return Reshape(name = name, targetShape = config.target_shape!!)
 }
 
-private fun createConv1D(config: LayerConfig, name: String): Conv1D {
+private fun createConv1DLayer(config: LayerConfig, name: String): Layer {
     val kernelSize = config.kernel_size!!.map { it.toLong() }[0]
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 
@@ -765,7 +765,7 @@ private fun createConv1D(config: LayerConfig, name: String): Conv1D {
     )
 }
 
-private fun createConv2D(config: LayerConfig, name: String): Conv2D {
+private fun createConv2DLayer(config: LayerConfig, name: String): Layer {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 
@@ -799,10 +799,10 @@ private fun createConv2D(config: LayerConfig, name: String): Conv2D {
     )
 }
 
-private fun createDepthwiseConv2D(
+private fun createDepthwiseConv2DLayer(
     config: LayerConfig,
     name: String
-): DepthwiseConv2D {
+): Layer {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 
@@ -836,10 +836,10 @@ private fun createDepthwiseConv2D(
     )
 }
 
-private fun createSeparableConv2D(
+private fun createSeparableConv2DLayer(
     config: LayerConfig,
     name: String
-): SeparableConv2D {
+): Layer {
     val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
     val strides = config.strides!!.map { it.toLong() }.toLongArray()
 
@@ -876,10 +876,10 @@ private fun createSeparableConv2D(
     )
 }
 
-private fun createZeroPadding2D(
+private fun createZeroPadding2DLayer(
     config: LayerConfig,
     name: String
-): ZeroPadding2D {
+): Layer {
     assert(config.padding is KerasPadding.ZeroPadding2D)
     return ZeroPadding2D(
         (config.padding as KerasPadding.ZeroPadding2D).padding,
@@ -888,10 +888,10 @@ private fun createZeroPadding2D(
     )
 }
 
-private fun createCropping2D(
+private fun createCropping2DLayer(
     config: LayerConfig,
     name: String
-): Cropping2D {
+): Layer {
     val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
     return Cropping2D(
         cropping,
