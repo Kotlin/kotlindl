@@ -16,6 +16,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.ELU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -88,6 +90,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is BatchNorm -> createKerasBatchNorm(layer, isKerasFullyCompatible)
         is ActivationLayer -> createKerasActivationLayer(layer)
         is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
+        is ReLU -> createKerasReLU(layer)
+        is ELU -> createKerasELU(layer)
         is LeakyReLU -> createKerasLeakyReLU(layer)
         is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
         is Add -> createKerasAddLayer(layer)
@@ -240,6 +244,24 @@ private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
         name = layer.name
     )
     return KerasLayer(class_name = LAYER_SOFTMAX, config = configX)
+}
+
+private fun createKerasReLU(layer: ReLU): KerasLayer {
+    val configX = LayerConfig(
+            dtype = DATATYPE_FLOAT32,
+            max_value = layer.maxValue?.toDouble(),
+            negative_slope = layer.negativeSlope.toDouble(),
+            threshold = layer.threshold.toDouble()
+    )
+    return KerasLayer(class_name = LAYER_RELU, config = configX)
+}
+
+private fun createKerasELU(layer: ELU): KerasLayer {
+    val configX = LayerConfig(
+            dtype = DATATYPE_FLOAT32,
+            alpha = layer.alpha.toDouble()
+    )
+    return KerasLayer(class_name = LAYER_ELU, config = configX)
 }
 
 private fun createKerasLeakyReLU(layer: LeakyReLU): KerasLayer {
