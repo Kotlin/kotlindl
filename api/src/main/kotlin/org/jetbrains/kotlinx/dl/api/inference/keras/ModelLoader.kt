@@ -113,12 +113,15 @@ private fun convertToLayer(
     kerasLayer: KerasLayer
 ): Layer {
     return when (kerasLayer.class_name) {
+        // Core layers
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DENSE -> createDenseLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Convolution layers
         LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
-        LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Pooling layers
         LAYER_MAX_POOL_1D -> createMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOL_2D -> createMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_MAX_POOL_3D -> createMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -129,18 +132,18 @@ private fun convertToLayer(
         LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(kerasLayer.config!!.name!!)
-        LAYER_DENSE -> createDenseLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Recurrent layers
+        // Normalization layers
         LAYER_BATCH_NORM -> createBatchNormLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Regularization layers
         LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Attention layers
+        // Reshaping layers
+        LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Merging layers
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
         LAYER_SUBTRACT -> createSubtractLayer(kerasLayer.config!!.name!!)
@@ -148,6 +151,14 @@ private fun convertToLayer(
         LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
         LAYER_MULTIPLY -> createMultiplyLayer(kerasLayer.config!!.name!!)
         LAYER_CONCATENATE -> createConcatenateLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        // Locally-connected layers
+        // Activation layers
+        LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }
 }

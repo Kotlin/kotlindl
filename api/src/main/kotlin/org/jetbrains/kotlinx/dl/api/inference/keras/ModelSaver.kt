@@ -23,6 +23,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
+import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
@@ -72,37 +73,48 @@ internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean)
 
 private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, isFunctional: Boolean): KerasLayer {
     val kerasLayer = when (layer) {
+        // Core layers
+        is Input -> createKerasInputLayer(layer)
+        is Dense -> createKerasDenseLayer(layer, isKerasFullyCompatible)
+        is ActivationLayer -> createKerasActivationLayer(layer)
+        // Convolution layers
         is Conv1D -> createKerasConv1DLayer(layer, isKerasFullyCompatible)
         is Conv2D -> createKerasConv2DLayer(layer, isKerasFullyCompatible)
-        is Flatten -> createKerasFlattenLayer(layer)
+        is DepthwiseConv2D -> createKerasDepthwiseConv2DLayer(layer, isKerasFullyCompatible)
+        is SeparableConv2D -> createKerasSeparableConv2DLayer(layer, isKerasFullyCompatible)
+        // Pooling layers
         is MaxPool1D -> createKerasMaxPool1DLayer(layer)
         is MaxPool2D -> createKerasMaxPool2DLayer(layer)
         is MaxPool3D -> createKerasMaxPool3DLayer(layer)
         is AvgPool1D -> createKerasAvgPool1DLayer(layer)
         is AvgPool2D -> createKerasAvgPool2DLayer(layer)
         is AvgPool3D -> createKerasAvgPool3DLayer(layer)
-        is Dense -> createKerasDenseLayer(layer, isKerasFullyCompatible)
-        is ZeroPadding2D -> createKerasZeroPadding2DLayer(layer)
-        is Input -> createKerasInputLayer(layer)
+        is GlobalMaxPool1D -> createKerasGlobalMaxPool1DLayer(layer)
+        is GlobalAvgPool1D -> createKerasGlobalAvgPool1DLayer(layer)
+        is GlobalAvgPool2D -> createKerasGlobalAvgPool2DLayer(layer)
+        is GlobalAvgPool3D -> createKerasGlobalAvgPool3DLayer(layer)
+        // Recurrent layers (e.g. LSTM)
+        // Normalization layers
         is BatchNorm -> createKerasBatchNormLayer(layer, isKerasFullyCompatible)
-        is ActivationLayer -> createKerasActivationLayer(layer)
-        is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
-        is LeakyReLU -> createKerasLeakyReLULayer(layer)
-        is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
+        // Regularization layers (e.g. Dropout)
+        // Attention layers
+        // Reshaping layers
+        is Flatten -> createKerasFlattenLayer(layer)
+        is ZeroPadding2D -> createKerasZeroPadding2DLayer(layer)
+        // Merging layers
         is Add -> createKerasAddLayer(layer)
         is Maximum -> createKerasMaximumLayer(layer)
         is Minimum -> createKerasMinimumLayer(layer)
         is Subtract -> createKerasSubtractLayer(layer)
         is Multiply -> createKerasMultiplyLayer(layer)
         is Average -> createKerasAverageLayer(layer)
-        is GlobalMaxPool1D -> createKerasGlobalMaxPool1DLayer(layer)
-        is GlobalAvgPool2D -> createKerasGlobalAvgPool2DLayer(layer)
-        is GlobalAvgPool3D -> createKerasGlobalAvgPool3DLayer(layer)
-        is DepthwiseConv2D -> createKerasDepthwiseConv2DLayer(layer, isKerasFullyCompatible)
-        is SeparableConv2D -> createKerasSeparableConv2DLayer(layer, isKerasFullyCompatible)
         is Concatenate -> createKerasConcatenateLayer(layer)
-        is GlobalAvgPool1D -> createKerasGlobalAvgPool1DLayer(layer)
+        // Locally-connected layers
+        // Activation layers
         is Softmax -> createKerasSoftmaxLayer(layer)
+        is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
+        is LeakyReLU -> createKerasLeakyReLULayer(layer)
+        is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
     }
 
