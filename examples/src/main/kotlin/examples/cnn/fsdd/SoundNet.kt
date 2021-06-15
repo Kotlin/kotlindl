@@ -21,7 +21,6 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
-import org.tensorflow.op.nn.MaxPool
 
 private const val EPOCHS = 10
 private const val TRAINING_BATCH_SIZE = 500
