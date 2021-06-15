@@ -68,7 +68,7 @@ internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean)
     (kerasLayers.first().config as LayerConfig).batch_input_shape =
         listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
 
-    val config = KerasModelConfig(name = "", layers = kerasLayers)
+    val config = KerasModelConfig(name = name, layers = kerasLayers)
     return KerasModel(config = config)
 }
 
