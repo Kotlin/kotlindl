@@ -167,6 +167,8 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         logger.info("===========================================================================")
         logger.info("Model: Sequential")
+        if (name != null)
+            logger.info("Model name: $name")
         logger.info("___________________________________________________________________________")
         logger.info("Layer (type)                           Output Shape              Param #   ")
         logger.info("===========================================================================")
