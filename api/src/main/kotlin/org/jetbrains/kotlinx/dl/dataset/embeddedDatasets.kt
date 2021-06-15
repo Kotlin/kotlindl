@@ -288,7 +288,7 @@ public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): Strin
         "/datasets/small-dogs-vs-cats")
 
 /** Path to the Free Spoken Digits Dataset. */
-private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/master.zip"
+private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd.zip"
 
 /** Path to download the Free Spoken Digits Dataset. */
 private const val FSS_SOUNDS_SOURCE: String = "https://codeload.github.com/Jakobovski/free-spoken-digit-dataset/zip/refs/heads/master"
