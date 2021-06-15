@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -40,20 +41,14 @@ public class AvgPool3D(
         set(value) = assignWeights(value)
 
     init {
-        require(poolSize.size == 5) {
-            "The poolSize should be an array of size 5."
-        }
-
-        require(strides.size == 5) {
-            "The strides should be an array of size 5."
-        }
-
+        requireArraySize(poolSize, 5, "poolSize")
+        requireArraySize(strides, 5, "strides")
         require(padding == ConvPadding.VALID || padding == ConvPadding.SAME) {
             "The padding should be either ${ConvPadding.VALID} or ${ConvPadding.SAME}."
         }
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var dim1 = inputShape.size(1)
@@ -82,5 +77,5 @@ public class AvgPool3D(
     }
 
     override fun toString(): String =
-        "AvgPool3D(poolSize=$poolSize, strides=$strides, padding=$padding)"
+        "AvgPool3D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
 }

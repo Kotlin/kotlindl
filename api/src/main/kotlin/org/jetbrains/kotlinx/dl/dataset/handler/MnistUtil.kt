@@ -29,7 +29,7 @@ public const val TEST_LABELS_ARCHIVE: String = "datasets/mnist/t10k-labels-idx1-
 public const val NUMBER_OF_CLASSES: Int = 10
 
 /**
- * Extracts Fashion Mnist images from [archivePath].
+ * Extracts (Fashion) Mnist images from [archivePath].
  */
 public fun extractImages(archivePath: String): Array<FloatArray> {
     val archiveStream = DataInputStream(
@@ -65,7 +65,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
 }
 
 /**
- * Extracts Fashion Mnist labels from [archivePath] with number of classes [numClasses].
+ * Extracts (Fashion) Mnist labels from [archivePath] with number of classes [numClasses].
  */
 public fun extractLabels(archivePath: String, numClasses: Int): FloatArray {
     val archiveStream = DataInputStream(

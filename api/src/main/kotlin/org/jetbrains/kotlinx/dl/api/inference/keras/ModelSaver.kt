@@ -74,6 +74,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
     val kerasLayer = when (layer) {
         is Conv1D -> createKerasConv1D(layer, isKerasFullyCompatible)
         is Conv2D -> createKerasConv2D(layer, isKerasFullyCompatible)
+        is Conv3D -> createKerasConv3D(layer, isKerasFullyCompatible)
         is Flatten -> createKerasFlatten(layer)
         is MaxPool1D -> createKerasMaxPool1D(layer)
         is MaxPool2D -> createKerasMaxPooling2D(layer)
@@ -560,6 +561,26 @@ private fun createKerasConv2D(layer: Conv2D, isKerasFullyCompatible: Boolean): K
         use_bias = layer.useBias
     )
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
+}
+
+private fun createKerasConv3D(layer: Conv3D, isKerasFullyCompatible: Boolean): KerasLayer {
+    val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
+    val configX = LayerConfig(
+        filters = layer.filters.toInt(),
+        kernel_size = kernelSize,
+        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt(), layer.strides[3].toInt()),
+        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt(), layer.dilations[3].toInt()),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
+        padding = convertPadding(layer.padding),
+        name = layer.name,
+        use_bias = layer.useBias
+    )
+    return KerasLayer(class_name = LAYER_CONV3D, config = configX)
 }
 
 private fun createKerasDepthwiseConv2D(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
