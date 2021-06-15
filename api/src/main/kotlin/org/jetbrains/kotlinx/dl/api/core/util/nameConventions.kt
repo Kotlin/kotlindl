@@ -19,11 +19,11 @@ internal fun defaultInitializerOpName(name: String) = "Init_$name"
 /** Default optimizer variable name in TensorFlow graph, based on variable's name. */
 internal fun defaultOptimizerVariableName(name: String) = "optimizer_$name"
 
-/** Default Conv2d bias variable name in TensorFlow graph, based on variable's name. */
-internal fun conv2dBiasVarName(name: String) = name + "_" + "conv2d_bias"
+/** Default Conv bias variable name in TensorFlow graph, based on variable's name. */
+internal fun convBiasVarName(name: String, dim: Int) = name + "_" + "conv${dim}d_bias"
 
-/** Default Conv2d kernel variable name in TensorFlow graph, based on variable's name. */
-internal fun conv2dKernelVarName(name: String) = name + "_" + "conv2d_kernel"
+/** Default Conv kernel variable name in TensorFlow graph, based on variable's name. */
+internal fun convKernelVarName(name: String, dim: Int) = name + "_" + "conv${dim}d_kernel"
 
 /** Default DepthwiseConv2d bias variable name in TensorFlow graph, based on variable's name. */
 internal fun depthwiseConv2dBiasVarName(name: String) = name + "_" + "depthwise_conv2d_bias"

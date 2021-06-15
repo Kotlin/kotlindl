@@ -30,7 +30,7 @@ internal class Conv1DTest : ConvLayerTest() {
 
     @Test
     fun constantInputTensorWithValidPadding() {
-        val input = createFloatConv1DTensor(batchSize = 1, size = 3,channels = 1, initValue = 1.0f)
+        val input = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 1.0f)
         val expected = createFloatConv1DTensor(batchSize = 1, size = 2, channels = 16, initValue = 2.0f)
 
         assertFloatConv1DTensorsEquals(
@@ -40,6 +40,31 @@ internal class Conv1DTest : ConvLayerTest() {
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
                 kernelSize = 2,
+                padding = ConvPadding.VALID
+            ),
+            input,
+            expected
+        )
+    }
+
+    @Test
+    fun randomInputTensorWithOnesWeight() {
+        val input = arrayOf(
+            arrayOf(
+                floatArrayOf(0.5967f, 0.6496f, 0.1336f, 0.0338f),
+                floatArrayOf(0.7829f, 0.2899f, 0.2759f, 0.0719f),
+                floatArrayOf(0.0820f, 0.2821f, 0.7951f, 0.3663f)
+            )
+        )
+        val expected = arrayOf(arrayOf(floatArrayOf(input.sum())))
+
+        assertFloatConv1DTensorsEquals(
+            Conv1D(
+                name = "TestConv1D_3",
+                filters = 1,
+                kernelInitializer = Constant(1.0f),
+                biasInitializer = Zeros(),
+                kernelSize = 3,
                 padding = ConvPadding.VALID
             ),
             input,

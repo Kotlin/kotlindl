@@ -5,9 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import io.jhdf.HdfFile
+import io.jhdf.api.Dataset
+import org.jetbrains.kotlinx.dl.api.core.shape.cast2D
+import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.handler.*
+import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
 import java.io.*
 import java.net.URL
 import java.nio.file.Files
@@ -16,6 +21,12 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.io.File
+
+import java.io.IOException
+
+import java.io.FileOutputStream
+import java.lang.IllegalStateException
 
 
 /**
@@ -35,10 +46,7 @@ import java.util.zip.ZipFile
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
@@ -85,10 +93,7 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
     val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath
@@ -106,6 +111,133 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
     )
 }
 
+/** Path to H5 file of Mnist 3D Dataset. */
+public const val MNIST_3D_DATASET: String = "datasets/mnist-3d/dataset.h5"
+
+/**
+ * Loads the [MNIST 3D dataset](https://www.kaggle.com/daavoo/3d-mnist).
+ * This is a dataset of 10,000 16x16x16 grayscale 3D images of the 10 digits,
+ * along with a test set of 2,000 3D images.
+ *
+ * NOTE: Yann LeCun and Corinna Cortes hold the copyright of MNIST dataset,
+ * which is a derivative work from original NIST datasets.
+ * MNIST dataset is made available under the terms of the
+ * [Creative Commons Attribution-Share Alike 3.0 license.](https://creativecommons.org/licenses/by-sa/3.0/)
+ * MNIST 3D dataset was created by [daavoo](https://github.com/daavoo) as a transformation of
+ * original MNIST dataset to 3D images to provide simple example of working with 3D images.
+ *
+ * @param [cacheDirectory] Cache directory to cached models and datasets.
+ *
+ * @return Train and test datasets. Each dataset includes X and Y data.
+ * X data are float arrays of grayscale image data with shapes (num_samples, 16, 16, 16).
+ * Y data float arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
+ */
+public fun mnist3D(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
+    cacheDirectory.existsOrMkdirs()
+
+    return HdfFile(loadFile(cacheDirectory, MNIST_3D_DATASET)).use {
+
+        val (trainData, trainLabels) = it.extractMnist3DDataset("train")
+        val (testData, testLabels) = it.extractMnist3DDataset("test")
+
+        Pair(
+            OnHeapDataset.create(trainData, trainLabels),
+            OnHeapDataset.create(testData, testLabels)
+        )
+    }
+}
+
+/** Extract mnist3d X data from HD5 file [dataset] */
+private fun extractMnist3DData(dataset: Dataset) =
+    dataset.data.castArray().cast2D<DoubleArray>()
+        .map { it.map(Double::toFloat).toFloatArray() }.toTypedArray()
+
+/** Extract mnist3d Y labels from HD5 file [dataset] */
+private fun extractMnist3DLabels(dataset: Dataset) =
+    (dataset.data as LongArray).map(Long::toFloat).toFloatArray()
+
+/** Extract mnist3d data and labels from HD5 file under specified [label] */
+private fun HdfFile.extractMnist3DDataset(label: String): Pair<Array<FloatArray>, FloatArray> =
+    Pair(
+        extractMnist3DData(getDatasetByPath("X_$label")),
+        extractMnist3DLabels(getDatasetByPath("y_$label"))
+    )
+
+public const val FSDD_SOUND_DATA_SIZE: Long = 20480
+
+/**
+ * Loads the [Free Spoken Digits Dataset](https://github.com/Jakobovski/free-spoken-digit-dataset).
+ * This is a dataset of wav sound files of the 10 digits spoken by different people many times each.
+ * The test set officially consists of the first 10% of the recordings. Recordings numbered 0-4 (inclusive)
+ * are in the test and 5-49 are in the training set.
+ * As the input data files have different number of channels of data we split every input file into separate samples
+ * that are threaten as separate samples with the same label.
+ *
+ * Free Spoken Digits Dataset dataset is made available under the terms of the
+ * [Creative Commons Attribution-ShareAlike 4.0 International.](https://creativecommons.org/licenses/by-sa/4.0/)
+ *
+ * @param [cacheDirectory] Cache directory to cached models and datasets.
+ * @param [maxTestIndex] Index of max sample to be selected to test part of data.
+ *
+ * @return Train and test datasets. Each dataset includes X and Y data. X data are float arrays of sound data with shapes
+ * (num_samples, FSDD_SOUND_DATA_SIZE) where FSDD_SOUND_DATA_SIZE is at least as long as the longest input sequence and all
+ * sequences are padded with zeros to have equal length. Y data float arrays of digit labels (integers in range 0-9)
+ * with shapes (num_samples,).
+ */
+public fun freeSpokenDigits(
+    cacheDirectory: File = File("cache"),
+    maxTestIndex: Int = 5
+): Pair<OnHeapDataset, OnHeapDataset> {
+    cacheDirectory.existsOrMkdirs()
+
+    val path = freeSpokenDigitDatasetPath(cacheDirectory)
+    val dataset = File("$path/free-spoken-digit-dataset-master/recordings")
+        .listFiles()?.flatMap(::extractWavFileSamples)
+        ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
+    val maxDataSize = dataset.map { it.first.size }.maxOrNull()
+        ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
+    check(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
+        "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"
+    }
+    val data = dataset.map(::extractPaddedDataWithIndex)
+    val labels = dataset.map(::extractLabelWithIndex)
+
+    val (trainData, testData) = data.splitToTrainAndTestByIndex(maxTestIndex)
+    val (trainLabels, testLabels) = labels.splitToTrainAndTestByIndex(maxTestIndex)
+
+    return Pair(
+        OnHeapDataset.create(trainData, trainLabels.toFloatArray()),
+        OnHeapDataset.create(testData, testLabels.toFloatArray())
+    )
+}
+
+/**
+ * Extract wav file samples from given file and return a list of data from all its
+ * channels as a triple of (channel_data, label, sample_index)
+ *
+ * @param file to read from the sound data
+ * @return list of triples (channel_data, label, sample_index) from all channels from file
+ */
+private fun extractWavFileSamples(file: File): List<Triple<FloatArray, Float, Int>> =
+    WavFile(file).use {
+        val data = it.readRemainingFrames()
+        val parts = file.name.split("_")
+        val label = parts[0].toFloat()
+        val index = parts[2].split(".")[0].toInt()
+        data.map { channel -> Triple(channel, label, index) }
+    }
+
+private fun extractPaddedDataWithIndex(dataLabelIndex: Triple<FloatArray, Float, Int>): Pair<FloatArray, Int> =
+    Pair(dataLabelIndex.first.copyInto(FloatArray(FSDD_SOUND_DATA_SIZE.toInt())), dataLabelIndex.third)
+
+private fun extractLabelWithIndex(dataLabelIndex: Triple<FloatArray, Float, Int>): Pair<Float, Int> =
+    Pair(dataLabelIndex.second, dataLabelIndex.third)
+
+private inline fun <reified T> List<Pair<T, Int>>.splitToTrainAndTestByIndex(maxTestIndex: Int): Pair<Array<T>, Array<T>> {
+    val test = filter { it.second < maxTestIndex }.map { it.first }.toTypedArray()
+    val train = filter { it.second >= maxTestIndex }.map { it.first }.toTypedArray()
+    return Pair(train, test)
+}
 
 /** Path to train images archive of Mnist Dataset. */
 private const val CIFAR_10_IMAGES_ARCHIVE: String = "datasets/cifar10/images.zip"
@@ -115,10 +247,7 @@ private const val CIFAR_10_LABELS_ARCHIVE: String = "datasets/cifar10/trainLabel
 
 /** Returns paths to images and its labels for the Cifar'10 dataset. */
 public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, String> {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+    cacheDirectory.existsOrMkdirs()
 
     val pathToLabel = loadFile(cacheDirectory, CIFAR_10_LABELS_ARCHIVE).absolutePath
 
@@ -130,7 +259,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
         Files.createDirectories(imageDataDirectory.toPath())
 
         val pathToImageArchive = loadFile(cacheDirectory, CIFAR_10_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
+        extractFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
         val deleted = pathToImageArchive.delete()
         if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
     }
@@ -142,76 +271,97 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
-public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
-
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/dogs-vs-cats")
-    val toFolder = imageDirectory.toPath()
-
-    if (!imageDirectory.exists()) {
-        Files.createDirectories(imageDirectory.toPath())
-
-        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
-        val deleted = pathToImageArchive.delete()
-        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
-    }
-
-    return toFolder.toAbsolutePath().toString()
-}
+public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE),
+        "/datasets/dogs-vs-cats")
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
-public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String {
-    if (!cacheDirectory.exists()) {
-        val created = cacheDirectory.mkdir()
-        if (!created) throw Exception("Directory ${cacheDirectory.absolutePath} could not be created! Create this directory manually.")
-    }
+public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE),
+        "/datasets/small-dogs-vs-cats")
 
-    val imageDirectory = File(cacheDirectory.absolutePath + "/datasets/small-dogs-vs-cats")
-    val toFolder = imageDirectory.toPath()
+/** Path to the Free Spoken Digits Dataset. */
+private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd.zip"
 
-    if (!imageDirectory.exists()) {
-        Files.createDirectories(imageDirectory.toPath())
+/** Path to download the Free Spoken Digits Dataset. */
+private const val FSS_SOUNDS_SOURCE: String = "https://codeload.github.com/Jakobovski/free-spoken-digit-dataset/zip/refs/heads/master"
 
-        val pathToImageArchive = loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE)
-        extractImagesFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
-        val deleted = pathToImageArchive.delete()
-        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+/** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
+public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): String =
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, FSDD_SOUNDS_ARCHIVE, downloadURLFromRelativePath = { FSS_SOUNDS_SOURCE }),
+        "/datasets/free-spoken-digit")
+
+/**
+ * Download the compressed dataset from external source, decompress the file and remove the downloaded file
+ * but leave the decompressed data from dataset.
+ *
+ * @param cacheDirectory where the downloaded files are stored
+ * @param archiveRelativePath relative path do download the archive from
+ * @param dirRelativePath dir to store the downloaded archive temporarily and decompress its data
+ * @return absolute path string to directory where dataset is decompressed
+ */
+private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePath: String): String {
+    cacheDirectory.existsOrMkdirs()
+
+    val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
+    val toFolder = dataDirectory.toPath()
+
+    if (!dataDirectory.exists()) {
+        Files.createDirectories(dataDirectory.toPath())
+
+        extractFromZipArchiveToFolder(archive.toPath(), toFolder)
+        val deleted = archive.delete()
+        if (!deleted) {
+            throw Exception("Archive ${archive.absolutePath} could not be deleted! Create this archive manually.")
+        }
     }
 
     return toFolder.toAbsolutePath().toString()
 }
 
-/** Downloads a file from a URL if it not already in the cache. */
+/**
+ * Downloads a file from a URL if it not already in the cache. By default the download location
+ * is defined as the concatenation of [AWS_S3_URL] and [relativePathToFile] but can be defined
+ * as an arbitrary file location to download file from *
+ *
+ * @param cacheDirectory where the downloaded file is stored
+ * @param relativePathToFile where the downloaded file is stored in [cacheDirectory] and which can
+ * define the location of file to be downloaded
+ * @param downloadURLFromRelativePath can produce the download URL of the file using. Defaults to [AWS_S3_URL]/[relativePathToFile].
+ * @param loadingMode of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
+ * @return downloaded [File] on local file system
+ */
 private fun loadFile(
     cacheDirectory: File,
     relativePathToFile: String,
+    downloadURLFromRelativePath: (String) -> String = { "$AWS_S3_URL/$it" },
     loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
 ): File {
     val fileName = cacheDirectory.absolutePath + "/" + relativePathToFile
-    val urlString = "$AWS_S3_URL/$relativePathToFile"
     val file = File(fileName)
-
     file.parentFile.mkdirs() // Will create parent directories if not exists
 
     if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
+        val urlString = downloadURLFromRelativePath(relativePathToFile)
         val inputStream = URL(urlString).openStream()
         Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
     }
 
-    return File(fileName)
+    return file
 }
 
 /** Creates file structure archived in zip file with all directories and sub-directories */
 @Throws(IOException::class)
-internal fun extractImagesFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path) {
-    val bufferSize = 4096
+internal fun extractFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path, bufferSize: Int = 4096) {
     val zipFile = ZipFile(zipArchivePath.toFile())
     val entries = zipFile.entries()
 
@@ -252,3 +402,11 @@ internal fun extractImagesFromZipArchiveToFolder(zipArchivePath: Path, toFolder:
     zipFile.close()
 }
 
+internal fun File.existsOrMkdirs() {
+    if (!exists()) {
+        val created = mkdirs()
+        if (!created) {
+            throw Exception("Directory $absolutePath could not be created! Create this directory manually.")
+        }
+    }
+}

@@ -20,7 +20,7 @@ open class PoolLayerTest {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
         assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
-                tensor.cast3DArray()
+                tensor.cast3D<FloatArray>()
             )
         }
     }
@@ -33,7 +33,7 @@ open class PoolLayerTest {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
         assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
-                tensor.cast4DArray()
+                tensor.cast4D<FloatArray>()
             )
         }
     }
@@ -46,7 +46,7 @@ open class PoolLayerTest {
         val actual = Array(expected.size) { FloatArray(expected[0].size) { 0f } }
         assertPoolLayer(layer, input, expected, actual, ::assertGlobalAvgPoolEquals) { tf, tensor ->
             tf.constant(
-                tensor.cast5DArray()
+                tensor.cast5D<FloatArray>()
             )
         }
     }
@@ -69,11 +69,9 @@ open class PoolLayerTest {
             val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
 
-            val expectedShape = getShapeOfArray(expected)
-
             val actualShape = shapeFromDims(*output.shape())
             output.copyTo(actual)
-            assertEquals(expectedShape, actualShape)
+            assertEquals(expected.shape, actualShape)
             assertEqual(expected, actual)
         }
     }
@@ -82,8 +80,8 @@ open class PoolLayerTest {
         expected: Array<*>,
         actual: Array<*>
     ) {
-        val expectedTensor = expected.cast2DArray()
-        val actualTensor = actual.cast2DArray()
+        val expectedTensor = expected.cast2D<FloatArray>()
+        val actualTensor = actual.cast2D<FloatArray>()
         val msg = "Expected ${expectedTensor.contentDeepToString()} " +
                 "to equal ${actualTensor.contentDeepToString()}"
         for (i in expectedTensor.indices) {

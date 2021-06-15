@@ -13,6 +13,7 @@ internal const val LAYER_ACTIVATION: String = "Activation"
 // Convolution layers
 internal const val LAYER_CONV1D: String = "Conv1D"
 internal const val LAYER_CONV2D: String = "Conv2D"
+internal const val LAYER_CONV3D: String = "Conv3D"
 internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_SEPARABLE_CONV2D: String = "SeparableConv2D"
 // Pooling layers

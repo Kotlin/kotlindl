@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool3D
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -53,13 +54,7 @@ internal class AvgPool3DTest {
         ),
     )
 
-    private val inputShape: Shape = Shape.make(
-        input.size.toLong(),
-        input[0].size.toLong(),
-        input[0][0].size.toLong(),
-        input[0][0][0].size.toLong(),
-        input[0][0][0][0].size.toLong(),
-    )
+    private val inputShape: Shape = input.shape
 
     @Test
     fun default() {
