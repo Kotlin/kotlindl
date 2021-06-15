@@ -191,7 +191,8 @@ public fun freeSpokenDigits(
     cacheDirectory.existsOrMkdirs()
 
     val path = freeSpokenDigitDatasetPath(cacheDirectory)
-    val dataset = File(path).listFiles()?.flatMap(::extractWavFileSamples)
+    val dataset = File("$path/free-spoken-digit-dataset-master/recordings")
+        .listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
     val maxDataSize = dataset.map { it.first.size }.maxOrNull()
         ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
@@ -271,21 +272,33 @@ private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
 public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
-    unzipDatasetPath(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE, "/datasets/dogs-vs-cats")
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE),
+        "/datasets/dogs-vs-cats")
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
-    unzipDatasetPath(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, "/datasets/small-dogs-vs-cats")
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE),
+        "/datasets/small-dogs-vs-cats")
 
 /** Path to the Free Spoken Digits Dataset. */
-private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/data.zip"
+private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd/master.zip"
+
+/** Path to download the Free Spoken Digits Dataset. */
+private const val FSS_SOUNDS_SOURCE: String = "https://codeload.github.com/Jakobovski/free-spoken-digit-dataset/zip/refs/heads/master"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): String =
-    unzipDatasetPath(cacheDirectory, FSDD_SOUNDS_ARCHIVE, "/datasets/free-spoken-digit")
+    unzipDatasetPath(
+        cacheDirectory,
+        loadFile(cacheDirectory, FSDD_SOUNDS_ARCHIVE, downloadURLFromRelativePath = { FSS_SOUNDS_SOURCE }),
+        "/datasets/free-spoken-digit")
 
 /**
  * Download the compressed dataset from external source, decompress the file and remove the downloaded file
@@ -296,7 +309,7 @@ public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): Str
  * @param dirRelativePath dir to store the downloaded archive temporarily and decompress its data
  * @return absolute path string to directory where dataset is decompressed
  */
-private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, dirRelativePath: String): String {
+private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePath: String): String {
     cacheDirectory.existsOrMkdirs()
 
     val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
@@ -305,11 +318,10 @@ private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, 
     if (!dataDirectory.exists()) {
         Files.createDirectories(dataDirectory.toPath())
 
-        val pathToArchive = loadFile(cacheDirectory, archiveRelativePath)
-        extractFromZipArchiveToFolder(pathToArchive.toPath(), toFolder)
-        val deleted = pathToArchive.delete()
+        extractFromZipArchiveToFolder(archive.toPath(), toFolder)
+        val deleted = archive.delete()
         if (!deleted) {
-            throw Exception("Archive ${pathToArchive.absolutePath} could not be deleted! Create this archive manually.")
+            throw Exception("Archive ${archive.absolutePath} could not be deleted! Create this archive manually.")
         }
     }
 
@@ -324,12 +336,14 @@ private fun unzipDatasetPath(cacheDirectory: File, archiveRelativePath: String, 
  * @param cacheDirectory where the downloaded file is stored
  * @param relativePathToFile where the downloaded file is stored in [cacheDirectory] and which can
  * define the location of file to be downloaded
+ * @param downloadURLFromRelativePath can produce the download URL of the file using. Defaults to [AWS_S3_URL]/[relativePathToFile].
  * @param loadingMode of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
  * @return downloaded [File] on local file system
  */
 private fun loadFile(
     cacheDirectory: File,
     relativePathToFile: String,
+    downloadURLFromRelativePath: (String) -> String = { "$AWS_S3_URL/$it" },
     loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
 ): File {
     val fileName = cacheDirectory.absolutePath + "/" + relativePathToFile
@@ -337,12 +351,12 @@ private fun loadFile(
     file.parentFile.mkdirs() // Will create parent directories if not exists
 
     if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-        val urlString = "$AWS_S3_URL/$relativePathToFile"
+        val urlString = downloadURLFromRelativePath(relativePathToFile)
         val inputStream = URL(urlString).openStream()
         Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
     }
 
-    return File(fileName)
+    return file
 }
 
 /** Creates file structure archived in zip file with all directories and sub-directories */
