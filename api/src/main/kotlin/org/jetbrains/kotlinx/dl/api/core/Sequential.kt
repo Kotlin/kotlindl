@@ -8,7 +8,10 @@ package org.jetbrains.kotlinx.dl.api.core
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.serializeModel
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import java.io.File
@@ -63,7 +66,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelConfiguration(configuration: File): Sequential {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadModelConfiguration(configuration)
+            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(configuration)
         }
 
         /**
@@ -76,7 +79,8 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadSequentialModelLayers(configuration)
+            val config = loadSerializedModel(configuration)
+            return loadSequentialModelLayers(config)
         }
 
         /**
@@ -97,7 +101,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadModelConfiguration(configuration)
+            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(configuration)
         }
 
         /**
@@ -118,7 +122,8 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadSequentialModelLayers(configuration)
+            val config = loadSerializedModel(configuration)
+            return loadSequentialModelLayers(config)
         }
     }
 
@@ -211,5 +216,28 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         stringBuilder.append(l.paramCount)
 
         return stringBuilder.toString()
+    }
+
+    /** Returns a copy of this model. */
+    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
+        val serializedModel = serializeModel(true)
+        val deserializedModel = deserializeSequentialModel(serializedModel)
+        if (!copyWeights) {
+            return deserializedModel
+        } else {
+            deserializedModel.compile(
+                optimizer = this.optimizer,
+                loss = this.loss,
+                metric = this.metric
+            )
+
+            deserializedModel.layers.forEach {
+                it.weights = this.getLayer(it.name).weights
+            }
+
+            deserializedModel.isModelInitialized = true
+
+            return deserializedModel
+        }
     }
 }

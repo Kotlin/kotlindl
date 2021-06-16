@@ -112,7 +112,9 @@ public class Dense(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override val weights: Map<String, Array<*>> get() = extractDenseWeights()
+    override var weights: Map<String, Array<*>>
+        get() = extractDenseWeights()
+        set(value) = assignWeights(value)
 
     private fun extractDenseWeights(): Map<String, Array<*>> {
         return extractWeights(defineVariableNames().toList())

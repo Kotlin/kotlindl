@@ -15,9 +15,13 @@ import org.tensorflow.op.Ops
 /**
  * Global average pooling operation for 2D data (images and so on).
  *
- * NOTE: Only works with tensors which have rank 4, i.e. tensors with shape
- * `(batch, rows, columns, channels)`.
+ * NOTE: Works with tensors which must have rank 4 (batch, height, width, channels).
  *
+ * Input shape: 4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * Output shape: 2D tensor with shape `(batch_size, channels)`.
+ *
+ * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool2D] object.
  *
  * @since 0.2
@@ -25,12 +29,10 @@ import org.tensorflow.op.Ops
 public class GlobalAvgPool2D(
     name: String = ""
 ) : Layer(name) {
-    // TODO: add support for `dataFormat` (i.e. "channels_last" or "channels_first")
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        return Shape.make(inputShape.size(0), inputShape.size(3))
+        return Shape.make(inputShape.size(0), inputShape.size(3)) //   if (this.dataFormat == 'channelsLast')
     }
 
     override fun forward(
@@ -39,11 +41,12 @@ public class GlobalAvgPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val spatialAxes = intArrayOf(1, 2)
-        return TF.mean(tf, input, tf.constant(spatialAxes))
+        return TF.mean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 

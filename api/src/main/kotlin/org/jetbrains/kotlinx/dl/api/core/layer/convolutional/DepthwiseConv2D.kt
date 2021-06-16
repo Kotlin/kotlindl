@@ -5,25 +5,21 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 import org.tensorflow.op.nn.DepthwiseConv2dNative
-import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
-import kotlin.math.roundToInt
 
 private const val KERNEL_VARIABLE_NAME = "depthwise_conv2d_kernel"
 private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
@@ -68,125 +64,82 @@ public class DepthwiseConv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Layer(name), NoGradients {
-    // weight tensors
-    private lateinit var depthwiseKernel: Variable<Float>
-    private var bias: Variable<Float>? = null
-
-    // weight tensor shapes
-    private lateinit var biasShape: Shape
-    private lateinit var depthwiseKernelShape: Shape
+) : AbstractConv(
+    // filtersInternal is not used in any place of this implementation of AbstractConv because
+    // all its usages are overridden with custom functions that use the depthMultiplier and the
+    // shape of the input data representing number of channels in it
+    filtersInternal = -1,
+    kernelSizeInternal = kernelSize,
+    stridesInternal = strides,
+    dilationsInternal = dilations,
+    activationInternal = activation,
+    kernelInitializerInternal = depthwiseInitializer,
+    biasInitializerInternal = biasInitializer,
+    kernelRegularizerInternal = depthwiseRegularizer,
+    biasRegularizerInternal = biasRegularizer,
+    activityRegularizerInternal = activityRegularizer,
+    paddingInternal = padding,
+    useBiasInternal = useBias,
+    kernelVariableName = KERNEL_VARIABLE_NAME,
+    biasVariableName = BIAS_VARIABLE_NAME,
+    name = name
+), NoGradients {
 
     init {
+        requireArraySize(kernelSize, 2, "kernelSize")
+        requireArraySize(strides, 4, "strides")
+        requireArraySize(dilations, 4, "dilations")
         isTrainable = false
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        // Amount of channels should be the last value in the inputShape (make warning here)
-        val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
-
-        // Compute shapes of kernel and bias matrices
-        depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
-        biasShape = Shape.make(numberOfChannels * this.depthMultiplier)
-
-        // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
-        // calculate fanIn, fanOut
-        val inputDepth = numberOfChannels // amount of channels
-        val outputDepth = numberOfChannels * this.depthMultiplier // amount of channels for the next layer
-
-        fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
-        fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
-
-        val (kernelVariableName, biasVariableName) = defineVariableNames()
-        createDepthwiseConv2DVariables(tf, kernelVariableName, biasVariableName, kGraph)
+    override fun computeMatricesShapes(numberOfChannels: Long) {
+        kernelShape = shapeFromDims(*kernelSize, numberOfChannels, depthMultiplier.toLong())
+        biasShape = Shape.make(numberOfChannels * depthMultiplier)
     }
 
-    private fun defineVariableNames(): Pair<String, String> {
-        return if (name.isNotEmpty()) {
-            Pair(depthwiseConv2dKernelVarName(name), depthwiseConv2dBiasVarName(name))
-        } else {
-            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
-        }
-    }
+    override fun getOutputDepth(numberOfChannels: Long): Long = numberOfChannels * depthMultiplier
 
-    private fun createDepthwiseConv2DVariables(
+    override fun kernelVarName(name: String): String = depthwiseConv2dKernelVarName(name)
+
+    override fun biasVarName(name: String): String = depthwiseConv2dBiasVarName(name)
+
+    override fun convImplementation(
         tf: Ops,
-        kernelVariableName: String,
-        biasVariableName: String,
-        kGraph: KGraph
-    ) {
-        depthwiseKernel = tf.withName(kernelVariableName).variable(depthwiseKernelShape, getDType())
-        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-        depthwiseKernel = addWeight(
-            tf,
-            kGraph,
-            kernelVariableName,
-            depthwiseKernel,
-            depthwiseInitializer,
-            depthwiseRegularizer
-        )
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        var rows = inputShape.size(1)
-        var cols = inputShape.size(2)
-        rows = convOutputLength(
-            rows, kernelSize[0].toInt(), padding,
-            strides[1].toInt(), dilations[1].toInt()
-        )
-        cols = convOutputLength(
-            cols, kernelSize[1].toInt(), padding,
-            strides[2].toInt(), dilations[2].toInt()
-        )
-
-        val outFilters = inputShape.size(3) * this.depthMultiplier
-        return Shape.make(inputShape.size(0), rows, cols, outFilters)
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+        input: Operand<Float>
     ): Operand<Float> {
-        val paddingName = padding.paddingName
-        val options: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
-        var output: Operand<Float> =
-            tf.nn.depthwiseConv2dNative(
-                input,
-                depthwiseKernel,
-                strides.toMutableList(),
-                paddingName,
-                options
-            )
-
-        if (useBias) {
-            output = tf.nn.biasAdd(output, bias)
-        }
-
-        return Activations.convert(activation).apply(tf, output, name)
+        val options = DepthwiseConv2dNative.dilations(dilations.toList()).dataFormat("NHWC")
+        return tf.nn.depthwiseConv2dNative(input, kernel, strides.toMutableList(), padding.paddingName, options)
     }
 
-    override val weights: Map<String, Array<*>> get() = extractDepthConv2DWeights()
+    override fun defineOutputShape(inputShape: Shape): Shape {
+        val batchSize = inputShape.size(0)
+        val rowsCount = inputShape.size(1)
+        val colsCount = inputShape.size(2)
+        val channelsCount = inputShape.size(3)
 
-    private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
-        return extractWeights(defineVariableNames().toList())
+        val rows = convOutputLength(
+            rowsCount,
+            kernelSizeInternal[0].toInt(),
+            paddingInternal,
+            stridesInternal[1].toInt(),
+            dilationsInternal[1].toInt()
+        )
+        val cols = convOutputLength(
+            colsCount,
+            kernelSizeInternal[1].toInt(),
+            paddingInternal,
+            stridesInternal[2].toInt(),
+            dilationsInternal[2].toInt()
+        )
+        val filters = channelsCount * depthMultiplier
+
+        return Shape.make(batchSize, rows, cols, filters)
     }
 
-    /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(depthwiseKernelShape).dims()
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
-
-    override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int
-        get() = (depthwiseKernelShape.numElements() + biasShape.numElements()).toInt()
-
-    override fun toString(): String {
-        return "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, useBias=$useBias, depthwiseKernel=$depthwiseKernel, bias=$bias, biasShape=$biasShape, depthwiseKernelShape=$depthwiseKernelShape)"
-    }
+    override fun toString(): String =
+        "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, " +
+                "depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, " +
+                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=$biasShape, " +
+                "depthwiseKernelShape=$kernelShape)"
 }

@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -64,7 +65,9 @@ public class MaxPool2D(
         )
     }
 
-    override val weights: Map<String, Array<*>> get() = emptyMap()
+    override var weights: Map<String, Array<*>>
+        get() = emptyMap()
+        set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
 
