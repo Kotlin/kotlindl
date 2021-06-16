@@ -3,7 +3,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool1D
 import org.junit.jupiter.api.Test
 
-internal class GlobalAvgPooling1DTest : PoolLayerTest() {
+internal class GlobalAvgPool1DTest : PoolLayerTest() {
     @Test
     fun globalAvgPool1DTest(){
         val input = Array(2, { Array(3, { FloatArray(4) { 0f } } ) } )

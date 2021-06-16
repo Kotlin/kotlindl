@@ -15,6 +15,7 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
+import java.lang.IllegalArgumentException
 
 /**
  * Base abstract class for all layers.
@@ -171,3 +172,8 @@ public abstract class Layer(public var name: String) {
     /** Returns amount of neurons. */
     public abstract val paramCount: Int
 }
+
+internal fun requireArraySize(array: LongArray, size: Int, name: String) =
+    require (array.size == size) {
+        "$name is expected to have size equal $size but got ${array.size}"
+    }

@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -95,6 +96,9 @@ public class SeparableConv2D(
     private lateinit var biasShape: Shape
 
     init {
+        requireArraySize(kernelSize, 2, "kernelSize")
+        requireArraySize(strides, 4, "strides")
+        requireArraySize(dilations, 4, "dilations")
         isTrainable = false
     }
 
@@ -238,7 +242,8 @@ public class SeparableConv2D(
     override val paramCount: Int
         get() = (depthwiseKernelShape.numElements() + pointwiseKernelShape.numElements() + biasShape.numElements()).toInt()
 
-    override fun toString(): String {
-        return "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"
-    }
+    override fun toString(): String =
+        "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, " +
+                "biasInitializer=$biasInitializer, kernelShape=$depthwiseKernelShape, padding=$padding)"
 }
