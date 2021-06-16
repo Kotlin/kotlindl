@@ -169,6 +169,7 @@ private fun convertToLayer(
             kerasLayer.config!!.name!!
         )
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1D(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_2D -> createGlobalMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOLING_1D -> createGlobalAvgPooling1D(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOLING_3D -> createGlobalAvgPooling3D(
             kerasLayer.config!!.name!!
@@ -321,6 +322,12 @@ private fun createGlobalAvgPooling3D(
 
 private fun createGlobalMaxPool1D(config: LayerConfig, name: String): Layer {
     return GlobalMaxPool1D(
+        name = name
+    )
+}
+
+private fun createGlobalMaxPool2DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool2D(
         name = name
     )
 }
