@@ -46,4 +46,35 @@ internal class Conv2DTest : ConvLayerTest() {
             expected
         )
     }
+
+    @Test
+    fun randomInputTensorWithOnesWeight() {
+        val input = arrayOf(
+            arrayOf(
+                arrayOf(
+                    floatArrayOf(0.8373f, 0.8765f, 0.4692f),
+                    floatArrayOf(0.5244f, 0.6573f, 0.9453f)
+                ),
+
+                arrayOf(
+                    floatArrayOf(0.6919f, 0.0724f, 0.7274f),
+                    floatArrayOf(0.1452f, 0.9262f, 0.7690f)
+                )
+            )
+        )
+        val expected = arrayOf(arrayOf(arrayOf(floatArrayOf(input.sum()))))
+
+        assertFloatConv2DTensorsEquals(
+            Conv2D(
+                name = "TestConv2D_3",
+                filters = 1,
+                kernelInitializer = Constant(1.0f),
+                biasInitializer = Zeros(),
+                kernelSize = longArrayOf(2, 2),
+                padding = ConvPadding.VALID
+            ),
+            input,
+            expected
+        )
+    }
 }

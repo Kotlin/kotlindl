@@ -188,7 +188,7 @@ private fun fillConv2DVariablesFromKeras(
         val data = it.data
         when (it.name) {
             "kernel:0" -> {
-                val kernelVariableName = conv2dKernelVarName(layerName)
+                val kernelVariableName = convKernelVarName(layerName, dim = 2)
                 val kernelShape = (model.getLayer(layerName) as Conv2D).kernelShapeArray
                 require(
                     kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
@@ -196,7 +196,7 @@ private fun fillConv2DVariablesFromKeras(
                 model.fillVariable(kernelVariableName, data)
             }
             "bias:0" -> {
-                val biasVariableName = conv2dBiasVarName(layerName)
+                val biasVariableName = convBiasVarName(layerName, dim = 2)
                 val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
@@ -576,8 +576,8 @@ public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
 }
 
 private fun initConv2DVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val kernelVariableName = conv2dKernelVarName(name)
-    val biasVariableName = conv2dBiasVarName(name)
+    val kernelVariableName = convKernelVarName(name, dim = 2)
+    val biasVariableName = convBiasVarName(name, dim = 2)
     model.runAssignOpByVarName(kernelVariableName)
     model.runAssignOpByVarName(biasVariableName)
 }
@@ -721,12 +721,12 @@ private fun fillConv2DVariables(
     }
 
     val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val kernelVariableName = conv2dKernelVarName(name)
+    val kernelVariableName = convKernelVarName(name, dim = 2)
     model.fillVariable(kernelVariableName, kernelData)
 
     if (useBias) {
         val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-        val biasVariableName = conv2dBiasVarName(name)
+        val biasVariableName = convBiasVarName(name, dim = 2)
         model.fillVariable(biasVariableName, biasData)
     }
 }
