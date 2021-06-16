@@ -16,7 +16,7 @@ import org.tensorflow.Graph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-const val EPS: Float = 1e-6f
+private const val EPS: Float = 1e-6f
 
 internal class AvgPool1DTest {
     @Test
