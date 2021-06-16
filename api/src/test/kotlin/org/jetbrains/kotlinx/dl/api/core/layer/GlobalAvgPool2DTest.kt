@@ -6,9 +6,11 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 
-internal class GlobalAvgPool2DTest : PoolLayerTest() {
+internal class GlobalAvgPool2DTest : LayerTest() {
     private val input = arrayOf(
         arrayOf(
             arrayOf(
@@ -36,9 +38,7 @@ internal class GlobalAvgPool2DTest : PoolLayerTest() {
         )
     )
 
-    private val inputShapeArray = longArrayOf(
-        input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong(), input[0][0][0].size.toLong()
-    )
+    private val inputShape = input.shape.toLongArray()
 
     @Test
     fun default(){
@@ -47,8 +47,8 @@ internal class GlobalAvgPool2DTest : PoolLayerTest() {
             floatArrayOf(0.0f, 1.5f/6, 4.0f/6, 16.0f/6),
             floatArrayOf(0.5f/6, 20.0f/6, 8.0f/6, 6.0f/6)
         )
-        val expectedShapeArray = longArrayOf(inputShapeArray[0], inputShapeArray[3])
-        assertGlobalPoolEquals(layer, input, expected, inputShapeArray, expectedShapeArray)
-        assertLayerComputedOutputShape(layer, inputShapeArray, expectedShapeArray)
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[3])
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 }
