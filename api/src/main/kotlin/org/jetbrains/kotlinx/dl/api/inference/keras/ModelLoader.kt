@@ -22,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.RepeatVector
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L1
@@ -141,6 +142,7 @@ private fun convertToLayer(
         // Attention layers
         // Reshaping layers
         LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -713,6 +715,10 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
 
 private fun createFlattenLayer(name: String): Layer {
     return Flatten(name = name)
+}
+
+private fun createRepeatVectorLayer(config: LayerConfig, name: String): Layer {
+    return RepeatVector(name = name, n = config.n!!)
 }
 
 private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
