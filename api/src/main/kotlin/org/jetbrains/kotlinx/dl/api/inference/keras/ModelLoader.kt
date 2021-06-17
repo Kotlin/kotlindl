@@ -147,6 +147,7 @@ private fun convertToLayer(
         LAYER_CROPPING_3D -> createCropping3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_1D -> createZeroPadding1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_3D -> createZeroPadding3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_UP_SAMPLING_1D -> createUpSampling1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_UP_SAMPLING_2D -> createUpSampling2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_UP_SAMPLING_3D -> createUpSampling3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -936,6 +937,14 @@ private fun createZeroPadding2DLayer(config: LayerConfig, name: String): Layer {
     return ZeroPadding2D(
         padding = (config.padding as KerasPadding.ZeroPadding2D).padding,
         dataFormat = config.data_format,
+        name = name
+    )
+}
+
+private fun createZeroPadding3DLayer(config: LayerConfig, name: String): Layer {
+    assert(config.padding is KerasPadding.ZeroPadding3D)
+    return ZeroPadding3D(
+        padding = (config.padding as KerasPadding.ZeroPadding3D).padding,
         name = name
     )
 }
