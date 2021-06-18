@@ -23,7 +23,7 @@ import kotlin.math.roundToInt
  * Abstract Convolutional layer is a base block for building base types of convolutional layers
  * of any dimensionality. It should simplify the internal calculations needed in most of
  * the convolutional layers and abstract the process of naming weights for these layers. It keeps
- * the actual implementation of convolutional layers e.i. the kernel and bias learnable variables
+ * the actual implementation of convolutional layers i.e. the kernel and bias learnable variables
  * that should be used in child classes in actual implementations of these layers. If the child class
  * uses some values for its implementation in other form than it is kept in this child class,
  * then this abstract class `internal` properties should keep the implementation values
