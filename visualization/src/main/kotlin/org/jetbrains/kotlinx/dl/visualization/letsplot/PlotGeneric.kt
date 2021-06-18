@@ -5,13 +5,16 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.Figure
-import jetbrains.letsPlot.GGBunch
-import jetbrains.letsPlot.gggrid
-import jetbrains.letsPlot.ggplot
+import jetbrains.letsPlot.*
+import jetbrains.letsPlot.geom.geomPath
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.label.ggtitle
 import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
+import java.io.File
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Column plot arranges the given iterable of plots in specified number of columns and
@@ -41,7 +44,7 @@ fun xyPlot(xSize: Int, ySize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Fl
     val gridY = List(ySize) { y -> List(xSize) { y } }.flatten()
     val gridZ = gridX.zip(gridY.reversed()).map { f(it.first, it.second) }
 
-    return ggplot {
+    return letsPlot {
         x = gridX
         y = gridY
         fill = gridZ
@@ -93,4 +96,45 @@ fun flattenImagePlot(
     }
 
     return xyPlot(imageSize, plotFeature) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
+}
+
+/**
+ * Create a [soundPlot] for all channels of given [WavFile]. If it is needed, the plot data can be
+ * cut from the beginning or its end because there may be extra noises that disturbs visualization.
+ *
+ * @param wavFile to read sound data from
+ * @param beginDrop part of data to drop from begin from range [0, 1]
+ * @param endDrop part of data to drop from end from range [0, 1]
+ * @return [Plot] representing the amplitude of sound of given [WavFile]
+ */
+fun soundPlot(wavFile: WavFile,
+              beginDrop: Double = 0.0,
+              endDrop: Double = 0.0
+): Plot = wavFile.use {
+    val soundData = it.readRemainingFrames()
+    val sampleRate = it.format.sampleRate
+    val frames = it.frames
+    val channels = it.format.numChannels
+    val secondsPerFrame = 1.0 / sampleRate.toDouble()
+
+    val dropBeginFrames = (frames * beginDrop).roundToInt()
+    val dropEndFrames = (frames * endDrop).roundToInt()
+    val takeFrames = max(0, frames - dropBeginFrames - dropEndFrames).toInt()
+    val singleTimeData = List(takeFrames) { (it + dropBeginFrames) * secondsPerFrame }
+
+    val channelName = List(channels) { idx -> List(takeFrames) { "channel $idx" } }.flatten()
+    val xData = List(channels) { singleTimeData }.flatten()
+    val yData = soundData.flatMap { it.drop(dropBeginFrames).take(takeFrames) }
+
+    val data = mapOf(
+        "channel" to channelName,
+        "time [s]" to xData,
+        "amplitude" to yData
+    )
+
+    letsPlot(data) {
+        x = "time [s]"
+        y = "amplitude"
+        fill = "channel"
+    } + geomPath()
 }
