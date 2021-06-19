@@ -10,25 +10,25 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- * Cropping layer for 2D data (e.g. images)
+ * Cropping layer for 3D data (e.g. video, spatio-temporal)
  *
- * Crops input along the second and third dimensions (i.e. spatial dimensions).
+ * Crops input along the second, third and forth dimensions.
  *
- * @property [cropping] An array consisting of two integer arrays of size two where each array indicates
+ * @property [cropping] An array consisting of three integer arrays of size two where each array indicates
  * the number of elements to remove from the beginning and end of the corresponding cropping axis.
  */
-public class Cropping2D(
+public class Cropping3D(
     public val cropping: Array<IntArray>,
-    name: String = "",
+    name: String = ""
 ) : AbstractCropping(
     croppingInternal = cropping,
-    name = name,
+    name = name
 ) {
     init {
-        require(cropping.size == 2) {
-            "The cropping should be an array of size 2."
+        require(cropping.size == 3) {
+            "The cropping should be an array of size 3."
         }
-        require(cropping[0].size == 2 && cropping[1].size == 2) {
+        require(cropping.all { it.size == 2 }) {
             "All elements of cropping should be arrays of size 2."
         }
     }
@@ -38,7 +38,8 @@ public class Cropping2D(
             inputShape.size(0),
             inputShape.size(1) - cropping[0][0] - cropping[0][1],
             inputShape.size(2) - cropping[1][0] - cropping[1][1],
-            inputShape.size(3)
+            inputShape.size(3) - cropping[2][0] - cropping[2][1],
+            inputShape.size(4)
         )
     }
 
@@ -46,22 +47,24 @@ public class Cropping2D(
         val inputShape = input.asOutput().shape()
         val cropSize = intArrayOf(
             inputShape.size(1).toInt() - cropping[0][0] - cropping[0][1],
-            inputShape.size(2).toInt() - cropping[1][0] - cropping[1][1]
+            inputShape.size(2).toInt() - cropping[1][0] - cropping[1][1],
+            inputShape.size(3).toInt() - cropping[2][0] - cropping[2][1]
         )
         return tf.slice(
             input,
-            tf.constant(intArrayOf(0, cropping[0][0], cropping[1][0], 0)),
+            tf.constant(intArrayOf(0, cropping[0][0], cropping[1][0], cropping[2][0], 0)),
             tf.constant(
                 intArrayOf(
                     inputShape.size(0).toInt(),
                     cropSize[0],
                     cropSize[1],
-                    inputShape.size(3).toInt()
+                    cropSize[2],
+                    inputShape.size(4).toInt()
                 )
             )
         )
     }
 
     override fun toString(): String =
-        "Cropping2D(cropping=${cropping.contentToString()})"
+        "Cropping3D(cropping=${cropping.contentToString()})"
 }
