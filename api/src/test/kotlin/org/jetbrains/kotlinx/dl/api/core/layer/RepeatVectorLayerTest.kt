@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -12,17 +12,13 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.Graph
 import org.tensorflow.Output
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-/**
- * A test for the [RepeatVector] layer.
- *
- * @author Stan van der Bend
- */
 internal class RepeatVectorLayerTest {
 
     @Test
-    fun `test output shape`(){
+    fun `test output shape`() {
         val layer = RepeatVector(n = 2)
         val x = Array(10) { FloatArray(10) { 1F } }
         val y = layer(x)
@@ -30,7 +26,7 @@ internal class RepeatVectorLayerTest {
     }
 
     @Test
-    fun `test repetition output`(){
+    fun `test repetition output`() {
         val layer = RepeatVector(n = 2)
         val x = Array(3) { FloatArray(3) { it.toFloat() } }
         val y = layer(x)
@@ -43,12 +39,12 @@ internal class RepeatVectorLayerTest {
         Assertions.assertArrayEquals(expected, actual)
     }
 
-    private operator fun RepeatVector.invoke(input : Array<FloatArray>) : Output<Float> {
+    private operator fun RepeatVector.invoke(input: Array<FloatArray>): Output<Float> {
         return Ops.create().let { tf ->
-            build(tf, KGraph(Graph().toGraphDef()), org.tensorflow.Shape.make(10, 10))
+            build(tf, KGraph(Graph().toGraphDef()), Shape.make(10, 10))
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
         }
     }
