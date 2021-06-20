@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Tile
 
 /**
  * Layer that repeats the input [n] times.
@@ -53,13 +52,9 @@ public class RepeatVector(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.repeat(input, n)
-    }
-
-    private fun Ops.repeat(input: Operand<Float>, n: Int): Tile<Float> {
-        val x = expandDims(input, constant(1))
-        val pattern = stack(listOf(constant(1), constant(n), constant(1)))
-        return tile(x, pattern)
+        val x = tf.expandDims(input, tf.constant(1))
+        val pattern = tf.stack(listOf(tf.constant(1), tf.constant(n), tf.constant(1)))
+        return tf.tile(x, pattern)
     }
 
     override var weights: Map<String, Array<*>>
