@@ -26,9 +26,9 @@ import java.io.File
 
 private const val NUM_CHANNELS = 1L
 private const val SEED = 12L
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 128
-private const val TEST_BATCH_SIZE = 256
+private const val EPOCHS = 10
+private const val TRAINING_BATCH_SIZE = 512
+private const val TEST_BATCH_SIZE = 512
 
 
 /**
@@ -61,11 +61,6 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val numbersPlots = List(3) { imageIndex ->
-            flattenImagePlot(imageIndex, test, it::predict)
-        }
-        columnPlot(numbersPlots, 3, 256).show()
-
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 
@@ -73,7 +68,7 @@ fun main() {
 //        val sndConv2D = it.layers[3] as Conv1D
 //
 //        // lets-plot approach
-//        filtersPlot(fstConv2D, columns = 16).show()
+        filtersPlot(fstConv2D, columns = 16).show()
 //        filtersPlot(sndConv2D, columns = 16).show()
 //
 //        // swing approach
@@ -134,14 +129,14 @@ private val smallSoundNet = Sequential.of(
         NUM_CHANNELS
     ),
     *soundBlock(
-        filters = 8,
-        kernelSize = 8,
-        poolStride = 4
+        filters = 16,
+        kernelSize = 64,
+        poolStride = 32
     ),
     *soundBlock(
         filters = 16,
-        kernelSize = 16,
-        poolStride = 8
+        kernelSize = 128,
+        poolStride = 64
     ),
     Flatten(),
     Dense(
