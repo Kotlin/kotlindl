@@ -39,7 +39,7 @@ private const val TEST_BATCH_SIZE = 512
  */
 fun main() {
 
-//    visualizeFSDDWavFiles()
+    visualizeFSDDWavFiles()
 
     val (train, test) = freeSpokenDigits()
 
@@ -63,37 +63,14 @@ fun main() {
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
-
-//        val fstConv2D = it.layers[1] as Conv1D
-//        val sndConv2D = it.layers[3] as Conv1D
-//
-//        // lets-plot approach
-        filtersPlot(fstConv2D, columns = 16).show()
-//        filtersPlot(sndConv2D, columns = 16).show()
-//
-//        // swing approach
-//        drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
-//        drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
-//
-//        val layersActivations = modelActivationOnLayersPlot(it, x)
-//        val (prediction, activations) = it.predictAndGetActivations(x)
-//        println("Prediction: $prediction")
-//        println("Ground Truth: $y")
-//
-//        // lets-plot approach
-//        layersActivations[0].show()
-//        layersActivations[1].show()
-//
-//        // swing approach
-//        drawActivations(activations)
     }
 }
 
+/** Create visualization plots of input sound files for selected data from Free Spoken Digits Dataset */
 private fun visualizeFSDDWavFiles(
     personName: String = "george",
     samples: Int = 5
 ) {
-
     val fssd = freeSpokenDigitDatasetPath()
     val wavFiles = File(fssd).listFiles() ?: arrayOf()
     val grouped = wavFiles
@@ -113,6 +90,7 @@ private fun visualizeFSDDWavFiles(
     columnPlot(plots, 4, 320).show()
 }
 
+/** Transpose list of lists when every element of list is a list of equal length */
 private fun <T> List<List<T>>.transpose(): List<List<T>> {
     val size = getOrNull(0)?.size ?: 0
     require(all { it.size == size }) { "Can transpose only list of lists of equal sizes" }
