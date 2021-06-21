@@ -3,13 +3,16 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.visualisation
+package examples.visualization
 
 import examples.inference.lenet5
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
+import org.jetbrains.kotlinx.dl.visualization.letsplot.*
+import org.jetbrains.kotlinx.dl.visualization.swing.*
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 500
@@ -38,7 +41,12 @@ fun main() {
 
     val (newTrain, validation) = train.split(0.95)
 
+    val sampleIndex = 42
+    val x = test.getX(sampleIndex)
+    val y = test.getY(sampleIndex).toInt()
+
     lenet5().use {
+
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -53,28 +61,39 @@ fun main() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val imageId = 0
-
-        val weights = it.layers[1].weights // first conv2d layer
-
-        drawFilters(weights.values.toTypedArray()[0], colorCoefficient = 10.0)
-
-        val weights2 = it.layers[3].weights // first conv2d layer
-
-        drawFilters(weights2.values.toTypedArray()[0], colorCoefficient = 12.0)
+        val fashionPlots = List(3) { imageIndex ->
+            flattenImagePlot(imageIndex, test,
+                predict = it::predict,
+                labelEncoding = fashionMnistLabelEncoding::get,
+                plotFeature = PlotFeature.GRAY
+            )
+        }
+        columnPlot(fashionPlots, 3, 256).show()
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
         println("Accuracy $accuracy")
 
-        val (prediction, activations) = it.predictAndGetActivations(train.getX(imageId))
+        val fstConv2D = it.layers[1] as Conv2D
+        val sndConv2D = it.layers[3] as Conv2D
 
+        // lets-plot approach
+        filtersPlot(fstConv2D, columns = 16).show()
+        filtersPlot(sndConv2D, columns = 16).show()
+
+        // swing approach
+        drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
+        drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
+
+        val layersActivations = modelActivationOnLayersPlot(it, x)
+        val (prediction, activations) = it.predictAndGetActivations(x)
         println("Prediction: ${fashionMnistLabelEncoding[prediction]}")
+        println("Ground Truth: ${fashionMnistLabelEncoding[y]}")
 
+        // lets-plot approach
+        layersActivations[0].show()
+        layersActivations[1].show()
+
+        // swing approach
         drawActivations(activations)
-
-        val trainImageLabel = train.getY(imageId)
-
-        println("Ground Truth: ${fashionMnistLabelEncoding[trainImageLabel.toInt()]}")
     }
 }

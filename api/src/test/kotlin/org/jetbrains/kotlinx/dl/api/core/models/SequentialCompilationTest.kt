@@ -82,7 +82,9 @@ internal class SequentialModelTest {
             biasInitializer = Constant(0.1f),
             name = "dense_2"
         )
-    )
+    ).apply {
+        name = "sequential_model"
+    }
 
     @Test
     fun buildModel() {
@@ -99,6 +101,8 @@ internal class SequentialModelTest {
     @Test
     fun summary() {
         correctTestModel.use {
+            assertEquals("sequential_model", it.name)
+
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
             val layerDescriptions = it.summary()
             assertTrue(layerDescriptions[1].contentEquals("conv2d_1(Conv2D)                       [None, 28, 28, 32]        832"))

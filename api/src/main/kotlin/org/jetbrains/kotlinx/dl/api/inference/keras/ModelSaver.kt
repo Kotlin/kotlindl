@@ -63,7 +63,7 @@ internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean)
     (kerasLayers.first().config as LayerConfig).batch_input_shape =
         listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
 
-    val config = KerasModelConfig(name = "", layers = kerasLayers)
+    val config = KerasModelConfig(name = name, layers = kerasLayers)
     return KerasModel(config = config)
 }
 
@@ -269,7 +269,8 @@ private fun convertToKerasActivation(activation: Activations): String? {
 private fun createKerasGlobalAvgPool2DLayer(layer: GlobalAvgPool2D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOL_2D, config = configX)
 }
@@ -277,7 +278,8 @@ private fun createKerasGlobalAvgPool2DLayer(layer: GlobalAvgPool2D): KerasLayer 
 private fun createKerasGlobalAvgPool1DLayer(layer: GlobalAvgPool1D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOL_1D, config = configX)
 }
@@ -285,7 +287,8 @@ private fun createKerasGlobalAvgPool1DLayer(layer: GlobalAvgPool1D): KerasLayer 
 private fun createKerasGlobalMaxPool1DLayer(layer: GlobalMaxPool1D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
 }
@@ -293,7 +296,8 @@ private fun createKerasGlobalMaxPool1DLayer(layer: GlobalMaxPool1D): KerasLayer 
 private fun createKerasGlobalAvgPool3DLayer(layer: GlobalAvgPool3D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_AVG_POOL_3D, config = configX)
 }
@@ -301,7 +305,8 @@ private fun createKerasGlobalAvgPool3DLayer(layer: GlobalAvgPool3D): KerasLayer 
 private fun createKerasAddLayer(layer: Add): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ADD, config = configX)
 }
@@ -309,7 +314,8 @@ private fun createKerasAddLayer(layer: Add): KerasLayer {
 private fun createKerasSubtractLayer(layer: Subtract): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_SUBTRACT, config = configX)
 }
@@ -317,7 +323,8 @@ private fun createKerasSubtractLayer(layer: Subtract): KerasLayer {
 private fun createKerasMinimumLayer(layer: Minimum): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_MINIMUM, config = configX)
 }
@@ -325,7 +332,8 @@ private fun createKerasMinimumLayer(layer: Minimum): KerasLayer {
 private fun createKerasMaximumLayer(layer: Maximum): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_MAXIMUM, config = configX)
 }
@@ -333,7 +341,8 @@ private fun createKerasMaximumLayer(layer: Maximum): KerasLayer {
 private fun createKerasAverageLayer(layer: Average): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_AVERAGE, config = configX)
 }
@@ -341,7 +350,8 @@ private fun createKerasAverageLayer(layer: Average): KerasLayer {
 private fun createKerasMultiplyLayer(layer: Multiply): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_MULTIPLY, config = configX)
 }
@@ -350,7 +360,8 @@ private fun createKerasActivationLayer(layer: ActivationLayer): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         activation = convertToKerasActivation(layer.activation),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ACTIVATION, config = configX)
 }
@@ -361,7 +372,8 @@ private fun createKerasPReLULayer(layer: PReLU, isKerasFullyCompatible: Boolean)
         alpha_initializer = convertToKerasInitializer(layer.alphaInitializer, isKerasFullyCompatible),
         alpha_regularizer = convertToKerasRegularizer(layer.alphaRegularizer),
         shared_axes = layer.sharedAxes?.toList(),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_PRELU, config = configX)
 }
@@ -370,7 +382,8 @@ private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         axis = layer.axis,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_SOFTMAX, config = configX)
 }
@@ -397,7 +410,8 @@ private fun createKerasLeakyReLULayer(layer: LeakyReLU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         alpha = layer.alpha.toDouble(),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_LEAKY_RELU, config = configX)
 }
@@ -406,7 +420,8 @@ private fun createKerasThresholdedReLULayer(layer: ThresholdedReLU): KerasLayer 
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         theta = layer.theta.toDouble(),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_THRESHOLDED_RELU, config = configX)
 }
@@ -415,6 +430,7 @@ private fun createKerasBatchNormLayer(layer: BatchNorm, isKerasFullyCompatible: 
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
         axis = layer.axis,
         momentum = layer.momentum,
         center = layer.center,
@@ -443,7 +459,8 @@ private fun createKerasInputLayer(layer: Input): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         sparse = false,
         batch_input_shape = shape,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_INPUT, config = config)
 }
@@ -454,6 +471,7 @@ private fun createKerasDenseLayer(layer: Dense, isKerasFullyCompatible: Boolean)
         units = layer.outputSize,
         name = layer.name,
         use_bias = layer.useBias,
+        trainable = layer.isTrainable,
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
@@ -470,7 +488,8 @@ private fun createKerasMaxPool1DLayer(layer: MaxPool1D): KerasLayer {
         pool_size = listOf(layer.poolSize[1].toInt()),
         strides = listOf(layer.strides[1].toInt()),
         padding = convertToKerasPadding(layer.padding),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_MAX_POOL_1D, config = configX)
 }
@@ -482,6 +501,7 @@ private fun createKerasMaxPool2DLayer(layer: MaxPool2D): KerasLayer {
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
         padding = convertToKerasPadding(layer.padding),
         pool_size = poolSize,
         strides = strides
@@ -495,7 +515,8 @@ private fun createKerasAvgPool1DLayer(layer: AvgPool1D): KerasLayer {
         pool_size = listOf(layer.poolSize[1].toInt()),
         strides = listOf(layer.strides[1].toInt()),
         padding = convertToKerasPadding(layer.padding),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_AVG_POOL_1D, config = configX)
 }
@@ -506,6 +527,7 @@ private fun createKerasMaxPool3DLayer(layer: MaxPool3D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
         padding = convertToKerasPadding(layer.padding),
         pool_size = poolSize,
         strides = strides
@@ -520,6 +542,7 @@ private fun createKerasAvgPool2DLayer(layer: AvgPool2D): KerasLayer {
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
         padding = convertToKerasPadding(layer.padding),
         pool_size = poolSize,
         strides = strides
@@ -533,7 +556,8 @@ private fun createKerasAvgPool3DLayer(layer: AvgPool3D): KerasLayer {
         pool_size = layer.poolSize.slice(1..3).map { it.toInt() },
         strides = layer.strides.slice(1..3).map { it.toInt() },
         padding = convertToKerasPadding(layer.padding),
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_AVG_POOL_3D, config = configX)
 }
@@ -542,7 +566,8 @@ private fun createKerasFlattenLayer(layer: Flatten): KerasLayer {
     val configX = LayerConfig(
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
 }
@@ -551,7 +576,8 @@ private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         axis = layer.axis,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
 }
@@ -569,8 +595,9 @@ private fun createKerasConv1DLayer(layer: Conv1D, isKerasFullyCompatible: Boolea
         bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
         activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
         padding = convertToKerasPadding(layer.padding),
-        name = layer.name,
-        use_bias = layer.useBias
+        trainable = layer.isTrainable,
+        use_bias = layer.useBias,
+        name = layer.name
     )
     return KerasLayer(class_name = LAYER_CONV1D, config = configX)
 }
@@ -589,8 +616,9 @@ private fun createKerasConv2DLayer(layer: Conv2D, isKerasFullyCompatible: Boolea
         bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
         activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
         padding = convertToKerasPadding(layer.padding),
-        name = layer.name,
-        use_bias = layer.useBias
+        trainable = layer.isTrainable,
+        use_bias = layer.useBias,
+        name = layer.name
     )
     return KerasLayer(class_name = LAYER_CONV2D, config = configX)
 }
@@ -625,6 +653,7 @@ private fun createKerasDepthwiseConv2DLayer(layer: DepthwiseConv2D, isKerasFully
         depth_multiplier = layer.depthMultiplier,
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
         padding = convertToKerasPadding(layer.padding),
+        trainable = layer.isTrainable,
         use_bias = layer.useBias,
         name = layer.name
     )
@@ -643,6 +672,7 @@ private fun createKerasSeparableConv2DLayer(layer: SeparableConv2D, isKerasFully
         depth_multiplier = layer.depthMultiplier,
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
         padding = convertToKerasPadding(layer.padding),
+        trainable = layer.isTrainable,
         use_bias = layer.useBias,
         name = layer.name
     )
@@ -654,7 +684,8 @@ private fun createKerasZeroPadding2DLayer(layer: ZeroPadding2D): KerasLayer {
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
-        padding = KerasPadding.ZeroPadding2D(layer.padding)
+        padding = KerasPadding.ZeroPadding2D(layer.padding),
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ZERO_PADDING_2D, config = configX)
 }
