@@ -26,7 +26,7 @@ public abstract class AbstractCropping(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        return computeOutputShape(inputShape)
+        return computeCroppedShape(inputShape)
     }
 
     override fun forward(
