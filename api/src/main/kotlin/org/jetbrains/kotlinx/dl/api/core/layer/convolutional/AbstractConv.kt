@@ -137,7 +137,6 @@ public abstract class AbstractConv(
      *  Defaults to the number of filter in convolutional layer. */
     protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal
 
-
     /**
      * Define the [kernelShape] by default from its [kernelSizeInternal],
      * [filtersInternal] and the given [numberOfChannels] from input Tensor.
@@ -155,7 +154,6 @@ public abstract class AbstractConv(
      */
     protected open fun computeBiasShape(numberOfChannels: Long): Shape =
         Shape.make(filtersInternal)
-
 
     /** Given a layer name specify its kernel name. */
     protected abstract fun kernelVarName(name: String): String
