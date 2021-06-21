@@ -393,7 +393,8 @@ private fun createKerasReLULayer(layer: ReLU): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         max_value = layer.maxValue?.toDouble(),
         negative_slope = layer.negativeSlope.toDouble(),
-        threshold = layer.threshold.toDouble()
+        threshold = layer.threshold.toDouble(),
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_RELU, config = configX)
 }
@@ -401,7 +402,8 @@ private fun createKerasReLULayer(layer: ReLU): KerasLayer {
 private fun createKerasELULayer(layer: ELU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        alpha = layer.alpha.toDouble()
+        alpha = layer.alpha.toDouble(),
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ELU, config = configX)
 }
