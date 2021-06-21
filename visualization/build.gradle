@@ -4,7 +4,7 @@ dependencies {
 }
 
 dependencies {
-    def excludeSLF4JImpl = { exclude group: 'org.slf4j' }
+    def excludeSLF4JImpl = { exclude group: 'org.slf4j', module: 'slf4j-simple' }
 
     implementation 'org.jetbrains.lets-plot:lets-plot-batik:2.0.2', excludeSLF4JImpl
     api 'org.jetbrains.lets-plot:lets-plot-common:2.0.2', excludeSLF4JImpl
@@ -26,4 +26,11 @@ compileTestKotlin {
 
 test {
     useJUnitPlatform()
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://dl.bintray.com/kotlin/kotlinx.html"
+    }
 }
