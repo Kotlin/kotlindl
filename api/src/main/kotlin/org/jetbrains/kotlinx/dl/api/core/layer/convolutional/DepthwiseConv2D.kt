@@ -92,10 +92,11 @@ public class DepthwiseConv2D(
         isTrainable = false
     }
 
-    override fun computeMatricesShapes(numberOfChannels: Long) {
-        kernelShape = shapeFromDims(*kernelSize, numberOfChannels, depthMultiplier.toLong())
-        biasShape = Shape.make(numberOfChannels * depthMultiplier)
-    }
+    protected override fun computeKernelShape(numberOfChannels: Long): Shape =
+        shapeFromDims(*kernelSize, numberOfChannels, depthMultiplier.toLong())
+
+    protected override fun computeBiasShape(numberOfChannels: Long): Shape =
+        Shape.make(numberOfChannels * depthMultiplier)
 
     override fun getOutputDepth(numberOfChannels: Long): Long = numberOfChannels * depthMultiplier
 

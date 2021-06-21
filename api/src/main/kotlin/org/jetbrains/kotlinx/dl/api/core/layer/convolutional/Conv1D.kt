@@ -96,7 +96,7 @@ public class Conv1D(
     }
 
     /** Axis of height for which the extra dimension is added (unsqueezed) before actual
-     * convolution operation and on which the output from actual implementation is squeezed */
+     * convolution operation and the output from actual implementation are squeezed. */
     private val squeezeAxis = Squeeze.axis(listOf(EXTRA_DIM))
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 1)

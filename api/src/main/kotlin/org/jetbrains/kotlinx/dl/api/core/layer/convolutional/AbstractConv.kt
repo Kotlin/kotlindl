@@ -21,29 +21,29 @@ import kotlin.math.roundToInt
 
 /**
  * Abstract Convolutional layer is a base block for building base types of convolutional layers
- * of any dimensionality. It should simplify the internal calculations needed in most of
- * the convolutional layers and abstract the process of naming weights for these layers. It keeps
- * the actual implementation of convolutional layers i.e. the kernel and bias learnable variables
- * that should be used in child classes in actual implementations of these layers. If the child class
+ * of any dimensionality. It should simplify the internal calculations needed in most convolutional
+ * layers and abstract the naming weights for these layers. It keeps the actual implementation
+ * of convolutional layers, i.e., the kernel and bias learnable variables that should
+ * be used in child classes in actual implementations of these layers. If the child class
  * uses some values for its implementation in other form than it is kept in this child class,
  * then this abstract class `internal` properties should keep the implementation values
  * while the child class properties should keep the printable values that are more representative.
- * But in most cases the `internal` and child values will be the same.
+ * But in most cases, the `internal` and child values will be the same.
  *
- * @property filtersInternal number used by default in calculation of layer weights and i/o shapes
- * @property kernelSizeInternal numbers used by default in calculation of layer weights and i/o shapes
- * @property stridesInternal numbers used by default in calculation of layer weights and i/o shapes
- * @property dilationsInternal numbers to keep for the dilations for implementation
- * @property activationInternal activation used in [forward] operation implementation
- * @property kernelInitializerInternal kernelInitializer used in actual kernel variable filling implementation
- * @property biasInitializerInternal biasInitializer used in actual bias variable filling implementation
- * @property kernelRegularizerInternal kernelRegularizer used in actual kernel variable filling implementation
- * @property biasRegularizerInternal biasRegularizer used in actual bias variable filling implementation
- * @property activityRegularizerInternal regularizer function applied to the output of the layer
- * @property paddingInternal numbers to keep for the padding for implementation
- * @property useBiasInternal flag if bias should be used during actual [forward] implementation
- * @property kernelVariableName name of kernel used when no layer name is defined
- * @property biasVariableName name of bias used when no layer name is defined
+ * @property [filtersInternal] number used by default in calculation of layer weights and i/o shapes
+ * @property [kernelSizeInternal] numbers used by default in calculation of layer weights and i/o shapes
+ * @property [stridesInternal] numbers used by default in calculation of layer weights and i/o shapes
+ * @property [dilationsInternal] numbers to keep for the dilations for implementation
+ * @property [activationInternal] activation used in [forward] operation implementation
+ * @property [kernelInitializerInternal] initializer used in actual kernel variable filling implementation
+ * @property [biasInitializerInternal] initializer used in actual bias variable filling implementation
+ * @property [kernelRegularizerInternal] regularizer function used in actual kernel variable filling implementation
+ * @property [biasRegularizerInternal] regularizer function used in actual bias variable filling implementation
+ * @property [activityRegularizerInternal] regularizer function applied to the output of the layer
+ * @property [paddingInternal] numbers to keep for the padding for implementation
+ * @property [useBiasInternal] flag if bias should be used during actual [forward] implementation
+ * @property [kernelVariableName] name of kernel used when no layer name is defined
+ * @property [biasVariableName] name of bias used when no layer name is defined
  * @constructor Creates [AbstractConv] object
  *
  * @param name of the layer to name its variables
@@ -66,10 +66,10 @@ public abstract class AbstractConv(
     name: String
 ) : Layer(name) {
 
-    /** Tensor with learnable variables for kernel defined by internal shapes */
+    /** Tensor with kernel weights */
     protected lateinit var kernel: Variable<Float>
 
-    /** Tensor with learnable variables for bias defined by internal shapes */
+    /** Tensor with bias weights */
     protected var bias: Variable<Float>? = null
 
     /** Shape of internal implementation of kernel variable */
@@ -83,7 +83,8 @@ public abstract class AbstractConv(
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        computeMatricesShapes(numberOfChannels)
+        kernelShape = computeKernelShape(numberOfChannels)
+        biasShape = computeBiasShape(numberOfChannels)
 
         // should be calculated before addWeight because it's used in calculation
         val inputDepth = numberOfChannels // number of input channels
@@ -136,16 +137,25 @@ public abstract class AbstractConv(
      *  Defaults to the number of filter in convolutional layer. */
     protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal
 
+
     /**
-     * Define the [kernelShape] and [biasShape] by default from its [kernelSizeInternal],
-     * [filtersInternal], [filtersInternal] and the given [numberOfChannels] from input Tensor.
+     * Define the [kernelShape] by default from its [kernelSizeInternal],
+     * [filtersInternal] and the given [numberOfChannels] from input Tensor.
      *
      * @param numberOfChannels for input of this layer
      */
-    protected open fun computeMatricesShapes(numberOfChannels: Long) {
-        kernelShape = shapeFromDims(*kernelSizeInternal, numberOfChannels, filtersInternal)
-        biasShape = Shape.make(filtersInternal)
-    }
+    protected open fun computeKernelShape(numberOfChannels: Long): Shape =
+        shapeFromDims(*kernelSizeInternal, numberOfChannels, filtersInternal)
+
+    /**
+     * Define the [biasShape] by default from its [filtersInternal] and
+     * the given [numberOfChannels] from input Tensor.
+     *
+     * @param numberOfChannels for input of this layer
+     */
+    protected open fun computeBiasShape(numberOfChannels: Long): Shape =
+        Shape.make(filtersInternal)
+
 
     /** Given a layer name specify its kernel name. */
     protected abstract fun kernelVarName(name: String): String
