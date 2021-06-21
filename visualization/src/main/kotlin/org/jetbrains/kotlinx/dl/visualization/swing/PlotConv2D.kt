@@ -156,6 +156,7 @@ class ReluGraphics2(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
 
 fun drawActivations(activations: List<*>) {
     val frame = JFrame("Visualise the matrix weights on Relu")
+    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(ReluGraphics(activations[0] as TensorImageData))
     frame.setSize(1500, 1500)
     frame.isVisible = true
@@ -163,6 +164,7 @@ fun drawActivations(activations: List<*>) {
     frame.isResizable = false
 
     val frame2 = JFrame("Visualise the matrix weights on Relu_1")
+    @Suppress("UNCHECKED_CAST")
     frame2.contentPane.add(ReluGraphics2(activations[1] as TensorImageData))
     frame2.setSize(1500, 1500)
     frame2.isVisible = true
@@ -172,6 +174,7 @@ fun drawActivations(activations: List<*>) {
 
 fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
     val frame = JFrame("Filters")
+    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(Conv2dJPanel(filters as TensorImageData, colorCoefficient))
     frame.setSize(1000, 1000)
     frame.isVisible = true
