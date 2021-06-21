@@ -7,8 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -24,7 +22,6 @@ import org.tensorflow.op.Ops
  * @property [name] Custom layer name.
  * @constructor Creates [RepeatVector] object.
  *
- * @author Stan van der Bend
  * @since 0.3
  */
 public class RepeatVector(
@@ -39,11 +36,10 @@ public class RepeatVector(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        require(inputShape.numDimensions() == 2) { "input tensor must have 2 dimensions" }
-        val tensorShape = TensorShape(inputShape)
-        // TODO: maybe make `n` of type Long?
-        val input = inputShape.toLongArray()
-        return Shape.make(input[0], n.toLong(), input[1])
+        require(inputShape.numDimensions() == 2) {
+            "Input tensor must have 2 dimensions but got ${inputShape.numDimensions()}"
+        }
+        return Shape.make(inputShape.size(0), n.toLong(), inputShape.size(1))
     }
 
     override fun forward(
