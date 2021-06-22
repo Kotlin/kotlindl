@@ -680,6 +680,7 @@ private fun createKerasCropping1DLayer(layer: Cropping1D): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         cropping = layer.cropping.toList(),
         name = layer.name,
+        trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_CROPPING_1D, config = configX)
 }
@@ -689,6 +690,7 @@ private fun createKerasCropping2DLayer(layer: Cropping2D): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         cropping = layer.cropping.toList().map { it.toList() },
         name = layer.name,
+        trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_CROPPING_2D, config = configX)
 }
@@ -698,6 +700,7 @@ private fun createKerasCropping3DLayer(layer: Cropping3D): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         cropping = layer.cropping.toList().map { it.toList() },
         name = layer.name,
+        trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_CROPPING_3D, config = configX)
 }
