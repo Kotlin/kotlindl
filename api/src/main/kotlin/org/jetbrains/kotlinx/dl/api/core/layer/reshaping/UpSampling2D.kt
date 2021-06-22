@@ -10,6 +10,16 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.image.ResizeBilinear
 
+/**
+ * Upsampling layer for 2D input.
+ *
+ * Repeats each row (second axis) and columns (third axis) of the input by `size[0]` and `size[1]`
+ * times, respectively.
+ *
+ * @property [size] Upsampling factor array of size 2 (i.e. number of repeats per rows and columns).
+ * @property [interpolation] Interpolation method; could be either of [InterpolationMethod.NEAREST] or
+ * [InterpolationMethod.BILINEAR].
+ */
 public class UpSampling2D(
     public val size: IntArray = intArrayOf(2, 2),
     public val interpolation: InterpolationMethod = InterpolationMethod.NEAREST,

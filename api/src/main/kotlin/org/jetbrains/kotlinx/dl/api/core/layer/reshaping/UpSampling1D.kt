@@ -10,6 +10,13 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 
+/**
+ * Upsampling layer for 1D input.
+ *
+ * Repeats each step of the second axis [size] times.
+ *
+ * @property [size] Upsampling factor (i.e. number of repeats).
+ */
 public class UpSampling1D(
     public val size: Int = 2,
     name: String = "",

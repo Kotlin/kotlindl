@@ -9,6 +9,14 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Upsampling layer for 3D input.
+ *
+ * Repeats the  second, third and forth dimensions of the input by `size[0]`, `size[1]` and
+ * `size[2]` times, repectively.
+ *
+ * @property [size] Upsampling factor array of size 3 (i.e. number of repeats per each dimension).
+ */
 public class UpSampling3D(
     public val size: IntArray = intArrayOf(2, 2, 2),
     name: String = "",
@@ -38,9 +46,11 @@ public class UpSampling3D(
     }
 
     protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {
-        var upSampled = repeat(tf, input, repeats = size[0], axis = 1)
-        upSampled = repeat(tf, upSampled, repeats = size[1], axis = 2)
-        upSampled = repeat(tf, upSampled, repeats = size[2], axis = 3)
+        var upSampled = input
+        repeat(3) {
+            if (size[it] > 1)
+                upSampled = repeat(tf, upSampled, repeats = size[it], axis = it + 1)
+        }
         return upSampled
     }
 
