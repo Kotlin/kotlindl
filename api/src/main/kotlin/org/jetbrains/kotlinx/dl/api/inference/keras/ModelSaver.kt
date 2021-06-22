@@ -12,10 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.LeakyReLU
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
-import org.jetbrains.kotlinx.dl.api.core.layer.activation.ThresholdedReLU
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -113,6 +110,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         // Activation layers
         is Softmax -> createKerasSoftmaxLayer(layer)
         is PReLU -> createKerasPReLULayer(layer, isKerasFullyCompatible)
+        is ReLU -> createKerasReLULayer(layer)
+        is ELU -> createKerasELULayer(layer)
         is LeakyReLU -> createKerasLeakyReLULayer(layer)
         is ThresholdedReLU -> createKerasThresholdedReLULayer(layer)
         else -> throw IllegalStateException("${layer.name} with type ${layer::class.simpleName} is not supported yet!")
@@ -389,6 +388,26 @@ private fun createKerasSoftmaxLayer(layer: Softmax): KerasLayer {
     return KerasLayer(class_name = LAYER_SOFTMAX, config = configX)
 }
 
+private fun createKerasReLULayer(layer: ReLU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        max_value = layer.maxValue?.toDouble(),
+        negative_slope = layer.negativeSlope.toDouble(),
+        threshold = layer.threshold.toDouble(),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_RELU, config = configX)
+}
+
+private fun createKerasELULayer(layer: ELU): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        alpha = layer.alpha.toDouble(),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_ELU, config = configX)
+}
+
 private fun createKerasLeakyReLULayer(layer: LeakyReLU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
@@ -506,7 +525,7 @@ private fun createKerasAvgPool1DLayer(layer: AvgPool1D): KerasLayer {
 
 private fun createKerasMaxPool3DLayer(layer: MaxPool3D): KerasLayer {
     val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
-    val strides = mutableListOf(layer.strides[1] , layer.strides[3])
+    val strides = mutableListOf(layer.strides[1], layer.strides[3])
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
