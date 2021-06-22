@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Permute
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Permute
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
@@ -515,7 +515,8 @@ private fun createKerasDenseLayer(layer: Dense, isKerasFullyCompatible: Boolean)
 private fun createKerasPermuteLayer(layer: Permute):KerasLayer{
     val configX = LayerConfig(
         dims = layer.dims,
-        name = layer.name
+        name = layer.name,
+        trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_PERMUTE, config = configX)
 }
