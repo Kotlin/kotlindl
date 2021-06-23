@@ -6,8 +6,8 @@ dependencies {
 dependencies {
     def excludeSLF4JImpl = { exclude group: 'org.slf4j', module: 'slf4j-simple' }
 
-    implementation 'org.jetbrains.lets-plot:lets-plot-batik:2.0.2', excludeSLF4JImpl
-    api 'org.jetbrains.lets-plot:lets-plot-common:2.0.2', excludeSLF4JImpl
+    implementation 'org.jetbrains.lets-plot:lets-plot-batik:2.0.4', excludeSLF4JImpl
+    api 'org.jetbrains.lets-plot:lets-plot-common:2.0.4', excludeSLF4JImpl
     api 'org.jetbrains.lets-plot:lets-plot-kotlin-api:2.0.1', excludeSLF4JImpl
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
