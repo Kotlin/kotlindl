@@ -1,10 +1,13 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.32'
     id 'maven'
-    id 'io.codearte.nexus-staging' version "0.22.0"
+    id 'io.codearte.nexus-staging' version '0.22.0'
+    id 'org.jetbrains.dokka' version '1.4.32'
+
 }
 
 apply plugin: "io.codearte.nexus-staging"
+apply from: project.rootProject.file('gradle/dokka.gradle')
 
 allprojects {
     group = 'org.jetbrains.kotlinx'
@@ -22,11 +25,17 @@ compileTestKotlin {
 }
 
 repositories {
+    maven { url 'https://maven.pkg.jetbrains.space/kotlin/p/dokka/dev' }
     mavenCentral()
+    // For Dokka that depends on kotlinx-html
+    maven { url 'https://kotlin.bintray.com/kotlinx' }
 }
 
 subprojects {
     repositories {
         mavenCentral()
+        maven { url 'https://maven.pkg.jetbrains.space/kotlin/p/dokka/dev' }
+        // For Dokka that depends on kotlinx-html
+        maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
 }
