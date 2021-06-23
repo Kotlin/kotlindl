@@ -31,9 +31,6 @@ class PReLUTest : LayerTest() {
         )
         val layer = PReLU()
 
-        // NOTE: It seems testing layers having trainable weights in Eager mode is not working.
-        //assertLayerOutputIsCorrect(layer, input, expected)
-
         assertLayerOutputIsCorrect(layer, input, expected, RunMode.GRAPH)
         val expectedShape = inputShape
         assertLayerComputedOutputShape(layer, inputShape, expectedShape)
@@ -77,6 +74,7 @@ class PReLUTest : LayerTest() {
                 "temp_init"
             ).asOutput().tensor()
             alphaTensor.copyTo(alpha)
+            alphaTensor.close()
         }
 
         val expected = getFloatArrayOfShape(input.shape).cast3D<FloatArray>()

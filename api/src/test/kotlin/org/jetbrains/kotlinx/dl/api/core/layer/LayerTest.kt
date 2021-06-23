@@ -61,20 +61,7 @@ open class LayerTest {
                 val tf = Ops.create(graph)
                 KGraph(graph.toGraphDef()).use { kGraph ->
                     val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
-                    /**
-                     * This check is necessary, otherwise it would throw the following error
-                     * if the layer has no trainable parameters:
-                     * ```
-                     * Must specify at least one target to fetch or execute.
-                     * ```
-                     * However, using `layer.weights.isNotEmpty()` for the condition would not work
-                     * because according to the current implementation of `extractWeights` the layer
-                     * should belong to an actual model and therefore it throws an error. Hence, we
-                     * are using `paramCount` instead to determine whether the layer has any trainable
-                     * weights.
-                     */
-                    if (layer.paramCount > 0)
-                        kGraph.initializeGraphVariables(session)
+                    kGraph.initializeGraphVariables(session)
                     val outputTensor = session.runner().fetch(outputOp).run().first()
                     return outputTensor
                 }
@@ -101,22 +88,24 @@ open class LayerTest {
             RunMode.EAGER -> runLayerInEagerMode(layer, input)
             RunMode.GRAPH -> runLayerInGraphMode(layer, input)
         }
-        val outputShape = shapeFromDims(*output.shape())
-        val outputArray = getFloatArrayOfShape(outputShape).let {
-            when (outputShape.numDimensions()) {
-                1 -> it as Array<Float>
-                2 -> it.cast2D<FloatArray>()
-                3 -> it.cast3D<FloatArray>()
-                4 -> it.cast4D<FloatArray>()
-                5 -> it.cast5D<FloatArray>()
-                else -> throw IllegalArgumentException("Arrays with more than 5 dimensions are not supported yet!")
+        output.use {
+            val outputShape = shapeFromDims(*output.shape())
+            val outputArray = getFloatArrayOfShape(outputShape).let {
+                when (outputShape.numDimensions()) {
+                    1 -> it as Array<Float>
+                    2 -> it.cast2D<FloatArray>()
+                    3 -> it.cast3D<FloatArray>()
+                    4 -> it.cast4D<FloatArray>()
+                    5 -> it.cast5D<FloatArray>()
+                    else -> throw IllegalArgumentException("Arrays with more than 5 dimensions are not supported yet!")
+                }
             }
+            output.copyTo(outputArray)
+            Assertions.assertArrayEquals(
+                expectedOutput,
+                outputArray
+            )
         }
-        output.copyTo(outputArray)
-        Assertions.assertArrayEquals(
-            expectedOutput,
-            outputArray
-        )
     }
 
     /**
