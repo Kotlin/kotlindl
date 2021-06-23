@@ -1,0 +1,3082 @@
+[
+  {
+    "name": "visualization",
+    "description": null,
+    "location": "visualization/index.html",
+    "searchKeys": [
+      "visualization"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.visualization.letsplot",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.visualization.letsplot"
+    ]
+  },
+  {
+    "name": "columnPlot()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/column-plot.html",
+    "searchKeys": [
+      "columnPlot()"
+    ]
+  },
+  {
+    "name": "filtersPlot()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/filters-plot.html",
+    "searchKeys": [
+      "filtersPlot()"
+    ]
+  },
+  {
+    "name": "flattenImagePlot()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/flatten-image-plot.html",
+    "searchKeys": [
+      "flattenImagePlot()"
+    ]
+  },
+  {
+    "name": "modelActivationOnLayersPlot()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/model-activation-on-layers-plot.html",
+    "searchKeys": [
+      "modelActivationOnLayersPlot()"
+    ]
+  },
+  {
+    "name": "PlotFeature",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/-plot-feature/index.html",
+    "searchKeys": [
+      "PlotFeature"
+    ]
+  },
+  {
+    "name": "soundPlot()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/sound-plot.html",
+    "searchKeys": [
+      "soundPlot()"
+    ]
+  },
+  {
+    "name": "xyPlot",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.letsplot/xy-plot.html",
+    "searchKeys": [
+      "xyPlot"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.visualization.swing",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.visualization.swing"
+    ]
+  },
+  {
+    "name": "Conv2dJPanel",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/-conv2d-j-panel/index.html",
+    "searchKeys": [
+      "Conv2dJPanel"
+    ]
+  },
+  {
+    "name": "Conv2dJPanel1",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/-conv2d-j-panel1/index.html",
+    "searchKeys": [
+      "Conv2dJPanel1"
+    ]
+  },
+  {
+    "name": "drawActivations()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/draw-activations.html",
+    "searchKeys": [
+      "drawActivations()"
+    ]
+  },
+  {
+    "name": "drawFilters()",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/draw-filters.html",
+    "searchKeys": [
+      "drawFilters()"
+    ]
+  },
+  {
+    "name": "ReluGraphics",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/-relu-graphics/index.html",
+    "searchKeys": [
+      "ReluGraphics"
+    ]
+  },
+  {
+    "name": "ReluGraphics2",
+    "description": null,
+    "location": "visualization/visualization/org.jetbrains.kotlinx.dl.visualization.swing/-relu-graphics2/index.html",
+    "searchKeys": [
+      "ReluGraphics2"
+    ]
+  },
+  {
+    "name": "api",
+    "description": null,
+    "location": "api/index.html",
+    "searchKeys": [
+      "api"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core"
+    ]
+  },
+  {
+    "name": "Functional",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-functional/index.html",
+    "searchKeys": [
+      "Functional"
+    ]
+  },
+  {
+    "name": "GraphTrainableModel",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-graph-trainable-model/index.html",
+    "searchKeys": [
+      "GraphTrainableModel"
+    ]
+  },
+  {
+    "name": "KGraph",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-k-graph/index.html",
+    "searchKeys": [
+      "KGraph"
+    ]
+  },
+  {
+    "name": "SavingFormat",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-saving-format/index.html",
+    "searchKeys": [
+      "SavingFormat"
+    ]
+  },
+  {
+    "name": "JSON_CONFIG_CUSTOM_VARIABLES",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-saving-format/-j-s-o-n_-c-o-n-f-i-g_-c-u-s-t-o-m_-v-a-r-i-a-b-l-e-s/index.html",
+    "searchKeys": [
+      "JSON_CONFIG_CUSTOM_VARIABLES"
+    ]
+  },
+  {
+    "name": "TF_GRAPH",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-saving-format/-t-f_-g-r-a-p-h/index.html",
+    "searchKeys": [
+      "TF_GRAPH"
+    ]
+  },
+  {
+    "name": "TF_GRAPH_CUSTOM_VARIABLES",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-saving-format/-t-f_-g-r-a-p-h_-c-u-s-t-o-m_-v-a-r-i-a-b-l-e-s/index.html",
+    "searchKeys": [
+      "TF_GRAPH_CUSTOM_VARIABLES"
+    ]
+  },
+  {
+    "name": "Sequential",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-sequential/index.html",
+    "searchKeys": [
+      "Sequential"
+    ]
+  },
+  {
+    "name": "TrainableModel",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-trainable-model/index.html",
+    "searchKeys": [
+      "TrainableModel"
+    ]
+  },
+  {
+    "name": "WritingMode",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-writing-mode/index.html",
+    "searchKeys": [
+      "WritingMode"
+    ]
+  },
+  {
+    "name": "APPEND",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-writing-mode/-a-p-p-e-n-d/index.html",
+    "searchKeys": [
+      "APPEND"
+    ]
+  },
+  {
+    "name": "FAIL_IF_EXISTS",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-writing-mode/-f-a-i-l_-i-f_-e-x-i-s-t-s/index.html",
+    "searchKeys": [
+      "FAIL_IF_EXISTS"
+    ]
+  },
+  {
+    "name": "OVERRIDE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core/-writing-mode/-o-v-e-r-r-i-d-e/index.html",
+    "searchKeys": [
+      "OVERRIDE"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.activation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.activation"
+    ]
+  },
+  {
+    "name": "Activation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activation/index.html",
+    "searchKeys": [
+      "Activation"
+    ]
+  },
+  {
+    "name": "Activations",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/index.html",
+    "searchKeys": [
+      "Activations"
+    ]
+  },
+  {
+    "name": "Elu",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-elu/index.html",
+    "searchKeys": [
+      "Elu"
+    ]
+  },
+  {
+    "name": "Exponential",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-exponential/index.html",
+    "searchKeys": [
+      "Exponential"
+    ]
+  },
+  {
+    "name": "HardSigmoid",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-hard-sigmoid/index.html",
+    "searchKeys": [
+      "HardSigmoid"
+    ]
+  },
+  {
+    "name": "Linear",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-linear/index.html",
+    "searchKeys": [
+      "Linear"
+    ]
+  },
+  {
+    "name": "LogSoftmax",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-log-softmax/index.html",
+    "searchKeys": [
+      "LogSoftmax"
+    ]
+  },
+  {
+    "name": "Relu",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-relu/index.html",
+    "searchKeys": [
+      "Relu"
+    ]
+  },
+  {
+    "name": "Relu6",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-relu6/index.html",
+    "searchKeys": [
+      "Relu6"
+    ]
+  },
+  {
+    "name": "Selu",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-selu/index.html",
+    "searchKeys": [
+      "Selu"
+    ]
+  },
+  {
+    "name": "Sigmoid",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-sigmoid/index.html",
+    "searchKeys": [
+      "Sigmoid"
+    ]
+  },
+  {
+    "name": "Softmax",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-softmax/index.html",
+    "searchKeys": [
+      "Softmax"
+    ]
+  },
+  {
+    "name": "SoftPlus",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-soft-plus/index.html",
+    "searchKeys": [
+      "SoftPlus"
+    ]
+  },
+  {
+    "name": "SoftSign",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-soft-sign/index.html",
+    "searchKeys": [
+      "SoftSign"
+    ]
+  },
+  {
+    "name": "Swish",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-swish/index.html",
+    "searchKeys": [
+      "Swish"
+    ]
+  },
+  {
+    "name": "Tanh",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-activations/-tanh/index.html",
+    "searchKeys": [
+      "Tanh"
+    ]
+  },
+  {
+    "name": "EluActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-elu-activation/index.html",
+    "searchKeys": [
+      "EluActivation"
+    ]
+  },
+  {
+    "name": "ExponentialActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-exponential-activation/index.html",
+    "searchKeys": [
+      "ExponentialActivation"
+    ]
+  },
+  {
+    "name": "HardSigmoidActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-hard-sigmoid-activation/index.html",
+    "searchKeys": [
+      "HardSigmoidActivation"
+    ]
+  },
+  {
+    "name": "LinearActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-linear-activation/index.html",
+    "searchKeys": [
+      "LinearActivation"
+    ]
+  },
+  {
+    "name": "LogSoftmaxActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-log-softmax-activation/index.html",
+    "searchKeys": [
+      "LogSoftmaxActivation"
+    ]
+  },
+  {
+    "name": "Relu6Activation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-relu6-activation/index.html",
+    "searchKeys": [
+      "Relu6Activation"
+    ]
+  },
+  {
+    "name": "ReluActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-relu-activation/index.html",
+    "searchKeys": [
+      "ReluActivation"
+    ]
+  },
+  {
+    "name": "SeluActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-selu-activation/index.html",
+    "searchKeys": [
+      "SeluActivation"
+    ]
+  },
+  {
+    "name": "SigmoidActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-sigmoid-activation/index.html",
+    "searchKeys": [
+      "SigmoidActivation"
+    ]
+  },
+  {
+    "name": "SoftmaxActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-softmax-activation/index.html",
+    "searchKeys": [
+      "SoftmaxActivation"
+    ]
+  },
+  {
+    "name": "SoftPlusActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-soft-plus-activation/index.html",
+    "searchKeys": [
+      "SoftPlusActivation"
+    ]
+  },
+  {
+    "name": "SoftSignActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-soft-sign-activation/index.html",
+    "searchKeys": [
+      "SoftSignActivation"
+    ]
+  },
+  {
+    "name": "SwishActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-swish-activation/index.html",
+    "searchKeys": [
+      "SwishActivation"
+    ]
+  },
+  {
+    "name": "TanhActivation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.activation/-tanh-activation/index.html",
+    "searchKeys": [
+      "TanhActivation"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.callback",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.callback"
+    ]
+  },
+  {
+    "name": "Callback",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-callback/index.html",
+    "searchKeys": [
+      "Callback"
+    ]
+  },
+  {
+    "name": "EarlyStopping",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-early-stopping/index.html",
+    "searchKeys": [
+      "EarlyStopping"
+    ]
+  },
+  {
+    "name": "EarlyStoppingMode",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-early-stopping-mode/index.html",
+    "searchKeys": [
+      "EarlyStoppingMode"
+    ]
+  },
+  {
+    "name": "AUTO",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-early-stopping-mode/-a-u-t-o/index.html",
+    "searchKeys": [
+      "AUTO"
+    ]
+  },
+  {
+    "name": "MAX",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-early-stopping-mode/-m-a-x/index.html",
+    "searchKeys": [
+      "MAX"
+    ]
+  },
+  {
+    "name": "MIN",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-early-stopping-mode/-m-i-n/index.html",
+    "searchKeys": [
+      "MIN"
+    ]
+  },
+  {
+    "name": "TerminateOnNaN",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.callback/-terminate-on-na-n/index.html",
+    "searchKeys": [
+      "TerminateOnNaN"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.exception",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.exception/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.exception"
+    ]
+  },
+  {
+    "name": "IdentityDimensionalityException",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.exception/-identity-dimensionality-exception/index.html",
+    "searchKeys": [
+      "IdentityDimensionalityException"
+    ]
+  },
+  {
+    "name": "RepeatableLayerNameException",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.exception/-repeatable-layer-name-exception/index.html",
+    "searchKeys": [
+      "RepeatableLayerNameException"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.history",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.history"
+    ]
+  },
+  {
+    "name": "BatchEvent",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/-batch-event/index.html",
+    "searchKeys": [
+      "BatchEvent"
+    ]
+  },
+  {
+    "name": "BatchTrainingEvent",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/-batch-training-event/index.html",
+    "searchKeys": [
+      "BatchTrainingEvent"
+    ]
+  },
+  {
+    "name": "EpochTrainingEvent",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/-epoch-training-event/index.html",
+    "searchKeys": [
+      "EpochTrainingEvent"
+    ]
+  },
+  {
+    "name": "History",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/-history/index.html",
+    "searchKeys": [
+      "History"
+    ]
+  },
+  {
+    "name": "TrainingHistory",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.history/-training-history/index.html",
+    "searchKeys": [
+      "TrainingHistory"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.initializer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.initializer"
+    ]
+  },
+  {
+    "name": "Constant",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-constant/index.html",
+    "searchKeys": [
+      "Constant"
+    ]
+  },
+  {
+    "name": "Distribution",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-distribution/index.html",
+    "searchKeys": [
+      "Distribution"
+    ]
+  },
+  {
+    "name": "TRUNCATED_NORMAL",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-distribution/-t-r-u-n-c-a-t-e-d_-n-o-r-m-a-l/index.html",
+    "searchKeys": [
+      "TRUNCATED_NORMAL"
+    ]
+  },
+  {
+    "name": "UNIFORM",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-distribution/-u-n-i-f-o-r-m/index.html",
+    "searchKeys": [
+      "UNIFORM"
+    ]
+  },
+  {
+    "name": "UNTRUNCATED_NORMAL",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-distribution/-u-n-t-r-u-n-c-a-t-e-d_-n-o-r-m-a-l/index.html",
+    "searchKeys": [
+      "UNTRUNCATED_NORMAL"
+    ]
+  },
+  {
+    "name": "GlorotNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-glorot-normal/index.html",
+    "searchKeys": [
+      "GlorotNormal"
+    ]
+  },
+  {
+    "name": "GlorotUniform",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-glorot-uniform/index.html",
+    "searchKeys": [
+      "GlorotUniform"
+    ]
+  },
+  {
+    "name": "HeNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-he-normal/index.html",
+    "searchKeys": [
+      "HeNormal"
+    ]
+  },
+  {
+    "name": "HeUniform",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-he-uniform/index.html",
+    "searchKeys": [
+      "HeUniform"
+    ]
+  },
+  {
+    "name": "Identity",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-identity/index.html",
+    "searchKeys": [
+      "Identity"
+    ]
+  },
+  {
+    "name": "Initializer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-initializer/index.html",
+    "searchKeys": [
+      "Initializer"
+    ]
+  },
+  {
+    "name": "LeCunNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-le-cun-normal/index.html",
+    "searchKeys": [
+      "LeCunNormal"
+    ]
+  },
+  {
+    "name": "LeCunUniform",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-le-cun-uniform/index.html",
+    "searchKeys": [
+      "LeCunUniform"
+    ]
+  },
+  {
+    "name": "Mode",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-mode/index.html",
+    "searchKeys": [
+      "Mode"
+    ]
+  },
+  {
+    "name": "FAN_AVG",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-mode/-f-a-n_-a-v-g/index.html",
+    "searchKeys": [
+      "FAN_AVG"
+    ]
+  },
+  {
+    "name": "FAN_IN",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-mode/-f-a-n_-i-n/index.html",
+    "searchKeys": [
+      "FAN_IN"
+    ]
+  },
+  {
+    "name": "FAN_OUT",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-mode/-f-a-n_-o-u-t/index.html",
+    "searchKeys": [
+      "FAN_OUT"
+    ]
+  },
+  {
+    "name": "Ones",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-ones/index.html",
+    "searchKeys": [
+      "Ones"
+    ]
+  },
+  {
+    "name": "Orthogonal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-orthogonal/index.html",
+    "searchKeys": [
+      "Orthogonal"
+    ]
+  },
+  {
+    "name": "ParametrizedTruncatedNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-parametrized-truncated-normal/index.html",
+    "searchKeys": [
+      "ParametrizedTruncatedNormal"
+    ]
+  },
+  {
+    "name": "RandomNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-random-normal/index.html",
+    "searchKeys": [
+      "RandomNormal"
+    ]
+  },
+  {
+    "name": "RandomUniform",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-random-uniform/index.html",
+    "searchKeys": [
+      "RandomUniform"
+    ]
+  },
+  {
+    "name": "TruncatedNormal",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-truncated-normal/index.html",
+    "searchKeys": [
+      "TruncatedNormal"
+    ]
+  },
+  {
+    "name": "VarianceScaling",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-variance-scaling/index.html",
+    "searchKeys": [
+      "VarianceScaling"
+    ]
+  },
+  {
+    "name": "Zeros",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.initializer/-zeros/index.html",
+    "searchKeys": [
+      "Zeros"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer"
+    ]
+  },
+  {
+    "name": "Layer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html",
+    "searchKeys": [
+      "Layer"
+    ]
+  },
+  {
+    "name": "NoGradients",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer/-no-gradients/index.html",
+    "searchKeys": [
+      "NoGradients"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.activation",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.activation"
+    ]
+  },
+  {
+    "name": "AbstractActivationLayer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-abstract-activation-layer/index.html",
+    "searchKeys": [
+      "AbstractActivationLayer"
+    ]
+  },
+  {
+    "name": "ELU",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-e-l-u/index.html",
+    "searchKeys": [
+      "ELU"
+    ]
+  },
+  {
+    "name": "LeakyReLU",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-leaky-re-l-u/index.html",
+    "searchKeys": [
+      "LeakyReLU"
+    ]
+  },
+  {
+    "name": "PReLU",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-p-re-l-u/index.html",
+    "searchKeys": [
+      "PReLU"
+    ]
+  },
+  {
+    "name": "ReLU",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-re-l-u/index.html",
+    "searchKeys": [
+      "ReLU"
+    ]
+  },
+  {
+    "name": "Softmax",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-softmax/index.html",
+    "searchKeys": [
+      "Softmax"
+    ]
+  },
+  {
+    "name": "ThresholdedReLU",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.activation/-thresholded-re-l-u/index.html",
+    "searchKeys": [
+      "ThresholdedReLU"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.convolutional",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.convolutional"
+    ]
+  },
+  {
+    "name": "AbstractConv",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-abstract-conv/index.html",
+    "searchKeys": [
+      "AbstractConv"
+    ]
+  },
+  {
+    "name": "Conv1D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv1-d/index.html",
+    "searchKeys": [
+      "Conv1D"
+    ]
+  },
+  {
+    "name": "Conv2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv2-d/index.html",
+    "searchKeys": [
+      "Conv2D"
+    ]
+  },
+  {
+    "name": "Conv3D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv3-d/index.html",
+    "searchKeys": [
+      "Conv3D"
+    ]
+  },
+  {
+    "name": "ConvPadding",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv-padding/index.html",
+    "searchKeys": [
+      "ConvPadding"
+    ]
+  },
+  {
+    "name": "FULL",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv-padding/-f-u-l-l/index.html",
+    "searchKeys": [
+      "FULL"
+    ]
+  },
+  {
+    "name": "SAME",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv-padding/-s-a-m-e/index.html",
+    "searchKeys": [
+      "SAME"
+    ]
+  },
+  {
+    "name": "VALID",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-conv-padding/-v-a-l-i-d/index.html",
+    "searchKeys": [
+      "VALID"
+    ]
+  },
+  {
+    "name": "DepthwiseConv2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-depthwise-conv2-d/index.html",
+    "searchKeys": [
+      "DepthwiseConv2D"
+    ]
+  },
+  {
+    "name": "SeparableConv2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.convolutional/-separable-conv2-d/index.html",
+    "searchKeys": [
+      "SeparableConv2D"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.core",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.core/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.core"
+    ]
+  },
+  {
+    "name": "ActivationLayer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.core/-activation-layer/index.html",
+    "searchKeys": [
+      "ActivationLayer"
+    ]
+  },
+  {
+    "name": "Dense",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.core/-dense/index.html",
+    "searchKeys": [
+      "Dense"
+    ]
+  },
+  {
+    "name": "Input",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.core/-input/index.html",
+    "searchKeys": [
+      "Input"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.merge",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.merge"
+    ]
+  },
+  {
+    "name": "AbstractMerge",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-abstract-merge/index.html",
+    "searchKeys": [
+      "AbstractMerge"
+    ]
+  },
+  {
+    "name": "Add",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-add/index.html",
+    "searchKeys": [
+      "Add"
+    ]
+  },
+  {
+    "name": "Average",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-average/index.html",
+    "searchKeys": [
+      "Average"
+    ]
+  },
+  {
+    "name": "Concatenate",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-concatenate/index.html",
+    "searchKeys": [
+      "Concatenate"
+    ]
+  },
+  {
+    "name": "Maximum",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-maximum/index.html",
+    "searchKeys": [
+      "Maximum"
+    ]
+  },
+  {
+    "name": "Minimum",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-minimum/index.html",
+    "searchKeys": [
+      "Minimum"
+    ]
+  },
+  {
+    "name": "Multiply",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-multiply/index.html",
+    "searchKeys": [
+      "Multiply"
+    ]
+  },
+  {
+    "name": "Subtract",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.merge/-subtract/index.html",
+    "searchKeys": [
+      "Subtract"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.normalization",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.normalization/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.normalization"
+    ]
+  },
+  {
+    "name": "BatchNorm",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.normalization/-batch-norm/index.html",
+    "searchKeys": [
+      "BatchNorm"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.pooling",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.pooling"
+    ]
+  },
+  {
+    "name": "AvgPool1D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-avg-pool1-d/index.html",
+    "searchKeys": [
+      "AvgPool1D"
+    ]
+  },
+  {
+    "name": "AvgPool2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-avg-pool2-d/index.html",
+    "searchKeys": [
+      "AvgPool2D"
+    ]
+  },
+  {
+    "name": "AvgPool3D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-avg-pool3-d/index.html",
+    "searchKeys": [
+      "AvgPool3D"
+    ]
+  },
+  {
+    "name": "GlobalAvgPool1D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-global-avg-pool1-d/index.html",
+    "searchKeys": [
+      "GlobalAvgPool1D"
+    ]
+  },
+  {
+    "name": "GlobalAvgPool2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-global-avg-pool2-d/index.html",
+    "searchKeys": [
+      "GlobalAvgPool2D"
+    ]
+  },
+  {
+    "name": "GlobalAvgPool3D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-global-avg-pool3-d/index.html",
+    "searchKeys": [
+      "GlobalAvgPool3D"
+    ]
+  },
+  {
+    "name": "GlobalMaxPool1D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-global-max-pool1-d/index.html",
+    "searchKeys": [
+      "GlobalMaxPool1D"
+    ]
+  },
+  {
+    "name": "MaxPool1D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-max-pool1-d/index.html",
+    "searchKeys": [
+      "MaxPool1D"
+    ]
+  },
+  {
+    "name": "MaxPool2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-max-pool2-d/index.html",
+    "searchKeys": [
+      "MaxPool2D"
+    ]
+  },
+  {
+    "name": "MaxPool3D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.pooling/-max-pool3-d/index.html",
+    "searchKeys": [
+      "MaxPool3D"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.regularization",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.regularization/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.regularization"
+    ]
+  },
+  {
+    "name": "Dropout",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.regularization/-dropout/index.html",
+    "searchKeys": [
+      "Dropout"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.layer.reshaping",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.reshaping/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.layer.reshaping"
+    ]
+  },
+  {
+    "name": "Cropping2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.reshaping/-cropping2-d/index.html",
+    "searchKeys": [
+      "Cropping2D"
+    ]
+  },
+  {
+    "name": "Flatten",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.reshaping/-flatten/index.html",
+    "searchKeys": [
+      "Flatten"
+    ]
+  },
+  {
+    "name": "Reshape",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.reshaping/-reshape/index.html",
+    "searchKeys": [
+      "Reshape"
+    ]
+  },
+  {
+    "name": "ZeroPadding2D",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.layer.reshaping/-zero-padding2-d/index.html",
+    "searchKeys": [
+      "ZeroPadding2D"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.loss",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.loss"
+    ]
+  },
+  {
+    "name": "BinaryCrossEntropy",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-binary-cross-entropy/index.html",
+    "searchKeys": [
+      "BinaryCrossEntropy"
+    ]
+  },
+  {
+    "name": "Hinge",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-hinge/index.html",
+    "searchKeys": [
+      "Hinge"
+    ]
+  },
+  {
+    "name": "Huber",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-huber/index.html",
+    "searchKeys": [
+      "Huber"
+    ]
+  },
+  {
+    "name": "LogCosh",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-log-cosh/index.html",
+    "searchKeys": [
+      "LogCosh"
+    ]
+  },
+  {
+    "name": "Losses",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/index.html",
+    "searchKeys": [
+      "Losses"
+    ]
+  },
+  {
+    "name": "BINARY_CROSSENTROPY",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-b-i-n-a-r-y_-c-r-o-s-s-e-n-t-r-o-p-y/index.html",
+    "searchKeys": [
+      "BINARY_CROSSENTROPY"
+    ]
+  },
+  {
+    "name": "HINGE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-h-i-n-g-e/index.html",
+    "searchKeys": [
+      "HINGE"
+    ]
+  },
+  {
+    "name": "HUBER",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-h-u-b-e-r/index.html",
+    "searchKeys": [
+      "HUBER"
+    ]
+  },
+  {
+    "name": "LOG_COSH",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-l-o-g_-c-o-s-h/index.html",
+    "searchKeys": [
+      "LOG_COSH"
+    ]
+  },
+  {
+    "name": "MAE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-m-a-e/index.html",
+    "searchKeys": [
+      "MAE"
+    ]
+  },
+  {
+    "name": "MAPE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-m-a-p-e/index.html",
+    "searchKeys": [
+      "MAPE"
+    ]
+  },
+  {
+    "name": "MSE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-m-s-e/index.html",
+    "searchKeys": [
+      "MSE"
+    ]
+  },
+  {
+    "name": "MSLE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-m-s-l-e/index.html",
+    "searchKeys": [
+      "MSLE"
+    ]
+  },
+  {
+    "name": "POISSON",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-p-o-i-s-s-o-n/index.html",
+    "searchKeys": [
+      "POISSON"
+    ]
+  },
+  {
+    "name": "SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-s-o-f-t_-m-a-x_-c-r-o-s-s_-e-n-t-r-o-p-y_-w-i-t-h_-l-o-g-i-t-s/index.html",
+    "searchKeys": [
+      "SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS"
+    ]
+  },
+  {
+    "name": "SQUARED_HINGE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-losses/-s-q-u-a-r-e-d_-h-i-n-g-e/index.html",
+    "searchKeys": [
+      "SQUARED_HINGE"
+    ]
+  },
+  {
+    "name": "LossFunction",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-loss-function/index.html",
+    "searchKeys": [
+      "LossFunction"
+    ]
+  },
+  {
+    "name": "MAE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-m-a-e/index.html",
+    "searchKeys": [
+      "MAE"
+    ]
+  },
+  {
+    "name": "MAPE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-m-a-p-e/index.html",
+    "searchKeys": [
+      "MAPE"
+    ]
+  },
+  {
+    "name": "MSE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-m-s-e/index.html",
+    "searchKeys": [
+      "MSE"
+    ]
+  },
+  {
+    "name": "MSLE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-m-s-l-e/index.html",
+    "searchKeys": [
+      "MSLE"
+    ]
+  },
+  {
+    "name": "Poisson",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-poisson/index.html",
+    "searchKeys": [
+      "Poisson"
+    ]
+  },
+  {
+    "name": "ReductionType",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-reduction-type/index.html",
+    "searchKeys": [
+      "ReductionType"
+    ]
+  },
+  {
+    "name": "SUM",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-reduction-type/-s-u-m/index.html",
+    "searchKeys": [
+      "SUM"
+    ]
+  },
+  {
+    "name": "SUM_OVER_BATCH_SIZE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-reduction-type/-s-u-m_-o-v-e-r_-b-a-t-c-h_-s-i-z-e/index.html",
+    "searchKeys": [
+      "SUM_OVER_BATCH_SIZE"
+    ]
+  },
+  {
+    "name": "SoftmaxCrossEntropyWithLogits",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-softmax-cross-entropy-with-logits/index.html",
+    "searchKeys": [
+      "SoftmaxCrossEntropyWithLogits"
+    ]
+  },
+  {
+    "name": "SquaredHinge",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.loss/-squared-hinge/index.html",
+    "searchKeys": [
+      "SquaredHinge"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.metric",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.metric"
+    ]
+  },
+  {
+    "name": "Accuracy",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-accuracy/index.html",
+    "searchKeys": [
+      "Accuracy"
+    ]
+  },
+  {
+    "name": "EvaluationResult",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-evaluation-result/index.html",
+    "searchKeys": [
+      "EvaluationResult"
+    ]
+  },
+  {
+    "name": "MAE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-m-a-e/index.html",
+    "searchKeys": [
+      "MAE"
+    ]
+  },
+  {
+    "name": "MAPE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-m-a-p-e/index.html",
+    "searchKeys": [
+      "MAPE"
+    ]
+  },
+  {
+    "name": "Metric",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metric/index.html",
+    "searchKeys": [
+      "Metric"
+    ]
+  },
+  {
+    "name": "Metrics",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metrics/index.html",
+    "searchKeys": [
+      "Metrics"
+    ]
+  },
+  {
+    "name": "ACCURACY",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metrics/-a-c-c-u-r-a-c-y/index.html",
+    "searchKeys": [
+      "ACCURACY"
+    ]
+  },
+  {
+    "name": "MAE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metrics/-m-a-e/index.html",
+    "searchKeys": [
+      "MAE"
+    ]
+  },
+  {
+    "name": "MSE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metrics/-m-s-e/index.html",
+    "searchKeys": [
+      "MSE"
+    ]
+  },
+  {
+    "name": "MSLE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-metrics/-m-s-l-e/index.html",
+    "searchKeys": [
+      "MSLE"
+    ]
+  },
+  {
+    "name": "MSE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-m-s-e/index.html",
+    "searchKeys": [
+      "MSE"
+    ]
+  },
+  {
+    "name": "MSLE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.metric/-m-s-l-e/index.html",
+    "searchKeys": [
+      "MSLE"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.model",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.model"
+    ]
+  },
+  {
+    "name": "resnet101()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet101.html",
+    "searchKeys": [
+      "resnet101()"
+    ]
+  },
+  {
+    "name": "resnet101Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet101-light.html",
+    "searchKeys": [
+      "resnet101Light()"
+    ]
+  },
+  {
+    "name": "resnet101v2()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet101v2.html",
+    "searchKeys": [
+      "resnet101v2()"
+    ]
+  },
+  {
+    "name": "resnet101v2Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet101v2-light.html",
+    "searchKeys": [
+      "resnet101v2Light()"
+    ]
+  },
+  {
+    "name": "resnet152()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet152.html",
+    "searchKeys": [
+      "resnet152()"
+    ]
+  },
+  {
+    "name": "resnet152Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet152-light.html",
+    "searchKeys": [
+      "resnet152Light()"
+    ]
+  },
+  {
+    "name": "resnet152v2()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet152v2.html",
+    "searchKeys": [
+      "resnet152v2()"
+    ]
+  },
+  {
+    "name": "resnet152v2Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet152v2-light.html",
+    "searchKeys": [
+      "resnet152v2Light()"
+    ]
+  },
+  {
+    "name": "resnet50()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet50.html",
+    "searchKeys": [
+      "resnet50()"
+    ]
+  },
+  {
+    "name": "resnet50Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet50-light.html",
+    "searchKeys": [
+      "resnet50Light()"
+    ]
+  },
+  {
+    "name": "resnet50v2()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet50v2.html",
+    "searchKeys": [
+      "resnet50v2()"
+    ]
+  },
+  {
+    "name": "resnet50v2Light()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/resnet50v2-light.html",
+    "searchKeys": [
+      "resnet50v2Light()"
+    ]
+  },
+  {
+    "name": "vgg16()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/vgg16.html",
+    "searchKeys": [
+      "vgg16()"
+    ]
+  },
+  {
+    "name": "vgg19()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.model/vgg19.html",
+    "searchKeys": [
+      "vgg19()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.optimizer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.optimizer"
+    ]
+  },
+  {
+    "name": "AdaDelta",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-ada-delta/index.html",
+    "searchKeys": [
+      "AdaDelta"
+    ]
+  },
+  {
+    "name": "AdaGrad",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-ada-grad/index.html",
+    "searchKeys": [
+      "AdaGrad"
+    ]
+  },
+  {
+    "name": "AdaGradDA",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-ada-grad-d-a/index.html",
+    "searchKeys": [
+      "AdaGradDA"
+    ]
+  },
+  {
+    "name": "Adam",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-adam/index.html",
+    "searchKeys": [
+      "Adam"
+    ]
+  },
+  {
+    "name": "Adamax",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-adamax/index.html",
+    "searchKeys": [
+      "Adamax"
+    ]
+  },
+  {
+    "name": "ClipGradientAction",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-clip-gradient-action/index.html",
+    "searchKeys": [
+      "ClipGradientAction"
+    ]
+  },
+  {
+    "name": "ClipGradientByNorm",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-clip-gradient-by-norm/index.html",
+    "searchKeys": [
+      "ClipGradientByNorm"
+    ]
+  },
+  {
+    "name": "ClipGradientByValue",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-clip-gradient-by-value/index.html",
+    "searchKeys": [
+      "ClipGradientByValue"
+    ]
+  },
+  {
+    "name": "Ftrl",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-ftrl/index.html",
+    "searchKeys": [
+      "Ftrl"
+    ]
+  },
+  {
+    "name": "Momentum",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-momentum/index.html",
+    "searchKeys": [
+      "Momentum"
+    ]
+  },
+  {
+    "name": "NoClipGradient",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-no-clip-gradient/index.html",
+    "searchKeys": [
+      "NoClipGradient"
+    ]
+  },
+  {
+    "name": "Optimizer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-optimizer/index.html",
+    "searchKeys": [
+      "Optimizer"
+    ]
+  },
+  {
+    "name": "RMSProp",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-r-m-s-prop/index.html",
+    "searchKeys": [
+      "RMSProp"
+    ]
+  },
+  {
+    "name": "SGD",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.optimizer/-s-g-d/index.html",
+    "searchKeys": [
+      "SGD"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.regularizer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.regularizer"
+    ]
+  },
+  {
+    "name": "DEFAULT_PENALTY",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/-d-e-f-a-u-l-t_-p-e-n-a-l-t-y.html",
+    "searchKeys": [
+      "DEFAULT_PENALTY"
+    ]
+  },
+  {
+    "name": "L1",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/-l1/index.html",
+    "searchKeys": [
+      "L1"
+    ]
+  },
+  {
+    "name": "L2",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/-l2/index.html",
+    "searchKeys": [
+      "L2"
+    ]
+  },
+  {
+    "name": "L2L1",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/-l2-l1/index.html",
+    "searchKeys": [
+      "L2L1"
+    ]
+  },
+  {
+    "name": "Regularizer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.regularizer/-regularizer/index.html",
+    "searchKeys": [
+      "Regularizer"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.shape",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.shape/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.shape"
+    ]
+  },
+  {
+    "name": "reshape3DTo1D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.shape/reshape3-d-to1-d.html",
+    "searchKeys": [
+      "reshape3DTo1D()"
+    ]
+  },
+  {
+    "name": "tail()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.shape/tail.html",
+    "searchKeys": [
+      "tail()"
+    ]
+  },
+  {
+    "name": "TensorShape",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.shape/-tensor-shape/index.html",
+    "searchKeys": [
+      "TensorShape"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.core.util",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.util/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.core.util"
+    ]
+  },
+  {
+    "name": "serializeLabelsToBuffer()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.util/serialize-labels-to-buffer.html",
+    "searchKeys": [
+      "serializeLabelsToBuffer()"
+    ]
+  },
+  {
+    "name": "serializeToBuffer",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.util/serialize-to-buffer.html",
+    "searchKeys": [
+      "serializeToBuffer"
+    ]
+  },
+  {
+    "name": "TF",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.core.util/-t-f/index.html",
+    "searchKeys": [
+      "TF"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.extension",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.extension"
+    ]
+  },
+  {
+    "name": "convertTensorToFlattenFloatArray()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/convert-tensor-to-flatten-float-array.html",
+    "searchKeys": [
+      "convertTensorToFlattenFloatArray()"
+    ]
+  },
+  {
+    "name": "convertTensorToMultiDimArray()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/convert-tensor-to-multi-dim-array.html",
+    "searchKeys": [
+      "convertTensorToMultiDimArray()"
+    ]
+  },
+  {
+    "name": "get2D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/get2-d.html",
+    "searchKeys": [
+      "get2D()"
+    ]
+  },
+  {
+    "name": "get3D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/get3-d.html",
+    "searchKeys": [
+      "get3D()"
+    ]
+  },
+  {
+    "name": "set2D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/set2-d.html",
+    "searchKeys": [
+      "set2D()"
+    ]
+  },
+  {
+    "name": "set3D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.extension/set3-d.html",
+    "searchKeys": [
+      "set3D()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.inference",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.inference"
+    ]
+  },
+  {
+    "name": "InferenceModel",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference/-inference-model/index.html",
+    "searchKeys": [
+      "InferenceModel"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.inference.keras",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.inference.keras"
+    ]
+  },
+  {
+    "name": "LayerBatchNormPaths",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-layer-batch-norm-paths/index.html",
+    "searchKeys": [
+      "LayerBatchNormPaths"
+    ]
+  },
+  {
+    "name": "LayerConvOrDensePaths",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-layer-conv-or-dense-paths/index.html",
+    "searchKeys": [
+      "LayerConvOrDensePaths"
+    ]
+  },
+  {
+    "name": "LayerPaths",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-layer-paths/index.html",
+    "searchKeys": [
+      "LayerPaths"
+    ]
+  },
+  {
+    "name": "LayerSeparableConv2DPaths",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-layer-separable-conv2-d-paths/index.html",
+    "searchKeys": [
+      "LayerSeparableConv2DPaths"
+    ]
+  },
+  {
+    "name": "loadWeights",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/load-weights.html",
+    "searchKeys": [
+      "loadWeights"
+    ]
+  },
+  {
+    "name": "loadWeightsByPaths",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/load-weights-by-paths.html",
+    "searchKeys": [
+      "loadWeightsByPaths"
+    ]
+  },
+  {
+    "name": "loadWeightsByPathTemplates",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/load-weights-by-path-templates.html",
+    "searchKeys": [
+      "loadWeightsByPathTemplates"
+    ]
+  },
+  {
+    "name": "loadWeightsForFrozenLayers()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/load-weights-for-frozen-layers.html",
+    "searchKeys": [
+      "loadWeightsForFrozenLayers()"
+    ]
+  },
+  {
+    "name": "loadWeightsForFrozenLayersByPathTemplates()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/load-weights-for-frozen-layers-by-path-templates.html",
+    "searchKeys": [
+      "loadWeightsForFrozenLayersByPathTemplates()"
+    ]
+  },
+  {
+    "name": "MissedWeightsStrategy",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-missed-weights-strategy/index.html",
+    "searchKeys": [
+      "MissedWeightsStrategy"
+    ]
+  },
+  {
+    "name": "INITIALIZE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-missed-weights-strategy/-i-n-i-t-i-a-l-i-z-e/index.html",
+    "searchKeys": [
+      "INITIALIZE"
+    ]
+  },
+  {
+    "name": "LOAD_NEW_FORMAT",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/-missed-weights-strategy/-l-o-a-d_-n-e-w_-f-o-r-m-a-t/index.html",
+    "searchKeys": [
+      "LOAD_NEW_FORMAT"
+    ]
+  },
+  {
+    "name": "recursivePrintGroupInHDF5File()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/recursive-print-group-in-h-d-f5-file.html",
+    "searchKeys": [
+      "recursivePrintGroupInHDF5File()"
+    ]
+  },
+  {
+    "name": "saveModelConfiguration()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras/save-model-configuration.html",
+    "searchKeys": [
+      "saveModelConfiguration()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.inference.keras.loaders",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.inference.keras.loaders"
+    ]
+  },
+  {
+    "name": "caffeStylePreprocessing()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/caffe-style-preprocessing.html",
+    "searchKeys": [
+      "caffeStylePreprocessing()"
+    ]
+  },
+  {
+    "name": "InputType",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-input-type/index.html",
+    "searchKeys": [
+      "InputType"
+    ]
+  },
+  {
+    "name": "CAFFE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-input-type/-c-a-f-f-e/index.html",
+    "searchKeys": [
+      "CAFFE"
+    ]
+  },
+  {
+    "name": "TF",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-input-type/-t-f/index.html",
+    "searchKeys": [
+      "TF"
+    ]
+  },
+  {
+    "name": "TORCH",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-input-type/-t-o-r-c-h/index.html",
+    "searchKeys": [
+      "TORCH"
+    ]
+  },
+  {
+    "name": "LoadingMode",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-loading-mode/index.html",
+    "searchKeys": [
+      "LoadingMode"
+    ]
+  },
+  {
+    "name": "OVERRIDE_IF_EXISTS",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-loading-mode/-o-v-e-r-r-i-d-e_-i-f_-e-x-i-s-t-s/index.html",
+    "searchKeys": [
+      "OVERRIDE_IF_EXISTS"
+    ]
+  },
+  {
+    "name": "SKIP_LOADING_IF_EXISTS",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-loading-mode/-s-k-i-p_-l-o-a-d-i-n-g_-i-f_-e-x-i-s-t-s/index.html",
+    "searchKeys": [
+      "SKIP_LOADING_IF_EXISTS"
+    ]
+  },
+  {
+    "name": "ModelType",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/index.html",
+    "searchKeys": [
+      "ModelType"
+    ]
+  },
+  {
+    "name": "DenseNet121",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-dense-net121/index.html",
+    "searchKeys": [
+      "DenseNet121"
+    ]
+  },
+  {
+    "name": "DenseNet169",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-dense-net169/index.html",
+    "searchKeys": [
+      "DenseNet169"
+    ]
+  },
+  {
+    "name": "DenseNet201",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-dense-net201/index.html",
+    "searchKeys": [
+      "DenseNet201"
+    ]
+  },
+  {
+    "name": "Inception",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-inception/index.html",
+    "searchKeys": [
+      "Inception"
+    ]
+  },
+  {
+    "name": "MobileNet",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-mobile-net/index.html",
+    "searchKeys": [
+      "MobileNet"
+    ]
+  },
+  {
+    "name": "MobileNetv2",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-mobile-netv2/index.html",
+    "searchKeys": [
+      "MobileNetv2"
+    ]
+  },
+  {
+    "name": "NASNetLarge",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-n-a-s-net-large/index.html",
+    "searchKeys": [
+      "NASNetLarge"
+    ]
+  },
+  {
+    "name": "NASNetMobile",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-n-a-s-net-mobile/index.html",
+    "searchKeys": [
+      "NASNetMobile"
+    ]
+  },
+  {
+    "name": "ResNet_101",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_101/index.html",
+    "searchKeys": [
+      "ResNet_101"
+    ]
+  },
+  {
+    "name": "ResNet_101_v2",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_101_v2/index.html",
+    "searchKeys": [
+      "ResNet_101_v2"
+    ]
+  },
+  {
+    "name": "ResNet_151_v2",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_151_v2/index.html",
+    "searchKeys": [
+      "ResNet_151_v2"
+    ]
+  },
+  {
+    "name": "ResNet_152",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_152/index.html",
+    "searchKeys": [
+      "ResNet_152"
+    ]
+  },
+  {
+    "name": "ResNet_50",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_50/index.html",
+    "searchKeys": [
+      "ResNet_50"
+    ]
+  },
+  {
+    "name": "ResNet_50_v2",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-res-net_50_v2/index.html",
+    "searchKeys": [
+      "ResNet_50_v2"
+    ]
+  },
+  {
+    "name": "VGG_16",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-v-g-g_16/index.html",
+    "searchKeys": [
+      "VGG_16"
+    ]
+  },
+  {
+    "name": "VGG_19",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-v-g-g_19/index.html",
+    "searchKeys": [
+      "VGG_19"
+    ]
+  },
+  {
+    "name": "Xception",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-type/-xception/index.html",
+    "searchKeys": [
+      "Xception"
+    ]
+  },
+  {
+    "name": "ModelZoo",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-model-zoo/index.html",
+    "searchKeys": [
+      "ModelZoo"
+    ]
+  },
+  {
+    "name": "predictTop5Labels()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/predict-top5-labels.html",
+    "searchKeys": [
+      "predictTop5Labels()"
+    ]
+  },
+  {
+    "name": "prepareHumanReadableClassLabels()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/prepare-human-readable-class-labels.html",
+    "searchKeys": [
+      "prepareHumanReadableClassLabels()"
+    ]
+  },
+  {
+    "name": "preprocessInput",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/preprocess-input.html",
+    "searchKeys": [
+      "preprocessInput"
+    ]
+  },
+  {
+    "name": "reshapeInput()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/reshape-input.html",
+    "searchKeys": [
+      "reshapeInput()"
+    ]
+  },
+  {
+    "name": "torchStylePreprocessing()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/torch-style-preprocessing.html",
+    "searchKeys": [
+      "torchStylePreprocessing()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.api.inference.savedmodel",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.api.inference.savedmodel"
+    ]
+  },
+  {
+    "name": "Input",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/-input/index.html",
+    "searchKeys": [
+      "Input"
+    ]
+  },
+  {
+    "name": "PLACEHOLDER",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/-input/-p-l-a-c-e-h-o-l-d-e-r/index.html",
+    "searchKeys": [
+      "PLACEHOLDER"
+    ]
+  },
+  {
+    "name": "Output",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/-output/index.html",
+    "searchKeys": [
+      "Output"
+    ]
+  },
+  {
+    "name": "ARGMAX",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/-output/-a-r-g-m-a-x/index.html",
+    "searchKeys": [
+      "ARGMAX"
+    ]
+  },
+  {
+    "name": "SavedModel",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.api.inference.savedmodel/-saved-model/index.html",
+    "searchKeys": [
+      "SavedModel"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset"
+    ]
+  },
+  {
+    "name": "cifar10Paths()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/cifar10-paths.html",
+    "searchKeys": [
+      "cifar10Paths()"
+    ]
+  },
+  {
+    "name": "DataBatch",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-data-batch/index.html",
+    "searchKeys": [
+      "DataBatch"
+    ]
+  },
+  {
+    "name": "Dataset",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-dataset/index.html",
+    "searchKeys": [
+      "Dataset"
+    ]
+  },
+  {
+    "name": "dogsCatsDatasetPath()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/dogs-cats-dataset-path.html",
+    "searchKeys": [
+      "dogsCatsDatasetPath()"
+    ]
+  },
+  {
+    "name": "dogsCatsSmallDatasetPath()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/dogs-cats-small-dataset-path.html",
+    "searchKeys": [
+      "dogsCatsSmallDatasetPath()"
+    ]
+  },
+  {
+    "name": "fashionMnist()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/fashion-mnist.html",
+    "searchKeys": [
+      "fashionMnist()"
+    ]
+  },
+  {
+    "name": "freeSpokenDigitDatasetPath()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/free-spoken-digit-dataset-path.html",
+    "searchKeys": [
+      "freeSpokenDigitDatasetPath()"
+    ]
+  },
+  {
+    "name": "freeSpokenDigits()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/free-spoken-digits.html",
+    "searchKeys": [
+      "freeSpokenDigits()"
+    ]
+  },
+  {
+    "name": "FSDD_SOUND_DATA_SIZE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-f-s-d-d_-s-o-u-n-d_-d-a-t-a_-s-i-z-e.html",
+    "searchKeys": [
+      "FSDD_SOUND_DATA_SIZE"
+    ]
+  },
+  {
+    "name": "mnist()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/mnist.html",
+    "searchKeys": [
+      "mnist()"
+    ]
+  },
+  {
+    "name": "mnist3D()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/mnist3-d.html",
+    "searchKeys": [
+      "mnist3D()"
+    ]
+  },
+  {
+    "name": "MNIST_3D_DATASET",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-m-n-i-s-t_3-d_-d-a-t-a-s-e-t.html",
+    "searchKeys": [
+      "MNIST_3D_DATASET"
+    ]
+  },
+  {
+    "name": "OnFlyImageDataset",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-on-fly-image-dataset/index.html",
+    "searchKeys": [
+      "OnFlyImageDataset"
+    ]
+  },
+  {
+    "name": "OnHeapDataset",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset/-on-heap-dataset/index.html",
+    "searchKeys": [
+      "OnHeapDataset"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.handler",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.handler"
+    ]
+  },
+  {
+    "name": "extractCifar10Images()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-cifar10-images.html",
+    "searchKeys": [
+      "extractCifar10Images()"
+    ]
+  },
+  {
+    "name": "extractCifar10Labels()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-cifar10-labels.html",
+    "searchKeys": [
+      "extractCifar10Labels()"
+    ]
+  },
+  {
+    "name": "extractCifar10LabelsAnsSort()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-cifar10-labels-ans-sort.html",
+    "searchKeys": [
+      "extractCifar10LabelsAnsSort()"
+    ]
+  },
+  {
+    "name": "extractFashionImages()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-fashion-images.html",
+    "searchKeys": [
+      "extractFashionImages()"
+    ]
+  },
+  {
+    "name": "extractFashionLabels()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-fashion-labels.html",
+    "searchKeys": [
+      "extractFashionLabels()"
+    ]
+  },
+  {
+    "name": "extractImages()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-images.html",
+    "searchKeys": [
+      "extractImages()"
+    ]
+  },
+  {
+    "name": "extractLabels()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/extract-labels.html",
+    "searchKeys": [
+      "extractLabels()"
+    ]
+  },
+  {
+    "name": "FASHION_TEST_IMAGES_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-f-a-s-h-i-o-n_-t-e-s-t_-i-m-a-g-e-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "FASHION_TEST_IMAGES_ARCHIVE"
+    ]
+  },
+  {
+    "name": "FASHION_TEST_LABELS_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-f-a-s-h-i-o-n_-t-e-s-t_-l-a-b-e-l-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "FASHION_TEST_LABELS_ARCHIVE"
+    ]
+  },
+  {
+    "name": "FASHION_TRAIN_IMAGES_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-f-a-s-h-i-o-n_-t-r-a-i-n_-i-m-a-g-e-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "FASHION_TRAIN_IMAGES_ARCHIVE"
+    ]
+  },
+  {
+    "name": "FASHION_TRAIN_LABELS_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-f-a-s-h-i-o-n_-t-r-a-i-n_-l-a-b-e-l-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "FASHION_TRAIN_LABELS_ARCHIVE"
+    ]
+  },
+  {
+    "name": "NUMBER_OF_CLASSES",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-n-u-m-b-e-r_-o-f_-c-l-a-s-s-e-s.html",
+    "searchKeys": [
+      "NUMBER_OF_CLASSES"
+    ]
+  },
+  {
+    "name": "TEST_IMAGES_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-t-e-s-t_-i-m-a-g-e-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "TEST_IMAGES_ARCHIVE"
+    ]
+  },
+  {
+    "name": "TEST_LABELS_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-t-e-s-t_-l-a-b-e-l-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "TEST_LABELS_ARCHIVE"
+    ]
+  },
+  {
+    "name": "TRAIN_IMAGES_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-t-r-a-i-n_-i-m-a-g-e-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "TRAIN_IMAGES_ARCHIVE"
+    ]
+  },
+  {
+    "name": "TRAIN_LABELS_ARCHIVE",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.handler/-t-r-a-i-n_-l-a-b-e-l-s_-a-r-c-h-i-v-e.html",
+    "searchKeys": [
+      "TRAIN_LABELS_ARCHIVE"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.image",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.image/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.image"
+    ]
+  },
+  {
+    "name": "ColorOrder",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.image/-color-order/index.html",
+    "searchKeys": [
+      "ColorOrder"
+    ]
+  },
+  {
+    "name": "BGR",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.image/-color-order/-b-g-r/index.html",
+    "searchKeys": [
+      "BGR"
+    ]
+  },
+  {
+    "name": "RGB",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.image/-color-order/-r-g-b/index.html",
+    "searchKeys": [
+      "RGB"
+    ]
+  },
+  {
+    "name": "ImageConverter",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.image/-image-converter/index.html",
+    "searchKeys": [
+      "ImageConverter"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.preprocessor",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.preprocessor"
+    ]
+  },
+  {
+    "name": "ImageShape",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-image-shape/index.html",
+    "searchKeys": [
+      "ImageShape"
+    ]
+  },
+  {
+    "name": "preprocess()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/preprocess.html",
+    "searchKeys": [
+      "preprocess()"
+    ]
+  },
+  {
+    "name": "Preprocessing",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-preprocessing/index.html",
+    "searchKeys": [
+      "Preprocessing"
+    ]
+  },
+  {
+    "name": "Preprocessor",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-preprocessor/index.html",
+    "searchKeys": [
+      "Preprocessor"
+    ]
+  },
+  {
+    "name": "rescale()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/rescale.html",
+    "searchKeys": [
+      "rescale()"
+    ]
+  },
+  {
+    "name": "Rescaling",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-rescaling/index.html",
+    "searchKeys": [
+      "Rescaling"
+    ]
+  },
+  {
+    "name": "Sharpen",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-sharpen/index.html",
+    "searchKeys": [
+      "Sharpen"
+    ]
+  },
+  {
+    "name": "sharpen()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/sharpen.html",
+    "searchKeys": [
+      "sharpen()"
+    ]
+  },
+  {
+    "name": "TensorPreprocessing",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/-tensor-preprocessing/index.html",
+    "searchKeys": [
+      "TensorPreprocessing"
+    ]
+  },
+  {
+    "name": "transformImage()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/transform-image.html",
+    "searchKeys": [
+      "transformImage()"
+    ]
+  },
+  {
+    "name": "transformTensor()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor/transform-tensor.html",
+    "searchKeys": [
+      "transformTensor()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.preprocessor.generator",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.generator/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.preprocessor.generator"
+    ]
+  },
+  {
+    "name": "FromFolders",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.generator/-from-folders/index.html",
+    "searchKeys": [
+      "FromFolders"
+    ]
+  },
+  {
+    "name": "LabelGenerator",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.generator/-label-generator/index.html",
+    "searchKeys": [
+      "LabelGenerator"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.preprocessor.image",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.preprocessor.image"
+    ]
+  },
+  {
+    "name": "crop()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/crop.html",
+    "searchKeys": [
+      "crop()"
+    ]
+  },
+  {
+    "name": "Cropping",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-cropping/index.html",
+    "searchKeys": [
+      "Cropping"
+    ]
+  },
+  {
+    "name": "ImagePreprocessing",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-image-preprocessing/index.html",
+    "searchKeys": [
+      "ImagePreprocessing"
+    ]
+  },
+  {
+    "name": "ImagePreprocessor",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-image-preprocessor/index.html",
+    "searchKeys": [
+      "ImagePreprocessor"
+    ]
+  },
+  {
+    "name": "InterpolationType",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-interpolation-type/index.html",
+    "searchKeys": [
+      "InterpolationType"
+    ]
+  },
+  {
+    "name": "BICUBIC",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-interpolation-type/-b-i-c-u-b-i-c/index.html",
+    "searchKeys": [
+      "BICUBIC"
+    ]
+  },
+  {
+    "name": "BILINEAR",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-interpolation-type/-b-i-l-i-n-e-a-r/index.html",
+    "searchKeys": [
+      "BILINEAR"
+    ]
+  },
+  {
+    "name": "NEAREST",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-interpolation-type/-n-e-a-r-e-s-t/index.html",
+    "searchKeys": [
+      "NEAREST"
+    ]
+  },
+  {
+    "name": "load()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/load.html",
+    "searchKeys": [
+      "load()"
+    ]
+  },
+  {
+    "name": "Loading",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-loading/index.html",
+    "searchKeys": [
+      "Loading"
+    ]
+  },
+  {
+    "name": "RenderingSpeed",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-rendering-speed/index.html",
+    "searchKeys": [
+      "RenderingSpeed"
+    ]
+  },
+  {
+    "name": "FAST",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-rendering-speed/-f-a-s-t/index.html",
+    "searchKeys": [
+      "FAST"
+    ]
+  },
+  {
+    "name": "MEDIUM",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-rendering-speed/-m-e-d-i-u-m/index.html",
+    "searchKeys": [
+      "MEDIUM"
+    ]
+  },
+  {
+    "name": "SLOW",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-rendering-speed/-s-l-o-w/index.html",
+    "searchKeys": [
+      "SLOW"
+    ]
+  },
+  {
+    "name": "Resize",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-resize/index.html",
+    "searchKeys": [
+      "Resize"
+    ]
+  },
+  {
+    "name": "resize()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/resize.html",
+    "searchKeys": [
+      "resize()"
+    ]
+  },
+  {
+    "name": "Rotate",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-rotate/index.html",
+    "searchKeys": [
+      "Rotate"
+    ]
+  },
+  {
+    "name": "rotate()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/rotate.html",
+    "searchKeys": [
+      "rotate()"
+    ]
+  },
+  {
+    "name": "Save",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/-save/index.html",
+    "searchKeys": [
+      "Save"
+    ]
+  },
+  {
+    "name": "save()",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.preprocessor.image/save.html",
+    "searchKeys": [
+      "save()"
+    ]
+  },
+  {
+    "name": "org.jetbrains.kotlinx.dl.dataset.sound.wav",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.sound.wav/index.html",
+    "searchKeys": [
+      "org.jetbrains.kotlinx.dl.dataset.sound.wav"
+    ]
+  },
+  {
+    "name": "WavFile",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.sound.wav/-wav-file/index.html",
+    "searchKeys": [
+      "WavFile"
+    ]
+  },
+  {
+    "name": "WavFileException",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.sound.wav/-wav-file-exception/index.html",
+    "searchKeys": [
+      "WavFileException"
+    ]
+  },
+  {
+    "name": "WavFileFormat",
+    "description": null,
+    "location": "api/api/org.jetbrains.kotlinx.dl.dataset.sound.wav/-wav-file-format/index.html",
+    "searchKeys": [
+      "WavFileFormat"
+    ]
+  }
+]
