@@ -38,6 +38,7 @@ internal const val LAYER_DROPOUT: String = "Dropout"
 // Attention layers
 // Reshaping layers
 internal const val LAYER_FLATTEN: String = "Flatten"
+internal const val LAYER_REPEAT_VECTOR: String = "RepeatVector"
 internal const val LAYER_RESHAPE: String = "Reshape"
 internal const val LAYER_ZERO_PADDING_2D = "ZeroPadding2D"
 internal const val LAYER_CROPPING_2D = "Cropping2D"
