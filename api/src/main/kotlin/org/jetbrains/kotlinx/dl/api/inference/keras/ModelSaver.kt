@@ -298,6 +298,7 @@ private fun createKerasGlobalMaxPool2DLayer(layer: GlobalMaxPool2D): KerasLayer 
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_2D, config = configX)
 }
