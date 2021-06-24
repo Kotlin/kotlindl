@@ -6,9 +6,11 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.UpSampling3D
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 
-internal class UpSampling3DTest {
+internal class UpSampling3DTest : LayerTest() {
     private val input = arrayOf(
         arrayOf(
             arrayOf(
@@ -25,6 +27,8 @@ internal class UpSampling3DTest {
             )
         )
     )
+
+    private val inputShape = input.shape.toLongArray()
 
     @Test
     fun default() {
@@ -101,11 +105,15 @@ internal class UpSampling3DTest {
                 )
             )
         )
-        TODO("Implement test case")
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(
+            inputShape[0], inputShape[1] * 2, inputShape[2] * 2, inputShape[3] * 2, inputShape[4]
+        )
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 
     @Test
-    fun testWithUnequalSize() {
+    fun testWithUnequalUpSamplingSize() {
         val layer = UpSampling3D(size = intArrayOf(1, 2, 1))
         val expected = arrayOf(
             arrayOf(
@@ -133,6 +141,10 @@ internal class UpSampling3DTest {
                 )
             )
         )
-        TODO("Implement test case")
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(
+            inputShape[0], inputShape[1], inputShape[2] * 2, inputShape[3], inputShape[4]
+        )
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 }

@@ -7,9 +7,11 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.InterpolationMethod
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.UpSampling2D
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 
-internal class UpSampling2DTest {
+internal class UpSampling2DTest : LayerTest() {
     private val input = arrayOf(
         arrayOf(
             arrayOf(
@@ -24,6 +26,8 @@ internal class UpSampling2DTest {
             )
         )
     )
+
+    private val inputShape = input.shape.toLongArray()
 
     @Test
     fun default() {
@@ -64,11 +68,13 @@ internal class UpSampling2DTest {
                 )
             )
         )
-        TODO("Implement test case")
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] * 2, inputShape[2] * 2, inputShape[3])
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 
     @Test
-    fun testBilinearInterpolation() {
+    fun testWithBilinearInterpolation() {
         val layer = UpSampling2D(interpolation = InterpolationMethod.BILINEAR)
         val expected = arrayOf(
             arrayOf(
@@ -106,11 +112,13 @@ internal class UpSampling2DTest {
                 )
             )
         )
-        TODO("Implement test case")
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] * 2, inputShape[2] * 2, inputShape[3])
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 
     @Test
-    fun testWithUnequalSize() {
+    fun testWithUnequalUpSamplingSize() {
         val layer = UpSampling2D(size = intArrayOf(2, 1))
         val expected = arrayOf(
             arrayOf(
@@ -136,6 +144,8 @@ internal class UpSampling2DTest {
                 )
             )
         )
-        TODO("Implement test case")
+        assertLayerOutputIsCorrect(layer, input, expected)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] * 2, inputShape[2], inputShape[3])
+        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
     }
 }
