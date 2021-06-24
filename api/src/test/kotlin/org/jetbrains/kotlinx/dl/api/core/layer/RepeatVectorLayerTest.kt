@@ -18,7 +18,7 @@ import org.tensorflow.op.Ops
 internal class RepeatVectorLayerTest {
 
     @Test
-    fun `test output shape`() {
+    fun testOutputShape() {
         val layer = RepeatVector(n = 2)
         val x = Array(10) { FloatArray(10) { 1F } }
         val y = layer(x)
@@ -26,7 +26,7 @@ internal class RepeatVectorLayerTest {
     }
 
     @Test
-    fun `test repetition output`() {
+    fun testOutput() {
         val layer = RepeatVector(n = 2)
         val x = Array(3) { FloatArray(3) { it.toFloat() } }
         val y = layer(x)

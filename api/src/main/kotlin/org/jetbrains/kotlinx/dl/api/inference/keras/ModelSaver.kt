@@ -536,6 +536,7 @@ private fun createKerasRepeatVectorLayer(layer: RepeatVector): KerasLayer {
     val configX = LayerConfig(
         data_format = CHANNELS_LAST,
         dtype = DATATYPE_FLOAT32,
+        trainable = layer.isTrainable,
         name = layer.name,
         n = layer.n
     )
