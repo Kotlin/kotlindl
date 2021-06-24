@@ -28,6 +28,11 @@ private const val RIFF_TYPE_ID: Long = 0x45564157
  *
  * Based on code written by [Andrew Greensted](http://www.labbookpages.co.uk/)
  * but modified to more Kotlin idiomatic way with only read option for simplicity.
+ *
+ * @property bufferSize is a size of a buffer to read from given file when reading next frames.
+ * @constructor creates [WavFile]
+ *
+ * @param file to read the WAV file data from
  */
 public class WavFile(
     file: File,
