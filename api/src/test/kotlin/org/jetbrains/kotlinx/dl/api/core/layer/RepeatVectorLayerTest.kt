@@ -18,6 +18,13 @@ import org.tensorflow.op.Ops
 internal class RepeatVectorLayerTest {
 
     @Test
+    fun testIllegalRepetitions() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            RepeatVector(n = -10)
+        }
+    }
+
+    @Test
     fun testOutputShape() {
         val layer = RepeatVector(n = 2)
         val x = Array(10) { FloatArray(10) { 1F } }
