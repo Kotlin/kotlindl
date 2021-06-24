@@ -21,12 +21,6 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.io.File
-
-import java.io.IOException
-
-import java.io.FileOutputStream
-import java.lang.IllegalStateException
 
 
 /**
@@ -191,7 +185,7 @@ public fun freeSpokenDigits(
     cacheDirectory.existsOrMkdirs()
 
     val path = freeSpokenDigitDatasetPath(cacheDirectory)
-    val dataset = File("$path/free-spoken-digit-dataset-master/recordings")
+    val dataset = File(path)
         .listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
     val maxDataSize = dataset.map { it.first.size }.maxOrNull()
@@ -275,7 +269,8 @@ public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
     unzipDatasetPath(
         cacheDirectory,
         loadFile(cacheDirectory, DOGS_CATS_IMAGES_ARCHIVE),
-        "/datasets/dogs-vs-cats")
+        "/datasets/dogs-vs-cats"
+    )
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
@@ -285,20 +280,25 @@ public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): Strin
     unzipDatasetPath(
         cacheDirectory,
         loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE),
-        "/datasets/small-dogs-vs-cats")
+        "/datasets/small-dogs-vs-cats"
+    )
 
 /** Path to the Free Spoken Digits Dataset. */
 private const val FSDD_SOUNDS_ARCHIVE: String = "datasets/fsdd.zip"
 
 /** Path to download the Free Spoken Digits Dataset. */
-private const val FSS_SOUNDS_SOURCE: String = "https://codeload.github.com/Jakobovski/free-spoken-digit-dataset/zip/refs/heads/master"
+private const val FSS_SOUNDS_SOURCE: String =
+    "https://codeload.github.com/Jakobovski/free-spoken-digit-dataset/zip/refs/heads/master"
 
-/** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
+/** Returns path to sound data files from Free Spoken Digits Dataset. */
 public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): String =
     unzipDatasetPath(
         cacheDirectory,
         loadFile(cacheDirectory, FSDD_SOUNDS_ARCHIVE, downloadURLFromRelativePath = { FSS_SOUNDS_SOURCE }),
-        "/datasets/free-spoken-digit")
+        "/datasets/free-spoken-digit"
+    ).run {
+        "$this/free-spoken-digit-dataset-master/recordings"
+    }
 
 /**
  * Download the compressed dataset from external source, decompress the file and remove the downloaded file
