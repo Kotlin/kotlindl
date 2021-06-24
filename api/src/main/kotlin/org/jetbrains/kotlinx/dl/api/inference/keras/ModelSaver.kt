@@ -86,6 +86,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is AvgPool2D -> createKerasAvgPool2DLayer(layer)
         is AvgPool3D -> createKerasAvgPool3DLayer(layer)
         is GlobalMaxPool1D -> createKerasGlobalMaxPool1DLayer(layer)
+        is GlobalMaxPool2D -> createKerasGlobalMaxPool2DLayer(layer)
         is GlobalAvgPool1D -> createKerasGlobalAvgPool1DLayer(layer)
         is GlobalAvgPool2D -> createKerasGlobalAvgPool2DLayer(layer)
         is GlobalAvgPool3D -> createKerasGlobalAvgPool3DLayer(layer)
@@ -293,6 +294,15 @@ private fun createKerasGlobalMaxPool1DLayer(layer: GlobalMaxPool1D): KerasLayer 
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool2DLayer(layer: GlobalMaxPool2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_2D, config = configX)
 }
 
 private fun createKerasGlobalAvgPool3DLayer(layer: GlobalAvgPool3D): KerasLayer {
