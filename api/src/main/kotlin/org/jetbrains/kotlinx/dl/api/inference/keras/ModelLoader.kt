@@ -128,6 +128,7 @@ private fun convertToLayer(
         LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_MAX_POOL_2D -> createGlobalMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_3D -> createGlobalMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(kerasLayer.config!!.name!!)
@@ -139,6 +140,7 @@ private fun convertToLayer(
         // Attention layers
         // Reshaping layers
         LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_1D -> createCropping1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -456,7 +458,13 @@ private fun createGlobalMaxPool1DLayer(config: LayerConfig, name: String): Layer
 
 private fun createGlobalMaxPool2DLayer(config: LayerConfig, name: String): Layer {
     return GlobalMaxPool2D(
-        name = name
+        name = name,
+    )
+}
+
+private fun createGlobalMaxPool3DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool3D(
+        name = name,
     )
 }
 
@@ -719,6 +727,10 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
 
 private fun createFlattenLayer(name: String): Layer {
     return Flatten(name = name)
+}
+
+private fun createRepeatVectorLayer(config: LayerConfig, name: String): Layer {
+    return RepeatVector(name = name, n = config.n!!)
 }
 
 private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
