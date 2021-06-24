@@ -181,12 +181,13 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      */
     public fun initializeGraphVariables(session: Session) {
         val runner = session.runner()
-
-        initializers.forEach {
-            runner.addTarget(it.value as Operand<Float>)
+        // Only run the session if there is initializer ops.
+        if (initializers.isNotEmpty()) {
+            initializers.forEach {
+                runner.addTarget(it.value as Operand<Float>)
+            }
+            runner.run()
         }
-
-        runner.run()
     }
 
     /**

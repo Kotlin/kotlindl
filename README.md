@@ -107,6 +107,7 @@ fun main() {
 - [Logging](#logging)
 - [Fat Jar issue](#fat-jar-issue)
 - [Reporting issues/Support](#reporting-issuessupport)
+- [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -270,6 +271,10 @@ task fatJar(type: Jar) {
     with jar
 }
 ```
+
+## Contributing
+
+Read the [Contributing Guidelines](https://github.com/JetBrains/KotlinDL/blob/master/CONTRIBUTING.md).
 
 ## Reporting issues/Support
 
