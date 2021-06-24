@@ -298,6 +298,7 @@ private fun createKerasGlobalMaxPool3DLayer(layer: GlobalMaxPool3D): KerasLayer 
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
+        trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_3D, config = configX)
 }
