@@ -11,6 +11,12 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
+/**
+ * Abstract Cropping layer used as the base layer for all the cropping layers.
+ *
+ * @property [croppingInternal] Cropping size values; currently, they are not used in the implementation
+ * of this abstract class and each subclassed layer uses its own copy of the cropping size values.
+ */
 public abstract class AbstractCropping(
     public val croppingInternal: Array<IntArray>,
     name: String,
@@ -38,6 +44,10 @@ public abstract class AbstractCropping(
         return crop(tf, input)
     }
 
+    /**
+     * The actual implementation of cropping operation which each subclassed layer needs to
+     * implement. This method will then be called from [forward] method to crop the input tensor.
+     */
     protected abstract fun crop(tf: Ops, input: Operand<Float>): Operand<Float>
 
     protected abstract fun computeCroppedShape(inputShape: Shape): Shape
