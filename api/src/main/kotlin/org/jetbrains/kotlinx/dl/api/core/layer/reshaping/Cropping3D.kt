@@ -14,8 +14,12 @@ import org.tensorflow.op.Ops
  *
  * Crops input along the second, third and forth dimensions.
  *
- * @property [cropping] An array consisting of three integer arrays of size two where each array indicates
- * the number of elements to remove from the beginning and end of the corresponding cropping axis.
+ * Input shape: 5D tensor with shape `(batch_size, dim1, dim2, dim3, depth)`.
+ *
+ * Output shape: 5D tensor with shape `(batch_size, cropped_dim1, cropped_dim2, cropped_dim3, depth)`.
+ *
+ * @property [cropping] An array consisting of three integer arrays of size two which are interpreted as
+ * `[[left_dim1_crop, right_dim1_crop], [left_dim2_crop, right_dim2_crop], [left_dim3_crop, right_dim3_crop]]`.
  */
 public class Cropping3D(
     public val cropping: Array<IntArray>,

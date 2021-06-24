@@ -916,7 +916,7 @@ private fun createCropping1DLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createCropping2DLayer(config: LayerConfig, name: String): Layer {
-    val cropping = config.cropping!!.map { it as IntArray }.toTypedArray()
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping2D(
         cropping = cropping,
         name = name,
@@ -924,7 +924,7 @@ private fun createCropping2DLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createCropping3DLayer(config: LayerConfig, name: String): Layer {
-    val cropping = config.cropping!!.map { it as IntArray }.toTypedArray()
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping3D(
         cropping = cropping,
         name = name,

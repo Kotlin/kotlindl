@@ -14,6 +14,10 @@ import org.tensorflow.op.Ops
  *
  * Crops input along the second dimension (i.e. temporal dimension).
  *
+ * Input shape: 3D tensor with shape `(batch_size, steps, features)`.
+ *
+ * Output shape: 3D tensor with shape `(batch_size, cropped_steps, features)`.
+ *
  * @property [cropping] An integer array of size two (`[begin_crop, end_crop]`) indicating
  * the number of elements to remove from the beginning and end of the cropping axis.
  */

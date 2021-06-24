@@ -14,8 +14,12 @@ import org.tensorflow.op.Ops
  *
  * Crops input along the second and third dimensions (i.e. spatial dimensions).
  *
- * @property [cropping] An array consisting of two integer arrays of size two where each array indicates
- * the number of elements to remove from the beginning and end of the corresponding cropping axis.
+ * Input shape: 4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * Output shape: 4D tensor with shape `(batch_size, cropped_rows, cropped_cols, channels)`.
+ *
+ * @property [cropping] An array consisting of two integer arrays of size two which are interpreted as
+ * `[[top_crop, bottom_crop], [left_crop, right_crop]]`.
  */
 public class Cropping2D(
     public val cropping: Array<IntArray>,
