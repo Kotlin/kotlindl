@@ -87,6 +87,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val moving_variance_initializer: KerasInitializer? = null,
     @Json(serializeNull = false)
+    val n: Int? = null,
+    @Json(serializeNull = false)
     val name: String? = null,
     @Json(serializeNull = false)
     val negative_slope: Double? = null,

@@ -86,6 +86,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is AvgPool2D -> createKerasAvgPool2DLayer(layer)
         is AvgPool3D -> createKerasAvgPool3DLayer(layer)
         is GlobalMaxPool1D -> createKerasGlobalMaxPool1DLayer(layer)
+        is GlobalMaxPool2D -> createKerasGlobalMaxPool2DLayer(layer)
+        is GlobalMaxPool3D -> createKerasGlobalMaxPool3DLayer(layer)
         is GlobalAvgPool1D -> createKerasGlobalAvgPool1DLayer(layer)
         is GlobalAvgPool2D -> createKerasGlobalAvgPool2DLayer(layer)
         is GlobalAvgPool3D -> createKerasGlobalAvgPool3DLayer(layer)
@@ -96,6 +98,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         // Attention layers
         // Reshaping layers
         is Flatten -> createKerasFlattenLayer(layer)
+        is RepeatVector -> createKerasRepeatVectorLayer(layer)
         is ZeroPadding2D -> createKerasZeroPadding2DLayer(layer)
         is UpSampling1D -> createKerasUpSampling1DLayer(layer)
         is UpSampling2D -> createKerasUpSampling2DLayer(layer)
@@ -293,6 +296,24 @@ private fun createKerasGlobalMaxPool1DLayer(layer: GlobalMaxPool1D): KerasLayer 
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool2DLayer(layer: GlobalMaxPool2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_2D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool3DLayer(layer: GlobalMaxPool3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_3D, config = configX)
 }
 
 private fun createKerasGlobalAvgPool3DLayer(layer: GlobalAvgPool3D): KerasLayer {
@@ -574,6 +595,17 @@ private fun createKerasFlattenLayer(layer: Flatten): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
+}
+
+private fun createKerasRepeatVectorLayer(layer: RepeatVector): KerasLayer {
+    val configX = LayerConfig(
+        data_format = CHANNELS_LAST,
+        dtype = DATATYPE_FLOAT32,
+        trainable = layer.isTrainable,
+        name = layer.name,
+        n = layer.n
+    )
+    return KerasLayer(class_name = LAYER_REPEAT_VECTOR, config = configX)
 }
 
 private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
