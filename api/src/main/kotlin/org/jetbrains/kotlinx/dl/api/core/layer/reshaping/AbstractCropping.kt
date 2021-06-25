@@ -31,10 +31,6 @@ public abstract class AbstractCropping(
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return computeCroppedShape(inputShape)
-    }
-
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
@@ -49,6 +45,4 @@ public abstract class AbstractCropping(
      * implement. This method will then be called from [forward] method to crop the input tensor.
      */
     protected abstract fun crop(tf: Ops, input: Operand<Float>): Operand<Float>
-
-    protected abstract fun computeCroppedShape(inputShape: Shape): Shape
 }
