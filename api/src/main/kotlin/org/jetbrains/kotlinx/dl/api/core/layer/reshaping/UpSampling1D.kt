@@ -35,7 +35,7 @@ public class UpSampling1D(
         }
     }
 
-    protected override fun computeUpSampledShape(inputShape: Shape): Shape {
+    override fun computeOutputShape(inputShape: Shape): Shape {
         return Shape.make(
             inputShape.size(0),
             inputShape.size(1) * size,

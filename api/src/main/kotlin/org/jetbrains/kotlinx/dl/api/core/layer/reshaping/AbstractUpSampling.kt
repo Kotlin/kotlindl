@@ -35,10 +35,6 @@ public abstract class AbstractUpSampling(
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return computeUpSampledShape(inputShape)
-    }
-
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
@@ -53,8 +49,6 @@ public abstract class AbstractUpSampling(
      * implement. This method will then be called from [forward] method to upsample the input tensor.
      */
     protected abstract fun upSample(tf: Ops, input: Operand<Float>): Operand<Float>
-
-    protected abstract fun computeUpSampledShape(inputShape: Shape): Shape
 }
 
 /**
@@ -86,6 +80,7 @@ public enum class InterpolationMethod(internal val methodName: String) {
      * See: [https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation]
      */
     NEAREST("nearest"),
+
     /**
      * Bilinear interpolation.
      * See: [https://en.wikipedia.org/wiki/Bilinear_interpolation]
