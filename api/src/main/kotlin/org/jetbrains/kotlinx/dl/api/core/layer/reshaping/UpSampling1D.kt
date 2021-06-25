@@ -15,6 +15,10 @@ import org.tensorflow.op.core.Squeeze
  *
  * Repeats each step of the second axis [size] times.
  *
+ * Input shape: 3D tensor with shape `(batch_size, steps, features)`.
+ *
+ * Output shape: 3D tensor with shape `(batch_size, steps * size, features)`.
+ *
  * @property [size] Upsampling factor (i.e. number of repeats).
  */
 public class UpSampling1D(
@@ -40,18 +44,7 @@ public class UpSampling1D(
     }
 
     protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {
-        val inputShape = input.asOutput().shape()
-        // First convert the input tensor to a 4D tensor by adding a new axis at the end, so
-        // the low-level resize op could be used directly. After resizing, the added
-        // axis will be removed.
-        val newSize = tf.constant(
-            intArrayOf(
-                inputShape.size(1).toInt() * size, inputShape.size(2).toInt()
-            )
-        )
-        val expandedInput = tf.expandDims(input, tf.constant(3))
-        val resized = tf.image.resizeNearestNeighbor(expandedInput, newSize)
-        return tf.squeeze(resized, Squeeze.axis(listOf(3L)))
+        return repeat(tf, input, repeats = size, axis = 1)
     }
 
     override fun toString(): String =

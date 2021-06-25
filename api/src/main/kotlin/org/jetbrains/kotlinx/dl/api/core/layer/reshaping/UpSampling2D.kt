@@ -16,6 +16,10 @@ import org.tensorflow.op.image.ResizeBilinear
  * Repeats each row (second axis) and columns (third axis) of the input by `size[0]` and `size[1]`
  * times, respectively.
  *
+ * Input shape: 4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * Output shape: 4D tensor with shape `(batch_size, rows * size[0], cols * size[1], channels)`.
+ *
  * @property [size] Upsampling factor array of size 2 (i.e. number of repeats per rows and columns).
  * @property [interpolation] Interpolation method; could be either of [InterpolationMethod.NEAREST] or
  * [InterpolationMethod.BILINEAR].

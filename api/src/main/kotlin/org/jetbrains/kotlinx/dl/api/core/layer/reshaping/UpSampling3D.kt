@@ -13,7 +13,11 @@ import org.tensorflow.op.Ops
  * Upsampling layer for 3D input.
  *
  * Repeats the  second, third and forth dimensions of the input by `size[0]`, `size[1]` and
- * `size[2]` times, repectively.
+ * `size[2]` times, respectively.
+ *
+ * Input shape: 5D tensor with shape `(batch_size, dim1, dim2, dim3, depth)`.
+ *
+ * Output shape: 5D tensor with shape `(batch_size, dim1 * size[0], dim2 * size[1], dim3 * size[2], depth)`.
  *
  * @property [size] Upsampling factor array of size 3 (i.e. number of repeats per each dimension).
  */
