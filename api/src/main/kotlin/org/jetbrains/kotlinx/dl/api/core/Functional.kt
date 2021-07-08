@@ -330,7 +330,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("==========================================================================================================")
-        logger.info("Model: Functional")
+        logger.info("Model type: Functional")
+        if (name != null)
+            logger.info("Model name: $name")
         logger.info("__________________________________________________________________________________________________________")
         logger.info("Layer (type)                           Output Shape              Param #       Connected to               ")
         logger.info("==========================================================================================================")

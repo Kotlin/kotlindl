@@ -166,7 +166,9 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.info("===========================================================================")
-        logger.info("Model: Sequential")
+        logger.info("Model type: Sequential")
+        if (name != null)
+            logger.info("Model name: $name")
         logger.info("___________________________________________________________________________")
         logger.info("Layer (type)                           Output Shape              Param #   ")
         logger.info("===========================================================================")

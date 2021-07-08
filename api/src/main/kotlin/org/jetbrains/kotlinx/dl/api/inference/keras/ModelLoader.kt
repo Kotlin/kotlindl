@@ -22,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.RepeatVector
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L1
@@ -130,6 +131,8 @@ private fun convertToLayer(
         LAYER_AVG_POOL_2D -> createAvgPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_2D -> createGlobalMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_3D -> createGlobalMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(kerasLayer.config!!.name!!)
@@ -141,6 +144,7 @@ private fun convertToLayer(
         // Attention layers
         // Reshaping layers
         LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -454,6 +458,18 @@ private fun createGlobalMaxPool1DLayer(config: LayerConfig, name: String): Layer
     )
 }
 
+private fun createGlobalMaxPool2DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool2D(
+        name = name,
+    )
+}
+
+private fun createGlobalMaxPool3DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool3D(
+        name = name,
+    )
+}
+
 private fun createAddLayer(name: String): Layer {
     return Add(
         name = name
@@ -713,6 +729,10 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
 
 private fun createFlattenLayer(name: String): Layer {
     return Flatten(name = name)
+}
+
+private fun createRepeatVectorLayer(config: LayerConfig, name: String): Layer {
+    return RepeatVector(name = name, n = config.n!!)
 }
 
 private fun createReshapeLayer(config: LayerConfig, name: String): Layer {

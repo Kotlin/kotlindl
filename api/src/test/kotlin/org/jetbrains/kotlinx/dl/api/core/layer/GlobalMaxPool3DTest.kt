@@ -1,11 +1,16 @@
+/*
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool3D
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalMaxPool3D
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 
-internal class GlobalAvgPool3DTest : LayerTest() {
+class GlobalMaxPool3DTest : LayerTest() {
     private val input = arrayOf(
         arrayOf(
             arrayOf(
@@ -42,10 +47,10 @@ internal class GlobalAvgPool3DTest : LayerTest() {
     private val inputShape = input.shape.toLongArray()
 
     @Test
-    fun default(){
-        val layer = GlobalAvgPool3D()
+    fun default() {
+        val layer = GlobalMaxPool3D()
         val expected = arrayOf(
-            floatArrayOf(27.5f/16, 16.5f/16, 29.5f/16),
+            floatArrayOf(7.0f, 5.0f, 5.0f),
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[4])
