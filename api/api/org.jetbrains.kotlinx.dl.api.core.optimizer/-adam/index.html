@@ -1,214 +1,83 @@
 <html>
-<head>
+  <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Adam</title>
-</head>
-<body>
-<link href="../../../../../../../images/logo-icon.svg" rel="icon" type="image/svg">
-<script>var pathToRoot = "../../../../";</script>
-<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
-<link href="../../../../styles/style.css" rel="Stylesheet">
-<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
-<link href="../../../../styles/main.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
-<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
-<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
-<script type="text/javascript" src="../../../../scripts/main.js" async></script>
-
-<div id="container">
-    <div id="leftColumn"><a href="../../../../index.html">
-        <div id="logo"></div>
-    </a>
+</head><body><link href="../../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script><script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script><link href="../../../../styles/style.css" rel="Stylesheet"><link href="../../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../../scripts/main.js" async></script>
+  
+    <div id="container">
+      <div id="leftColumn"><a href="../../../../index.html">
+            <div id="logo"></div>
+          </a>
         <div id="paneSearch"></div>
         <div id="sideMenu"></div>
-    </div>
-    <div id="main">
-        <script type="text/javascript" src="../../../../scripts/main.js"></script>
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
+      </div>
+      <div id="main">
+        <script type="text/javascript" src="../../../../scripts/main.js"></script><div id="leftToggler"><span class="icon-toggler"></span></div>
 
-        <div class="main-content" id="content"
-             pageids="api::org.jetbrains.kotlinx.dl.api.core.optimizer/Adam///PointingToDeclaration//-1197683648">
-            <div class="navigation-wrapper" id="navigation-wrapper">
-                <div class="breadcrumbs"><a href="../../../index.html">api</a>/<a href="../index.html">org.jetbrains.kotlinx.dl.api.core.optimizer</a>/<a
-                        href="index.html">Adam</a></div>
-                <div class="pull-right d-flex">
-                    <div id="searchBar"></div>
-                </div>
+        <div class="main-content" id="content" pageids="api::org.jetbrains.kotlinx.dl.api.core.optimizer/Adam///PointingToDeclaration//-1197683648">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">api</a>/<a href="../index.html">org.jetbrains.kotlinx.dl.api.core.optimizer</a>/<a href="index.html">Adam</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
             </div>
-            <div class="cover ">
-                <h1 class="cover"><span>Adam</span></h1>
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted">
-                    <div class="content sourceset-depenent-content" data-active=""
-                         data-togglable=":api:dokkaHtmlPartial/main">
-                        <div class="symbol monospace">class <a href="index.html">Adam</a>(learningRate: <a
-                                href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>,
-                            beta1: <a
-                                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>,
-                            beta2: <a
-                                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>,
-                            epsilon: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>,
-                            useNesterov: <a
-                                    href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>,
-                            clipGradient: <a href="../-clip-gradient-action/index.html">ClipGradientAction</a>) : <a
-                                    href="../-optimizer/index.html">Optimizer</a><span class="top-right-position"><span
-                                    class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span
-                                    class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span>
-                        </div>
-                        <p class="paragraph">Adam optimizer.</p>
-                        <p class="paragraph">Updates variable according next formula:</p>
-                        <div class="sample-container"><code class="" theme="idea">
-                            <pre>lr_t := learning_rate * sqrt{1 - beta_2^t} / (1 - beta_1^t)<br>m_t := beta_1 * m_{t-1} + (1 - beta_1) * g<br>v_t := beta_2 * v_{t-1} + (1 - beta_2) * g * g<br>variable := variable - lr_t * m_t / sqrt{v_t} + epsilon)</pre>
-                        </code></div>
-                        <p class="paragraph">It is recommended to leave the parameters of this optimizer at their
-                            default values.</p></div>
-                </div>
-            </div>
-            <div class="tabbedcontent">
-                <div class="tabs-section" tabs-section="tabs-section">
-                    <button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button>
-                    <button class="section-tab" data-togglable="Properties">Properties</button>
-                </div>
-                <div class="tabs-section-body">
-                    <h2 class="tabbedcontent">Constructors</h2>
-                    <div class="table" data-togglable="Constructors"><a
-                            data-name="-288287993%2FConstructors%2F-1197683648" anchor-label="Adam"
-                            id="-288287993%2FConstructors%2F-1197683648"
-                            data-filterable-set=":api:dokkaHtmlPartial/main"></a>
-                        <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main"
-                             data-filterable-set=":api:dokkaHtmlPartial/main">
-                            <div class="main-subrow keyValue TabbedContent">
-                                <div class=""><span class="inline-flex"><a href="-adam.html">Adam</a><span
-                                        class="anchor-wrapper"><span class="anchor-icon"
-                                                                     pointing-to="-288287993%2FConstructors%2F-1197683648"></span>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Adam</span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">class <a href="index.html">Adam</a>(learningRate: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>, beta1: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>, beta2: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>, epsilon: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>, useNesterov: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>, clipGradient: <a href="../-clip-gradient-action/index.html">ClipGradientAction</a>) : <a href="../-optimizer/index.html">Optimizer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Adam optimizer.</p><p class="paragraph">Updates variable according next formula:</p><div class="sample-container"><code class="" theme="idea"><pre>lr_t := learning_rate * sqrt{1 - beta_2^t} / (1 - beta_1^t)<br>m_t := beta_1 * m_{t-1} + (1 - beta_1) * g<br>v_t := beta_2 * v_{t-1} + (1 - beta_2) * g * g<br>variable := variable - lr_t * m_t / sqrt{v_t} + epsilon)</pre></code></div><p class="paragraph">It is recommended to leave the parameters of this optimizer at their default values.</p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="-288287993%2FConstructors%2F-1197683648" anchor-label="Adam" id="-288287993%2FConstructors%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex"><a href="-adam.html">Adam</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-288287993%2FConstructors%2F-1197683648"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
-                                <div>
-                                    <div class="title">
-                                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted">
-                                            <div class="content sourceset-depenent-content" data-active=""
-                                                 data-togglable=":api:dokkaHtmlPartial/main">
-                                                <div class="symbol monospace">fun <a href="-adam.html">Adam</a>(learningRate:
-                                                    <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>
-                                                    = 0.001f, beta1: <a
-                                                            href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>
-                                                    = 0.9f, beta2: <a
-                                                            href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>
-                                                    = 0.999f, epsilon: <a
-                                                            href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>
-                                                    = 1e-07f, useNesterov: <a
-                                                            href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>
-                                                    = false, clipGradient: <a
-                                                            href="../-clip-gradient-action/index.html">ClipGradientAction</a>
-                                                    = NoClipGradient())<span class="top-right-position"><span
-                                                            class="copy-icon"></span><div
-                                                            class="copy-popup-wrapper popup-to-left"><span
-                                                            class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">fun <a href="-adam.html">Adam</a>(learningRate: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a> = 0.001f, beta1: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a> = 0.9f, beta2: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a> = 0.999f, epsilon: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a> = 1e-07f, useNesterov: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a> = false, clipGradient: <a href="../-clip-gradient-action/index.html">ClipGradientAction</a> = NoClipGradient())<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
-                    <h2 class="">Properties</h2>
-                    <div class="table" data-togglable="Properties"><a data-name="765200037%2FProperties%2F-1197683648"
-                                                                      anchor-label="clipGradient"
-                                                                      id="765200037%2FProperties%2F-1197683648"
-                                                                      data-filterable-set=":api:dokkaHtmlPartial/main"></a>
-                        <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main"
-                             data-filterable-set=":api:dokkaHtmlPartial/main">
-                            <div class="main-subrow keyValue ">
-                                <div class=""><span class="inline-flex"><a
-                                        href="index.html#765200037%2FProperties%2F-1197683648">clipGradient</a><span
-                                        class="anchor-wrapper"><span class="anchor-icon"
-                                                                     pointing-to="765200037%2FProperties%2F-1197683648"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                                <div>
-                                    <div class="title">
-                                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"
-                                             data-togglable="Properties">
-                                            <div class="content sourceset-depenent-content" data-active=""
-                                                 data-togglable=":api:dokkaHtmlPartial/main"><a
-                                                    data-name="765200037%2FProperties%2F-1197683648"
-                                                    anchor-label="clipGradient"
-                                                    id="765200037%2FProperties%2F-1197683648"
-                                                    data-filterable-set=":api:dokkaHtmlPartial/main"></a>
-                                                <div class="symbol monospace">val <a
-                                                        href="index.html#765200037%2FProperties%2F-1197683648">clipGradient</a>:
-                                                    <a href="../-clip-gradient-action/index.html">ClipGradientAction</a><span
-                                                            class="top-right-position"><span class="copy-icon"></span><div
-                                                            class="copy-popup-wrapper popup-to-left"><span
-                                                            class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span>
-                                                </div>
-                                                <div class="brief "><a data-name="765200037%2FProperties%2F-1197683648"
-                                                                       anchor-label="clipGradient"
-                                                                       id="765200037%2FProperties%2F-1197683648"
-                                                                       data-filterable-set=":api:dokkaHtmlPartial/main"></a>Strategy
-                                                    of gradient clipping as sub-class of <a
-                                                            href="../-clip-gradient-action/index.html">ClipGradientAction</a>.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <a data-name="1651928533%2FProperties%2F-1197683648" anchor-label="optimizerName"
-                           id="1651928533%2FProperties%2F-1197683648"
-                           data-filterable-set=":api:dokkaHtmlPartial/main"></a>
-                        <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main"
-                             data-filterable-set=":api:dokkaHtmlPartial/main">
-                            <div class="main-subrow keyValue ">
-                                <div class=""><span class="inline-flex"><a
-                                        href="optimizer-name.html">optimizerName</a><span class="anchor-wrapper"><span
-                                        class="anchor-icon" pointing-to="1651928533%2FProperties%2F-1197683648"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                                <div>
-                                    <div class="title">
-                                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"
-                                             data-togglable="Properties">
-                                            <div class="content sourceset-depenent-content" data-active=""
-                                                 data-togglable=":api:dokkaHtmlPartial/main"><a
-                                                    data-name="1651928533%2FProperties%2F-1197683648"
-                                                    anchor-label="optimizerName"
-                                                    id="1651928533%2FProperties%2F-1197683648"
-                                                    data-filterable-set=":api:dokkaHtmlPartial/main"></a>
-                                                <div class="symbol monospace">open override val <a
-                                                        href="optimizer-name.html">optimizerName</a>: <a
-                                                        href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span
-                                                        class="top-right-position"><span class="copy-icon"></span><div
-                                                        class="copy-popup-wrapper popup-to-left"><span
-                                                        class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span>
-                                                </div>
-                                                <div class="brief "><a data-name="1651928533%2FProperties%2F-1197683648"
-                                                                       anchor-label="optimizerName"
-                                                                       id="1651928533%2FProperties%2F-1197683648"
-                                                                       data-filterable-set=":api:dokkaHtmlPartial/main"></a>Returns
-                                                    optimizer name.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  </div>
                 </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="765200037%2FProperties%2F-1197683648" anchor-label="clipGradient" id="765200037%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="index.html#765200037%2FProperties%2F-1197683648">clipGradient</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="765200037%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="765200037%2FProperties%2F-1197683648" anchor-label="clipGradient" id="765200037%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">val <a href="index.html#765200037%2FProperties%2F-1197683648">clipGradient</a>: <a href="../-clip-gradient-action/index.html">ClipGradientAction</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="765200037%2FProperties%2F-1197683648" anchor-label="clipGradient" id="765200037%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>Strategy of gradient clipping as sub-class of <a href="../-clip-gradient-action/index.html">ClipGradientAction</a>.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1651928533%2FProperties%2F-1197683648" anchor-label="optimizerName" id="1651928533%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="optimizer-name.html">optimizerName</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1651928533%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1651928533%2FProperties%2F-1197683648" anchor-label="optimizerName" id="1651928533%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">open override val <a href="optimizer-name.html">optimizerName</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1651928533%2FProperties%2F-1197683648" anchor-label="optimizerName" id="1651928533%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>Returns optimizer name.</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a
-                href="#content"></a></span><span>© 2021 Copyright</span><span
-                class="pull-right"><span>Generated by </span><a
-                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
     </div>
-</div>
-
-</body>
-</html>
+  
+</body></html>
 
 
