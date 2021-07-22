@@ -1,8 +1,3 @@
-plugins {
-    // Documentation
-    id 'org.jetbrains.dokka' version '0.10.1'
-}
-
 apply plugin: 'maven-publish'
 apply from: project.rootProject.file('gradle/maven-metadata.gradle')
 
@@ -25,6 +20,7 @@ nexusStaging {
     packageGroup project.group.toString()
     repositoryDescription "kotlinx.kotlindl staging repository, version: $version"
 }
+
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -106,7 +102,7 @@ if (signingKey != null) {
     }
 }
 
-dokka {
+/*dokka {
     outputFormat = 'html'
     outputDirectory = "$buildDir/dokka"
 
@@ -143,4 +139,4 @@ dokka {
         // Disable linking to online JDK documentation
         noJdkLink = false
     }
-}
+}*/
