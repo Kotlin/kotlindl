@@ -102,6 +102,7 @@ fun main() {
 - [Limitations](#limitations)
 - [How to configure KotlinDL in your project](#how-to-configure-kotlindl-in-your-project)
 - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
+- [Documentation](#documentation)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
 - [Logging](#logging)
@@ -162,6 +163,14 @@ You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin ker
 ```
 
 For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
+
+## Documentation
+
+* Presentations and videos:
+  * [Deep Learning with KotlinDL](https://www.youtube.com/watch?v=jCFZc97_XQU) (Zinoviev Alexey at Huawei Developer Group HDG UK 2021, [slides](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa1RPX3h0a2FrZ2pUby1kSURzYWVpM0tHNFRrUXxBQ3Jtc0tucjZMRE1JbWNuN1BrbGFMc0FOeERPVEtMR0FDLUo4bi1lcC1BcmFkMkd0WFJOS3ZVMFQ3YlctUXFHU1lVdjVZMHUzYmlETjRCZ3lLclBpZGNWcXJXcmdVLTQ5Ujd2N0hNUHlMZXRTZE1wYktHSUZuSQ&q=https%3A%2F%2Fspeakerdeck.com%2Fzaleslaw%2Fdeep-learning-with-kotlindl))
+  * [Introduction to Deep Learning with KotlinDL](https://www.youtube.com/watch?v=ruUz8uMZUVw) (Zinoviev Alexey at Kotlin Budapest User Group 2021, [slides](https://speakerdeck.com/zaleslaw/deep-learning-introduction-with-kotlindl))
+* [Change log for KotlinDL](CHANGELOG.md)
+* [Full KotlinDL API reference](https://jetbrains.github.io/KotlinDL/)
 
 ## Examples and tutorials
 You do not need to have any prior deep learning experience to start using KotlinDL. 
