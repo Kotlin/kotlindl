@@ -262,7 +262,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 }
 
 /** Path to the Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
+private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/dogs-vs-cats/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
 public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
