@@ -103,6 +103,9 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Cropping1D -> createKerasCropping1DLayer(layer)
         is Cropping2D -> createKerasCropping2DLayer(layer)
         is Cropping3D -> createKerasCropping3DLayer(layer)
+        is UpSampling1D -> createKerasUpSampling1DLayer(layer)
+        is UpSampling2D -> createKerasUpSampling2DLayer(layer)
+        is UpSampling3D -> createKerasUpSampling3DLayer(layer)
         // Merging layers
         is Add -> createKerasAddLayer(layer)
         is Maximum -> createKerasMaximumLayer(layer)
@@ -754,4 +757,35 @@ private fun createKerasCropping3DLayer(layer: Cropping3D): KerasLayer {
         trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_CROPPING_3D, config = configX)
+}
+
+private fun createKerasUpSampling1DLayer(layer: UpSampling1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_1D,  config = configX)
+}
+
+private fun createKerasUpSampling2DLayer(layer: UpSampling2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size.toList(),
+        interpolation = layer.interpolation.methodName,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_2D,  config = configX)
+}
+
+private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size.toList(),
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_3D,  config = configX)
 }
