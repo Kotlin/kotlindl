@@ -142,7 +142,9 @@ private fun convertToLayer(
         LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
         LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_1D -> createCropping1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_3D -> createCropping3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_UP_SAMPLING_1D -> createUpSampling1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_UP_SAMPLING_2D -> createUpSampling2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -929,11 +931,27 @@ private fun createZeroPadding2DLayer(config: LayerConfig, name: String): Layer {
     )
 }
 
+private fun createCropping1DLayer(config: LayerConfig, name: String): Layer {
+    val cropping = config.cropping!!.map { it as Int }.toTypedArray().toIntArray()
+    return Cropping1D(
+        cropping = cropping,
+        name = name,
+    )
+}
+
 private fun createCropping2DLayer(config: LayerConfig, name: String): Layer {
-    val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping2D(
         cropping = cropping,
-        name = name
+        name = name,
+    )
+}
+
+private fun createCropping3DLayer(config: LayerConfig, name: String): Layer {
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
+    return Cropping3D(
+        cropping = cropping,
+        name = name,
     )
 }
 
