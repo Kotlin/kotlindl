@@ -276,7 +276,7 @@ public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
     )
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
+private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small-dogs-vs-cats/data.zip"
 
 /** Path to the Data.zip url to be downloaded from. */
 private const val DOGS_CATS_SMALL_IMAGES_DOWNLOAD_URL: String = "https://kotlindl.s3.amazonaws.com/datasets/small_catdogs/data.zip"
@@ -286,7 +286,7 @@ public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): Strin
     unzipDatasetPath(
         cacheDirectory,
         loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, downloadURLFromRelativePath = { DOGS_CATS_SMALL_IMAGES_DOWNLOAD_URL }),
-        "/datasets/small_catdogs"
+        "/datasets/small-dogs-vs-cats"
     )
 
 /** Path to the Free Spoken Digits Dataset. */
