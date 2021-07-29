@@ -6,8 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -18,16 +16,15 @@ import org.tensorflow.op.Ops
  *
  * @property [padding] 2 numbers  interpreted as `(left_pad, right_pad)`.
  *
- * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2699)
  */
-public class ZeroPadding1D : Layer {
+public class ZeroPadding1D : AbstractZeroPadding {
     public val padding: IntArray
     private lateinit var inputShape: Shape
 
     /**
-     * Constructs an instance of ZeroPadding1D layer
-     * @param [padding] symmetric padding applied to width(same on all sides)
-     * @param [name] layer name
+    //     * Constructs an instance of ZeroPadding1D layer
+    //     * @param [padding] symmetric padding applied to width(same on all sides)
+    //     * @param [name] layer name
      */
     public constructor(
         padding: Int,
@@ -73,28 +70,11 @@ public class ZeroPadding1D : Layer {
         return Shape.make(inputShape.size(1), length, inputShape.size(2))
     }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val pattern = arrayOf(intArrayOf(0, 0), intArrayOf(padding[0], padding[1]), intArrayOf(0, 0))
-        val paddingOperand = tf.constant(pattern)
-        val constantValue = tf.constant(0f)
-        return tf.pad(input, paddingOperand, constantValue)
+    override fun paddingArrayToTfFormat(): Array<IntArray> {
+        return arrayOf(intArrayOf(0, 0), intArrayOf(padding[0], padding[1]), intArrayOf(0, 0))
     }
-
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
-    override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "ZeroPadding1D(padding=$padding)"
     }
 }
-

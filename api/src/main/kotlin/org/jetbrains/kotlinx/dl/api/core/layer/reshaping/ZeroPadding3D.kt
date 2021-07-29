@@ -6,8 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -18,9 +16,8 @@ import org.tensorflow.op.Ops
  *
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
  *
- * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2890)
  */
-public class ZeroPadding3D : Layer {
+public class ZeroPadding3D : AbstractZeroPadding {
     //TODO add dataFormat support
     public val padding: IntArray
     private lateinit var inputShape: Shape
@@ -98,18 +95,7 @@ public class ZeroPadding3D : Layer {
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val paddingOperand = tf.constant(paddingArrayToTfFormat())
-        val constantValue = tf.constant(0f)
-        return tf.pad(input, paddingOperand, constantValue)
-    }
-
-    private fun paddingArrayToTfFormat(): Array<IntArray> {
+    override fun paddingArrayToTfFormat(): Array<IntArray> {
         val paddingFirstDim: IntArray
         val paddingSecondDim: IntArray
         val paddingThirdDim: IntArray
@@ -147,14 +133,6 @@ public class ZeroPadding3D : Layer {
             else -> throw IllegalArgumentException("Invalid input shape $inputShape")
         }
     }
-
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
-    override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "ZeroPadding3D(padding=$padding)"

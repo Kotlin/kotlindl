@@ -6,10 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
-import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -20,9 +18,8 @@ import org.tensorflow.op.Ops
  *
  * @property [padding] 4 numbers  interpreted as `(top_pad, bottom_pad, left_pad, right_pad)`.
  *
- * @see [Tensorflow implementation](https://github.com/tensorflow/tensorflow/blob/582c8d236cb079023657287c318ff26adb239002/tensorflow/python/keras/layers/convolutional.py#L2765)
  */
-public class ZeroPadding2D : Layer {
+public class ZeroPadding2D : AbstractZeroPadding {
     public val padding: IntArray
     private val dataFormat: String
     private lateinit var inputShape: Shape // TODO: refactor this shape to another property in another place
@@ -107,30 +104,7 @@ public class ZeroPadding2D : Layer {
         }
     }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val paddingOperand = tf.constant(paddingArrayToTfFormat())
-        val constantValue = tf.constant(0f)
-        return tf.pad(input, paddingOperand, constantValue)
-    }
-
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
-    override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "ZeroPadding2D(padding=$padding)"
-    }
-
-    private fun paddingArrayToTfFormat(): Array<IntArray> {
+    override fun paddingArrayToTfFormat(): Array<IntArray> {
         val paddingFirstDim: IntArray
         val paddingSecondDim: IntArray
 
@@ -173,5 +147,9 @@ public class ZeroPadding2D : Layer {
             }
             else -> throw IllegalArgumentException("Invalid input shape $inputShape")
         }
+    }
+
+    override fun toString(): String {
+        return "ZeroPadding2D(padding=$padding)"
     }
 }
