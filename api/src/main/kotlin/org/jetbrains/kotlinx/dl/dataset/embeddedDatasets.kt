@@ -278,12 +278,15 @@ public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
 /** Path to the subset of Dogs-vs-Cats dataset. */
 private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
 
+/** Path to the Data.zip url to be downloaded from. */
+private const val DOGS_CATS_SMALL_IMAGES_DOWNLOAD_URL: String = "https://kotlindl.s3.amazonaws.com/datasets/small_catdogs/data.zip"
+
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
     unzipDatasetPath(
         cacheDirectory,
-        loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE),
-        "/datasets/small-dogs-vs-cats"
+        loadFile(cacheDirectory, DOGS_CATS_SMALL_IMAGES_ARCHIVE, downloadURLFromRelativePath = { DOGS_CATS_SMALL_IMAGES_DOWNLOAD_URL }),
+        "/datasets/small_catdogs"
     )
 
 /** Path to the Free Spoken Digits Dataset. */
@@ -321,6 +324,12 @@ private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePat
     if (!dataDirectory.exists()) {
         Files.createDirectories(dataDirectory.toPath())
 
+        extractFromZipArchiveToFolder(archive.toPath(), toFolder)
+        val deleted = archive.delete()
+        if (!deleted) {
+            throw Exception("Archive ${archive.absolutePath} could not be deleted! Create this archive manually.")
+        }
+    } else {
         extractFromZipArchiveToFolder(archive.toPath(), toFolder)
         val deleted = archive.delete()
         if (!deleted) {
