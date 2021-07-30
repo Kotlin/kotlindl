@@ -215,6 +215,26 @@ public enum class Activations {
      */
     Swish;
 
+    /**
+     * Mish activation function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * mish(x) = x * tanh(softplus(x))
+     * ```
+     *
+     * It is a smooth, non-monotonic function that consistently matches
+     * or outperforms ReLU and Swish on deep networks, it is unbounded above and
+     * bounded below. It also smoothens the loss landscape of the network.
+     *
+     * Calls [MishActivation] under the hood.
+     *
+     * @see <a href="https://arxiv.org/abs/1908.08681">Misra, 2019</a>
+     */
+    Mish;
+
+
+
     public companion object {
         /**
          * Converts [activationType] to the appropriate [Activation] sub-class.
@@ -235,6 +255,7 @@ public enum class Activations {
                 SoftSign -> SoftSignActivation()
                 HardSigmoid -> HardSigmoidActivation()
                 Swish -> SwishActivation()
+                Mish -> MishActivation()
             }
         }
     }
@@ -356,4 +377,12 @@ public class HardSigmoidActivation : Activation {
 public class SwishActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.sigmoid(features))
+}
+
+/**
+ * @see [Activations.Mish]
+ */
+public class MishActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.mul(features, tf.math.tanh(tf.math.softplus(features)))
 }
