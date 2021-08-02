@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelzoo.resnet.resnet50
+package examples.transferlearning.modelzoo.resnet.resnet18
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
@@ -23,17 +23,17 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on ResNet'50 model:
+ * This examples demonstrates the inference concept on ResNet'18 model:
  * - Model configuration, model weights and labels are obtained from [ModelZoo].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - No additional training.
  * - No new layers are added.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'18  during training on ImageNet dataset) is applied to images before prediction.
  */
-fun resnet50prediction() {
+fun resnet18prediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_18)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
@@ -75,4 +75,4 @@ fun resnet50prediction() {
 }
 
 /** */
-fun main(): Unit = resnet50prediction()
+fun main(): Unit = resnet18prediction()

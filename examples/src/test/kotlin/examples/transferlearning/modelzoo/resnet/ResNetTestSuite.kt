@@ -5,12 +5,24 @@
 
 package examples.transferlearning.modelzoo.resnet
 
+import examples.transferlearning.modelzoo.resnet.resnet18.resnet18prediction
+import examples.transferlearning.modelzoo.resnet.resnet18.resnet34prediction
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50additionalTraining
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50copyModelPrediction
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50prediction
 import org.junit.jupiter.api.Test
 
 class ResNetTestSuite {
+    @Test
+    fun resnet18predictionTest() {
+        resnet18prediction()
+    }
+
+    @Test
+    fun resnet34predictionTest() {
+        resnet34prediction()
+    }
+
     @Test
     fun resnet50predictionTest() {
         resnet50prediction()

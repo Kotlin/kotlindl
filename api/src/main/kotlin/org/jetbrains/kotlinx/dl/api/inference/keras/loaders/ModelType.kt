@@ -20,6 +20,12 @@ public enum class ModelType(public val modelName: String) {
     VGG_19("vgg19"),
 
     /** */
+    ResNet_18("resnet18"),
+
+    /** */
+    ResNet_34("resnet34"),
+
+    /** */
     ResNet_50("resnet50"),
 
     /** */
