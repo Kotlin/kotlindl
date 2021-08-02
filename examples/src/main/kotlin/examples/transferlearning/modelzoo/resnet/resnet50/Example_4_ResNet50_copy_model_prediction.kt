@@ -29,7 +29,7 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - No additional training.
  * - No new layers are added.
- * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'50  during training on ImageNet dataset) is applied to images before prediction.
  * - Model copied and used for prediction.
  */
 fun resnet50copyModelPrediction() {

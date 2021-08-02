@@ -60,6 +60,8 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
         return when (modelType) {
             ModelType.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)
             ModelType.VGG_19 -> Sequential.loadModelConfiguration(jsonConfigFile)
+            ModelType.ResNet_18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            ModelType.ResNet_34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.ResNet_50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
             ModelType.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
@@ -168,6 +170,8 @@ public fun preprocessInput(data: FloatArray, tensorShape: LongArray, modelType: 
     return when (modelType) {
         ModelType.VGG_16 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
         ModelType.VGG_19 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_18 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+        ModelType.ResNet_34 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
         ModelType.ResNet_50 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
         ModelType.ResNet_101 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
         ModelType.ResNet_152 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
