@@ -100,6 +100,7 @@ internal const val ACTIVATION_ELU: String = "elu"
 internal const val ACTIVATION_SELU: String = "selu"
 internal const val ACTIVATION_LOG_SOFTMAX: String = "log_softmax"
 internal const val ACTIVATION_EXP: String = "exponential"
+internal const val ACTIVATION_MISH: String = "mish"
 
 // Layer settings
 internal const val CHANNELS_LAST: String = "channels_last"
