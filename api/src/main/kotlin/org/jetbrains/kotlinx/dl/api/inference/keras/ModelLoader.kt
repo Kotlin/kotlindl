@@ -429,6 +429,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SOFTSIGN -> Activations.SoftSign
         ACTIVATION_HARD_SIGMOID -> Activations.HardSigmoid
         ACTIVATION_SWISH -> Activations.Swish
+        ACTIVATION_MISH -> Activations.Mish
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
