@@ -11,14 +11,10 @@ import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 3D input (e.g. video).
- *
  * This layer can add zeros in the rows, cols and depth of an video tensor.
- *
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
- *
  */
 public class ZeroPadding3D : AbstractZeroPadding {
-    //TODO add dataFormat support
     public val padding: IntArray
     private lateinit var inputShape: Shape
 
@@ -116,7 +112,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
                 paddingSecondDim = intArrayOf(padding[0], padding[0])
                 paddingThirdDim = intArrayOf(padding[0], padding[0])
             }
-            else -> throw IllegalArgumentException("Invalid padding argument at layer $name")
+            else -> throw IllegalArgumentException("Invalid padding argument at layer $name.")
         }
         return paddingArraysToInputShape(paddingFirstDim, paddingSecondDim, paddingThirdDim)
     }
@@ -130,7 +126,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
             5 -> arrayOf(intArrayOf(0, 0), paddingFirstDim, paddingSecondDim, paddingThirdDim, intArrayOf(0, 0))
             4 -> arrayOf(paddingFirstDim, paddingSecondDim, paddingThirdDim, intArrayOf(0, 0))
             3 -> arrayOf(paddingFirstDim, paddingSecondDim, paddingThirdDim)
-            else -> throw IllegalArgumentException("Invalid input shape $inputShape")
+            else -> throw IllegalArgumentException("Invalid input shape $inputShape.")
         }
     }
 

@@ -1,9 +1,17 @@
+/*
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
+/**
+ * Abstract Zero Padding layer used as the base layer for all the ZeroPadding layers.
+ */
 public abstract class AbstractZeroPadding(
     name:String
 ): Layer(name) {

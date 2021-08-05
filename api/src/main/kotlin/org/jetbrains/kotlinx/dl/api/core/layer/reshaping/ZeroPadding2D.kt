@@ -13,16 +13,13 @@ import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 2D input (e.g. picture).
- *
  * This layer can add rows and columns of zeros at the top, bottom, left and right side of an image tensor.
- *
  * @property [padding] 4 numbers  interpreted as `(top_pad, bottom_pad, left_pad, right_pad)`.
- *
  */
 public class ZeroPadding2D : AbstractZeroPadding {
     public val padding: IntArray
     private val dataFormat: String
-    private lateinit var inputShape: Shape // TODO: refactor this shape to another property in another place
+    private lateinit var inputShape: Shape
 
     /**
      * Constructs an instance of ZeroPadding2D layer
@@ -121,7 +118,7 @@ public class ZeroPadding2D : AbstractZeroPadding {
                 paddingFirstDim = intArrayOf(padding[0], padding[0])
                 paddingSecondDim = intArrayOf(padding[0], padding[0])
             }
-            else -> throw IllegalArgumentException("Invalid padding argument at layer $name")
+            else -> throw IllegalArgumentException("Invalid padding argument at layer $name.")
         }
         return paddingArraysToInputShape(paddingFirstDim, paddingSecondDim)
     }
@@ -145,7 +142,7 @@ public class ZeroPadding2D : AbstractZeroPadding {
             2 -> {
                 arrayOf(paddingFirstDim, paddingSecondDim)
             }
-            else -> throw IllegalArgumentException("Invalid input shape $inputShape")
+            else -> throw IllegalArgumentException("Invalid input shape $inputShape.")
         }
     }
 
