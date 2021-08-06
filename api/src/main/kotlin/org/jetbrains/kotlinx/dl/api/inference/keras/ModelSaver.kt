@@ -101,7 +101,9 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         // Reshaping layers
         is Flatten -> createKerasFlattenLayer(layer)
         is RepeatVector -> createKerasRepeatVectorLayer(layer)
+        is ZeroPadding1D -> createKerasZeroPadding1DLayer(layer)
         is ZeroPadding2D -> createKerasZeroPadding2DLayer(layer)
+        is ZeroPadding3D -> createKerasZeroPadding3DLayer(layer)
         is Cropping1D -> createKerasCropping1DLayer(layer)
         is Cropping2D -> createKerasCropping2DLayer(layer)
         is Cropping3D -> createKerasCropping3DLayer(layer)
@@ -730,6 +732,16 @@ private fun createKerasSeparableConv2DLayer(layer: SeparableConv2D, isKerasFully
     return KerasLayer(class_name = LAYER_SEPARABLE_CONV2D, config = configX)
 }
 
+private fun createKerasZeroPadding1DLayer(layer: ZeroPadding1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = KerasPadding.ZeroPadding1D(layer.padding),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_ZERO_PADDING_1D, config = configX)
+}
+
 private fun createKerasZeroPadding2DLayer(layer: ZeroPadding2D): KerasLayer {
     val configX = LayerConfig(
         data_format = CHANNELS_LAST,
@@ -739,6 +751,16 @@ private fun createKerasZeroPadding2DLayer(layer: ZeroPadding2D): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ZERO_PADDING_2D, config = configX)
+}
+
+private fun createKerasZeroPadding3DLayer(layer: ZeroPadding3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = KerasPadding.ZeroPadding3D(layer.padding),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_ZERO_PADDING_3D, config = configX)
 }
 
 private fun createKerasCropping1DLayer(layer: Cropping1D): KerasLayer {
@@ -778,7 +800,7 @@ private fun createKerasUpSampling1DLayer(layer: UpSampling1D): KerasLayer {
         name = layer.name,
         trainable = layer.isTrainable,
     )
-    return KerasLayer(class_name = LAYER_UP_SAMPLING_1D,  config = configX)
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_1D, config = configX)
 }
 
 private fun createKerasUpSampling2DLayer(layer: UpSampling2D): KerasLayer {
@@ -789,7 +811,7 @@ private fun createKerasUpSampling2DLayer(layer: UpSampling2D): KerasLayer {
         name = layer.name,
         trainable = layer.isTrainable,
     )
-    return KerasLayer(class_name = LAYER_UP_SAMPLING_2D,  config = configX)
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_2D, config = configX)
 }
 
 private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
@@ -799,5 +821,5 @@ private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
         name = layer.name,
         trainable = layer.isTrainable,
     )
-    return KerasLayer(class_name = LAYER_UP_SAMPLING_3D,  config = configX)
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_3D, config = configX)
 }
