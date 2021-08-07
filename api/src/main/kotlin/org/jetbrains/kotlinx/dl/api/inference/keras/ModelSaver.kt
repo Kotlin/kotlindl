@@ -47,18 +47,6 @@ internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean)
     val kerasLayers = layers.map {
         convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
     }
-
-    val inputLayer = when (this) {
-        is Sequential -> this.inputLayer
-        is Functional -> this.inputLayer
-        else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
-    }
-
-    val inputShape = inputLayer.packedDims.map { it.toInt() }
-
-    (kerasLayers.first().config as LayerConfig).batch_input_shape =
-        listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
-
     val config = KerasModelConfig(name = name, layers = kerasLayers)
     return KerasModel(config = config)
 }
