@@ -59,18 +59,12 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequenti
  * @return Pair of <input layer; list of layers>.
  */
 internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
-    val layers = mutableListOf<Layer>()
+    val kerasLayers = config!!.config!!.layers!!
 
-    (config as KerasModel).config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it)
-                layers.add(layer)
-            }
-        }
+    val input = createInputLayer(kerasLayers.first())
+    val layers = kerasLayers.filter { !it.class_name.equals(LAYER_INPUT) }.mapTo(mutableListOf()) {
+        convertToLayer(it)
     }
-
-    val input = createInputLayer(config.config!!.layers!!.first())
 
     return Pair(input, layers)
 }
@@ -170,18 +164,17 @@ internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> 
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
-    val input = createInputLayer((config as KerasModel).config!!.layers!!.first())
+    val kerasLayers = config!!.config!!.layers!!
 
+    val input = createInputLayer(kerasLayers.first())
     layers.add(input)
     layersByNames[input.name] = input
 
-    config.config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it, layersByNames)
-                layers.add(layer)
-                layersByNames[layer.name] = layer
-            }
+    kerasLayers.forEach {
+        if (!it.class_name.equals(LAYER_INPUT)) {
+            val layer = convertToLayer(it, layersByNames)
+            layers.add(layer)
+            layersByNames[layer.name] = layer
         }
     }
 
