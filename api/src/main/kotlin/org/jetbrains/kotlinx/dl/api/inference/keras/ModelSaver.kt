@@ -44,12 +44,8 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 }
 
 internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean): KerasModel {
-    val kerasLayers = mutableListOf<KerasLayer>()
-    this.layers.forEach {
-        run {
-            val layer = convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
-            kerasLayers.add(layer)
-        }
+    val kerasLayers = layers.map {
+        convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
     }
 
     val inputLayer = when (this) {
