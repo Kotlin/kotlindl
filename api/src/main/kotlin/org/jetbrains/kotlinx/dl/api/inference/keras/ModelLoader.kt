@@ -377,35 +377,10 @@ private fun convertToInterpolationMethod(interpolation: String): InterpolationMe
  */
 
 private fun createInputLayer(layer: KerasLayer): Input {
-    val batchInputShape = layer.config!!.batch_input_shape
-    val inputLayerName = if (layer.class_name.equals("InputLayer")) layer.config.name ?: "input" else "input"
-
-    // TODO: write more universal code here
-    return when (batchInputShape!!.size) {
-        3 -> {
-            Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-    }
+    val batchInputShape = layer.config!!.batch_input_shape!!
+    val inputLayerDims = batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()
+    val inputLayerName = if (layer.class_name.equals(LAYER_INPUT)) layer.config.name ?: "input" else "input"
+    return Input(*inputLayerDims, name = inputLayerName)
 }
 
 private fun createGlobalAvgPool2DLayer(name: String): Layer {
