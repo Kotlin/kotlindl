@@ -70,39 +70,7 @@ internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, Mutable
         }
     }
 
-    val input: Input
-
-    val firstLayer = config.config!!.layers!!.first()
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = config.config.layers!!.first().config!!.batch_input_shape
-
-    // TODO: write more universal code here
-    when (batchInputShape!!.size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-    }
+    val input = createInputLayer(config.config!!.layers!!.first())
 
     return Pair(input, layers)
 }
@@ -202,41 +170,7 @@ internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> 
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
-    val input: Input
-
-    val firstLayer = (config as KerasModel).config!!.layers!!.first()
-    val batchInputShape =
-        firstLayer.config!!.batch_input_shape
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config.name ?: "input" else "input"
-
-    // TODO: write more universal code here
-    val size = batchInputShape!!.size
-    when (size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-    }
+    val input = createInputLayer((config as KerasModel).config!!.layers!!.first())
 
     layers.add(input)
     layersByNames[input.name] = input
@@ -448,6 +382,38 @@ private fun convertToInterpolationMethod(interpolation: String): InterpolationMe
 /**
  * The layer creator functions should be put below.
  */
+
+private fun createInputLayer(layer: KerasLayer): Input {
+    val batchInputShape = layer.config!!.batch_input_shape
+    val inputLayerName = if (layer.class_name.equals("InputLayer")) layer.config.name ?: "input" else "input"
+
+    // TODO: write more universal code here
+    return when (batchInputShape!!.size) {
+        3 -> {
+            Input(
+                batchInputShape[1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                name = inputLayerName
+            )
+        }
+        4 -> {
+            Input(
+                batchInputShape[1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = inputLayerName
+            )
+        }
+        else -> {
+            Input(
+                batchInputShape[1]?.toLong()!!,
+                batchInputShape[2]?.toLong()!!,
+                batchInputShape[3]?.toLong()!!,
+                name = inputLayerName
+            )
+        }
+    }
+}
 
 private fun createGlobalAvgPool2DLayer(name: String): Layer {
     return GlobalAvgPool2D(
