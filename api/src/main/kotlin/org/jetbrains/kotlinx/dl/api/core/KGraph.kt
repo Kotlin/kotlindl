@@ -30,6 +30,8 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /** Internal static TensorFlow graph. */
     internal var tfGraph: Graph = Graph()
 
+    public var isClosed: Boolean = false
+
     /** A list of initializer to initialize the trainableVariables. */
     private val optimizerInitializers: MutableList<Assign<*>> = mutableListOf()
 
@@ -60,6 +62,7 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      * Closes internal TensorFlow graph.
      */
     override fun close() {
+        isClosed = true
         tfGraph.close()
     }
 
@@ -78,8 +81,25 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         return s
     }
 
+    /** Returns list of variable names in TensorFlow graph. */
+    public fun variableNames(): List<String> {
+        val operations = tfGraph.operations()
+        val variableNames = mutableListOf<String>()
+
+        while (operations.hasNext()) {
+            val operation = operations.next() as GraphOperation
+            if(operation.type().equals("VariableV2")) {
+                variableNames.add(operation.name())
+            }
+        }
+        return variableNames.toList()
+    }
+
     /** Makes a graph copy. */
-    public fun copy(): KGraph = KGraph(tfGraph.toGraphDef())
+    public fun copy(): KGraph {
+        require(!isClosed) { "The copied graph and model are closed and could not be reused!" }
+        return KGraph(tfGraph.toGraphDef())
+    }
 
     /**
      * Adds a variable used in layer to the pool of tracked variables.
