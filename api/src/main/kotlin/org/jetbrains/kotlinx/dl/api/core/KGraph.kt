@@ -19,6 +19,9 @@ import org.tensorflow.op.core.Variable
  *
  * It tracks all model variables (used in optimizers or layers) and its initializers.
  *
+ * @param [graphDef] A serialized representation of the graph.
+ * @param [prefix] A prefix that will be prepended to names in graphDef.
+ *
  * @constructor Creates KGraph by serialized representation of the graph.
  */
 public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
@@ -74,6 +77,9 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         }
         return s
     }
+
+    /** Makes a graph copy. */
+    public fun copy(): KGraph = KGraph(tfGraph.toGraphDef())
 
     /**
      * Adds a variable used in layer to the pool of tracked variables.

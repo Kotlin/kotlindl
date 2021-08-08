@@ -461,12 +461,14 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     /** Returns a copy of this model. */
+    // TODO: support saveOptimizerState=true with assignment of intermediate optimizer state
     public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Functional {
         val serializedModel = serializeModel(true)
         val deserializedModel = deserializeFunctionalModel(serializedModel)
         if (!copyWeights) {
             return deserializedModel
         } else {
+            // TODO: make deep copies, not just links
             deserializedModel.compile(
                 optimizer = this.optimizer,
                 loss = this.loss,

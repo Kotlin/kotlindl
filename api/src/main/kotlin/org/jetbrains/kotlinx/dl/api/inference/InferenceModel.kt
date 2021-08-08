@@ -184,6 +184,21 @@ public open class InferenceModel : AutoCloseable {
     }
 
     /**
+     * Returns copied inference model.
+     */
+    public open fun copy(copiedModelName: String? = null): InferenceModel {
+        val model = InferenceModel()
+        model.kGraph = this.kGraph.copy()
+        model.tf = Ops.create(model.kGraph.tfGraph)
+        model.session = Session(model.kGraph.tfGraph)
+        model.shape = shape
+        model.input = input
+        model.output = output
+        if (copiedModelName!=null) model.name = name
+        return model
+    }
+
+    /**
      * Executes pre-defined Assign TensorFlow operand.
      *
      * @param [variableName] Name of variable to be assigned.
@@ -459,13 +474,6 @@ public open class InferenceModel : AutoCloseable {
         }
 
         return result
-    }
-
-    /**
-     * Returns copied inference model.
-     */
-    public open fun copy(): InferenceModel {
-        TODO()
     }
 
     override fun toString(): String {
