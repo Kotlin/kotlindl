@@ -33,6 +33,7 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
+import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.FloatBuffer
@@ -823,19 +824,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Saves variables and optimizer state if [saveOptimizerState] is enabled in txt format to the [pathToModelDirectory] directory.*/
     protected fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        val modelWeightsExtractorRunner = session.runner()
-
-        var variables = kGraph.layerVariables()
-
-        if (saveOptimizerState) {
-            variables = variables + kGraph.optimizerVariables()
-        }
-
-        variables.forEach {
-            modelWeightsExtractorRunner.fetch(it)
-        }
-
-        val modelWeights = modelWeightsExtractorRunner.run()
+        val pair = getVariablesAndTensors(saveOptimizerState)
+        val variables = pair.first
+        val modelWeights = pair.second
 
         Files.createDirectories(Paths.get(pathToModelDirectory))
         val file = File("$pathToModelDirectory/variableNames.txt")
@@ -880,7 +871,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
 
         val variableNames = file.readLines()
-
+        // TODO: common code could be refactored with the link to the function (load variable)
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
@@ -893,12 +884,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true
-    }
-
-    private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph().frozenLayerVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
     }
 
     /**

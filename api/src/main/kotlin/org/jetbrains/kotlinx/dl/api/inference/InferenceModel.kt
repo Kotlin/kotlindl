@@ -16,6 +16,7 @@ import org.tensorflow.Session
 import org.tensorflow.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.NotDirectoryException
@@ -111,7 +112,6 @@ public open class InferenceModel : AutoCloseable {
 
             return result.copyTo(LongArray(1))[0].toInt()
         }
-
     }
 
     /**
@@ -161,7 +161,7 @@ public open class InferenceModel : AutoCloseable {
     /**
      * Chain-like setter to set up input shape.
      *
-     * @param dims The input shape.
+     * @param [dims] The input shape.
      */
     public fun reshape(vararg dims: Long) {
         this.shape = TensorShape(1, *dims).dims()
@@ -181,6 +181,90 @@ public open class InferenceModel : AutoCloseable {
         if (::kGraph.isInitialized) {
             kGraph.close()
         }
+    }
+
+    /**
+     * Creates a copy.
+     *
+     * @param [copiedModelName] Set up this name to make a copy with a new name.
+     * @return A copied inference model.
+     */
+    // TODO: add tests to the tests
+    public open fun copy(
+        copiedModelName: String? = null,
+        saveOptimizerState: Boolean = false, // TODO, check this case
+        copyWeights: Boolean = true
+    ): InferenceModel {
+        val model = InferenceModel()
+        model.kGraph = this.kGraph.copy()
+        model.tf = Ops.create(model.kGraph.tfGraph)
+        model.session = Session(model.kGraph.tfGraph)
+        model.shape = shape
+        model.input = input
+        model.output = output
+        if (copiedModelName != null) model.name = name
+        // TODO: check that tensors are closed after usage
+        if (copyWeights) {
+            val modelWeightsExtractorRunner = session.runner()
+            val variableNames = kGraph.variableNames()
+            check(variableNames.isNotEmpty()) {
+                "Found 0 variable names in TensorFlow graph $kGraph. " +
+                        "If copied model has no weights, set flag `copyWeights` to `false`."
+            }
+
+            // TODO: the same code-block related to saveOptimizerState
+            for (varName in variableNames) {
+                if (!saveOptimizerState && varName.startsWith("optimizer")) // skip loading optimizers' variables
+                    continue
+                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(varName)) // skip loading optimizers' variables for frozen layers
+                    continue
+                else modelWeightsExtractorRunner.fetch(varName)
+            }
+
+            val modelWeights = modelWeightsExtractorRunner.run()
+
+            for ((index, tensorForCopying) in modelWeights.withIndex()) {
+                val variableName = variableNames[index]
+                // TODO: do we need to load optimizer variables if it's not used during inference
+                if (!saveOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
+                    continue
+                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
+                    continue
+                else assignVariable(
+                    variableName,
+                    tensorForCopying.convertTensorToMultiDimArray(),
+                    model.kGraph,
+                    model.session
+                )
+
+                tensorForCopying.close()
+            }
+        }
+        model.isModelInitialized = true
+        return model
+    }
+
+    protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
+        return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
+            .map { it.ref().op().name() } // extract names
+            .any { variableName.contains(it) }
+    }
+
+    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
+        val modelWeightsExtractorRunner = session.runner()
+
+        var variables = kGraph.layerVariables()
+
+        if (saveOptimizerState) {
+            variables = variables + kGraph.optimizerVariables()
+        }
+
+        variables.forEach {
+            modelWeightsExtractorRunner.fetch(it)
+        }
+
+        val modelWeights = modelWeightsExtractorRunner.run()
+        return Pair(variables, modelWeights)
     }
 
     /**
@@ -288,7 +372,7 @@ public open class InferenceModel : AutoCloseable {
      * @param [data] Variable data.
      */
     // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
-    internal fun assignVariable(variableName: String, data: Array<*>) {
+    internal fun assignVariable(variableName: String, data: Array<*>, kGraph: KGraph = this.kGraph, session: Session = this.session) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
 
@@ -307,7 +391,7 @@ public open class InferenceModel : AutoCloseable {
         val shape = operation.output<Float>(0).shape()
         val tensorShape = TensorShape(shape)
 
-        populateVariable(initializerName, data, assignOpName)
+        populateVariable(initializerName, data, assignOpName, session)
 
         logger.debug { "Loading the variable $variableName data" }
         logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
@@ -358,7 +442,8 @@ public open class InferenceModel : AutoCloseable {
     private fun populateVariable(
         initializerName: String,
         data: Any,
-        assignOpName: String
+        assignOpName: String,
+        session: Session = this.session
     ) {
         var tensorData = data
         if (data is Array<*> && data.isArrayOf<Float>()) {
@@ -459,13 +544,6 @@ public open class InferenceModel : AutoCloseable {
         }
 
         return result
-    }
-
-    /**
-     * Returns copied inference model.
-     */
-    public open fun copy(): InferenceModel {
-        TODO()
     }
 
     override fun toString(): String {

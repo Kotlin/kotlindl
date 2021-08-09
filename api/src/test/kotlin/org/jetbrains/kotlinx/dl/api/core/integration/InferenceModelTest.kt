@@ -165,6 +165,79 @@ class InferenceModelTest {
     }
 
     @Test
+    fun basicInferenceAndCopy(@TempDir tempDir: Path?) {
+        assertTrue(tempDir!!.toFile().isDirectory)
+
+        val lenet5 = Sequential.of(lenet5Layers)
+
+        val (train, test) = mnist()
+
+        lenet5.use {
+            it.compile(
+                optimizer = SGD(learningRate = 0.05f),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Accuracy()
+            )
+
+            it.fit(
+                dataset = train,
+                epochs = EPOCHS,
+                batchSize = TRAINING_BATCH_SIZE
+            )
+
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.5)
+            }
+
+            it.save(
+                modelDirectory = tempDir.toFile(),
+                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                writingMode = WritingMode.OVERRIDE
+            )
+        }
+
+        val inferenceModel = InferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
+
+        var copiedInferenceModel: InferenceModel
+
+        val firstAccuracy: Double
+        val secondAccuracy: Double
+
+        inferenceModel.use {
+            it.reshape(28, 28, 1)
+            var accuracy = 0.0
+            val amountOfTestSet = 10000
+            for (imageId in 0..amountOfTestSet) {
+                val prediction = it.predict(train.getX(imageId))
+                val softPrediction = it.predictSoftly(train.getX(imageId))
+                assertEquals(10, softPrediction.size)
+
+                if (prediction == train.getY(imageId).toInt())
+                    accuracy += (1.0 / amountOfTestSet)
+            }
+            copiedInferenceModel = inferenceModel.copy("CopiedLenet")
+            assertTrue(accuracy > 0.5)
+            firstAccuracy = accuracy
+        }
+
+        copiedInferenceModel.use {
+            var accuracy = 0.0
+            val amountOfTestSet = 10000
+            for (imageId in 0..amountOfTestSet) {
+                val prediction = it.predict(train.getX(imageId))
+
+                if (prediction == train.getY(imageId).toInt())
+                    accuracy += (1.0 / amountOfTestSet)
+            }
+            assertTrue(accuracy > 0.5)
+            secondAccuracy = accuracy
+        }
+
+        assertEquals(firstAccuracy, secondAccuracy, EPS)
+    }
+
+    @Test
     fun emptyInferenceModel() {
         val (train, test) = mnist()
 

@@ -19,6 +19,9 @@ import org.tensorflow.op.core.Variable
  *
  * It tracks all model variables (used in optimizers or layers) and its initializers.
  *
+ * @param [graphDef] A serialized representation of the graph.
+ * @param [prefix] A prefix that will be prepended to names in graphDef.
+ *
  * @constructor Creates KGraph by serialized representation of the graph.
  */
 public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
@@ -26,6 +29,8 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
 
     /** Internal static TensorFlow graph. */
     internal var tfGraph: Graph = Graph()
+
+    public var isClosed: Boolean = false
 
     /** A list of initializer to initialize the trainableVariables. */
     private val optimizerInitializers: MutableList<Assign<*>> = mutableListOf()
@@ -57,6 +62,7 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
      * Closes internal TensorFlow graph.
      */
     override fun close() {
+        isClosed = true
         tfGraph.close()
     }
 
@@ -73,6 +79,26 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
             s += "Name: " + operation.name() + "; Type: " + operation.type() + "; Out #tensors:  " + operation.numOutputs() + "\n"
         }
         return s
+    }
+
+    /** Returns list of variable names in TensorFlow graph. */
+    public fun variableNames(): List<String> {
+        val operations = tfGraph.operations()
+        val variableNames = mutableListOf<String>()
+
+        while (operations.hasNext()) {
+            val operation = operations.next() as GraphOperation
+            if(operation.type().equals("VariableV2")) {
+                variableNames.add(operation.name())
+            }
+        }
+        return variableNames.toList()
+    }
+
+    /** Makes a graph copy. */
+    public fun copy(): KGraph {
+        require(!isClosed) { "The copied graph and model are closed and could not be reused!" }
+        return KGraph(tfGraph.toGraphDef())
     }
 
     /**
