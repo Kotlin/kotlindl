@@ -9,7 +9,6 @@ import examples.cnn.fsdd.soundBlock
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
@@ -20,7 +19,7 @@ import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
+import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import org.jetbrains.kotlinx.dl.visualization.letsplot.*
 import java.io.File
 

@@ -23,6 +23,7 @@ nexusStaging {
 
 
 dependencies {
+    api project(":dataset")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     compile 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing

@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.handler.*
-import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
+import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import java.io.*
 import java.net.URL
 import java.nio.file.Files
