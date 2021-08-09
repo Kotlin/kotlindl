@@ -33,7 +33,6 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
-import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.FloatBuffer
