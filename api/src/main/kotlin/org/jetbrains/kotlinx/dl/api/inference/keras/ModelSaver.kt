@@ -272,6 +272,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
         Activations.Mish -> ACTIVATION_MISH
+        Activations.HardShrink -> ACTIVATION_HARDSHRINK
     }
 }
 
