@@ -37,7 +37,7 @@ public fun TensorPreprocessing.rescale(block: Rescaling.() -> Unit) {
 
 /** */
 public fun TensorPreprocessing.sharpen(block: Sharpen.() -> Unit) {
-    sharpen = Sharpen().apply(block)
+    sharpen = Sharpen(null).apply(block)
 }
 
 

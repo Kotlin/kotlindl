@@ -5,17 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
-
 /**
- * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelType].
+ * This wrapper preprocessor applies the passed custom preprocessor to be used in Preprocessing DSL.
  *
- * @property [modelType] One the supported models pre-trained on ImageNet.
+ * @property [customPreprocessor] Custom preprocessor.
  */
-public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Preprocessor {
+public class Sharpen(public var customPreprocessor: Preprocessor?) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
-        return preprocessInput(data, tensorShape, modelType)
+        return customPreprocessor?.apply(data, inputShape) ?: data
     }
 }
