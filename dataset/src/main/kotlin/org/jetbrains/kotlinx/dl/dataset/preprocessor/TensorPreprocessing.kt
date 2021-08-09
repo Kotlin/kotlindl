@@ -10,7 +10,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
  *
  * It supports the following ops:
  * - [rescaling] See [Rescaling] preprocessor.
- * - [sharpen] See [Sharpen] preprocessor.
+ * - [customPreprocessor] See [CustomPreprocessor] preprocessor.
  *
  * It's a part of the [org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing] pipeline DSL.
  */
@@ -19,25 +19,20 @@ public class TensorPreprocessing {
     public lateinit var rescaling: Rescaling
 
     /** */
-    public lateinit var sharpen: Sharpen
+    public lateinit var customPreprocessor: Preprocessor
 
     /** True, if [rescaling] is initialized. */
     public val isRescalingInitialized: Boolean
         get() = ::rescaling.isInitialized
 
-    /** True, if [sharpen] is initialized. */
-    public val isSharpenInitialized: Boolean
-        get() = ::sharpen.isInitialized
+    /** True, if [customPreprocessor] is initialized. */
+    public val isCustomPreprocessorInitialized: Boolean
+        get() = ::customPreprocessor.isInitialized
 }
 
 /** */
 public fun TensorPreprocessing.rescale(block: Rescaling.() -> Unit) {
     rescaling = Rescaling().apply(block)
-}
-
-/** */
-public fun TensorPreprocessing.sharpen(block: Sharpen.() -> Unit) {
-    sharpen = Sharpen(null).apply(block)
 }
 
 

@@ -68,7 +68,7 @@ fun resnet50additionalTraining() {
         }
         transformTensor {
             sharpen {
-                customPreprocessor = ImageNetize(ModelType.ResNet_50)
+                modelType = ModelType.ResNet_50
             }
         }
     }

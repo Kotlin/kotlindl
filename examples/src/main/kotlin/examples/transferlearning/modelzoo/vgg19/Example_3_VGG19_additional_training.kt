@@ -72,7 +72,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                customPreprocessor = ImageNetize(ModelType.VGG_19)
+                ModelType.VGG_19
             }
         }
     }
