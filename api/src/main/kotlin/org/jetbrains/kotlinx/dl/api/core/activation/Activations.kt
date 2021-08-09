@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.op.linalg.Transpose
 
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
@@ -234,7 +235,6 @@ public enum class Activations {
     Mish;
 
 
-
     public companion object {
         /**
          * Converts [activationType] to the appropriate [Activation] sub-class.
@@ -385,4 +385,19 @@ public class SwishActivation : Activation {
 public class MishActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.tanh(tf.math.softplus(features)))
+}
+
+public class HardShrinkActivation(public val lower: Float, public val upper: Float) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        require(lower < upper) {
+            "The value of lower should not be higher than upper"
+        }
+        val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
+        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(lower)
+        val mask = (maskLower || maskUpper)
+        return when (mask) {
+            false -> tf.constant(0) as Operand<Float>
+            true -> features
+        }
+    }
 }
