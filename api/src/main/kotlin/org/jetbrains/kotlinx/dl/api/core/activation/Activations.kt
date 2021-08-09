@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.linalg.Transpose
 
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
@@ -232,7 +231,22 @@ public enum class Activations {
      *
      * @see <a href="https://arxiv.org/abs/1908.08681">Misra, 2019</a>
      */
-    Mish;
+    Mish,
+
+    /**
+     * HardShrink Function
+     *
+     * Computes hard shrink function:
+     *
+     * hardshrink(x) = x if x < lower
+     *                 x if x > upper
+     *                 0 otherwise
+     *
+     * Calls [HardShrinkActivation] under the hood.
+     * @property [lower] lower bound for setting values to zeros
+     * @property [upper] upper bound for setting values to zeros
+     */
+    HardShrink;
 
 
     public companion object {
@@ -256,6 +270,7 @@ public enum class Activations {
                 HardSigmoid -> HardSigmoidActivation()
                 Swish -> SwishActivation()
                 Mish -> MishActivation()
+                HardShrink -> HardShrinkActivation(lower = -0.5f, upper = 0.5f)
             }
         }
     }
@@ -387,6 +402,9 @@ public class MishActivation : Activation {
         tf.math.mul(features, tf.math.tanh(tf.math.softplus(features)))
 }
 
+/**
+ * @see [Activations.HardShrink]
+ */
 public class HardShrinkActivation(public val lower: Float, public val upper: Float) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         require(lower < upper) {
