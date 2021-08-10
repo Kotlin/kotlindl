@@ -10,6 +10,8 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 private const val PATH_TO_MODEL_1 = "examples/src/main/resources/models/onnx/mnist-8.onnx"
 private const val PATH_TO_MODEL_2 = "examples/src/main/resources/models/onnx/resnet50.onnx"
 private const val PATH_TO_MODEL_3 = "examples/src/main/resources/models/onnx/resnet50notop.onnx"
+private const val PATH_TO_MODEL_4 = "examples/src/main/resources/models/onnx/efficientnet-lite4-11.onnx"
+
 
 fun main() {
     var model = OnnxInferenceModel.load(PATH_TO_MODEL_1)
@@ -25,6 +27,12 @@ fun main() {
     model.close()
 
     model = OnnxInferenceModel.load(PATH_TO_MODEL_3)
+
+    println(model.toString())
+
+    model.close()
+
+    model = OnnxInferenceModel.load(PATH_TO_MODEL_4)
 
     println(model.toString())
 
