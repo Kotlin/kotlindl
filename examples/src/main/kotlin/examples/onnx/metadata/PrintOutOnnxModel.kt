@@ -11,6 +11,7 @@ private const val PATH_TO_MODEL_1 = "examples/src/main/resources/models/onnx/mni
 private const val PATH_TO_MODEL_2 = "examples/src/main/resources/models/onnx/resnet50.onnx"
 private const val PATH_TO_MODEL_3 = "examples/src/main/resources/models/onnx/resnet50notop.onnx"
 private const val PATH_TO_MODEL_4 = "examples/src/main/resources/models/onnx/efficientnet-lite4-11.onnx"
+private const val PATH_TO_MODEL_5 = "examples/src/main/resources/models/onnx/yolov4.onnx"
 
 
 fun main() {
@@ -33,6 +34,12 @@ fun main() {
     model.close()
 
     model = OnnxInferenceModel.load(PATH_TO_MODEL_4)
+
+    println(model.toString())
+
+    model.close()
+
+    model = OnnxInferenceModel.load(PATH_TO_MODEL_5)
 
     println(model.toString())
 

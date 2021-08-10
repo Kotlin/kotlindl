@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
+import ai.onnxruntime.TensorInfo
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
@@ -67,6 +68,7 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val tensor = OnnxTensor.createTensor(env, preparedData, shape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
+
         val outputProbs = output[0].value as Array<FloatArray>
         val predLabel = pred(outputProbs[0])
         return predLabel
@@ -83,7 +85,15 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val tensor = OnnxTensor.createTensor(env, preparedData, shape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
-        return output[0].value
+
+        val result = mutableListOf<Array<*>>()
+
+        output.forEach {
+            println("Shape of output ${(it.value.info as TensorInfo).shape.contentToString()}")
+            result.add(it.value.value as Array<*>)
+        }
+
+        return result
         // ((((output as Result).list as java.util.ArrayList<*>)[0] as OnnxTensor).info as TensorInfo).shape = [1, 7, 7, 2048]
     }
 
