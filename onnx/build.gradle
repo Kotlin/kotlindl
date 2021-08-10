@@ -1,5 +1,5 @@
 dependencies {
-    api project(":dataset")
+    api project(":api")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'com.microsoft.onnxruntime:onnxruntime:1.8.1'
 }

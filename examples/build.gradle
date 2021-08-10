@@ -2,6 +2,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     api project(":api")
     api project(":visualization")
+    api project(":onnx")
 }
 
 dependencies {
