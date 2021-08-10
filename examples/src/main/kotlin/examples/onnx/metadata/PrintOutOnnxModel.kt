@@ -5,26 +5,26 @@
 
 package examples.onnx
 
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 
 private const val PATH_TO_MODEL_1 = "examples/src/main/resources/models/onnx/mnist-8.onnx"
 private const val PATH_TO_MODEL_2 = "examples/src/main/resources/models/onnx/resnet50.onnx"
 private const val PATH_TO_MODEL_3 = "examples/src/main/resources/models/onnx/resnet50notop.onnx"
 
 fun main() {
-    var model = OnnxModel.load(PATH_TO_MODEL_1)
+    var model = OnnxInferenceModel.load(PATH_TO_MODEL_1)
 
     println(model.toString())
 
     model.close()
 
-    model = OnnxModel.load(PATH_TO_MODEL_2)
+    model = OnnxInferenceModel.load(PATH_TO_MODEL_2)
 
     println(model.toString())
 
     model.close()
 
-    model = OnnxModel.load(PATH_TO_MODEL_3)
+    model = OnnxInferenceModel.load(PATH_TO_MODEL_3)
 
     println(model.toString())
 

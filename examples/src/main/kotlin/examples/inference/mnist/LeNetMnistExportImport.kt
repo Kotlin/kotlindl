@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
@@ -24,8 +24,8 @@ private const val TEST_BATCH_SIZE = 1000
  * - Model is exported as graph in .pb format, weights are exported in custom (txt) format.
  * - Model is trained on Mnist dataset.
  * - It saves all the data to the project root directory.
- * - [InferenceModel] is created via graph and weights loading.
- * - [InferenceModel] is reshaped and evaluated on first 10'000 images.
+ * - [TensorFlowInferenceModel] is created via graph and weights loading.
+ * - [TensorFlowInferenceModel] is reshaped and evaluated on first 10'000 images.
  */
 fun lenetOnMnistDatasetExportImportToTxt() {
     val (train, test) = mnist()
@@ -73,7 +73,7 @@ fun lenetOnMnistDatasetExportImportToTxt() {
         println("Accuracy $accuracy")
     }
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
         it.reshape(*lenet5.inputDimensions)

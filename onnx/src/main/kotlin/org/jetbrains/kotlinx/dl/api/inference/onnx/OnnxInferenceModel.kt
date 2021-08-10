@@ -10,6 +10,8 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import java.nio.FloatBuffer
 import java.util.*
@@ -18,7 +20,7 @@ import java.util.*
 /**
  * Inference model built on SavedModelBundle format to predict on images.
  */
-public open class OnnxModel : AutoCloseable {
+public open class OnnxInferenceModel : InferenceModel() {
 
     private lateinit var env: OrtEnvironment
     private lateinit var session: OrtSession
@@ -31,8 +33,8 @@ public open class OnnxModel : AutoCloseable {
         /**
          * Loads model from SavedModelBundle format.
          */
-        public fun load(pathToModel: String): OnnxModel {
-            val model = OnnxModel()
+        public fun load(pathToModel: String): OnnxInferenceModel {
+            val model = OnnxInferenceModel()
 
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
@@ -46,11 +48,19 @@ public open class OnnxModel : AutoCloseable {
      *
      * @param dims The input shape.
      */
-    public fun reshape(vararg dims: Long) {
+    public override fun reshape(vararg dims: Long) {
         this.shape = TensorShape(1, *dims).dims()
     }
 
-    public fun predict(inputData: FloatArray): Int {
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): TensorFlowInferenceModel {
+        TODO("Not yet implemented")
+    }
+
+    public override fun predict(inputData: FloatArray): Int {
         require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
@@ -60,6 +70,10 @@ public open class OnnxModel : AutoCloseable {
         val outputProbs = output[0].value as Array<FloatArray>
         val predLabel = pred(outputProbs[0])
         return predLabel
+    }
+
+    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+        TODO("Not yet implemented")
     }
 
     public fun rawPredict(inputData: FloatArray): Any {

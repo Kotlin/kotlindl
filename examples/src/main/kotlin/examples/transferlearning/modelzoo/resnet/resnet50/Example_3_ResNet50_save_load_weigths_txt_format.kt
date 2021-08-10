@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
@@ -37,7 +37,7 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
  * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
  * - Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.
  * - It saves all the data to the project root directory.
- * - The first [InferenceModel] is created via graph and weights loading.
+ * - The first [TensorFlowInferenceModel] is created via graph and weights loading.
  * - Model again predicts on a few images located in resources.
  * - The second [Functional] model is created via JSON configuration and weights loading.
  * - Model again predicts on a few images located in resources.
@@ -96,7 +96,7 @@ fun main() {
         )
     }
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL_2))
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL_2))
 
     inferenceModel.use {
         for (i in 1..8) {

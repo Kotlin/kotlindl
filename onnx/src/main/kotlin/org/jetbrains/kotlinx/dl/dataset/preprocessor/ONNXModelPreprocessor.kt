@@ -6,14 +6,14 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape4DTo1D
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 
 /**
  * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelType].
  *
  * @property [modelType] One the supported models pre-trained on ImageNet.
  */
-public class ONNXModelPreprocessor(public var onnxModel: OnnxModel?) : Preprocessor {
+public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         //val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
 

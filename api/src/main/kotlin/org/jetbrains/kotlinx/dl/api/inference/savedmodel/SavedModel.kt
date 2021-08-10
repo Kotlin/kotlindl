@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
@@ -16,7 +16,7 @@ import org.tensorflow.Tensor
 /**
  * Inference model built on SavedModelBundle format to predict on images.
  */
-public open class SavedModel : InferenceModel() {
+public open class SavedModel : TensorFlowInferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 

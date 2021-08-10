@@ -9,7 +9,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 
 /**
  * Common preprocessing functions for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
@@ -92,7 +92,7 @@ public fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Ar
 
 /** Returns top-5 labels for the given [floatArray] encoded with mapping [imageNetClassLabels]. */
 public fun predictTop5Labels(
-    it: InferenceModel,
+    it: TensorFlowInferenceModel,
     floatArray: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>
 ): MutableMap<Int, Pair<String, Float>> {

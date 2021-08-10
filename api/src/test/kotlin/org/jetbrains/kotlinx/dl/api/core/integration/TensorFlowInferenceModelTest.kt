@@ -21,7 +21,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -43,7 +43,7 @@ private const val IMAGE_SIZE = 28L
 private val kernelInitializer = HeNormal(12L)
 private val biasInitializer = HeUniform(12L)
 
-class InferenceModelTest {
+class TensorFlowInferenceModelTest {
     private val lenet5Layers = listOf(
         Input(
             IMAGE_SIZE,
@@ -146,7 +146,7 @@ class InferenceModelTest {
             )
         }
 
-        val inferenceModel = InferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
+        val inferenceModel = TensorFlowInferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
         inferenceModel.use {
             it.reshape(28, 28, 1)
             var accuracy = 0.0
@@ -197,9 +197,9 @@ class InferenceModelTest {
             )
         }
 
-        val inferenceModel = InferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
+        val inferenceModel = TensorFlowInferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
 
-        var copiedInferenceModel: InferenceModel
+        var copiedInferenceModel: TensorFlowInferenceModel
 
         val firstAccuracy: Double
         val secondAccuracy: Double
@@ -241,7 +241,7 @@ class InferenceModelTest {
     fun emptyInferenceModel() {
         val (train, test) = mnist()
 
-        val inferenceModel = InferenceModel()
+        val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {
             it.reshape(28, 28, 1)
 
@@ -260,7 +260,7 @@ class InferenceModelTest {
     fun missedReshapeFunction() {
         val (train, test) = mnist()
 
-        val inferenceModel = InferenceModel()
+        val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {
             val exception =
                 Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -317,7 +317,7 @@ class InferenceModelTest {
 
         val exception =
             Assertions.assertThrows(FileNotFoundException::class.java) {
-                InferenceModel.load(tempDir.toFile())
+                TensorFlowInferenceModel.load(tempDir.toFile())
             }
         assertEquals(
             "File 'graph.pb' is not found. This file must be in the model directory. It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH.",
@@ -363,7 +363,7 @@ class InferenceModelTest {
 
         val exception =
             Assertions.assertThrows(FileNotFoundException::class.java) {
-                InferenceModel.load(tempDir.toFile())
+                TensorFlowInferenceModel.load(tempDir.toFile())
             }
         assertEquals(
             "File 'variableNames.txt' is not found. This file must be in the model directory. It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES.",

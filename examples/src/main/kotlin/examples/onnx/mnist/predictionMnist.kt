@@ -5,7 +5,7 @@
 
 package examples.onnx
 
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/mnist-8.onnx"
@@ -13,7 +13,7 @@ private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/mnist
 fun main() {
     val (train, test) = mnist()
 
-    OnnxModel.load(PATH_TO_MODEL).use {
+    OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
 
         it.reshape(1, 28, 28)

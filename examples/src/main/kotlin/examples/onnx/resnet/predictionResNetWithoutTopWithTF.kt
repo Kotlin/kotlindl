@@ -9,7 +9,7 @@ import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -26,7 +26,7 @@ fun main() {
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
 
-    OnnxModel.load(PATH_TO_MODEL).use {
+    OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
 
         it.reshape(224, 224, 3)

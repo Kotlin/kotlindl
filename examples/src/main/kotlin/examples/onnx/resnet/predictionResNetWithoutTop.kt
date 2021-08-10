@@ -19,7 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -54,7 +54,7 @@ fun main() {
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
 
-    val resnet50 = OnnxModel.load(PATH_TO_MODEL)
+    val resnet50 = OnnxInferenceModel.load(PATH_TO_MODEL)
 
     resnet50.use {
         println(it)
