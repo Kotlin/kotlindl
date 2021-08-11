@@ -270,7 +270,7 @@ public enum class Activations {
                 HardSigmoid -> HardSigmoidActivation()
                 Swish -> SwishActivation()
                 Mish -> MishActivation()
-                HardShrink -> HardShrinkActivation(lower = -0.5f, upper = 0.5f)
+                HardShrink -> HardShrinkActivation()
             }
         }
     }
@@ -405,13 +405,13 @@ public class MishActivation : Activation {
 /**
  * @see [Activations.HardShrink]
  */
-public class HardShrinkActivation(public val lower: Float, public val upper: Float) : Activation {
+public class HardShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         require(lower < upper) {
             "The value of lower should not be higher than upper"
         }
         val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
-        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(lower)
+        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(upper)
         val mask = (maskLower || maskUpper)
         return when (mask) {
             false -> tf.constant(0) as Operand<Float>
