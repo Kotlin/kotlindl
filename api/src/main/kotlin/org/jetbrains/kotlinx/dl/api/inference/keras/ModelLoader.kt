@@ -360,6 +360,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_MISH -> Activations.Mish
         ACTIVATION_HARDSHRINK -> Activations.HardShrink
         ACTIVATION_LISHT -> Activations.LiSHT
+        ACTIVATION_GELU -> Activations.Gelu
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
