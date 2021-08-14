@@ -19,6 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
  * @property [verbose] Verbosity mode.
  */
 public class TimeStopping(
+    // TODO: alternatively, we can use `kotlin.time.Duration` instead (after upgrading to Kotlin 1.5).
     private val seconds: Int = 86400,
     private val verbose: Boolean = false,
 ) : Callback() {
