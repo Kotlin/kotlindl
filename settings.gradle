@@ -2,5 +2,6 @@ rootProject.name = 'KotlinDL'
 include("api")
 include("visualization")
 include("examples")
+include("dataset")
 
 

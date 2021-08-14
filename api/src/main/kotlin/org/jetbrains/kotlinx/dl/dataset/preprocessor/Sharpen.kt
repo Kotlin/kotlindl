@@ -19,3 +19,9 @@ public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Prepr
         return preprocessInput(data, tensorShape, modelType)
     }
 }
+
+
+/** Image DSL Preprocessing extension.*/
+public fun TensorPreprocessing.sharpen(sharpBlock: Sharpen.() -> Unit) {
+    customPreprocessor = CustomPreprocessor(Sharpen().apply(sharpBlock))
+}

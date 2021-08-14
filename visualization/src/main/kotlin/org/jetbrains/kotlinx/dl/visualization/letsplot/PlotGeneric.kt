@@ -10,9 +10,7 @@ import jetbrains.letsPlot.geom.geomPath
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.label.ggtitle
 import org.jetbrains.kotlinx.dl.dataset.Dataset
-import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
-import java.io.File
+import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -79,11 +77,11 @@ fun xyPlot(imageSize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Pl
  * @return [Plot] representing model sample with prediction label if available
  */
 fun flattenImagePlot(
-        sampleNumber: Int,
-        dataset: Dataset,
-        predict: (FloatArray) -> Int? = { null },
-        labelEncoding: (Int) -> Any? = { it },
-        plotFeature: PlotFeature = PlotFeature.GRAY
+    sampleNumber: Int,
+    dataset: Dataset,
+    predict: (FloatArray) -> Int? = { null },
+    labelEncoding: (Int) -> Any? = { it },
+    plotFeature: PlotFeature = PlotFeature.GRAY
 ): Plot {
     val imageSize = 28
     val imageData = dataset.getX(sampleNumber)

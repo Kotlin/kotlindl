@@ -59,49 +59,11 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequenti
  * @return Pair of <input layer; list of layers>.
  */
 internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
-    val layers = mutableListOf<Layer>()
+    val kerasLayers = config!!.config!!.layers!!
 
-    (config as KerasModel).config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it)
-                layers.add(layer)
-            }
-        }
-    }
-
-    val input: Input
-
-    val firstLayer = config.config!!.layers!!.first()
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = config.config.layers!!.first().config!!.batch_input_shape
-
-    // TODO: write more universal code here
-    when (batchInputShape!!.size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
+    val input = createInputLayer(kerasLayers.first())
+    val layers = kerasLayers.filter { !it.class_name.equals(LAYER_INPUT) }.mapTo(mutableListOf()) {
+        convertToLayer(it)
     }
 
     return Pair(input, layers)
@@ -202,52 +164,17 @@ internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> 
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
-    val input: Input
+    val kerasLayers = config!!.config!!.layers!!
 
-    val firstLayer = (config as KerasModel).config!!.layers!!.first()
-    val batchInputShape =
-        firstLayer.config!!.batch_input_shape
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config.name ?: "input" else "input"
-
-    // TODO: write more universal code here
-    val size = batchInputShape!!.size
-    when (size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-    }
-
+    val input = createInputLayer(kerasLayers.first())
     layers.add(input)
     layersByNames[input.name] = input
 
-    config.config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it, layersByNames)
-                layers.add(layer)
-                layersByNames[layer.name] = layer
-            }
+    kerasLayers.forEach {
+        if (!it.class_name.equals(LAYER_INPUT)) {
+            val layer = convertToLayer(it, layersByNames)
+            layers.add(layer)
+            layersByNames[layer.name] = layer
         }
     }
 
@@ -432,6 +359,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_HARD_SIGMOID -> Activations.HardSigmoid
         ACTIVATION_SWISH -> Activations.Swish
         ACTIVATION_MISH -> Activations.Mish
+        ACTIVATION_HARDSHRINK -> Activations.HardShrink
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
@@ -448,6 +376,13 @@ private fun convertToInterpolationMethod(interpolation: String): InterpolationMe
 /**
  * The layer creator functions should be put below.
  */
+
+private fun createInputLayer(layer: KerasLayer): Input {
+    val batchInputShape = layer.config!!.batch_input_shape!!
+    val inputLayerDims = batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()
+    val inputLayerName = if (layer.class_name.equals(LAYER_INPUT)) layer.config.name ?: "input" else "input"
+    return Input(*inputLayerDims, name = inputLayerName)
+}
 
 private fun createGlobalAvgPool2DLayer(name: String): Layer {
     return GlobalAvgPool2D(

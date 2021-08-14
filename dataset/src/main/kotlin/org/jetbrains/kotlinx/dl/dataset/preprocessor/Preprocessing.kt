@@ -86,8 +86,8 @@ public class Preprocessing {
             if (tensorPreprocessingStage.isRescalingInitialized)
                 tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
 
-            if (tensorPreprocessingStage.isSharpenInitialized)
-                tensor = tensorPreprocessingStage.sharpen.apply(tensor, shape)
+            if (tensorPreprocessingStage.isCustomPreprocessorInitialized)
+                tensor = tensorPreprocessingStage.customPreprocessor.apply(tensor, shape)
         }
 
         return Pair(tensor, shape)
