@@ -462,7 +462,7 @@ public class GeluActivation(public val approximate: Boolean = false) : Activatio
                     features, tf.math.add(
                         tf.constant(1.0f), tf.math.tanh(
                             tf.math.mul(
-                                tf.constant(0.7978845608028654f),
+                                tf.constant(0.7978845608028654f),       // This value is equal to sqrt(2/pi) to avoid a constant division
                                 tf.math.add(features, tf.math.mul(coeff, tf.math.pow(features, tf.constant(3f))))
                             )
                         )
