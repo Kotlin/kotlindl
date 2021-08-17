@@ -35,7 +35,7 @@ public class RandomUniform(
         val seeds = longArrayOf(seed, 0L)
         var distOp: Operand<Float> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())
         if (minVal == 0.0f) {
-            if (minVal != 1.0f) {
+            if (maxVal != 1.0f) {
                 distOp = tf.math.mul(distOp, tf.constant(maxVal))
             }
         } else {
