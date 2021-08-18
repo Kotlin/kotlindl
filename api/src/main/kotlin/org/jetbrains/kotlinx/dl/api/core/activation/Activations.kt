@@ -246,8 +246,16 @@ public enum class Activations {
      * @property [lower] lower bound for setting values to zeros
      * @property [upper] upper bound for setting values to zeros
      */
-    HardShrink;
+    HardShrink,
 
+    /**
+     * Non-Parametric Linearly Scaled Hyperbolic Tangent (LiSHT) Activation Function.
+     *
+     * ```
+     * LiSHT(x) = x * tanh(x)
+     * ```
+     */
+    LiSHT;
 
     public companion object {
         /**
@@ -271,6 +279,7 @@ public enum class Activations {
                 Swish -> SwishActivation()
                 Mish -> MishActivation()
                 HardShrink -> HardShrinkActivation()
+                LiSHT -> LishtActivation()
             }
         }
     }
@@ -418,4 +427,12 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
             true -> features
         }
     }
+}
+
+/**
+ * @see [Activations.LiSHT]
+ */
+public class LishtActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.mul(features, tf.math.tanh(features))
 }

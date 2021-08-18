@@ -16,7 +16,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Permute
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
@@ -275,7 +274,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScalingInitializer(initializer)
-        INITIALIZER_ORTHOGONAL -> Orthogonal( seed = seed, gain = initializer.config.gain!!.toFloat() )
+        INITIALIZER_ORTHOGONAL -> Orthogonal(seed = seed, gain = initializer.config.gain!!.toFloat())
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
@@ -360,6 +359,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SWISH -> Activations.Swish
         ACTIVATION_MISH -> Activations.Mish
         ACTIVATION_HARDSHRINK -> Activations.HardShrink
+        ACTIVATION_LISHT -> Activations.LiSHT
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
@@ -558,7 +558,7 @@ private fun createDenseLayer(config: LayerConfig, name: String): Layer {
     )
 }
 
-private fun createPermuteLayer(config: LayerConfig,name: String): Layer {
+private fun createPermuteLayer(config: LayerConfig, name: String): Layer {
     return Permute(
         dims = config.dims!!,
         name = name
