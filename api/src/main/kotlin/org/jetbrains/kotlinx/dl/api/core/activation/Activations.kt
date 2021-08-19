@@ -255,7 +255,20 @@ public enum class Activations {
      * LiSHT(x) = x * tanh(x)
      * ```
      */
-    LiSHT;
+    LiSHT,
+
+    /**
+     * Snake Activation Function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * snake(x) = x + (1 - cos(2 * frequency * x)) / (2 * frequency)
+     * ```
+     * See [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
+     * @property [frequency] A scalar, frequency of the periodic part
+     */
+
+    Snake;
 
     public companion object {
         /**
@@ -280,6 +293,7 @@ public enum class Activations {
                 Mish -> MishActivation()
                 HardShrink -> HardShrinkActivation()
                 LiSHT -> LishtActivation()
+                Snake -> SnakeActivation()
             }
         }
     }
@@ -436,3 +450,19 @@ public class LishtActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.tanh(features))
 }
+
+
+/**
+* @see [Activations.Snake]
+*/
+
+public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        val f = tf.constant(frequency)
+        val fDouble = tf.math.mul(tf.constant(2.0f), f) // returns 2 * frequency
+
+        return tf.math.add(features,
+            tf.math.div(tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(fDouble, features))), fDouble))
+    }
+}
+
