@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 
-private const val INITALIZER_PATH = "src/test/resources/inference/keras/ModelLoader/initializer_identity.json"
+private const val INITIALIZER_PATH = "src/test/resources/inference/keras/ModelLoader/initializer_identity.json"
 
 class ModelLoaderTest {
     @Test
     fun `load initializers from file`(){
-        val initializerFile = File(INITALIZER_PATH)
+        val initializerFile = File(INITIALIZER_PATH)
 
         val modelConfiguration = loadSequentialModelConfiguration(initializerFile)
 
