@@ -7,14 +7,20 @@ package examples.ml
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.MAE
+import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import java.util.*
 import kotlin.random.Random
 
 private const val SEED = 12L
@@ -24,7 +30,7 @@ private const val TRAINING_BATCH_SIZE = 100
 
 private val model = Sequential.of(
     Input(4),
-    Dense(1, Activations.Linear, kernelInitializer = HeNormal(SEED), biasInitializer = Zeros(), name = "dense_2")
+    Dense(1, Activations.Linear, kernelInitializer = GlorotNormal(), biasInitializer = Zeros(), name = "dense_2")
 )
 
 /**
@@ -46,7 +52,7 @@ fun linearRegression() {
         data[i][2] = 2 * (rnd.nextDouble() - 0.5)
         data[i][3] = 2 * (rnd.nextDouble() - 0.5)
         data[i][4] = 2 * (rnd.nextDouble() - 0.5)
-        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4] + 0.2 + rnd.nextDouble(0.1)
+        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4]  + rnd.nextDouble(0.1)
         // 1 * x1 - 2 * x2 + 1.5 * x3  - 0.95 * x4 +- 0.1
     }
 
@@ -82,13 +88,24 @@ fun linearRegression() {
 
     model.use {
         it.compile(
-            optimizer = SGD(learningRate = 0.001f),
-            loss = Losses.MAE,
+            optimizer = Adam(),
+            loss = Losses.MSE,
             metric = Metrics.MAE
         )
 
         it.summary()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+
+
+        repeat(100) { id ->
+            val xReal = test.getX(id)
+            val yReal = test.getY(id)
+
+            val yPred2 = it.predict(xReal)
+            val yPred3 = it.predictSoftly(xReal) // returns value oscillating around 1.0
+
+            println("xReal: ${arrayOf(xReal).contentDeepToString()}, yReal: $yReal, yPred2: $yPred2, yPred3: ${yPred3[0]}")
+        }
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
         println("Weights: " + it.getLayer("dense_2").weights["dense_2_dense_kernel"].contentDeepToString())
