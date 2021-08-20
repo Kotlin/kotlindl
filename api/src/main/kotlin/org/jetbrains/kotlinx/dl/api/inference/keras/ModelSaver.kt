@@ -259,6 +259,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.HardShrink -> ACTIVATION_HARDSHRINK
         Activations.LiSHT -> ACTIVATION_LISHT
         Activations.Snake -> ACTIVATION_SNAKE
+        Activations.Gelu -> ACTIVATION_GELU
     }
 }
 

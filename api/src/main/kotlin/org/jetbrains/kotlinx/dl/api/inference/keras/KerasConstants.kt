@@ -107,6 +107,7 @@ internal const val ACTIVATION_MISH: String = "mish"
 internal const val ACTIVATION_HARDSHRINK: String = "hardshrink"
 internal const val ACTIVATION_LISHT: String = "lisht"
 internal const val ACTIVATION_SNAKE: String = "snake"
+internal const val ACTIVATION_GELU: String = "gelu"
 
 // Layer settings
 internal const val CHANNELS_LAST: String = "channels_last"
