@@ -17,3 +17,4 @@
 /api/cache/
 /pretrainedModels/
 /examples/savedmodels/
+/dataset/build/

@@ -249,6 +249,18 @@ public enum class Activations {
     HardShrink,
 
     /**
+     * Gelu Function
+     *
+     * Computes the Gaussian Error Linear Unit (GELU):
+     *
+     * gelu(x) = x * P(X <= x) where P(X) ~ N(0, 1)
+     *
+     * Calls [GeluActivation] under the hood.
+     * @property [approximate], boolean to toggle approximation
+     */
+    Gelu,
+
+    /**
      * Non-Parametric Linearly Scaled Hyperbolic Tangent (LiSHT) Activation Function.
      *
      * ```
@@ -280,6 +292,7 @@ public enum class Activations {
                 Mish -> MishActivation()
                 HardShrink -> HardShrinkActivation()
                 LiSHT -> LishtActivation()
+                Gelu -> GeluActivation()
             }
         }
     }
@@ -435,4 +448,38 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
 public class LishtActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.tanh(features))
+}
+
+/**
+ * @see [Activations.Gelu]
+ */
+public class GeluActivation(public val approximate: Boolean = false) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        if (approximate) {
+            val coeff = tf.constant(0.044715f)
+            return tf.math.mul(
+                tf.constant(0.5f), tf.math.mul(
+                    features, tf.math.add(
+                        tf.constant(1.0f), tf.math.tanh(
+                            tf.math.mul(
+                                tf.constant(0.7978845608028654f),       // This value is equal to sqrt(2/pi) to avoid a constant division
+                                tf.math.add(features, tf.math.mul(coeff, tf.math.pow(features, tf.constant(3f))))
+                            )
+                        )
+                    )
+                )
+            )
+        } else {
+            return tf.math.mul(
+                tf.constant(0.5f),
+                tf.math.mul(
+                    features,
+                    tf.math.add(
+                        tf.constant(1f),
+                        tf.math.erf(tf.math.div(features, tf.constant(1.4142135623730951f)))
+                    )
+                )
+            )
+        }
+    }
 }
