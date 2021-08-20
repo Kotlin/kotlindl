@@ -94,6 +94,15 @@ fun linearRegression() {
         println("Weights: " + it.getLayer("dense_2").weights["dense_2_dense_kernel"].contentDeepToString())
         println("Bias: " + it.getLayer("dense_2").weights["dense_2_dense_bias"].contentDeepToString())
         println("MAE: $mae")
+
+        repeat(100) { id ->
+            val xReal = test.getX(id)
+            val yReal = test.getY(id)
+
+            val yPred = it.predictSoftly(xReal)
+
+            println("xReal: ${xReal[0]}, yReal: $yReal, yPred: ${yPred[0]}")
+        }
     }
 }
 
