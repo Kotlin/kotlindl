@@ -19,7 +19,7 @@ import java.util.*
 
 
 /**
- * Inference model built on SavedModelBundle format to predict on images.
+ * Inference model built on ONNX format.
  */
 public open class OnnxInferenceModel : InferenceModel() {
 
