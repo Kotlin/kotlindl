@@ -86,7 +86,7 @@ internal const val INITIALIZER_TRUNCATED_NORMAL: String = "TruncatedNormal"
 internal const val INITIALIZER_CONSTANT: String = "Constant"
 internal const val INITIALIZER_VARIANCE_SCALING: String = "VarianceScaling"
 internal const val INITIALIZER_IDENTITY: String = "Identity"
-internal const val INITIALIZER_ORTHOGONAL:String = "Orthogonal"
+internal const val INITIALIZER_ORTHOGONAL: String = "Orthogonal"
 
 // Keras activations
 internal const val ACTIVATION_RELU: String = "relu"
@@ -104,6 +104,8 @@ internal const val ACTIVATION_SELU: String = "selu"
 internal const val ACTIVATION_LOG_SOFTMAX: String = "log_softmax"
 internal const val ACTIVATION_EXP: String = "exponential"
 internal const val ACTIVATION_MISH: String = "mish"
+internal const val ACTIVATION_HARDSHRINK: String = "hardshrink"
+internal const val ACTIVATION_LISHT: String = "lisht"
 
 // Layer settings
 internal const val CHANNELS_LAST: String = "channels_last"

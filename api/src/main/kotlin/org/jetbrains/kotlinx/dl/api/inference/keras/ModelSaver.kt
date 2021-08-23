@@ -44,25 +44,9 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 }
 
 internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean): KerasModel {
-    val kerasLayers = mutableListOf<KerasLayer>()
-    this.layers.forEach {
-        run {
-            val layer = convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
-            kerasLayers.add(layer)
-        }
+    val kerasLayers = layers.map {
+        convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
     }
-
-    val inputLayer = when (this) {
-        is Sequential -> this.inputLayer
-        is Functional -> this.inputLayer
-        else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
-    }
-
-    val inputShape = inputLayer.packedDims.map { it.toInt() }
-
-    (kerasLayers.first().config as LayerConfig).batch_input_shape =
-        listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
-
     val config = KerasModelConfig(name = name, layers = kerasLayers)
     return KerasModel(config = config)
 }
@@ -272,6 +256,8 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
         Activations.Mish -> ACTIVATION_MISH
+        Activations.HardShrink -> ACTIVATION_HARDSHRINK
+        Activations.LiSHT -> ACTIVATION_LISHT
     }
 }
 

@@ -1,0 +1,59 @@
+package org.jetbrains.kotlinx.dl.api.inference.keras
+
+import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
+import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv3D
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.io.File
+
+class InputLayerPersistenceTest {
+    private lateinit var tempFile: File
+
+    @BeforeEach
+    fun createTempFile() {
+        tempFile = File.createTempFile("model", ".json")
+    }
+
+    @AfterEach
+    fun deleteTempFile() {
+        tempFile.delete()
+    }
+
+    @Test
+    fun inputLayerSequential() {
+        testSequentialModel(Sequential.of(Input(4)))
+        testSequentialModel(Sequential.of(Input(128, 128)))
+        testSequentialModel(Sequential.of(Input(128, 128, 3)))
+        testSequentialModel(Sequential.of(Input(10, 10, 10, 10)))
+    }
+
+    @Test
+    fun inputLayerFunctional() {
+        testFunctionalModel(Functional.of(Input(10)))
+        testFunctionalModel(Functional.of(Input(128, 128)))
+        testFunctionalModel(Functional.of(Input(128, 128, 3)))
+        testFunctionalModel(Functional.of(Input(10, 10, 10, 10)))
+    }
+
+    private fun testSequentialModel(originalModel: Sequential) {
+        originalModel.saveModelConfiguration(tempFile)
+        val restoredModel = Sequential.loadModelConfiguration(tempFile)
+        assertTrue(originalModel.inputDimensions.contentEquals(restoredModel.inputDimensions))
+    }
+
+    private fun testFunctionalModel(originalModel: Functional) {
+        originalModel.saveModelConfiguration(tempFile)
+        val restoredModel = Functional.loadModelConfiguration(tempFile)
+        assertTrue(originalModel.inputDimensions.contentEquals(restoredModel.inputDimensions))
+    }
+}
