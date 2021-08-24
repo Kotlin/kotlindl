@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
@@ -31,7 +31,7 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
 
 /**
  * This examples demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:
- * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Model configuration, model weights and labels are obtained from [ModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
@@ -43,11 +43,11 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
  * - Model again predicts on a few images located in resources.
  */
 fun main() {
-    val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub =
+        ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
+    val model = modelHub.loadModel() as Functional
 
-    val imageNetClassLabels = modelZoo.loadClassLabels()
+    val imageNetClassLabels = modelHub.loadClassLabels()
 
     model.use {
         it.compile(
@@ -58,7 +58,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = modelZoo.loadWeights()
+        val hdfFile = modelHub.loadWeights()
 
         it.loadWeights(hdfFile)
 
@@ -73,7 +73,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -112,7 +112,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -146,7 +146,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model2.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model2.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

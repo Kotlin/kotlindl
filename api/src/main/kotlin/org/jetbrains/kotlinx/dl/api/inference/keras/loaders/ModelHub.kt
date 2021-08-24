@@ -14,6 +14,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -33,8 +34,8 @@ internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
  *
  * @since 0.2
  */
-public class ModelZoo(public val commonModelDirectory: File, public val modelType: ModelType) {
-    private val modelDirectory = "/" + modelType.modelName
+public class ModelHub(public val commonModelDirectory: File, public val modelType: ModelType) {
+    private val modelDirectory = "/" + modelType.modelRelativePath
     private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
     private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
     private val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
@@ -55,7 +56,7 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
-    public fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): GraphTrainableModel {
+    public fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): InferenceModel {
         val jsonConfigFile = getJSONConfigFile(loadingMode)
         return when (modelType) {
             Models.TensorFlow.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)

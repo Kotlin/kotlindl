@@ -80,6 +80,9 @@ public open class OnnxInferenceModel : InferenceModel() {
         TODO("Not yet implemented")
     }
 
+    override val inputDimensions: LongArray
+        get() = inputShape
+
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()
     }

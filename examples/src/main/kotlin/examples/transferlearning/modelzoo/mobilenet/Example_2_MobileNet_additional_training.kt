@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -36,7 +36,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
  * This examples demonstrates the transfer learning concept on MobileNet model:
- * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Model configuration, model weights and labels are obtained from [ModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - New Dense layers are added and initialized via defined initializers.
@@ -47,9 +47,9 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun mobilenetWithAdditionalTraining() {
-    val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub =
+        ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
+    val model = modelHub.loadModel() as Functional
 
     val catdogimages = dogsCatsSmallDatasetPath()
 
@@ -77,7 +77,7 @@ fun mobilenetWithAdditionalTraining() {
     val dataset = OnHeapDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val hdfFile = modelZoo.loadWeights()
+    val hdfFile = modelHub.loadWeights()
 
     model.use {
         it.layers.last().isTrainable = true

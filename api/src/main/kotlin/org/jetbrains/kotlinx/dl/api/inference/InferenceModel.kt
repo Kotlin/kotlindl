@@ -10,6 +10,8 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 
 public abstract class InferenceModel: AutoCloseable {
+    public abstract val inputDimensions: LongArray
+
     /** Model name. */
     public var name: String? = null
 

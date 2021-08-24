@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
@@ -49,10 +49,10 @@ private val topModel = Sequential.of(
 )
 
 fun main() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub = ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
+    val model = modelHub.loadModel() as Functional
 
-    val imageNetClassLabels = modelZoo.loadClassLabels()
+    val imageNetClassLabels = modelHub.loadClassLabels()
 
     val resnet50 = OnnxInferenceModel.load(PATH_TO_MODEL)
 

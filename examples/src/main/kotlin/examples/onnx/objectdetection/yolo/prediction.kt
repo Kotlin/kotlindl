@@ -8,7 +8,7 @@ package examples.onnx
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -20,8 +20,8 @@ import java.io.File
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/yolov4.onnx"
 
 fun main() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub = ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
+    val model = modelHub.loadModel() as Functional
 
     OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
@@ -48,7 +48,7 @@ fun main() {
 
             // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
             // Correct preprocessing https://github.com/onnx/models/tree/master/vision/classification/efficientnet-lite4
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val yhat = it.predictRaw(inputData)
             val smallGrid = (yhat as List<Array<*>>)[2][0] as Array<Array<Array<FloatArray>>>

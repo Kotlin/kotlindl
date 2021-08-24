@@ -14,7 +14,8 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
  */
 public enum class Models {
     ;
-    public enum class TensorFlow(override val modelName: String): ModelType {
+
+    public enum class TensorFlow(override val modelRelativePath: String) : ModelType {
         /** */
         VGG_16("vgg16"),
 
@@ -72,38 +73,8 @@ public enum class Models {
         /** */
         NASNetLarge("nasnetlarge"),
     }
-    ;
-    public enum class ONNX(override val modelName: String): ModelType {
-        /** */
-        ResNet_18("resnet18"),
-
-        /** */
-        ResNet_34("resnet34"),
-
-        /** */
-        ResNet_50("resnet50"),
-
-        /** */
-        ResNet_101("resnet101"),
-
-        /** */
-        ResNet_152("resnet151"),
-
-        /** */
-        ResNet_50_v2("resnet50v2"),
-
-        /** */
-        ResNet_101_v2("resnet101v2"),
-
-        /** */
-        ResNet_151_v2("resnet151v2"),
-
-        /** */
-        DenseNet121("densenet121"),
-    }
-
 }
 
 public interface ModelType {
-    public val modelName: String
+    public val modelRelativePath: String
 }
