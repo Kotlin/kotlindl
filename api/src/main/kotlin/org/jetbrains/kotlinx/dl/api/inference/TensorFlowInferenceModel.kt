@@ -87,6 +87,9 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         }
     }
 
+    override val inputDimensions: LongArray
+        get() = TODO("Not yet implemented")
+
     /**
      * Generates output prediction for the input sample.
      *

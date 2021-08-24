@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx;
 
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 
 public enum class ONNXModels {
@@ -122,7 +123,11 @@ public enum class ONNXModels {
         /** */
         SSD("models/onnx/objectdetection/ssd") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.TF
+                )
             }
         },
 

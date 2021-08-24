@@ -16,8 +16,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/ssd.onnx"
-
 fun main() {
     val modelHub = ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
     val model = modelHub.loadModel() as OnnxInferenceModel

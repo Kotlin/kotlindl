@@ -23,7 +23,7 @@ import java.nio.file.StandardCopyOption
 
 private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
-
+internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
@@ -35,12 +35,8 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  * @since 0.2
  */
 public abstract class ModelHub(public val commonModelDirectory: File, public val modelType: ModelType) {
-    protected val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
+    protected val aws_s3_url: String = AWS_S3_URL
     private val modelDirectory = "/" + modelType.modelRelativePath
-    private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
-    private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
-    private val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
-    private val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
 
     /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
