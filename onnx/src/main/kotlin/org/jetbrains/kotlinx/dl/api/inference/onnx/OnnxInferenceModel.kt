@@ -36,7 +36,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     private lateinit var session: OrtSession
 
     /** Data shape for prediction. */
-    public lateinit var shape: LongArray
+    public lateinit var inputShape: LongArray
         private set
 
     public companion object {
@@ -59,7 +59,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * @param dims The input shape.
      */
     public override fun reshape(vararg dims: Long) {
-        this.shape = TensorShape(1, *dims).dims()
+        this.inputShape = TensorShape(1, *dims).dims()
     }
 
     override fun copy(
@@ -79,11 +79,11 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     public fun predictSoftly(inputData: FloatArray): FloatArray {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
 
-        val tensor = OnnxTensor.createTensor(env, preparedData, shape)
+        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
 
         val outputProbs = output[0].value as Array<FloatArray>
@@ -101,11 +101,11 @@ public open class OnnxInferenceModel : InferenceModel() {
      * you should prefer [predictRawWithShapes] in this case.
      */
     public fun predictRaw(inputData: FloatArray): List<Array<*>> {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
 
-        val tensor = OnnxTensor.createTensor(env, preparedData, shape)
+        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
         logger.debug { "Number of model's output tensors: ${output.size()}" }
         val result = mutableListOf<Array<*>>()
@@ -128,19 +128,19 @@ public open class OnnxInferenceModel : InferenceModel() {
      *  Returns list of pairs <data; shape> from model outputs.
      */
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
 
-        val tensor = OnnxTensor.createTensor(env, preparedData, shape)
+        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
-        logger.debug { "Number of model's output tensors: ${output.size()}" }
+       // logger.debug { "Number of model's output tensors: ${output.size()}" }
         val result = mutableListOf<Pair<FloatBuffer, LongArray>>()
 
         output.forEach {
-            logger.debug { "Output tensor: ${it.key}" }
+           // logger.debug { "Output tensor: ${it.key}" }
             val onnxTensorShape = (it.value.info as TensorInfo).shape
-            logger.debug { "Shape of the output: ${onnxTensorShape.contentToString()}" }
+           // logger.debug { "Shape of the output: ${onnxTensorShape.contentToString()}" }
             result.add(Pair((it.value as OnnxTensor).floatBuffer, onnxTensorShape))
         }
 

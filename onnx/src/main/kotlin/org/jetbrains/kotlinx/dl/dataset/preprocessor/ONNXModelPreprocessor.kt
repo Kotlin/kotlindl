@@ -13,12 +13,10 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
  *
  * @property [modelType] One the supported models pre-trained on ImageNet.
  */
-public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?) : Preprocessor {
+public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        //val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
-
-        val prediction = onnxModel!!.predictRaw(data)
-        return reshape4DTo1D(predictRaw as Array<Array<Array<FloatArray>>>, 100352)
+        val (prediction, _) = onnxModel!!.predictRawWithShapes(data)[outputIndex]
+        return prediction.array()
     }
 }
 

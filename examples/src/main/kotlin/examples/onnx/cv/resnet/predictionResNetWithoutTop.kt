@@ -43,7 +43,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * This is a simple model based on Dense layers only.
  */
 private val topModel = Sequential.of(
-    Input(7, 7, 2048),
+    Input(2, 2, 2048),
     GlobalAvgPool2D(),
     Dense(2, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
 )
@@ -82,7 +82,6 @@ fun main() {
                 }
                 onnx {
                     onnxModel = resnet50
-                // ((((output as Result).list as java.util.ArrayList<*>)[0] as OnnxTensor).info as TensorInfo).shape = [1, 7, 7, 2048] in predictRaw
                 }
             }
         }
