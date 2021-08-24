@@ -17,8 +17,6 @@ fun main() {
     OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
 
-        it.reshape(1, 28, 28)
-
         val prediction = it.predict(train.getX(0))
 
         println("Predicted Label is: $prediction")

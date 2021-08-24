@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
@@ -48,7 +48,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun mobilenetWithAdditionalTraining() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     val catdogimages = dogsCatsSmallDatasetPath()
@@ -69,7 +69,7 @@ fun mobilenetWithAdditionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = ModelType.MobileNet
+                modelType = Models.TensorFlow.MobileNet
             }
         }
     }

@@ -7,7 +7,7 @@ package examples.onnx
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
@@ -20,13 +20,11 @@ import java.io.File
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/yolov4.onnx"
 
 fun main() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
-
-        it.reshape(416, 416, 3)
 
         for (i in 0..8) {
             val preprocessing: Preprocessing = preprocess {

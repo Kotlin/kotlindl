@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx
+package examples.onnx.cv.resnet
 
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
@@ -49,7 +49,7 @@ private val topModel = Sequential.of(
 )
 
 fun main() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
@@ -78,7 +78,7 @@ fun main() {
             }
             transformTensor {
                 sharpen {
-                    modelType = ModelType.ResNet_50
+                    modelType = Models.TensorFlow.ResNet_50
                 }
                 onnx {
                     onnxModel = resnet50

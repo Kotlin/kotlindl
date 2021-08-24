@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
@@ -51,7 +51,7 @@ private const val EPOCHS = 2
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun vgg19additionalTraining() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.VGG_19)
     val model = modelZoo.loadModel() as Sequential
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
@@ -72,7 +72,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                ModelType.VGG_19
+                Models.TensorFlow.VGG_19
             }
         }
     }

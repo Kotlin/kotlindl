@@ -7,7 +7,7 @@ package examples.onnx.yolo
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -19,13 +19,11 @@ import java.io.File
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/ssd.onnx"
 
 fun main() {
-    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNet)
+    val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
     val model = modelZoo.loadModel() as Functional
 
     OnnxInferenceModel.load(PATH_TO_MODEL).use {
         println(it)
-
-        it.reshape(3, 1200, 1200)
 
         for (i in 0..8) {
             val preprocessing: Preprocessing = preprocess {
@@ -42,7 +40,7 @@ fun main() {
                 }
                 transformTensor {
                     sharpen {
-                        modelType = ModelType.DenseNet201
+                        modelType = Models.TensorFlow.DenseNet201
                     }
                     transpose {
                         axes = intArrayOf(2, 0, 1)

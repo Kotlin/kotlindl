@@ -9,11 +9,13 @@ import org.jetbrains.kotlinx.dl.api.core.shape.reshape4DTo1D
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 
 /**
- * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelType].
+ * Applies the given [onnxModel] as a preprocessing stage.
  *
- * @property [modelType] One the supported models pre-trained on ImageNet.
+ * @property [onnxModel] ONNX model. It could have multiple outputs.
+ * @property [outputIndex] Index of the output to be passed forward.
  */
-public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) : Preprocessor {
+public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) :
+    Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         val (prediction, _) = onnxModel!!.predictRawWithShapes(data)[outputIndex]
         return prediction.array()

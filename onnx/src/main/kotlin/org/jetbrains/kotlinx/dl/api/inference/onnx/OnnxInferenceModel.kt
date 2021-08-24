@@ -39,6 +39,10 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var inputShape: LongArray
         private set
 
+    /** Data shape for prediction. */
+    public lateinit var outputShape: LongArray
+        private set
+
     public companion object {
         /**
          * Loads model from SavedModelBundle format.
@@ -48,6 +52,12 @@ public open class OnnxInferenceModel : InferenceModel() {
 
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
+
+            val inputDims = (model.session.inputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+            model.inputShape = TensorShape(1, *inputDims).dims()
+
+            val outputDims = (model.session.outputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+            model.outputShape = TensorShape(1, *outputDims).dims()
 
             return model
         }
@@ -107,12 +117,10 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
-        logger.debug { "Number of model's output tensors: ${output.size()}" }
+
         val result = mutableListOf<Array<*>>()
 
         output.forEach {
-            logger.debug { "Output tensor: ${it.key}" }
-            logger.debug { "Shape of the output: ${(it.value.info as TensorInfo).shape.contentToString()}" }
             result.add(it.value.value as Array<*>)
         }
 
@@ -134,13 +142,11 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
-       // logger.debug { "Number of model's output tensors: ${output.size()}" }
+
         val result = mutableListOf<Pair<FloatBuffer, LongArray>>()
 
         output.forEach {
-           // logger.debug { "Output tensor: ${it.key}" }
             val onnxTensorShape = (it.value.info as TensorInfo).shape
-           // logger.debug { "Shape of the output: ${onnxTensorShape.contentToString()}" }
             result.add(Pair((it.value as OnnxTensor).floatBuffer, onnxTensorShape))
         }
 

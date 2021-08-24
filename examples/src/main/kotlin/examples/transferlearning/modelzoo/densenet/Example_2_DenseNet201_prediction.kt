@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -37,7 +37,7 @@ import java.io.File
  */
 fun denseNet201Prediction() {
     val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.DenseNet201)
+        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.DenseNet201)
     val model = modelZoo.loadModel() as Functional
 
     val imageNetClassLabels = modelZoo.loadClassLabels()
