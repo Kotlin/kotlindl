@@ -8,6 +8,9 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.Companion.imageToByteArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Save
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -25,10 +28,11 @@ public class Preprocessing {
     /** Returns the final shape of data when image preprocessing is applied to the image. */
     public val finalShape: ImageShape
         get() {
-            return if (imagePreprocessingStage.isResizeInitialized && imagePreprocessingStage.isLoadInitialized) {
+            val resize = imagePreprocessingStage.operations.findLast { it is Resize } as? Resize
+            return if (resize != null && imagePreprocessingStage.isLoadInitialized) {
                 ImageShape(
-                    imagePreprocessingStage.resize.outputWidth.toLong(),
-                    imagePreprocessingStage.resize.outputHeight.toLong(),
+                    resize.outputWidth.toLong(),
+                    resize.outputHeight.toLong(),
                     imagePreprocessingStage.load.imageShape!!.channels
                 )
             } else if (imagePreprocessingStage.load.imageShape!!.width != null && imagePreprocessingStage.load.imageShape!!.height != null) {
@@ -51,31 +55,17 @@ public class Preprocessing {
     }
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        val filename = file.name
         var image = imagePreprocessingStage.load.fileToImage(file)
-        var shape = imagePreprocessingStage.load.imageShape!!
+        var shape = image.getShape()
 
-        // if both nulls write a warning to logs about possible mismatch
-        if (imagePreprocessingStage.isCropInitialized) {
-            val (croppedImage, croppedShape) = imagePreprocessingStage.crop.apply(image, shape)
-            image = croppedImage
-            shape = croppedShape
-        }
-
-        if (imagePreprocessingStage.isRotateInitialized) {
-            val (rotatedImage, rotatedShape) = imagePreprocessingStage.rotate.apply(image, shape)
-            image = rotatedImage
-            shape = rotatedShape
-        }
-
-        if (imagePreprocessingStage.isResizeInitialized) {
-            val (resizedImage, resizedShape) = imagePreprocessingStage.resize.apply(image, shape)
-            image = resizedImage
-            shape = resizedShape
-        }
-
-        if (imagePreprocessingStage.isSaveInitialized) {
-            imagePreprocessingStage.save.imageToFile(filename, image, shape)
+        for (operation in imagePreprocessingStage.operations) {
+            if (operation is Save) {
+                operation.imageToFile(file.name, image, shape)
+                continue
+            }
+            val (newImage, newShape) = operation.apply(image, shape)
+            image = newImage
+            shape = newShape
         }
 
         var tensor = OnHeapDataset.toRawVector(
@@ -83,13 +73,9 @@ public class Preprocessing {
         )
 
         if (::tensorPreprocessingStage.isInitialized) {
-            if (tensorPreprocessingStage.isRescalingInitialized)
-                tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
-
-            if (tensorPreprocessingStage.customPreprocessors.isNotEmpty())
-                tensorPreprocessingStage.customPreprocessors.forEach {
-                    tensor = it.apply(tensor, shape)
-                }
+            for (operation in tensorPreprocessingStage.operations) {
+                tensor = operation.apply(tensor, shape)
+            }
         }
 
         return Pair(tensor, shape)
@@ -109,4 +95,8 @@ public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {
 /** */
 public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) {
     tensorPreprocessingStage = TensorPreprocessing().apply(block)
+}
+
+private fun BufferedImage.getShape(): ImageShape {
+    return ImageShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
 }

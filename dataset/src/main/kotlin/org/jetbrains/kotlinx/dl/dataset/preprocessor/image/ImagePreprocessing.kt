@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 /**
  * The whole image preprocessing pipeline DSL.
  *
- * It supports the following ops:
+ * It supports operations that implement [ImagePreprocessor], for example:
  * - [crop] See [Cropping] image preprocessor.
  * - [resize] See [Resize] image preprocessor.
  * - [rotate] See [Rotate] image preprocessor.
@@ -20,37 +20,16 @@ public class ImagePreprocessing {
     /** */
     public lateinit var load: Loading
 
-    /** */
-    public lateinit var crop: Cropping
-
-    /** */
-    public lateinit var resize: Resize
-
-    /** */
-    public lateinit var rotate: Rotate
-
-    /** */
-    public lateinit var save: Save
-
-    /** True, if [crop] is initialized. */
-    public val isCropInitialized: Boolean
-        get() = ::crop.isInitialized
-
-    /** True, if [resize] is initialized. */
-    public val isResizeInitialized: Boolean
-        get() = ::resize.isInitialized
-
-    /** True, if [rotate] is initialized. */
-    public val isRotateInitialized: Boolean
-        get() = ::rotate.isInitialized
-
     /** True, if [load] is initialized. */
     public val isLoadInitialized: Boolean
         get() = ::load.isInitialized
 
-    /** True, if [save] is initialized. */
-    public val isSaveInitialized: Boolean
-        get() = ::save.isInitialized
+    /** */
+    internal val operations = mutableListOf<ImagePreprocessor>()
+
+    public fun addOperation(operation: ImagePreprocessor) {
+        operations.add(operation)
+    }
 }
 
 /** */
@@ -60,24 +39,20 @@ public fun ImagePreprocessing.load(block: Loading.() -> Unit) {
 
 /** */
 public fun ImagePreprocessing.rotate(block: Rotate.() -> Unit) {
-    rotate = Rotate().apply(block)
+    addOperation(Rotate().apply(block))
 }
 
 /** */
 public fun ImagePreprocessing.crop(block: Cropping.() -> Unit) {
-    crop = Cropping().apply(block)
+    addOperation(Cropping().apply(block))
 }
 
 /** */
 public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
-    resize = Resize().apply(block)
+    addOperation(Resize().apply(block))
 }
 
 /** */
 public fun ImagePreprocessing.save(block: Save.() -> Unit) {
-    save = Save().apply(block)
+    addOperation(Save().apply(block))
 }
-
-
-
-

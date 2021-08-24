@@ -39,14 +39,14 @@ fun main() {
                 colorMode = ColorOrder.BGR
                 labelGenerator = EmptyLabels()
             }
-            rotate {
-                degrees = 60f
-            }
             crop {
                 left = 12
                 right = 12
                 top = 12
                 bottom = 12
+            }
+            rotate {
+                degrees = 60f
             }
             resize {
                 outputWidth = 300

@@ -32,14 +32,14 @@ fun main() {
                 imageShape = ImageShape(224, 224, 3)
                 colorMode = ColorOrder.BGR
             }
-            rotate {
-                degrees = 0f
-            }
             crop {
                 left = 100
                 right = 0
                 top = 100
                 bottom = 0
+            }
+            rotate {
+                degrees = 0f
             }
             resize {
                 outputWidth = 400
