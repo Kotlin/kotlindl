@@ -9,11 +9,12 @@ import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import ai.onnxruntime.TensorInfo
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import mu.KLogger
+import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.Dataset
 import java.nio.FloatBuffer
 import java.util.*
 
@@ -22,8 +23,16 @@ import java.util.*
  * Inference model built on ONNX format.
  */
 public open class OnnxInferenceModel : InferenceModel() {
+    /** Logger for the model. */
+    private val logger: KLogger = KotlinLogging.logger {}
 
+    /**
+     * The host object for the onnx-runtime system. Can create [session] which encapsulate
+     * specific models.
+     */
     private lateinit var env: OrtEnvironment
+
+    /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
 
     /** Data shape for prediction. */
@@ -62,6 +71,14 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     public override fun predict(inputData: FloatArray): Int {
+        return predictSoftly(inputData).argmax()
+    }
+
+    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+        return predictSoftly(inputData)
+    }
+
+    public fun predictSoftly(inputData: FloatArray): FloatArray {
         require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
@@ -70,50 +87,67 @@ public open class OnnxInferenceModel : InferenceModel() {
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
 
         val outputProbs = output[0].value as Array<FloatArray>
-        val predLabel = pred(outputProbs[0])
-        return predLabel
+
+        output.close()
+        tensor.close()
+
+        return outputProbs[0]
     }
 
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        TODO("Not yet implemented")
-    }
-
-    public fun rawPredict(inputData: FloatArray): Any {
+    /**
+     * Returns list of multidimensional arrays with data from model outputs.
+     *
+     * NOTE: This operation can be quite slow for high dimensional tensors,
+     * you should prefer [predictRawWithShapes] in this case.
+     */
+    public fun predictRaw(inputData: FloatArray): List<Array<*>> {
         require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val preparedData = FloatBuffer.wrap(inputData)
 
         val tensor = OnnxTensor.createTensor(env, preparedData, shape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
-
+        logger.debug { "Number of model's output tensors: ${output.size()}" }
         val result = mutableListOf<Array<*>>()
 
         output.forEach {
-            println("Shape of output ${(it.value.info as TensorInfo).shape.contentToString()}")
+            logger.debug { "Output tensor: ${it.key}" }
+            logger.debug { "Shape of the output: ${(it.value.info as TensorInfo).shape.contentToString()}" }
             result.add(it.value.value as Array<*>)
         }
 
-        return result
-        // ((((output as Result).list as java.util.ArrayList<*>)[0] as OnnxTensor).info as TensorInfo).shape = [1, 7, 7, 2048]
+        output.close()
+        tensor.close()
+
+        return result.toList()
     }
 
+    // TODO: refactor predictRaw and predictRawWithShapes to extract the common functionality
 
     /**
-     * Find the maximum probability and return it's index.
-     *
-     * @param probabilities The probabilites.
-     * @return The index of the max.
+     *  Returns list of pairs <data; shape> from model outputs.
      */
-    private fun pred(probabilities: FloatArray): Int {
-        var maxVal = Float.NEGATIVE_INFINITY
-        var idx = 0
-        for (i in probabilities.indices) {
-            if (probabilities[i] > maxVal) {
-                maxVal = probabilities[i]
-                idx = i
-            }
+    public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
+        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+
+        val preparedData = FloatBuffer.wrap(inputData)
+
+        val tensor = OnnxTensor.createTensor(env, preparedData, shape)
+        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
+        logger.debug { "Number of model's output tensors: ${output.size()}" }
+        val result = mutableListOf<Pair<FloatBuffer, LongArray>>()
+
+        output.forEach {
+            logger.debug { "Output tensor: ${it.key}" }
+            val onnxTensorShape = (it.value.info as TensorInfo).shape
+            logger.debug { "Shape of the output: ${onnxTensorShape.contentToString()}" }
+            result.add(Pair((it.value as OnnxTensor).floatBuffer, onnxTensorShape))
         }
-        return idx
+
+        output.close()
+        tensor.close()
+
+        return result.toList()
     }
 
     /**
@@ -125,76 +159,15 @@ public open class OnnxInferenceModel : InferenceModel() {
      * @return Predicted class index.
      */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
-        return 0
+        TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
     }
-
-    /**
-     * Predicts labels for all [images].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     *
-     * @param [dataset] Dataset.
-     */
-    public fun predictAll(dataset: Dataset): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
-
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
-    }
-
-    /**
-     * Predicts labels for all [images].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     *
-     * @param [inputTensorName] The name of input tensor.
-     * @param [outputTensorName] The name of output tensor.
-     * @param [dataset] Dataset.
-     */
-    public fun predictAll(dataset: Dataset, inputTensorName: String, outputTensorName: String): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
-
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i), inputTensorName, outputTensorName)
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
-    }
-
-    /**
-     * Evaluates [dataset] via [metric].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     */
-    public fun evaluate(
-        dataset: Dataset,
-        metric: Metrics
-    ): Double {
-        return if (metric == Metrics.ACCURACY) {
-            var counter = 0
-            for (i in 0 until dataset.xSize()) {
-                val predictedLabel = predict(dataset.getX(i))
-                if (predictedLabel == dataset.getY(i).toInt())
-                    counter++
-            }
-
-            (counter.toDouble() / dataset.xSize())
-        } else {
-            Double.NaN
-        }
-    }
-
 
     override fun close() {
         session.close()
+        env.close()
     }
 
-
+    // TODO: make ONNX model description
     override fun toString(): String {
         println(session.inputNames)
         println(session.inputInfo)

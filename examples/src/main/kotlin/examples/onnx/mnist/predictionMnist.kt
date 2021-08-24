@@ -3,12 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx
+package examples.onnx.mnist
 
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/mnist-8.onnx"
+private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/mnist.onnx"
 
 fun main() {
     val (train, test) = mnist()
@@ -22,15 +23,6 @@ fun main() {
 
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
+        println("Accuracy is: ${it.evaluate(test, Metrics.ACCURACY)}")
     }
-}
-
-fun reshapeInput(inputData: FloatArray): Array<Array<Array<FloatArray>>> {
-    val reshaped = Array(1) {
-        Array(1)
-        { Array(28) { FloatArray(28) } }
-    }
-
-    for (i in inputData.indices) reshaped[0][0][i / 28][i % 28] = inputData[i]
-    return reshaped
 }

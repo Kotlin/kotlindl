@@ -33,7 +33,7 @@ fun lenetOnMnistInference() {
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
 
-        val predictions = it.predictAll(test)
+        val predictions = it.predict(test)
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")

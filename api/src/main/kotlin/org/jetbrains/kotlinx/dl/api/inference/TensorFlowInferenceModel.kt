@@ -87,7 +87,11 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         }
     }
 
-
+    /**
+     * Generates output prediction for the input sample.
+     *
+     * @param [inputData] Unlabeled input data to define label.
+     */
     override fun predict(inputData: FloatArray): Int {
         require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }

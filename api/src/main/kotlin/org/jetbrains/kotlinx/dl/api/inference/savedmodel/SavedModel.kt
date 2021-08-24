@@ -74,23 +74,7 @@ public open class SavedModel : TensorFlowInferenceModel() {
         }
     }
 
-    /**
-     * Predicts labels for all observation in [dataset].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     *
-     * @param [dataset] Dataset.
-     */
-    public fun predictAll(dataset: OnHeapDataset): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
 
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
-    }
 
     /**
      * Predicts labels for all observation in [dataset].
@@ -101,7 +85,7 @@ public open class SavedModel : TensorFlowInferenceModel() {
      * @param [outputTensorName] The name of output tensor.
      * @param [dataset] Dataset.
      */
-    public fun predictAll(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
+    public fun predict(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
@@ -110,30 +94,6 @@ public open class SavedModel : TensorFlowInferenceModel() {
         }
 
         return predictedLabels
-    }
-
-    /**
-     * Evaluates [dataset] via [metric].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     */
-    public fun evaluate(
-        dataset: OnHeapDataset,
-        metric: Metrics
-    ): Double {
-
-        return if (metric == Metrics.ACCURACY) {
-            var counter = 0
-            for (i in 0 until dataset.xSize()) {
-                val predictedLabel = predict(dataset.getX(i))
-                if (predictedLabel == dataset.getY(i).toInt())
-                    counter++
-            }
-
-            (counter.toDouble() / dataset.xSize())
-        } else {
-            Double.NaN
-        }
     }
 
     override fun close() {

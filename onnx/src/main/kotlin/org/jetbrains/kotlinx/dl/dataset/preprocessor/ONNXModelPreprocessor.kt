@@ -17,7 +17,8 @@ public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?) : 
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         //val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
 
-        return reshape4DTo1D(onnxModel!!.rawPredict(data) as Array<Array<Array<FloatArray>>>, 100352)
+        val prediction = onnxModel!!.predictRaw(data)
+        return reshape4DTo1D(predictRaw as Array<Array<Array<FloatArray>>>, 100352)
     }
 }
 

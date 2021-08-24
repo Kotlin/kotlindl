@@ -100,11 +100,9 @@ fun linearRegression() {
         repeat(100) { id ->
             val xReal = test.getX(id)
             val yReal = test.getY(id)
+            val yPred = it.predictSoftly(xReal)
 
-            val yPred2 = it.predict(xReal)
-            val yPred3 = it.predictSoftly(xReal) // returns value oscillating around 1.0
-
-            println("xReal: ${arrayOf(xReal).contentDeepToString()}, yReal: $yReal, yPred2: $yPred2, yPred3: ${yPred3[0]}")
+            println("xReal: ${arrayOf(xReal).contentDeepToString()}, yReal: $yReal, yPred: ${yPred[0]}")
         }
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]

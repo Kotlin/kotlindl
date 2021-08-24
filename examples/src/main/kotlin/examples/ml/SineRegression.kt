@@ -58,10 +58,9 @@ fun main() {
             val xReal = test.getX(id)
             val yReal = test.getY(id)
 
-            val yPred2 = it.predict(xReal) // always returns 0
-            val yPred3 = it.predictSoftly(xReal) // returns value oscillating around 1.0
+            val yPred = it.predictSoftly(xReal)
 
-            println("xReal: ${xReal[0]}, yReal: $yReal, yPred2: $yPred2, yPred3: ${yPred3[0]}")
+            println("xReal: ${xReal[0]}, yReal: $yReal, yPred3: ${yPred[0]}")
         }
     }
 }

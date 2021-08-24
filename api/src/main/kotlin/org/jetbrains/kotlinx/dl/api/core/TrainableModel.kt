@@ -203,13 +203,6 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
     public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
 
     /**
-     * Generates output prediction for the input sample.
-     *
-     * @param [inputData] Unlabeled input data to define label.
-     */
-    public abstract override fun predict(inputData: FloatArray): Int
-
-    /**
      * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.
      *
      * @param [inputData] Unlabeled input data to define label.
