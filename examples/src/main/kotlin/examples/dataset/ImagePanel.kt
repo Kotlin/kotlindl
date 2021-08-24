@@ -4,31 +4,27 @@ import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Color
 import java.awt.Graphics
+import java.awt.image.BufferedImage
 import javax.swing.JPanel
-import kotlin.math.max
-import kotlin.math.min
 
-class ImagePanel(private val image: FloatArray, private val imageShape: ImageShape) : JPanel() {
+class ImagePanel(image: FloatArray, imageShape: ImageShape) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape)
+
     override fun paint(graphics: Graphics) {
-        for (i in 0 until imageShape.height!!.toInt()) { // rows
-            for (j in 0 until imageShape.width!!.toInt()) { // columns
-                val pixelWidth = 2
-                val pixelHeight = 2
-                val y = 100 + i * pixelWidth
-                val x = 100 + j * pixelHeight
+        super.paint(graphics)
+        graphics.drawImage(bufferedImage, 100, 100, null)
+    }
+}
 
-                val r = image.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val g = image.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val b = image.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
-                val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
-                val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
-                val color = Color(r1, g1, b1)
-                graphics.color = color
-                graphics.fillRect(x, y, pixelWidth, pixelHeight)
-                graphics.color = Color.BLACK
-                graphics.drawRect(x, y, pixelWidth, pixelHeight)
-            }
+private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
+    val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
+    for (i in 0 until imageShape.height!!.toInt()) { // rows
+        for (j in 0 until imageShape.width!!.toInt()) { // columns
+            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            result.setRGB(j, i, Color(r, g, b).rgb)
         }
     }
+    return result
 }
