@@ -465,16 +465,15 @@ public class LishtActivation : Activation {
 }
 
 /**
-* @see [Activations.Snake]
-*/
-
+ * @see [Activations.Snake]
+ */
 public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
-        val f = tf.constant(frequency)
-        val fDouble = tf.math.mul(tf.constant(2.0f), f) // returns 2 * frequency
+        val doubleFreqConstant = tf.constant(2 * frequency)
 
         return tf.math.add(features,
-            tf.math.div(tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(fDouble, features))), fDouble))
+            tf.math.div(tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(doubleFreqConstant, features))),
+                doubleFreqConstant))
     }
 }
 
