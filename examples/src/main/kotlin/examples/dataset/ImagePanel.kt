@@ -3,6 +3,7 @@ package examples.dataset
 import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import javax.swing.JPanel
@@ -12,7 +13,13 @@ class ImagePanel(image: FloatArray, imageShape: ImageShape) : JPanel() {
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
-        graphics.drawImage(bufferedImage, 100, 100, null)
+        val x = (size.width - bufferedImage.width) / 2
+        val y = (size.height - bufferedImage.height) / 2
+        graphics.drawImage(bufferedImage, x, y, null)
+    }
+
+    override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
     }
 }
 

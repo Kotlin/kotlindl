@@ -62,8 +62,8 @@ fun main() {
     val rawImage = preprocessing().first
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, ImageShape(400, 400, 3)))
-    frame.setSize(1000, 1000)
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape))
+    frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
