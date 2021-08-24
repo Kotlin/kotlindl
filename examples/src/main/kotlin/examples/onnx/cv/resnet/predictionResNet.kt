@@ -7,8 +7,8 @@ package examples.onnx.cv.resnet
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
@@ -21,7 +21,7 @@ import java.io.File
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/resnet50.onnx"
 
 fun main() {
-    val modelHub = ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
+    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
     val model = modelHub.loadModel() as Functional
 
     val imageNetClassLabels = modelHub.loadClassLabels()

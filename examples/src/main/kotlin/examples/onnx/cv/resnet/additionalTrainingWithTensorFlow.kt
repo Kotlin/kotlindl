@@ -17,8 +17,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
@@ -49,7 +49,7 @@ private val topModel = Sequential.of(
 )
 
 fun main() {
-    val modelHub = ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.ResNet_50)
+    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
     val model = modelHub.loadModel() as Functional
 
     val imageNetClassLabels = modelHub.loadClassLabels()
@@ -78,7 +78,7 @@ fun main() {
             }
             transformTensor {
                 sharpen {
-                    modelType = Models.TensorFlow.ResNet_50
+                    modelType = TFModels.CV.ResNet_50
                 }
                 onnx {
                     onnxModel = resnet50

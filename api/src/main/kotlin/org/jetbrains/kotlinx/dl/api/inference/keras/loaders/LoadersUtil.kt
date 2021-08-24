@@ -91,7 +91,7 @@ public fun reshapeInput(inputData: FloatArray, tensorShape: LongArray): Array<Ar
 }
 
 /** Returns top-5 labels for the given [floatArray] encoded with mapping [imageNetClassLabels]. */
-public fun predictTop5Labels(
+public fun predictTop5ImageNetLabels(
     it: TensorFlowInferenceModel,
     floatArray: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>
@@ -111,7 +111,7 @@ public fun predictTop5Labels(
 }
 
 /** Forms mapping of class label to class name for the ImageNet dataset. */
-public fun prepareHumanReadableClassLabels(): MutableMap<Int, String> {
+public fun prepareImageNetHumanReadableClassLabels(): MutableMap<Int, String> {
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 
     fun parse(name: String): Any? {

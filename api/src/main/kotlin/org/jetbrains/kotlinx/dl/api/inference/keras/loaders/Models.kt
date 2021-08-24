@@ -12,69 +12,152 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
  *
  * @property [modelName] Name of the model.
  */
-public enum class Models {
+public enum class TFModels {
     ;
 
-    public enum class TensorFlow(override val modelRelativePath: String) : ModelType {
+    public enum class CV(override val modelRelativePath: String) : ModelType {
         /** */
-        VGG_16("vgg16"),
+        VGG_16("vgg16") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        VGG_19("vgg19"),
+        VGG_19("vgg19") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_18("resnet18"),
+        ResNet_18("resnet18") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_34("resnet34"),
+        ResNet_34("resnet34") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_50("resnet50"),
+        ResNet_50("resnet50") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_101("resnet101"),
+        ResNet_101("resnet101") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_152("resnet151"),
+        ResNet_152("resnet151") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        },
 
         /** */
-        ResNet_50_v2("resnet50v2"),
+        ResNet_50_v2("resnet50v2") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        ResNet_101_v2("resnet101v2"),
+        ResNet_101_v2("resnet101v2"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        ResNet_151_v2("resnet151v2"),
+        ResNet_151_v2("resnet151v2"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        MobileNet("mobilenet"),
+        MobileNet("mobilenet"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        MobileNetv2("mobilenetv2"),
+        MobileNetv2("mobilenetv2"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        Inception("inception"),
+        Inception("inception"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        Xception("xception"),
+        Xception("xception"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        DenseNet121("densenet121"),
+        DenseNet121("densenet121") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+            }
+        },
 
         /** */
-        DenseNet169("densenet169"),
+        DenseNet169("densenet169"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+            }
+        },
 
         /** */
-        DenseNet201("densenet201"),
+        DenseNet201("densenet201"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+            }
+        },
 
         /** */
-        NASNetMobile("nasnetmobile"),
+        NASNetMobile("nasnetmobile"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
 
         /** */
-        NASNetLarge("nasnetlarge"),
+        NASNetLarge("nasnetlarge"){
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        },
     }
 }
 
 public interface ModelType {
     public val modelRelativePath: String
+
+    /**
+     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+     *
+     * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according chosen modelType.
+     */
+    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray
 }

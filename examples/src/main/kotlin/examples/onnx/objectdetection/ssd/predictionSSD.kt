@@ -3,11 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.yolo
+package examples.onnx.objectdetection.ssd
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -19,10 +19,7 @@ import java.io.File
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/ssd.onnx"
 
 fun main() {
-    val
-
-    val modelHub =
-        ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
+    val modelHub = ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
     val model = modelHub.loadModel() as OnnxInferenceModel
 
     model.use {
@@ -43,7 +40,7 @@ fun main() {
                 }
                 transformTensor {
                     sharpen {
-                        modelType = Models.TensorFlow.DenseNet201
+                        modelType = TFModels.CV.DenseNet201
                     }
                     transpose {
                         axes = intArrayOf(2, 0, 1)

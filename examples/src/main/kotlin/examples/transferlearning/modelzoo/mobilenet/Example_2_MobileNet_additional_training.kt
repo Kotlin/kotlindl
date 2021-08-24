@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -36,7 +36,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
  * This examples demonstrates the transfer learning concept on MobileNet model:
- * - Model configuration, model weights and labels are obtained from [ModelHub].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - New Dense layers are added and initialized via defined initializers.
@@ -48,7 +48,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun mobilenetWithAdditionalTraining() {
     val modelHub =
-        ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.MobileNet)
+        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.MobileNet)
     val model = modelHub.loadModel() as Functional
 
     val catdogimages = dogsCatsSmallDatasetPath()
@@ -69,7 +69,7 @@ fun mobilenetWithAdditionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = Models.TensorFlow.MobileNet
+                modelType = TFModels.CV.MobileNet
             }
         }
     }

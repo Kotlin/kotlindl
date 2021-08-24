@@ -439,7 +439,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
-        //check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         val evaluationHistory = History()
@@ -506,7 +506,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predict(dataset: Dataset, batchSize: Int): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
-        //check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         callback.onPredictBegin()
@@ -574,7 +574,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
-        //check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         callback.onPredictBegin()
@@ -633,7 +633,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        //check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         val imageShape = calculateXShape(1)

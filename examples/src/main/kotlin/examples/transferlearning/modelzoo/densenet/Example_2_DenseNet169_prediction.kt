@@ -15,9 +15,9 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -28,7 +28,7 @@ import java.io.File
 
 /**
  * This examples demonstrates the inference concept on DenseNet169 model:
- * - Model configuration, model weights and labels are obtained from [ModelHub].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in DenseNet169 during training on ImageNet dataset) is applied to images before prediction.
@@ -37,7 +37,7 @@ import java.io.File
  */
 fun denseNet169Prediction() {
     val modelHub =
-        ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.DenseNet169)
+        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.DenseNet169)
     val model = modelHub.loadModel() as Functional
 
     val imageNetClassLabels = modelHub.loadClassLabels()
@@ -84,7 +84,7 @@ fun denseNet169Prediction() {
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

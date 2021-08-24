@@ -15,8 +15,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.Models
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -36,7 +36,7 @@ private const val EPOCHS = 2
 
 /**
  * This examples demonstrates the transfer learning concept on VGG'19 model:
- * - Model configuration, model weights and labels are obtained from [ModelHub].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - New Dense layers are added and initialized via defined initializers.
@@ -51,7 +51,7 @@ private const val EPOCHS = 2
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun vgg19additionalTraining() {
-    val modelHub = ModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = Models.TensorFlow.VGG_19)
+    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_19)
     val model = modelHub.loadModel() as Sequential
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
@@ -72,7 +72,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                Models.TensorFlow.VGG_19
+                TFModels.CV.VGG_19
             }
         }
     }
