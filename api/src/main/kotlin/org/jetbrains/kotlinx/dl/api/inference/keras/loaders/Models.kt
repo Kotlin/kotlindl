@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
  *

@@ -86,8 +86,10 @@ public class Preprocessing {
             if (tensorPreprocessingStage.isRescalingInitialized)
                 tensor = tensorPreprocessingStage.rescaling.apply(tensor, shape)
 
-            if (tensorPreprocessingStage.isCustomPreprocessorInitialized)
-                tensor = tensorPreprocessingStage.customPreprocessor.apply(tensor, shape)
+            if (tensorPreprocessingStage.customPreprocessors.isNotEmpty())
+                tensorPreprocessingStage.customPreprocessors.forEach {
+                    tensor = it.apply(tensor, shape)
+                }
         }
 
         return Pair(tensor, shape)

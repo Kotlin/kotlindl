@@ -50,13 +50,27 @@ public open class OnnxInferenceModel : InferenceModel() {
         public fun load(pathToModel: String): OnnxInferenceModel {
             val model = OnnxInferenceModel()
 
+            return initializeONNXModel(model, pathToModel)
+        }
+
+        internal fun initializeONNXModel(
+            model: OnnxInferenceModel,
+            pathToModel: String
+        ): OnnxInferenceModel {
+            require(!model::env.isInitialized) { "The model $model is initialized!" }
+            require(!model::session.isInitialized) { "The model $model is initialized!" }
+            require(!model::inputShape.isInitialized) { "The model $model is initialized!" }
+            require(!model::outputShape.isInitialized) { "The model $model is initialized!" }
+
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
 
-            val inputDims = (model.session.inputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+            val inputDims =
+                (model.session.inputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
             model.inputShape = TensorShape(1, *inputDims).dims()
 
-            val outputDims = (model.session.outputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+            val outputDims =
+                (model.session.outputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
             model.outputShape = TensorShape(1, *outputDims).dims()
 
             return model

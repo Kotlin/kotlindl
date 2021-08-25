@@ -9,6 +9,7 @@ import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
@@ -18,31 +19,18 @@ import java.io.File
 fun main() {
     val modelHub =
         ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val model = modelHub.loadModel() as SSDObjectDetectionModel
 
     model.use {
         println(it)
 
         for (i in 0..8) {
-            val preprocessing: Preprocessing = preprocess {
-                transformImage {
-                    load {
-                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                        imageShape = ImageShape(224, 224, 3)
-                        colorMode = ColorOrder.BGR
-                    }
-                    resize {
-                        outputHeight = 1200
-                        outputWidth = 1200
-                    }
-                }
+            println("Image $i")
+            val detectedObjects =
+                it.detectObjects(imageFile = getFileFromResource("datasets/vgg/image$i.jpg"), topK = 10)
+            detectedObjects.forEach {
+                println("Found ${it.classLabel} with probability ${it.probability}")
             }
-
-            val inputData = modelHub.preprocessInput(preprocessing)
-
-            val yhat = it.predictRaw(inputData)
-            println(yhat)
-
         }
     }
 }

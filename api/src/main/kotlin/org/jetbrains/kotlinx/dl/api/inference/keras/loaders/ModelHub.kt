@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -63,6 +64,16 @@ public abstract class ModelHub(public val commonModelDirectory: File, public val
      */
     public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
         return preprocessInput(data, tensorShape, modelType)
+    }
+
+    /**
+     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+     *
+     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing according given [modelType].
+     */
+    public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
+        val (data, shape) = preprocessing()
+        return preprocessInput(data, longArrayOf(1, shape.width!!, shape.height!!, shape.channels), modelType)
     }
 }
 

@@ -23,6 +23,7 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) : Prepro
             inputShape.channels.toInt()
         )
         val ndArray = mk.ndarray<Float, D3>(data.toList(), tensorShape)
+        // TODO: add output shape as an result
         return ndArray.transpose(*axes).toList().toFloatArray() // TODO: a lot of copying
     }
 }
@@ -30,5 +31,5 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) : Prepro
 
 /** Image DSL Preprocessing extension.*/
 public fun TensorPreprocessing.transpose(sharpBlock: Transpose.() -> Unit) {
-    customPreprocessor = CustomPreprocessor(Transpose().apply(sharpBlock))
+    customPreprocessors.add(CustomPreprocessor(Transpose().apply(sharpBlock)))
 }

@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx;
 
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
 public enum class ONNXModels {
     ;
@@ -120,13 +122,32 @@ public enum class ONNXModels {
     ;
 
     public enum class ObjectDetection(override val modelRelativePath: String) : ModelType {
-        /** */
+        /**
+         * This model is a real-time neural network for object detection that detects 80 different classes.
+         *
+         * Image shape is (1x3x1200x1200).
+         *
+         * The model has 3 outputs:
+         *  - boxes: (1x'nbox'x4)
+         *  - labels: (1x'nbox')
+         *  - scores: (1x'nbox')
+         *
+         * @see <a href="https://arxiv.org/abs/1512.02325">
+         *     SSD: Single Shot MultiBox Detector.</a>
+         * @see <a href="https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/ssd">
+         *    Detailed description of SSD model and its pre- and postprocessing in onnx/models repository.</a>
+         */
         SSD("models/onnx/objectdetection/ssd") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                val processedData = org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
                     data,
                     tensorShape,
                     inputType = InputType.TF
+                )
+
+                return Transpose(axes = intArrayOf(2, 0, 1)).apply(
+                    processedData,
+                    ImageShape(width = tensorShape[1], height = tensorShape[2], channels = tensorShape[3])
                 )
             }
         },

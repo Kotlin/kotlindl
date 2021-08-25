@@ -11,7 +11,9 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.SSDObjectDetectionModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -50,7 +52,12 @@ public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
     public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
-        return OnnxInferenceModel.load(getONNXModelFile(loadingMode).absolutePath)
+        val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
+            SSDObjectDetectionModel()
+        } else {
+            OnnxInferenceModel()
+        }
+        return OnnxInferenceModel.initializeONNXModel(inferenceModel, getONNXModelFile(loadingMode).absolutePath)
     }
 
     private fun getONNXModelFile(loadingMode: LoadingMode): File {

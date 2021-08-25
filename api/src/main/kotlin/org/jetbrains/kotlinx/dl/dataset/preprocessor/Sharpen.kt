@@ -24,5 +24,5 @@ public class Sharpen(public var modelType: ModelType = TFModels.CV.VGG_16) : Pre
 
 /** Image DSL Preprocessing extension.*/
 public fun TensorPreprocessing.sharpen(sharpBlock: Sharpen.() -> Unit) {
-    customPreprocessor = CustomPreprocessor(Sharpen().apply(sharpBlock))
+    customPreprocessors.add(CustomPreprocessor(Sharpen().apply(sharpBlock)))
 }
