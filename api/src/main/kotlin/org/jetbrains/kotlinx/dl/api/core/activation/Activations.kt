@@ -280,7 +280,19 @@ public enum class Activations {
      * @property [frequency] A scalar, frequency of the periodic part
      */
 
-    Snake;
+    Snake,
+
+    /**
+     * TanhShrink Activation Function.
+     *
+     * This is a hyperbolic tangent (TanH) shrink activation type that implements the element wise function:
+     * ```
+     * TanhShrink(x) = x − tanh(x)
+     * ```
+     * Calls [TanhActivation] under the hood.
+     */
+
+    TanhShrink;
 
     public companion object {
         /**
@@ -291,6 +303,7 @@ public enum class Activations {
                 Sigmoid -> SigmoidActivation()
                 Linear -> LinearActivation()
                 Tanh -> TanhActivation()
+                TanhShrink -> TanhShrinkActivation()
                 Relu -> ReluActivation()
                 Relu6 -> Relu6Activation()
                 Elu -> EluActivation()
@@ -347,6 +360,13 @@ public class Relu6Activation : Activation {
  */
 public class TanhActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
+}
+
+/**
+ * @see [Activations.TanhShrink]
+ */
+public class TanhShrinkActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sub(features, tf.math.tanh(features))
 }
 
 /**
