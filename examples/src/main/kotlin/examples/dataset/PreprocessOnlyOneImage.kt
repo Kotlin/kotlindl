@@ -27,11 +27,9 @@ import kotlin.math.min
  * - image visualisation
  */
 fun main() {
-    val image =
-        File("C:\\Users\\zaleslaw\\IdeaProjects\\KotlinDL\\examples\\src\\main\\resources\\datasets\\vgg\\image2.jpg")
-
-    val preprocessedImagesDirectory =
-        File("C:\\Users\\zaleslaw\\processedImages")
+    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
+    val image = File(imageResource!!.toURI())
+    val preprocessedImagesDirectory = File("processedImages")
 
     val preprocessing: Preprocessing = preprocess {
         transformImage {
