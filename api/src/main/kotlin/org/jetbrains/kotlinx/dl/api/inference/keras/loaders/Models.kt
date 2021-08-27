@@ -4,19 +4,15 @@
  */
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
-
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
  *
  * All weights are imported from the Keras.applications or ONNX.models project and preprocessed with the KotlinDL project.
- *
- * @property [modelName] Name of the model.
  */
 public enum class TFModels {
     ;
 
+    /** Image recognition models and preprocessing. */
     public enum class CV(override val modelRelativePath: String) : ModelType {
         /** */
         VGG_16("vgg16") {
@@ -153,7 +149,9 @@ public enum class TFModels {
     }
 }
 
+/** Basic interface for models loaded from S3. */
 public interface ModelType {
+    /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
 
     /**

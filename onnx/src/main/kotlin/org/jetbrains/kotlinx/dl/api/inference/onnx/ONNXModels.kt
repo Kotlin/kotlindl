@@ -10,77 +10,79 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
+/** Models in the ONNX format and running via ONNX Runtime. */
 public enum class ONNXModels {
     ;
 
+    /** Image recognition models and preprocessing. */
     public enum class CV(override val modelRelativePath: String) : ModelType {
         /** */
         ResNet_18_v1("models/onnx/cv/resnet/resnet18-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_34_v1("models/onnx/cv/resnet/resnet34-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_50_v1("models/onnx/cv/resnet/resnet50-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_101_v1("models/onnx/cv/resnet/resnet101-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
-        ResNet_152_v1("models/onnx/cv/resnet/resnet151-v1") {
+        ResNet_152_v1("models/onnx/cv/resnet/resnet152-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_18_v2("models/onnx/cv/resnet/resnet18-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_34_v2("models/onnx/cv/resnet/resnet34-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_50_v2("models/onnx/cv/resnet/resnet50-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_101_v2("models/onnx/cv/resnet/resnet101-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
-        ResNet_151_v2("models/onnx/cv/resnet/resnet151-v2") {
+        ResNet_152_v2("models/onnx/cv/resnet/resnet152-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
@@ -94,7 +96,12 @@ public enum class ONNXModels {
         /** */
         EfficientNet_4_Lite("models/onnx/cv/efficientnet/efficientnet-lite4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.TF,
+                    channelsLast = false
+                )
             }
         },
 
@@ -121,6 +128,7 @@ public enum class ONNXModels {
     }
     ;
 
+    /** Object detection models and preprocessing. */
     public enum class ObjectDetection(override val modelRelativePath: String) : ModelType {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes.
@@ -163,4 +171,39 @@ public enum class ONNXModels {
             }
         },
     }
+
+    /** Face alignment models and preprocessing. */
+    public enum class FaceAlignment(override val modelRelativePath: String) : ModelType {
+        FAN_2D_106("models/onnx/facealignment/fan_2d_106") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+                    data,
+                    ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
+                )
+
+                // TODO: should be returned from the Transpose from apply method
+                val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+                return transposedData
+            }
+        },
+
+    }
+}
+
+internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
+    val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+        data,
+        ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
+    )
+
+    // TODO: should be returned from the Transpose from apply method
+    val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+    return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+        transposedData,
+        transposedShape,
+        inputType = InputType.TF,
+        channelsLast = false
+    )
 }

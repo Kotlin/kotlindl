@@ -21,6 +21,8 @@ import java.util.*
 
 /**
  * Inference model built on ONNX format.
+ *
+ * @since 0.3
  */
 public open class OnnxInferenceModel : InferenceModel() {
     /** Logger for the model. */
@@ -95,7 +97,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override val inputDimensions: LongArray
-        get() = inputShape
+        get() = TensorShape(inputShape).tail() // TODO: it keeps only 3 numbers
 
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()

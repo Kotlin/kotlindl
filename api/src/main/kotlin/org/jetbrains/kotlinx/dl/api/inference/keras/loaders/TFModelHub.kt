@@ -107,7 +107,6 @@ public class TFModelHub(commonModelDirectory: File, modelType: ModelType): Model
             imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
         }
         return imageNetClassIndices
-
     }
 
     /**

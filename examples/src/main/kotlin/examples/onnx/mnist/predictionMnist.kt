@@ -6,15 +6,21 @@
 package examples.onnx.mnist
 
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
-
-private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/mnist.onnx"
+import java.io.File
 
 fun main() {
     val (train, test) = mnist()
-
-    OnnxInferenceModel.load(PATH_TO_MODEL).use {
+    val modelHub =
+        ONNXModelHub(
+            commonModelDirectory = File("cache/pretrainedModels"),
+            modelType = ONNXModels.CV.Lenet_mnist
+        )
+    val model = modelHub.loadModel() as OnnxInferenceModel
+    model.use {
         println(it)
 
         val prediction = it.predict(train.getX(0))

@@ -16,7 +16,27 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
+/**
+ * Special model class for detection objects on images
+ * with built-in preprocessing and post-processing.
+ *
+ * It internally uses SSD model trained on the COCO dataset.
+ *
+ * @since 0.3
+ *
+ * @see <a href="https://arxiv.org/abs/1512.02325">
+ *     SSD: Single Shot MultiBox Detector.</a>
+ */
 class SSDObjectDetectionModel : OnnxInferenceModel() {
+    /**
+     * Returns the top N detected object for the given image file.
+     *
+     * NOTE: this method doesn't include the SSD - related preprocessing.
+     *
+     * @param [inputData] Preprocessed data from the image file.
+     * @param [topK] The number of the detected objects with the highest score to be returned.
+     * @return List of [DetectedObject] sorted by score.
+     */
     public fun detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
         val rawPrediction = this.predictRaw(inputData)
 
@@ -47,6 +67,15 @@ class SSDObjectDetectionModel : OnnxInferenceModel() {
         return foundObjects
     }
 
+    /**
+     * Returns the top N detected object for the given image file.
+     *
+     * NOTE: this method includes the SSD - related preprocessing.
+     *
+     * @param [imageFile] File, should be an image.
+     * @param [topK] The number of the detected objects with the highest score to be returned.
+     * @return List of [DetectedObject] sorted by score.
+     */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         val preprocessing: Preprocessing = preprocess {
             transformImage {

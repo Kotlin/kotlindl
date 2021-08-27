@@ -224,13 +224,67 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
     frame.isResizable = false
 }
 
-class DetectedObjectJPanel(val image: FloatArray, val imageShape: ImageShape, val detectedObjects: List<DetectedObject>) : JPanel() {
+fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array<*>>) {
+    val frame = JFrame("Landmarks")
+    @Suppress("UNCHECKED_CAST")
+    frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
+}
+
+
+class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, val landmarks: List<Array<*>>) : JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
-        val xCoefficient: Float = size.width.toFloat()/bufferedImage.width.toFloat()
-        val yCoefficient: Float = size.height.toFloat()/bufferedImage.height.toFloat()
+        val tempLandMarks = mutableListOf<Pair<Float, Float>>()
+        val floats = landmarks[0][0] as FloatArray
+        for (i in floats.indices step 2) {
+            tempLandMarks.add(Pair(floats[i], floats[i + 1]))
+        }
+
+
+        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
+        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
+
+        graphics.drawImage(bufferedImage, 0, 0, null)
+
+        for (i in tempLandMarks.indices) {
+            val xLM = (size.width / 2) * (1 + tempLandMarks[i].first) / xCoefficient
+            val yLM = (size.height / 2) * (1 + tempLandMarks[i].second) / yCoefficient
+
+            graphics as Graphics2D
+            val stroke1: Stroke = BasicStroke(3f)
+            graphics.setColor(Color.RED)
+            graphics.stroke = stroke1
+            graphics.drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
+        }
+    }
+
+    override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+
+    override fun getMinimumSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+}
+
+class DetectedObjectJPanel(
+    val image: FloatArray,
+    val imageShape: ImageShape,
+    val detectedObjects: List<DetectedObject>
+) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape)
+
+    override fun paint(graphics: Graphics) {
+        super.paint(graphics)
+        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
+        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
 
         graphics.drawImage(bufferedImage, 0, 0, null)
 
@@ -249,7 +303,7 @@ class DetectedObjectJPanel(val image: FloatArray, val imageShape: ImageShape, va
             val yRect = bottom
             val xRect = left
             graphics.setColor(Color.ORANGE)
-            graphics.font = Font ("Courier New", 1, 17);
+            graphics.font = Font("Courier New", 1, 17);
             graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8);
 
             graphics as Graphics2D
@@ -332,10 +386,6 @@ fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
 }
-
-
-
-
 
 
 private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
