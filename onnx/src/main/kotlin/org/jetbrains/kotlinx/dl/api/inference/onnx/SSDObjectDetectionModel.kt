@@ -30,9 +30,10 @@ class SSDObjectDetectionModel : OnnxInferenceModel() {
             val detectedObject = DetectedObject(
                 classLabel = cocoCategories[classIndices[i].toInt()]!!,
                 probability = probabilities[i],
-                xMax = boxes[i][0],
-                xMin = boxes[i][1],
-                yMax = boxes[i][2],
+                // left, bot, right, top
+                xMin = boxes[i][0],
+                yMax = boxes[i][1],
+                xMax = boxes[i][2],
                 yMin = boxes[i][3]
             )
             foundObjects.add(detectedObject)

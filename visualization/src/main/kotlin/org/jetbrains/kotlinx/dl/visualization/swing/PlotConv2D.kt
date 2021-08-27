@@ -5,13 +5,17 @@
 
 package org.jetbrains.kotlinx.dl.visualization.swing
 
+import org.jetbrains.kotlinx.dl.api.extension.get3D
+import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.visualization.letsplot.TensorImageData
-import java.awt.Color
-import java.awt.Graphics
+import java.awt.*
+import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
+
 
 class Conv2dJPanel(
     val dst: Array<Array<Array<FloatArray>>>,
@@ -154,6 +158,153 @@ class ReluGraphics2(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
     }
 }
 
+/*class DetectedObjectJPanel(
+    val dst: FloatArray,
+    val imageShape: ImageShape,
+    val detectedObjects: List<DetectedObject>,
+) : JPanel() {
+    override fun paint(g: Graphics) {
+        //drawImage()
+        detectedObjects.forEach {
+            val pixelWidth = 1
+            val pixelHeight = 1
+
+            val top = it.yMin * imageShape.height!! * pixelHeight
+            val left = it.xMin * imageShape.width!! * pixelWidth
+            val bottom = it.yMax * imageShape.height!! * pixelHeight
+            val right = it.xMax * imageShape.width!! * pixelWidth
+            // left, bot, right, top
+
+            // y = columnIndex
+            // x = rowIndex
+            val y = 50 + top
+            val x = 50 + left
+
+            g.color = Color.BLACK
+            g.drawRect(x.toInt(), y.toInt(), (right - left).toInt(), (top - bottom).toInt())
+            g.drawString(" ${it.classLabel} : ${it.probability}",  x.toInt(), y.toInt(),);
+        }
+
+    }
+
+    private fun drawImage() {
+        for (i in 0 until imageShape.height!!.toInt()) { // rows
+            for (j in 0 until imageShape.width!!.toInt()) { // columns
+                val pixelWidth = 1
+                val pixelHeight = 1
+
+                // y = columnIndex
+                // x = rowIndex
+                val y = 100 + i * pixelWidth
+                val x = 100 + j * pixelHeight
+
+                val r =
+                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                val g =
+                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                val b =
+                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
+
+                val color = Color(r, g, b)
+                graphics.color = color
+                graphics.fillRect(x, y, pixelWidth, pixelHeight)
+            }
+        }
+    }
+}
+*/
+fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects: List<DetectedObject>) {
+    val frame = JFrame("Filters")
+    @Suppress("UNCHECKED_CAST")
+    frame.contentPane.add(DetectedObjectJPanel(dst, imageShape, detectedObjects))
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
+}
+
+class DetectedObjectJPanel(val image: FloatArray, val imageShape: ImageShape, val detectedObjects: List<DetectedObject>) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape)
+
+    override fun paint(graphics: Graphics) {
+        super.paint(graphics)
+        val xCoefficient: Float = size.width.toFloat()/bufferedImage.width.toFloat()
+        val yCoefficient: Float = size.height.toFloat()/bufferedImage.height.toFloat()
+
+        graphics.drawImage(bufferedImage, 0, 0, null)
+
+        detectedObjects.forEach {
+            val pixelWidth = 1
+            val pixelHeight = 1
+
+            val top = yCoefficient * it.yMin * imageShape.height!! * pixelHeight
+            val left = xCoefficient * it.xMin * imageShape.width!! * pixelWidth
+            val bottom = yCoefficient * it.yMax * imageShape.height!! * pixelHeight
+            val right = xCoefficient * it.xMax * imageShape.width!! * pixelWidth
+            // left, bot, right, top
+
+            // y = columnIndex
+            // x = rowIndex
+            val yRect = bottom
+            val xRect = left
+            graphics.setColor(Color.ORANGE)
+            graphics.font = Font ("Courier New", 1, 17);
+            graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8);
+
+            graphics as Graphics2D
+            val stroke1: Stroke = BasicStroke(6f)
+            graphics.setColor(Color.RED)
+            graphics.stroke = stroke1
+            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
+
+        }
+    }
+
+    override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+
+    override fun getMinimumSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+}
+
+
+class ImagesJPanel3(
+    val dst: FloatArray,
+    val imageShape: ImageShape
+) : JPanel() {
+    override fun paint(graphics: Graphics) {
+        for (i in 0 until imageShape.height!!.toInt()) { // rows
+            for (j in 0 until imageShape.width!!.toInt()) { // columns
+                val pixelWidth = 2
+                val pixelHeight = 2
+
+                // y = columnIndex
+                // x = rowIndex
+                val y = 100 + i * pixelWidth
+                val x = 100 + j * pixelHeight
+
+                val r =
+                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                val g =
+                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                val b =
+                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
+                val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
+                val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
+                val color = Color(r, g, b)
+                graphics.color = color
+                graphics.fillRect(x, y, pixelWidth, pixelHeight)
+                graphics.color = Color.BLACK
+                graphics.drawRect(x, y, pixelWidth, pixelHeight)
+            }
+        }
+    }
+}
+
 fun drawActivations(activations: List<*>) {
     val frame = JFrame("Visualise the matrix weights on Relu")
     @Suppress("UNCHECKED_CAST")
@@ -180,4 +331,22 @@ fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
+}
+
+
+
+
+
+
+private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
+    val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
+    for (i in 0 until imageShape.height!!.toInt()) { // rows
+        for (j in 0 until imageShape.width!!.toInt()) { // columns
+            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            result.setRGB(j, i, Color(r, g, b).rgb)
+        }
+    }
+    return result
 }

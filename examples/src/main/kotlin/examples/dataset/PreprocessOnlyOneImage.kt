@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagesJPanel3
 import java.awt.Color
 import java.awt.Graphics
 import java.io.File
@@ -76,36 +77,4 @@ fun main() {
 }
 
 
-class ImagesJPanel3(
-    val dst: FloatArray,
-    val imageShape: ImageShape
-) : JPanel() {
-    override fun paint(graphics: Graphics) {
-        for (i in 0 until imageShape.height!!.toInt()) { // rows
-            for (j in 0 until imageShape.width!!.toInt()) { // columns
-                val pixelWidth = 2
-                val pixelHeight = 2
 
-                // y = columnIndex
-                // x = rowIndex
-                val y = 100 + i * pixelWidth
-                val x = 100 + j * pixelHeight
-
-                val r =
-                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val g =
-                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val b =
-                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
-                val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
-                val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
-                val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
-                val color = Color(r, g, b)
-                graphics.color = color
-                graphics.fillRect(x, y, pixelWidth, pixelHeight)
-                graphics.color = Color.BLACK
-                graphics.drawRect(x, y, pixelWidth, pixelHeight)
-            }
-        }
-    }
-}

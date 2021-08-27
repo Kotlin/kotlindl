@@ -41,8 +41,7 @@ fun main() {
             val inputData = modelHub.preprocessInput(preprocessing)
 
             val yhat = it.predictRaw(inputData)
-            println(yhat)
-
+            println(yhat.toTypedArray().contentDeepToString())
         }
     }
 }
