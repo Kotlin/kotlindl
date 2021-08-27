@@ -73,7 +73,7 @@ public abstract class ModelHub(public val commonModelDirectory: File, public val
      */
     public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
         val (data, shape) = preprocessing()
-        return preprocessInput(data, longArrayOf(1, shape.width!!, shape.height!!, shape.channels), modelType)
+        return preprocessInput(data, longArrayOf(shape.width!!, shape.height!!, shape.channels), modelType) // TODO: need to be 4 or 3 in all cases
     }
 }
 

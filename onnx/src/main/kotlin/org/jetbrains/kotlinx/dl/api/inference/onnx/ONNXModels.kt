@@ -17,70 +17,70 @@ public enum class ONNXModels {
         /** */
         ResNet_18_v1("models/onnx/cv/resnet/resnet18-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_34_v1("models/onnx/cv/resnet/resnet34-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_50_v1("models/onnx/cv/resnet/resnet50-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_101_v1("models/onnx/cv/resnet/resnet101-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
-        ResNet_152_v1("models/onnx/cv/resnet/resnet151-v1") {
+        ResNet_152_v1("models/onnx/cv/resnet/resnet152-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_18_v2("models/onnx/cv/resnet/resnet18-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_34_v2("models/onnx/cv/resnet/resnet34-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_50_v2("models/onnx/cv/resnet/resnet50-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
         ResNet_101_v2("models/onnx/cv/resnet/resnet101-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
         /** */
-        ResNet_151_v2("models/onnx/cv/resnet/resnet151-v2") {
+        ResNet_152_v2("models/onnx/cv/resnet/resnet152-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return resNetOnnxPreprocessing(data, tensorShape)
             }
         },
 
@@ -94,7 +94,12 @@ public enum class ONNXModels {
         /** */
         EfficientNet_4_Lite("models/onnx/cv/efficientnet/efficientnet-lite4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.TF,
+                    channelsLast = false
+                )
             }
         },
 
@@ -163,4 +168,21 @@ public enum class ONNXModels {
             }
         },
     }
+}
+
+internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
+    val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+        data,
+        ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
+    )
+
+    // TODO: should be returned from the Transpose from apply method
+    val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+    return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+        transposedData,
+        transposedShape,
+        inputType = InputType.TF,
+        channelsLast = false
+    )
 }

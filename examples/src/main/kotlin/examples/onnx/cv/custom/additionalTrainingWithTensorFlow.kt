@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.resnet
+package examples.onnx.cv.custom
 
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
@@ -31,7 +31,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/resnet50notop.onnx"
-private const val EPOCHS = 10
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2

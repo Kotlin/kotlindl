@@ -95,7 +95,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override val inputDimensions: LongArray
-        get() = inputShape
+        get() = TensorShape(inputShape).tail() // TODO: it keeps only 3 numbers
 
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()

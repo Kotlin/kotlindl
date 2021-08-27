@@ -17,23 +17,23 @@ import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
 import java.io.File
 
 fun main() {
+    // TODO: ModelHub -> RemoteModel -> loadModel
     val modelHub =
         ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
-    val model = modelHub.loadModel() as SSDObjectDetectionModel
+    val model = modelHub.loadModel() as SSDObjectDetectionModel // TODO: reifed parameter
 
     model.use { detectionModel ->
         println(detectionModel)
 
         val imageFile = getFileFromResource("datasets/vgg/image9.jpg")
         val detectedObjects =
-            detectionModel.detectObjects(imageFile = imageFile, topK = 40)
+            detectionModel.detectObjects(imageFile = imageFile, topK = 50)
 
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
         visualise(imageFile, detectedObjects)
-
     }
 }
 

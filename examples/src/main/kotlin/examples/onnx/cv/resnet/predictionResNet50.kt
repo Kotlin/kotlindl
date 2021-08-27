@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.efficicentnet
+package examples.onnx.cv.resnet
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
@@ -23,12 +23,14 @@ import java.io.File
 fun main() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.EfficientNet_4_Lite
+        modelType = ONNXModels.CV.ResNet_50_v1
     )
     val model = modelHub.loadModel() as OnnxInferenceModel
 
+    println(model.inputDimensions.contentToString())
+
     val imageNetClassLabels =
-        loadImageNetClassLabels() // TODO: move to overriden method of ModelType (loading of labels for each model)
+        loadImageNetClassLabels() // TODO: move to overridden method of ModelType (loading of labels for each model)
 
     model.use {
         println(it)
@@ -45,7 +47,7 @@ fun main() {
             }
 
             // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelHub.preprocessInput(preprocessing) // TODO: to preprocessInput(preprocessing)
+            val inputData = modelHub.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -56,3 +58,4 @@ fun main() {
         }
     }
 }
+
