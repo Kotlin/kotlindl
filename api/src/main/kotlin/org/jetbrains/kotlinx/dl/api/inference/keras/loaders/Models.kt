@@ -160,6 +160,8 @@ public interface ModelType {
      * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
      *
      * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according chosen modelType.
+     *
+     * @param [tensorShape] Should be 3 dimensional array (HWC or CHW format)
      */
     public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray
 }

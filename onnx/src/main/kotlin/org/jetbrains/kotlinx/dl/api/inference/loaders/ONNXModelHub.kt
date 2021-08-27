@@ -20,9 +20,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
-private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
-private const val WEIGHTS_FILE_NAME = "/weights.h5"
-
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
  * [commonModelDirectory].
@@ -30,13 +27,13 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
  *
- * @since 0.2
+ * @since 0.3
  */
 public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
     ModelHub(commonModelDirectory, modelType) {
     private val modelFile = "/" + modelType.modelRelativePath + ".onnx"
 
-    /** Logger for modelZoo model. */
+    /** Logger. */
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {
@@ -49,7 +46,7 @@ public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
      * Loads model configuration without weights.
      *
      * @param [loadingMode] Strategy of existing model use-case handling.
-     * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
+     * @return An example of [OnnxInferenceModel].
      */
     public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
         val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {

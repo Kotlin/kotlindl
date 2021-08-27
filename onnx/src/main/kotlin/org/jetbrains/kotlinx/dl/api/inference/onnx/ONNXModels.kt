@@ -139,15 +139,19 @@ public enum class ONNXModels {
          */
         SSD("models/onnx/objectdetection/ssd") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                val processedData = org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
                     data,
-                    tensorShape,
-                    inputType = InputType.TF
+                    ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
                 )
 
-                return Transpose(axes = intArrayOf(2, 0, 1)).apply(
-                    processedData,
-                    ImageShape(width = tensorShape[1], height = tensorShape[2], channels = tensorShape[3])
+                // TODO: should be returned from the Transpose from apply method
+                val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    transposedData,
+                    transposedShape,
+                    inputType = InputType.TORCH,
+                    channelsLast = false
                 )
             }
         },

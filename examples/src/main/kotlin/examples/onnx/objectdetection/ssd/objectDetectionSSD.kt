@@ -24,18 +24,16 @@ fun main() {
     model.use { detectionModel ->
         println(detectionModel)
 
-        for (i in 9 until 10) {
-            println("Image $i")
-            val imageFile = getFileFromResource("datasets/vgg/image$i.jpg")
-            val detectedObjects =
-                detectionModel.detectObjects(imageFile = imageFile, topK = 20)
+        val imageFile = getFileFromResource("datasets/vgg/image9.jpg")
+        val detectedObjects =
+            detectionModel.detectObjects(imageFile = imageFile, topK = 40)
 
-            detectedObjects.forEach {
-                println("Found ${it.classLabel} with probability ${it.probability}")
-            }
-
-            visualise(imageFile, detectedObjects)
+        detectedObjects.forEach {
+            println("Found ${it.classLabel} with probability ${it.probability}")
         }
+
+        visualise(imageFile, detectedObjects)
+
     }
 }
 
@@ -63,7 +61,6 @@ private fun visualise(
     }
 
     val rawImage = preprocessing().first
-
 
     drawDetectedObjects(rawImage, ImageShape(1200, 1200, 3), detectedObjects)
 }

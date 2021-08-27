@@ -66,7 +66,7 @@ class SSDObjectDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
             data,
-            longArrayOf(1, shape.width!!, shape.height!!, shape.channels)
+            longArrayOf(shape.width!!, shape.height!!, shape.channels) // TODO: refactor to the imageShape
         )
 
         return this.detectObjects(preprocessedData, topK)
