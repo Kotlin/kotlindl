@@ -246,6 +246,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.Softmax -> ACTIVATION_SOFTMAX
         Activations.Linear -> ACTIVATION_LINEAR
         Activations.Tanh -> ACTIVATION_TANH
+        Activations.TanhShrink -> ACTIVATION_TANHSHRINK
         Activations.Relu6 -> ACTIVATION_RELU6
         Activations.Elu -> ACTIVATION_ELU
         Activations.Selu -> ACTIVATION_SELU

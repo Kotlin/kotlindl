@@ -348,6 +348,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SOFTMAX -> Activations.Softmax
         ACTIVATION_LINEAR -> Activations.Linear
         ACTIVATION_TANH -> Activations.Tanh
+        ACTIVATION_TANHSHRINK -> Activations.TanhShrink
         ACTIVATION_RELU6 -> Activations.Relu6
         ACTIVATION_ELU -> Activations.Elu
         ACTIVATION_SELU -> Activations.Selu
