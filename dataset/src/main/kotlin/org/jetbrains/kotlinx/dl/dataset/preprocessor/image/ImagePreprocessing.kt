@@ -9,7 +9,6 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
  * The whole image preprocessing pipeline DSL.
  *
  * It supports the following ops:
- * - [load] See [Loading] image preprocessor.
  * - [crop] See [Cropping] image preprocessor.
  * - [resize] See [Resize] image preprocessor.
  * - [rotate] See [Rotate] image preprocessor.
