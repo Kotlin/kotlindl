@@ -11,6 +11,16 @@ import java.awt.image.BufferedImage
 /** Basic interface for image preprocessors. It operates on [BufferedImage]. */
 public interface ImagePreprocessor {
     /**
+     * Computes output image shape for the provided [inputShape].
+     * @param inputShape image input shape. Null value means that input image size is not known.
+     *                   This is useful for operations with a fixed output size,
+     *                   which should return a non-null value in this case.
+     *
+     * @return output image shape
+     */
+    public fun getOutputShape(inputShape: ImageShape?): ImageShape? = inputShape
+
+    /**
      * Transforms [image] with [inputShape] to the new image with the new shape.
      *
      * @return Pair <new image; new shape>.

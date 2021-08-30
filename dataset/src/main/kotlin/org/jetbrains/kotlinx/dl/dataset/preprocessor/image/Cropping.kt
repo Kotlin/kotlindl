@@ -29,16 +29,21 @@ public class Cropping(
     public var left: Int = 1,
     public var right: Int = 1
 ) : ImagePreprocessor {
+
+    override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
+        if (inputShape == null) return null
+        return ImageShape(
+            width = inputShape.width?.let { it - left - right },
+            height = inputShape.height?.let { it - top - bottom },
+            channels = 3
+        )
+    }
+
     override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
-        val croppedImageShape =
-            ImageShape(
-                width = inputShape.width!! - left - right,
-                height = inputShape.height!! - top - bottom,
-                channels = inputShape.channels
-            )
+        val croppedImageShape = getOutputShape(inputShape)!!
 
         val img = image.getSubimage(
-            left, top, (inputShape.width - left - right).toInt(), (inputShape.height - top - bottom).toInt(),
+            left, top, croppedImageShape.width!!.toInt(), croppedImageShape.height!!.toInt(),
         )
 
         val croppedImage = BufferedImage(img.width, img.height, BufferedImage.TYPE_3BYTE_BGR)

@@ -33,6 +33,12 @@ public class Rotate(
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
 ) : ImagePreprocessor {
+
+    override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
+        if (inputShape == null) return null
+        return ImageShape(inputShape.width, inputShape.height, 3)
+    }
+
     override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
         val width: Int = inputShape.width!!.toInt()
         val height: Int = inputShape.height!!.toInt()
