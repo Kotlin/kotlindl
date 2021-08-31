@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 
@@ -13,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
  *
  * @property [modelType] One the supported models pre-trained on ImageNet.
  */
-public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Preprocessor {
+public class Sharpen(public var modelType: ModelType = TFModels.CV.VGG_16) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
         return preprocessInput(data, tensorShape, modelType)
@@ -23,5 +24,5 @@ public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Prepr
 
 /** Image DSL Preprocessing extension.*/
 public fun TensorPreprocessing.sharpen(sharpBlock: Sharpen.() -> Unit) {
-    customPreprocessor = CustomPreprocessor(Sharpen().apply(sharpBlock))
+    customPreprocessors.add(CustomPreprocessor(Sharpen().apply(sharpBlock)))
 }

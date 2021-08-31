@@ -19,15 +19,11 @@ public class TensorPreprocessing {
     public lateinit var rescaling: Rescaling
 
     /** */
-    public lateinit var customPreprocessor: Preprocessor
+    public var customPreprocessors: MutableList<Preprocessor> = mutableListOf()
 
     /** True, if [rescaling] is initialized. */
     public val isRescalingInitialized: Boolean
         get() = ::rescaling.isInitialized
-
-    /** True, if [customPreprocessor] is initialized. */
-    public val isCustomPreprocessorInitialized: Boolean
-        get() = ::customPreprocessor.isInitialized
 }
 
 /** */

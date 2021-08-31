@@ -14,6 +14,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -22,7 +23,6 @@ import java.nio.file.StandardCopyOption
 
 private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
-internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
@@ -33,8 +33,8 @@ internal const val AWS_S3_URL = "https://kotlindl.s3.amazonaws.com"
  *
  * @since 0.2
  */
-public class ModelZoo(public val commonModelDirectory: File, public val modelType: ModelType) {
-    private val modelDirectory = "/" + modelType.modelName
+public class TFModelHub(commonModelDirectory: File, modelType: ModelType): ModelHub(commonModelDirectory, modelType) {
+    private val modelDirectory = "/" + modelType.modelRelativePath
     private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
     private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
     private val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
@@ -55,28 +55,29 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
-    public fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): GraphTrainableModel {
+    public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
         val jsonConfigFile = getJSONConfigFile(loadingMode)
         return when (modelType) {
-            ModelType.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)
-            ModelType.VGG_19 -> Sequential.loadModelConfiguration(jsonConfigFile)
-            ModelType.ResNet_18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            ModelType.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)
+            TFModels.CV.VGG_19 -> Sequential.loadModelConfiguration(jsonConfigFile)
+            TFModels.CV.ResNet_18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            else -> TODO()
         }
     }
 
@@ -106,7 +107,6 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
             imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
         }
         return imageNetClassIndices
-
     }
 
     /**
@@ -117,15 +117,6 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
      */
     public fun loadWeights(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): HdfFile {
         return getWeightsFile(loadingMode)
-    }
-
-    /**
-     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
-     *
-     * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according given [modelType].
-     */
-    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-        return preprocessInput(data, tensorShape, modelType)
     }
 
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
@@ -161,34 +152,6 @@ public class ModelZoo(public val commonModelDirectory: File, public val modelTyp
     }
 }
 
-/**
- * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
- *
- * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according chosen [modelType].
- */
-public fun preprocessInput(data: FloatArray, tensorShape: LongArray, modelType: ModelType): FloatArray {
-    return when (modelType) {
-        ModelType.VGG_16 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.VGG_19 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_18 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_34 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_50 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_101 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_152 -> preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-        ModelType.ResNet_50_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.ResNet_101_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.ResNet_151_v2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.MobileNet -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.MobileNetv2 -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.Inception -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.Xception -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.DenseNet121 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
-        ModelType.DenseNet169 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
-        ModelType.DenseNet201 -> preprocessInput(data, tensorShape, inputType = InputType.TORCH)
-        ModelType.NASNetMobile -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-        ModelType.NASNetLarge -> preprocessInput(data, tensorShape, inputType = InputType.TF)
-    }
-}
 
 
 

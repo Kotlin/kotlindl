@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -36,7 +36,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
  * This examples demonstrates the transfer learning concept on ResNet'50 model:
- * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - New Dense layers are added and initialized via defined initializers.
@@ -46,9 +46,9 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun resnet50additionalTraining() {
-    val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub =
+        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
+    val model = modelHub.loadModel() as Functional
 
     val catdogimages = dogsCatsSmallDatasetPath()
 
@@ -68,7 +68,7 @@ fun resnet50additionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = ModelType.ResNet_50
+                modelType = TFModels.CV.ResNet_50
             }
         }
     }
@@ -76,7 +76,7 @@ fun resnet50additionalTraining() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val hdfFile = modelZoo.loadWeights()
+    val hdfFile = modelHub.loadWeights()
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {

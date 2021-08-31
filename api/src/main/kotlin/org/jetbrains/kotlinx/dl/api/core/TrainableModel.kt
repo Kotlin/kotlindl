@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
@@ -25,7 +25,7 @@ import java.io.FileNotFoundException
 /**
  * Base abstract class for all trainable models.
  */
-public abstract class TrainableModel : InferenceModel() {
+public abstract class TrainableModel : TensorFlowInferenceModel() {
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
@@ -201,13 +201,6 @@ public abstract class TrainableModel : InferenceModel() {
      * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
      */
     public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
-
-    /**
-     * Generates output prediction for the input sample.
-     *
-     * @param [inputData] Unlabeled input data to define label.
-     */
-    public abstract override fun predict(inputData: FloatArray): Int
 
     /**
      * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.

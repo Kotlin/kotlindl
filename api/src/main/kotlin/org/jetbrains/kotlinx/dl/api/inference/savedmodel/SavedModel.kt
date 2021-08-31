@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
@@ -16,7 +16,7 @@ import org.tensorflow.Tensor
 /**
  * Inference model built on SavedModelBundle format to predict on images.
  */
-public open class SavedModel : InferenceModel() {
+public open class SavedModel : TensorFlowInferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 
@@ -74,23 +74,7 @@ public open class SavedModel : InferenceModel() {
         }
     }
 
-    /**
-     * Predicts labels for all observation in [dataset].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     *
-     * @param [dataset] Dataset.
-     */
-    public fun predictAll(dataset: OnHeapDataset): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
 
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
-    }
 
     /**
      * Predicts labels for all observation in [dataset].
@@ -101,7 +85,7 @@ public open class SavedModel : InferenceModel() {
      * @param [outputTensorName] The name of output tensor.
      * @param [dataset] Dataset.
      */
-    public fun predictAll(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
+    public fun predict(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
@@ -110,30 +94,6 @@ public open class SavedModel : InferenceModel() {
         }
 
         return predictedLabels
-    }
-
-    /**
-     * Evaluates [dataset] via [metric].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     */
-    public fun evaluate(
-        dataset: OnHeapDataset,
-        metric: Metrics
-    ): Double {
-
-        return if (metric == Metrics.ACCURACY) {
-            var counter = 0
-            for (i in 0 until dataset.xSize()) {
-                val predictedLabel = predict(dataset.getX(i))
-                if (predictedLabel == dataset.getY(i).toInt())
-                    counter++
-            }
-
-            (counter.toDouble() / dataset.xSize())
-        } else {
-            Double.NaN
-        }
     }
 
     override fun close() {

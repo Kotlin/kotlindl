@@ -25,6 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
@@ -57,7 +58,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         get() = layers[0] as Input
 
     /** Returns input dimensions in order HWC (height, width, channels) */
-    public val inputDimensions: LongArray
+    public override val inputDimensions: LongArray
         get() {
             return (layers[0] as Input).packedDims
         }
@@ -543,7 +544,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
 
                     dst.forEachIndexed { index, element ->
-                        argMaxBatchPrediction[index] = element.indexOfFirst { it == element.maxOrNull()!! }
+                        argMaxBatchPrediction[index] = element.argmax()
                     }
 
                     callback.onPredictBatchEnd(batchCounter, batchSize)
@@ -558,17 +559,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predict(inputData: FloatArray): Int {
         val softPrediction = predictSoftly(inputData)
-        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
+        return softPrediction.argmax()
     }
 
     override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
-        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
+        return softPrediction.argmax()
     }
 
     override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
-        return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
+        return Pair(softPrediction.argmax(), activations)
     }
 
     override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {

@@ -45,7 +45,7 @@ val preprocessing: Preprocessing = preprocess {
     }
     transformTensor {
         sharpen {
-            modelType = ModelType.VGG_19
+            modelType = TFModels.CV.VGG_19
         }
     }
 }
@@ -62,7 +62,7 @@ You can either train a model from scratch yourself and store it for later use on
 In this tutorial, we will load VGG-19 model and weights that are made available in the Model Zoo: 
 
 ```kotlin
-val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
+val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_19)
 val model = modelZoo.loadModel() as Sequential
 ```
 

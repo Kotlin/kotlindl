@@ -33,7 +33,7 @@ fun lenetOnMnistInferenceWithTensorNames() {
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
 
-        val predictions = it.predictAll(test, "Placeholder", "ArgMax")
+        val predictions = it.predict(test, "Placeholder", "ArgMax")
         println(predictions.toString())
 
         println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")

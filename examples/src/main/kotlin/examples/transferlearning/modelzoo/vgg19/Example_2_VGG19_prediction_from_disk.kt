@@ -13,8 +13,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareHumanReadableClassLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
@@ -39,7 +39,7 @@ fun main() {
     val jsonConfigFile = getVGG19JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
-    val imageNetClassLabels = prepareHumanReadableClassLabels()
+    val imageNetClassLabels = prepareImageNetHumanReadableClassLabels()
 
     model.use {
         it.compile(
@@ -63,7 +63,7 @@ fun main() {
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

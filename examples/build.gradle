@@ -2,12 +2,14 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     api project(":api")
     api project(":visualization")
+    api project(":onnx")
 }
 
 dependencies {
     compile 'org.apache.logging.log4j:log4j-api:2.14.0'
     compile 'org.apache.logging.log4j:log4j-core:2.14.0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'

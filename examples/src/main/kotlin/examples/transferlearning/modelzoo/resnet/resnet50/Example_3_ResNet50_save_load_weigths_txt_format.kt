@@ -13,11 +13,11 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -31,23 +31,23 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
 
 /**
  * This examples demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:
- * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
  * - Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.
  * - It saves all the data to the project root directory.
- * - The first [InferenceModel] is created via graph and weights loading.
+ * - The first [TensorFlowInferenceModel] is created via graph and weights loading.
  * - Model again predicts on a few images located in resources.
  * - The second [Functional] model is created via JSON configuration and weights loading.
  * - Model again predicts on a few images located in resources.
  */
 fun main() {
-    val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.ResNet_50)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub =
+        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
+    val model = modelHub.loadModel() as Functional
 
-    val imageNetClassLabels = modelZoo.loadClassLabels()
+    val imageNetClassLabels = modelHub.loadClassLabels()
 
     model.use {
         it.compile(
@@ -58,7 +58,7 @@ fun main() {
 
         it.summary()
 
-        val hdfFile = modelZoo.loadWeights()
+        val hdfFile = modelHub.loadWeights()
 
         it.loadWeights(hdfFile)
 
@@ -73,12 +73,12 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
@@ -96,7 +96,7 @@ fun main() {
         )
     }
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL_2))
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL_2))
 
     inferenceModel.use {
         for (i in 1..8) {
@@ -112,12 +112,12 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
@@ -146,11 +146,11 @@ fun main() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model2.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model2.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

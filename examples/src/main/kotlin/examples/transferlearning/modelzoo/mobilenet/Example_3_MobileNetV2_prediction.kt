@@ -11,9 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelZoo
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -24,17 +24,17 @@ import java.io.File
 
 /**
  * This examples demonstrates the inference concept on MobileNetV2 model:
- * - Model configuration, model weights and labels are obtained from [ModelZoo].
+ * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
  */
 fun mobileNetV2Prediction() {
-    val modelZoo =
-        ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.MobileNetv2)
-    val model = modelZoo.loadModel() as Functional
+    val modelHub =
+        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.MobileNetv2)
+    val model = modelHub.loadModel() as Functional
 
-    val imageNetClassLabels = modelZoo.loadClassLabels()
+    val imageNetClassLabels = modelHub.loadClassLabels()
 
     model.use {
         it.compile(
@@ -45,7 +45,7 @@ fun mobileNetV2Prediction() {
 
         it.summary()
 
-        val hdfFile = modelZoo.loadWeights()
+        val hdfFile = modelHub.loadWeights()
 
         it.loadWeights(hdfFile)
 
@@ -60,11 +60,11 @@ fun mobileNetV2Prediction() {
                 }
             }
 
-            val inputData = modelZoo.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

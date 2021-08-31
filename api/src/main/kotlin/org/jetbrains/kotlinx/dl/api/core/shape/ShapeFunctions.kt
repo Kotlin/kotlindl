@@ -90,7 +90,7 @@ internal fun numElementsInShape(shape: LongArray): Long {
 internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
 
 /** Reshapes 2D array of floats to 1D array of floats. */
-internal fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
+public fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
@@ -123,7 +123,7 @@ public fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
 }
 
 /** Reshapes 4D array of floats to 1D array of floats. */
-internal fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
+public fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0

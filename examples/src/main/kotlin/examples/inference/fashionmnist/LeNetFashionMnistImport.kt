@@ -5,7 +5,7 @@
 
 package examples.inference.fashionmnist
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
@@ -19,7 +19,7 @@ private const val PATH_TO_MODEL = "savedmodels/fashionLenet"
 fun main() {
     val (train, _) = fashionMnist()
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
         it.reshape(28, 28, 1)

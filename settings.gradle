@@ -3,5 +3,6 @@ include("api")
 include("visualization")
 include("examples")
 include("dataset")
+include("onnx")
 
 
