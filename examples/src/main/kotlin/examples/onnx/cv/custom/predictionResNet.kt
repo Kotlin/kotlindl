@@ -6,10 +6,10 @@
 package examples.onnx.cv.custom
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
@@ -19,15 +19,16 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/resnet50.onnx"
-
 fun main() {
-    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = ONNXModelHub(
+        commonModelDirectory = File("cache/pretrainedModels"),
+        modelType = ONNXModels.CV.ResNet_50_v1_custom
+    )
+    val model = modelHub.loadModel() as OnnxInferenceModel
 
-    val imageNetClassLabels = modelHub.loadClassLabels()
+    val imageNetClassLabels = loadImageNetClassLabels()
 
-    OnnxInferenceModel.load(PATH_TO_MODEL).use {
+    model.use {
         println(it)
 
         for (i in 1..8) {

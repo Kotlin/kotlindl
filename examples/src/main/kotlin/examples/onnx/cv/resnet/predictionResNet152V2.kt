@@ -19,6 +19,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
+/**
+ * This examples demonstrates the inference concept on ResNet'152v2 model:
+ * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in ResNet'152v2 during training on ImageNet dataset) is applied to images before prediction.
+ */
 fun main() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),

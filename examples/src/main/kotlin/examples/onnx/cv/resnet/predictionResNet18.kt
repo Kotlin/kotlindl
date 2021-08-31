@@ -8,6 +8,7 @@ package examples.onnx.cv.resnet
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -19,7 +20,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-
+/**
+ * This examples demonstrates the inference concept on ResNet'18 model:
+ * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in ResNet'18 during training on ImageNet dataset) is applied to images before prediction.
+ */
 fun main() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),

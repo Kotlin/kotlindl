@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx
+package examples.onnx.objectdetection.yolo
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
@@ -19,6 +19,7 @@ import java.io.File
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/yolov4.onnx"
 
+// TODO: this example doesn't work
 fun main() {
     val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.MobileNet)
     val model = modelHub.loadModel() as Functional

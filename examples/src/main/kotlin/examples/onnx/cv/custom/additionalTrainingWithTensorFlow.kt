@@ -19,6 +19,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
@@ -30,7 +32,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val PATH_TO_MODEL = "examples/src/main/resources/models/onnx/resnet50notop.onnx"
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 32
@@ -49,14 +50,13 @@ private val topModel = Sequential.of(
 )
 
 fun main() {
-    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = ONNXModelHub(
+        commonModelDirectory = File("cache/pretrainedModels"),
+        modelType = ONNXModels.CV.ResNet_50_v1_no_top_custom
+    )
+    val model = modelHub.loadModel() as OnnxInferenceModel
 
-    val imageNetClassLabels = modelHub.loadClassLabels()
-
-    val resnet50 = OnnxInferenceModel.load(PATH_TO_MODEL)
-
-    resnet50.use {
+    model.use {
         println(it)
         it.reshape(64, 64, 3)
 
@@ -81,7 +81,7 @@ fun main() {
                     modelType = TFModels.CV.ResNet_50
                 }
                 onnx {
-                    onnxModel = resnet50
+                    onnxModel = model
                 }
             }
         }

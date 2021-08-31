@@ -108,14 +108,22 @@ public enum class ONNXModels {
         /** */
         ResNet_50_v1_custom("models/onnx/cv/custom/resnet50") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.CAFFE
+                )
             }
         },
 
         /** */
         ResNet_50_v1_no_top_custom("models/onnx/cv/custom/resnet50notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.CAFFE
+                )
             }
         },
 
@@ -189,23 +197,6 @@ public enum class ONNXModels {
         },
 
     }
-}
-
-internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
-    val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
-        data,
-        ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
-    )
-
-    // TODO: should be returned from the Transpose from apply method
-    val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
-
-    return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
-        transposedData,
-        transposedShape,
-        inputType = InputType.TF,
-        channelsLast = false
-    )
 }
 
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
