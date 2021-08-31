@@ -49,15 +49,10 @@ public fun extractFashionImages(archivePath: String): Array<FloatArray> {
             archivePath
         )
     )
-    val images =
-        Array(imageCount) { FloatArray(imageRows * imageCols) }
     val imageBuffer = ByteArray(imageRows * imageCols)
-    for (i in 0 until imageCount) {
+    val images = Array(imageCount) {
         archiveStream.readFully(imageBuffer)
-        images[i] =
-            OnHeapDataset.toNormalizedVector(
-                imageBuffer
-            )
+        OnHeapDataset.toNormalizedVector(imageBuffer)
     }
     return images
 }
@@ -78,14 +73,11 @@ public fun extractFashionLabels(archivePath: String, numClasses: Int): Array<Flo
     println(String.format("Extracting %d labels from %s", labelCount, archivePath))
     val labelBuffer = ByteArray(labelCount)
     archiveStream.readFully(labelBuffer)
-    val floats =
-        Array(labelCount) { FloatArray(numClasses) }
-    for (i in 0 until labelCount) {
-        floats[i] =
-            OnHeapDataset.toOneHotVector(
-                numClasses,
-                labelBuffer[i]
-            )
+    val floats = Array(labelCount) {
+        OnHeapDataset.toOneHotVector(
+            numClasses,
+            labelBuffer[it]
+        )
     }
     return floats
 }

@@ -27,9 +27,8 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
-        val dataForBatch = Array(length) { FloatArray(src[0].size) { 0.0f } }
-        for (i in start until start + length) {
-            dataForBatch[i - start] = src[i].copyOf() // Creates new copy for batch data
+        val dataForBatch = Array(length) {
+            src[it + start].copyOf()
         }
         return dataForBatch
     }
@@ -185,7 +184,7 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
                 val loading = preprocessors.imagePreprocessingStage.load
                 val xFiles = loading.prepareFileNames()
 
-                val x = prepareX(xFiles, preprocessors, preprocessors.finalShape.numberOfElements.toInt())
+                val x = prepareX(xFiles, preprocessors)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -195,14 +194,9 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
 
         private fun prepareX(
             xFiles: Array<File>,
-            preprocessors: Preprocessing,
-            numOfPixels: Int
+            preprocessors: Preprocessing
         ): Array<FloatArray> {
-            val x = Array(xFiles.size) { FloatArray(numOfPixels) { 0.0f } }
-            for (i in xFiles.indices) {
-                x[i] = preprocessors.handleFile(xFiles[i]).first
-            }
-            return x
+            return Array(xFiles.size) { preprocessors.handleFile(xFiles[it]).first }
         }
 
 
@@ -217,8 +211,7 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             return try {
                 val loading = preprocessors.imagePreprocessingStage.load
                 val xFiles = loading.prepareFileNames()
-                val numOfPixels = preprocessors.finalShape.numberOfElements.toInt()
-                val x = prepareX(xFiles, preprocessors, numOfPixels)
+                val x = prepareX(xFiles, preprocessors)
                 val y = prepareY(xFiles, preprocessors)
 
                 OnHeapDataset(x, y)
