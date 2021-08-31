@@ -85,9 +85,9 @@ public class ZeroPadding3D : AbstractZeroPadding {
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        val dim1 = inputShape.size(1) + padding[0] + padding[1];
-        val dim2 = inputShape.size(2) + padding[2] + padding[3];
-        val dim3 = inputShape.size(3) + padding[4] + padding[5];
+        val dim1 = inputShape.size(1) + padding[0] + padding[1]
+        val dim2 = inputShape.size(2) + padding[2] + padding[3]
+        val dim3 = inputShape.size(3) + padding[4] + padding[5]
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
 

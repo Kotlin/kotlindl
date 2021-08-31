@@ -12,8 +12,8 @@ import org.tensorflow.op.Ops
 /**
  * Initializer that generates tensors with a uniform distribution.
  *
- * @property [maxVal] Lower bound of the range of random values to generate (inclusive).
- * @property [minVal] Upper bound of the range of random values to generate (exclusive).
+ * @property [minVal] Lower bound of the range of random values to generate (inclusive).
+ * @property [maxVal] Upper bound of the range of random values to generate (exclusive).
  * @property [seed] Used to create random seeds.
  * @constructor Creates a [RandomUniform] initializer.
  */

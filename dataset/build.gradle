@@ -11,6 +11,10 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+kotlin {
+    explicitApiWarning()
+}
+
 test {
     useJUnitPlatform()
 }

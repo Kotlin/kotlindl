@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -17,7 +16,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Permute
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
@@ -246,6 +244,7 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.Softmax -> ACTIVATION_SOFTMAX
         Activations.Linear -> ACTIVATION_LINEAR
         Activations.Tanh -> ACTIVATION_TANH
+        Activations.TanhShrink -> ACTIVATION_TANHSHRINK
         Activations.Relu6 -> ACTIVATION_RELU6
         Activations.Elu -> ACTIVATION_ELU
         Activations.Selu -> ACTIVATION_SELU
@@ -258,6 +257,8 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.Mish -> ACTIVATION_MISH
         Activations.HardShrink -> ACTIVATION_HARDSHRINK
         Activations.LiSHT -> ACTIVATION_LISHT
+        Activations.Snake -> ACTIVATION_SNAKE
+        Activations.Gelu -> ACTIVATION_GELU
     }
 }
 

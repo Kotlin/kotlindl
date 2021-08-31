@@ -249,13 +249,50 @@ public enum class Activations {
     HardShrink,
 
     /**
+     * Gelu Function
+     *
+     * Computes the Gaussian Error Linear Unit (GELU):
+     *
+     * gelu(x) = x * P(X <= x) where P(X) ~ N(0, 1)
+     *
+     * Calls [GeluActivation] under the hood.
+     * @property [approximate], boolean to toggle approximation
+     */
+    Gelu,
+
+    /**
      * Non-Parametric Linearly Scaled Hyperbolic Tangent (LiSHT) Activation Function.
      *
      * ```
      * LiSHT(x) = x * tanh(x)
      * ```
      */
-    LiSHT;
+    LiSHT,
+
+    /**
+     * Snake Activation Function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * snake(x) = x + (1 - cos(2 * frequency * x)) / (2 * frequency)
+     * ```
+     * See [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
+     * @property [frequency] A scalar, frequency of the periodic part
+     */
+
+    Snake,
+
+    /**
+     * TanhShrink Activation Function.
+     *
+     * This is a hyperbolic tangent (TanH) shrink activation type that implements the element wise function:
+     * ```
+     * TanhShrink(x) = x − tanh(x)
+     * ```
+     * Calls [TanhActivation] under the hood.
+     */
+
+    TanhShrink;
 
     public companion object {
         /**
@@ -266,6 +303,7 @@ public enum class Activations {
                 Sigmoid -> SigmoidActivation()
                 Linear -> LinearActivation()
                 Tanh -> TanhActivation()
+                TanhShrink -> TanhShrinkActivation()
                 Relu -> ReluActivation()
                 Relu6 -> Relu6Activation()
                 Elu -> EluActivation()
@@ -280,6 +318,8 @@ public enum class Activations {
                 Mish -> MishActivation()
                 HardShrink -> HardShrinkActivation()
                 LiSHT -> LishtActivation()
+                Snake -> SnakeActivation()
+                Gelu -> GeluActivation()
             }
         }
     }
@@ -320,6 +360,13 @@ public class Relu6Activation : Activation {
  */
 public class TanhActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
+}
+
+/**
+ * @see [Activations.TanhShrink]
+ */
+public class TanhShrinkActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sub(features, tf.math.tanh(features))
 }
 
 /**
@@ -435,4 +482,51 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
 public class LishtActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.tanh(features))
+}
+
+/**
+ * @see [Activations.Snake]
+ */
+public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        val doubleFreqConstant = tf.constant(2 * frequency)
+
+        return tf.math.add(features,
+            tf.math.div(tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(doubleFreqConstant, features))),
+                doubleFreqConstant))
+    }
+}
+
+/**
+ * @see [Activations.Gelu]
+ */
+public class GeluActivation(public val approximate: Boolean = false) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        if (approximate) {
+            val coeff = tf.constant(0.044715f)
+            return tf.math.mul(
+                tf.constant(0.5f), tf.math.mul(
+                    features, tf.math.add(
+                        tf.constant(1.0f), tf.math.tanh(
+                            tf.math.mul(
+                                tf.constant(0.7978845608028654f),       // This value is equal to sqrt(2/pi) to avoid a constant division
+                                tf.math.add(features, tf.math.mul(coeff, tf.math.pow(features, tf.constant(3f))))
+                            )
+                        )
+                    )
+                )
+            )
+        } else {
+            return tf.math.mul(
+                tf.constant(0.5f),
+                tf.math.mul(
+                    features,
+                    tf.math.add(
+                        tf.constant(1f),
+                        tf.math.erf(tf.math.div(features, tf.constant(1.4142135623730951f)))
+                    )
+                )
+            )
+        }
+    }
 }
