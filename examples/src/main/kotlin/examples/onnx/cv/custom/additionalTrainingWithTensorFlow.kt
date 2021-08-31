@@ -5,8 +5,6 @@
 
 package examples.onnx.cv.custom
 
-
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
@@ -24,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -49,7 +48,19 @@ private val topModel = Sequential.of(
     Dense(2, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
 )
 
-fun main() {
+/**
+ * This examples demonstrates the transfer learning concept on ResNet'50 model:
+ * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
+ * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
+ * - ONNX frozen model is used as a preprocessing stage via `onnx` stage of the Image Preprocessing DSL.
+ * - New Dense layers are added and initialized via defined initializers.
+ * - Model is re-trained on [dogsCatsDatasetPath] dataset.
+ *
+ *
+ * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
+ */
+fun resnet50additionalTraining() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
         modelType = ONNXModels.CV.ResNet_50_v1_no_top_custom
@@ -104,5 +115,8 @@ fun main() {
         }
     }
 }
+
+/** */
+fun main(): Unit = resnet50additionalTraining()
 
 

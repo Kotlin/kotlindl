@@ -5,10 +5,10 @@
 
 package examples.onnx.cv.resnet
 
+import examples.transferlearning.modelzoo.resnet.resnet18.resnet18prediction
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -26,7 +26,7 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in ResNet'18 during training on ImageNet dataset) is applied to images before prediction.
  */
-fun main() {
+fun resnet18prediction() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
         modelType = ONNXModels.CV.ResNet_18_v1
@@ -65,3 +65,5 @@ fun main() {
     }
 }
 
+/** */
+fun main(): Unit = resnet18prediction()

@@ -25,7 +25,7 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in ResNet'152v2 during training on ImageNet dataset) is applied to images before prediction.
  */
-fun main() {
+fun resnet152v2prediction() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
         modelType = ONNXModels.CV.ResNet_152_v2
@@ -61,3 +61,6 @@ fun main() {
         }
     }
 }
+
+/** */
+fun main(): Unit = resnet152v2prediction()

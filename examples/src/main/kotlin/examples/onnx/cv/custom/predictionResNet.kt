@@ -19,7 +19,13 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-fun main() {
+/**
+ * This examples demonstrates the inference concept on ResNet'50 (exported from Keras to ONNX) model:
+ * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ */
+fun resnet50CustomPrediction() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
         modelType = ONNXModels.CV.ResNet_50_v1_custom
@@ -53,4 +59,7 @@ fun main() {
         }
     }
 }
+
+/** */
+fun main(): Unit = resnet50CustomPrediction()
 

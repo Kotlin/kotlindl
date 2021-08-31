@@ -19,8 +19,13 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-
-fun main() {
+/**
+ * This examples demonstrates the inference concept on EfficientNet4Lite model:
+ * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing (used in EfficientNet4Lite during training on ImageNet dataset) is applied to images before prediction.
+ */
+fun efficientNet4LitePrediction() {
     val modelHub = ONNXModelHub(
         commonModelDirectory = File("cache/pretrainedModels"),
         modelType = ONNXModels.CV.EfficientNet_4_Lite
@@ -56,3 +61,6 @@ fun main() {
         }
     }
 }
+
+/** */
+fun main(): Unit = efficientNet4LitePrediction()
