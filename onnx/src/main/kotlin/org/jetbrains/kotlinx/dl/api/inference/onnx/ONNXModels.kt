@@ -207,3 +207,20 @@ internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): 
         channelsLast = false
     )
 }
+
+internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
+    val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+        data,
+        ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
+    )
+
+    // TODO: should be returned from the Transpose from apply method
+    val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+    return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+        transposedData,
+        transposedShape,
+        inputType = InputType.TF,
+        channelsLast = false
+    )
+}
