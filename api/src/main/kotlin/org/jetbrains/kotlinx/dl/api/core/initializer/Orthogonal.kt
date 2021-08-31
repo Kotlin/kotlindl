@@ -61,7 +61,7 @@ public class Orthogonal(
         val n:Operand<Float>? = null
         if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, n)
 
-        return tf.math.mul(tf.reshape(qop,shape), tf.dtypes.cast(tf.constant(this.gain), getDType()));
+        return tf.math.mul(tf.reshape(qop,shape), tf.dtypes.cast(tf.constant(this.gain), getDType()))
     }
 
     override fun toString(): String {
