@@ -27,7 +27,7 @@ import java.io.File
  * @see <a href="https://arxiv.org/abs/1512.02325">
  *     SSD: Single Shot MultiBox Detector.</a>
  */
-class SSDObjectDetectionModel : OnnxInferenceModel() {
+public class SSDObjectDetectionModel : OnnxInferenceModel() {
     /**
      * Returns the top N detected object for the given image file.
      *
