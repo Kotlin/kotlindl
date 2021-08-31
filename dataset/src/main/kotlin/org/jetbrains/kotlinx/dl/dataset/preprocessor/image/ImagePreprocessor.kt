@@ -21,13 +21,9 @@ public interface ImagePreprocessor {
     public fun getOutputShape(inputShape: ImageShape?): ImageShape? = inputShape
 
     /**
-     * Transforms [image] with [inputShape] to the new image with the new shape.
+     * Transforms provided input [image].
      *
-     * @return Pair <new image; new shape>.
+     * @return processed image.
      */
-    public fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape>
+    public fun apply(image: BufferedImage): BufferedImage
 }
-
-
-
-

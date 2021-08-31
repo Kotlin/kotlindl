@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.getShape
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 
@@ -39,8 +40,8 @@ public class Cropping(
         )
     }
 
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
-        val croppedImageShape = getOutputShape(inputShape)!!
+    override fun apply(image: BufferedImage): BufferedImage {
+        val croppedImageShape = getOutputShape(image.getShape())!!
 
         val img = image.getSubimage(
             left, top, croppedImageShape.width!!.toInt(), croppedImageShape.height!!.toInt(),
@@ -50,6 +51,6 @@ public class Cropping(
         val g: Graphics = croppedImage.createGraphics()
         g.drawImage(img, 0, 0, null)
 
-        return Pair(croppedImage, croppedImageShape)
+        return croppedImage
     }
 }

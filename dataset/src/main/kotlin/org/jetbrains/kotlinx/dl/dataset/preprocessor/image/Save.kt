@@ -24,7 +24,7 @@ public class Save(
     public var dirLocation: File? = null
 ) : ImagePreprocessor {
     @Throws(IOException::class)
-    internal fun imageToFile(filename: String, image: BufferedImage, shape: ImageShape): File {
+    internal fun imageToFile(filename: String, image: BufferedImage): File {
         val outputFile: File = if (dirLocation!!.isDirectory) {
             File("${dirLocation}\\${filename}")
         } else {
@@ -36,7 +36,7 @@ public class Save(
     }
 
 
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+    override fun apply(image: BufferedImage): BufferedImage {
         TODO("Not yet implemented")
     }
 }

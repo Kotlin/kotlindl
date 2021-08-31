@@ -39,9 +39,9 @@ public class Rotate(
         return ImageShape(inputShape.width, inputShape.height, 3)
     }
 
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
-        val width: Int = inputShape.width!!.toInt()
-        val height: Int = inputShape.height!!.toInt()
+    override fun apply(image: BufferedImage): BufferedImage {
+        val width: Int = image.width
+        val height: Int = image.height
         var centerByX = width / 2
         var centerByY = height / 2
 
@@ -106,6 +106,6 @@ public class Rotate(
         g2d.drawImage(image, -minX, -minY, null)
         g2d.dispose()
 
-        return Pair(rotatedImage, inputShape)
+        return rotatedImage
     }
 }

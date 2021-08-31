@@ -38,7 +38,7 @@ public class Resize(
         return ImageShape(outputWidth.toLong(), outputHeight.toLong(), 3)
     }
 
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+    override fun apply(image: BufferedImage): BufferedImage {
         val resizedImage = BufferedImage(outputWidth, outputHeight, BufferedImage.TYPE_3BYTE_BGR)
         val graphics2D = resizedImage.createGraphics()
 
@@ -64,6 +64,6 @@ public class Resize(
         graphics2D.drawImage(image, 0, 0, outputWidth, outputHeight, null)
         graphics2D.dispose()
 
-        return Pair(resizedImage, getOutputShape(inputShape))
+        return resizedImage
     }
 }

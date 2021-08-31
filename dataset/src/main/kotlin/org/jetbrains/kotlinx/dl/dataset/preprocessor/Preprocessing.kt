@@ -50,21 +50,19 @@ public class Preprocessing {
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
         var image = imagePreprocessingStage.load.fileToImage(file)
-        var shape = image.getShape()
 
         for (operation in imagePreprocessingStage.operations) {
             if (operation is Save) {
-                operation.imageToFile(file.name, image, shape)
+                operation.imageToFile(file.name, image)
                 continue
             }
-            val (newImage, newShape) = operation.apply(image, shape)
-            image = newImage
-            shape = newShape
+            image = operation.apply(image)
         }
 
         var tensor = OnHeapDataset.toRawVector(
             imageToByteArray(image, imagePreprocessingStage.load.colorMode)
         )
+        val shape = image.getShape()
 
         if (::tensorPreprocessingStage.isInitialized) {
             for (operation in tensorPreprocessingStage.operations) {
@@ -91,6 +89,6 @@ public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) 
     tensorPreprocessingStage = TensorPreprocessing().apply(block)
 }
 
-private fun BufferedImage.getShape(): ImageShape {
+internal fun BufferedImage.getShape(): ImageShape {
     return ImageShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
 }
