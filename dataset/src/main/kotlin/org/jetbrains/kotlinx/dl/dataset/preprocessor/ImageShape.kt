@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 /** Helper class to keep widely used shape of image object presented as a 4D tensor (batchSize = 1, [width], [height], [channels]). */
 
 // TODO: add the flag (channelsLast = true) + getter shape in format (1, HWC) or (1, CHW)
-public class ImageShape(
+public data class ImageShape(
     /** */
     public val width: Long? = null,
     /** */
