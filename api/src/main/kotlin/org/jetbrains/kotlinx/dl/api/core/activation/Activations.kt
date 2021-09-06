@@ -279,7 +279,6 @@ public enum class Activations {
      * See [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
      * @property [frequency] A scalar, frequency of the periodic part
      */
-
     Snake,
 
     /**
@@ -291,7 +290,6 @@ public enum class Activations {
      * ```
      * Calls [TanhActivation] under the hood.
      */
-
     TanhShrink;
 
     public companion object {
