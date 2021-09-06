@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.*
 
 /**
  * A Functional model is defined as a directed graph of layers.
@@ -102,33 +103,27 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             }
         }
 
-        private fun topologicalSort(layers: List<Layer>, inputLayer: Input): List<Layer> {
-            val visited = mutableMapOf<Layer, Boolean>()
-            layers.forEach { visited[it] = false }
+        private fun topologicalSort(inputLayer: Input): List<Layer> {
+            val visited = mutableSetOf<Layer>()
 
-            val grayStack: Stack<Layer> = mutableListOf()
+            val grayStack = Stack<Layer>()
 
-            recursiveTopologicalSort(inputLayer, grayStack, visited)
-
-            val sortedListOfLayers = mutableListOf<Layer>()
-            while (grayStack.isNotEmpty())
-                sortedListOfLayers.add(grayStack.pop()!!)
-
-            return sortedListOfLayers
-        }
-
-        // Recursive topological Sort
-        private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
-            val outboundLayers = node.outboundLayers
-            for (i in 0 until outboundLayers.size) {
-                val layer = outboundLayers[i]
-                if (!visited[layer]!!) {
-                    recursiveTopologicalSort(layer, stack, visited)
-                    visited[layer] = true
+            // Recursive topological Sort
+            fun recursiveTopologicalSort(node: Layer) {
+                for (layer in node.outboundLayers) {
+                    if (layer !in visited) {
+                        recursiveTopologicalSort(layer)
+                        visited.add(layer)
+                    }
                 }
+                grayStack.push(node)
             }
-            stack.push(node)
+
+            recursiveTopologicalSort(inputLayer)
+
+            return grayStack.reversed()
         }
+
 
         /**
          * Creates the [Functional] model.
@@ -141,7 +136,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             val inputLayer = findInputLayer(layerList)
 
             fillOutputLayers(layerList)
-            layerList = topologicalSort(layerList, inputLayer)
+            layerList = topologicalSort(inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
             val model = Functional(*layerList.toTypedArray())
