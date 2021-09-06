@@ -6,9 +6,11 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import java.io.File
 import java.io.IOException
+import java.lang.UnsupportedOperationException
 import java.nio.FloatBuffer
 import kotlin.math.truncate
 import kotlin.random.Random
@@ -231,15 +233,23 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
         ): FloatArray {
             val y: FloatArray
             if (preprocessors.imagePreprocessingStage.load.labelGenerator != null) {
-                val labelGenerator = preprocessors.imagePreprocessingStage.load.labelGenerator as FromFolders
-                val mapping = labelGenerator.mapping
+                when (val labelGenerator = preprocessors.imagePreprocessingStage.load.labelGenerator) {
+                    is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
+                        val mapping = labelGenerator.mapping
 
-                y = FloatArray(xFiles.size) { 0.0f }
-                for (i in xFiles.indices) {
-                    y[i] = (mapping[xFiles[i].parentFile.name]
-                        ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
+                        y = FloatArray(xFiles.size) { 0.0f }
+                        for (i in xFiles.indices) {
+                            y[i] = (mapping[xFiles[i].parentFile.name]
+                                ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
+                        }
+                    }
+                    is EmptyLabels -> {
+                        y = FloatArray(xFiles.size) { Float.NaN }
+                    }
+                    else -> {
+                        throw UnsupportedOperationException("Unknown label generator: ${labelGenerator.toString()}") // TODO: labelGenerator.apply(...) will be better solution here.
+                    }
                 }
-
             } else {
                 throw IllegalStateException("Label generator should be defined for Loading stage of image preprocessing.")
             }

@@ -10,11 +10,11 @@ import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
-import java.io.FileReader
 import java.net.URL
 import java.nio.file.Paths
-import java.util.*
 import javax.swing.JFrame
 
 /**
@@ -28,12 +28,6 @@ import javax.swing.JFrame
  * - image visualisation
  */
 fun main() {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
-
-    val cifarLabelsArchive = properties["cifarLabelsArchive"] as String
-
     val resource: URL = ImagePreprocessing::class.java.getResource("/datasets/vgg")
     val imageDirectory = Paths.get(resource.toURI()).toFile()
 
@@ -43,6 +37,7 @@ fun main() {
                 pathToData = imageDirectory
                 imageShape = ImageShape(224, 224, 3)
                 colorMode = ColorOrder.BGR
+                labelGenerator = EmptyLabels()
             }
             rotate {
                 degrees = 60f
@@ -66,13 +61,12 @@ fun main() {
         }
     }
 
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnFlyImageDataset.create(preprocessing, y)
+    val dataset = OnFlyImageDataset.create(preprocessing)
     val batchIter: Dataset.BatchIterator = dataset.batchIterator(
         8
     )
 
-    val rawImage = batchIter.next().x[1]
+    val rawImage = batchIter.next().x[2]
 
     val frame = JFrame("Filters")
     frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape))
