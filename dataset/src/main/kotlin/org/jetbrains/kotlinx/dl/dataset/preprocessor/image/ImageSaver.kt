@@ -2,19 +2,22 @@
  * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
-
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
 /**
- * This image preprocessor defines the Save operation.
- *
- * It saves the input image to the [dirLocation] in jpg format.
+ * Interface for saving image preprocessing output result.
+ */
+public interface ImageSaver {
+    public fun save(filename: String, image: BufferedImage)
+}
+
+/**
+ * This [ImageSaver] allows saving image preprocessing result to file or directory in jpg format.
  *
  * @property [dirLocation] Could be link to the file or directory.
  *
@@ -22,21 +25,20 @@ import javax.imageio.ImageIO
  */
 public class Save(
     public var dirLocation: File? = null
-) : ImagePreprocessor {
+) : ImageSaver {
     @Throws(IOException::class)
-    internal fun imageToFile(filename: String, image: BufferedImage): File {
+    override fun save(filename: String, image: BufferedImage) {
         val outputFile: File = if (dirLocation!!.isDirectory) {
-            File("${dirLocation}\\${filename}")
+            File("$dirLocation\\${filename}")
         } else {
             dirLocation!!
         }
         // TODO: file extension is a part of name, need to extract name without extension
         ImageIO.write(image, "jpg", outputFile)
-        return outputFile
     }
+}
 
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        TODO("Not yet implemented")
-    }
+/** */
+public fun ImagePreprocessorBase.save(block: Save.() -> Unit) {
+    save = Save().apply(block)
 }

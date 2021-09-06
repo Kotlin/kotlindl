@@ -32,7 +32,7 @@ public class Resize(
     public var interpolation: InterpolationType = InterpolationType.BILINEAR,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessor {
+) : ImagePreprocessorBase() {
 
     override fun getOutputShape(inputShape: ImageShape?): ImageShape {
         return ImageShape(outputWidth.toLong(), outputHeight.toLong(), 3)

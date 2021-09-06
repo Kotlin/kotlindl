@@ -32,7 +32,7 @@ public class Rotate(
     public var interpolation: InterpolationType = InterpolationType.BICUBIC,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessor {
+) : ImagePreprocessorBase() {
 
     override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
         if (inputShape == null) return null

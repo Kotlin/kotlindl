@@ -45,9 +45,9 @@ fun main() {
                 outputWidth = 400
                 outputHeight = 400
                 interpolation = InterpolationType.NEAREST
-            }
-            save {
-                dirLocation = preprocessedImagesDirectory
+                save {
+                    dirLocation = preprocessedImagesDirectory
+                }
             }
         }
         transformTensor {

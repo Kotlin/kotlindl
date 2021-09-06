@@ -8,8 +8,8 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.Companion.imageToByteArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Save
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -59,11 +59,8 @@ public class Preprocessing {
 
         if (::imagePreprocessingStage.isInitialized) {
             for (operation in imagePreprocessingStage.operations) {
-                if (operation is Save) {
-                    operation.imageToFile(file.name, image)
-                    continue
-                }
                 image = operation.apply(image)
+                (operation as? ImagePreprocessorBase)?.save?.save(file.name, image)
             }
         }
 

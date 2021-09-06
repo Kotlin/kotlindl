@@ -29,7 +29,7 @@ public class Cropping(
     public var bottom: Int = 1,
     public var left: Int = 1,
     public var right: Int = 1
-) : ImagePreprocessor {
+) : ImagePreprocessorBase() {
 
     override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
         if (inputShape == null) return null

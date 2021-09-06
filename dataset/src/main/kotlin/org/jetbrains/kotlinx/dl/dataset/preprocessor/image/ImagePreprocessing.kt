@@ -12,7 +12,6 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
  * - [crop] See [Cropping] image preprocessor.
  * - [resize] See [Resize] image preprocessor.
  * - [rotate] See [Rotate] image preprocessor.
- * - [save] See [Save] image preprocessor.
  *
  * It's a part of the [org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing] pipeline DSL.
  */
@@ -38,9 +37,4 @@ public fun ImagePreprocessing.crop(block: Cropping.() -> Unit) {
 /** */
 public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
     addOperation(Resize().apply(block))
-}
-
-/** */
-public fun ImagePreprocessing.save(block: Save.() -> Unit) {
-    addOperation(Save().apply(block))
 }
