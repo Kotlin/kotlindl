@@ -103,7 +103,7 @@ private fun Operand<Float>.to2DArray(): Array<FloatArray> = asOutput().tensor().
 private fun Tensor<Float>.to2DArray(): Array<FloatArray> {
     require(numDimensions() == 2)
     val shape = shape()
-    val array: Array<FloatArray> = Array(shape[0].toInt()) {FloatArray(shape[1].toInt())}
+    val array: Array<FloatArray> = Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
     copyTo(array)
     return array
 }

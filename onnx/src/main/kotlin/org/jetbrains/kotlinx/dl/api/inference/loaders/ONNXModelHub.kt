@@ -65,7 +65,7 @@ public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
             Files.createDirectories(parentDirectory.toPath())
         }
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-            val inputStream = URL(aws_s3_url + modelFile).openStream()
+            val inputStream = URL(awsS3Url + modelFile).openStream()
             logger.debug { "Model loading is started!" }
             Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
             logger.debug { "Model loading is finished!" }

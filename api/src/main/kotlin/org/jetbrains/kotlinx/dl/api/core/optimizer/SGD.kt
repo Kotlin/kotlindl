@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Stochastic gradient descent optimizer.
  *
- * NOTE: It's not an equivalent for keras.sgd, it's pure SGD with simple 'variable' update by subtracting 'alpha' * 'delta' from it.
+ * NOTE: It's not an equivalent for `keras.sgd`, it is a pure SGD with simple 'variable' update by subtracting 'alpha' * 'delta' from it.
  */
 public class SGD(
     clipGradient: ClipGradientAction = NoClipGradient()

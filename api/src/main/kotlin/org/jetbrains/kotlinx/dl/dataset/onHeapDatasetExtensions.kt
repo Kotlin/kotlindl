@@ -9,10 +9,19 @@ import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import kotlin.math.roundToInt
 
 
+/**
+ * Creates [OnHeapDataset] string representation for part of data.
+ */
 public fun OnHeapDataset.toString(): String = buildStringRepr(x.partialToString(), y.partialToString())
 
+/**
+ * Creates [OnHeapDataset] string representation for full of data.
+ */
 public fun OnHeapDataset.fullToString(): String = buildStringRepr(x.contentDeepToString(), y.contentToString())
 
+/**
+ * Builds intermediate [OnHeapDataset] string representation.
+ */
 public fun OnHeapDataset.buildStringRepr(xString: String, yString: String): String =
     "OnHeapDataset(\nx ${x.shape} =\n${xString},\ny [${y.size}] =\n${yString}\n)"
 

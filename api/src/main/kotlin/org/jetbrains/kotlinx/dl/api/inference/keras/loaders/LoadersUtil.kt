@@ -37,9 +37,9 @@ public fun torchStylePreprocessing(
 ): FloatArray {
     require(imageShape.size == 3) { "Image shape should contain only 3 values, but contains ${imageShape.size} with values: ${imageShape.contentToString()}" }
 
-    var height: Int
-    var width: Int
-    var channels: Int
+    val height: Int
+    val width: Int
+    val channels: Int
 
     val mean = floatArrayOf(0.485f, 0.456f, 0.406f)
     val std = floatArrayOf(0.229f, 0.224f, 0.225f)
@@ -88,9 +88,9 @@ public fun caffeStylePreprocessing(
 ): FloatArray {
     require(imageShape.size == 3) { "Image shape should contain only 3 values, but contains ${imageShape.size} with values: ${imageShape.contentToString()}" }
 
-    var height: Int
-    var width: Int
-    var channels: Int
+    val height: Int
+    val width: Int
+    val channels: Int
 
     val mean = floatArrayOf(103.939f, 116.779f, 123.68f)
 

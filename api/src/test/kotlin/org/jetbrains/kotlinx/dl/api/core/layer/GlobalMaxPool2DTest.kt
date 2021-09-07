@@ -41,7 +41,7 @@ internal class GlobalMaxPool2DTest : LayerTest() {
     private val inputShape = input.shape.toLongArray()
 
     @Test
-    fun default(){
+    fun default() {
         val layer = GlobalMaxPool2D()
         val expected = arrayOf(
             floatArrayOf(4.0f, 2.5f, 5.0f, 6.0f),

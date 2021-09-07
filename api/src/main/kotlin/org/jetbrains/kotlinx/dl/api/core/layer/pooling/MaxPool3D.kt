@@ -49,11 +49,10 @@ public class MaxPool3D(
     ): Operand<Float> {
         // TODO add dataFormat support
         val paddingName = padding.paddingName
-        var tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()
-        var tfStrides = Arrays.stream(strides).asLongStream().toArray()
-        var tfInput: Operand<Float> = input
-        var output = tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
-        return output
+        val tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()
+        val tfStrides = Arrays.stream(strides).asLongStream().toArray()
+        val tfInput: Operand<Float> = input
+        return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }
 
     override var weights: Map<String, Array<*>>

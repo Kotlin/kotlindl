@@ -10,12 +10,12 @@ import org.tensorflow.op.Ops
 private const val EPS = 1e-7f
 private const val FAN_IN = 10
 private const val FAN_OUT = 20
-private val gain: Float =  1.0f
-private val seed: Long = 12L
+private const val GAIN: Float = 1.0f
+private const val SEED: Long = 12L
 
-internal class OrthogonalTest{
+internal class OrthogonalTest {
     @Test
-    fun initialize(){
+    fun initialize() {
         val actual = Array(2) { FloatArray(2) { 0f } }
         val expected = Array(2) { FloatArray(2) { 0f } }
         expected[0][0] = 0.96555376f
@@ -28,7 +28,13 @@ internal class OrthogonalTest{
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Orthogonal(gain = 1.0f, seed = 12L)
-            val operand = instance.initialize(fanIn = FAN_IN,fanOut = FAN_OUT,tf=tf,shape =  shapeOperand(tf, shape), name="default_name")
+            val operand = instance.initialize(
+                fanIn = FAN_IN,
+                fanOut = FAN_OUT,
+                tf = tf,
+                shape = shapeOperand(tf, shape),
+                name = "default_name"
+            )
             operand.asOutput().tensor().copyTo(actual)
 
             Assertions.assertArrayEquals(
@@ -44,7 +50,7 @@ internal class OrthogonalTest{
             )
 
             Assertions.assertEquals(
-                "Orthogonal(gain=$gain, seed=$seed)",
+                "Orthogonal(gain=$GAIN, seed=$SEED)",
                 instance.toString()
             )
         }

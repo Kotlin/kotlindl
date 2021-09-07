@@ -141,7 +141,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      *
-     * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
+     * @return A [TrainingHistory] object. Its [TrainingHistory.batchHistory] attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     public abstract fun fit(
         dataset: Dataset,
@@ -198,7 +198,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
-     * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
+     * @return Array of labels. All labels are vectors that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
      */
     public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
 

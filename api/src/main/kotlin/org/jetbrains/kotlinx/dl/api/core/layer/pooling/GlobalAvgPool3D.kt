@@ -14,16 +14,19 @@ import org.tensorflow.op.Ops
 
 /**
  * Global Average pooling operation for 3D data.
+ *
  * NOTE: Works with tensors which must have rank 5 (batch_size, spatial_dim1, spatial_dim2, spatial_dim3, channels).
+ *
  * Input shape: 5D tensor with shape `(batch_size, spatial_dim1, spatial_dim2, spatial_dim3, channels)`.
  * Output shape: 2D tensor with shape `(batch_size, channels)`.
+ *
  * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool3D] object.
  */
 public class GlobalAvgPool3D(
     name: String = ""
-):Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) { }
+) : Layer(name) {
+    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // TODO add dataFormat support

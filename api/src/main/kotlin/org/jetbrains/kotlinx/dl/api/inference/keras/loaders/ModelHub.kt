@@ -5,22 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
-import io.jhdf.HdfFile
 import mu.KLogger
 import mu.KotlinLogging
-import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import java.io.File
-import java.net.URL
 import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 
 private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
@@ -36,7 +26,8 @@ internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
  * @since 0.2
  */
 public abstract class ModelHub(public val commonModelDirectory: File, public val modelType: ModelType) {
-    protected val aws_s3_url: String = AWS_S3_URL
+    /** */
+    protected val awsS3Url: String = AWS_S3_URL
     private val modelDirectory = "/" + modelType.modelRelativePath
 
     /** Logger for modelZoo model. */
@@ -52,7 +43,7 @@ public abstract class ModelHub(public val commonModelDirectory: File, public val
      * Loads model configuration without weights.
      *
      * @param [loadingMode] Strategy of existing model use-case handling.
-     * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
+     * @return Raw model without weights. Needs in compilation and weights loading before usage.
      */
     public abstract fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): InferenceModel
 
@@ -73,11 +64,14 @@ public abstract class ModelHub(public val commonModelDirectory: File, public val
      */
     public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
         val (data, shape) = preprocessing()
-        return preprocessInput(data, longArrayOf(shape.width!!, shape.height!!, shape.channels), modelType) // TODO: need to be 4 or 3 in all cases
+        return modelType.preprocessInput(
+            data,
+            longArrayOf(shape.width!!, shape.height!!, shape.channels)
+        ) // TODO: need to be 4 or 3 in all cases
     }
 }
 
-
+/** Wraps the [ModelType.preprocessInput] functionality. */
 public fun preprocessInput(data: FloatArray, tensorShape: LongArray, modelType: ModelType): FloatArray {
     return modelType.preprocessInput(data, tensorShape)
 }

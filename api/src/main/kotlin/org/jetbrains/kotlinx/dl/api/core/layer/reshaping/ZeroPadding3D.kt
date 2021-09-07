@@ -11,7 +11,7 @@ import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 3D input (e.g. video).
- * This layer can add zeros in the rows, cols and depth of an video tensor.
+ * This layer can add zeros in the rows, cols and depth of a video tensor.
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
  */
 public class ZeroPadding3D : AbstractZeroPadding {
@@ -47,7 +47,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding3D layer
-     * @param [padding] list of pair of padding values [padding[0]] represents the first pair(applied to vertical),
+     * @param [padding] list of a pair of padding values [padding[0]] represents the first pair(applied to vertical),
      * [padding[1]] is horizontal padding, [padding[2]] is the depth padding.
      * @param [name] layer name
      */
@@ -70,8 +70,8 @@ public class ZeroPadding3D : AbstractZeroPadding {
      * padding[0] -> top padding,
      * padding[1] -> bottom padding,
      * padding[2] -> left padding,
-     * padding[3] -> right padding
-     * padding[4] -> front padding
+     * padding[3] -> right padding,
+     * padding[4] -> front padding,
      * padding[5] -> back padding
      * @param [name] layer name
      */

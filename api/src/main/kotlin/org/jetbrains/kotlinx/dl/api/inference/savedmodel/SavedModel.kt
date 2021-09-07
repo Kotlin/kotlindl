@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -73,8 +72,6 @@ public open class SavedModel : TensorFlowInferenceModel() {
                 .copyTo(LongArray(1))[0].toInt()
         }
     }
-
-
 
     /**
      * Predicts labels for all observation in [dataset].

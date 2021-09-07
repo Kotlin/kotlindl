@@ -32,7 +32,7 @@ private const val BIAS_VARIABLE_NAME = "dense_bias"
  * `outputs = activation(inputs * kernel + bias)`
  *
  * where `activation` is the element-wise activation function
- * passed as the `activation` argument, `kernel` is a weights matrix
+ * passed as the `activation` argument, `kernel` is a weights' matrix
  * created by the layer, and `bias` is a bias vector created by the layer
  * (only applicable if `use_bias` is `True`).
  *
