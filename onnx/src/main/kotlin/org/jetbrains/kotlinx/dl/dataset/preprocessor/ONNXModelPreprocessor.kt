@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.api.core.shape.reshape4DTo1D
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 
 /**

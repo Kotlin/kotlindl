@@ -18,8 +18,8 @@ import kotlin.math.min
 
 
 class Conv2dJPanel(
-    val dst: Array<Array<Array<FloatArray>>>,
-    val colorCoefficient: Double = 2.0
+    private val dst: Array<Array<Array<FloatArray>>>,
+    private val colorCoefficient: Double = 2.0
 ) : JPanel() {
     override fun paint(g: Graphics) {
 
@@ -55,7 +55,7 @@ class Conv2dJPanel(
     }
 }
 
-class Conv2dJPanel1(val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
+class Conv2dJPanel1(private val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
     override fun paint(g: Graphics) {
 
         for (k in 0 until 32) {
@@ -217,8 +217,8 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
     val frame = JFrame("Filters")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(DetectedObjectJPanel(dst, imageShape, detectedObjects))
-    frame.pack();
-    frame.setLocationRelativeTo(null);
+    frame.pack()
+    frame.setLocationRelativeTo(null)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
@@ -228,15 +228,15 @@ fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
-    frame.pack();
-    frame.setLocationRelativeTo(null);
+    frame.pack()
+    frame.setLocationRelativeTo(null)
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
 }
 
 
-class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, val landmarks: List<Array<*>>) : JPanel() {
+class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) : JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {
@@ -277,7 +277,7 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, val lan
 class DetectedObjectJPanel(
     val image: FloatArray,
     val imageShape: ImageShape,
-    val detectedObjects: List<DetectedObject>
+    private val detectedObjects: List<DetectedObject>
 ) : JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
@@ -302,9 +302,9 @@ class DetectedObjectJPanel(
             // x = rowIndex
             val yRect = bottom
             val xRect = left
-            graphics.setColor(Color.ORANGE)
-            graphics.font = Font("Courier New", 1, 17);
-            graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8);
+            graphics.color = Color.ORANGE
+            graphics.font = Font("Courier New", 1, 17)
+            graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8)
 
             graphics as Graphics2D
             val stroke1: Stroke = BasicStroke(6f)

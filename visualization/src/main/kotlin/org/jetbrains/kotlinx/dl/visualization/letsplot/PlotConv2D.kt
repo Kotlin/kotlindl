@@ -23,18 +23,18 @@ internal val ACTIVATION_LAYERS_PERMUTATION = intArrayOf(2, 1, 0, 3)
  * @return a figure representing the weights plots
  */
 fun filtersPlot(
-        conv2DLayer: Conv2D,
-        plotFeature: PlotFeature = PlotFeature.GRAY,
-        imageSize: Int = 64,
-        columns: Int = 8
+    conv2DLayer: Conv2D,
+    plotFeature: PlotFeature = PlotFeature.GRAY,
+    imageSize: Int = 64,
+    columns: Int = 8
 ): Figure {
     @Suppress("UNCHECKED_CAST")
     val weights = conv2DLayer.weights.values.toTypedArray()[0] as TensorImageData
 
-    val XYInOut = extractXYInputOutputAxeSizes(weights, FILTER_LAYERS_PERMUTATION)
+    val xyInOut = extractXYInputOutputAxeSizes(weights, FILTER_LAYERS_PERMUTATION)
 
-    val plots = cartesianProductIndices(XYInOut[2], XYInOut[3]).map { (i, o) ->
-        xyPlot(XYInOut[0], XYInOut[1], plotFeature) { x, y ->
+    val plots = cartesianProductIndices(xyInOut[2], xyInOut[3]).map { (i, o) ->
+        xyPlot(xyInOut[0], xyInOut[1], plotFeature) { x, y ->
             weights[y][x][i][o]
         }
     }
@@ -55,21 +55,22 @@ fun filtersPlot(
  * @return list of figures representing the activations plots for model evaluation
  */
 fun modelActivationOnLayersPlot(
-        model: TrainableModel,
-        x: FloatArray,
-        plotFeature: PlotFeature = PlotFeature.GRAY,
-        imageSize: Int = 64,
-        columns: Int = 8,
+    model: TrainableModel,
+    x: FloatArray,
+    plotFeature: PlotFeature = PlotFeature.GRAY,
+    imageSize: Int = 64,
+    columns: Int = 8,
 ): List<Figure> {
     val activations = model.predictAndGetActivations(x).second
+
     @Suppress("UNCHECKED_CAST")
     val activationArrays = activations.mapNotNull { it as? TensorImageData }
 
     return activationArrays.map { weights ->
-        val XYInOut = extractXYInputOutputAxeSizes(weights, ACTIVATION_LAYERS_PERMUTATION)
+        val xyInOut = extractXYInputOutputAxeSizes(weights, ACTIVATION_LAYERS_PERMUTATION)
 
-        val plots = cartesianProductIndices(XYInOut[2], XYInOut[3]).map { (i, o) ->
-            xyPlot(XYInOut[0], XYInOut[1], plotFeature) { x, y ->
+        val plots = cartesianProductIndices(xyInOut[2], xyInOut[3]).map { (i, o) ->
+            xyPlot(xyInOut[0], xyInOut[1], plotFeature) { x, y ->
                 weights[i][y][x][o]
             }
         }
