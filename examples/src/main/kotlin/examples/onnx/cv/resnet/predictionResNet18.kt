@@ -5,7 +5,7 @@
 
 package examples.onnx.cv.resnet
 
-import examples.transferlearning.modelzoo.resnet.resnet18.resnet18prediction
+import examples.transferlearning.modelzoo.resnet.resnet18prediction
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels

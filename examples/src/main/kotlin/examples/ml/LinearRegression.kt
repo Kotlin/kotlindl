@@ -52,7 +52,7 @@ fun linearRegression() {
         data[i][2] = 2 * (rnd.nextDouble() - 0.5)
         data[i][3] = 2 * (rnd.nextDouble() - 0.5)
         data[i][4] = 2 * (rnd.nextDouble() - 0.5)
-        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4]  + rnd.nextDouble(0.1)
+        data[i][0] = data[i][1] - 2 * data[i][2] + 1.5 * data[i][3] - 0.95 * data[i][4] + rnd.nextDouble(0.1)
         // 1 * x1 - 2 * x2 + 1.5 * x3  - 0.95 * x4 +- 0.1
     }
 

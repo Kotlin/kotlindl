@@ -105,14 +105,6 @@ class TensorFlowInferenceModelTest {
         )
     )
 
-    private fun mnistReshape(image: FloatArray): Array<Array<Array<FloatArray>>> {
-        val reshaped = Array(
-            1
-        ) { Array(28) { Array(28) { FloatArray(1) } } }
-        for (i in image.indices) reshaped[0][i / 28][i % 28][0] = image[i]
-        return reshaped
-    }
-
     @Test
     fun basicInference(@TempDir tempDir: Path?) {
         assertTrue(tempDir!!.toFile().isDirectory)
@@ -187,7 +179,7 @@ class TensorFlowInferenceModelTest {
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
             if (accuracy != null) {
-                assertTrue(accuracy > 0.5)
+                assertTrue(accuracy > 0.4)
             }
 
             it.save(

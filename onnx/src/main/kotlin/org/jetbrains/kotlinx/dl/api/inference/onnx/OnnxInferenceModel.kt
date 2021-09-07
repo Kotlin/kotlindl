@@ -107,6 +107,12 @@ public open class OnnxInferenceModel : InferenceModel() {
         return predictSoftly(inputData)
     }
 
+    /**
+     * Predicts vector of probabilities instead of specific class in [predict] method.
+     *
+     * @param [inputData] The single example with unknown vector of probabilities.
+     * @return Vector that represents the probability distributions of a list of potential outcomes
+     */
     public fun predictSoftly(inputData: FloatArray): FloatArray {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 

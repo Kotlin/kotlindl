@@ -97,18 +97,18 @@ public class TensorShape() {
     /**
      * Test whether dimension i in this shape is known
      *
-     * @param i Target dimension to test
-     * @return Whether dimension i is unknown (equal to -1)
+     * @param [i] Target dimension to test
+     * @return Whether dimension [i] is unknown (equal to -1)
      */
     private fun isKnown(i: Int): Boolean {
         return dims[i] != -1L
     }
 
     /**
-     * Throw an exception if dimension i is unknown.
+     * Throw an exception if dimension [i] is unknown.
      *
-     * @param i Target dimension to test
-     * @throws IllegalStateException if dimension i is unknown
+     * @param [i] Target dimension to test
+     * @throws IllegalStateException if dimension [i] is unknown
      */
     public fun assertKnown(i: Int) {
         check(isKnown(i)) { "Dimension $i in shape needs to be known." }

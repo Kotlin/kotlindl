@@ -195,7 +195,8 @@ public abstract class AbstractConv(
         if (useBiasInternal) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
 
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
-        if (useBiasInternal) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
+        if (useBiasInternal) bias =
+            addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
     }
 }
 

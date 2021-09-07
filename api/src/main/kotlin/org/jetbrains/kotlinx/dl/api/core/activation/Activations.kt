@@ -80,7 +80,7 @@ public enum class Activations {
      * The exponential linear unit (ELU) with `alpha > 0` is:
      * `x` if `x > 0` and `alpha * (exp(x) - 1)` if `x < 0`
      *
-     * For this implementations alpha is equal to 1.0.
+     * For this implementation alpha is equal to 1.0.
      *
      * The ELU hyperparameter `alpha` controls the value to which an
      * ELU saturates for negative net inputs. ELUs diminish the
@@ -98,7 +98,7 @@ public enum class Activations {
      * Calls [EluActivation] under the hood.
      *
      * @see <a href="https://arxiv.org/abs/1511.07289">Fast and Accurate Deep Network Learning by Exponential Linear Units
-     * (ELUs) (Clevert et al, 2016)</a>
+     * (ELUs) (Clevert et al., 2016)</a>
      */
     Elu,
 
@@ -243,8 +243,6 @@ public enum class Activations {
      *                 0 otherwise
      *
      * Calls [HardShrinkActivation] under the hood.
-     * @property [lower] lower bound for setting values to zeros
-     * @property [upper] upper bound for setting values to zeros
      */
     HardShrink,
 
@@ -256,7 +254,6 @@ public enum class Activations {
      * gelu(x) = x * P(X <= x) where P(X) ~ N(0, 1)
      *
      * Calls [GeluActivation] under the hood.
-     * @property [approximate], boolean to toggle approximation
      */
     Gelu,
 
@@ -276,8 +273,7 @@ public enum class Activations {
      * ```
      * snake(x) = x + (1 - cos(2 * frequency * x)) / (2 * frequency)
      * ```
-     * See [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
-     * @property [frequency] A scalar, frequency of the periodic part
+     * @see [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
      */
     Snake,
 
@@ -364,7 +360,8 @@ public class TanhActivation : Activation {
  * @see [Activations.TanhShrink]
  */
 public class TanhShrinkActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sub(features, tf.math.tanh(features))
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.sub(features, tf.math.tanh(features))
 }
 
 /**
@@ -457,6 +454,9 @@ public class MishActivation : Activation {
 }
 
 /**
+ * @property [lower] lower bound for setting values to zeros
+ * @property [upper] upper bound for setting values to zeros
+ *
  * @see [Activations.HardShrink]
  */
 public class HardShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
@@ -483,32 +483,39 @@ public class LishtActivation : Activation {
 }
 
 /**
+ * @property [frequency] A scalar, frequency of the periodic part.
  * @see [Activations.Snake]
  */
 public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         val doubleFreqConstant = tf.constant(2 * frequency)
 
-        return tf.math.add(features,
-            tf.math.div(tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(doubleFreqConstant, features))),
-                doubleFreqConstant))
+        return tf.math.add(
+            features,
+            tf.math.div(
+                tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(doubleFreqConstant, features))),
+                doubleFreqConstant
+            )
+        )
     }
 }
 
 /**
+ * @property [approximate] The boolean flag to toggle approximation.
+ *
  * @see [Activations.Gelu]
  */
 public class GeluActivation(public val approximate: Boolean = false) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
         if (approximate) {
-            val coeff = tf.constant(0.044715f)
+            val coefficient = tf.constant(0.044715f)
             return tf.math.mul(
                 tf.constant(0.5f), tf.math.mul(
                     features, tf.math.add(
                         tf.constant(1.0f), tf.math.tanh(
                             tf.math.mul(
                                 tf.constant(0.7978845608028654f),       // This value is equal to sqrt(2/pi) to avoid a constant division
-                                tf.math.add(features, tf.math.mul(coeff, tf.math.pow(features, tf.constant(3f))))
+                                tf.math.add(features, tf.math.mul(coefficient, tf.math.pow(features, tf.constant(3f))))
                             )
                         )
                     )

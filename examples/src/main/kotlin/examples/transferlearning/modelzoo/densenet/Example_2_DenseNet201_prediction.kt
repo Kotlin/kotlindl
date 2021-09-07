@@ -67,7 +67,7 @@ fun denseNet201Prediction() {
                 "/conv1/bn/conv1/bn/moving_variance:0"
             )
         )
-        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_NEW_FORMAT)
+        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH)
 
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {

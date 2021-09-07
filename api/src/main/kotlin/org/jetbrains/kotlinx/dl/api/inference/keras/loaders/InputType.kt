@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 /**
  * Different Neural Networks were trained on ImageNet dataset with different image preprocessing.
- * The main types of preprocessing widely used in keras.applications are presented in this enumeration.
+ * The main types of preprocessing widely used in `keras.applications` are presented in this enumeration.
  */
 public enum class InputType {
     /**

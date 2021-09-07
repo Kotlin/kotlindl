@@ -13,8 +13,8 @@ import org.tensorflow.op.Ops
  * Abstract Zero Padding layer used as the base layer for all the ZeroPadding layers.
  */
 public abstract class AbstractZeroPadding(
-    name:String
-): Layer(name) {
+    name: String
+) : Layer(name) {
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)

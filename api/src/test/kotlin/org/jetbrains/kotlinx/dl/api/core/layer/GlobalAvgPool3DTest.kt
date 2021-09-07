@@ -42,10 +42,10 @@ internal class GlobalAvgPool3DTest : LayerTest() {
     private val inputShape = input.shape.toLongArray()
 
     @Test
-    fun default(){
+    fun default() {
         val layer = GlobalAvgPool3D()
         val expected = arrayOf(
-            floatArrayOf(27.5f/16, 16.5f/16, 29.5f/16),
+            floatArrayOf(27.5f / 16, 16.5f / 16, 29.5f / 16),
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[4])

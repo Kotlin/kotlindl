@@ -220,7 +220,7 @@ private fun convertToLayer(
 private fun convertToRegularizer(regularizer: KerasRegularizer?): Regularizer? {
     return if (regularizer != null) {
         val l1 = regularizer.config!!.l1
-        val l2 = regularizer.config!!.l2
+        val l2 = regularizer.config.l2
         if (l1 != 0.0 && l2 != 0.0) {
             L2L1(l1!!.toFloat(), l2!!.toFloat())
         } else if (l1 == 0.0 && l2 != 0.0) {

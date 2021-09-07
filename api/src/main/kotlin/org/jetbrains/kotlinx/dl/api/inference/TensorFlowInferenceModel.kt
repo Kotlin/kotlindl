@@ -117,7 +117,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
-        val fetchTensorName = if (predictionTensorName.isEmpty()) OUTPUT_NAME else predictionTensorName
+        val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
 
         require(kGraph.tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
 
@@ -224,12 +224,14 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         return model
     }
 
+    /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
     protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
         return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
             .map { it.ref().op().name() } // extract names
             .any { variableName.contains(it) }
     }
 
+    /** Returns two lists : variables and tensors (containing the variables' data) with the same order and size. */
     protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
         val modelWeightsExtractorRunner = session.runner()
 
@@ -352,7 +354,12 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [data] Variable data.
      */
     // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
-    internal fun assignVariable(variableName: String, data: Array<*>, kGraph: KGraph = this.kGraph, session: Session = this.session) {
+    internal fun assignVariable(
+        variableName: String,
+        data: Array<*>,
+        kGraph: KGraph = this.kGraph,
+        session: Session = this.session
+    ) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
 

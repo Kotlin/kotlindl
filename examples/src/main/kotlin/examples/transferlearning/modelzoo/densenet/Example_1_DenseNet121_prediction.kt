@@ -31,7 +31,7 @@ import java.io.File
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in DenseNet121 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in DenseNet121 during training on ImageNet dataset) is applied to the images before prediction.
  *
  * NOTE: Input resolution is 224*224
  */
@@ -67,7 +67,7 @@ fun denseNet121Prediction() {
                 "/conv1/bn/conv1/bn/moving_variance:0"
             )
         )
-        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_NEW_FORMAT)
+        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH)
 
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {

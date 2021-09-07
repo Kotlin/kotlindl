@@ -52,8 +52,8 @@ fun main() {
             val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val yhat = it.predictRaw(inputData)
-            val smallGrid = (yhat as List<Array<*>>)[2][0] as Array<Array<Array<FloatArray>>>
-            for (i in 0..12){
+            val smallGrid = yhat[2][0] as Array<Array<Array<FloatArray>>>
+            for (i in 0..12) {
                 for (j in 0..12) {
                     for (k in 0..2) {
                         val row = smallGrid[i][j][k]
@@ -64,8 +64,8 @@ fun main() {
                 }
 
             }
-        // TODO: interpret the results of YOLOv4 https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/yolov4
-        /*val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
+            // TODO: interpret the results of YOLOv4 https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/yolov4
+            /*val top5 = predictTop5Labels(it, inputData, imageNetClassLabels)
 
 
             // TODO:
@@ -77,8 +77,8 @@ fun main() {
             // 7) write a tutorial for YOLOv4 + add info about transfer learning https://www.reddit.com/r/computervision/comments/mc6m87/how_do_you_add_a_class_to_coco_classes_in_yolo/
             // 8) interpritation of yhat is here https://machinelearningmastery.com/how-to-perform-object-detection-with-yolov3-in-keras/
             println(top5.toString())*/
+        }
     }
-}
 }
 
 

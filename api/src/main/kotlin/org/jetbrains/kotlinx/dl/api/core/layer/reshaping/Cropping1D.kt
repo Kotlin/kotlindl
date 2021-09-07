@@ -10,7 +10,7 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
- * Cropping layer for 1D data (e.g. audio, timeseries)
+ * Cropping layer for 1D data (e.g. audio, time-series)
  *
  * Crops input along the second dimension (i.e. temporal dimension).
  *

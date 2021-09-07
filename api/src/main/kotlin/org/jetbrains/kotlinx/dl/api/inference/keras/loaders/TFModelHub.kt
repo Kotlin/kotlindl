@@ -33,7 +33,7 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  *
  * @since 0.2
  */
-public class TFModelHub(commonModelDirectory: File, modelType: ModelType): ModelHub(commonModelDirectory, modelType) {
+public class TFModelHub(commonModelDirectory: File, modelType: ModelType) : ModelHub(commonModelDirectory, modelType) {
     private val modelDirectory = "/" + modelType.modelRelativePath
     private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
     private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME

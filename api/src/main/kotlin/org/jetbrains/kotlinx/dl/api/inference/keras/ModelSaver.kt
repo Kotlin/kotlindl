@@ -148,7 +148,7 @@ private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegulariz
     }
 }
 
-private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer? {
+private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer {
     val className: String
     val config: KerasInitializerConfig
     if (isKerasFullyCompatible) {
@@ -237,7 +237,7 @@ private fun convertToKerasPadding(padding: ConvPadding): KerasPadding {
     }
 }
 
-private fun convertToKerasActivation(activation: Activations): String? {
+private fun convertToKerasActivation(activation: Activations): String {
     return when (activation) {
         Activations.Relu -> ACTIVATION_RELU
         Activations.Sigmoid -> ACTIVATION_SIGMOID
@@ -502,7 +502,7 @@ private fun createKerasDenseLayer(layer: Dense, isKerasFullyCompatible: Boolean)
     return KerasLayer(class_name = LAYER_DENSE, config = configX)
 }
 
-private fun createKerasPermuteLayer(layer: Permute):KerasLayer{
+private fun createKerasPermuteLayer(layer: Permute): KerasLayer {
     val configX = LayerConfig(
         dims = layer.dims,
         name = layer.name,

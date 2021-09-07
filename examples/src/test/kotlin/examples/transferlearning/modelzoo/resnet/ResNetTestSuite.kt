@@ -5,8 +5,6 @@
 
 package examples.transferlearning.modelzoo.resnet
 
-import examples.transferlearning.modelzoo.resnet.resnet18.resnet18prediction
-import examples.transferlearning.modelzoo.resnet.resnet18.resnet34prediction
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50additionalTraining
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50copyModelPrediction
 import examples.transferlearning.modelzoo.resnet.resnet50.resnet50prediction

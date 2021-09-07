@@ -173,6 +173,6 @@ public abstract class Layer(public var name: String) {
 }
 
 internal fun requireArraySize(array: LongArray, size: Int, name: String) =
-    require (array.size == size) {
+    require(array.size == size) {
         "$name is expected to have size equal $size but got ${array.size}"
     }

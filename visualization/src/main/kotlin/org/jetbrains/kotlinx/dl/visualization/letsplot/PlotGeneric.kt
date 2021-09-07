@@ -105,10 +105,11 @@ fun flattenImagePlot(
  * @param endDrop part of data to drop from end from range [0, 1]
  * @return [Plot] representing the amplitude of sound of given [WavFile]
  */
-fun soundPlot(wavFile: WavFile,
-              beginDrop: Double = 0.0,
-              endDrop: Double = 0.0
-): Plot = wavFile.use {
+fun soundPlot(
+    wavFile: WavFile,
+    beginDrop: Double = 0.0,
+    endDrop: Double = 0.0
+): Plot = wavFile.use { it ->
     val soundData = it.readRemainingFrames()
     val sampleRate = it.format.sampleRate
     val frames = it.frames

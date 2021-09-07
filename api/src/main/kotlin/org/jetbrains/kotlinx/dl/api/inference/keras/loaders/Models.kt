@@ -4,10 +4,11 @@
  */
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
+
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
  *
- * All weights are imported from the Keras.applications or ONNX.models project and preprocessed with the KotlinDL project.
+ * All weights are imported from the `Keras.applications` or `ONNX.models` project and preprocessed with the KotlinDL project.
  */
 public enum class TFModels {
     ;
@@ -71,42 +72,42 @@ public enum class TFModels {
         },
 
         /** */
-        ResNet_101_v2("resnet101v2"){
+        ResNet_101_v2("resnet101v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        ResNet_151_v2("resnet151v2"){
+        ResNet_151_v2("resnet151v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        MobileNet("mobilenet"){
+        MobileNet("mobilenet") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        MobileNetv2("mobilenetv2"){
+        MobileNetv2("mobilenetv2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        Inception("inception"){
+        Inception("inception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        Xception("xception"){
+        Xception("xception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
@@ -120,28 +121,28 @@ public enum class TFModels {
         },
 
         /** */
-        DenseNet169("densenet169"){
+        DenseNet169("densenet169") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         },
 
         /** */
-        DenseNet201("densenet201"){
+        DenseNet201("densenet201") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         },
 
         /** */
-        NASNetMobile("nasnetmobile"){
+        NASNetMobile("nasnetmobile") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         },
 
         /** */
-        NASNetLarge("nasnetlarge"){
+        NASNetLarge("nasnetlarge") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }

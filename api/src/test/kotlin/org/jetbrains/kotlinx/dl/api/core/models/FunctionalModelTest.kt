@@ -68,7 +68,7 @@ internal class FunctionalModelTest {
         assertEquals(descriptions[1], "conv2D_1(Conv2D)                       [None, 26, 26, 32]        320           input_1")
 
         val graphLines = correctTestModel.kGraph().toString().split('\n').toList()
-        assertEquals(stringifiedGraphLines, graphLines)
+        assertEquals(org.jetbrains.kotlinx.dl.api.core.models.graphLines, graphLines)
     }
 
     /**
@@ -181,7 +181,7 @@ internal val dense_2 = Dense(
 )
 
 
-private val stringifiedGraphLines = listOf(
+private val graphLines = listOf(
     "Name: default_data_placeholder; Type: Placeholder; Out #tensors:  1",
     "Name: conv2D_1_conv2d_kernel; Type: VariableV2; Out #tensors:  1",
     "Name: conv2D_1_conv2d_bias; Type: VariableV2; Out #tensors:  1",

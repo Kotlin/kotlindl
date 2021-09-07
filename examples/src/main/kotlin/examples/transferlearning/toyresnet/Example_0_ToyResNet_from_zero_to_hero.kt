@@ -20,7 +20,7 @@ import java.util.*
  *
  * It used simple initializers and training from zero is too long.
  *
- * It's better to to load pretrained model.
+ * It's better to load pretrained model.
  */
 fun main() {
     val (train, test) = fashionMnist()

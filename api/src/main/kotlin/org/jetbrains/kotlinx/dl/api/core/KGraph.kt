@@ -30,6 +30,7 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /** Internal static TensorFlow graph. */
     internal var tfGraph: Graph = Graph()
 
+    /** True if the graph object is closed and the occupied resources are freed. */
     public var isClosed: Boolean = false
 
     /** A list of initializer to initialize the trainableVariables. */
@@ -113,10 +114,10 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     }
 
     /**
-     * Adds a variable used in layer to the pool of tracked variables.
+     * Adds a variable related to the given [regularizer] to the pool of tracked variables.
      *
-     * @param variable Variable to track in KGraph.
-     * @param isTrainable When passed isTrainable = true, the KGraph automatically adds new variables to the tracked collection of graph variables.
+     * @param [variable] TensorFlow variable to track in KGraph.
+     * @param [regularizer] The regularizer related to the given [variable].
      */
     public fun addVariableRegularizer(variable: Variable<Float>, regularizer: Regularizer) {
         check(!variableRegularizers.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }

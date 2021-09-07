@@ -31,7 +31,7 @@ private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
  *
- * @param [hdfFile] File in hdf5 file format containing weights of Model model.
+ * @param [hdfFile] File in hdf5 file format containing weights of the model.
  */
 public fun GraphTrainableModel.loadWeights(
     hdfFile: HdfFile
@@ -170,7 +170,7 @@ private fun fillConv2DVariablesFromKeras(
     group: Group,
     model: GraphTrainableModel
 ) {
-    val availableLayerNames = group.children.map { e -> group.children[e.key]!!.name }.toList()
+    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
@@ -217,7 +217,7 @@ private fun fillDepthwiseConv2DVariablesFromKeras(
     group: Group,
     model: GraphTrainableModel
 ) {
-    val availableLayerNames = group.children.map { e -> group.children[e.key]!!.name }.toList()
+    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
@@ -263,7 +263,7 @@ private fun fillSeparableConv2DVariablesFromKeras(
     group: Group,
     model: GraphTrainableModel
 ) {
-    val availableLayerNames = group.children.map { e -> group.children[e.key]!!.name }.toList()
+    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
@@ -640,7 +640,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
             if (layerWeightPaths != null) {
                 fillLayerWeights(it, hdfFile, layerWeightPaths, this)
             } else {
-                if (missedWeights == MissedWeightsStrategy.LOAD_NEW_FORMAT) {
+                if (missedWeights == MissedWeightsStrategy.LOAD_CUSTOM_PATH) {
                     fillLayerWeights(
                         it,
                         hdfFile,
@@ -658,10 +658,13 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     this.isModelInitialized = true
 }
 
-// TODO: Refactor and add documentation
+/** This strategy defines the behaviour during weights' loading if the weights are not found in the h5 file by the standard Keras paths. */
 public enum class MissedWeightsStrategy {
+    /** In this case the missed weights should be filled via initializer. */
     INITIALIZE,
-    LOAD_NEW_FORMAT
+
+    /** In this case the loader should try to load them by the alternative path proposed by the user. */
+    LOAD_CUSTOM_PATH
 }
 
 /**
@@ -870,8 +873,11 @@ private fun fillDenseVariables(
     }
 }
 
-/** Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
-public open class LayerPaths(public val layerName: String)
+/**
+ * Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
+public open class LayerPaths(
+    /** */
+    public val layerName: String)
 
 /**
  * Contains [layerName], [kernelPath], [biasPath] for specific layer, found in hdf5 file via

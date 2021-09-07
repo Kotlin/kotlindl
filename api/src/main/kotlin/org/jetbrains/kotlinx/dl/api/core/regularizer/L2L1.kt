@@ -14,7 +14,6 @@ public const val DEFAULT_PENALTY: Float = 0.00001f
 
 /**
  * A regularizer that applies both L1 and L2 regularization penalties.
- *
  * The L1 regularization penalty is computed as:
  *
  * ```loss = l1 * reduce_sum(abs(x))```
@@ -22,8 +21,19 @@ public const val DEFAULT_PENALTY: Float = 0.00001f
  * The L2 regularization penalty is computed as
  *
  * ```loss = l2 * reduce_sum(square(x))```
+ *
+ * This is a common class which have two specific implementations: [L1] and [L2].
  */
-public open class L2L1(public val l1: Float = DEFAULT_PENALTY, public val l2: Float = DEFAULT_PENALTY) : Regularizer() {
+public open class L2L1(
+    /**
+     * Value of L1 regularization penalty. Could be calculated during graph computations.
+     */
+    public val l1: Float = DEFAULT_PENALTY,
+    /**
+     * Value of L2 regularization penalty. Could be calculated during graph computations.
+     */
+    public val l2: Float = DEFAULT_PENALTY
+) : Regularizer() {
     override fun apply(tf: Ops, input: Operand<Float>): Operand<Float> {
         var regularization: Operand<Float> = tf.constant(0.0f)
         if (l1 == 0f && l2 == 0f) {

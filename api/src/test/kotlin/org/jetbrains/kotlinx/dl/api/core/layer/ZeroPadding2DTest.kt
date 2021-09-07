@@ -26,7 +26,8 @@ internal class ZeroPadding2DTest {
     fun oneArgumentChannelsLast() {
         val padding = 1
         val inputDimensionsArray = intArrayOf(BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-        val inputShape = Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
+        val inputShape =
+            Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
         val expectedOutputSize = IMAGE_SIZE + 2 * padding
 
         EagerSession.create().use {
@@ -62,7 +63,8 @@ internal class ZeroPadding2DTest {
                     for (j in 0 until expectedOutputSize) {
                         for (channel in 0 until NUM_CHANNELS) {
                             if ((i < padding || i >= IMAGE_SIZE + padding) ||
-                                (j < padding || j >= IMAGE_SIZE + padding)) {
+                                (j < padding || j >= IMAGE_SIZE + padding)
+                            ) {
                                 assertEquals(0f, actualArray[batch][i][j][channel])
                             } else {
                                 assertEquals(1f, actualArray[batch][i][j][channel])
@@ -80,7 +82,8 @@ internal class ZeroPadding2DTest {
         val paddingWidth = 2
         val paddingArray = paddingHeight to paddingWidth
         val inputDimensionsArray = intArrayOf(BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-        val inputShape = Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
+        val inputShape =
+            Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
         val expectedOutputHeight = IMAGE_SIZE + paddingHeight * 2
         val expectedOutputWidth = IMAGE_SIZE + paddingWidth * 2
 
@@ -117,7 +120,8 @@ internal class ZeroPadding2DTest {
                     for (j in 0 until expectedOutputWidth) {
                         for (channel in 0 until NUM_CHANNELS) {
                             if ((i < paddingHeight || i >= IMAGE_SIZE + paddingHeight) ||
-                                (j < paddingWidth || j >= IMAGE_SIZE + paddingWidth)) {
+                                (j < paddingWidth || j >= IMAGE_SIZE + paddingWidth)
+                            ) {
                                 assertEquals(0f, actualArray[batch][i][j][channel])
                             } else {
                                 assertEquals(1f, actualArray[batch][i][j][channel])
@@ -137,7 +141,8 @@ internal class ZeroPadding2DTest {
         val paddingRight = 4
         val paddingArray = intArrayOf(paddingTop, paddingBottom, paddingLeft, paddingRight)
         val inputDimensionsArray = intArrayOf(BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-        val inputShape = Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
+        val inputShape =
+            Shape.make(BATCH_SIZE.toLong(), IMAGE_SIZE.toLong(), IMAGE_SIZE.toLong(), NUM_CHANNELS.toLong())
         val expectedOutputHeight = IMAGE_SIZE + paddingTop + paddingBottom
         val expectedOutputWidth = IMAGE_SIZE + paddingLeft + paddingRight
 
@@ -174,7 +179,8 @@ internal class ZeroPadding2DTest {
                     for (j in 0 until expectedOutputWidth) {
                         for (channel in 0 until NUM_CHANNELS) {
                             if ((i < paddingTop || i >= IMAGE_SIZE + paddingTop) ||
-                                (j < paddingLeft || j >= IMAGE_SIZE + paddingLeft)) {
+                                (j < paddingLeft || j >= IMAGE_SIZE + paddingLeft)
+                            ) {
                                 assertEquals(0f, actualArray[batch][i][j][channel])
                             } else {
                                 assertEquals(1f, actualArray[batch][i][j][channel])

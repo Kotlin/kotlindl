@@ -301,7 +301,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.fit(
                         dataset = train,
                         epochs = EPOCHS,
@@ -321,7 +321,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
                 }
             assertEquals(
@@ -337,7 +337,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predict(train.getX(0))
                 }
             assertEquals(
@@ -353,7 +353,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predictSoftly(train.getX(0))
                 }
             assertEquals(
@@ -369,7 +369,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
+                assertThrows(IllegalArgumentException::class.java) {
                     it.predict(test, 256)
                 }
             assertEquals(
@@ -380,7 +380,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predict(test, 100)
                 }
             assertEquals(
@@ -396,7 +396,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predictAndGetActivations(test.getX(0))
                 }
             assertEquals(

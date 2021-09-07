@@ -7,9 +7,12 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.dataset.Dataset
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 
-public abstract class InferenceModel: AutoCloseable {
+/**
+ * The basic class for all models which defines the basic interfaces required for inference tasks only.
+ */
+public abstract class InferenceModel : AutoCloseable {
+    /** Input specification for this model. */
     public abstract val inputDimensions: LongArray
 
     /** Model name. */

@@ -39,6 +39,7 @@ import java.io.FileNotFoundException
 import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 
 /**
  * [GraphTrainableModel] model groups a linear stack of layers into a graph-based TensorFlow Model.
@@ -118,7 +119,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
-                    val generatedLayerName = (layer::class.simpleName ?: return).toLowerCase() + "_" + cnt
+                    val generatedLayerName =
+                        (layer::class.simpleName ?: return).lowercase(Locale.getDefault()) + "_" + cnt
                     layer.name = generatedLayerName
                     cnt++
                 }
@@ -750,7 +752,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /**
      * Returns KGraph.
      *
-     * NOTE: Be careful, this is a direct access to the model graph, not a copy.
+     * NOTE: Be careful, this is direct access to the model graph, not a copy.
      */
     public fun kGraph(): KGraph {
         return kGraph

@@ -64,7 +64,7 @@ public class UpSampling2D(
                 inputShape.size(2).toInt() * size[1]
             )
         )
-        return when(interpolation) {
+        return when (interpolation) {
             InterpolationMethod.NEAREST -> tf.image.resizeNearestNeighbor(input, newSize)
             InterpolationMethod.BILINEAR ->
                 tf.image.resizeBilinear(input, newSize, ResizeBilinear.halfPixelCenters(true))

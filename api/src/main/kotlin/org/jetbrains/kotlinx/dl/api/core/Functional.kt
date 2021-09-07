@@ -144,8 +144,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             layerList = topologicalSort(layerList, inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
-            val model = Functional(*layerList.toTypedArray())
-            return model
+            return Functional(*layerList.toTypedArray())
         }
 
         /**
@@ -158,7 +157,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelConfiguration(configuration: File): Functional {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration)
         }
 
         /**
@@ -192,7 +191,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration)
         }
 
         /**
