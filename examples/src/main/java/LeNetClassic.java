@@ -59,7 +59,7 @@ public class LeNetClassic {
 
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY, new Callback());
-            lenet5Classic.summary(40, 26, 14);
+            lenet5Classic.summary();
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE);
 
             Double accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE).getMetrics().get(Metrics.ACCURACY);

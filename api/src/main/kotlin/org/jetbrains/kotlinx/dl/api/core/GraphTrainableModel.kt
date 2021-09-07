@@ -24,6 +24,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
@@ -899,5 +901,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun toString(): String {
         return "GraphTrainableModel(numberOfLayers=${layers.size}) ${super.toString()}"
+    }
+
+    public override fun summary(): ModelSummary {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+
+        val (trainableLayers, frozenLayers) = layers.partition { it.isTrainable }
+
+        return ModelSummary(
+            type = this::class.simpleName.toString(),
+            name = name,
+            layersSummaries = layers.map { layer ->
+                LayerSummary(
+                    name = layer.name,
+                    type = layer::class.simpleName.toString(),
+                    outputShape = layer.outputShape,
+                    paramsCount = layer.paramCount.toLong(),
+                    inboundLayers = layer.inboundLayers.map { it.name }
+                )
+            },
+            trainableParamsCount = trainableLayers.sumOf { it.paramCount.toLong() },
+            frozenParamsCount = frozenLayers.sumOf { it.paramCount.toLong() },
+        )
     }
 }

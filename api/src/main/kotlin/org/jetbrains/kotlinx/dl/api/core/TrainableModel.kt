@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -303,15 +304,11 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
     }
 
     /**
-     * Formats and builds the model description.
+     * Returns model summary.
      *
-     * @return list of layer descriptions.
+     * @return model summary
      */
-    public abstract fun summary(
-        stringLayerNameTypeSize: Int = 40,
-        stringOutputShapeSize: Int = 26,
-        stringParamSize: Int = 14
-    ): List<String>
+    public abstract fun summary(): ModelSummary
 
     override fun toString(): String {
         return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"

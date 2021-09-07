@@ -19,9 +19,11 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -63,19 +65,34 @@ internal class FunctionalModelTest {
     fun summary() {
         assertEquals("functional_model", correctTestModel.name)
 
-        val descriptions = correctTestModel.summary()
-        assertEquals(descriptions[0], "input_1(Input)                         [None, 28, 28, 1]         0")
-        assertEquals(descriptions[1], "conv2D_1(Conv2D)                       [None, 26, 26, 32]        320           input_1")
+        assertEquals(
+            ModelSummary(
+                type = "Functional",
+                name = "functional_model",
+                layersSummaries = listOf(
+                    LayerSummary("input_1", "Input", TensorShape(-1, 28, 28, 1), 0, emptyList()),
+                    LayerSummary("conv2D_1", "Conv2D", TensorShape(-1, 26, 26, 32), 320, listOf("input_1")),
+                    LayerSummary("conv2D_2", "Conv2D", TensorShape(-1, 24, 24, 64), 18496, listOf("conv2D_1")),
+                    LayerSummary("maxPool2D", "MaxPool2D", TensorShape(-1, 8, 8, 64), 0, listOf("conv2D_2")),
+                    LayerSummary("conv2D_4", "Conv2D", TensorShape(-1, 8, 8, 64), 36928, listOf("maxPool2D")),
+                    LayerSummary("conv2D_5", "Conv2D", TensorShape(-1, 8, 8, 64), 36928, listOf("conv2D_4")),
+                    LayerSummary("add", "Add", TensorShape(-1, 8, 8, 64), 0, listOf("conv2D_5", "maxPool2D")),
+                    LayerSummary("conv2D_6", "Conv2D", TensorShape(-1, 8, 8, 64), 36928, listOf("add")),
+                    LayerSummary("conv2D_7", "Conv2D", TensorShape(-1, 8, 8, 64), 36928, listOf("conv2D_6")),
+                    LayerSummary("add_1", "Add", TensorShape(-1, 8, 8, 64), 0, listOf("conv2D_7", "add")),
+                    LayerSummary("conv2D_8", "Conv2D", TensorShape(-1, 6, 6, 64), 36928, listOf("add_1")),
+                    LayerSummary("globalAvgPool2D", "GlobalAvgPool2D", TensorShape(-1, 64), 0, listOf("conv2D_8")),
+                    LayerSummary("dense_1", "Dense", TensorShape(-1, 256), 16640, listOf("globalAvgPool2D")),
+                    LayerSummary("dense_2", "Dense", TensorShape(-1, 10), 2570, listOf("dense_1"))
+                ),
+                trainableParamsCount = 222666,
+                frozenParamsCount = 0
+            ),
+            correctTestModel.summary()
+        )
 
         val graphLines = correctTestModel.kGraph().toString().split('\n').toList()
         assertEquals(org.jetbrains.kotlinx.dl.api.core.models.graphLines, graphLines)
-    }
-
-    /**
-     * TODO: use built-in assertEquals?
-     */
-    private fun assertEquals(a: String, b: String) {
-        assertTrue(a.contentEquals(b))
     }
 }
 
