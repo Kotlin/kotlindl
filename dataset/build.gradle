@@ -1,8 +1,8 @@
+project.setDescription("A KotlinDL library provides Dataset API and DSL to build image preprocessing pipeline for better Kotlin programming for Deep Learning.")
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21'
 }
-
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

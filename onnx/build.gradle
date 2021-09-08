@@ -1,3 +1,5 @@
+project.setDescription("This module contains the Kotlin API for loading and executing the ONNX models.")
+
 dependencies {
     api project(":api")
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21'
