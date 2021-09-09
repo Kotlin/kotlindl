@@ -38,4 +38,4 @@ public fun FloatArray.get2D(rowIndex: Int, columnIndex: Int, width: Int): Float 
  * TODO: Should be replaced with Multik in future.
  */
 public fun FloatArray.argmax(): Int =
-    this.indexOfFirst { it == this.maxOrNull()!! }
+    maxOrNull()?.let { max -> indexOfFirst { it == max } } ?: -1
