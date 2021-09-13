@@ -39,7 +39,6 @@ fun efficientNet4LitePrediction() {
                     imageShape = ImageShape(224, 224, 3)
                     colorMode = ColorOrder.BGR
                 }
-                transformImage {}
             }
 
             // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only

@@ -32,8 +32,10 @@ public class Preprocessing {
     public val finalShape: ImageShape
         get() {
             var imageShape = if (::load.isInitialized) load.imageShape else null
-            for (operation in imagePreprocessingStage.operations) {
-                imageShape = operation.getOutputShape(imageShape)
+            if (::imagePreprocessingStage.isInitialized) {
+                for (operation in imagePreprocessingStage.operations) {
+                    imageShape = operation.getOutputShape(imageShape)
+                }
             }
             if (imageShape == null) {
                 throw IllegalStateException(
@@ -55,12 +57,14 @@ public class Preprocessing {
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
         var image = load.fileToImage(file)
 
-        for (operation in imagePreprocessingStage.operations) {
-            if (operation is Save) {
-                operation.imageToFile(file.name, image)
-                continue
+        if (::imagePreprocessingStage.isInitialized) {
+            for (operation in imagePreprocessingStage.operations) {
+                if (operation is Save) {
+                    operation.imageToFile(file.name, image)
+                    continue
+                }
+                image = operation.apply(image)
             }
-            image = operation.apply(image)
         }
 
         var tensor = OnHeapDataset.toRawVector(imageToByteArray(image, load.colorMode))

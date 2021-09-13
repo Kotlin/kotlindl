@@ -72,7 +72,6 @@ fun denseNet169Prediction() {
                     imageShape = ImageShape(224, 224, 3)
                     colorMode = ColorOrder.RGB
                 }
-                transformImage {}
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)

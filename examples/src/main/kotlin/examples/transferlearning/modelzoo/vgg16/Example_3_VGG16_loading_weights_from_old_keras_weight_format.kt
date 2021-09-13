@@ -70,7 +70,6 @@ fun main() {
                     imageShape = ImageShape(224, 224, 3)
                     colorMode = ColorOrder.BGR
                 }
-                transformImage {}
             }
 
             val inputData = preprocessInput(preprocessing().first, model.inputDimensions, inputType = InputType.CAFFE)

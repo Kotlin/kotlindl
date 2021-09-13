@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
@@ -61,7 +60,6 @@ public class ImageRecognitionModel(
                 imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
                 colorMode = ColorOrder.BGR
             }
-            transformImage {}
         }
 
         val inputData = modelType.preprocessInput(preprocessing().first, inputDimensions)
@@ -75,7 +73,6 @@ public class ImageRecognitionModel(
                 imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
                 colorMode = ColorOrder.BGR
             }
-            transformImage {}
         }
 
         val inputData = modelType.preprocessInput(preprocessing().first, inputDimensions)

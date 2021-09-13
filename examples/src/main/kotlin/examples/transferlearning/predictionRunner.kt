@@ -81,7 +81,6 @@ private fun preprocessing(
                 imageShape = ImageShape(224, 224, 3)
                 colorMode = ColorOrder.BGR
             }
-            transformImage {}
         }
     } else {
         preprocess {

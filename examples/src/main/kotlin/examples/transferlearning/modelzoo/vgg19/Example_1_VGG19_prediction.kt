@@ -60,7 +60,6 @@ fun vgg19prediction() {
                     imageShape = ImageShape(224, 224, 3)
                     colorMode = ColorOrder.BGR
                 }
-                transformImage {}
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)

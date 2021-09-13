@@ -183,7 +183,6 @@ fun vgg() {
             imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
             colorMode = ColorOrder.BGR
         }
-        transformImage {}
         transformTensor {
             rescale {
                 scalingCoefficient = 255f
