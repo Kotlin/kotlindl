@@ -40,12 +40,12 @@ private fun visualise(
     detectedObjects: List<DetectedObject>
 ) {
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = imageFile
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-            }
             resize {
                 outputWidth = 1200
                 outputHeight = 1200

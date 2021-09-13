@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
 import java.io.File
@@ -26,12 +25,12 @@ fun main() {
         for (i in 0..8) {
             val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
             val preprocessing: Preprocessing = preprocess {
+                load {
+                    pathToData = imageFile
+                    imageShape = ImageShape(224, 224, 3)
+                    colorMode = ColorOrder.BGR
+                }
                 transformImage {
-                    load {
-                        pathToData = imageFile
-                        imageShape = ImageShape(224, 224, 3)
-                        colorMode = ColorOrder.BGR
-                    }
                     resize {
                         outputHeight = 192
                         outputWidth = 192
@@ -54,12 +53,12 @@ fun visualiseLandMarks(
     landmarks: List<Array<*>>
 ) {
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = imageFile
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-            }
             resize {
                 outputWidth = 192
                 outputHeight = 192

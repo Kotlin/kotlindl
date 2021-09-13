@@ -18,23 +18,11 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
  */
 public class ImagePreprocessing {
     /** */
-    public lateinit var load: Loading
-
-    /** True, if [load] is initialized. */
-    public val isLoadInitialized: Boolean
-        get() = ::load.isInitialized
-
-    /** */
     internal val operations = mutableListOf<ImagePreprocessor>()
 
     public fun addOperation(operation: ImagePreprocessor) {
         operations.add(operation)
     }
-}
-
-/** */
-public fun ImagePreprocessing.load(block: Loading.() -> Unit) {
-    load = Loading().apply(block)
 }
 
 /** */

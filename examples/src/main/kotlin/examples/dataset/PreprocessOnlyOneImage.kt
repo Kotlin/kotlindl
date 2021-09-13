@@ -26,12 +26,12 @@ fun main() {
     val preprocessedImagesDirectory = File("processedImages")
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = image
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = image
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-            }
             crop {
                 left = 100
                 right = 0

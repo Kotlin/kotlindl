@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.Companion.imageToByteArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Save
 import java.awt.image.BufferedImage
 import java.io.File
@@ -18,6 +19,9 @@ import java.io.File
  * Could be used to handle directory of images or one image file.
  */
 public class Preprocessing {
+    /** */
+    public lateinit var load: Loading
+
     /** This stage describes the process of image loading and transformation before converting to tensor. */
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
@@ -27,7 +31,7 @@ public class Preprocessing {
     /** Returns the final shape of data when image preprocessing is applied to the image. */
     public val finalShape: ImageShape
         get() {
-            var imageShape = if (imagePreprocessingStage.isLoadInitialized) imagePreprocessingStage.load.imageShape else null
+            var imageShape = if (::load.isInitialized) load.imageShape else null
             for (operation in imagePreprocessingStage.operations) {
                 imageShape = operation.getOutputShape(imageShape)
             }
@@ -42,14 +46,14 @@ public class Preprocessing {
 
     /** Applies the preprocessing pipeline to the specific image file. */
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
-        val file = imagePreprocessingStage.load.pathToData
+        val file = load.pathToData
         require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
 
         return handleFile(file)
     }
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        var image = imagePreprocessingStage.load.fileToImage(file)
+        var image = load.fileToImage(file)
 
         for (operation in imagePreprocessingStage.operations) {
             if (operation is Save) {
@@ -59,9 +63,7 @@ public class Preprocessing {
             image = operation.apply(image)
         }
 
-        var tensor = OnHeapDataset.toRawVector(
-            imageToByteArray(image, imagePreprocessingStage.load.colorMode)
-        )
+        var tensor = OnHeapDataset.toRawVector(imageToByteArray(image, load.colorMode))
         val shape = image.getShape()
 
         if (::tensorPreprocessingStage.isInitialized) {
@@ -78,6 +80,11 @@ public class Preprocessing {
 public fun preprocess(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
+
+/** */
+public fun Preprocessing.load(block: Loading.() -> Unit) {
+    load = Loading().apply(block)
+}
 
 /** */
 public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {

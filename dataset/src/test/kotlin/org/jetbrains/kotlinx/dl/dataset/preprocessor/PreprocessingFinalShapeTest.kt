@@ -10,11 +10,11 @@ class PreprocessingFinalShapeTest {
     @Test
     fun resizeNoInputShape() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    colorMode = ColorOrder.BGR
-                }
                 resize {
                     outputWidth = 100
                     outputHeight = 100
@@ -28,12 +28,12 @@ class PreprocessingFinalShapeTest {
     @Test
     fun resizeInputShape() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(20, 20, 3)
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    imageShape = ImageShape(20, 20, 3)
-                    colorMode = ColorOrder.BGR
-                }
                 resize {
                     outputWidth = 100
                     outputHeight = 100
@@ -47,12 +47,12 @@ class PreprocessingFinalShapeTest {
     @Test
     fun cropImage() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(200, 200, 3)
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    imageShape = ImageShape(200, 200, 3)
-                    colorMode = ColorOrder.BGR
-                }
                 crop {
                     left = 3
                     right = 11
@@ -67,12 +67,12 @@ class PreprocessingFinalShapeTest {
     @Test
     fun cropTwice() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(200, 200, 3)
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    imageShape = ImageShape(200, 200, 3)
-                    colorMode = ColorOrder.BGR
-                }
                 crop {
                     left = 3
                     right = 11
@@ -93,12 +93,12 @@ class PreprocessingFinalShapeTest {
     @Test
     fun resizeAndCrop() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(200, 200, 3)
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    imageShape = ImageShape(200, 200, 3)
-                    colorMode = ColorOrder.BGR
-                }
                 resize {
                     outputWidth = 150
                     outputHeight = 100
@@ -118,12 +118,12 @@ class PreprocessingFinalShapeTest {
     @Test
     fun rotateImage() {
         val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(200, 200, 3)
+                colorMode = ColorOrder.BGR
+            }
             transformImage {
-                load {
-                    pathToData = File("test.jpg")
-                    imageShape = ImageShape(200, 200, 3)
-                    colorMode = ColorOrder.BGR
-                }
                 rotate {
                     degrees = 30f
                 }

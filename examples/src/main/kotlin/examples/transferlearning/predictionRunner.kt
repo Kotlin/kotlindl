@@ -15,12 +15,8 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 import java.net.URISyntaxException
 import java.net.URL
@@ -80,22 +76,21 @@ private fun preprocessing(
 ): Preprocessing {
     val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         preprocess {
-            transformImage {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
-                }
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+                colorMode = ColorOrder.BGR
             }
+            transformImage {}
         }
     } else {
         preprocess {
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+                colorMode = ColorOrder.RGB
+            }
             transformImage {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.RGB
-                }
                 resize {
                     outputWidth = resizeTo.first
                     outputHeight = resizeTo.second

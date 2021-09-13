@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -24,12 +23,12 @@ fun main() {
 
         for (i in 0..8) {
             val preprocessing: Preprocessing = preprocess {
+                load {
+                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                    imageShape = ImageShape(224, 224, 3)
+                    colorMode = ColorOrder.BGR
+                }
                 transformImage {
-                    load {
-                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                        imageShape = ImageShape(224, 224, 3)
-                        colorMode = ColorOrder.BGR
-                    }
                     resize {
                         outputHeight = 1200
                         outputWidth = 1200

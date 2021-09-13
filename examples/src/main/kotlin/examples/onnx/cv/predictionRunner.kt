@@ -20,12 +20,8 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 fun runImageRecognitionPrediction(
@@ -42,13 +38,12 @@ fun runImageRecognitionPrediction(
 
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
-                transformImage {
-                    load {
-                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                        imageShape = ImageShape(224, 224, 3)
-                        colorMode = ColorOrder.BGR
-                    }
+                load {
+                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                    imageShape = ImageShape(224, 224, 3)
+                    colorMode = ColorOrder.BGR
                 }
+                transformImage {}
             }
 
             val inputData = modelType.preprocessInput(preprocessing)
@@ -69,22 +64,21 @@ private fun preprocessing(
 ): Preprocessing {
     val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         preprocess {
-            transformImage {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
-                }
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+                colorMode = ColorOrder.BGR
             }
+            transformImage {}
         }
     } else {
         preprocess {
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+                colorMode = ColorOrder.RGB
+            }
             transformImage {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.RGB
-                }
                 resize {
                     outputWidth = 299
                     outputHeight = 299
