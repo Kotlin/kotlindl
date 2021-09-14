@@ -33,9 +33,9 @@ import java.io.File
  * - Model copied and used for prediction.
  */
 fun resnet50copyModelPrediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.ResNet50
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -50,7 +50,7 @@ fun resnet50copyModelPrediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -67,7 +67,7 @@ fun resnet50copyModelPrediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -90,7 +90,7 @@ fun resnet50copyModelPrediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

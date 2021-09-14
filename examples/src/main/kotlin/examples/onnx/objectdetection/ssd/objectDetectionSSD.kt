@@ -17,7 +17,7 @@ import java.io.File
 
 fun main() {
     val modelHub =
-        ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"))
+        ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
 
     model.use { detectionModel ->

@@ -22,22 +22,22 @@ import java.nio.file.StandardCopyOption
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
- * [commonModelDirectory].
+ * [cacheDirectory].
  *
- * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
+ * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
  *
  * @since 0.3
  */
-public class ONNXModelHub(commonModelDirectory: File) :
-    ModelHub(commonModelDirectory) {
+public class ONNXModelHub(cacheDirectory: File) :
+    ModelHub(cacheDirectory) {
 
     /** Logger. */
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {
-        if (!commonModelDirectory.exists()) {
-            Files.createDirectories(commonModelDirectory.toPath())
+        if (!cacheDirectory.exists()) {
+            Files.createDirectories(cacheDirectory.toPath())
         }
     }
 

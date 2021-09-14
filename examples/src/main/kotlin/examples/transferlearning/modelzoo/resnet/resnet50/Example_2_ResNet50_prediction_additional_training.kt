@@ -46,9 +46,9 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun resnet50additionalTraining() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    var modelType = TFModels.CV.ResNet50
+    val model = modelHub.loadModel(modelType)
 
     val catdogimages = dogsCatsSmallDatasetPath()
 
@@ -68,7 +68,7 @@ fun resnet50additionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = TFModels.CV.ResNet_50
+                modelType = TFModels.CV.ResNet50
             }
         }
     }
@@ -76,7 +76,7 @@ fun resnet50additionalTraining() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val hdfFile = modelHub.loadWeights()
+    val hdfFile = modelHub.loadWeights(modelType)
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {

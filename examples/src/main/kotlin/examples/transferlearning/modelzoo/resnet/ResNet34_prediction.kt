@@ -6,7 +6,6 @@
 package examples.transferlearning.modelzoo.resnet
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -32,9 +31,9 @@ import java.io.File
  * - Special preprocessing (used in ResNet'34  during training on ImageNet dataset) is applied to images before prediction.
  */
 fun resnet34prediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_34)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.ResNet34
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -47,7 +46,7 @@ fun resnet34prediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -62,7 +61,7 @@ fun resnet34prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

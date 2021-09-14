@@ -26,11 +26,9 @@ import java.io.File
  * - Special preprocessing (used in ResNet'101v2 during training on ImageNet dataset) is applied to images before prediction.
  */
 fun resnet101v2prediction() {
-    val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.ResNet_101_v2
-    )
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = ONNXModels.CV.ResNet_101_v2
+    val model = modelHub.loadModel(modelType)
 
     println(model.inputDimensions.contentToString())
 
@@ -52,7 +50,7 @@ fun resnet101v2prediction() {
             }
 
             // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelHub.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

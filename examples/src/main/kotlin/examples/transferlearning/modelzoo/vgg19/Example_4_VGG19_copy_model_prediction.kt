@@ -39,8 +39,9 @@ import java.io.File
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun vgg19copyModelPrediction() {
-    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_19)
-    val model = modelHub.loadModel() as Sequential
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.VGG19
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -55,7 +56,7 @@ fun vgg19copyModelPrediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -72,7 +73,7 @@ fun vgg19copyModelPrediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -95,7 +96,7 @@ fun vgg19copyModelPrediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

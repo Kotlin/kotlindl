@@ -26,11 +26,10 @@ import java.io.File
  * - Special preprocessing (used in EfficientNet4Lite during training on ImageNet dataset) is applied to images before prediction.
  */
 fun efficientNet4LitePrediction() {
-    val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.EfficientNet_4_Lite
-    )
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+
+    val modelType = ONNXModels.CV.EfficientNet_4_Lite
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
         loadImageNetClassLabels() // TODO: move to overriden method of ModelType (loading of labels for each model)
@@ -50,7 +49,7 @@ fun efficientNet4LitePrediction() {
             }
 
             // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelHub.preprocessInput(preprocessing) // TODO: to preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing) // TODO: to preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -27,7 +26,7 @@ import java.io.File
  */
 fun resnet101prediction() {
     val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels")
+        cacheDirectory = File("cache/pretrainedModels")
     )
 
     val modelType = ONNXModels.CV.ResNet_101_v1

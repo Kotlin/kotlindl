@@ -30,9 +30,9 @@ import java.io.File
  * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
  */
 fun mobileNetV2Prediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.MobileNetv2)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.MobileNetv2
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -45,7 +45,7 @@ fun mobileNetV2Prediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -60,7 +60,7 @@ fun mobileNetV2Prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

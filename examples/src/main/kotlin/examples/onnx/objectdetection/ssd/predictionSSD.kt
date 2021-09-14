@@ -8,7 +8,6 @@ package examples.onnx.objectdetection.ssd
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
@@ -16,9 +15,9 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 fun main() {
-    val modelHub =
-        ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = ONNXModels.ObjectDetection.SSD
+    val model = modelHub.loadModel(modelType)
 
     model.use {
         println(it)
@@ -38,7 +37,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val yhat = it.predictRaw(inputData)
             println(yhat.toTypedArray().contentDeepToString())

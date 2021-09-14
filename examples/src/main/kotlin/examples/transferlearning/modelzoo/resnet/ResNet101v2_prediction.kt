@@ -7,7 +7,6 @@ package examples.transferlearning.modelzoo.resnet
 
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -33,9 +32,9 @@ import java.io.File
  * - No new layers are added.
  */
 fun resnet101v2prediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_101_v2)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.ResNet_101_v2
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -47,8 +46,8 @@ fun resnet101v2prediction() {
         )
 
         it.summary()
-
-        val hdfFile = modelHub.loadWeights()
+        // TODO: add a method it.loadWeights(modelType)
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -63,7 +62,7 @@ fun resnet101v2prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
