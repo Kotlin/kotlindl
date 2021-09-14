@@ -29,9 +29,8 @@ import java.nio.file.StandardCopyOption
  *
  * @since 0.3
  */
-public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
-    ModelHub(commonModelDirectory, modelType) {
-    private val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+public class ONNXModelHub(commonModelDirectory: File) :
+    ModelHub(commonModelDirectory) {
 
     /** Logger. */
     private val logger: KLogger = KotlinLogging.logger {}
@@ -48,16 +47,25 @@ public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return An example of [OnnxInferenceModel].
      */
-    public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
+    @Suppress("UNCHECKED_CAST")
+    public override fun <T : InferenceModel, U : InferenceModel> loadModel(
+        modelType: ModelType<T, U>,
+        loadingMode: LoadingMode
+    ): T {
+        val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+
         val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
             SSDObjectDetectionModel()
         } else {
             OnnxInferenceModel()
         }
-        return OnnxInferenceModel.initializeONNXModel(inferenceModel, getONNXModelFile(loadingMode).absolutePath)
+        return OnnxInferenceModel.initializeONNXModel(
+            inferenceModel,
+            getONNXModelFile(modelFile, loadingMode).absolutePath
+        ) as T
     }
 
-    private fun getONNXModelFile(loadingMode: LoadingMode): File {
+    private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
         val fileName = commonModelDirectory.absolutePath + modelFile
         val file = File(fileName)
         val parentDirectory = file.parentFile

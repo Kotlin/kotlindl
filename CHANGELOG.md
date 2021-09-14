@@ -1,4 +1,106 @@
-# 0.2.0 (17/05/2021)
+# 0.3.0 (28/09/2021) ONNX for inference and transfer learning and ONNX Model Hub
+Features:
+* Implemented the [copying for the Functional and Sequential models](https://github.com/JetBrains/KotlinDL/issues/40)
+* Implemented the [copying for the TensorFlow-based Inference Model](https://github.com/JetBrains/KotlinDL/issues/178)
+* Implemented the [experimental ONNX integration](https://github.com/JetBrains/KotlinDL/issues/184):
+   * added new 'onnx' module
+   * added the ONNXModel implementing the common InferenceModel interface
+   * ONNX model could be used as a preprocessing stage for the TensorFlow model
+   * prepared ONNX model without top layers could be fine-tuned via training of top layers implemented with TensowFlow-based layers
+* Added SSD and YOLOv4 object detection models to the Model Hub
+* Added Fan2D106 face alignment model to the Model Hub
+* Added SSDObjectDetectionModel with the easy API for object detection, including pre- and post-processing
+* Added a few models in ONNX format to the Model Hub
+   * ResNet18
+   * ResNet34
+   * ResNet50
+   * ResNet101 
+   * ResNet152 
+   * ResNet18V2
+   * ResNet34V2
+   * ResNet50V2 
+   * ResNet101V2 
+   * ResNet152V2
+   * EfficientNetV4
+* Added [new TensorFlow-based models to the Model Zoo (or Model Hub)](https://github.com/JetBrains/KotlinDL/issues/101): 
+   * NasNetMobile
+   * NasNetLarge
+   * DenseNet121
+   * DenseNet169
+   * DenseNet201
+   * Xception 
+* Added [ResNet18 and ResNet34 TensorFlow-based models to ModelZoo](https://github.com/JetBrains/KotlinDL/issues/175)
+* Added [L1 and L2 regularization to the layers](https://github.com/JetBrains/KotlinDL/issues/83)
+* Added [Identity initializer](https://github.com/JetBrains/KotlinDL/issues/50)
+* Added [Orthogonal initializer](https://github.com/JetBrains/KotlinDL/issues/51)
+* Added [Softmax activation layer](https://github.com/JetBrains/KotlinDL/issues/52)
+* Added [LeakyReLU activation layer](https://github.com/JetBrains/KotlinDL/issues/53)
+* Added [PReLU activate layer](https://github.com/JetBrains/KotlinDL/issues/54)
+* Added [ELU activation layer](https://github.com/JetBrains/KotlinDL/issues/55)
+* Added [ThresholdedReLU activation layer](https://github.com/JetBrains/KotlinDL/issues/56)
+* Added [Conv1D layer](https://github.com/JetBrains/KotlinDL/issues/59)
+* Added [MaxPooling1D layer](https://github.com/JetBrains/KotlinDL/issues/60)
+* Added [AveragePooling1D layer](https://github.com/JetBrains/KotlinDL/issues/61)
+* Added [GlobalMaxPooling1D layer](https://github.com/JetBrains/KotlinDL/issues/62)
+* Added [GlobalAveragePooling1D layer](https://github.com/JetBrains/KotlinDL/issues/63)
+* Added [Conv3D layer](https://github.com/JetBrains/KotlinDL/issues/79)
+* Added [MaxPooling3D layer](https://github.com/JetBrains/KotlinDL/issues/80)
+* Added [AveragePooling3D layer](https://github.com/JetBrains/KotlinDL/issues/81)
+* Added [GlobalAveragePooling3D layer](https://github.com/JetBrains/KotlinDL/issues/82)
+* Added [GlobalMaxPool2D layer](https://github.com/JetBrains/KotlinDL/issues/116)
+* Added [GlobalMaxPool3D layer](https://github.com/JetBrains/KotlinDL/issues/117)
+* Added [Cropping1D and Cropping3D layers](https://github.com/JetBrains/KotlinDL/issues/121)
+* Added [Permute layer](https://github.com/JetBrains/KotlinDL/issues/142)
+* Added [RepeatVector layer](https://github.com/JetBrains/KotlinDL/issues/123)
+* Added [UpSampling1D, UpSampling2D and UpSampling3D layers](https://github.com/JetBrains/KotlinDL/issues/143)
+* Added [Gelu activation function](https://github.com/JetBrains/KotlinDL/issues/165)
+* Added [HardShrink activation function](https://github.com/JetBrains/KotlinDL/issues/166)
+* Added [LiSHT activation function](https://github.com/JetBrains/KotlinDL/issues/167)
+* Added [Mish activation function](https://github.com/JetBrains/KotlinDL/issues/168)
+* Added [Snake activation function](https://github.com/JetBrains/KotlinDL/issues/169)
+* Added [Tanh shrink activation function](https://github.com/JetBrains/KotlinDL/issues/172)
+* Added [TimeStopping callback](https://github.com/JetBrains/KotlinDL/issues/174)
+
+Bugs:
+* Added [missed loaders for the ReLU and ELU activation layers](https://github.com/JetBrains/KotlinDL/issues/78)
+* Add [model export for a few layers (Concatenate, DepthwiseConv2D, SeparableConv2D) missed in ModelSaver.kt](https://github.com/JetBrains/KotlinDL/issues/87)
+* Fixed the use-case when [ModelSaver fails on saving Input with 2d and 3d tensors](https://github.com/JetBrains/KotlinDL/issues/160)
+
+API breaking changes:
+* Renamed ModelZoo to the ModelHub
+* Changed the ImagePreprocessing DSL: loading and saving are moved to the separate level of DSL
+* 
+
+Infrastructure:
+* Loaded the weights and JSON configurations of the newly added ModelHub models to S3 storage
+* [Moved ImageDSL and Dataset API to the separate 'dataset' module](https://github.com/JetBrains/KotlinDL/issues/180)
+* Added a new 'visualization' module with the basic support for painting on Swing and in Jupyter Notebook with lets-plot
+* Transformed the project from the single-module project to the multi-modules project
+
+Docs:
+* Created [website with API Documentation from KDoc via Dokka](https://github.com/JetBrains/KotlinDL/issues/71)
+* Updated all existing tutorials
+* Updated the Readme.md
+* Updated the existing KDocs
+* Added a new tutorial about ONNX models usage
+* Added a new tutorial about the Easy API
+* Added a new tutorial about the Image Preprocessing DSL
+* Added a new tutorial about Transfer Learning with ONNX ResNet no-top model and TensorFlow
+
+Examples:
+* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/objectdetection/ssd/objectDetectionSSD.kt) of SSDObjectDetectionModel usage and visualisation of the detected objects on the Swing panel
+* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/faces/predictionFan2D106.kt) of Fan2D106 (face alignment) model and landmarks visualisation on the Swing panel
+* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/cv/custom/additionalTrainingWithTensorFlow.kt) where the prepared ONNX model without top layers is fine-tuned via training of top layers implemented with TensowFlow-based layers
+* Added a lot of examples for the newly added to the ModelHub models (ONNX-based and TensorFlow-based)
+* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/visualization/SoundNetFSDDVisualization.kt) with the model SoundNet trained on Free Spoken Digits Dataset to classify the audio 
+* Updated ['visualization'](https://github.com/JetBrains/KotlinDL/tree/master/examples/src/main/kotlin/examples/visualization) examples with the new Batik and lets-plot support
+
+Tests:
+* Added tests for ModelLoading
+* Added tests for InputLayer
+* Added tests for all newly added layers
+
+# 0.2.0 (17/05/2021) Functional API, Model Zoo and Image Preprocessing DSL
 Features:
 * Added [support for Functional API](https://github.com/JetBrains/KotlinDL/issues/23)
 * Added [BatchNorm layer](https://github.com/JetBrains/KotlinDL/issues/34) for inference

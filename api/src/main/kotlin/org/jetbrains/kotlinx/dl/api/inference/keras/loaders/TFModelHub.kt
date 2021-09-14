@@ -33,19 +33,13 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  *
  * @since 0.2
  */
-public class TFModelHub(commonModelDirectory: File, modelType: ModelType) : ModelHub(commonModelDirectory, modelType) {
-    private val modelDirectory = "/" + modelType.modelRelativePath
-    private val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
-    private val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
-    private val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
-    private val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
-
+public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {
-        if (!commonModelDirectory.exists()) {
-            Files.createDirectories(commonModelDirectory.toPath())
+        if (!cacheDirectory.exists()) {
+            Files.createDirectories(cacheDirectory.toPath())
         }
     }
 
@@ -55,28 +49,32 @@ public class TFModelHub(commonModelDirectory: File, modelType: ModelType) : Mode
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
-    public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
-        val jsonConfigFile = getJSONConfigFile(loadingMode)
+    @Suppress("UNCHECKED_CAST")
+    public override fun <T : InferenceModel, U : InferenceModel> loadModel(
+        modelType: ModelType<T, U>,
+        loadingMode: LoadingMode
+    ): T {
+        val jsonConfigFile = getJSONConfigFile(modelType, loadingMode)
         return when (modelType) {
-            TFModels.CV.VGG_16 -> Sequential.loadModelConfiguration(jsonConfigFile)
-            TFModels.CV.VGG_19 -> Sequential.loadModelConfiguration(jsonConfigFile)
-            TFModels.CV.ResNet_18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
-            TFModels.CV.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile))
+            TFModels.CV.VGG16 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
+            TFModels.CV.VGG19 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
+            TFModels.CV.ResNet18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             else -> TODO()
         }
     }
@@ -115,12 +113,19 @@ public class TFModelHub(commonModelDirectory: File, modelType: ModelType) : Mode
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Compiled model with initialized weights.
      */
-    public fun loadWeights(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): HdfFile {
-        return getWeightsFile(loadingMode)
+    public fun loadWeights(
+        modelType: ModelType<*, *>,
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+    ): HdfFile {
+        return getWeightsFile(modelType, loadingMode)
     }
 
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
-    private fun getJSONConfigFile(loadingMode: LoadingMode): File {
+    private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode): File {
+        val modelDirectory = "/" + modelType.modelRelativePath
+        val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
+        val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
+
         val dir = File(commonModelDirectory.absolutePath + modelDirectory)
         if (!dir.exists()) dir.mkdir()
 
@@ -138,7 +143,11 @@ public class TFModelHub(commonModelDirectory: File, modelType: ModelType) : Mode
     }
 
     /** Returns .h5 file with model weights, saved from Keras 2.x. */
-    private fun getWeightsFile(loadingMode: LoadingMode): HdfFile {
+    private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode): HdfFile {
+        val modelDirectory = "/" + modelType.modelRelativePath
+        val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
+        val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
+
         val fileName = commonModelDirectory.absolutePath + relativeWeightsPath
         val file = File(fileName)
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {

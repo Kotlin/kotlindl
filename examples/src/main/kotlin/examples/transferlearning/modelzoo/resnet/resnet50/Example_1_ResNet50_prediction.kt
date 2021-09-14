@@ -6,10 +6,10 @@
 package examples.transferlearning.modelzoo.resnet.resnet50
 
 import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
@@ -22,21 +22,14 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-/**
- * This examples demonstrates the inference concept on ResNet'50 model:
- * - Model configuration, model weights and labels are obtained from [TFModelHub].
- * - Weights are loaded from .h5 file, configuration is loaded from .json file.
- * - Model predicts on a few images located in resources.
- * - No additional training.
- * - No new layers are added.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
- */
-fun resnet50prediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.ResNet_50)
-    val model = modelHub.loadModel() as Functional
+fun resnet50Prediction() {
+    val imageNetClassLabels = loadImageNetClassLabels()
 
-    val imageNetClassLabels = modelHub.loadClassLabels()
+    val modelHub =
+        TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+
+    val modelType = TFModels.CV.ResNet50
+    val model = modelType.model(modelHub)
 
     model.use {
         it.compile(
@@ -47,7 +40,7 @@ fun resnet50prediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -62,7 +55,7 @@ fun resnet50prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -75,4 +68,4 @@ fun resnet50prediction() {
 }
 
 /** */
-fun main(): Unit = resnet50prediction()
+fun main(): Unit = resnet50Prediction()

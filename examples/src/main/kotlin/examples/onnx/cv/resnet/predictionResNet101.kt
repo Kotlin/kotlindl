@@ -27,12 +27,11 @@ import java.io.File
  */
 fun resnet101prediction() {
     val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.ResNet_101_v1
+        commonModelDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel() as OnnxInferenceModel
 
-    println(model.inputDimensions.contentToString())
+    val modelType = ONNXModels.CV.ResNet_101_v1
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
         loadImageNetClassLabels() // TODO: move to overridden method of ModelType (loading of labels for each model)
@@ -51,8 +50,7 @@ fun resnet101prediction() {
                 }
             }
 
-            // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelHub.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

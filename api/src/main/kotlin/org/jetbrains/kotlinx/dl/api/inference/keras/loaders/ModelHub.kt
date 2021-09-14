@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import java.io.File
 import java.nio.file.Files
 
@@ -25,10 +24,9 @@ internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
  *
  * @since 0.2
  */
-public abstract class ModelHub(public val commonModelDirectory: File, public val modelType: ModelType) {
+public abstract class ModelHub(public val commonModelDirectory: File) {
     /** */
     protected val awsS3Url: String = AWS_S3_URL
-    private val modelDirectory = "/" + modelType.modelRelativePath
 
     /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
@@ -45,35 +43,25 @@ public abstract class ModelHub(public val commonModelDirectory: File, public val
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading before usage.
      */
-    public abstract fun loadModel(loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS): InferenceModel
+    public abstract fun <T : InferenceModel, U : InferenceModel> loadModel(
+        modelType: ModelType<T, U>,
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+    ): T
 
-
-    /**
-     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
-     *
-     * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according given [modelType].
-     */
-    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-        return preprocessInput(data, tensorShape, modelType)
+    public fun <T : InferenceModel, U : InferenceModel> loadPretrainedModel(
+        modelType: ModelType<T, U>,
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+    ): U {
+        return modelType.pretrainedModel(this)
     }
 
     /**
-     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
      *
-     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing according given [modelType].
      */
-    public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
-        val (data, shape) = preprocessing()
-        return modelType.preprocessInput(
-            data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels)
-        ) // TODO: need to be 4 or 3 in all cases
+    @Suppress("UNCHECKED_CAST")
+    public operator fun <T : InferenceModel, U : InferenceModel> get(modelType: ModelType<T, U>): U {
+        return loadPretrainedModel(modelType = modelType)
     }
-}
-
-/** Wraps the [ModelType.preprocessInput] functionality. */
-public fun preprocessInput(data: FloatArray, tensorShape: LongArray, modelType: ModelType): FloatArray {
-    return modelType.preprocessInput(data, tensorShape)
 }
 
 
