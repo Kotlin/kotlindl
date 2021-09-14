@@ -9,7 +9,6 @@ import examples.transferlearning.modelzoo.vgg16.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
@@ -17,10 +16,9 @@ import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
 import java.io.File
 
 fun main() {
-    // TODO: ModelHub -> RemoteModel -> loadModel
     val modelHub =
-        ONNXModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = ONNXModels.ObjectDetection.SSD)
-    val model = modelHub.loadModel() as SSDObjectDetectionModel // TODO: reifed parameter
+        ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
 
     model.use { detectionModel ->
         println(detectionModel)

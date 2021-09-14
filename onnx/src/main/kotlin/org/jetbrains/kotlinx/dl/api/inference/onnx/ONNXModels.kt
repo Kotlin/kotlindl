@@ -5,96 +5,109 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
 /** Models in the ONNX format and running via ONNX Runtime. */
-public enum class ONNXModels {
-    ;
-
+public object ONNXModels {
     /** Image recognition models and preprocessing. */
-    public enum class CV(override val modelRelativePath: String) : ModelType {
+    public sealed class CV<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
+        ModelType<T, U> {
         /** */
-        ResNet_18_v1("models/onnx/cv/resnet/resnet18-v1") {
+        public object ResNet18v1 : CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet18-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_34_v1("models/onnx/cv/resnet/resnet34-v1") {
+        public object ResNet34v1 : CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet34-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_50_v1("models/onnx/cv/resnet/resnet50-v1") {
+        public object ResNet_50_v1 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet50-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_101_v1("models/onnx/cv/resnet/resnet101-v1") {
+        public object ResNet_101_v1 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet101-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_152_v1("models/onnx/cv/resnet/resnet152-v1") {
+        public object ResNet_152_v1 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet152-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_18_v2("models/onnx/cv/resnet/resnet18-v2") {
+        public object ResNet_18_v2 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet18-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_34_v2("models/onnx/cv/resnet/resnet34-v2") {
+        public object ResNet_34_v2 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet34-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_50_v2("models/onnx/cv/resnet/resnet50-v2") {
+        public object ResNet_50_v2 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet50-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_101_v2("models/onnx/cv/resnet/resnet101-v2") {
+        public object ResNet_101_v2 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet101-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        ResNet_152_v2("models/onnx/cv/resnet/resnet152-v2") {
+        public object ResNet_152_v2 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/resnet/resnet152-v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
-        },
+        }
 
         /** */
-        DenseNet_121("models/onnx/cv/densenet/densenet121") {
+        public object DenseNet_121 :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/densenet/densenet121") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
             }
-        },
+        }
 
         /** */
-        EfficientNet_4_Lite("models/onnx/cv/efficientnet/efficientnet-lite4") {
+        public object EfficientNet_4_Lite :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/efficientnet/efficientnet-lite4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
                     data,
@@ -103,10 +116,11 @@ public enum class ONNXModels {
                     channelsLast = false
                 )
             }
-        },
+        }
 
         /** */
-        ResNet_50_v1_custom("models/onnx/cv/custom/resnet50") {
+        public object ResNet_50_v1_custom :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/custom/resnet50") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
                     data,
@@ -114,10 +128,11 @@ public enum class ONNXModels {
                     inputType = InputType.CAFFE
                 )
             }
-        },
+        }
 
         /** */
-        ResNet_50_v1_no_top_custom("models/onnx/cv/custom/resnet50notop") {
+        public object ResNet_50_v1_no_top_custom :
+            CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/custom/resnet50notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
                     data,
@@ -125,10 +140,10 @@ public enum class ONNXModels {
                     inputType = InputType.CAFFE
                 )
             }
-        },
+        }
 
         /** */
-        Lenet_mnist("models/onnx/cv/custom/mnist") {
+        public object Lenet_mnist : CV<OnnxInferenceModel, ImageRecognitionModel>("models/onnx/cv/custom/mnist") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
             }
@@ -136,7 +151,8 @@ public enum class ONNXModels {
     }
 
     /** Object detection models and preprocessing. */
-    public enum class ObjectDetection(override val modelRelativePath: String) : ModelType {
+    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
+        ModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes.
          *
@@ -152,7 +168,8 @@ public enum class ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/ssd">
          *    Detailed description of SSD model and its pre- and postprocessing in onnx/models repository.</a>
          */
-        SSD("models/onnx/objectdetection/ssd") {
+        public object SSD :
+            ObjectDetection<OnnxInferenceModel, SSDObjectDetectionModel>("models/onnx/objectdetection/ssd") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
                     data,
@@ -169,19 +186,26 @@ public enum class ONNXModels {
                     channelsLast = false
                 )
             }
-        },
+
+            override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
+                return modelHub[this] as SSDObjectDetectionModel
+            }
+        }
 
         /** */
-        YOLO_v4("models/onnx/objectdetection/yolov4") {
+        public object YOLO_v4 :
+            ObjectDetection<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/objectdetection/yolov4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
             }
-        },
+        }
     }
 
     /** Face alignment models and preprocessing. */
-    public enum class FaceAlignment(override val modelRelativePath: String) : ModelType {
-        FAN_2D_106("models/onnx/facealignment/fan_2d_106") {
+    public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
+        ModelType<T, U> {
+        public object Fan2d106 :
+            FaceAlignment<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/facealignment/fan_2d_106") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
                     data,
@@ -193,7 +217,7 @@ public enum class ONNXModels {
 
                 return transposedData
             }
-        },
+        }
 
     }
 }

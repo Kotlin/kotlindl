@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
@@ -18,6 +19,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -36,11 +38,11 @@ import java.io.File
  * NOTE: Input resolution is 224*224
  */
 fun denseNet121Prediction() {
-    val modelHub =
-        TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.DenseNet121)
-    val model = modelHub.loadModel() as Functional
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.DenseNet121
+    val model = modelHub.loadModel(modelType)
 
-    val imageNetClassLabels = modelHub.loadClassLabels()
+    val imageNetClassLabels = loadImageNetClassLabels()
 
     model.use {
         it.compile(
@@ -51,7 +53,7 @@ fun denseNet121Prediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         val weightPaths = listOf(
             LayerConvOrDensePaths(
@@ -80,7 +82,7 @@ fun denseNet121Prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

@@ -5,153 +5,187 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
+import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
+import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
  *
  * All weights are imported from the `Keras.applications` or `ONNX.models` project and preprocessed with the KotlinDL project.
  */
-public enum class TFModels {
-    ;
-
+public object TFModels {
     /** Image recognition models and preprocessing. */
-    public enum class CV(override val modelRelativePath: String) : ModelType {
+    public sealed class CV<T : GraphTrainableModel>(override val modelRelativePath: String) :
+        ModelType<T, ImageRecognitionModel> {
+        override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
+            return buildImageRecognitionModel(modelHub, this)
+        }
+
         /** */
-        VGG_16("vgg16") {
+        public object VGG16 : CV<Sequential>("vgg16") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        VGG_19("vgg19") {
+        public object VGG19 : CV<Sequential>("vgg19") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_18("resnet18") {
+        public object ResNet18 : CV<Functional>("resnet18") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_34("resnet34") {
+        public object ResNet34 : CV<Functional>("resnet34") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_50("resnet50") {
+        public object ResNet50 : CV<Functional>("resnet50") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_101("resnet101") {
+        public object ResNet_101 : CV<Functional>("resnet101") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_152("resnet151") {
+        public object ResNet_152 : CV<Functional>("resnet151") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
-        },
+        }
 
         /** */
-        ResNet_50_v2("resnet50v2") {
+        public object ResNet_50_v2 : CV<Functional>("resnet50v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        ResNet_101_v2("resnet101v2") {
+        public object ResNet_101_v2 : CV<Functional>("resnet101v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        ResNet_151_v2("resnet151v2") {
+        public object ResNet_151_v2 : CV<Functional>("resnet151v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        MobileNet("mobilenet") {
+        public object MobileNet : CV<Functional>("mobilenet") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        MobileNetv2("mobilenetv2") {
+        public object MobileNetv2 : CV<Functional>("mobilenetv2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        Inception("inception") {
+        public object Inception : CV<Functional>("inception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        Xception("xception") {
+        public object Xception : CV<Functional>("xception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        DenseNet121("densenet121") {
+        public object DenseNet121 : CV<Functional>("densenet121") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
-        },
+        }
 
         /** */
-        DenseNet169("densenet169") {
+        public object DenseNet169 : CV<Functional>("densenet169") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
-        },
+        }
 
         /** */
-        DenseNet201("densenet201") {
+        public object DenseNet201 : CV<Functional>("densenet201") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
-        },
+        }
 
         /** */
-        NASNetMobile("nasnetmobile") {
+        public object NASNetMobile : CV<Functional>("nasnetmobile") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
 
         /** */
-        NASNetLarge("nasnetlarge") {
+        public object NASNetLarge : CV<Functional>("nasnetlarge") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
-        },
+        }
+    }
+
+    private fun buildImageRecognitionModel(
+        modelHub: ModelHub,
+        modelType: ModelType<out GraphTrainableModel, ImageRecognitionModel>
+    ): ImageRecognitionModel {
+        modelHub as TFModelHub
+        val model = modelHub.loadModel(modelType)
+
+        model.compile(
+            optimizer = Adam(),
+            loss = Losses.MAE,
+            metric = Metrics.ACCURACY
+        )
+
+        val hdfFile = modelHub.loadWeights(modelType)
+
+        model.loadWeights(hdfFile)
+
+        return ImageRecognitionModel(model, modelType)
     }
 }
 
 /** Basic interface for models loaded from S3. */
-public interface ModelType {
+public interface ModelType<T: InferenceModel, U: InferenceModel> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
 
@@ -163,4 +197,27 @@ public interface ModelType {
      * @param [tensorShape] Should be 3 dimensional array (HWC or CHW format)
      */
     public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray
+
+    /**
+     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+     *
+     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing according given [modelType].
+     */
+    public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
+        val (data, shape) = preprocessing()
+        return preprocessInput(
+            data,
+            longArrayOf(shape.width!!, shape.height!!, shape.channels)
+        ) // TODO: need to be 4 or 3 in all cases
+    }
+
+    // TODO: make an abstract
+    public fun pretrainedModel(modelHub: ModelHub): U {
+        TODO()
+    }
+
+    // TODO: make an abstract
+    public fun model(modelHub: ModelHub): T {
+        return modelHub.loadModel(this)
+    }
 }

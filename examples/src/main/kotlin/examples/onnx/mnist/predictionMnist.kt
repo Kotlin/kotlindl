@@ -14,12 +14,11 @@ import java.io.File
 
 fun main() {
     val (train, test) = mnist()
-    val modelHub =
-        ONNXModelHub(
-            commonModelDirectory = File("cache/pretrainedModels"),
-            modelType = ONNXModels.CV.Lenet_mnist
-        )
-    val model = modelHub.loadModel() as OnnxInferenceModel
+
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = ONNXModels.CV.Lenet_mnist
+    val model = modelHub.loadModel(modelType)
+
     model.use {
         println(it)
 

@@ -51,8 +51,9 @@ private const val EPOCHS = 2
  *    Detailed description of VGG'19 model and an approach to build it in Keras.</a>
  */
 fun vgg19additionalTraining() {
-    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_19)
-    val model = modelHub.loadModel() as Sequential
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.VGG19
+    val model = modelHub.loadModel(modelType)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
@@ -72,7 +73,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                TFModels.CV.VGG_19
+                TFModels.CV.VGG19
             }
         }
     }
@@ -116,7 +117,7 @@ fun vgg19additionalTraining() {
             metric = Metrics.ACCURACY
         )
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
         it.loadWeightsForFrozenLayers(hdfFile)
 
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

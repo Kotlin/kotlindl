@@ -60,10 +60,9 @@ private val topModel = Sequential.of(
  */
 fun resnet50additionalTraining() {
     val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.ResNet_50_v1_no_top_custom
+        cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val model = modelHub.loadModel(ONNXModels.CV.ResNet_50_v1_no_top_custom)
 
     model.use {
         println(it)
@@ -87,7 +86,7 @@ fun resnet50additionalTraining() {
             }
             transformTensor {
                 sharpen {
-                    modelType = TFModels.CV.ResNet_50
+                    modelType = TFModels.CV.ResNet50
                 }
                 onnx {
                     onnxModel = model

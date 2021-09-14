@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -27,12 +26,11 @@ import java.io.File
  */
 fun resnet101prediction() {
     val modelHub = ONNXModelHub(
-        commonModelDirectory = File("cache/pretrainedModels"),
-        modelType = ONNXModels.CV.ResNet_101_v1
+        cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel() as OnnxInferenceModel
 
-    println(model.inputDimensions.contentToString())
+    val modelType = ONNXModels.CV.ResNet_101_v1
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
         loadImageNetClassLabels() // TODO: move to overridden method of ModelType (loading of labels for each model)
@@ -51,8 +49,7 @@ fun resnet101prediction() {
                 }
             }
 
-            // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelHub.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

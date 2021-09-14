@@ -22,23 +22,22 @@ import java.nio.file.StandardCopyOption
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
- * [commonModelDirectory].
+ * [cacheDirectory].
  *
- * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
+ * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
  *
  * @since 0.3
  */
-public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
-    ModelHub(commonModelDirectory, modelType) {
-    private val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+public class ONNXModelHub(cacheDirectory: File) :
+    ModelHub(cacheDirectory) {
 
     /** Logger. */
     private val logger: KLogger = KotlinLogging.logger {}
 
     init {
-        if (!commonModelDirectory.exists()) {
-            Files.createDirectories(commonModelDirectory.toPath())
+        if (!cacheDirectory.exists()) {
+            Files.createDirectories(cacheDirectory.toPath())
         }
     }
 
@@ -48,16 +47,25 @@ public class ONNXModelHub(commonModelDirectory: File, modelType: ModelType) :
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return An example of [OnnxInferenceModel].
      */
-    public override fun loadModel(loadingMode: LoadingMode): InferenceModel {
+    @Suppress("UNCHECKED_CAST")
+    public override fun <T : InferenceModel, U : InferenceModel> loadModel(
+        modelType: ModelType<T, U>,
+        loadingMode: LoadingMode
+    ): T {
+        val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+
         val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
             SSDObjectDetectionModel()
         } else {
             OnnxInferenceModel()
         }
-        return OnnxInferenceModel.initializeONNXModel(inferenceModel, getONNXModelFile(loadingMode).absolutePath)
+        return OnnxInferenceModel.initializeONNXModel(
+            inferenceModel,
+            getONNXModelFile(modelFile, loadingMode).absolutePath
+        ) as T
     }
 
-    private fun getONNXModelFile(loadingMode: LoadingMode): File {
+    private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
         val fileName = commonModelDirectory.absolutePath + modelFile
         val file = File(fileName)
         val parentDirectory = file.parentFile

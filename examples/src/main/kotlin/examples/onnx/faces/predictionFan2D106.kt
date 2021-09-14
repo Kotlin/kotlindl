@@ -17,12 +17,9 @@ import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
 import java.io.File
 
 fun main() {
-    val modelHub =
-        ONNXModelHub(
-            commonModelDirectory = File("cache/pretrainedModels"),
-            modelType = ONNXModels.FaceAlignment.FAN_2D_106
-        )
-    val model = modelHub.loadModel() as OnnxInferenceModel
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = ONNXModels.FaceAlignment.Fan2d106
+    val model = modelHub.loadModel(modelType)
 
     model.use {
         println(it)
@@ -43,7 +40,7 @@ fun main() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val yhat = it.predictRaw(inputData)
             println(yhat.toTypedArray().contentDeepToString())

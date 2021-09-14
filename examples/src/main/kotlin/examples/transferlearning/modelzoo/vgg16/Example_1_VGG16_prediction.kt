@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
@@ -23,7 +23,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 import java.net.URISyntaxException
 import java.net.URL
-
 
 /**
  * This examples demonstrates the inference concept on VGG'16 model:
@@ -40,8 +39,9 @@ import java.net.URL
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun vgg16prediction() {
-    val modelHub = TFModelHub(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_16)
-    val model = modelHub.loadModel() as Sequential
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.VGG16
+    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -55,7 +55,7 @@ fun vgg16prediction() {
 
         it.summary()
 
-        val hdfFile = modelHub.loadWeights()
+        val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
 
@@ -70,7 +70,7 @@ fun vgg16prediction() {
                 }
             }
 
-            val inputData = modelHub.preprocessInput(preprocessing().first, model.inputDimensions)
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
