@@ -8,7 +8,6 @@ package examples.onnx.mnist
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
@@ -16,7 +15,7 @@ fun main() {
     val (train, test) = mnist()
 
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.Lenet_mnist
+    val modelType = ONNXModels.CV.Lenet
     val model = modelHub.loadModel(modelType)
 
     model.use {

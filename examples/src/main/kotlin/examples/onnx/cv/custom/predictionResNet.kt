@@ -5,12 +5,11 @@
 
 package examples.onnx.cv.custom
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -27,7 +26,7 @@ import java.io.File
  */
 fun resnet50CustomPrediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.ResNet_50_v1_custom
+    val modelType = ONNXModels.CV.ResNet50custom
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = loadImageNetClassLabels()

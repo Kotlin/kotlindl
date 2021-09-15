@@ -30,133 +30,133 @@ public object TFModels {
         }
 
         /** */
-        public object VGG16 : CV<Sequential>("vgg16") {
+        public object VGG16 : CV<Sequential>("models/tensorflow/cv/vgg16") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object VGG19 : CV<Sequential>("vgg19") {
+        public object VGG19 : CV<Sequential>("models/tensorflow/cv/vgg19") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet18 : CV<Functional>("resnet18") {
+        public object ResNet18 : CV<Functional>("models/tensorflow/cv/resnet18") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet34 : CV<Functional>("resnet34") {
+        public object ResNet34 : CV<Functional>("models/tensorflow/cv/resnet34") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet50 : CV<Functional>("resnet50") {
+        public object ResNet50 : CV<Functional>("models/tensorflow/cv/resnet50") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet_101 : CV<Functional>("resnet101") {
+        public object ResNet_101 : CV<Functional>("models/tensorflow/cv/resnet101") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet_152 : CV<Functional>("resnet151") {
+        public object ResNet_152 : CV<Functional>("models/tensorflow/cv/resnet152") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet_50_v2 : CV<Functional>("resnet50v2") {
+        public object ResNet_50_v2 : CV<Functional>("models/tensorflow/cv/resnet50v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet_101_v2 : CV<Functional>("resnet101v2") {
+        public object ResNet_101_v2 : CV<Functional>("models/tensorflow/cv/resnet101v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet_151_v2 : CV<Functional>("resnet151v2") {
+        public object ResNet_152_v2 : CV<Functional>("models/tensorflow/cv/resnet152v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object MobileNet : CV<Functional>("mobilenet") {
+        public object MobileNet : CV<Functional>("models/tensorflow/cv/mobilenet") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object MobileNetv2 : CV<Functional>("mobilenetv2") {
+        public object MobileNetv2 : CV<Functional>("models/tensorflow/cv/mobilenetv2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object Inception : CV<Functional>("inception") {
+        public object Inception : CV<Functional>("models/tensorflow/cv/inception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object Xception : CV<Functional>("xception") {
+        public object Xception : CV<Functional>("models/tensorflow/cv/xception") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object DenseNet121 : CV<Functional>("densenet121") {
+        public object DenseNet121 : CV<Functional>("models/tensorflow/cv/densenet121") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object DenseNet169 : CV<Functional>("densenet169") {
+        public object DenseNet169 : CV<Functional>("models/tensorflow/cv/densenet169") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object DenseNet201 : CV<Functional>("densenet201") {
+        public object DenseNet201 : CV<Functional>("models/tensorflow/cv/densenet201") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object NASNetMobile : CV<Functional>("nasnetmobile") {
+        public object NASNetMobile : CV<Functional>("models/tensorflow/cv/nasnetmobile") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object NASNetLarge : CV<Functional>("nasnetlarge") {
+        public object NASNetLarge : CV<Functional>("models/tensorflow/cv/nasnetlarge") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }

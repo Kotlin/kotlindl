@@ -5,6 +5,8 @@
 
 package examples.cnn.dogscats
 
+import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.model.resnet50Light
@@ -18,6 +20,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import kotlin.reflect.KFunction4
 
 private const val EPOCHS = 20
 private const val TRAINING_BATCH_SIZE = 64
@@ -44,6 +47,11 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * - model evaluation
  */
 fun resnet50onDogsVsCatsDataset() {
+    val modelBuilderFunction = ::resnet50Light
+    runResNetTraining(modelBuilderFunction)
+}
+
+internal fun runResNetTraining(modelBuilderFunction: KFunction4<Long, Int, Long, Activations, Functional>) {
     val dogsVsCatsDatasetPath = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
@@ -70,7 +78,8 @@ fun resnet50onDogsVsCatsDataset() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    resnet50Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
+    val model = modelBuilderFunction.invoke(IMAGE_SIZE, NUM_CLASSES, NUM_CHANNELS, Activations.Linear)
+    model.use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,

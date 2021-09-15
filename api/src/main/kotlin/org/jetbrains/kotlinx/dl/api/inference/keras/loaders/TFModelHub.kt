@@ -65,7 +65,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
             TFModels.CV.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_152_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T

@@ -5,12 +5,11 @@
 
 package examples.onnx.cv.efficicentnet
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
@@ -28,7 +27,7 @@ import java.io.File
 fun efficientNet4LitePrediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val modelType = ONNXModels.CV.EfficientNet_4_Lite
+    val modelType = ONNXModels.CV.EfficientNet4Lite
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =

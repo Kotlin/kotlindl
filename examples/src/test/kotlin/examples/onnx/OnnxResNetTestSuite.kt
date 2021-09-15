@@ -9,6 +9,8 @@ import examples.onnx.cv.custom.resnet50CustomPrediction
 import examples.onnx.cv.custom.resnet50additionalTraining
 import examples.onnx.cv.efficicentnet.efficientNet4LitePrediction
 import examples.onnx.cv.resnet.*
+import examples.onnx.cv.runImageRecognitionPrediction
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
 class OnnxResNetTestSuite {
@@ -19,27 +21,27 @@ class OnnxResNetTestSuite {
 
     @Test
     fun resnet18v2predictionTest() {
-        resnet18v2prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet18v2)
     }
 
     @Test
     fun resnet34predictionTest() {
-        resnet34prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet34)
     }
 
     @Test
     fun resnet34v2predictionTest() {
-        resnet34v2prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet34v2)
     }
 
     @Test
     fun resnet50predictionTest() {
-        resnet50prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet50)
     }
 
     @Test
     fun resnet50v2predictionTest() {
-        resnet50v2prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet50v2)
     }
 
     @Test
@@ -54,22 +56,22 @@ class OnnxResNetTestSuite {
 
     @Test
     fun resnet101predictionTest() {
-        resnet101prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet101)
     }
 
     @Test
     fun resnet101v2predictionTest() {
-        resnet101v2prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet101v2)
     }
 
     @Test
     fun resnet152predictionTest() {
-        resnet152prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet152)
     }
 
     @Test
     fun resnet152v2predictionTest() {
-        resnet152v2prediction()
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet152v2)
     }
 
     @Test

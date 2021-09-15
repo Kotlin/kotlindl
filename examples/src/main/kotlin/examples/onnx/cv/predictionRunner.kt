@@ -3,11 +3,19 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.resnet
+package examples.onnx.cv
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
+import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -15,23 +23,19 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
-/**
- * This examples demonstrates the inference concept on ResNet'152v2 model:
- * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
- * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'152v2 during training on ImageNet dataset) is applied to images before prediction.
- */
-fun resnet152v2prediction() {
+fun runImageRecognitionPrediction(
+    modelType: ONNXModels.CV<OnnxInferenceModel>
+) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.ResNet_152_v2
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
-        loadImageNetClassLabels() // TODO: move to overridden method of ModelType (loading of labels for each model)
+        loadImageNetClassLabels()
 
     model.use {
         println(it)
@@ -47,7 +51,6 @@ fun resnet152v2prediction() {
                 }
             }
 
-            // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
             val inputData = modelType.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
@@ -60,5 +63,34 @@ fun resnet152v2prediction() {
     }
 }
 
-/** */
-fun main(): Unit = resnet152v2prediction()
+private fun preprocessing(
+    resizeTo: Pair<Int, Int>,
+    i: Int
+): Preprocessing {
+    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        preprocess {
+            transformImage {
+                load {
+                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                    imageShape = ImageShape(224, 224, 3)
+                    colorMode = ColorOrder.BGR
+                }
+            }
+        }
+    } else {
+        preprocess {
+            transformImage {
+                load {
+                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                    imageShape = ImageShape(224, 224, 3)
+                    colorMode = ColorOrder.RGB
+                }
+                resize {
+                    outputWidth = 299
+                    outputHeight = 299
+                }
+            }
+        }
+    }
+    return preprocessing
+}

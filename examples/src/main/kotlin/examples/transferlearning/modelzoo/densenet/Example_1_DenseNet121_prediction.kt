@@ -6,8 +6,7 @@
 package examples.transferlearning.modelzoo.densenet
 
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -19,7 +18,6 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing

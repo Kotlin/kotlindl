@@ -18,7 +18,6 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -62,7 +61,7 @@ fun resnet50additionalTraining() {
     val modelHub = ONNXModelHub(
         cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel(ONNXModels.CV.ResNet_50_v1_no_top_custom)
+    val model = modelHub.loadModel(ONNXModels.CV.ResNet50noTopCustom)
 
     model.use {
         println(it)
