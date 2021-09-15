@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -24,10 +24,6 @@ import org.tensorflow.op.Ops
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
 public abstract class AbstractActivationLayer(name: String) : Layer(name) {
-    init {
-        isTrainable = false
-    }
-
     /**
      * Applies the activation functions to the [input] to produce the output.
      *
@@ -58,6 +54,4 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int get() = 0
 }

@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -168,7 +169,7 @@ fun runImageRecognitionTransferLearningOnTopModel(
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {
-        layer.isTrainable = false
+        layer.freeze()
         layers.add(layer)
     }
 

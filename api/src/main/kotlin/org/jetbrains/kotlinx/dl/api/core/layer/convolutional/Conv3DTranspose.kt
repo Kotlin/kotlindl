@@ -99,7 +99,6 @@ public class Conv3DTranspose(
         requireArraySize(kernelSize, dimensions, "kernelSize")
         requireArraySize(strides, dimensions + 2, "strides")
         requireArraySize(dilations, dimensions + 2, "dilations")
-        isTrainable = false
     }
 
     override val outputPadding: IntArray? get() = null

@@ -147,6 +147,6 @@ public class ZeroPadding2D : AbstractZeroPadding {
     }
 
     override fun toString(): String {
-        return "ZeroPadding2D(name = $name, isTrainable=$isTrainable, padding=${padding.contentToString()}, hasActivation=$hasActivation)"
+        return "ZeroPadding2D(name = $name, padding=${padding.contentToString()}, hasActivation=$hasActivation)"
     }
 }

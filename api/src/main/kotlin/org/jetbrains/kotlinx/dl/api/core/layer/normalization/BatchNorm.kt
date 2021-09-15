@@ -9,10 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
-import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
@@ -56,15 +53,11 @@ public class BatchNorm(
     public val movingMeanInitializer: Initializer = Zeros(),
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
-) : Layer(name), NoGradients {
+) : Layer(name), NoGradients, ParametrizedLayer {
     internal var gamma: KVariable? = null
     internal var beta: KVariable? = null
     internal lateinit var movingMean: KVariable
     internal lateinit var movingVariance: KVariable
-
-    init {
-        isTrainable = false
-    }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
@@ -72,7 +65,6 @@ public class BatchNorm(
 
         if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
-        isTrainable = false // TODO: add isTrainable to addWeight method as a flag
         val fanIn = Int.MIN_VALUE
         val fanOut = Int.MIN_VALUE
 

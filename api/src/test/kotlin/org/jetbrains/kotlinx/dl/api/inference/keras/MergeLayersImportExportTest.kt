@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 import org.jetbrains.kotlinx.dl.api.core.dsl.functional
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.junit.jupiter.api.Test
 
@@ -102,8 +103,8 @@ class MergeLayersImportExportTest {
             functional {
                 layers {
                     val input = +Input(10)
-                    val dense1 = +Dense(name = "Dense1", outputSize = 5)(input).apply { isTrainable = false }
-                    val dense2 = +Dense(name = "Dense2", outputSize = 5)(input).apply { isTrainable = false }
+                    val dense1 = +Dense(name = "Dense1", outputSize = 5)(input).apply { freeze() }
+                    val dense2 = +Dense(name = "Dense2", outputSize = 5)(input).apply { freeze() }
                     +Concatenate(name = "test_concatenate", axis = 1)(dense1, dense2)
                 }
             }

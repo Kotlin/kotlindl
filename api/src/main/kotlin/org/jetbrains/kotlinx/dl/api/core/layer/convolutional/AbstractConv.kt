@@ -8,10 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
@@ -46,8 +43,8 @@ import kotlin.math.roundToInt
  */
 public abstract class AbstractConv(
     name: String
-) : Layer(name) {
-    
+) : Layer(name), ParametrizedLayer {
+
     protected abstract val filters: Int
     protected abstract val kernelSize: IntArray
     protected abstract val strides: IntArray

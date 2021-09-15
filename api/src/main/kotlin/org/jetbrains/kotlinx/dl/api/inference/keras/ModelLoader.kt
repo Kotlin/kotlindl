@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -138,8 +138,9 @@ private fun convertToLayer(
         LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }.apply {
-        isTrainable = if (this !is NoGradients) kerasLayer.config?.trainable?:isTrainable
-        else false
+        if (this is TrainableLayer) {
+            isTrainable = kerasLayer.config?.trainable?:isTrainable
+        }
         name = kerasLayer.config?.name?:name
     }
 }

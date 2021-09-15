@@ -82,10 +82,10 @@ So this is what we will do:
 val layers = mutableListOf<Layer>()
 
 for (layer in model.layers.dropLast(1)) {
-    layer.isTrainable = false
+    layer.freeze()
     layers.add(layer)
 }
-layers.forEach { it.isTrainable = false }
+layers.forEach { freeze() }
 
 layers.add(
     Dense(

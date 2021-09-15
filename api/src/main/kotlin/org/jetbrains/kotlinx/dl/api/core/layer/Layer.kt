@@ -19,17 +19,6 @@ import org.tensorflow.op.Ops
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
 public abstract class Layer(public var name: String) {
-    /**
-     * True, if layer's weights could be changed during training.
-     * If false, layer's weights are frozen and could be changed during the training.
-     */
-    public var isTrainable: Boolean = true
-        set(value) {
-            if (value && this is NoGradients)
-                throw IllegalStateException("${this.javaClass.simpleName} layer can not set `isTrainable` to `true`.")
-            field = value
-        }
-
     /** Output data tensor shape. */
     public lateinit var outputShape: TensorShape
 
@@ -140,9 +129,6 @@ public abstract class Layer(public var name: String) {
 
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean
-
-    /** Returns amount of neurons. */
-    public abstract val paramCount: Int
 }
 
 internal fun requireArraySize(array: IntArray, size: Int, name: String) =

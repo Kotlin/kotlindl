@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -54,7 +54,7 @@ public class RepeatVector(
     }
 
     override fun toString(): String {
-        return "RepeatVector(name = $name, isTrainable=$isTrainable, n=$n, hasActivation=$hasActivation)"
+        return "RepeatVector(name = $name, n=$n, hasActivation=$hasActivation)"
     }
 
     override var weights: Map<String, Array<*>>
@@ -62,6 +62,4 @@ public class RepeatVector(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 }

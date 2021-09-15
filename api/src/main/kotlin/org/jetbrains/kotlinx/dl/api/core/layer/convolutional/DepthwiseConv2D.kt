@@ -98,7 +98,6 @@ public class DepthwiseConv2D(
         requireArraySize(kernelSize, 2, "kernelSize")
         requireArraySize(strides, 4, "strides")
         requireArraySize(dilations, 4, "dilations")
-        isTrainable = false
     }
 
     // filters is not used in any place of this implementation of AbstractConv because
@@ -154,7 +153,7 @@ public class DepthwiseConv2D(
     }
 
     override fun toString(): String {
-        return "DepthwiseConv2D(name = $name, isTrainable=$isTrainable, " +
+        return "DepthwiseConv2D(name = $name, " +
                 "kernelSize=${kernelSize.contentToString()}, " +
                 "strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, " +

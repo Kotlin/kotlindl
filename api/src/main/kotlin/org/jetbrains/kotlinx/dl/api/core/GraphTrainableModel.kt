@@ -11,10 +11,11 @@ import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
@@ -143,8 +144,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     override fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>) {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
-        validateModelArchitecture()
-
         this.loss = loss
         this.metrics = metrics
         this.optimizer = optimizer
@@ -205,23 +204,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metrics) {
         compile(optimizer, loss, Metrics.convert(metric))
-    }
-
-    /** Validates architecture. */
-    private fun validateModelArchitecture() {
-        layerValidation(layers.toList())
-
-        require(layers.none { it is NoGradients && it.isTrainable })
-        {
-            "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
-                    "But the following layers violates this rule: ${
-                        layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
-                            .contentDeepToString()
-                    }"
-        }
-        //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
-        //  require(layers.last().hasActivation()) { "Last layer must have an activation function." }
-        //  require((layers.last() as Dense).activation != Activations.Sigmoid) { "The last dense layer should have Linear activation, alternative activations are not supported yet!" }
     }
 
     /** Common method for building the initial part of the model static graph layer by layer via calling build() method on each layer in correct order. */
@@ -307,13 +289,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         fitCallbacks: List<Callback>
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-
-        for (layer in layers) {
-            check(!(layer is NoGradients && layer.isTrainable)) {
-                "Layer $layer has no gradients implementations in TensorFlow and should be non-trainable only. " +
-                        "Set 'isTrainable' to 'false'."
-            }
-        }
 
         if (!isModelInitialized) {
             logger.debug { "Initialization of TensorFlow Graph variables." }

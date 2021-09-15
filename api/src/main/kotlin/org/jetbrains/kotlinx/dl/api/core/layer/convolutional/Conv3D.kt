@@ -104,7 +104,6 @@ public class Conv3D(
         requireArraySize(kernelSize, 3, "kernelSize")
         requireArraySize(strides, 5, "strides")
         requireArraySize(dilations, 5, "dilations")
-        isTrainable = false
     }
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 3)
@@ -157,7 +156,7 @@ public class Conv3D(
     }
 
     override fun toString(): String {
-        return "Conv3D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, " +
+        return "Conv3D(name = $name, filters=$filters, kernelSize=${kernelSize.contentToString()}, " +
                 "strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, " +
                 "activation=$activation, " +
                 "kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, " +

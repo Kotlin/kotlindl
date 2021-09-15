@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,6 +13,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -133,7 +135,7 @@ class TransferLearningTest : IntegrationTest() {
         val dense1LayerName = "dense_1"
 
         assertEquals(testModel.layers.size, 9)
-        assertTrue(testModel.getLayer(flattenLayerName).isTrainable)
+        assertTrue(!testModel.getLayer(flattenLayerName).isTrainable)
         assertFalse(testModel.getLayer(flattenLayerName).hasActivation)
         assertTrue(testModel.getLayer(conv2dLayerName) is Conv2D)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).kernelInitializer is GlorotNormal)
@@ -487,7 +489,7 @@ class TransferLearningTest : IntegrationTest() {
         testModel.use {
             for (layer in it.layers) {
                 if (layer is Conv2D)
-                    layer.isTrainable = false
+                    layer.freeze()
             }
 
             it.compile(
@@ -556,7 +558,7 @@ class TransferLearningTest : IntegrationTest() {
 
             for (layer in it.layers) {
                 if (layer is Conv2D) {
-                    layer.isTrainable = false
+                    layer.freeze()
                     layerList.add(layer)
                 }
             }
@@ -627,7 +629,7 @@ class TransferLearningTest : IntegrationTest() {
 
             for (layer in it.layers) {
                 if (layer is Conv2D) {
-                    layer.isTrainable = false
+                    layer.freeze()
                     layerList.add(layer)
                 }
             }

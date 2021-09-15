@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
@@ -66,7 +71,7 @@ public class MaxPool3D(
     }
 
     override fun toString(): String {
-        return "MaxPool3D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+        return "MaxPool3D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
     }
 
     override var weights: Map<String, Array<*>>
@@ -74,6 +79,4 @@ public class MaxPool3D(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 }

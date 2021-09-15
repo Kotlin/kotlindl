@@ -70,6 +70,6 @@ public class Cropping3D(
     }
 
     override fun toString(): String {
-        return "Cropping3D(name = $name, isTrainable=$isTrainable, cropping=${cropping.contentDeepToString()}, hasActivation=$hasActivation)"
+        return "Cropping3D(name = $name, cropping=${cropping.contentDeepToString()}, hasActivation=$hasActivation)"
     }
 }

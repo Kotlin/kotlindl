@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.tensorflow.Operand
@@ -45,7 +50,7 @@ public class Dot(
     }
 
     override fun toString(): String {
-        return "Dot(name = $name, isTrainable=$isTrainable, axis=${axis.contentToString()}, normalize=$normalize)"
+        return "Dot(name = $name, axis=${axis.contentToString()}, normalize=$normalize)"
     }
 }
 

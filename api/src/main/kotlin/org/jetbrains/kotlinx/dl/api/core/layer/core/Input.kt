@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -75,9 +75,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
 
     override val hasActivation: Boolean get() = false
 
-    override val paramCount: Int get() = 0
-
     override fun toString(): String {
-        return "Input(name = $name, isTrainable=$isTrainable, shape=${packedDims.contentToString()})"
+        return "Input(name = $name, shape=${packedDims.contentToString()})"
     }
 }

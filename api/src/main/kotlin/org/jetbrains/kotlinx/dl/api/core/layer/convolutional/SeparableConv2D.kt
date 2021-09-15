@@ -76,7 +76,8 @@ public class SeparableConv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Layer(name), NoGradients {
+) : Layer(name), NoGradients, ParametrizedLayer {
+
     public constructor(
         filters: Int = 32,
         kernelSize: Int = 3,
@@ -122,7 +123,6 @@ public class SeparableConv2D(
         requireArraySize(kernelSize, 2, "kernelSize")
         requireArraySize(strides, 4, "strides")
         requireArraySize(dilations, 4, "dilations")
-        isTrainable = false
     }
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {

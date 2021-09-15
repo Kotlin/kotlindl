@@ -1,7 +1,7 @@
 /*
-* Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
-* Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
-*/
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
@@ -46,8 +46,6 @@ public class AvgPool1D(
 
     override val hasActivation: Boolean
         get() = false
-    override val paramCount: Int
-        get() = 0
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -95,6 +93,6 @@ public class AvgPool1D(
     }
 
     override fun toString(): String {
-        return "AvgPool1D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+        return "AvgPool1D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
     }
 }

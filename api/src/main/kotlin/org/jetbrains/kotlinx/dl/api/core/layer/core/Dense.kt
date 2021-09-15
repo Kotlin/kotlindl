@@ -10,9 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
@@ -54,9 +52,11 @@ public class Dense(
     public val activityRegularizer: Regularizer? = null,
     public val useBias: Boolean = true,
     name: String = ""
-) : Layer(name) {
+) : Layer(name), ParametrizedLayer, TrainableLayer {
     internal lateinit var kernel: KVariable
     internal var bias: KVariable? = null
+
+    override var isTrainable: Boolean = true
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
