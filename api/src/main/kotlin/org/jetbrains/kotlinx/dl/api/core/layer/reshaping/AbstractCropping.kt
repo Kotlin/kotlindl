@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -27,7 +26,7 @@ public abstract class AbstractCropping(
         get() = emptyMap()
         set(value) = assignWeights(value)
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun forward(
         tf: Ops,

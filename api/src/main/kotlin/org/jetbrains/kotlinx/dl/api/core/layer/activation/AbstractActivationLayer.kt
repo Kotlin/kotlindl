@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
@@ -42,7 +41,7 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         numberOfLosses: Operand<Float>?
     ): Operand<Float> = forward(tf, input)
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
+    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         this.outputShape = TensorShape(inputShape)

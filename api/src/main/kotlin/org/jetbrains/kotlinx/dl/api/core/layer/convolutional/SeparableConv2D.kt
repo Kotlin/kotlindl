@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
@@ -127,7 +126,7 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
@@ -58,7 +57,7 @@ public class MaxPool1D(
         }
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         val steps = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])

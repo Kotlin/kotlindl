@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -31,7 +30,7 @@ public class Reshape(
 ) : Layer(name) {
     private lateinit var units: Constant<Int>
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         units = tf.constant(IntArray(targetShape.size + 1) {
             if (it == 0) -1 else targetShape[it - 1]
         })

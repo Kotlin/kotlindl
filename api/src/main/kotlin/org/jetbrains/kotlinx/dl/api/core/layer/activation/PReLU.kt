@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
@@ -55,7 +54,7 @@ public class PReLU(
 
     override var isTrainable: Boolean = true
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         val alphaShapeArray = inputShape.toLongArray().drop(1).toLongArray()
         if (sharedAxes != null) {
             for (axis in sharedAxes) {

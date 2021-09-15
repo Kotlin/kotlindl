@@ -256,7 +256,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.buildFromInboundLayers(tf, kGraph)
+            it.buildFromInboundLayers(tf)
 
             val outputShape = it.computeOutputShapeFromInboundLayers()
             val dims = outputShape.dims()

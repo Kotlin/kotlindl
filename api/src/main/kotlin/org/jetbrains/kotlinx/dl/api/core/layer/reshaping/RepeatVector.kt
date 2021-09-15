@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -33,7 +32,7 @@ public class RepeatVector(
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
+    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         require(inputShape.numDimensions() == 2) {

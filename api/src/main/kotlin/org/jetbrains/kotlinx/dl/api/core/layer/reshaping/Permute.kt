@@ -4,7 +4,6 @@
  */
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
@@ -31,7 +30,7 @@ public class Permute(
         }
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         val outputShape = inputShape.toLongArray()

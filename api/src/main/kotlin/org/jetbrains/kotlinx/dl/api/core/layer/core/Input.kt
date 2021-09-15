@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
@@ -30,7 +29,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
     public var packedDims: LongArray = dims
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     /**
      * Extend this function to define placeholder in layer.

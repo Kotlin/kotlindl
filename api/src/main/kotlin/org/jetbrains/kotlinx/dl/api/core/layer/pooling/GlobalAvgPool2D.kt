@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.util.TF
 import org.tensorflow.Operand
@@ -29,7 +28,7 @@ import org.tensorflow.op.Ops
 public class GlobalAvgPool2D(
     name: String = ""
 ) : Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         return Shape.make(inputShape.size(0), inputShape.size(3)) //   if (this.dataFormat == 'channelsLast')

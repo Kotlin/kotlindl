@@ -1,16 +1,14 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.RepeatVector
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.tensorflow.Graph
 import org.tensorflow.Output
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -48,7 +46,7 @@ internal class RepeatVectorLayerTest {
 
     // TODO: generalise this for Layer, see https://github.com/JetBrains/KotlinDL/issues/145
     private operator fun RepeatVector.invoke(input: Array<FloatArray>): Output<Float> = Ops.create().let { tf ->
-        build(tf, KGraph(Graph().toGraphDef()), Shape.make(10, 10))
+        build(tf, Shape.make(10, 10))
         val inputOp = tf.constant(input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)

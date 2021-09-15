@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
@@ -20,7 +19,7 @@ import org.tensorflow.op.Ops
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
 public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
 
     }
 

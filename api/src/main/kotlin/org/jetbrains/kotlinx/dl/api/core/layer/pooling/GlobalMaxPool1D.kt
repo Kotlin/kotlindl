@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -26,7 +25,7 @@ public class GlobalMaxPool1D(
         get() = emptyMap()
         set(value) = assignWeights(value)
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         return Shape.make(inputShape.size(0), inputShape.size(2))

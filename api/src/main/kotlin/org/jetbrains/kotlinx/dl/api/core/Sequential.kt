@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -148,7 +148,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         var inputShape: Shape = inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.build(tf, kGraph, inputShape)
+            it.build(tf, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
             val tensorShape = TensorShape(inputShape)

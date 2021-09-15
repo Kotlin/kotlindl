@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.regularization
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.tensorflow.Operand
@@ -34,7 +33,7 @@ public class Dropout(
     name: String = ""
 ) : Layer(name), NoGradients {
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
