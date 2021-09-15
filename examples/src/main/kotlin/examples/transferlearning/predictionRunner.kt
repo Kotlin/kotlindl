@@ -63,7 +63,7 @@ fun runImageRecognitionPrediction(
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
-            val res = it.predict(inputData, "Activation_predictions")
+            val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)

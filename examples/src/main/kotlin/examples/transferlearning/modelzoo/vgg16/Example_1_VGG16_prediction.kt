@@ -6,9 +6,7 @@
 package examples.transferlearning.modelzoo.vgg16
 
 
-import examples.transferlearning.runImageRecognitionPrediction
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -20,12 +18,9 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
-import java.net.URISyntaxException
-import java.net.URL
 
 /**
  * This examples demonstrates the inference concept on VGG'16 model:
@@ -42,7 +37,46 @@ import java.net.URL
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
 fun vgg16prediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.VGG16)
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = TFModels.CV.VGG16
+    val model = modelHub.loadModel(modelType)
+
+    val imageNetClassLabels = modelHub.loadClassLabels()
+
+    model.use {
+        it.compile(
+            optimizer = Adam(),
+            loss = Losses.MAE,
+            metric = Metrics.ACCURACY
+        )
+
+        it.summary()
+
+        val hdfFile = modelHub.loadWeights(modelType)
+
+        it.loadWeights(hdfFile)
+
+        for (i in 1..8) {
+            val preprocessing: Preprocessing =  preprocess {
+                transformImage {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
+
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
+
+            val res = it.predict(inputData, "Activation_predictions")
+            println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
+
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
+
+            println(top5.toString())
+        }
+    }
 }
 
 /** */

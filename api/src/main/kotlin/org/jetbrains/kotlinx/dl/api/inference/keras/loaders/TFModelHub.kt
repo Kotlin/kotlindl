@@ -127,7 +127,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
 
         val dir = File(commonModelDirectory.absolutePath + modelDirectory)
-        if (!dir.exists()) dir.mkdir()
+        if (!dir.exists()) Files.createDirectories(dir.toPath())
 
         val fileName = commonModelDirectory.absolutePath + relativeConfigPath
         val file = File(fileName)
