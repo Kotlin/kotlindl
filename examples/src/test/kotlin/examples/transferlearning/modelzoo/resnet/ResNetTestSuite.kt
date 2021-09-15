@@ -5,20 +5,19 @@
 
 package examples.transferlearning.modelzoo.resnet
 
-import examples.transferlearning.modelzoo.resnet.resnet50.resnet50additionalTraining
-import examples.transferlearning.modelzoo.resnet.resnet50.resnet50copyModelPrediction
-import examples.transferlearning.modelzoo.resnet.resnet50.resnet50easyPrediction
+import examples.transferlearning.runImageRecognitionPrediction
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class ResNetTestSuite {
     @Test
     fun resnet18predictionTest() {
-        resnet18prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet18)
     }
 
     @Test
     fun resnet34predictionTest() {
-        resnet34prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet34)
     }
 
     @Test
@@ -38,26 +37,26 @@ class ResNetTestSuite {
 
     @Test
     fun resnet50v2predictionTest() {
-        resnet50v2prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet_50_v2)
     }
 
     @Test
     fun resnet101predictionTest() {
-        resnet101prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet_101)
     }
 
     @Test
     fun resnet101v2predictionTest() {
-        resnet101v2prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet_101_v2)
     }
 
     @Test
     fun resnet152predictionTest() {
-        resnet152prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet_152)
     }
 
     @Test
     fun resnet152v2predictionTest() {
-        resnet152v2prediction()
+        runImageRecognitionPrediction(modelType = TFModels.CV.ResNet_152_v2)
     }
 }

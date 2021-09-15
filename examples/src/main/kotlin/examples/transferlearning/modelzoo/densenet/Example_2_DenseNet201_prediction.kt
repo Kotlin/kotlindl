@@ -6,8 +6,7 @@
 package examples.transferlearning.modelzoo.densenet
 
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.Functional
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelzoo.resnet.resnet50
+package examples.transferlearning.modelzoo.resnet
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations

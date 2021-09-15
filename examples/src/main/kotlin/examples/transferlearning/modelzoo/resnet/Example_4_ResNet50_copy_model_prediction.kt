@@ -5,7 +5,7 @@
 
 package examples.transferlearning.modelzoo.resnet
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -23,20 +23,23 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on ResNet'152v2 model:
+ * This examples demonstrates the inference concept on ResNet'50 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'152v2 during training on ImageNet dataset) is applied to images before prediction.
  * - No additional training.
  * - No new layers are added.
+ * - Special preprocessing (used in ResNet'50  during training on ImageNet dataset) is applied to images before prediction.
+ * - Model copied and used for prediction.
  */
-fun resnet152v2prediction() {
+fun resnet50copyModelPrediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.ResNet_151_v2
+    val modelType = TFModels.CV.ResNet50
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
+
+    var copiedModel: Functional
 
     model.use {
         it.compile(
@@ -51,18 +54,44 @@ fun resnet152v2prediction() {
 
         it.loadWeights(hdfFile)
 
+        copiedModel = it.copy(copyWeights = true)
+
         for (i in 1..8) {
             val preprocessing: Preprocessing = preprocess {
                 transformImage {
                     load {
                         pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                         imageShape = ImageShape(224, 224, 3)
-                        colorMode = ColorOrder.RGB
+                        colorMode = ColorOrder.BGR
                     }
                 }
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
+
+            val res = it.predict(inputData)
+            println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
+
+            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
+
+            println(top5.toString())
+        }
+    }
+
+    copiedModel.use {
+        for (i in 1..8) {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
+                    load {
+                        pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                        imageShape = ImageShape(224, 224, 3)
+                        colorMode = ColorOrder.BGR
+                    }
+                }
+            }
+
+            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
+
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
@@ -74,4 +103,4 @@ fun resnet152v2prediction() {
 }
 
 /** */
-fun main(): Unit = resnet152v2prediction()
+fun main(): Unit = resnet50copyModelPrediction()

@@ -5,7 +5,7 @@
 
 package examples.onnx.objectdetection.ssd
 
-import examples.transferlearning.modelzoo.vgg16.getFileFromResource
+import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder

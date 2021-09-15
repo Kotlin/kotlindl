@@ -5,6 +5,7 @@
 
 package examples.transferlearning.modelzoo.vgg16
 
+import examples.transferlearning.getFileFromResource
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses

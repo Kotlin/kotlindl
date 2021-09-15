@@ -65,7 +65,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
             TFModels.CV.ResNet_152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet_50_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet_101_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet_151_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            TFModels.CV.ResNet_152_v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.MobileNetv2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
@@ -127,7 +127,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
 
         val dir = File(commonModelDirectory.absolutePath + modelDirectory)
-        if (!dir.exists()) dir.mkdir()
+        if (!dir.exists()) Files.createDirectories(dir.toPath())
 
         val fileName = commonModelDirectory.absolutePath + relativeConfigPath
         val file = File(fileName)
