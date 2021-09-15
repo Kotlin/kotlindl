@@ -96,8 +96,8 @@ private fun preprocessing(
                     colorMode = ColorOrder.RGB
                 }
                 resize {
-                    outputWidth = 299
-                    outputHeight = 299
+                    outputWidth = resizeTo.first
+                    outputHeight = resizeTo.second
                 }
             }
         }
