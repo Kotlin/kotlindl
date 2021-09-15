@@ -21,8 +21,6 @@ public abstract class AbstractZeroPadding(
 
     override val hasActivation: Boolean get() = false
 
-    override val paramCount: Int get() = 0
-
     override fun forward(
         tf: Ops,
         input: Operand<Float>,

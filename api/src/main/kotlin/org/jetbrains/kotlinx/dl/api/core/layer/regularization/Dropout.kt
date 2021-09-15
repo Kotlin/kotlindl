@@ -32,10 +32,6 @@ public class Dropout(
     private val seed: Long = 12L,
     name: String = ""
 ) : Layer(name), NoGradients {
-    init {
-        isTrainable = false
-    }
-
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
     }
 
@@ -78,8 +74,6 @@ public class Dropout(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 
     override fun toString(): String {
         return "Dropout(keepProbability=$keepProbability)"

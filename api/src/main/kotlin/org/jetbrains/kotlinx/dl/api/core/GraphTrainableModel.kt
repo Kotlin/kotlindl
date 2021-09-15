@@ -10,8 +10,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
@@ -54,7 +53,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     public val logger: KLogger = KotlinLogging.logger {}
 
     /** The layers to describe the model design. Main part of the internal state of the model. */
-    public var layers: List<Layer> = listOf(*layers)
+    init {
+        this.layers = listOf(*layers)
+    }
 
     /** First layer that is responsible for the input shape of the Neural Network. */
     public val inputLayer: Input
@@ -178,7 +179,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         yPredOp = forward(xOp, inputLayer)
         lossOp = buildLossFunction(loss)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+        targets = optimizer.prepareTargets(kGraph, trainableLayerVariables().map { it.variable }, tf, lossOp)
 
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
@@ -191,14 +192,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     private fun buildLossFunction(loss: LossFunction): Operand<Float> {
         val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
-        var totalLoss = basicLoss
         // TODO: probably regularization output should be divided on numberOfLossesOp and changed together with loss before averaging
-        kGraph.variableRegularizers.forEach { (variable, regularizer) ->
-            run {
-                totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable))
+        val result = trainableLayerVariables()
+            .mapNotNull { it.regularizer?.let { r -> it.variable to r } }
+            .fold(basicLoss) { acc, (variable, regularizer) ->
+                tf.math.add(acc, regularizer.apply(tf, variable))
             }
-        }
-        return tf.withName(TRAINING_LOSS).identity(totalLoss)
+        return tf.withName(TRAINING_LOSS).identity(result)
     }
 
 
@@ -212,12 +212,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Validates architecture. */
     private fun validateModelArchitecture() {
-        require(layers.none { it is NoGradients && it.isTrainable })
+        require(layers.none { it is NoGradients && it is ParametrizedLayer && it.isTrainable })
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
                     "But the following layers violates this rule: ${
-                        layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
-                            .contentDeepToString()
+                        layers.filter { it is NoGradients && it is ParametrizedLayer && it.isTrainable }
+                            .joinToString { it.name }
                     }"
         }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
@@ -274,8 +274,23 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
 
         logger.debug { "Initialization of TensorFlow Graph variables." }
-        kGraph.initializeGraphVariables(session)
+        initializeGraphVariables(session)
         isModelInitialized = true
+    }
+
+    /**
+     * Initializes TensorFlow graph variables used in model layers.
+     */
+    private fun initializeGraphVariables(session: Session) {
+        layersVariables()
+            .map { it.initOp }
+            // Only run the session if there is initializer ops.
+            .takeIf { it.isNotEmpty() }
+            ?.let { variables ->
+                val runner = session.runner()
+                variables.forEach(runner::addTarget)
+                runner.run()
+            }
     }
 
     private fun internalFit(
@@ -289,7 +304,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         for (layer in layers) {
-            check(!(layer is NoGradients && layer.isTrainable)) {
+            check(!(layer is NoGradients && layer is ParametrizedLayer && layer.isTrainable)) {
                 "Layer $layer has no gradients implementations in TensorFlow and should be non-trainable only. " +
                         "Set 'isTrainable' to 'false'."
             }
@@ -297,7 +312,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         if (!isModelInitialized) {
             logger.debug { "Initialization of TensorFlow Graph variables." }
-            kGraph.initializeGraphVariables(session)
+            initializeGraphVariables(session)
             isModelInitialized = true
         }
 

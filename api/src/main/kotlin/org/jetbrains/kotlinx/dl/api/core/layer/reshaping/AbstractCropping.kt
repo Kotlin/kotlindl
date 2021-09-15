@@ -23,8 +23,6 @@ public abstract class AbstractCropping(
 ) : Layer(name) {
     override val hasActivation: Boolean
         get() = false
-    override val paramCount: Int
-        get() = 0
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)

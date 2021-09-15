@@ -15,7 +15,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.util.*
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
@@ -197,7 +199,7 @@ private fun fillConv2DVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = convBiasVarName(layerName, dim = 2)
-                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -244,7 +246,7 @@ private fun fillDepthwiseConv2DVariablesFromKeras(
             }
             "depthwise_bias:0" -> {
                 val biasVariableName = depthwiseConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -298,7 +300,7 @@ private fun fillSeparableConv2DVariablesFromKeras(
             }
             "depthwise_bias:0" -> {
                 val biasVariableName = separableConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -335,7 +337,7 @@ private fun fillDenseVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = denseBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }

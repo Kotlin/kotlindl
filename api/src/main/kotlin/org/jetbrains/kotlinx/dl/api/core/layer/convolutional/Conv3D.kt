@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -84,15 +85,16 @@ public class Conv3D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
+    defaultKernelVariableName = KERNEL_VARIABLE_NAME,
+    defaultBiasVariableName = BIAS_VARIABLE_NAME,
     name = name
-) {
+), TrainableLayer {
+    public override var isTrainable: Boolean = true
+
     init {
         requireArraySize(kernelSize, 3, "kernelSize")
         requireArraySize(strides, 5, "strides")
         requireArraySize(dilations, 5, "dilations")
-        isTrainable = false
     }
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 3)
@@ -104,7 +106,13 @@ public class Conv3D(
         input: Operand<Float>
     ): Operand<Float> {
         val options = dilations(dilationsInternal.toList()).dataFormat("NDHWC")
-        return tf.nn.conv3d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+        return tf.nn.conv3d(
+            input,
+            kernel.variable,
+            stridesInternal.toMutableList(),
+            paddingInternal.paddingName,
+            options
+        )
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -141,6 +149,6 @@ public class Conv3D(
     override fun toString(): String =
         "Conv3D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }

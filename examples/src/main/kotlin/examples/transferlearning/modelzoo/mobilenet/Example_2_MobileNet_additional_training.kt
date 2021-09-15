@@ -9,14 +9,15 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -81,7 +82,7 @@ fun mobilenetWithAdditionalTraining() {
     val hdfFile = modelHub.loadWeights(modelType)
 
     model.use {
-        it.layers.last().isTrainable = true
+        (it.layers.last() as TrainableLayer).isTrainable = true
 
         it.compile(
             optimizer = Adam(),
@@ -95,7 +96,7 @@ fun mobilenetWithAdditionalTraining() {
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {
-        layer.isTrainable = false
+        if (layer is TrainableLayer) layer.isTrainable = false
         layers.add(layer)
     }
 

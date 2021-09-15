@@ -5,7 +5,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.*
 import org.tensorflow.op.Ops
-import kotlin.IllegalArgumentException
 
 enum class RunMode {
     EAGER,
@@ -61,9 +60,10 @@ open class LayerTest {
                 val tf = Ops.create(graph)
                 KGraph(graph.toGraphDef()).use { kGraph ->
                     val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
-                    kGraph.initializeGraphVariables(session)
-                    val outputTensor = session.runner().fetch(outputOp).run().first()
-                    return outputTensor
+
+                    if (layer is ParametrizedLayer) layer.initialize(session)
+
+                    return session.runner().fetch(outputOp).run().first()
                 }
             }
         }

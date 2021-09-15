@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -83,11 +84,8 @@ fun vgg19additionalTraining() {
 
     val layers = mutableListOf<Layer>()
 
-    for (layer in model.layers.dropLast(1)) {
-        layer.isTrainable = false
-        layers.add(layer)
-    }
-    layers.forEach { it.isTrainable = false }
+    layers.addAll(model.layers.dropLast(1))
+    layers.filterIsInstance<TrainableLayer>().forEach { it.isTrainable = false }
 
     layers.add(
         Dense(

@@ -71,7 +71,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
         for (layer in it.layers) {
-            if (layer::class == Conv2D::class)
+            if (layer is Conv2D)
                 layer.isTrainable = false
         }
 

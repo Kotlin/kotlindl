@@ -9,11 +9,12 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -81,10 +82,12 @@ public class Conv2D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
+    defaultKernelVariableName = KERNEL_VARIABLE_NAME,
+    defaultBiasVariableName = BIAS_VARIABLE_NAME,
     name = name
-) {
+), TrainableLayer {
+    public override var isTrainable: Boolean = true
+
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
         requireArraySize(strides, 4, "strides")
@@ -96,7 +99,13 @@ public class Conv2D(
         input: Operand<Float>
     ): Operand<Float> {
         val options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
-        return tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+        return tf.nn.conv2d(
+            input,
+            kernel.variable,
+            stridesInternal.toMutableList(),
+            paddingInternal.paddingName,
+            options
+        )
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -125,7 +134,7 @@ public class Conv2D(
     override fun toString(): String =
         "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)

@@ -7,6 +7,7 @@ package examples.transferlearning.toyresnet
 
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -45,10 +46,10 @@ fun main() {
 
         println("Accuracy before: $accuracy")
 
-        for (layer in it.layers) {
+        it.layers.filterIsInstance<TrainableLayer>().forEach { layer ->
             layer.isTrainable = false
         }
-        it.layers.last().isTrainable = true
+        (it.layers.last() as TrainableLayer).isTrainable = true
 
         it.fit(dataset = train, epochs = 1, batchSize = 1000)
 

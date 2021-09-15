@@ -92,7 +92,4 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
 
     override val hasActivation: Boolean
         get() = false
-
-    override val paramCount: Int
-        get() = 0
 }

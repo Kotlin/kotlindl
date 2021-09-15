@@ -7,6 +7,9 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.frozenLayerVariables
+import org.jetbrains.kotlinx.dl.api.core.layer.layersVariables
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -28,6 +31,9 @@ import java.util.*
  * Provides functionality to make predictions and model loading.
  */
 public open class TensorFlowInferenceModel : InferenceModel() {
+    /** The layers to describe the model design. Main part of the internal state of the model. */
+    public lateinit var layers: List<Layer>
+
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -226,16 +232,14 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
     protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
+        return variableName.startsWith("optimizer") && frozenLayerVariables().any { it.name in variableName }
     }
 
     /** Returns two lists : variables and tensors (containing the variables' data) with the same order and size. */
     protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
         val modelWeightsExtractorRunner = session.runner()
 
-        var variables = kGraph.layerVariables()
+        var variables = layersVariables().map { it.variable }
 
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()

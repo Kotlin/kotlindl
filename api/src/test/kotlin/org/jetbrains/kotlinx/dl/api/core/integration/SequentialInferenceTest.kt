@@ -15,6 +15,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -23,8 +25,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.*
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -145,8 +146,8 @@ class SequentialInferenceTest {
             assertTrue(model.getLayer("conv2d_3") is Conv2D)
             assertTrue(model.getLayer("conv2d_1").isTrainable)
             assertTrue(model.getLayer("conv2d_1").hasActivation)
-            assertTrue(model.getLayer("flatten_5").isTrainable)
-            Assertions.assertFalse(model.getLayer("flatten_5").hasActivation)
+            assertFalse(model.getLayer("flatten_5").isTrainable)
+            assertFalse(model.getLayer("flatten_5").hasActivation)
             assertTrue(model.getLayer("maxPool_2") is MaxPool2D)
             assertTrue(model.getLayer("maxPool_4") is MaxPool2D)
             assertTrue(model.getLayer("dense_6") is Dense)
@@ -371,7 +372,7 @@ class SequentialInferenceTest {
 
         model.use {
             for (layer in it.layers) {
-                if (layer::class == Conv2D::class)
+                if (layer is Conv2D)
                     layer.isTrainable = false
             }
 
@@ -568,7 +569,7 @@ class SequentialInferenceTest {
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
             for (layer in it.layers) {
-                if (layer::class == Conv2D::class)
+                if (layer is Conv2D)
                     layer.isTrainable = false
             }
 

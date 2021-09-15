@@ -24,10 +24,6 @@ import org.tensorflow.op.Ops
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
 public abstract class AbstractActivationLayer(name: String) : Layer(name) {
-    init {
-        isTrainable = false
-    }
-
     /**
      * Applies the activation functions to the [input] to produce the output.
      *
@@ -58,6 +54,4 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int get() = 0
 }

@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -26,7 +28,7 @@ internal typealias AnyDTensor = Array<*>
 open class ConvLayerTest {
 
     protected fun assertFloatConv1DTensorsEquals(
-        layer: Layer,
+        layer: AbstractConv,
         input: FloatConv1DTensor,
         expected: FloatConv1DTensor
     ) {
@@ -38,7 +40,7 @@ open class ConvLayerTest {
     }
 
     protected fun assertFloatConv2DTensorsEquals(
-        layer: Layer,
+        layer: AbstractConv,
         input: FloatConv2DTensor,
         expected: FloatConv2DTensor
     ) {
@@ -50,7 +52,7 @@ open class ConvLayerTest {
     }
 
     protected fun assertFloatConv3DTensorsEquals(
-        layer: Layer,
+        layer: AbstractConv,
         input: FloatConv3DTensor,
         expected: FloatConv3DTensor
     ) {
@@ -98,7 +100,7 @@ open class ConvLayerTest {
         getFloatArrayOfShape(this.shape).cast5D()
 
     private fun assertTensorsEquals(
-        layer: Layer,
+        layer: AbstractConv,
         input: AnyDTensor,
         expected: AnyDTensor,
         actual: AnyDTensor,
@@ -116,7 +118,9 @@ open class ConvLayerTest {
 
                     layer.build(tf, kGraph, input.shape)
                     val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-                    kGraph.initializeGraphVariables(session)
+
+                    layer.initialize(session)
+
                     val outputTensor = session.runner().fetch(output).run().first()
                     val outputTensorShape = shapeFromDims(*outputTensor.shape())
                     outputTensor.copyTo(actual)

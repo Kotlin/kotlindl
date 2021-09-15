@@ -8,16 +8,13 @@ package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 import kotlin.math.roundToInt
 
 /**
@@ -43,8 +40,8 @@ import kotlin.math.roundToInt
  * @property [activityRegularizerInternal] regularizer function applied to the output of the layer
  * @property [paddingInternal] numbers to keep for the padding for implementation
  * @property [useBiasInternal] flag if bias should be used during actual [forward] implementation
- * @property [kernelVariableName] name of kernel used when no layer name is defined
- * @property [biasVariableName] name of bias used when no layer name is defined
+ * @property [defaultKernelVariableName] name of kernel used when no layer name is defined
+ * @property [defaultBiasVariableName] name of bias used when no layer name is defined
  * @constructor Creates [AbstractConv] object
  *
  * @param name of the layer to name its variables
@@ -62,40 +59,53 @@ public abstract class AbstractConv(
     protected val activityRegularizerInternal: Regularizer?,
     protected val paddingInternal: ConvPadding,
     protected val useBiasInternal: Boolean,
-    protected val kernelVariableName: String,
-    protected val biasVariableName: String,
+    protected val defaultKernelVariableName: String,
+    protected val defaultBiasVariableName: String,
     name: String
-) : Layer(name) {
+) : Layer(name), ParametrizedLayer {
+    public override val variables: List<VariableDto>
+        get() = listOfNotNull(kernel, bias)
 
     /** Tensor with kernel weights */
-    protected lateinit var kernel: Variable<Float>
+    protected lateinit var kernel: VariableDto
 
     /** Tensor with bias weights */
-    protected var bias: Variable<Float>? = null
-
-    /** Shape of internal implementation of kernel variable */
-    protected lateinit var biasShape: Shape
-
-    /** Shape of internal implementation of bias variable */
-    protected lateinit var kernelShape: Shape
+    protected var bias: VariableDto? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
-        // Compute shapes of kernel and bias matrices
-        kernelShape = computeKernelShape(numberOfChannels)
-        biasShape = computeBiasShape(numberOfChannels)
-
         // should be calculated before addWeight because it's used in calculation
         val inputDepth = numberOfChannels // number of input channels
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
-        fanIn = (inputDepth * multiply(*kernelSizeInternal)).toInt()
-        fanOut = ((outputDepth * multiply(*kernelSizeInternal)).toDouble() /
-                multiply(*stridesInternal).toDouble()).roundToInt()
+        fanIn = (inputDepth * multiply(kernelSizeInternal)).toInt()
+        fanOut = ((outputDepth * multiply(kernelSizeInternal)).toDouble() /
+                multiply(stridesInternal).toDouble()).roundToInt()
 
-        val (kernelVariableName, biasVariableName) = defineVariableNames()
-        createConvVariables(tf, kernelVariableName, biasVariableName, kGraph)
+        val kernelShape = computeKernelShape(numberOfChannels)
+        kernel = variable(
+            tf,
+            kernelVariableName,
+            kernelShape,
+            fanIn,
+            fanOut,
+            kernelInitializerInternal,
+            kernelRegularizerInternal
+        )
+
+        if (useBiasInternal) {
+            val biasShape = computeBiasShape(numberOfChannels)
+            bias = variable(
+                tf,
+                biasVariableName,
+                biasShape,
+                fanIn,
+                fanOut,
+                biasInitializerInternal,
+                biasRegularizerInternal
+            )
+        }
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -110,29 +120,24 @@ public abstract class AbstractConv(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        var output = convImplementation(tf, input)
+        val convolution = convImplementation(tf, input)
 
-        if (useBiasInternal) {
-            output = tf.nn.biasAdd(output, bias)
-        }
+        val withBias = bias?.let { tf.nn.biasAdd(convolution, it.variable) } ?: convolution
 
-        return Activations.convert(activationInternal).apply(tf, output, name)
+        return Activations.convert(activationInternal).apply(tf, withBias, name)
     }
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
+    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override var weights: Map<String, Array<*>>
         get() = extractConvWeights()
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int
-        get() = (kernelShape.numElements() + biasShape.numElements()).toInt()
 
     /** Define the number of output channels given the number of input channels.
      *  Defaults to the number of filter in convolutional layer. */
@@ -175,29 +180,14 @@ public abstract class AbstractConv(
     protected abstract fun defineOutputShape(inputShape: Shape): Shape
 
     /** Extract weights of the layer with the names from [defineVariableNames]. */
-    private fun extractConvWeights(): Map<String, Array<*>> = extractWeights(defineVariableNames().toList())
+    private fun extractConvWeights(): Map<String, Array<*>> = extractWeights(variables.map { it.name })
 
     /** Create the names of variables of the layer based on layer name or not if not present. */
-    private fun defineVariableNames(): Pair<String, String> = if (name.isNotEmpty()) {
-        Pair(kernelVarName(name), biasVarName(name))
-    } else {
-        Pair(kernelVariableName, biasVariableName)
-    }
+    private val kernelVariableName: String
+        get() = if (name.isNotEmpty()) kernelVarName(name) else defaultKernelVariableName
 
-    /** Create the variables of the layer in proper order. */
-    private fun createConvVariables(
-        tf: Ops,
-        kernelVariableName: String,
-        biasVariableName: String,
-        kGraph: KGraph
-    ) {
-        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        if (useBiasInternal) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
-        if (useBiasInternal) bias =
-            addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializerInternal, biasRegularizerInternal)
-    }
+    private val biasVariableName: String
+        get() = if (name.isNotEmpty()) biasVarName(name) else defaultBiasVariableName
 }
 
-private fun multiply(vararg values: Long) = values.fold(1L, Long::times)
+private fun multiply(values: LongArray) = values.fold(1L, Long::times)

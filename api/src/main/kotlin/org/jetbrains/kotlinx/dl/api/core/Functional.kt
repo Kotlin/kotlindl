@@ -6,7 +6,10 @@
 package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File

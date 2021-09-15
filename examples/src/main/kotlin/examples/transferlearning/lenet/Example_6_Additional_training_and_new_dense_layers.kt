@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
@@ -39,7 +40,7 @@ fun additionalTrainingAndNewTopDenseLayers() {
     layers.add(input)
     for (layer in otherLayers) {
         if (layer is Conv2D || layer is MaxPool2D) {
-            layer.isTrainable = false
+            (layer as TrainableLayer).isTrainable = false
             layers.add(layer)
         }
     }

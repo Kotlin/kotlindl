@@ -14,6 +14,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.net.URL
@@ -80,9 +81,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     }
 
     private fun freezeAllLayers(model: Functional): GraphTrainableModel {
-        for (layer in model.layers) {
-            layer.isTrainable = false
-        }
+        model.layers.filterIsInstance<TrainableLayer>().forEach { it.isTrainable = false }
         return model
     }
 

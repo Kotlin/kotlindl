@@ -49,8 +49,6 @@ public class GlobalAvgPool3D(
 
     override val hasActivation: Boolean get() = false
 
-    override val paramCount: Int get() = 0
-
     override fun toString(): String {
         return "GlobalAvgPool3D(name=$name)"
     }

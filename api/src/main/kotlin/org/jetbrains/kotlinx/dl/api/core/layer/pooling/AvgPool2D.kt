@@ -80,6 +80,4 @@ public class AvgPool2D(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 }

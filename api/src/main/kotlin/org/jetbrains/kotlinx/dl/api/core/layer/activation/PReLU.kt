@@ -8,14 +8,15 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.VariableDto
+import org.jetbrains.kotlinx.dl.api.core.layer.variable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 /**
  * Parametric Rectified Linear Unit.
@@ -35,25 +36,23 @@ public class PReLU(
     public val alphaInitializer: Initializer = Zeros(),
     public val alphaRegularizer: Regularizer? = null,
     public val sharedAxes: IntArray? = null,
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    name: String = "",
+    override var isTrainable: Boolean = true
+) : AbstractActivationLayer(name), ParametrizedLayer, TrainableLayer {
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */
 
-    private lateinit var alphaShape: Shape
-    private lateinit var alpha: Variable<Float>
-    private val alphaVariableName = if (name.isNotEmpty()) name + "_" + "alpha" else "alpha"
+    private lateinit var alpha: VariableDto
+    private val alphaVariableName: String
+        get() = if (name.isNotEmpty()) "${name}_alpha" else "alpha"
 
     override var weights: Map<String, Array<*>>
         get() = extractWeights(listOf(alphaVariableName))
         set(value) = assignWeights(value)
-    override val paramCount: Int
-        get() = alphaShape.numElements().toInt()
 
-    init {
-        isTrainable = true
-    }
+    override val variables: List<VariableDto>
+        get() = listOf(alpha)
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val alphaShapeArray = inputShape.toLongArray().drop(1).toLongArray()
@@ -62,19 +61,18 @@ public class PReLU(
                 alphaShapeArray[axis - 1] = 1
             }
         }
-        alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
 
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = fanIn
 
-        alpha = tf.withName(alphaVariableName).variable(alphaShape, getDType())
-        alpha = addWeight(tf, kGraph, alphaVariableName, alpha, alphaInitializer, alphaRegularizer)
+        val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
+        alpha = variable(tf, alphaVariableName, alphaShape, fanIn, fanOut, alphaInitializer, alphaRegularizer)
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
         // It's equivalent to: `-alpha * relu(-x) + relu(x)`
         val positive = tf.nn.relu(input)
-        val negative = tf.math.mul(tf.math.neg(alpha), tf.nn.relu(tf.math.neg(input)))
+        val negative = tf.math.mul(tf.math.neg(alpha.variable), tf.nn.relu(tf.math.neg(input)))
         return tf.math.add(positive, negative)
     }
 

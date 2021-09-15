@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -86,10 +87,12 @@ public class Conv1D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
+    defaultKernelVariableName = KERNEL_VARIABLE_NAME,
+    defaultBiasVariableName = BIAS_VARIABLE_NAME,
     name = name
-) {
+), TrainableLayer {
+    public override var isTrainable: Boolean = true
+
     init {
         requireArraySize(strides, 3, "strides")
         requireArraySize(dilations, 3, "dilations")
@@ -110,7 +113,13 @@ public class Conv1D(
         val options = Conv2d.dilations(dilationsInternal.toList()).dataFormat("NHWC")
         val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
         val result =
-            tf.nn.conv2d(reshapedInput, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+            tf.nn.conv2d(
+                reshapedInput,
+                kernel.variable,
+                stridesInternal.toMutableList(),
+                paddingInternal.paddingName,
+                options
+            )
         return tf.squeeze(result, squeezeAxis)
     }
 
@@ -132,6 +141,6 @@ public class Conv1D(
     override fun toString(): String =
         "Conv1D(filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, " +
                 "dilation=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }
