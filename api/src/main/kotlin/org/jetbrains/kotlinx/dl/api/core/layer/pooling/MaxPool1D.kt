@@ -45,9 +45,6 @@ public class MaxPool1D(
 
     override val hasActivation: Boolean
         get() = false
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
 
     init {
         requireArraySize(poolSize, 3, "poolSize")

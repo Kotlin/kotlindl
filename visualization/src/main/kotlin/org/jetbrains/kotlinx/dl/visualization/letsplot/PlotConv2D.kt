@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.visualization.letsplot
 import jetbrains.letsPlot.Figure
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
 
 internal val FILTER_LAYERS_PERMUTATION = intArrayOf(1, 0, 2, 3)
 

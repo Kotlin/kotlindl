@@ -230,9 +230,5 @@ public class SeparableConv2D(
                 "hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(depthwiseKernel, pointwiseKernel, bias)
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = true
 }

@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers

@@ -45,10 +45,6 @@ public class PReLU(
     private fun alphaVariableName(): String =
         if (name.isNotEmpty()) "${name}_alpha" else "alpha"
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(alpha)
-        set(value) = assignWeights(value)
-
     override val variables: List<KVariable>
         get() = listOf(alpha)
 

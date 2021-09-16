@@ -110,9 +110,5 @@ public class Dense(
                 "useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernel.shape}, biasShapeArray=${bias?.shape})"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(kernel, bias)
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = true
 }

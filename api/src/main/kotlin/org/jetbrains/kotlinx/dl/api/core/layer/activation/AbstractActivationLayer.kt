@@ -48,9 +48,5 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         return inputShape
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = true
 }

@@ -78,9 +78,5 @@ public class AvgPool2D(
         return "AvgPool2D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

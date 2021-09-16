@@ -73,9 +73,5 @@ public class MaxPool3D(
         return "MaxPool3D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

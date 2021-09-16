@@ -47,9 +47,5 @@ public class GlobalAvgPool2D(
         return "GlobalAvgPool2D(name = $name, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

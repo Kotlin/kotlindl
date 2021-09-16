@@ -74,9 +74,5 @@ public class Dropout(
         return "Dropout(name = $name, rate=$rate, seed=$seed, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

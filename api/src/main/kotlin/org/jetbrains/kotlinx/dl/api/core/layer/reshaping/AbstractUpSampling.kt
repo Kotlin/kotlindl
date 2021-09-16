@@ -26,9 +26,6 @@ public abstract class AbstractUpSampling(
 
     override val hasActivation: Boolean
         get() = false
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

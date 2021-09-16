@@ -56,9 +56,5 @@ public class Permute(
         return "Permute(name = $name, dims=${dims.contentToString()}, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

@@ -56,9 +56,5 @@ public class RepeatVector(
         return "RepeatVector(name = $name, n=$n, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

@@ -117,10 +117,6 @@ public abstract class AbstractConv(
         return Activations.convert(activation).apply(tf, withBias, name)
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(kernel, bias)
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = true
 
     /** Define the number of output channels given the number of input channels.

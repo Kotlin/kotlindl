@@ -15,10 +15,6 @@ import org.tensorflow.op.Ops
 public abstract class AbstractZeroPadding(
     name: String
 ) : Layer(name) {
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 
     override fun forward(

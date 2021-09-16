@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -95,34 +94,6 @@ public abstract class Layer(public var name: String) {
         inboundLayers = layers.toMutableList()
         return this
     }
-
-    /** Extract weights values for provided variables. */
-    protected fun extractWeights(vararg variables: KVariable?): Map<String, Array<*>> {
-        require(parentModel != null) { "Layer $name is not related to any model!" }
-
-        val session = parentModel!!.session
-        val runner = session.runner()
-
-        val variableNames = variables.mapNotNull { it?.name }
-        for (variableName in variableNames) {
-            runner.fetch(variableName)
-        }
-
-        val weights = runner.run().map { it.convertTensorToMultiDimArray() }
-        return variableNames.zip(weights).toMap()
-    }
-
-    /** Extract weights values by variable names. */
-    protected fun assignWeights(weights: Map<String, Array<*>>) {
-        require(parentModel != null) { "Layer $name is not related to any model!" }
-
-        for (variableName in weights.keys) {
-            parentModel!!.assignVariable(variableName, weights[variableName]!!)
-        }
-    }
-
-    /** Layer's weights. */
-    public abstract var weights: Map<String, Array<*>>
 
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean

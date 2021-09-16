@@ -53,9 +53,5 @@ public class Reshape(
         return "Reshape(name = $name, targetShape=$targetShape, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }

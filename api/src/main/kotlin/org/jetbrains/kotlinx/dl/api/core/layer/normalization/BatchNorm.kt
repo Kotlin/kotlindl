@@ -176,10 +176,6 @@ public class BatchNorm(
                 "movingMeanShapeArray=${movingMean.shape}, movingVarianceShapeArray=${movingVariance.shape})"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(gamma, beta, movingMean, movingVariance)
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 }
 
