@@ -14,15 +14,15 @@ private data class SummaryRow(
 
 /**
  * Formats model summary
- * @param layerNameColumnName title of the column with layer names
- * @param outputShapeColumnName title of the column with layer output shapes
- * @param paramsCountColumnName title of the column with layer parameter counts
- * @param connectedToColumnName title of the column with layers that are inputs for a layer
- * @param columnSeparator text chunk that will be used as column separator for the layer description table
- * @param lineSeparator character that will be used to produce a string to separate rows of the layer description table
- * @param thickLineSeparator character that will be used to produce a string to separate general model description,
+ * @param [layerNameColumnName] title of the column with layer names
+ * @param [outputShapeColumnName] title of the column with layer output shapes
+ * @param [paramsCountColumnName] title of the column with layer parameter counts
+ * @param [connectedToColumnName] title of the column with layers that are inputs for a layer
+ * @param [columnSeparator] text chunk that will be used as column separator for the layer description table
+ * @param [lineSeparator] character that will be used to produce a string to separate rows of the layer description table
+ * @param [thickLineSeparator] character that will be used to produce a string to separate general model description,
  * header and body of the table with layers description, and description footer
- * @param withConnectionsColumn flag that turns on/off displaying of the column with names of inbound layers
+ * @param [withConnectionsColumn] flag that turns on/off displaying of the column with names of inbound layers
  * @return description of model summary as list of strings, which are suitable for printing or logging
  */
 public fun ModelSummary.format(

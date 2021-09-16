@@ -41,8 +41,8 @@ internal class SummaryHelpersTests {
             LayerSummary("dense_1", "Dense", TensorShape(-1, 256), 16640, listOf("globalAvgPool2D")),
             LayerSummary("dense_2", "Dense", TensorShape(-1, 10), 2570, listOf("dense_1"))
         ),
-        trainableParamsCount = 222666,
-        frozenParamsCount = 911333
+        trainableParamsCount = 2570,
+        frozenParamsCount = 220096
     )
 
     @Test
@@ -122,9 +122,9 @@ internal class SummaryHelpersTests {
                 "dense_2(Dense)                         [None, 10]                2570          dense_1                    ",
                 "__________________________________________________________________________________________________________",
                 "==========================================================================================================",
-                "Total trainable params: 222666",
-                "Total frozen params: 911333",
-                "Total params: 1133999",
+                "Total trainable params: 2570",
+                "Total frozen params: 220096",
+                "Total params: 222666",
                 "=========================================================================================================="
             ),
             functionalModel.format()
@@ -182,9 +182,9 @@ internal class SummaryHelpersTests {
                 "dense_2(Dense)                       ::[None, 10]        ::2570           ::dense_1            ",
                 "...............................................................................................",
                 ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::",
-                "Total trainable params: 222666",
-                "Total frozen params: 911333",
-                "Total params: 1133999",
+                "Total trainable params: 2570",
+                "Total frozen params: 220096",
+                "Total params: 222666",
                 ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
             ),
             functionalModel.format(

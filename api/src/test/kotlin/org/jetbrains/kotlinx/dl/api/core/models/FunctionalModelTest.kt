@@ -65,6 +65,8 @@ internal class FunctionalModelTest {
     fun summary() {
         assertEquals("functional_model", correctTestModel.name)
 
+        dense_2.isTrainable = false
+
         assertEquals(
             ModelSummary(
                 type = "Functional",
@@ -85,8 +87,8 @@ internal class FunctionalModelTest {
                     LayerSummary("dense_1", "Dense", TensorShape(-1, 256), 16640, listOf("globalAvgPool2D")),
                     LayerSummary("dense_2", "Dense", TensorShape(-1, 10), 2570, listOf("dense_1"))
                 ),
-                trainableParamsCount = 222666,
-                frozenParamsCount = 0
+                trainableParamsCount = 220096,
+                frozenParamsCount = 2570
             ),
             correctTestModel.summary()
         )
