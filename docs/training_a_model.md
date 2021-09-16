@@ -22,7 +22,7 @@ model.use {
         metric = Metrics.ACCURACY
     )
 
-    it.summary()
+    it.logSummary()
 
     // You can think of the training process as "fitting" the model to describe the given data :)
     it.fit(

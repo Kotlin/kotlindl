@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /**
@@ -33,7 +34,7 @@ fun loadModelWithoutWeightsInitAndEvaluate() {
             metric = Metrics.ACCURACY
         )
         it.init()
-        it.summary()
+        it.logSummary()
 
         val accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 

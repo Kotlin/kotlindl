@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
@@ -56,7 +57,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val hdfFile = modelHub.loadWeights(modelType)
 
@@ -131,7 +132,7 @@ fun main() {
             loss = Losses.MAE,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
 
         it.loadWeights(File(PATH_TO_MODEL))
 

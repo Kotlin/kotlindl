@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
@@ -42,7 +43,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
     lenet5().use {
         it.compile(optimizer = optimizer, loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
-        it.summary()
+        it.logSummary()
 
         print(it.kGraph())
 
@@ -79,7 +80,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
         print(it.kGraph())
         it.loadWeights(File(PATH_TO_MODEL), loadOptimizerState = true)
 
@@ -108,7 +109,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
         it.loadWeights(File(PATH_TO_MODEL), loadOptimizerState = false)
 
         val accuracyBefore = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]

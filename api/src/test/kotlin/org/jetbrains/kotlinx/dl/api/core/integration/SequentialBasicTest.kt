@@ -22,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
@@ -133,7 +134,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.7)
             }
 
-            it.summary()
+            it.logSummary()
 
             // Prediction testing
             val label = it.predict(test.getX(0))
@@ -201,7 +202,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.7)
             }
 
-            it.summary()
+            it.logSummary()
 
             // Prediction testing
             val label = it.predict(test.getX(0))
@@ -501,7 +502,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
@@ -582,7 +583,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
@@ -662,7 +663,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 metric = Accuracy()
             )
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = 1000)

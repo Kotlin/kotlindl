@@ -85,7 +85,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
     
-        it.summary()
+        it.logSummary()
     
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
     

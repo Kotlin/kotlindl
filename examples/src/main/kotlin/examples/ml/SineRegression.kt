@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import kotlin.math.sin
@@ -64,7 +65,7 @@ fun sineRegression() {
             metric = Metrics.MAE
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(
             dataset = train,
