@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
@@ -27,7 +28,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val hdfFile = getToyResNetWeightsFile()
 
@@ -40,7 +41,7 @@ fun main() {
     }
 
     copiedModel.use {
-        copiedModel.summary()
+        copiedModel.logSummary()
         val accuracy = copiedModel.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
 
         println("Accuracy before: $accuracy")

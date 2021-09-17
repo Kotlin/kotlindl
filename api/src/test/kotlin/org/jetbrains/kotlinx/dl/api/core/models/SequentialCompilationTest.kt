@@ -21,6 +21,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -111,8 +114,26 @@ internal class SequentialModelTest {
             assertEquals("sequential_model", it.name)
 
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
-            val layerDescriptions = it.summary()
-            assertTrue(layerDescriptions[1].contentEquals("conv2d_1(Conv2D)                       [None, 28, 28, 32]        832"))
+
+            assertEquals(
+                ModelSummary(
+                    type = "Sequential",
+                    name = "sequential_model",
+                    layersSummaries = listOf(
+                        LayerSummary("input_1", "Input", TensorShape(-1, 28, 28, 1), 0, emptyList()),
+                        LayerSummary("conv2d_1", "Conv2D", TensorShape(-1, 28, 28, 32), 832, emptyList()),
+                        LayerSummary("maxPool_1", "MaxPool2D", TensorShape(-1, 14, 14, 32), 0, emptyList()),
+                        LayerSummary("conv2d_2", "Conv2D", TensorShape(-1, 14, 14, 64), 51264, emptyList()),
+                        LayerSummary("maxPool_2", "MaxPool2D", TensorShape(-1, 7, 7, 64), 0, emptyList()),
+                        LayerSummary("flatten_1", "Flatten", TensorShape(-1, 3136), 0, emptyList()),
+                        LayerSummary("dense_1", "Dense", TensorShape(-1, 512), 1606144, emptyList()),
+                        LayerSummary("dense_2", "Dense", TensorShape(-1, 10), 5130, emptyList())
+                    ),
+                    trainableParamsCount = 1663370,
+                    frozenParamsCount = 0
+                ),
+                it.summary()
+            )
 
             assertTrue(
                 it.kGraph().toString().contentEquals(

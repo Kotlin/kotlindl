@@ -70,7 +70,7 @@ val model = modelZoo.loadModel() as Sequential
 Now we have created the dataset, and we have a model, we can put everything together, and apply the transfer learning technique.
 
 At this point, we need to decide which layers of this model we want to fine-tune, which ones we want to leave as is and if we want to add or remove layers. 
-You can use `model.summary()` to inspect the model's architecture.
+You can use `model.logSummary()` to inspect the model's architecture.
 
 This model consists mainly of Conv2D and MaxPool2D layers and has a couple of dense layers at the end. One way to do transfer learning (although, of course, not the only one) is to leave the convolutional layers as they are, and re-train the dense layers. 
 So this is what we will do:

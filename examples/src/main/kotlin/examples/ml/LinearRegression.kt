@@ -19,6 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.ReductionType
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.util.*
 import kotlin.random.Random
@@ -93,7 +94,7 @@ fun linearRegression() {
             metric = Metrics.MAE
         )
 
-        it.summary()
+        it.logSummary()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
 

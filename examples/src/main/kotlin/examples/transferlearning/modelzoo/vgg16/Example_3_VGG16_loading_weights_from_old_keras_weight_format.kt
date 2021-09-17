@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
@@ -57,7 +58,7 @@ fun main() {
             loss = Losses.MAE,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
 
         val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
@@ -94,7 +95,7 @@ fun main() {
             loss = Losses.MAE,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
 
         val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)
@@ -198,7 +199,7 @@ fun main() {
             loss = Losses.MAE,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
 
         val hdfFile = getVGG16WeightsFile()
         recursivePrintGroupInHDF5File(hdfFile, hdfFile)

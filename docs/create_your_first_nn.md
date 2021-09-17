@@ -136,10 +136,10 @@ Here, the last layer of the model gives us 10 numbers, each representing the pro
 *Softmax Crossentropy with logits* measures the probability of error. *Softmax Crossentropy with logits* measures the probability error. 
 * Metrics allow you to monitor the training and evaluation of the model. Accuracy simply represents the percentage of correct predictions out of all the predictions made.  
 
-At this point, we can call the `summary()` method to get a printout of the neural network's architecture. 
+At this point, we can call the `logSummary()` method to get a printout of the neural network's architecture. 
 
 ```kotlin
-it.summary()
+it.logSummary()
 ```
 
 ```

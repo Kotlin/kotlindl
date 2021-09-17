@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
@@ -50,7 +51,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(
             dataset = train,
