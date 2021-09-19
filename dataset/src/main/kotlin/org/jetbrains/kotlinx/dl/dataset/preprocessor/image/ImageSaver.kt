@@ -29,7 +29,7 @@ public class Save(
     @Throws(IOException::class)
     override fun save(filename: String, image: BufferedImage) {
         val outputFile: File = if (dirLocation!!.isDirectory) {
-            File("$dirLocation\\${filename}")
+            File(dirLocation, filename)
         } else {
             dirLocation!!
         }
