@@ -55,12 +55,15 @@ public class Preprocessing {
     }
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        var image = load.fileToImage(file)
+        return handleImage(load.fileToImage(file), file.name)
+    }
 
+    internal fun handleImage(inputImage: BufferedImage, imageName: String): Pair<FloatArray, ImageShape> {
+        var image = inputImage
         if (::imagePreprocessingStage.isInitialized) {
             for (operation in imagePreprocessingStage.operations) {
                 image = operation.apply(image)
-                (operation as? ImagePreprocessorBase)?.save?.save(file.name, image)
+                (operation as? ImagePreprocessorBase)?.save?.save(imageName, image)
             }
         }
 
