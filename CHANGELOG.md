@@ -35,7 +35,7 @@ Features:
 * Added [Orthogonal initializer](https://github.com/JetBrains/KotlinDL/issues/51)
 * Added [Softmax activation layer](https://github.com/JetBrains/KotlinDL/issues/52)
 * Added [LeakyReLU activation layer](https://github.com/JetBrains/KotlinDL/issues/53)
-* Added [PReLU activate layer](https://github.com/JetBrains/KotlinDL/issues/54)
+* Added [PReLU activation layer](https://github.com/JetBrains/KotlinDL/issues/54)
 * Added [ELU activation layer](https://github.com/JetBrains/KotlinDL/issues/55)
 * Added [ThresholdedReLU activation layer](https://github.com/JetBrains/KotlinDL/issues/56)
 * Added [Conv1D layer](https://github.com/JetBrains/KotlinDL/issues/59)
@@ -69,7 +69,6 @@ Bugs:
 API breaking changes:
 * Renamed ModelZoo to the ModelHub
 * Changed the ImagePreprocessing DSL: loading and saving are moved to the separate level of DSL
-* 
 
 Infrastructure:
 * Loaded the weights and JSON configurations of the newly added ModelHub models to S3 storage
