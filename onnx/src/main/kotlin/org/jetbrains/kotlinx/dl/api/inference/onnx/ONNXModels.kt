@@ -188,7 +188,7 @@ public object ONNXModels {
             }
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
-                return modelHub[this] as SSDObjectDetectionModel
+                return modelHub.loadModel(this) as SSDObjectDetectionModel
             }
         }
 
