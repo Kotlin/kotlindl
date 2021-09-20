@@ -37,7 +37,9 @@ public class Loading(
     public var colorMode: ColorOrder = ColorOrder.BGR
 ) {
     internal fun fileToImage(file: File): BufferedImage {
-        return ImageConverter.toBufferedImage(file.inputStream(), colorOrder = colorMode)
+        return file.inputStream().use { inputStream ->
+            ImageConverter.toBufferedImage(inputStream, colorOrder = colorMode)
+        }
     }
 
     /*internal fun fileTo2D(file: File): Array<Array<FloatArray>> {

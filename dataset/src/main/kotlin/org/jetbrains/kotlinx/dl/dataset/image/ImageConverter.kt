@@ -28,7 +28,7 @@ public class ImageConverter {
         /** All pixels has values in range [0; 255]. */
         public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
             return OnHeapDataset.toRawVector(
-                toRawPixels(imageFile.inputStream(), colorOrder)
+                imageFile.inputStream().use { toRawPixels(it, colorOrder) }
             )
         }
 
@@ -45,7 +45,7 @@ public class ImageConverter {
         /** All pixels in range [0;1) */
         public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
             return OnHeapDataset.toNormalizedVector(
-                toRawPixels(imageFile.inputStream(), colorOrder)
+                imageFile.inputStream().use { toRawPixels(it, colorOrder) }
             )
         }
 
