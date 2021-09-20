@@ -28,7 +28,7 @@ public class OnFlyImageDataset internal constructor(
     private var y: FloatArray
 
     init {
-        val loading = preprocessing.imagePreprocessingStage.load
+        val loading = preprocessing.load
         xFiles = loading.prepareFileNames()
         y = labels ?: OnHeapDataset.prepareY(xFiles, preprocessing)
     }

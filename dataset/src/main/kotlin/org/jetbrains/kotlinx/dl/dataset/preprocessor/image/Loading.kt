@@ -17,7 +17,7 @@ import java.nio.file.Path
 import kotlin.streams.toList
 
 /**
- * This image preprocessor defines the Loading operation.
+ * This class defines the Loading operation.
  *
  * Describes the initial phase of data and its labels loading.
  * Could be applied to one file or whole directory.
@@ -35,7 +35,7 @@ public class Loading(
     public var labelGenerator: LabelGenerator? = null,
     /** Keep channels in the given order after loading. */
     public var colorMode: ColorOrder = ColorOrder.BGR
-) : ImagePreprocessor {
+) {
     internal fun fileToImage(file: File): BufferedImage {
         return ImageConverter.toBufferedImage(file.inputStream(), colorOrder = colorMode)
     }
@@ -53,9 +53,5 @@ public class Loading(
             .map { obj: Path -> obj.toFile() }
             .toList()
             .toTypedArray()
-    }
-
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
-        TODO("Not yet implemented")
     }
 }

@@ -182,7 +182,7 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             labels: FloatArray
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.imagePreprocessingStage.load
+                val loading = preprocessors.load
                 val xFiles = loading.prepareFileNames()
 
                 val x = prepareX(xFiles, preprocessors, preprocessors.finalShape.numberOfElements.toInt())
@@ -215,7 +215,7 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             preprocessors: Preprocessing
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.imagePreprocessingStage.load
+                val loading = preprocessors.load
                 val xFiles = loading.prepareFileNames()
                 val numOfPixels = preprocessors.finalShape.numberOfElements.toInt()
                 val x = prepareX(xFiles, preprocessors, numOfPixels)
@@ -232,8 +232,8 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             preprocessors: Preprocessing,
         ): FloatArray {
             val y: FloatArray
-            if (preprocessors.imagePreprocessingStage.load.labelGenerator != null) {
-                when (val labelGenerator = preprocessors.imagePreprocessingStage.load.labelGenerator) {
+            if (preprocessors.load.labelGenerator != null) {
+                when (val labelGenerator = preprocessors.load.labelGenerator) {
                     is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
                         val mapping = labelGenerator.mapping
 

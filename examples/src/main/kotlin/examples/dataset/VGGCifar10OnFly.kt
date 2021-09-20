@@ -185,20 +185,20 @@ fun main() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(cifarImagesArchive)
+            imageShape = ImageShape(32, 32, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = File(cifarImagesArchive)
-                imageShape = ImageShape(32, 32, 3)
-                colorMode = ColorOrder.BGR
-            }
-            rotate {
-                degrees = 90f
-            }
             crop {
                 left = 2
                 right = 2
                 top = 2
                 bottom = 2
+            }
+            rotate {
+                degrees = 90f
             }
             resize {
                 outputHeight = IMAGE_SIZE.toInt()

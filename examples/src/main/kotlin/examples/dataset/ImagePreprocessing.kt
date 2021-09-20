@@ -32,21 +32,21 @@ fun main() {
     val imageDirectory = Paths.get(resource.toURI()).toFile()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = imageDirectory
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+            labelGenerator = EmptyLabels()
+        }
         transformImage {
-            load {
-                pathToData = imageDirectory
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-                labelGenerator = EmptyLabels()
-            }
-            rotate {
-                degrees = 60f
-            }
             crop {
                 left = 12
                 right = 12
                 top = 12
                 bottom = 12
+            }
+            rotate {
+                degrees = 60f
             }
             resize {
                 outputWidth = 300

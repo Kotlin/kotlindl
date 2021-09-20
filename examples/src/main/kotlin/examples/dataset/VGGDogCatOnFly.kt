@@ -26,7 +26,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -187,13 +186,13 @@ fun main() {
     val catdogimages = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(catdogimages)
+            imageShape = ImageShape(channels = 3)
+            colorMode = ColorOrder.BGR
+            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+        }
         transformImage {
-            load {
-                pathToData = File(catdogimages)
-                imageShape = ImageShape(channels = 3)
-                colorMode = ColorOrder.BGR
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
                 outputWidth = IMAGE_SIZE.toInt()

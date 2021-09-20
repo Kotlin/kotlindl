@@ -26,28 +26,28 @@ fun main() {
     val preprocessedImagesDirectory = File("processedImages")
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = image
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = image
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-            }
-            rotate {
-                degrees = 0f
-            }
             crop {
                 left = 100
                 right = 0
                 top = 100
                 bottom = 0
             }
+            rotate {
+                degrees = 0f
+            }
             resize {
                 outputWidth = 400
                 outputHeight = 400
                 interpolation = InterpolationType.NEAREST
-            }
-            save {
-                dirLocation = preprocessedImagesDirectory
+                save {
+                    dirLocation = preprocessedImagesDirectory
+                }
             }
         }
         transformTensor {

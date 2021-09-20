@@ -23,5 +23,5 @@ public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, pu
 
 /** Image DSL Preprocessing extension.*/
 public fun TensorPreprocessing.onnx(block: ONNXModelPreprocessor.() -> Unit) {
-    customPreprocessors.add(CustomPreprocessor(ONNXModelPreprocessor(null).apply(block)))
+    addOperation(CustomPreprocessor(ONNXModelPreprocessor(null).apply(block)))
 }
