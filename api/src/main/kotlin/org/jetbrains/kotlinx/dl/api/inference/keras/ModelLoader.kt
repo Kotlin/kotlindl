@@ -557,7 +557,8 @@ private fun createDenseLayer(config: LayerConfig, name: String): Layer {
         kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
-        name = name
+        name = name,
+        useBias = config.use_bias ?: true
     )
 }
 
