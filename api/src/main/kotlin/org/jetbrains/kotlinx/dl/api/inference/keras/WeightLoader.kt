@@ -335,7 +335,7 @@ private fun fillDenseVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = denseBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }

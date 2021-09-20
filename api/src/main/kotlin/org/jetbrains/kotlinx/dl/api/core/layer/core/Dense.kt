@@ -59,31 +59,30 @@ public class Dense(
     name: String = ""
 ) : Layer(name) {
     private lateinit var kernelShape: Shape
-    private lateinit var biasShape: Shape
+    private var biasShape: Shape? = null
 
     // weight tensors
     private lateinit var kernel: Variable<Float>
-    private lateinit var bias: Variable<Float>
+    private var bias: Variable<Float>? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
-        biasShape = Shape.make(outputSize.toLong())
+        if (useBias) {
+            biasShape = Shape.make(outputSize.toLong())
+        }
 
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
-        val (kernelVariableName, biasVariableName) = defineVariableNames()
-        createDenseVariables(tf, kernelVariableName, biasVariableName, kGraph)
+        createDenseVariables(tf, defineKernelVariableName(), defineBiasVariableName(), kGraph)
     }
 
-    private fun defineVariableNames(): Pair<String, String> {
-        return if (name.isNotEmpty()) {
-            Pair(denseKernelVarName(name), denseBiasVarName(name))
-        } else {
-            Pair(KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
-        }
-    }
+    private fun defineKernelVariableName(): String =
+        if (name.isNotEmpty()) denseKernelVarName(name) else KERNEL_VARIABLE_NAME
+
+    private fun defineBiasVariableName(): String =
+        if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
 
     private fun createDenseVariables(
         tf: Ops,
@@ -92,10 +91,12 @@ public class Dense(
         kGraph: KGraph
     ) {
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias, biasInitializer, biasRegularizer)
+
+        if (useBias) {
+            val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
+            bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
+        }
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -108,7 +109,8 @@ public class Dense(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val signal: Operand<Float> = tf.math.add(tf.linalg.matMul(input, kernel), bias)
+        val signalWithoutBias = tf.linalg.matMul(input, kernel)
+        val signal = bias?.let { tf.math.add(signalWithoutBias, it) } ?: signalWithoutBias
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
@@ -117,19 +119,22 @@ public class Dense(
         set(value) = assignWeights(value)
 
     private fun extractDenseWeights(): Map<String, Array<*>> {
-        return extractWeights(defineVariableNames().toList())
+        return extractWeights(
+            if (useBias) listOf(defineKernelVariableName(), defineBiasVariableName())
+            else listOf(defineKernelVariableName())
+        )
     }
 
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (kernelShape.numElements() + biasShape.numElements()).toInt()
+        get() = (kernelShape.numElements() + (biasShape?.numElements() ?: 0)).toInt()
 
     /** Returns the shape of kernel weights. */
     public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
+    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"

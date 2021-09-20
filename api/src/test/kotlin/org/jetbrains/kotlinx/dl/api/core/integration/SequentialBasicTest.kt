@@ -82,7 +82,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             activation = Activations.Linear,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeUniform(SEED),
-            name = "dense_2"
+            name = "dense_2",
+            useBias = false
         )
     )
 
