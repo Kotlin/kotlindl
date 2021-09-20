@@ -30,7 +30,36 @@ fun main() {
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
+
+        visualise(imageFile, detectedObjects)
     }
 }
 
+private fun visualise(
+    imageFile: File,
+    detectedObjects: List<DetectedObject>
+) {
+    val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = imageFile
+            imageShape = ImageShape(224, 224, 3)
+            colorMode = ColorOrder.BGR
+        }
+        transformImage {
+            resize {
+                outputWidth = 1200
+                outputHeight = 1200
+            }
+        }
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
+        }
+    }
+
+    val rawImage = preprocessing().first
+
+    drawDetectedObjects(rawImage, ImageShape(1200, 1200, 3), detectedObjects)
+}
 
