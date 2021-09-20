@@ -93,7 +93,7 @@ internal class FunctionalModelTest {
             correctTestModel.summary()
         )
 
-        val graphLines = correctTestModel.kGraph().toString().split('\n').toList()
+        val graphLines = correctTestModel.kGraph().toString().split('\n').toSet()
         assertEquals(org.jetbrains.kotlinx.dl.api.core.models.graphLines, graphLines)
     }
 }
@@ -200,7 +200,7 @@ internal val dense_2 = Dense(
 )
 
 
-private val graphLines = listOf(
+private val graphLines = setOf(
     "Name: default_data_placeholder; Type: Placeholder; Out #tensors:  1",
     "Name: conv2D_1_conv2d_kernel; Type: VariableV2; Out #tensors:  1",
     "Name: conv2D_1_conv2d_bias; Type: VariableV2; Out #tensors:  1",
