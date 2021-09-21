@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.shape.cast2D
 import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
-import org.jetbrains.kotlinx.dl.dataset.handler.*
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
+import org.jetbrains.kotlinx.dl.dataset.handler.*
 import java.io.*
 import java.net.URL
 import java.nio.file.Files
@@ -264,7 +264,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 }
 
 /** Path to the Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
+private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/dogs-vs-cats/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
 public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
@@ -275,7 +275,7 @@ public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
     )
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
+private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small-dogs-vs-cats/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
@@ -317,14 +317,16 @@ private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePat
     val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
     val toFolder = dataDirectory.toPath()
 
-    if (!dataDirectory.exists()) {
-        Files.createDirectories(dataDirectory.toPath())
+    if (!dataDirectory.exists()) Files.createDirectories(dataDirectory.toPath())
 
+    if (archive.exists()) {
         extractFromZipArchiveToFolder(archive.toPath(), toFolder)
         val deleted = archive.delete()
         if (!deleted) {
-            throw Exception("Archive ${archive.absolutePath} could not be deleted! Create this archive manually.")
+            throw Exception("Archive ${archive.absolutePath} could not be deleted! Delete this archive manually.")
         }
+    } else {
+        throw Exception("No archive file ${archive.absolutePath} in the cache folder!")
     }
 
     return toFolder.toAbsolutePath().toString()
