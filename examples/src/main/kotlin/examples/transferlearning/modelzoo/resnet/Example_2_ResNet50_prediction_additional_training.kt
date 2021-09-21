@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
@@ -49,11 +49,11 @@ fun resnet50additionalTraining() {
     var modelType = TFModels.CV.ResNet50
     val model = modelHub.loadModel(modelType)
 
-    val catdogimages = dogsCatsSmallDatasetPath()
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         load {
-            pathToData = File(catdogimages)
+            pathToData = File(dogsCatsImages)
             imageShape = ImageShape(channels = NUM_CHANNELS)
             colorMode = ColorOrder.BGR
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
