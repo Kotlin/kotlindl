@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-fun main() {
+fun predictionSSD() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.ObjectDetection.SSD
     val model = modelHub.loadModel(modelType)
@@ -43,4 +43,7 @@ fun main() {
         }
     }
 }
+
+/** */
+fun main(): Unit = predictionSSD()
 

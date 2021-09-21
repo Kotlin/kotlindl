@@ -7,15 +7,10 @@ package examples.onnx.objectdetection.ssd
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
 import java.io.File
 
-fun main() {
+fun objectDetectionSSD() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
@@ -30,36 +25,10 @@ fun main() {
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
-
-        visualise(imageFile, detectedObjects)
     }
 }
 
-private fun visualise(
-    imageFile: File,
-    detectedObjects: List<DetectedObject>
-) {
-    val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
-        }
-        transformImage {
-            resize {
-                outputWidth = 1200
-                outputHeight = 1200
-            }
-        }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
-        }
-    }
+/** */
+fun main(): Unit = objectDetectionSSD()
 
-    val rawImage = preprocessing().first
-
-    drawDetectedObjects(rawImage, ImageShape(1200, 1200, 3), detectedObjects)
-}
 
