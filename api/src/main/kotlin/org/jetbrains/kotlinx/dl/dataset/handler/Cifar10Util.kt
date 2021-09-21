@@ -27,7 +27,7 @@ private fun loadImagesFromDirectory(
     archiveName: String
 ): Array<FloatArray> {
     val images = Array(subDatasetSize) {
-        ImageConverter.toNormalizedFloatArray(File("$archiveName\\${it + 1}.png"))
+        ImageConverter.toNormalizedFloatArray(File(archiveName, "${it + 1}.png"))
     }
 
     return images
