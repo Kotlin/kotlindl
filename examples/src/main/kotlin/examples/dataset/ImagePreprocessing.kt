@@ -50,7 +50,7 @@ fun main() {
                 outputHeight = 300
                 interpolation = InterpolationType.NEAREST
             }
-            convert { colorMode = ColorMode.BGR }
+            grayscale()
         }
         transformTensor {
             rescale {
@@ -67,7 +67,7 @@ fun main() {
     val rawImage = batchIter.next().x[2]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.BGR))
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.GRAYSCALE))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
