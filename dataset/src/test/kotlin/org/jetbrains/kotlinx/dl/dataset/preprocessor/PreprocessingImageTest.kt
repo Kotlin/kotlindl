@@ -184,7 +184,7 @@ class PreprocessingImageTest {
                 }
             }
             for (i in colorComponents.indices) {
-                set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels.toInt(), colorComponents[i])
+                set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels!!.toInt(), colorComponents[i])
             }
         }
     }

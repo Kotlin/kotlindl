@@ -384,11 +384,11 @@ class ImagesJPanel3(
                 val x = 100 + j * pixelHeight
 
                 val r =
-                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val g =
-                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val b =
-                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
                 val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
                 val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
@@ -435,9 +435,9 @@ private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
     val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
     for (i in 0 until imageShape.height!!.toInt()) { // rows
         for (j in 0 until imageShape.width!!.toInt()) { // columns
-            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
+            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
+            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
             result.setRGB(j, i, Color(r, g, b).rgb)
         }
     }

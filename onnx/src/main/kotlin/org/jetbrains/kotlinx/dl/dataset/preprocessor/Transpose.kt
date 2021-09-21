@@ -20,7 +20,7 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) : Prepro
         val tensorShape = intArrayOf(
             inputShape.width!!.toInt(),
             inputShape.height!!.toInt(),
-            inputShape.channels.toInt()
+            inputShape.channels!!.toInt()
         )
         val ndArray = mk.ndarray<Float, D3>(data.toList(), tensorShape)
         // TODO: add output shape as an result
