@@ -20,7 +20,7 @@ class PreprocessingFinalShapeTest {
                 }
             }
         }
-        assertEquals(ImageShape(100, 100, 3), preprocess.finalShape)
+        assertEquals(ImageShape(100, 100, null), preprocess.finalShape)
     }
 
     @Test
