@@ -51,15 +51,10 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
             archivePath
         )
     )
-    val images =
-        Array(imageCount) { FloatArray(imageRows * imageCols) }
     val imageBuffer = ByteArray(imageRows * imageCols)
-    for (i in 0 until imageCount) {
+    val images = Array(imageCount) {
         archiveStream.readFully(imageBuffer)
-        images[i] =
-            OnHeapDataset.toNormalizedVector(
-                imageBuffer
-            )
+        OnHeapDataset.toNormalizedVector(imageBuffer)
     }
     return images
 }
