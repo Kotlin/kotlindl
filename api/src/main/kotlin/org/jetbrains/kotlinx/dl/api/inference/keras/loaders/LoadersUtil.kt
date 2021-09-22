@@ -177,7 +177,7 @@ public fun predictTopKImageNetLabels(
     for (j in 1..topK) {
         val max = predictionVector2.maxOrNull()
         val indexOfElem = predictionVector.indexOf(max!!)
-        topKResult[j] = Pair(imageNetClassLabels[indexOfElem]!!, predictionVector[indexOfElem])
+        topKResult.add(Pair(imageNetClassLabels[indexOfElem]!!, predictionVector[indexOfElem]))
         predictionVector2.remove(max)
     }
 
