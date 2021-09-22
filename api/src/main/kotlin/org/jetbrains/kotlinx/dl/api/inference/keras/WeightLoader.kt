@@ -46,7 +46,7 @@ public fun GraphTrainableModel.loadWeights(
             loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, null)
         }
         else -> {
-            this.logger.info { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
+            this.logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
         }
     }
 
@@ -76,7 +76,7 @@ public fun GraphTrainableModel.loadWeights(
             loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, layerList)
         }
         else -> {
-            this.logger.info { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
+            this.logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
         }
     }
 
@@ -137,6 +137,7 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
     }
 }
 
+// TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
 private fun fillLayerWeights(
     it: Layer,
     group: Group,
@@ -160,9 +161,8 @@ private fun fillLayerWeights(
             model
         )
         BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
-        else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
+    model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
 
 private fun fillConv2DVariablesFromKeras(
@@ -416,7 +416,7 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.debug { "Starting weights loading.." }
+    this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {
             fillLayerWeights(
@@ -509,11 +509,9 @@ private fun fillLayerWeights(
             model,
             layerPaths
         )
-        else -> println("No weights loading for ${it.name}")
     }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
+    model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
-
 
 /*private fun fillLayerWeights(
     it: Layer,
@@ -549,9 +547,8 @@ private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
         DepthwiseConv2D::class -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
         SeparableConv2D::class -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
         BatchNorm::class -> initBatchNormVariablesByDefaultInitializer(it.name, model)
-        else -> println("No default initialization handled for ${it.name}")
     }
-    model.logger.info { " Weights initialized for ${it.name}. ${it.paramCount} parameters are initialized. " }
+    model.logger.debug { "${it.paramCount} parameters initialized for the layer ${it.name}." }
 }
 
 /**
@@ -632,7 +629,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.debug { "Starting weights loading.." }
+    this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
         run {
             val initializedLayerName = it.name
@@ -648,7 +645,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
                         this
                     )
                 } else {
-                    this.logger.info { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
+                    this.logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
                     initLayerWeights(it, this)
                 }
             }
