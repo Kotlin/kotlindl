@@ -14,7 +14,7 @@ import javax.swing.JFrame
 /**
  * This example shows how to do image preprocessing using [Preprocessing] for only one image.
  *
- * Also we use the [ImagePanel] to visualise (a back part of the pigeon should be displayed).
+ * Also, we use the [ImagePanel] to visualise (a back part of the pigeon should be displayed).
  *
  * It includes:
  * - image preprocessing

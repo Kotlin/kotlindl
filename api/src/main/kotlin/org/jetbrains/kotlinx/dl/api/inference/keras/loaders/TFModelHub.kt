@@ -25,10 +25,9 @@ private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
 
 /**
- * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
- * [cacheDirectory].
+ * This class  provides methods for loading Keras models, its weights and ImageNet labels (for prediction purposes) to the local [cacheDirectory].
  *
- * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
+ * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  * @since 0.2
  */
 public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {

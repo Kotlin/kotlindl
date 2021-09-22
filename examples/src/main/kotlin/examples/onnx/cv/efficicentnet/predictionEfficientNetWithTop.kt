@@ -27,7 +27,7 @@ fun efficientNet4LitePrediction() {
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
-        loadImageNetClassLabels() // TODO: move to overriden method of ModelType (loading of labels for each model)
+        loadImageNetClassLabels() // TODO: move to overridden method of ModelType (loading of labels for each model)
 
     model.use {
         println(it)

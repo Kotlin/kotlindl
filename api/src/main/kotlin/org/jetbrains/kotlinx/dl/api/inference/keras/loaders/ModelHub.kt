@@ -16,10 +16,9 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
 internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**
- * This is an abstract class which provides methods for loading models, its weights and labels (for prediction purposes) to the local directory.
- * [cacheDirectory].
+ * This is an abstract class which provides methods for loading models, its weights and labels (for prediction purposes) to the local [cacheDirectory].
  *
- * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
+ * @property [cacheDirectory] The directory for all loaded models and datasets. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  *
  * @since 0.2
  */

@@ -183,11 +183,11 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun main() {
-    val catdogimages = dogsCatsDatasetPath()
+    val dogsCatsImages = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
         load {
-            pathToData = File(catdogimages)
+            pathToData = File(dogsCatsImages)
             imageShape = ImageShape(channels = 3)
             colorMode = ColorOrder.BGR
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))

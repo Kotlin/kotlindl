@@ -21,10 +21,9 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 /**
- * This model loaders provides methods for loading ONNX model to the local directory
- * [cacheDirectory].
+ * This class provides methods for loading ONNX model to the local [cacheDirectory].
  *
- * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
+ * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  *
  * @since 0.3
  */
