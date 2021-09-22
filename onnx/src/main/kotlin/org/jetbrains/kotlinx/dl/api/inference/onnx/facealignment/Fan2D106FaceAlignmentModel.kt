@@ -15,6 +15,9 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
+/**
+ * The light-weight API for solving Face Alignment task via Fan2D106 model.
+ */
 public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel() {
     override val inputDimensions: LongArray
         get() = internalModel.inputDimensions
@@ -39,10 +42,14 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         TODO("Not yet implemented")
     }
 
+    /** */
     override fun close() {
         internalModel.close()
     }
 
+    /**
+     * Detects 106 [Landmark] objects for the given [imageFile].
+     */
     public fun detectLandmarks(imageFile: File): List<Landmark> {
         val preprocessing: Preprocessing = preprocess {
             load {

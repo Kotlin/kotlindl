@@ -297,8 +297,8 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private
         graphics.drawImage(bufferedImage, 0, 0, null)
 
         for (i in landmarks.indices) {
-            val xLM = (size.width / 2) * (1 + landmarks[i].x) / xCoefficient
-            val yLM = (size.height / 2) * (1 + landmarks[i].y) / yCoefficient
+            val xLM = (size.width / 2) * (1 + landmarks[i].xRate) / xCoefficient
+            val yLM = (size.height / 2) * (1 + landmarks[i].yRate) / yCoefficient
 
             graphics as Graphics2D
             val stroke1: Stroke = BasicStroke(3f)
@@ -369,7 +369,7 @@ class DetectedObjectJPanel(
 
 
 class ImagesJPanel3(
-    val dst: FloatArray,
+    private val dst: FloatArray,
     val imageShape: ImageShape
 ) : JPanel() {
     override fun paint(graphics: Graphics) {

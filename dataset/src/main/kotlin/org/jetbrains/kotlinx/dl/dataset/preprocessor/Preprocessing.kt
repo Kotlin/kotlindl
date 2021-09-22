@@ -40,7 +40,7 @@ public class Preprocessing {
             if (imageShape == null) {
                 throw IllegalStateException(
                     "Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
-                        "or imageShape with height, weight and channels should be initialized."
+                            "or imageShape with height, weight and channels should be initialized."
                 )
             }
             return imageShape

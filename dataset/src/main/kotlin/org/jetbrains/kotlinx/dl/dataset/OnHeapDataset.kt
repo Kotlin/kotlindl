@@ -22,7 +22,7 @@ import kotlin.random.Random
  *
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  */
-public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y: FloatArray) :
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) :
     Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */

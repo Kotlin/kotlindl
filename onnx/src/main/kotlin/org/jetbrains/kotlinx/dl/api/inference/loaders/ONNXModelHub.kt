@@ -21,11 +21,10 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 /**
- * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
+ * This model loaders provides methods for loading ONNX model to the local directory
  * [cacheDirectory].
  *
  * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
- * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
  *
  * @since 0.3
  */
@@ -66,7 +65,7 @@ public class ONNXModelHub(cacheDirectory: File) :
     }
 
     private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
-        val fileName = commonModelDirectory.absolutePath + modelFile
+        val fileName = cacheDirectory.absolutePath + modelFile
         val file = File(fileName)
         val parentDirectory = file.parentFile
         if (!parentDirectory.exists()) {

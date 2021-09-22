@@ -26,11 +26,9 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
 
 /**
  * This model loaders provides methods for loading model, its weights and ImageNet labels (for prediction purposes) to the local directory
- * [commonModelDirectory].
+ * [cacheDirectory].
  *
- * @property [commonModelDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
- * @property [modelType] This value defines the way to S3 bucket with the model and its weights and also local directory for the model and its weights.
- *
+ * @property [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS
  * @since 0.2
  */
 public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
@@ -46,6 +44,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /**
      * Loads model configuration without weights.
      *
+     * @param [modelType] This unique identifier defines the way to the S3 bucket with the model and its weights and the local directory for the model and its weights.
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
@@ -110,6 +109,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /**
      * Loads model weights.
      *
+     * @param [modelType] This unique identifier defines the way to the S3 bucket with the model and its weights and the local directory for the model and its weights.
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Compiled model with initialized weights.
      */
@@ -126,10 +126,10 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
 
-        val dir = File(commonModelDirectory.absolutePath + modelDirectory)
+        val dir = File(cacheDirectory.absolutePath + modelDirectory)
         if (!dir.exists()) Files.createDirectories(dir.toPath())
 
-        val fileName = commonModelDirectory.absolutePath + relativeConfigPath
+        val fileName = cacheDirectory.absolutePath + relativeConfigPath
         val file = File(fileName)
 
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
@@ -148,7 +148,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
         val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
 
-        val fileName = commonModelDirectory.absolutePath + relativeWeightsPath
+        val fileName = cacheDirectory.absolutePath + relativeWeightsPath
         val file = File(fileName)
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
             val inputStream = URL(weightsURL).openStream()

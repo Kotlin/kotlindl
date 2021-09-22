@@ -193,6 +193,7 @@ public open class OnnxInferenceModel : InferenceModel() {
         TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
     }
 
+    /** */
     override fun close() {
         session.close()
         env.close()

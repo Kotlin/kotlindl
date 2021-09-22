@@ -14,10 +14,14 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import java.io.File
 
+/**
+ * The light-weight API for solving Image Recognition task with one of the Model Hub models trained on ImageNet dataset.
+ */
 public class ImageRecognitionModel(
     private val internalModel: InferenceModel,
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
 ) : InferenceModel() {
+    /** Class labels for ImageNet dataset. */
     public val imageNetClassLabels: MutableMap<Int, String> = loadImageNetClassLabels()
 
     override val inputDimensions: LongArray
@@ -32,7 +36,7 @@ public class ImageRecognitionModel(
     }
 
     override fun reshape(vararg dims: Long) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("The reshape operation is not required for this model.")
     }
 
     override fun copy(
@@ -43,11 +47,17 @@ public class ImageRecognitionModel(
         TODO("Not yet implemented")
     }
 
+    /** */
     override fun close() {
         internalModel.close()
     }
 
-    public fun predictTopKObjects(imageFile: File, topK: Int = 5): MutableMap<Int, Pair<String, Float>> {
+    /**
+     * Predicts [topK] objects for the given [imageFile].
+     *
+     * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
+     */
+    public fun predictTopKObjects(imageFile: File, topK: Int = 5): List<Pair<String, Float>> {
         val inputData = preprocessData(imageFile)
         return predictTopKImageNetLabels(internalModel, inputData, imageNetClassLabels, topK)
     }
@@ -61,10 +71,14 @@ public class ImageRecognitionModel(
             }
         }
 
-        val inputData = modelType.preprocessInput(preprocessing)
-        return inputData
+        return modelType.preprocessInput(preprocessing)
     }
 
+    /**
+     * Predicts object for the given [imageFile].
+     *
+     * @return The label of the recognized object with the highest probability.
+     */
     public fun predictObject(imageFile: File): String {
         val preprocessing: Preprocessing = preprocess {
             load {

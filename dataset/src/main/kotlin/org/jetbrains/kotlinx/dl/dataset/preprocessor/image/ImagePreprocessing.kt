@@ -16,9 +16,10 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
  * It's a part of the [org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing] pipeline DSL.
  */
 public class ImagePreprocessing {
-    /** */
+    /** The internal state of [ImagePreprocessing]. */
     internal val operations = mutableListOf<ImagePreprocessor>()
 
+    /** Adds a new operation to the [operations]. */
     public fun addOperation(operation: ImagePreprocessor) {
         operations.add(operation)
     }

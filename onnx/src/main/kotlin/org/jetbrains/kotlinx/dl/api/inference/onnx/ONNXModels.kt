@@ -211,6 +211,7 @@ public object ONNXModels {
     /** Face alignment models and preprocessing. */
     public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
         ModelType<T, U> {
+        /** */
         public object Fan2d106 :
             FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {

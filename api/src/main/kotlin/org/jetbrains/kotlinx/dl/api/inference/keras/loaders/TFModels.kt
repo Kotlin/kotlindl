@@ -201,7 +201,7 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /**
      * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
      *
-     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing according given [modelType].
+     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
      */
     public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
         val (data, shape) = preprocessing()

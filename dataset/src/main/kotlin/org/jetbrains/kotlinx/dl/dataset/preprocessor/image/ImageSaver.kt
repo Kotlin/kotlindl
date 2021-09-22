@@ -13,6 +13,7 @@ import javax.imageio.ImageIO
  * Interface for saving image preprocessing output result.
  */
 public interface ImageSaver {
+    /** Saves the [image] to the [filename]. */
     public fun save(filename: String, image: BufferedImage)
 }
 

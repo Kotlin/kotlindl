@@ -38,8 +38,7 @@ public class WavFileFormat(buffer: ByteArray) {
         }
         if (validBits < 2) {
             throw WavFileException("Valid Bits specified in header is less than 2")
-        }
-        else if (validBits > 64) {
+        } else if (validBits > 64) {
             throw WavFileException("Valid Bits specified in header is greater than 64, this is greater than a long can hold")
         }
         if (validBits > 8) {
