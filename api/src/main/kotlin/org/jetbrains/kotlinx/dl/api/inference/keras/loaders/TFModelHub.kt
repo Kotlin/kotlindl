@@ -152,9 +152,9 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val file = File(fileName)
         if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
             val inputStream = URL(weightsURL).openStream()
-            logger.debug { "Weights loading is started!" }
+            logger.info { "Weights loading is started!" }
             Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
-            logger.debug { "Weights loading is finished!" }
+            logger.info { "Weights loading is finished!" }
         }
 
         return HdfFile(File(fileName))

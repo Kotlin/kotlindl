@@ -235,7 +235,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             it.outputShape = outputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
 
-            logger.info { "${it.name}; outputShape: $outputShape $it" }
+            logger.debug { "${it.name}; outputShape: $outputShape $it" }
         }
     }
 
