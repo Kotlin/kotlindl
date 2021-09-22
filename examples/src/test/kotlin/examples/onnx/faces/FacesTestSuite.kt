@@ -5,17 +5,15 @@
 
 package examples.onnx.faces
 
-import examples.onnx.objectdetection.ssd.objectDetectionSSD
-import examples.onnx.objectdetection.ssd.predictionSSD
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
 
 class FacesTestSuite {
     @Test
