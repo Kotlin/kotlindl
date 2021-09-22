@@ -118,13 +118,13 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val preparedData = FloatBuffer.wrap(inputData)
 
-        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
-        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
+        val inputTensor = OnnxTensor.createTensor(env, preparedData, inputShape)
+        val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
-        val outputProbs = output[0].value as Array<FloatArray>
+        val outputProbs = outputTensor[0].value as Array<FloatArray>
 
-        output.close()
-        tensor.close()
+        outputTensor.close()
+        inputTensor.close()
 
         return outputProbs[0]
     }

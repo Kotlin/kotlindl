@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.visualization.swing
 
 import org.jetbrains.kotlinx.dl.api.extension.get3D
+import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.visualization.letsplot.TensorImageData
@@ -224,7 +225,18 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
     frame.isResizable = false
 }
 
-fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array<*>>) {
+fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array<*>>) {
+    val frame = JFrame("Landmarks")
+    @Suppress("UNCHECKED_CAST")
+    frame.contentPane.add(RawLandMarksJPanel(dst, imageShape, landmarks))
+    frame.pack()
+    frame.setLocationRelativeTo(null)
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
+}
+
+fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
@@ -235,8 +247,7 @@ fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array
     frame.isResizable = false
 }
 
-
-class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) : JPanel() {
+class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) : JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {
@@ -256,6 +267,38 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private
         for (i in tempLandMarks.indices) {
             val xLM = (size.width / 2) * (1 + tempLandMarks[i].first) / xCoefficient
             val yLM = (size.height / 2) * (1 + tempLandMarks[i].second) / yCoefficient
+
+            graphics as Graphics2D
+            val stroke1: Stroke = BasicStroke(3f)
+            graphics.setColor(Color.RED)
+            graphics.stroke = stroke1
+            graphics.drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
+        }
+    }
+
+    override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+
+    override fun getMinimumSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+}
+
+class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Landmark>) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape)
+
+    override fun paint(graphics: Graphics) {
+        super.paint(graphics)
+
+        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
+        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
+
+        graphics.drawImage(bufferedImage, 0, 0, null)
+
+        for (i in landmarks.indices) {
+            val xLM = (size.width / 2) * (1 + landmarks[i].x) / xCoefficient
+            val yLM = (size.height / 2) * (1 + landmarks[i].y) / yCoefficient
 
             graphics as Graphics2D
             val stroke1: Stroke = BasicStroke(3f)

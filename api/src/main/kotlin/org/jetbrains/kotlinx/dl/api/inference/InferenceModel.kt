@@ -48,10 +48,9 @@ public abstract class InferenceModel : AutoCloseable {
      * @param [copiedModelName] Set up this name to make a copy with a new name.
      * @return A copied inference model.
      */
-    // TODO: add tests to the tests
     public abstract fun copy(
         copiedModelName: String? = null,
-        saveOptimizerState: Boolean = false, // TODO, check this case
+        saveOptimizerState: Boolean = false,
         copyWeights: Boolean = true
     ): TensorFlowInferenceModel
 

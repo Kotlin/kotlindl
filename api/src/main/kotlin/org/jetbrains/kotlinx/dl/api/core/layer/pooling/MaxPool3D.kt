@@ -29,7 +29,6 @@ public class MaxPool3D(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        // TODO add dataFormat support
         var lenDim1: Long = inputShape.size(1)
         var lenDim2: Long = inputShape.size(2)
         var lenDim3: Long = inputShape.size(3)
@@ -47,11 +46,11 @@ public class MaxPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO add dataFormat support
         val paddingName = padding.paddingName
         val tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()
         val tfStrides = Arrays.stream(strides).asLongStream().toArray()
         val tfInput: Operand<Float> = input
+
         return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }
 

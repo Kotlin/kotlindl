@@ -142,7 +142,12 @@ public enum class Activations {
     Softmax,
 
     /**
+     * Log softmax activation function.
      *
+     *  For each batch `i` and class `j` we have
+     *  ```
+     *  logsoftmax = logits - log(reduce_sum(exp(logits), axis))
+     *  ```
      */
     LogSoftmax,
 

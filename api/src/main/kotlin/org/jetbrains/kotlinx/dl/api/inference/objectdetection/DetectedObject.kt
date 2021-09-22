@@ -13,7 +13,7 @@ package org.jetbrains.kotlinx.dl.api.inference.objectdetection
  * @property [yMax] The maximum Y coordinate for the bounding box containing the predicted object.
  * @property [yMin] The minimum Y coordinate for the bounding box containing the predicted object.
  */
-data class DetectedObject(
+public data class DetectedObject(
     val classLabel: String,
     val probability: Float,
     val xMax: Float,

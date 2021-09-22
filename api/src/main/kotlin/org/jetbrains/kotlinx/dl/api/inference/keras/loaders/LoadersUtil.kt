@@ -9,6 +9,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 
 /**
@@ -161,7 +162,7 @@ public fun predictTop5ImageNetLabels(
 }
 
 public fun predictTopKImageNetLabels(
-    it: TensorFlowInferenceModel,
+    it: InferenceModel,
     data: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>,
     topK: Int = 5

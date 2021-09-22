@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 
@@ -65,35 +65,35 @@ public object TFModels {
         }
 
         /** */
-        public object ResNet_101 : CV<Functional>("models/tensorflow/cv/resnet101") {
+        public object ResNet101 : CV<Functional>("models/tensorflow/cv/resnet101") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet_152 : CV<Functional>("models/tensorflow/cv/resnet152") {
+        public object ResNet152 : CV<Functional>("models/tensorflow/cv/resnet152") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet_50_v2 : CV<Functional>("models/tensorflow/cv/resnet50v2") {
+        public object ResNet50v2 : CV<Functional>("models/tensorflow/cv/resnet50v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet_101_v2 : CV<Functional>("models/tensorflow/cv/resnet101v2") {
+        public object ResNet101v2 : CV<Functional>("models/tensorflow/cv/resnet101v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet_152_v2 : CV<Functional>("models/tensorflow/cv/resnet152v2") {
+        public object ResNet152v2 : CV<Functional>("models/tensorflow/cv/resnet152v2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
@@ -107,7 +107,7 @@ public object TFModels {
         }
 
         /** */
-        public object MobileNetv2 : CV<Functional>("models/tensorflow/cv/mobilenetv2") {
+        public object MobileNetV2 : CV<Functional>("models/tensorflow/cv/mobilenetv2") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
@@ -185,7 +185,7 @@ public object TFModels {
 }
 
 /** Basic interface for models loaded from S3. */
-public interface ModelType<T: InferenceModel, U: InferenceModel> {
+public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
 
@@ -211,12 +211,10 @@ public interface ModelType<T: InferenceModel, U: InferenceModel> {
         ) // TODO: need to be 4 or 3 in all cases
     }
 
-    // TODO: make an abstract
-    public fun pretrainedModel(modelHub: ModelHub): U {
-        TODO()
-    }
+    /** Returns the specially prepared pre-trained model of the type U. */
+    public fun pretrainedModel(modelHub: ModelHub): U
 
-    // TODO: make an abstract
+    /** Loads the model, identified by this name, from the [modelHub]. */
     public fun model(modelHub: ModelHub): T {
         return modelHub.loadModel(this)
     }
