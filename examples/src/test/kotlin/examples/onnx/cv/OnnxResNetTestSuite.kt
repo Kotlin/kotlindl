@@ -20,6 +20,11 @@ class OnnxResNetTestSuite {
     }
 
     @Test
+    fun resnet18easyPredictionTest() {
+        resnet18easyPrediction()
+    }
+
+    @Test
     fun resnet18v2predictionTest() {
         runImageRecognitionPrediction(ONNXModels.CV.ResNet18v2)
     }

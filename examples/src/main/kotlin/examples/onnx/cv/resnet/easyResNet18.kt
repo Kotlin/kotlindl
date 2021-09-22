@@ -5,21 +5,18 @@
 package examples.onnx.cv.resnet
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on ResNet'50 model:
- * - Model configuration, model weights and labels are obtained from [TFModelHub].
- * - Weights are loaded from .h5 file, configuration is loaded from .json file.
+ * This examples demonstrates the light-weight inference API with [ImageRecognitionModel] on ResNet'18 model:
+ * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - No additional training.
- * - No new layers are added.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
  */
-fun resnet50easyPrediction() {
+fun resnet18easyPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
@@ -39,4 +36,4 @@ fun resnet50easyPrediction() {
 }
 
 /** */
-fun main(): Unit = resnet50easyPrediction()
+fun main(): Unit = resnet18easyPrediction()

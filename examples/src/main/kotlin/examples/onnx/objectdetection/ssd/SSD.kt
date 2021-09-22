@@ -13,6 +13,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
+/**
+ * This examples demonstrates the inference concept on SSD model:
+ * - Model is obtained from [ONNXModelHub].
+ * - Model predicts on a few images located in resources.
+ * - Special preprocessing is applied to images before prediction.
+ */
 fun predictionSSD() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.ObjectDetection.SSD
