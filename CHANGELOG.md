@@ -6,7 +6,7 @@ Features:
    * added new 'onnx' module
    * added the ONNXModel implementing the common InferenceModel interface
    * ONNX model could be used as a preprocessing stage for the TensorFlow model
-   * prepared ONNX model without top layers could be fine-tuned via training of top layers implemented with TensowFlow-based layers
+   * prepared ONNX model without top layers could be fine-tuned via training of top layers implemented with TensorFlow-based layers
 * Added SSD and YOLOv4 object detection models to the Model Hub
 * Added Fan2D106 face alignment model to the Model Hub
 * Added SSDObjectDetectionModel with the easy API for object detection, including pre- and post-processing
@@ -65,31 +65,38 @@ Bugs:
 * Added [missed loaders for the ReLU and ELU activation layers](https://github.com/JetBrains/KotlinDL/issues/78)
 * Add [model export for a few layers (Concatenate, DepthwiseConv2D, SeparableConv2D) missed in ModelSaver.kt](https://github.com/JetBrains/KotlinDL/issues/87)
 * Fixed the use-case when [ModelSaver fails on saving Input with 2d and 3d tensors](https://github.com/JetBrains/KotlinDL/issues/160)
+* Fixed a [StackOverflowError in objectDetectionSSD.kt example](https://github.com/JetBrains/KotlinDL/issues/230)
+* Fixed a problem with the [confusing logs during weights loading from .h5 file](https://github.com/JetBrains/KotlinDL/issues/155)
+* Fixed the Windows separator usage instead of [File.separator in the Save and Load preprocessors](https://github.com/JetBrains/KotlinDL/issues/226)
+* Fixed the [incorrect temporary folder for the cat-vs-dogs dataset](https://github.com/JetBrains/KotlinDL/issues/161)
+* Fixed the problem when [ImageConverter and Loading do not close opened streams](https://github.com/JetBrains/KotlinDL/issues/228)
+* Fixed the [Image Preprocessing DSL issues](https://github.com/JetBrains/KotlinDL/issues/208)
+* Reduced time complexity of FloatArray::argmax to linear
 
 API breaking changes:
 * Renamed ModelZoo to the ModelHub
 * Changed the ImagePreprocessing DSL: loading and saving are moved to the separate level of DSL
+* Changed the [TrainableModel::summary API to return ModelSummary](https://github.com/JetBrains/KotlinDL/issues/135)
 
 Infrastructure:
 * Loaded the weights and JSON configurations of the newly added ModelHub models to S3 storage
 * [Moved ImageDSL and Dataset API to the separate 'dataset' module](https://github.com/JetBrains/KotlinDL/issues/180)
 * Added a new 'visualization' module with the basic support for painting on Swing and in Jupyter Notebook with lets-plot
-* Transformed the project from the single-module project to the multi-modules project
+* Transformed the project from the single-module project to the multi-module project
 
 Docs:
 * Created [website with API Documentation from KDoc via Dokka](https://github.com/JetBrains/KotlinDL/issues/71)
+* Added support for the multiple version API Documentation from KDoc via Dokka 
 * Updated all existing tutorials
 * Updated the Readme.md
 * Updated the existing KDocs
 * Added a new tutorial about ONNX models usage
-* Added a new tutorial about the Easy API
-* Added a new tutorial about the Image Preprocessing DSL
 * Added a new tutorial about Transfer Learning with ONNX ResNet no-top model and TensorFlow
 
 Examples:
 * Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/objectdetection/ssd/objectDetectionSSD.kt) of SSDObjectDetectionModel usage and visualisation of the detected objects on the Swing panel
 * Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/faces/predictionFan2D106.kt) of Fan2D106 (face alignment) model and landmarks visualisation on the Swing panel
-* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/cv/custom/additionalTrainingWithTensorFlow.kt) where the prepared ONNX model without top layers is fine-tuned via training of top layers implemented with TensowFlow-based layers
+* Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/onnx/cv/custom/additionalTrainingWithTensorFlow.kt) where the prepared ONNX model without top layers is fine-tuned via training of top layers implemented with TensorFlow-based layers
 * Added a lot of examples for the newly added to the ModelHub models (ONNX-based and TensorFlow-based)
 * Added an [example](https://github.com/JetBrains/KotlinDL/blob/master/examples/src/main/kotlin/examples/visualization/SoundNetFSDDVisualization.kt) with the model SoundNet trained on Free Spoken Digits Dataset to classify the audio 
 * Updated ['visualization'](https://github.com/JetBrains/KotlinDL/tree/master/examples/src/main/kotlin/examples/visualization) examples with the new Batik and lets-plot support
