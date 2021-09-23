@@ -7,22 +7,44 @@ specify which architectures are currently supported, and demonstrate how to load
 KotlinDL 0.2 supports a limited number of deep learning architectures. As the project evolves, we will expand the list of supported architectures.
 
 Currently, the following layers are supported: 
-- Input()
-- Flatten()
-- Dense()
-- Dropout()
-- Conv2D()
-- MaxPool2D()
-- AvgPool2D()   
+- Input
+- Flatten
+- Dense
+- Dropout
+- Conv2D
+- MaxPool2D
+- AvgPool2D  
 - BatchNorm
 - ActivationLayer
 - DepthwiseConv2D
 - SeparableConv2D
 - Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
 - GlobalAvgPool2D
-- Cropping2D
-- Reshape
+- GlobalMaxPool2D
+- Cropping2D 
+- UpSampling2D
 - ZeroPadding2D
+- Reshape
+- Permute
+- RepeatVector
+- Softmax   
+- LeakyReLU   
+- PReLU   
+- ELU 
+- ThresholdedReLU 
+- Conv1D  
+- MaxPooling1D  
+- AveragePooling1D  
+- GlobalMaxPooling1D  
+- GlobalAveragePooling1D
+- UpSampling1D
+- Cropping1D
+- Conv3D  
+- MaxPooling3D  
+- AveragePooling3D  
+- GlobalAveragePooling3D
+- GlobalMaxPool3D
+- Cropping3D
 
 ### Saving a trained Keras model 
 For this tutorial, we'll train a simple convolutional neural network that can classify images 

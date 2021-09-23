@@ -22,7 +22,7 @@ model.use {
         metric = Metrics.ACCURACY
     )
 
-    it.logSummary()
+    it.printSummary()
 
     // You can think of the training process as "fitting" the model to describe the given data :)
     it.fit(
@@ -34,7 +34,7 @@ model.use {
     val accuracy = it.evaluate(dataset = test, batchSize = 100).metrics[Metrics.ACCURACY]
 
     println("Accuracy: $accuracy")
-    it.save(File("src/model/my_model"))
+    it.save(File("model/my_model"), writingMode = WritingMode.OVERRIDE)
 }
 ```
 

@@ -117,27 +117,6 @@ KotlinDL is built on top of the TensorFlow 1.15 Java API.
 The Java API for TensorFlow 2.+ has recently had its first public release, and this project will be switching to it in the nearest future. 
 This, however, does not affect the high-level API.
 
-## Limitations
-Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
- 
-- Input()
-- Flatten()
-- Dense()
-- Dropout()
-- Conv2D()
-- MaxPool2D()
-- AvgPool2D()   
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- Cropping2D
-- Reshape
-- ZeroPadding2D 
-
-KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.  
 
 ## How to configure KotlinDL in your project
 To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
@@ -284,6 +263,50 @@ task fatJar(type: Jar) {
     with jar
 }
 ```
+
+## Limitations
+Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
+
+- Input
+- Flatten
+- Dense
+- Dropout
+- Conv2D
+- MaxPool2D
+- AvgPool2D
+- BatchNorm
+- ActivationLayer
+- DepthwiseConv2D
+- SeparableConv2D
+- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
+- GlobalAvgPool2D
+- GlobalMaxPool2D
+- Cropping2D
+- UpSampling2D
+- ZeroPadding2D
+- Reshape
+- Permute
+- RepeatVector
+- Softmax
+- LeakyReLU
+- PReLU
+- ELU
+- ThresholdedReLU
+- Conv1D
+- MaxPooling1D
+- AveragePooling1D
+- GlobalMaxPooling1D
+- GlobalAveragePooling1D
+- UpSampling1D
+- Cropping1D
+- Conv3D
+- MaxPooling3D
+- AveragePooling3D
+- GlobalAveragePooling3D
+- GlobalMaxPool3D
+- Cropping3D
+
+KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.
 
 ## Contributing
 

@@ -30,22 +30,22 @@ Here's code that will go through a folder structure received via ```catDogsSmall
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
 val preprocessing: Preprocessing = preprocess {
+    load {
+        pathToData = File(dogsVsCatsDatasetPath)
+        imageShape = ImageShape(channels = 3)
+        colorMode = ColorOrder.BGR
+        labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+    }
     transformImage {
-        load {
-            pathToData = File(dogsVsCatsDatasetPath)
-            imageShape = ImageShape(channels = NUM_CHANNELS)
-            colorMode = ColorOrder.BGR
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
+            outputHeight = 224
+            outputWidth = 224
             interpolation = InterpolationType.BILINEAR
         }
     }
     transformTensor {
         sharpen {
-            modelType = TFModels.CV.VGG_19
+            modelType = TFModels.CV.VGG19
         }
     }
 }
@@ -59,11 +59,12 @@ In the final lines, after creating a dataset, we shuffle the data, so that when 
 KotlinDL bundles a lot of pre-trained models available via ModelZoo object. 
 You can either train a model from scratch yourself and store it for later use on other tasks, or you can import a pre-trained Keras model with compatible architecture.  
 
-In this tutorial, we will load VGG-19 model and weights that are made available in the Model Zoo: 
+In this tutorial, we will load VGG-19 model and weights that are made available in the ModelHub: 
 
 ```kotlin
-val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = TFModels.CV.VGG_19)
-val model = modelZoo.loadModel() as Sequential
+val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+val modelType = TFModels.CV.VGG19
+val model = modelHub.loadModel(modelType)
 ```
 
 ## Transfer Learning
@@ -78,7 +79,7 @@ So this is what we will do:
 - The last layer of the original model classifies 1000 classes, but we only have two, so we'll dispose of it, and add another final prediction layer (and one intermediate dense layer to achieve better accuracy).   
 
 ```kotlin
-val layers = mutableListOf<Layer>()
+ val layers = mutableListOf<Layer>()
 
 for (layer in model.layers.dropLast(1)) {
     layer.isTrainable = false
@@ -112,14 +113,14 @@ Finally, we can train this model. The only difference to training a model from s
 These will not be further trained – that's how we can leverage the fact that this model has already learned some patterns on a much larger dataset.  
 
 ```kotlin
-newModel.use {
+ newModel.use {
     it.compile(
         optimizer = Adam(),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric = Metrics.ACCURACY
     )
 
-    val hdfFile = modelZoo.loadWeights()
+    val hdfFile = modelHub.loadWeights(modelType)
     it.loadWeightsForFrozenLayers(hdfFile)
 
     val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]
@@ -128,7 +129,7 @@ newModel.use {
     it.fit(
         dataset = train,
         batchSize = 8,
-        epochs = 3
+        epochs = 2
     )
 
     val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]
