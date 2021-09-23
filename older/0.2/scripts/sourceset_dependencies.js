@@ -1,0 +1,1 @@
+sourceset_dependencies = '{":examples:dokkaHtmlPartial/main":[],":api:dokkaHtmlPartial/main":[]}'
