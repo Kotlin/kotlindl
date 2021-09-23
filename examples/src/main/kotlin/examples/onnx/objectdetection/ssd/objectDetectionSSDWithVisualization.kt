@@ -9,12 +9,19 @@ import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
 import java.io.File
 
+/**
+ * This examples demonstrates the light-weight inference API with [SSDObjectDetectionModel] on SSD model:
+ * - Model is obtained from [ONNXModelHub].
+ * - Model predicts rectangles for the detected objects on a few images located in resources.
+ * - The detected rectangles related to the objects are drawn on the images used for prediction.
+ */
 fun main() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

@@ -8,15 +8,15 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 /**
  * The whole tensor preprocessing pipeline DSL.
  *
- * It supports operations that implement [Preprocessor], for example:
- * - [rescaling] See [Rescaling] preprocessor.
- * - [customPreprocessor] See [CustomPreprocessor] preprocessor.
+ * It supports operations that implement [Preprocessor], for example: [Rescaling] preprocessor or [CustomPreprocessor] preprocessor.
  *
  * It's a part of the [org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing] pipeline DSL.
  */
 public class TensorPreprocessing {
+    /** Internal state of the [TensorPreprocessing]. The list of [Preprocessor].*/
     internal val operations = mutableListOf<Preprocessor>()
 
+    /** Adds an [operation] to the [operations].*/
     public fun addOperation(operation: Preprocessor) {
         operations.add(operation)
     }

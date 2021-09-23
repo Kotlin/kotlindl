@@ -6,16 +6,8 @@
 package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.loss.Losses
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel

@@ -9,6 +9,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 
 /**
@@ -151,31 +152,32 @@ public fun reshapeInput(inputData: FloatArray, imageShape: LongArray): Array<Arr
     return reshaped
 }
 
-/** Returns top-5 labels for the given [floatArray] encoded with mapping [imageNetClassLabels]. */
+/** Returns top-5 labels for the given [data] encoded with mapping [imageNetClassLabels]. */
 public fun predictTop5ImageNetLabels(
     it: TensorFlowInferenceModel,
     data: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>,
-): MutableMap<Int, Pair<String, Float>> {
+): List<Pair<String, Float>> {
     return predictTopKImageNetLabels(it, data, imageNetClassLabels)
 }
 
+/** Returns [topK] labels for the given [data] encoded with mapping [imageNetClassLabels]. */
 public fun predictTopKImageNetLabels(
-    it: TensorFlowInferenceModel,
+    it: InferenceModel,
     data: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>,
     topK: Int = 5
-): MutableMap<Int, Pair<String, Float>> {
+): List<Pair<String, Float>> {
     require(topK <= data.size) { "TopK parameter value: $topK should be equal or less than number of elements in data: ${data.size}." }
 
     val predictionVector = it.predictSoftly(data).toMutableList()
     val predictionVector2 = it.predictSoftly(data).toMutableList() // get copy of previous vector
 
-    val topKResult: MutableMap<Int, Pair<String, Float>> = mutableMapOf()
+    val topKResult: MutableList<Pair<String, Float>> = mutableListOf()
     for (j in 1..topK) {
         val max = predictionVector2.maxOrNull()
         val indexOfElem = predictionVector.indexOf(max!!)
-        topKResult[j] = Pair(imageNetClassLabels[indexOfElem]!!, predictionVector[indexOfElem])
+        topKResult.add(Pair(imageNetClassLabels[indexOfElem]!!, predictionVector[indexOfElem]))
         predictionVector2.remove(max)
     }
 

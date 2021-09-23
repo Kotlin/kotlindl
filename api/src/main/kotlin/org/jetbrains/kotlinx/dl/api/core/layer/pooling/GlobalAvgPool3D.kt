@@ -29,7 +29,6 @@ public class GlobalAvgPool3D(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        // TODO add dataFormat support
         return Shape.make(inputShape.size(0), inputShape.size(4))
     }
 
@@ -39,7 +38,6 @@ public class GlobalAvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO add dataFormat support
         return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
     }
 

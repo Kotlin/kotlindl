@@ -6,11 +6,10 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.imagerecognition.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
@@ -19,6 +18,10 @@ public object ONNXModels {
     /** Image recognition models and preprocessing. */
     public sealed class CV<T : InferenceModel>(override val modelRelativePath: String) :
         ModelType<T, ImageRecognitionModel> {
+        override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
+            return ImageRecognitionModel(modelHub.loadModel(this), this)
+        }
+
         /** */
         public object ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -109,7 +112,7 @@ public object ONNXModels {
         public object EfficientNet4Lite :
             CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                return preprocessInput(
                     data,
                     tensorShape,
                     inputType = InputType.TF,
@@ -122,7 +125,7 @@ public object ONNXModels {
         public object ResNet50custom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                return preprocessInput(
                     data,
                     tensorShape,
                     inputType = InputType.CAFFE
@@ -134,7 +137,7 @@ public object ONNXModels {
         public object ResNet50noTopCustom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                return preprocessInput(
                     data,
                     tensorShape,
                     inputType = InputType.CAFFE
@@ -179,7 +182,7 @@ public object ONNXModels {
                 // TODO: should be returned from the Transpose from apply method
                 val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
-                return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+                return preprocessInput(
                     transposedData,
                     transposedShape,
                     inputType = InputType.TORCH,
@@ -198,14 +201,19 @@ public object ONNXModels {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
             }
+
+            override fun pretrainedModel(modelHub: ModelHub): OnnxInferenceModel {
+                TODO("Not yet implemented")
+            }
         }
     }
 
     /** Face alignment models and preprocessing. */
     public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
         ModelType<T, U> {
+        /** */
         public object Fan2d106 :
-            FaceAlignment<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/facealignment/fan_2d_106") {
+            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
                     data,
@@ -217,8 +225,11 @@ public object ONNXModels {
 
                 return transposedData
             }
-        }
 
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            }
+        }
     }
 }
 
@@ -231,7 +242,7 @@ internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): 
     // TODO: should be returned from the Transpose from apply method
     val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
-    return org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput(
+    return preprocessInput(
         transposedData,
         transposedShape,
         inputType = InputType.TF,

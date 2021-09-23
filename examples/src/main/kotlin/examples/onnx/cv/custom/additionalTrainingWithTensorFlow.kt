@@ -41,7 +41,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 private val topModel = Sequential.of(
     Input(2, 2, 2048),
     GlobalAvgPool2D(),
-    Dense(2, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
+    Dense(NUM_CLASSES, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
 )
 
 /**

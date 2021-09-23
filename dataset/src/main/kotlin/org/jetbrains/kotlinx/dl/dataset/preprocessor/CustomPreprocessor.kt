@@ -10,7 +10,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
  *
  * @property [customPreprocessor] Custom preprocessor.
  */
-public class CustomPreprocessor(public var customPreprocessor: Preprocessor?) : Preprocessor {
+public class CustomPreprocessor(private var customPreprocessor: Preprocessor?) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         return customPreprocessor?.apply(data, inputShape) ?: data
     }
