@@ -197,7 +197,7 @@ private fun fillConv2DVariablesFromKeras(
             }
             "bias:0" -> {
                 val biasVariableName = convBiasVarName(layerName, dim = 2)
-                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -244,7 +244,7 @@ private fun fillDepthwiseConv2DVariablesFromKeras(
             }
             "depthwise_bias:0" -> {
                 val biasVariableName = depthwiseConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
@@ -298,7 +298,7 @@ private fun fillSeparableConv2DVariablesFromKeras(
             }
             "depthwise_bias:0" -> {
                 val biasVariableName = separableConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray
+                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray!!
                 require(
                     biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
                 ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }

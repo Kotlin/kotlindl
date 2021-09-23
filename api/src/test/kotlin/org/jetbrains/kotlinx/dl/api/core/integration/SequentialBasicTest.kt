@@ -62,7 +62,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeUniform(SEED),
             padding = ConvPadding.SAME,
-            name = "conv2d_2"
+            name = "conv2d_2",
+            useBias = false
         ),
         MaxPool2D(
             poolSize = intArrayOf(1, 2, 2, 1),

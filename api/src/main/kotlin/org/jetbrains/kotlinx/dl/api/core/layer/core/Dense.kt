@@ -75,7 +75,7 @@ public class Dense(
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
-        createDenseVariables(tf, defineKernelVariableName(), defineBiasVariableName(), kGraph)
+        createDenseVariables(tf, kGraph)
     }
 
     private fun defineKernelVariableName(): String =
@@ -84,16 +84,13 @@ public class Dense(
     private fun defineBiasVariableName(): String =
         if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
 
-    private fun createDenseVariables(
-        tf: Ops,
-        kernelVariableName: String,
-        biasVariableName: String,
-        kGraph: KGraph
-    ) {
+    private fun createDenseVariables(tf: Ops, kGraph: KGraph) {
+        val kernelVariableName = defineKernelVariableName()
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
 
         if (useBias) {
+            val biasVariableName = defineBiasVariableName()
             val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
             bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
         }

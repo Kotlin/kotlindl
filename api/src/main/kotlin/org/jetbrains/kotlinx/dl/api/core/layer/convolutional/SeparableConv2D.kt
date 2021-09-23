@@ -93,7 +93,7 @@ public class SeparableConv2D(
     // weight tensor shapes
     private lateinit var depthwiseKernelShape: Shape
     private lateinit var pointwiseKernelShape: Shape
-    private lateinit var biasShape: Shape
+    private var biasShape: Shape? = null
 
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
@@ -109,7 +109,7 @@ public class SeparableConv2D(
         // Compute shapes of kernel and bias matrices
         depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
         pointwiseKernelShape = shapeFromDims(1, 1, numberOfChannels * this.depthMultiplier, filters)
-        biasShape = Shape.make(filters)
+        if (useBias) biasShape = Shape.make(filters)
 
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
@@ -119,40 +119,21 @@ public class SeparableConv2D(
         fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        val (depthwiseKernelVariableName, pointwiseKernelVariableName, biasVariableName) = defineVariableNames()
-
-        createSeparableConv2DVariables(
-            tf,
-            depthwiseKernelVariableName,
-            pointwiseKernelVariableName,
-            biasVariableName,
-            kGraph
-        )
+        createSeparableConv2DVariables(tf, kGraph)
     }
 
-    private fun defineVariableNames(): Triple<String, String, String> {
-        return if (name.isNotEmpty()) {
-            Triple(
-                separableConv2dDepthwiseKernelVarName(name),
-                separableConv2dPointwiseKernelVarName(name),
-                separableConv2dBiasVarName(name)
-            )
-        } else {
-            Triple(DEPTHWISE_KERNEL_VARIABLE_NAME, POINTWISE_KERNEL_VARIABLE_NAME, BIAS_VARIABLE_NAME)
-        }
-    }
+    private fun defineDepthwiseKernelVariableName(): String =
+        if (name.isNotEmpty()) separableConv2dDepthwiseKernelVarName(name) else DEPTHWISE_KERNEL_VARIABLE_NAME
 
-    private fun createSeparableConv2DVariables(
-        tf: Ops,
-        depthwiseKernelVariableName: String,
-        pointwiseKernelVariableName: String,
-        biasVariableName: String,
-        kGraph: KGraph
-    ) {
+    private fun definePointwiseKernelVariableName(): String =
+        if (name.isNotEmpty()) separableConv2dPointwiseKernelVarName(name) else POINTWISE_KERNEL_VARIABLE_NAME
+
+    private fun defineBiasVariableName(): String =
+        if (name.isNotEmpty()) separableConv2dBiasVarName(name) else BIAS_VARIABLE_NAME
+
+    private fun createSeparableConv2DVariables(tf: Ops, kGraph: KGraph) {
+        val depthwiseKernelVariableName = defineDepthwiseKernelVariableName()
         depthwiseKernel = tf.withName(depthwiseKernelVariableName).variable(depthwiseKernelShape, getDType())
-        pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
-        if (useBias) bias = tf.withName(biasVariableName).variable(biasShape, getDType())
-
         depthwiseKernel = addWeight(
             tf,
             kGraph,
@@ -161,6 +142,9 @@ public class SeparableConv2D(
             depthwiseInitializer,
             depthwiseRegularizer
         )
+
+        val pointwiseKernelVariableName = definePointwiseKernelVariableName()
+        pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
         pointwiseKernel = addWeight(
             tf,
             kGraph,
@@ -169,7 +153,12 @@ public class SeparableConv2D(
             pointwiseInitializer,
             pointwiseRegularizer
         )
-        if (useBias) bias = addWeight(tf, kGraph, biasVariableName, bias!!, biasInitializer, biasRegularizer)
+
+        if (useBias) {
+            val biasVariableName = defineBiasVariableName()
+            val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
+            bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
+        }
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -225,7 +214,16 @@ public class SeparableConv2D(
         set(value) = assignWeights(value)
 
     private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
-        return extractWeights(defineVariableNames().toList())
+        return extractWeights(
+            if (useBias) listOf(
+                defineDepthwiseKernelVariableName(),
+                definePointwiseKernelVariableName(),
+                defineBiasVariableName()
+            ) else listOf(
+                defineDepthwiseKernelVariableName(),
+                definePointwiseKernelVariableName()
+            )
+        )
     }
 
     /** Returns the shape of kernel weights. */
@@ -235,12 +233,14 @@ public class SeparableConv2D(
     public val pointwiseShapeArray: LongArray get() = TensorShape(pointwiseKernelShape).dims()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray get() = TensorShape(biasShape).dims()
+    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
 
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (depthwiseKernelShape.numElements() + pointwiseKernelShape.numElements() + biasShape.numElements()).toInt()
+        get() = (depthwiseKernelShape.numElements() +
+                pointwiseKernelShape.numElements() +
+                (biasShape?.numElements() ?: 0)).toInt()
 
     override fun toString(): String =
         "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
