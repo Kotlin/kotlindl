@@ -6,15 +6,15 @@ dependencies {
 }
 
 dependencies {
-    compile 'org.apache.logging.log4j:log4j-api:2.14.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.14.0'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.14.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.14.1'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
 
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
     // to run on GPU (if CUDA is updated and machine with NVIDIA onboard)
     /*compile 'org.tensorflow:libtensorflow:1.15.0'
     compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'*/

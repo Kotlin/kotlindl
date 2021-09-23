@@ -2,7 +2,7 @@ project.setDescription("This module contains the Kotlin API for loading and exec
 
 dependencies {
     api project(":api")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
     compile 'com.microsoft.onnxruntime:onnxruntime:1.8.1'
     compile "org.jetbrains.kotlinx:multik-api:0.0.1"
     compile "org.jetbrains.kotlinx:multik-default:0.0.1"
