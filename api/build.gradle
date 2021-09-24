@@ -1,40 +1,18 @@
-apply plugin: 'maven-publish'
-apply from: project.rootProject.file('gradle/maven-metadata.gradle')
-
-task sourcesJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar) {
-    classifier 'javadoc'
-    from javadoc
-}
-
-def sonatypeUser = System.getenv('SONATYPE_USER')
-def sonatypePassword = System.getenv('SONATYPE_PASSWORD')
-
-nexusStaging {
-    username sonatypeUser
-    password sonatypePassword
-    packageGroup project.group.toString()
-    repositoryDescription "kotlinx.kotlindl staging repository, version: $version"
-}
-
+project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
 dependencies {
     api project(":dataset")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     compile 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
     compile 'io.github.microutils:kotlin-logging:2.0.4' // for logging
     compile 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     compile 'com.beust:klaxon:5.5'
     testCompile 'ch.qos.logback:logback-classic:1.2.3'
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.8.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
 }
 
 compileKotlin {
@@ -53,7 +31,6 @@ test {
     useJUnitPlatform()
 }
 
-
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Version': '1.15'
@@ -64,80 +41,5 @@ task fatJar(type: Jar) {
 }
 
 artifacts {
-    archives sourcesJar
     archives fatJar
 }
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            pom.withXml(configureMavenCentralMetadata)
-            from components.java
-            groupId project.group
-            artifactId 'kotlin-deeplearning-api'
-            version project.version
-            artifact sourcesJar { classifier "sources" }
-            artifact javadocJar { classifier "javadoc" }
-        }
-    }
-    repositories {
-        maven {
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = sonatypeUser
-                password = sonatypePassword
-            }
-        }
-    }
-}
-
-def signingKey = System.getenv("SIGN_KEY_ID")
-def signingKeyPassphrase = System.getenv("SIGN_KEY_PASSPHRASE")
-def signingPrivateKey = System.getenv("SIGN_KEY_PRIVATE")
-
-if (signingKey != null) {
-    apply plugin: 'signing'
-    signing {
-        useInMemoryPgpKeys(signingKey, signingPrivateKey, signingKeyPassphrase)
-        sign publishing.publications
-    }
-}
-
-/*dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/dokka"
-
-    configuration {
-        moduleName = 'KotlinDL'
-
-        // Use to include or exclude non public members.
-        includeNonPublic = false
-
-        // Do not create index pages for empty packages
-        skipEmptyPackages = true
-
-        // Specifies the location of the project source code on the Web.
-        // If provided, Dokka generates "source" links for each declaration.
-        // Repeat for multiple mappings
-        sourceLink {
-            // Unix based directory relative path to the root of the project (where you execute gradle respectively).
-            path = "./"
-
-            // URL showing where the source code can be accessed through the web browser
-            url = "https://github.com/zaleslaw/KotlinDL/tree/master"
-            //remove src/main/kotlin if you use "./" above
-
-            // Suffix which is used to append the line number to the URL. Use #L for GitHub
-            lineSuffix = "#L"
-        }
-
-        // Used for linking to JDK documentation
-        jdkVersion = 8
-
-        // Disable linking to online kotlin-stdlib documentation
-        noStdlibLink = false
-
-        // Disable linking to online JDK documentation
-        noJdkLink = false
-    }
-}*/

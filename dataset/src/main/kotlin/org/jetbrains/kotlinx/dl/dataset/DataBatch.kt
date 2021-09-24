@@ -18,4 +18,24 @@ public data class DataBatch internal constructor(
 ) {
     /** */
     public fun shape(elementSize: Int): List<Long> = listOf(size.toLong(), elementSize.toLong())
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DataBatch
+
+        if (!x.contentDeepEquals(other.x)) return false
+        if (!y.contentEquals(other.y)) return false
+        if (size != other.size) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = x.contentDeepHashCode()
+        result = 31 * result + y.contentHashCode()
+        result = 31 * result + size
+        return result
+    }
 }

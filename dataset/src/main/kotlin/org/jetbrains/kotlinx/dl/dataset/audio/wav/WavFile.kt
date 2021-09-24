@@ -37,7 +37,7 @@ private const val RIFF_TYPE_ID: Long = 0x45564157
 public class WavFile(
     file: File,
     private val bufferSize: Int = 4096
-): AutoCloseable {
+) : AutoCloseable {
 
     private enum class IOState {
         READING,
@@ -67,7 +67,7 @@ public class WavFile(
 
     init {
         readWavHeader(file, inputStream, buffer)
-        
+
         var chunkSize: Long
         var fileFormatChunk: WavFileFormat? = null
         var numFrames: Long? = null
@@ -112,6 +112,7 @@ public class WavFile(
         this.frames = numFrames ?: throw WavFileException("Did not find a Data chunk")
     }
 
+    /** */
     public override fun close() {
         ioState = IOState.CLOSED
         inputStream.close()

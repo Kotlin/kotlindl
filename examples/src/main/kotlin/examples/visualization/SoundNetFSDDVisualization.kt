@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
@@ -31,7 +32,7 @@ private const val TEST_BATCH_SIZE = 512
 
 
 /**
- * This examples demonstrates model activations and Conv1D filters visualisation.
+ * This examples demonstrates model activations and Conv1D filters visualization.
  * Additionally, we present the visualization of sound files as the plots of the sound data.
  *
  * Model is trained on Free Spoken Digits Dataset.
@@ -50,7 +51,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(
             dataset = train,

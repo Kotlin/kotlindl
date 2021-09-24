@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
@@ -52,7 +53,7 @@ fun lenetClassic() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 

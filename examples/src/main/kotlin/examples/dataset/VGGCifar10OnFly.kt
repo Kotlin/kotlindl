@@ -19,6 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
@@ -184,20 +185,20 @@ fun main() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(cifarImagesArchive)
+            imageShape = ImageShape(32, 32, 3)
+            colorMode = ColorOrder.BGR
+        }
         transformImage {
-            load {
-                pathToData = File(cifarImagesArchive)
-                imageShape = ImageShape(32, 32, 3)
-                colorMode = ColorOrder.BGR
-            }
-            rotate {
-                degrees = 90f
-            }
             crop {
                 left = 2
                 right = 2
                 top = 2
                 bottom = 2
+            }
+            rotate {
+                degrees = 90f
             }
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
@@ -224,7 +225,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val start = System.currentTimeMillis()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)

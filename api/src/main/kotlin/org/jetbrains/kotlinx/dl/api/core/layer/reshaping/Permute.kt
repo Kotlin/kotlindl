@@ -36,8 +36,8 @@ public class Permute(
     override fun computeOutputShape(inputShape: Shape): Shape {
         val outputShape = inputShape.toLongArray()
         dims.forEachIndexed { i, dim ->
-            val target_dim = inputShape.size(dim)
-            outputShape[i + 1] = target_dim
+            val targetDim = inputShape.size(dim)
+            outputShape[i + 1] = targetDim
         }
         return shapeFromDims(*outputShape)
     }

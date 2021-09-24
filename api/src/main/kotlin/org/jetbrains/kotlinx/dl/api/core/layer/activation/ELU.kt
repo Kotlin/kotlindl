@@ -37,7 +37,7 @@ public class ELU(
     override fun forward(
         tf: Ops,
         input: Operand<Float>
-    ): Operand<Float> = when(alpha) {
+    ): Operand<Float> = when (alpha) {
         1.0f -> tf.nn.elu(input)
         else -> {
             val greaterThanZero = tf.math.greater(input, tf.constant(0.0f))

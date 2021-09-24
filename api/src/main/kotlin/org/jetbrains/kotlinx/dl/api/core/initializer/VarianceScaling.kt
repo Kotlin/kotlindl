@@ -14,7 +14,7 @@ import kotlin.math.sqrt
 /**
  * The Glorot normal initializer, also called Xavier normal initializer.
  *
- * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / (fan_in + fan_out))`
+ * Draw samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / (fan_in + fan_out))`
  * where `fan_in` is the number of input units in
  * the weight tensor and `fan_out` is the number of output units in the weight tensor.
  *
@@ -34,7 +34,7 @@ public class GlorotNormal(
 /**
  * The Glorot uniform initializer, also called Xavier uniform initializer.
  *
- * Draws samples from a uniform distribution within `[-limit, limit]` where `limit`
+ * Draw samples from a uniform distribution within `[-limit, limit]` where `limit`
  * is `sqrt(6 / (fan_in + fan_out))` where `fan_in` is the number of input units
  * in the weight tensor and `fan_out` is the number of output units in the weight tensor.
  *
@@ -55,7 +55,7 @@ public class GlorotUniform(
 /**
  * He normal initializer.
  *
- * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / fan_in)`
+ * Draw samples from a truncated normal distribution centered on 0 with `stddev = sqrt(2 / fan_in)`
  * where `fan_in` is the number of input units in the weight tensor.
  *
  * @property [seed] Used to create random seeds.
@@ -75,7 +75,7 @@ public class HeNormal(
 /**
  * He uniform variance scaling initializer.
  *
- * Draws samples from a uniform distribution within `[-limit, limit]` where `limit`
+ * Draw samples from a uniform distribution within `[-limit, limit]` where `limit`
  * is `sqrt(6 / fan_in)` where `fan_in` is the number of input units in the weight tensor.
  *
  * @property [seed] Used to create random seeds.
@@ -95,7 +95,7 @@ public class HeUniform(
 /**
  * LeCun normal initializer.
  *
- * Draws samples from a truncated normal distribution centered on 0 with `stddev = sqrt(1 / fan_in)`
+ * Draw samples from a truncated normal distribution centered on 0 with `stddev = sqrt(1 / fan_in)`
  * where `fan_in` is the number of input units in the weight tensor.
  *
  * @property [seed] Used to create random seeds.
@@ -117,7 +117,7 @@ public class LeCunNormal(
 /**
  * LeCun uniform initializer.
  *
- * Draws samples from a uniform distribution within [-limit, limit] where `limit` is `sqrt(3 / fan_in)`
+ * Draw samples from a uniform distribution within [-limit, limit] where `limit` is `sqrt(3 / fan_in)`
  * where `fan_in` is the number of input units in the weight tensor.
  *
  * @property [seed] Used to create random seeds.

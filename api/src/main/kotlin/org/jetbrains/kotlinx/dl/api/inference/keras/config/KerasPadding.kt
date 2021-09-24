@@ -22,7 +22,7 @@ internal sealed class KerasPadding {
      * @property [padding] numeric value from `ZeroPadding1D`
      */
     internal class ZeroPadding1D : KerasPadding {
-        val padding:IntArray
+        val padding: IntArray
 
         /**
          * Constructs an instance of KerasPadding.ZeroPadding1D
@@ -36,7 +36,7 @@ internal sealed class KerasPadding {
          * Constructs an instance of KerasPadding.ZeroPadding1D
          * @param [padding] integer array from ZeroPadding1D
          */
-        constructor(padding: IntArray){
+        constructor(padding: IntArray) {
             this.padding = IntArray(2)
             this.padding[0] = padding[0]
             this.padding[1] = padding[1]

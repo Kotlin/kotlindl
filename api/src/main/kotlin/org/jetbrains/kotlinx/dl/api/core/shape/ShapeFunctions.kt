@@ -90,7 +90,7 @@ internal fun numElementsInShape(shape: LongArray): Long {
 internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
 
 /** Reshapes 2D array of floats to 1D array of floats. */
-internal fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
+public fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
@@ -123,7 +123,7 @@ public fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
 }
 
 /** Reshapes 4D array of floats to 1D array of floats. */
-internal fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
+public fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
     val result = FloatArray(size) { 0.0f }
 
     var pos = 0
@@ -148,10 +148,11 @@ internal fun getShapeOfArray(data: Array<*>): Shape {
         acc += size.toLong()
         return acc.toLongArray()
     }
+
     tailrec fun collectDims(data: Array<*>, acc: MutableList<Long>): LongArray {
         val firstElem = data[0] ?: return acc.toLongArray()
         acc += data.size.toLong()
-        return when(firstElem) {
+        return when (firstElem) {
             is Array<*> -> collectDims(firstElem, acc)
             is BooleanArray -> appendPrimitiveArraySize(firstElem.size, acc)
             is ByteArray -> appendPrimitiveArraySize(firstElem.size, acc)
@@ -183,8 +184,7 @@ internal fun getFloatArrayOfShape(shape: Shape, initValue: Float = 0.0f): Array<
     }
     return if (shape.numDimensions() == 1) {
         Array(shape.size(0).toInt()) { initValue }
-    }
-    else {
+    } else {
         getFloatArrayOfShape(shape, 0) as Array<*>
     }
 }

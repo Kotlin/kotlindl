@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -17,7 +16,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Permute
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
@@ -150,7 +148,7 @@ private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegulariz
     }
 }
 
-private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer? {
+private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer {
     val className: String
     val config: KerasInitializerConfig
     if (isKerasFullyCompatible) {
@@ -239,7 +237,7 @@ private fun convertToKerasPadding(padding: ConvPadding): KerasPadding {
     }
 }
 
-private fun convertToKerasActivation(activation: Activations): String? {
+private fun convertToKerasActivation(activation: Activations): String {
     return when (activation) {
         Activations.Relu -> ACTIVATION_RELU
         Activations.Sigmoid -> ACTIVATION_SIGMOID
@@ -504,7 +502,7 @@ private fun createKerasDenseLayer(layer: Dense, isKerasFullyCompatible: Boolean)
     return KerasLayer(class_name = LAYER_DENSE, config = configX)
 }
 
-private fun createKerasPermuteLayer(layer: Permute):KerasLayer{
+private fun createKerasPermuteLayer(layer: Permute): KerasLayer {
     val configX = LayerConfig(
         dims = layer.dims,
         name = layer.name,

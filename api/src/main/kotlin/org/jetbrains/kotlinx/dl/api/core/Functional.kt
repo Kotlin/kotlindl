@@ -144,8 +144,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             layerList = topologicalSort(layerList, inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
-            val model = Functional(*layerList.toTypedArray())
-            return model
+            return Functional(*layerList.toTypedArray())
         }
 
         /**
@@ -158,7 +157,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelConfiguration(configuration: File): Functional {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration)
         }
 
         /**
@@ -192,7 +191,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration)
         }
 
         /**
@@ -236,7 +235,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             it.outputShape = outputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
 
-            logger.info { "${it.name}; outputShape: $outputShape $it" }
+            logger.debug { "${it.name}; outputShape: $outputShape $it" }
         }
     }
 
@@ -320,144 +319,6 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     private fun saveGraphDef(pathToModelDirectory: String) {
         val file = File("$pathToModelDirectory/graph.pb")
         file.writeBytes(kGraph.tfGraph.toGraphDef())
-    }
-
-    public override fun summary(
-        stringLayerNameTypeSize: Int,
-        stringOutputShapeSize: Int,
-        stringParamSize: Int
-    ): List<String> {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-
-        logger.info("==========================================================================================================")
-        logger.info("Model type: Functional")
-        if (name != null)
-            logger.info("Model name: $name")
-        logger.info("__________________________________________________________________________________________________________")
-        logger.info("Layer (type)                           Output Shape              Param #       Connected to               ")
-        logger.info("==========================================================================================================")
-
-        var totalTrainableParams = 0
-        var totalFrozenParams = 0
-
-        val layerDescriptions = mutableListOf<String>()
-
-        for (l in layers) {
-            if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
-            val inboundLayerNames = l.inboundLayers.map { it.name }.toTypedArray()
-
-            if (inboundLayerNames.isNotEmpty()) {
-                val layerDescription = createHeaderFunctionalLayerDescription(
-                    l,
-                    inboundLayerNames[0],
-                    stringLayerNameTypeSize,
-                    stringOutputShapeSize,
-                    stringParamSize
-                )
-                layerDescriptions.add(layerDescription)
-                logger.info(layerDescription)
-
-                inboundLayerNames.drop(1).forEach {
-                    val yetOneRowForInboundNode = createNextRowInFunctionalLayerDescription(
-                        it,
-                        stringLayerNameTypeSize + stringOutputShapeSize + stringParamSize
-                    )
-                    layerDescriptions.add(yetOneRowForInboundNode)
-                    logger.info(yetOneRowForInboundNode)
-                }
-
-            } else {
-                val layerDescription = createSimpleLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
-                layerDescriptions.add(layerDescription)
-                logger.info(layerDescription)
-            }
-
-            logger.info("__________________________________________________________________________________________________________")
-        }
-
-        logger.info("==========================================================================================================")
-        logger.info("Total trainable params: $totalTrainableParams")
-        logger.info("Total frozen params: $totalFrozenParams")
-        logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
-        logger.info("==========================================================================================================")
-
-        return layerDescriptions
-    }
-
-    private fun createSimpleLayerDescription(
-        l: Layer,
-        stringLayerNameTypeSize: Int,
-        stringOutputShapeSize: Int
-    ): String {
-        val firstPart = "${l.name}(${l::class.simpleName})"
-
-        val stringBuilder = StringBuilder(firstPart)
-        for (i in 1 until stringLayerNameTypeSize - firstPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        val secondPart = l.outputShape.toString()
-
-        stringBuilder.append(secondPart)
-
-        for (i in 0 until stringOutputShapeSize - secondPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        stringBuilder.append(l.paramCount)
-
-        return stringBuilder.toString()
-    }
-
-    private fun createHeaderFunctionalLayerDescription(
-        l: Layer,
-        inboundNodeName: String,
-        stringLayerNameTypeSize: Int,
-        stringOutputShapeSize: Int,
-        stringParamSize: Int
-    ): String {
-        val firstPart = "${l.name}(${l::class.simpleName})"
-
-        val stringBuilder = StringBuilder(firstPart)
-        for (i in 1 until stringLayerNameTypeSize - firstPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        val secondPart = l.outputShape.toString()
-
-        stringBuilder.append(secondPart)
-
-        for (i in 0 until stringOutputShapeSize - secondPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        val thirdPart = l.paramCount.toString()
-
-        stringBuilder.append(thirdPart)
-
-        for (i in 0 until stringParamSize - thirdPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        stringBuilder.append(inboundNodeName)
-
-        return stringBuilder.toString()
-    }
-
-    private fun createNextRowInFunctionalLayerDescription(
-        inboundNodeName: String,
-        stringTabSize: Int
-    ): String {
-        val firstPart = ""
-
-        val stringBuilder = StringBuilder(firstPart)
-        for (i in 1 until stringTabSize) {
-            stringBuilder.append(" ")
-        }
-
-        stringBuilder.append(inboundNodeName)
-
-        return stringBuilder.toString()
     }
 
     /** Returns a copy of this model. */

@@ -40,7 +40,6 @@ public class PReLU(
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */
-
     private lateinit var alphaShape: Shape
     private lateinit var alpha: Variable<Float>
     private val alphaVariableName = if (name.isNotEmpty()) name + "_" + "alpha" else "alpha"

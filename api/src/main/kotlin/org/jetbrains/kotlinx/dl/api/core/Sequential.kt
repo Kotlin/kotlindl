@@ -158,68 +158,6 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return out
     }
 
-    public override fun summary(
-        stringLayerNameTypeSize: Int,
-        stringOutputShapeSize: Int,
-        stringParamSize: Int
-    ): List<String> {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-
-        logger.info("===========================================================================")
-        logger.info("Model type: Sequential")
-        if (name != null)
-            logger.info("Model name: $name")
-        logger.info("___________________________________________________________________________")
-        logger.info("Layer (type)                           Output Shape              Param #   ")
-        logger.info("===========================================================================")
-
-        var totalTrainableParams = 0
-        var totalFrozenParams = 0
-
-        val layerDescriptions = mutableListOf<String>()
-
-        for (l in layers) {
-            if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
-            val layerDescription = createLayerDescription(l, stringLayerNameTypeSize, stringOutputShapeSize)
-            layerDescriptions.add(layerDescription)
-            logger.info(layerDescription)
-            logger.info("___________________________________________________________________________")
-        }
-
-        logger.info("===========================================================================")
-        logger.info("Total trainable params: $totalTrainableParams")
-        logger.info("Total frozen params: $totalFrozenParams")
-        logger.info("Total params: ${totalTrainableParams + totalFrozenParams}")
-        logger.info("===========================================================================")
-
-        return layerDescriptions
-    }
-
-    private fun createLayerDescription(
-        l: Layer,
-        stringLayerNameTypeSize: Int,
-        stringOutputShapeSize: Int
-    ): String {
-        val firstPart = "${l.name}(${l::class.simpleName})"
-
-        val stringBuilder = StringBuilder(firstPart)
-        for (i in 1 until stringLayerNameTypeSize - firstPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        val secondPart = l.outputShape.toString()
-
-        stringBuilder.append(secondPart)
-
-        for (i in 0 until stringOutputShapeSize - secondPart.length) {
-            stringBuilder.append(" ")
-        }
-
-        stringBuilder.append(l.paramCount)
-
-        return stringBuilder.toString()
-    }
-
     /** Returns a copy of this model. */
     public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
         val serializedModel = serializeModel(true)

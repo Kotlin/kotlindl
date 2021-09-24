@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 
@@ -37,8 +37,8 @@ private val fashionMnistLabelEncoding = mapOf(
  * - Model is exported as graph in .pb format, weights are exported in custom (txt) format.
  * - Model is trained on FashionMnist dataset.
  * - It saves all the data to the project root directory.
- * - [InferenceModel] is created via graph and weights loading.
- * - [InferenceModel] is reshaped and evaluated on first 10'000 images.
+ * - [TensorFlowInferenceModel] is created via graph and weights loading.
+ * - [TensorFlowInferenceModel] is reshaped and evaluated on first 10'000 images.
  */
 fun lenetOnFashionMnistExportImportToTxt() {
     val (train, test) = fashionMnist()
@@ -63,7 +63,7 @@ fun lenetOnFashionMnistExportImportToTxt() {
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
     }
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
         it.reshape(28, 28, 1)

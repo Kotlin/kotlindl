@@ -28,20 +28,14 @@ public class OnFlyImageDataset internal constructor(
     private var y: FloatArray
 
     init {
-        val loading = preprocessing.imagePreprocessingStage.load
+        val loading = preprocessing.load
         xFiles = loading.prepareFileNames()
         y = labels ?: OnHeapDataset.prepareY(xFiles, preprocessing)
     }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyImagesToBatch(src: Array<File>, start: Int, length: Int): Array<FloatArray> {
-        val numOfPixels: Int = 32 * 32 * 3
-
-        val dataForBatch = Array(length) { FloatArray(numOfPixels) { 0.0f } }
-        for (i in start until start + length) {
-            dataForBatch[i - start] = applyImagePreprocessing(src[i])
-        }
-        return dataForBatch
+        return Array(length) { index -> applyImagePreprocessing(src[start + index]) }
     }
 
     private fun applyImagePreprocessing(file: File): FloatArray {
@@ -50,11 +44,7 @@ public class OnFlyImageDataset internal constructor(
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyLabelsToBatch(src: FloatArray, start: Int, length: Int): FloatArray {
-        val dataForBatch = FloatArray(length) { 0.0f }
-        for (i in start until start + length) {
-            dataForBatch[i - start] = src[i]
-        }
-        return dataForBatch
+        return FloatArray(length) { src[start + it] }
     }
 
     /** Splits datasets on two sub-datasets according [splitRatio].*/

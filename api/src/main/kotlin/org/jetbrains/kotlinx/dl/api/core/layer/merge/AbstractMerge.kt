@@ -15,7 +15,7 @@ import org.tensorflow.op.Ops
 /**
  * Layer that adds a list of inputs.
  *
- * It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape).
+ * It takes as input a list of tensors, all the same shape, and returns a single tensor (also of the same shape).
  *
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */

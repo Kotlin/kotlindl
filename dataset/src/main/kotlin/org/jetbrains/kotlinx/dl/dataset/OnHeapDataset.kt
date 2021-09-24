@@ -6,9 +6,11 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import java.io.File
 import java.io.IOException
+import java.lang.UnsupportedOperationException
 import java.nio.FloatBuffer
 import kotlin.math.truncate
 import kotlin.random.Random
@@ -20,14 +22,13 @@ import kotlin.random.Random
  *
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  */
-public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y: FloatArray) :
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) :
     Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
-        val dataForBatch = Array(length) { FloatArray(src[0].size) { 0.0f } }
-        for (i in start until start + length) {
-            dataForBatch[i - start] = src[i].copyOf() // Creates new copy for batch data
+        val dataForBatch = Array(length) {
+            src[it + start].copyOf()
         }
         return dataForBatch
     }
@@ -180,10 +181,10 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             labels: FloatArray
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.imagePreprocessingStage.load
+                val loading = preprocessors.load
                 val xFiles = loading.prepareFileNames()
 
-                val x = prepareX(xFiles, preprocessors, preprocessors.finalShape.numberOfElements.toInt())
+                val x = prepareX(xFiles, preprocessors)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -193,14 +194,9 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
 
         private fun prepareX(
             xFiles: Array<File>,
-            preprocessors: Preprocessing,
-            numOfPixels: Int
+            preprocessors: Preprocessing
         ): Array<FloatArray> {
-            val x = Array(xFiles.size) { FloatArray(numOfPixels) { 0.0f } }
-            for (i in xFiles.indices) {
-                x[i] = preprocessors.handleFile(xFiles[i]).first
-            }
-            return x
+            return Array(xFiles.size) { preprocessors.handleFile(xFiles[it]).first }
         }
 
 
@@ -213,10 +209,9 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             preprocessors: Preprocessing
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.imagePreprocessingStage.load
+                val loading = preprocessors.load
                 val xFiles = loading.prepareFileNames()
-                val numOfPixels = preprocessors.finalShape.numberOfElements.toInt()
-                val x = prepareX(xFiles, preprocessors, numOfPixels)
+                val x = prepareX(xFiles, preprocessors)
                 val y = prepareY(xFiles, preprocessors)
 
                 OnHeapDataset(x, y)
@@ -230,16 +225,24 @@ public class OnHeapDataset internal constructor(val x: Array<FloatArray>, val y:
             preprocessors: Preprocessing,
         ): FloatArray {
             val y: FloatArray
-            if (preprocessors.imagePreprocessingStage.load.labelGenerator != null) {
-                val labelGenerator = preprocessors.imagePreprocessingStage.load.labelGenerator as FromFolders
-                val mapping = labelGenerator.mapping
+            if (preprocessors.load.labelGenerator != null) {
+                when (val labelGenerator = preprocessors.load.labelGenerator) {
+                    is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
+                        val mapping = labelGenerator.mapping
 
-                y = FloatArray(xFiles.size) { 0.0f }
-                for (i in xFiles.indices) {
-                    y[i] = (mapping[xFiles[i].parentFile.name]
-                        ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
+                        y = FloatArray(xFiles.size) { 0.0f }
+                        for (i in xFiles.indices) {
+                            y[i] = (mapping[xFiles[i].parentFile.name]
+                                ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
+                        }
+                    }
+                    is EmptyLabels -> {
+                        y = FloatArray(xFiles.size) { Float.NaN }
+                    }
+                    else -> {
+                        throw UnsupportedOperationException("Unknown label generator: ${labelGenerator.toString()}") // TODO: labelGenerator.apply(...) will be better solution here.
+                    }
                 }
-
             } else {
                 throw IllegalStateException("Label generator should be defined for Loading stage of image preprocessing.")
             }

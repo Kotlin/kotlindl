@@ -23,8 +23,8 @@ import jetbrains.letsPlot.theme
 class PlotFeature(val scale: Scale) {
 
     companion object {
-        val GRAY = PlotFeature(scaleFillGrey())
-        val HUE = PlotFeature(scaleFillHue())
+        val GRAY: PlotFeature = PlotFeature(scaleFillGrey())
+        val HUE: PlotFeature = PlotFeature(scaleFillHue())
     }
 }
 

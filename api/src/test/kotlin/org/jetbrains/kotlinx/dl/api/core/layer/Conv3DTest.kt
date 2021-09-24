@@ -15,8 +15,10 @@ internal class Conv3DTest : ConvLayerTest() {
 
     @Test
     fun zeroedInputTensorWithDefaultValues() {
-        val input = createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 0.0f)
-        val expected = createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 32, initValue = 0.0f)
+        val input =
+            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 0.0f)
+        val expected =
+            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 32, initValue = 0.0f)
 
         assertFloatConv3DTensorsEquals(
             Conv3D(
@@ -30,8 +32,10 @@ internal class Conv3DTest : ConvLayerTest() {
 
     @Test
     fun constantInputTensorWithValidPadding() {
-        val input = createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 1.0f)
-        val expected = createFloatConv3DTensor(batchSize = 1, depth = 2, height = 2, width = 2, channels = 16, initValue = 8.0f)
+        val input =
+            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 1.0f)
+        val expected =
+            createFloatConv3DTensor(batchSize = 1, depth = 2, height = 2, width = 2, channels = 16, initValue = 8.0f)
 
         assertFloatConv3DTensorsEquals(
             Conv3D(

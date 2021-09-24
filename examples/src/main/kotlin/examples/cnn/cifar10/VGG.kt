@@ -19,12 +19,12 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -178,12 +178,10 @@ fun vgg() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            load {
-                pathToData = File(cifarImagesArchive)
-                imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
-                colorMode = ColorOrder.BGR
-            }
+        load {
+            pathToData = File(cifarImagesArchive)
+            imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
+            colorMode = ColorOrder.BGR
         }
         transformTensor {
             rescale {
@@ -204,7 +202,7 @@ fun vgg() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val start = System.currentTimeMillis()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)

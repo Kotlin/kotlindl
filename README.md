@@ -1,6 +1,6 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.5.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.5.31-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
@@ -85,7 +85,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
     
-        it.summary()
+        it.logSummary()
     
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
     
@@ -117,27 +117,6 @@ KotlinDL is built on top of the TensorFlow 1.15 Java API.
 The Java API for TensorFlow 2.+ has recently had its first public release, and this project will be switching to it in the nearest future. 
 This, however, does not affect the high-level API.
 
-## Limitations
-Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
- 
-- Input()
-- Flatten()
-- Dense()
-- Dropout()
-- Conv2D()
-- MaxPool2D()
-- AvgPool2D()   
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- Cropping2D
-- Reshape
-- ZeroPadding2D 
-
-KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.  
 
 ## How to configure KotlinDL in your project
 To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
@@ -150,7 +129,7 @@ To use KotlinDL in your project, add the following dependency to your `build.gra
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.2.0. 
+The latest KotlinDL version is 0.3.0-alpha-5. 
 The latest stable KotlinDL version is 0.2.0. 
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
@@ -213,9 +192,9 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```
-  compile 'org.apache.logging.log4j:log4j-api:2.14.0'
-  compile 'org.apache.logging.log4j:log4j-core:2.14.0'
-  compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+  implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
 ```
 
 ```
@@ -225,10 +204,14 @@ You will also need to add the following dependencies and configuration file ``lo
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
         </Console>
     </Appenders>
+
     <Loggers>
         <Root level="debug">
             <AppenderRef ref="STDOUT" level="DEBUG"/>
         </Root>
+        <Logger name="io.jhdf" level="off" additivity="true">
+            <appender-ref ref="STDOUT" />
+        </Logger>
     </Loggers>
 </Configuration>
 
@@ -280,6 +263,50 @@ task fatJar(type: Jar) {
     with jar
 }
 ```
+
+## Limitations
+Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
+
+- Input
+- Flatten
+- Dense
+- Dropout
+- Conv2D
+- MaxPool2D
+- AvgPool2D
+- BatchNorm
+- ActivationLayer
+- DepthwiseConv2D
+- SeparableConv2D
+- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
+- GlobalAvgPool2D
+- GlobalMaxPool2D
+- Cropping2D
+- UpSampling2D
+- ZeroPadding2D
+- Reshape
+- Permute
+- RepeatVector
+- Softmax
+- LeakyReLU
+- PReLU
+- ELU
+- ThresholdedReLU
+- Conv1D
+- MaxPooling1D
+- AveragePooling1D
+- GlobalMaxPooling1D
+- GlobalAveragePooling1D
+- UpSampling1D
+- Cropping1D
+- Conv3D
+- MaxPooling3D
+- AveragePooling3D
+- GlobalAveragePooling3D
+- GlobalMaxPool3D
+- Cropping3D
+
+KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.
 
 ## Contributing
 

@@ -2,14 +2,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv3D
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

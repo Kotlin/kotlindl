@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
@@ -42,7 +43,7 @@ fun lenetOnMnistExportImportToJson() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(
             trainingDataset = newTrain,
@@ -76,7 +77,7 @@ fun lenetOnMnistExportImportToJson() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-        it.summary()
+        it.logSummary()
 
         it.loadWeights(File(PATH_TO_MODEL))
 

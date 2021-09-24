@@ -47,7 +47,7 @@ internal class PaddingConverter : Converter {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun fromJson(jv: JsonValue): KerasPadding? {
+    override fun fromJson(jv: JsonValue): KerasPadding {
         val stringValue = jv.string
         if (stringValue != null) {
             return when (stringValue) {

@@ -6,15 +6,12 @@
 /savedmodels/
 /.gradle/
 /.idea/
-/build/
+build/
 /gradle/
-/api/build/
 /api/out/
-/examples/build/
 /examples/out/
 /cache/
 /examples/cache/
 /api/cache/
 /pretrainedModels/
 /examples/savedmodels/
-/dataset/build/

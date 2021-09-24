@@ -32,8 +32,13 @@ public class Resize(
     public var interpolation: InterpolationType = InterpolationType.BILINEAR,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessor {
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
+) : ImagePreprocessorBase() {
+
+    override fun getOutputShape(inputShape: ImageShape?): ImageShape {
+        return ImageShape(outputWidth.toLong(), outputHeight.toLong(), 3)
+    }
+
+    override fun apply(image: BufferedImage): BufferedImage {
         val resizedImage = BufferedImage(outputWidth, outputHeight, BufferedImage.TYPE_3BYTE_BGR)
         val graphics2D = resizedImage.createGraphics()
 
@@ -59,9 +64,6 @@ public class Resize(
         graphics2D.drawImage(image, 0, 0, outputWidth, outputHeight, null)
         graphics2D.dispose()
 
-        return Pair(
-            resizedImage,
-            ImageShape(outputWidth.toLong(), outputHeight.toLong(), channels = inputShape.channels)
-        )
+        return resizedImage
     }
 }

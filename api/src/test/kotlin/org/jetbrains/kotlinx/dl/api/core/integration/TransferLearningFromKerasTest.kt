@@ -92,8 +92,8 @@ class TransferLearningTest : IntegrationTest() {
 
     @Test
     fun loadMismatchJSONConfigAndH5Weights() {
-        val JSONConfig = File(realPathToMismatchConfig)
-        val model = Sequential.loadModelConfiguration(JSONConfig)
+        val jsonConfig = File(realPathToMismatchConfig)
+        val model = Sequential.loadModelConfiguration(jsonConfig)
         val modelDirectory = HdfFile(File(realPathToWeights))
 
         model.compile(

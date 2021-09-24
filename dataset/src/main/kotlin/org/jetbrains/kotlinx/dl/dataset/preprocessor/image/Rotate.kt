@@ -32,10 +32,16 @@ public class Rotate(
     public var interpolation: InterpolationType = InterpolationType.BICUBIC,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessor {
-    override fun apply(image: BufferedImage, inputShape: ImageShape): Pair<BufferedImage, ImageShape> {
-        val width: Int = inputShape.width!!.toInt()
-        val height: Int = inputShape.height!!.toInt()
+) : ImagePreprocessorBase() {
+
+    override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
+        if (inputShape == null) return null
+        return ImageShape(inputShape.width, inputShape.height, 3)
+    }
+
+    override fun apply(image: BufferedImage): BufferedImage {
+        val width: Int = image.width
+        val height: Int = image.height
         var centerByX = width / 2
         var centerByY = height / 2
 
@@ -100,6 +106,6 @@ public class Rotate(
         g2d.drawImage(image, -minX, -minY, null)
         g2d.dispose()
 
-        return Pair(rotatedImage, inputShape)
+        return rotatedImage
     }
 }

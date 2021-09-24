@@ -5,7 +5,7 @@
 
 package examples.inference.mnist
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.mnist
 import java.io.File
 
@@ -23,9 +23,9 @@ private const val PATH_TO_MODEL = "savedmodels/lenet5"
 fun main() {
     val (train, _) = mnist()
 
-    val inferenceModel = InferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
+    val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
-    var copiedInferenceModel: InferenceModel
+    var copiedInferenceModel: TensorFlowInferenceModel
 
     inferenceModel.use {
         it.reshape(28, 28, 1)

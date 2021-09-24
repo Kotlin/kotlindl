@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /**
@@ -21,12 +22,9 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
  *
  * NOTE: Functional API supports one output and one input for model.
  */
-private const val EPOCHS = 2
-private const val TRAINING_BATCH_SIZE = 100
-private const val TEST_BATCH_SIZE = 100
-private const val NUM_CHANNELS = 1L
-private const val IMAGE_SIZE = 28L
-private const val SEED = 13L
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 1000
+private const val TEST_BATCH_SIZE = 1000
 
 // TODO: move to tests
 private val model = Functional.of(
@@ -56,16 +54,16 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.init()
-        var accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
+        var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy before: $accuracy")
 
-        it.fit(dataset = train, epochs = 3, batchSize = 1000)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-        accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy after: $accuracy")
     }

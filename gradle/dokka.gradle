@@ -2,12 +2,10 @@
  * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
-
 apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.dokka'
 
-def documentedSubprojects = ["api",
-                             "visualization"]
+def documentedSubprojects = ["api", "dataset", "onnx", "visualization", "examples"]
 subprojects {
     if (!(name in documentedSubprojects)) return
     apply plugin: 'org.jetbrains.dokka'
@@ -26,4 +24,13 @@ subprojects {
         }
     }
 }
+
+
+
+tasks.named('dokkaHtmlMultiModule') {
+  def configuredVersion = "0.3"
+  def olderVersionsDir = "older_versions"
+  pluginsMapConfiguration.set(["org.jetbrains.dokka.versioning.VersioningPlugin" : """{ "version": "$configuredVersion", "olderVersionsDir":"$olderVersionsDir"}"""])
+}
+
 
