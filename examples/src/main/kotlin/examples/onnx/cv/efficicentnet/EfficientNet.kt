@@ -41,8 +41,8 @@ fun efficientNet4LitePrediction() {
                 }
             }
 
-            // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
-            val inputData = modelType.preprocessInput(preprocessing) // TODO: to preprocessInput(preprocessing)
+
+            val inputData = modelType.preprocessInput(preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
