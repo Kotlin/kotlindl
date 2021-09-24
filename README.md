@@ -129,8 +129,8 @@ To use KotlinDL in your project, add the following dependency to your `build.gra
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.3.0-alpha-5. 
-The latest stable KotlinDL version is 0.2.0. 
+The latest KotlinDL version is 0.3.0. 
+The latest stable KotlinDL version is 0.3.0. 
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
