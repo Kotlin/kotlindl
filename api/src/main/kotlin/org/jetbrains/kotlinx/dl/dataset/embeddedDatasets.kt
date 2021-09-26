@@ -7,8 +7,6 @@ package org.jetbrains.kotlinx.dl.dataset
 
 import io.jhdf.HdfFile
 import io.jhdf.api.Dataset
-import org.jetbrains.kotlinx.dl.api.core.shape.cast2D
-import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
@@ -143,8 +141,9 @@ public fun mnist3D(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, On
 
 /** Extract mnist3d X data from HD5 file [dataset] */
 private fun extractMnist3DData(dataset: Dataset) =
-    dataset.data.castArray().cast2D<DoubleArray>()
-        .map { it.map(Double::toFloat).toFloatArray() }.toTypedArray()
+    (dataset.data as Array<*>)
+        .map { (it as DoubleArray).map(Double::toFloat).toFloatArray() }
+        .toTypedArray()
 
 /** Extract mnist3d Y labels from HD5 file [dataset] */
 private fun extractMnist3DLabels(dataset: Dataset) =
