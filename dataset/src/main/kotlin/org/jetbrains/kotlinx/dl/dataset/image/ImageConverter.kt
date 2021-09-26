@@ -18,48 +18,45 @@ import javax.imageio.ImageIO
 /** Helper object to convert images to [FloatArray]. */
 public object ImageConverter {
     /** All pixels has values in range [0; 255]. */
+    public fun toRawFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+        return OnHeapDataset.toRawVector(imageToByteArray(image, colorOrder))
+    }
+
+    /** All pixels has values in range [0; 255]. */
     public fun toRawFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-        return OnHeapDataset.toRawVector(
-            toRawPixels(inputStream, colorOrder)
-        )
+        return toRawFloatArray(toBufferedImage(inputStream), colorOrder)
     }
 
     /** All pixels has values in range [0; 255]. */
     public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-        return OnHeapDataset.toRawVector(
-            imageFile.inputStream().use { toRawPixels(it, colorOrder) }
-        )
+        return imageFile.inputStream().use { toRawFloatArray(it, colorOrder) }
     }
 
     /** All pixels in range [0;1) */
-    public fun toNormalizedFloatArray(
-        inputStream: InputStream,
-        colorOrder: ColorOrder = ColorOrder.BGR
-    ): FloatArray {
-        return OnHeapDataset.toNormalizedVector(
-            toRawPixels(inputStream, colorOrder)
-        )
+    public fun toNormalizedFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+        return OnHeapDataset.toNormalizedVector(imageToByteArray(image, colorOrder))
+    }
+
+    /** All pixels in range [0;1) */
+    public fun toNormalizedFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+        return toNormalizedFloatArray(toBufferedImage(inputStream), colorOrder)
     }
 
     /** All pixels in range [0;1) */
     public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-        return OnHeapDataset.toNormalizedVector(
-            imageFile.inputStream().use { toRawPixels(it, colorOrder) }
-        )
+        return imageFile.inputStream().use { toNormalizedFloatArray(it, colorOrder) }
     }
 
-    private fun toRawPixels(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): ByteArray {
-        val image = getImage(inputStream)
-
-        return imageToByteArray(image, colorOrder)
-    }
-
-    /** */
+    /**
+     * Returns [BufferedImage] extracted from [inputStream].
+     */
+    @Throws(IOException::class)
     public fun toBufferedImage(inputStream: InputStream): BufferedImage {
-        return getImage(inputStream)
+        ImageIO.setUseCache(false)
+        return ImageIO.read(inputStream)
     }
 
-    internal fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
+    private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
         var res = (image.raster.dataBuffer as DataBufferByte).data // pixels
         check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
         check(image.type == TYPE_3BYTE_BGR) { "Images with image type (constant from BufferedImage class) ${image.type} are not supported!" }
@@ -139,15 +136,6 @@ public object ImageConverter {
             }
         }
         return result
-    }
-
-    /**
-     * Returns [BufferedImage] extracted from [inputStream].
-     */
-    @Throws(IOException::class)
-    public fun getImage(inputStream: InputStream): BufferedImage {
-        ImageIO.setUseCache(false)
-        return ImageIO.read(inputStream)
     }
 }
 
