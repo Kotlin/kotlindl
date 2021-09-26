@@ -7,12 +7,10 @@ package org.jetbrains.kotlinx.dl.dataset.image
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_3BYTE_BGR
 import java.awt.image.DataBufferByte
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.util.*
 import javax.imageio.ImageIO
 
 
@@ -20,7 +18,7 @@ import javax.imageio.ImageIO
 public object ImageConverter {
     /** All pixels has values in range [0; 255]. */
     public fun toRawFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-        return OnHeapDataset.toRawVector(imageToByteArray(image, colorOrder))
+        return imageToFloatArray(image, colorOrder)
     }
 
     /** All pixels has values in range [0; 255]. */
@@ -35,7 +33,7 @@ public object ImageConverter {
 
     /** All pixels in range [0;1) */
     public fun toNormalizedFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
-        return OnHeapDataset.toNormalizedVector(imageToByteArray(image, colorOrder))
+        return toRawFloatArray(image, colorOrder).also { normalize(it) }
     }
 
     /** All pixels in range [0;1) */
@@ -57,22 +55,54 @@ public object ImageConverter {
         return ImageIO.read(inputStream)
     }
 
-    private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
-        check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
-        check(image.type == TYPE_3BYTE_BGR) { "Images with image type (constant from BufferedImage class) ${image.type} are not supported!" }
+    private val supportedImageTypes = setOf(
+        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB
+    )
 
-        val res = (image.raster.dataBuffer as DataBufferByte).data // pixels
-        if (image.type == TYPE_3BYTE_BGR && colorOrder == ColorOrder.RGB) {
-            return Arrays.copyOf(res, res.size).also { swapRandB(it) }
+    private fun imageToFloatArray(image: BufferedImage, colorOrder: ColorOrder): FloatArray {
+        check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
+        check(supportedImageTypes.contains(image.type)) {
+            "Images with type ${image.type} are not supported yet. " +
+                "Supported types are: $supportedImageTypes. See also `java.awt.image.BufferedImage.getType`."
         }
-        return res
+
+        val raster = image.raster
+        if (raster.dataBuffer is DataBufferByte) {
+            return byteBufferToFloatArray(raster.dataBuffer as DataBufferByte, image.colorOrder(), colorOrder)
+        }
+        val buffer = FloatArray(raster.numBands * raster.width * raster.height)
+        val result = raster.getPixels(0, 0, raster.width, raster.height, buffer)
+        if (colorOrder == ColorOrder.BGR) { // getPixels returns data in RGB order
+            swapRandB(result)
+        }
+        return result
     }
 
-    private fun swapRandB(res: ByteArray) {
+    private fun byteBufferToFloatArray(buffer: DataBufferByte, sourceColorOrder: ColorOrder, targetColorOrder: ColorOrder): FloatArray {
+        val result = OnHeapDataset.toRawVector(buffer.data)
+        if (sourceColorOrder != targetColorOrder) {
+            swapRandB(result)
+        }
+        return result
+    }
+
+    private fun swapRandB(res: FloatArray) {
         for (i in res.indices step 3) {
             val tmp = res[i]
             res[i] = res[i + 2]
             res[i + 2] = tmp
+        }
+    }
+
+    private fun normalize(data: FloatArray, scale: Float = 255.0f) {
+        for (i in data.indices) data[i] /= scale
+    }
+
+    private fun BufferedImage.colorOrder(): ColorOrder {
+        return when (type) {
+            BufferedImage.TYPE_INT_RGB -> ColorOrder.RGB
+            BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR -> ColorOrder.BGR
+            else -> throw UnsupportedOperationException("Images with type $type are not supported.")
         }
     }
 

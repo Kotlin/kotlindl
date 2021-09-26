@@ -25,8 +25,6 @@ import kotlin.streams.toList
  * @property [imageShape] The shape of input image. If height and width are different for different images, need to skip the filling of these properties of [ImageShape].
  * @property [labelGenerator] A way to generate labels.
  * @property [colorMode] Color mode.
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Loading(
     public var pathToData: File? = null,
