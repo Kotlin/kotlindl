@@ -54,7 +54,7 @@ internal class AvgPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -118,7 +118,7 @@ internal class AvgPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -161,12 +161,12 @@ internal class AvgPool1DTest {
         )
         val expected = arrayOf(
             arrayOf(
-                floatArrayOf(0.5f/3, 1.0f, 10.0f/3),
-                floatArrayOf(1.0f/3, 4.0f/3, 2.5f),
+                floatArrayOf(0.5f / 3, 1.0f, 10.0f / 3),
+                floatArrayOf(1.0f / 3, 4.0f / 3, 2.5f),
             ),
             arrayOf(
-                floatArrayOf(6.0f, 0.5f/3, 10.0f/3),
-                floatArrayOf(14.0f/3, -0.5f/3, 13.0f/3),
+                floatArrayOf(6.0f, 0.5f / 3, 10.0f / 3),
+                floatArrayOf(14.0f / 3, -0.5f / 3, 13.0f / 3),
             )
         )
         val layer = AvgPool1D(poolSize = longArrayOf(1, 3, 1), strides = longArrayOf(1, 1, 1))
@@ -178,7 +178,7 @@ internal class AvgPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.

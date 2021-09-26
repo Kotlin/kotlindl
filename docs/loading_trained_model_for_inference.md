@@ -17,20 +17,20 @@ To load the model simply use the path to it, tell it how incoming images should 
 fun main() {
     val (train, test) = fashionMnist()
 
-    InferenceModel.load(File(PATH_TO_MODEL)).use {
+    TensorFlowInferenceModel.load(File("model/my_model")).use {
         it.reshape(28, 28, 1)
         val prediction = it.predict(test.getX(0))
         val actualLabel = test.getY(0)
-        
-        println("Predicted label is: $prediction. This corresponds to class ${labelsMap[prediction]}.")
+
+        println("Predicted label is: $prediction. This corresponds to class ${stringLabels[prediction]}.")
         println("Actual label is: $actualLabel.")
     }
 }
 ```
 
 ```
-Predicted label is: 7. This corresponds to class Sneaker.
-Actual label is: 7.
+Predicted label is: 9. This corresponds to class Ankle boots.
+Actual label is: 9.0.
 ```
 
 Congratulations! You have learned how to create, train, and use your first neural network model! 

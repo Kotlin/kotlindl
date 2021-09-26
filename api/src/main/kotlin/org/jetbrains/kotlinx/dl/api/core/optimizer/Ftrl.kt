@@ -35,7 +35,7 @@ private const val LINEAR_ACCUMULATOR = "linear_accumulator"
  * Check the documentation for the [l2ShrinkageRegularizationStrength]
  * parameter for more details when shrinkage is enabled, in which case gradient is replaced with gradient_with_shrinkage.
  *
- * NOTE: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ * NOTE: This optimizer works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
  *
  * It is recommended to leave the parameters of this optimizer at their default values.
  *

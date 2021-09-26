@@ -24,8 +24,7 @@ internal class PaddingConverterTest {
     @Test
     fun parseStringValues() {
         val paddingValidString = """{"padding": "valid"}"""
-        var layerConfig: LayerConfig?
-        layerConfig = klaxon.parse<LayerConfig>(paddingValidString)
+        var layerConfig: LayerConfig? = klaxon.parse<LayerConfig>(paddingValidString)
         assertTrue { layerConfig!!.padding is KerasPadding.Valid }
 
         val paddingSameString = """{"padding": "same"}"""
@@ -58,11 +57,10 @@ internal class PaddingConverterTest {
     @Test
     fun serializeStringPaddings() {
         var serializedConfig: String
-        var jsonObject: JsonObject
 
         val paddingValidConfig = LayerConfig(padding = KerasPadding.Valid)
         serializedConfig = klaxon.toJsonString(paddingValidConfig)
-        jsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
+        var jsonObject: JsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
         assertEquals("valid", jsonObject["padding"])
 
         val paddingSameConfig = LayerConfig(padding = KerasPadding.Same)
@@ -79,11 +77,10 @@ internal class PaddingConverterTest {
     @Test
     fun serializeZeroPaddingValues() {
         var serializedConfig: String
-        var jsonObject: JsonObject
 
         var layerConfig = LayerConfig(padding = KerasPadding.ZeroPadding2D(1))
         serializedConfig = klaxon.toJsonString(layerConfig)
-        jsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
+        var jsonObject: JsonObject = parser.parse(StringBuilder(serializedConfig)) as JsonObject
         assertEquals(1, jsonObject["padding"])
 
         layerConfig = LayerConfig(padding = KerasPadding.ZeroPadding2D(intArrayOf(1, 2)))

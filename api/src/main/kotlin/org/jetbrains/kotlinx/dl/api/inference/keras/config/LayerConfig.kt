@@ -37,7 +37,7 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val center: Boolean? = null,
     @Json(serializeNull = false)
-    val cropping: List<List<Int>>? = null,
+    val cropping: List<Any>? = null,
     @Json(serializeNull = false)
     val data_format: String? = null,
     @Json(serializeNull = false)
@@ -69,6 +69,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val implementation: Int? = null,
     @Json(serializeNull = false)
+    val interpolation: String? = null,
+    @Json(serializeNull = false)
     val kernel_constraint: Any? = null,
     @Json(serializeNull = false)
     val kernel_initializer: KerasInitializer? = null,
@@ -84,6 +86,8 @@ internal data class LayerConfig(
     val moving_mean_initializer: KerasInitializer? = null,
     @Json(serializeNull = false)
     val moving_variance_initializer: KerasInitializer? = null,
+    @Json(serializeNull = false)
+    val n: Int? = null,
     @Json(serializeNull = false)
     val name: String? = null,
     @Json(serializeNull = false)
@@ -125,6 +129,8 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val shared_axes: List<Int>? = null,
     @Json(serializeNull = false)
+    val size: Any? = null,
+    @Json(serializeNull = false)
     val sparse: Boolean? = null,
     @Json(serializeNull = false)
     val stateful: Boolean? = null,
@@ -147,5 +153,7 @@ internal data class LayerConfig(
     @Json(serializeNull = false)
     val unroll: Boolean? = null,
     @Json(serializeNull = false)
-    val use_bias: Boolean? = null
+    val use_bias: Boolean? = null,
+    @Json(serializeNull = false)
+    val dims: IntArray? = null
 )

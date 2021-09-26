@@ -31,4 +31,16 @@ open class ActivationTest {
             )
         }
     }
+
+    protected fun Activation.apply(input: FloatArray): FloatArray = EagerSession.create().use { session ->
+        val tf = Ops.create(session)
+
+        val operand = this.apply(tf, tf.constant(input))
+
+        operand.asOutput().tensor().copyTo(FloatArray(input.size))
+    }
+
+    protected fun assertActivationFunction(activation: Activation, input: FloatArray, expected: FloatArray) {
+        Assertions.assertArrayEquals(expected, activation.apply(input), EPS)
+    }
 }

@@ -30,7 +30,7 @@ open class LayerTest {
         layer: Layer,
         input: Array<*>,
         kGraph: KGraph,
-    ) : Output<*> {
+    ): Output<*> {
         val inputShape = input.shape
         layer.build(tf, kGraph, inputShape)
         val inputOp = getInputOp(tf, input)
@@ -40,7 +40,7 @@ open class LayerTest {
         return output
     }
 
-    protected fun runLayerInEagerMode(
+    private fun runLayerInEagerMode(
         layer: Layer,
         input: Array<*>,
     ): Tensor<*> {
@@ -52,10 +52,10 @@ open class LayerTest {
         }
     }
 
-    protected fun runLayerInGraphMode(
+    private fun runLayerInGraphMode(
         layer: Layer,
         input: Array<*>,
-    ) : Tensor<*> {
+    ): Tensor<*> {
         Graph().use { graph ->
             Session(graph).use { session ->
                 val tf = Ops.create(graph)
@@ -125,7 +125,7 @@ open class LayerTest {
         Assertions.assertArrayEquals(
             expectedOutputShape,
             outputShape,
-             "Computed output shape differs from expected output shape!",
+            "Computed output shape differs from expected output shape!",
         )
     }
 }

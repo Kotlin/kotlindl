@@ -1,6 +1,6 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.4.32-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.5.31-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
@@ -85,7 +85,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
     
-        it.summary()
+        it.logSummary()
     
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
     
@@ -102,6 +102,7 @@ fun main() {
 - [Limitations](#limitations)
 - [How to configure KotlinDL in your project](#how-to-configure-kotlindl-in-your-project)
 - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
+- [Documentation](#documentation)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
 - [Logging](#logging)
@@ -116,27 +117,6 @@ KotlinDL is built on top of the TensorFlow 1.15 Java API.
 The Java API for TensorFlow 2.+ has recently had its first public release, and this project will be switching to it in the nearest future. 
 This, however, does not affect the high-level API.
 
-## Limitations
-Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
- 
-- Input()
-- Flatten()
-- Dense()
-- Dropout()
-- Conv2D()
-- MaxPool2D()
-- AvgPool2D()   
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- Cropping2D
-- Reshape
-- ZeroPadding2D 
-
-KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.  
 
 ## How to configure KotlinDL in your project
 To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
@@ -149,8 +129,8 @@ To use KotlinDL in your project, add the following dependency to your `build.gra
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.2.0. 
-The latest stable KotlinDL version is 0.2.0. 
+The latest KotlinDL version is 0.3.0. 
+The latest stable KotlinDL version is 0.3.0. 
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
@@ -162,6 +142,14 @@ You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin ker
 ```
 
 For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
+
+## Documentation
+
+* Presentations and videos:
+  * [Deep Learning with KotlinDL](https://www.youtube.com/watch?v=jCFZc97_XQU) (Zinoviev Alexey at Huawei Developer Group HDG UK 2021, [slides](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa1RPX3h0a2FrZ2pUby1kSURzYWVpM0tHNFRrUXxBQ3Jtc0tucjZMRE1JbWNuN1BrbGFMc0FOeERPVEtMR0FDLUo4bi1lcC1BcmFkMkd0WFJOS3ZVMFQ3YlctUXFHU1lVdjVZMHUzYmlETjRCZ3lLclBpZGNWcXJXcmdVLTQ5Ujd2N0hNUHlMZXRTZE1wYktHSUZuSQ&q=https%3A%2F%2Fspeakerdeck.com%2Fzaleslaw%2Fdeep-learning-with-kotlindl))
+  * [Introduction to Deep Learning with KotlinDL](https://www.youtube.com/watch?v=ruUz8uMZUVw) (Zinoviev Alexey at Kotlin Budapest User Group 2021, [slides](https://speakerdeck.com/zaleslaw/deep-learning-introduction-with-kotlindl))
+* [Change log for KotlinDL](CHANGELOG.md)
+* [Full KotlinDL API reference](https://jetbrains.github.io/KotlinDL/)
 
 ## Examples and tutorials
 You do not need to have any prior deep learning experience to start using KotlinDL. 
@@ -204,9 +192,9 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```
-  compile 'org.apache.logging.log4j:log4j-api:2.14.0'
-  compile 'org.apache.logging.log4j:log4j-core:2.14.0'
-  compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+  implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
 ```
 
 ```
@@ -216,10 +204,14 @@ You will also need to add the following dependencies and configuration file ``lo
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
         </Console>
     </Appenders>
+
     <Loggers>
         <Root level="debug">
             <AppenderRef ref="STDOUT" level="DEBUG"/>
         </Root>
+        <Logger name="io.jhdf" level="off" additivity="true">
+            <appender-ref ref="STDOUT" />
+        </Logger>
     </Loggers>
 </Configuration>
 
@@ -271,6 +263,50 @@ task fatJar(type: Jar) {
     with jar
 }
 ```
+
+## Limitations
+Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
+
+- Input
+- Flatten
+- Dense
+- Dropout
+- Conv2D
+- MaxPool2D
+- AvgPool2D
+- BatchNorm
+- ActivationLayer
+- DepthwiseConv2D
+- SeparableConv2D
+- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
+- GlobalAvgPool2D
+- GlobalMaxPool2D
+- Cropping2D
+- UpSampling2D
+- ZeroPadding2D
+- Reshape
+- Permute
+- RepeatVector
+- Softmax
+- LeakyReLU
+- PReLU
+- ELU
+- ThresholdedReLU
+- Conv1D
+- MaxPooling1D
+- AveragePooling1D
+- GlobalMaxPooling1D
+- GlobalAveragePooling1D
+- UpSampling1D
+- Cropping1D
+- Conv3D
+- MaxPooling3D
+- AveragePooling3D
+- GlobalAveragePooling3D
+- GlobalMaxPool3D
+- Cropping3D
+
+KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.
 
 ## Contributing
 

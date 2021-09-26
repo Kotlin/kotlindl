@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.shape.cast2D
 import org.jetbrains.kotlinx.dl.api.core.shape.castArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
+import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import org.jetbrains.kotlinx.dl.dataset.handler.*
-import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
 import java.io.*
 import java.net.URL
 import java.nio.file.Files
@@ -157,6 +157,7 @@ private fun HdfFile.extractMnist3DDataset(label: String): Pair<Array<FloatArray>
         extractMnist3DLabels(getDatasetByPath("y_$label"))
     )
 
+/** Data size of [Free Spoken Digits Dataset](https://github.com/Jakobovski/free-spoken-digit-dataset). */
 public const val FSDD_SOUND_DATA_SIZE: Long = 20480
 
 /**
@@ -164,10 +165,11 @@ public const val FSDD_SOUND_DATA_SIZE: Long = 20480
  * This is a dataset of wav sound files of the 10 digits spoken by different people many times each.
  * The test set officially consists of the first 10% of the recordings. Recordings numbered 0-4 (inclusive)
  * are in the test and 5-49 are in the training set.
- * As the input data files have different number of channels of data we split every input file into separate samples
- * that are threaten as separate samples with the same label.
  *
- * Free Spoken Digits Dataset dataset is made available under the terms of the
+ * As the input data files have different number of channels of data we split every input file into separate samples
+ * that are threatened as separate samples with the same label.
+ *
+ * Free Spoken Digits Dataset is made available under the terms of the
  * [Creative Commons Attribution-ShareAlike 4.0 International.](https://creativecommons.org/licenses/by-sa/4.0/)
  *
  * @param [cacheDirectory] Cache directory to cached models and datasets.
@@ -262,7 +264,7 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
 }
 
 /** Path to the Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/catdogs/data.zip"
+private const val DOGS_CATS_IMAGES_ARCHIVE: String = "datasets/dogs-vs-cats/data.zip"
 
 /** Returns path to images of the Dogs-vs-Cats dataset. */
 public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
@@ -273,7 +275,7 @@ public fun dogsCatsDatasetPath(cacheDirectory: File = File("cache")): String =
     )
 
 /** Path to the subset of Dogs-vs-Cats dataset. */
-private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small_catdogs/data.zip"
+private const val DOGS_CATS_SMALL_IMAGES_ARCHIVE: String = "datasets/small-dogs-vs-cats/data.zip"
 
 /** Returns path to images of the subset of the Dogs-vs-Cats dataset. */
 public fun dogsCatsSmallDatasetPath(cacheDirectory: File = File("cache")): String =
@@ -304,10 +306,10 @@ public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): Str
  * Download the compressed dataset from external source, decompress the file and remove the downloaded file
  * but leave the decompressed data from dataset.
  *
- * @param cacheDirectory where the downloaded files are stored
- * @param archiveRelativePath relative path do download the archive from
- * @param dirRelativePath dir to store the downloaded archive temporarily and decompress its data
- * @return absolute path string to directory where dataset is decompressed
+ * @param [cacheDirectory] The directory where the downloaded files are stored.
+ * @param [archive] Archive file.
+ * @param [dirRelativePath] The relative path where to store the downloaded archive temporarily and decompress its data.
+ * @return The absolute path string to directory where dataset is decompressed.
  */
 private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePath: String): String {
     cacheDirectory.existsOrMkdirs()
@@ -315,30 +317,34 @@ private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePat
     val dataDirectory = File(cacheDirectory.absolutePath + dirRelativePath)
     val toFolder = dataDirectory.toPath()
 
-    if (!dataDirectory.exists()) {
-        Files.createDirectories(dataDirectory.toPath())
+    if (!dataDirectory.exists()) Files.createDirectories(dataDirectory.toPath())
 
+    if (archive.exists()) {
         extractFromZipArchiveToFolder(archive.toPath(), toFolder)
         val deleted = archive.delete()
         if (!deleted) {
-            throw Exception("Archive ${archive.absolutePath} could not be deleted! Create this archive manually.")
+            throw Exception("Archive ${archive.absolutePath} could not be deleted! Delete this archive manually.")
         }
+    } else {
+        throw Exception("No archive file ${archive.absolutePath} in the cache folder!")
     }
 
     return toFolder.toAbsolutePath().toString()
 }
 
 /**
- * Downloads a file from a URL if it not already in the cache. By default the download location
+ * Downloads a file from a URL if it not already in the cache.
+ *
+ * By default, the download location
  * is defined as the concatenation of [AWS_S3_URL] and [relativePathToFile] but can be defined
  * as an arbitrary file location to download file from *
  *
- * @param cacheDirectory where the downloaded file is stored
- * @param relativePathToFile where the downloaded file is stored in [cacheDirectory] and which can
+ * @param [cacheDirectory] where the downloaded file is stored
+ * @param [relativePathToFile] where the downloaded file is stored in [cacheDirectory] and which can
  * define the location of file to be downloaded
- * @param downloadURLFromRelativePath can produce the download URL of the file using. Defaults to [AWS_S3_URL]/[relativePathToFile].
- * @param loadingMode of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
- * @return downloaded [File] on local file system
+ * @param [downloadURLFromRelativePath] can produce the download URL of the file using. Defaults to [AWS_S3_URL]/[relativePathToFile].
+ * @param [loadingMode] of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
+ * @return downloaded [File] on local file system.
  */
 private fun loadFile(
     cacheDirectory: File,
@@ -359,7 +365,7 @@ private fun loadFile(
     return file
 }
 
-/** Creates file structure archived in zip file with all directories and sub-directories */
+/** Creates file structure archived in zip file with all directories and sub-directories. */
 @Throws(IOException::class)
 internal fun extractFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path, bufferSize: Int = 4096) {
     val zipFile = ZipFile(zipArchivePath.toFile())

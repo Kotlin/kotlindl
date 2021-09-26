@@ -31,8 +31,10 @@ open class ConvLayerTest {
         expected: FloatConv1DTensor
     ) {
         val actual = expected.copyZeroed()
-        assertTensorsEquals(layer, input, expected, actual,
-            ::assertFloatConv1DTensorsEquals) { tf, tensor -> tf.constant(tensor.cast3D<FloatArray>()) }
+        assertTensorsEquals(
+            layer, input, expected, actual,
+            ::assertFloatConv1DTensorsEquals
+        ) { tf, tensor -> tf.constant(tensor.cast3D<FloatArray>()) }
     }
 
     protected fun assertFloatConv2DTensorsEquals(
@@ -41,8 +43,10 @@ open class ConvLayerTest {
         expected: FloatConv2DTensor
     ) {
         val actual = expected.copyZeroed()
-        assertTensorsEquals(layer, input, expected, actual,
-            ::assertFloatConv2DTensorsEquals) { tf, tensor -> tf.constant(tensor.cast4D<FloatArray>()) }
+        assertTensorsEquals(
+            layer, input, expected, actual,
+            ::assertFloatConv2DTensorsEquals
+        ) { tf, tensor -> tf.constant(tensor.cast4D<FloatArray>()) }
     }
 
     protected fun assertFloatConv3DTensorsEquals(
@@ -51,8 +55,10 @@ open class ConvLayerTest {
         expected: FloatConv3DTensor
     ) {
         val actual = expected.copyZeroed()
-        assertTensorsEquals(layer, input, expected, actual,
-            ::assertFloatConv3DTensorsEquals) { tf, tensor -> tf.constant(tensor.cast5D<FloatArray>()) }
+        assertTensorsEquals(
+            layer, input, expected, actual,
+            ::assertFloatConv3DTensorsEquals
+        ) { tf, tensor -> tf.constant(tensor.cast5D<FloatArray>()) }
     }
 
     protected fun createFloatConv1DTensor(
@@ -173,9 +179,11 @@ open class ConvLayerTest {
         }
     }
 
-    protected fun Array<*>.sum(): Float = fold(0.0f) { acc, arr -> when(arr) {
-        is FloatArray -> arr.sum() + acc
-        is Array<*> -> arr.sum() + acc
-        else -> throw IllegalArgumentException("Cannot sum array other than Array of FloatArray")
-    } }
+    protected fun Array<*>.sum(): Float = fold(0.0f) { acc, arr ->
+        when (arr) {
+            is FloatArray -> arr.sum() + acc
+            is Array<*> -> arr.sum() + acc
+            else -> throw IllegalArgumentException("Cannot sum array other than Array of FloatArray")
+        }
+    }
 }

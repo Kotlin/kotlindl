@@ -16,24 +16,18 @@ private const val DATASET_SIZE = 50000
 /** Loads images from [archiveName] to heap memory and applies basic normalization preprocessing. */
 @Throws(IOException::class)
 public fun extractCifar10Images(archiveName: String): Array<FloatArray> {
-    val numOfPixels: Int = 32 * 32 * 3
-
     return loadImagesFromDirectory(
-        numOfPixels,
         DATASET_SIZE,
         archiveName
     )
 }
 
 private fun loadImagesFromDirectory(
-    numOfPixels: Int,
     subDatasetSize: Int,
     archiveName: String
 ): Array<FloatArray> {
-    val images = Array(subDatasetSize) { FloatArray(numOfPixels) }
-
-    for (i in 1..50000) {
-        images[i - 1] = ImageConverter.toNormalizedFloatArray(File("$archiveName\\$i.png"))
+    val images = Array(subDatasetSize) {
+        ImageConverter.toNormalizedFloatArray(File(archiveName, "${it + 1}.png"))
     }
 
     return images

@@ -13,7 +13,7 @@ import org.tensorflow.op.Ops
 /**
  * Layer that concatenates a list of inputs.
  *
- * It takes as input a list of tensors, all of the same shape except
+ * It takes as input a list of tensors, all the same shape except
  * for the concatenation axis, and returns a single tensor that is the concatenation of all inputs.
  *
  * @property [axis] Axis along which to concatenate.
@@ -38,7 +38,7 @@ public class Concatenate(
         }
 
 
-        newShape[axe] = inputShapes.map { it[axe] }.sum() // concatenated dimension
+        newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
 
         val tensorShape = newShape.clone()
         outputShape = tensorShape

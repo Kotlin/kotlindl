@@ -9,18 +9,18 @@ import examples.cnn.fsdd.soundBlock
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.dataset.sound.wav.WavFile
+import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import org.jetbrains.kotlinx.dl.visualization.letsplot.*
 import java.io.File
 
@@ -32,7 +32,7 @@ private const val TEST_BATCH_SIZE = 512
 
 
 /**
- * This examples demonstrates model activations and Conv1D filters visualisation.
+ * This examples demonstrates model activations and Conv1D filters visualization.
  * Additionally, we present the visualization of sound files as the plots of the sound data.
  *
  * Model is trained on Free Spoken Digits Dataset.
@@ -51,7 +51,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(
             dataset = train,

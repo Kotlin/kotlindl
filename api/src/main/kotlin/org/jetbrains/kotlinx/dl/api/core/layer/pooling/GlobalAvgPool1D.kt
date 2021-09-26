@@ -35,8 +35,7 @@ public class GlobalAvgPool1D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // TODO support for different dataFormat("channel_last", "channel_first")
-        var stepAxis = 1
+        val stepAxis = 1
         // TODO support for masking
         return TF.mean(tf, input, tf.constant(stepAxis))
     }

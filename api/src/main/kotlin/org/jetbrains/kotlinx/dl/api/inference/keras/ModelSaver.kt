@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 import com.beust.klaxon.Klaxon
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -20,8 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.*
@@ -44,25 +42,9 @@ public fun GraphTrainableModel.saveModelConfiguration(jsonConfigFile: File, isKe
 }
 
 internal fun GraphTrainableModel.serializeModel(isKerasFullyCompatible: Boolean): KerasModel {
-    val kerasLayers = mutableListOf<KerasLayer>()
-    this.layers.forEach {
-        run {
-            val layer = convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
-            kerasLayers.add(layer)
-        }
+    val kerasLayers = layers.map {
+        convertToKerasLayer(it, isKerasFullyCompatible, this is Functional)
     }
-
-    val inputLayer = when (this) {
-        is Sequential -> this.inputLayer
-        is Functional -> this.inputLayer
-        else -> throw UnsupportedOperationException("${this::class} is not supported yet!")
-    }
-
-    val inputShape = inputLayer.packedDims.map { it.toInt() }
-
-    (kerasLayers.first().config as LayerConfig).batch_input_shape =
-        listOf(null, inputShape[0], inputShape[1], inputShape[2]) // TODO: refactor with method for Input layer
-
     val config = KerasModelConfig(name = name, layers = kerasLayers)
     return KerasModel(config = config)
 }
@@ -73,6 +55,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Input -> createKerasInputLayer(layer)
         is Dense -> createKerasDenseLayer(layer, isKerasFullyCompatible)
         is ActivationLayer -> createKerasActivationLayer(layer)
+        is Permute -> createKerasPermuteLayer(layer)
         // Convolution layers
         is Conv1D -> createKerasConv1DLayer(layer, isKerasFullyCompatible)
         is Conv2D -> createKerasConv2DLayer(layer, isKerasFullyCompatible)
@@ -87,6 +70,8 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is AvgPool2D -> createKerasAvgPool2DLayer(layer)
         is AvgPool3D -> createKerasAvgPool3DLayer(layer)
         is GlobalMaxPool1D -> createKerasGlobalMaxPool1DLayer(layer)
+        is GlobalMaxPool2D -> createKerasGlobalMaxPool2DLayer(layer)
+        is GlobalMaxPool3D -> createKerasGlobalMaxPool3DLayer(layer)
         is GlobalAvgPool1D -> createKerasGlobalAvgPool1DLayer(layer)
         is GlobalAvgPool2D -> createKerasGlobalAvgPool2DLayer(layer)
         is GlobalAvgPool3D -> createKerasGlobalAvgPool3DLayer(layer)
@@ -97,7 +82,16 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         // Attention layers
         // Reshaping layers
         is Flatten -> createKerasFlattenLayer(layer)
+        is RepeatVector -> createKerasRepeatVectorLayer(layer)
+        is ZeroPadding1D -> createKerasZeroPadding1DLayer(layer)
         is ZeroPadding2D -> createKerasZeroPadding2DLayer(layer)
+        is ZeroPadding3D -> createKerasZeroPadding3DLayer(layer)
+        is Cropping1D -> createKerasCropping1DLayer(layer)
+        is Cropping2D -> createKerasCropping2DLayer(layer)
+        is Cropping3D -> createKerasCropping3DLayer(layer)
+        is UpSampling1D -> createKerasUpSampling1DLayer(layer)
+        is UpSampling2D -> createKerasUpSampling2DLayer(layer)
+        is UpSampling3D -> createKerasUpSampling3DLayer(layer)
         // Merging layers
         is Add -> createKerasAddLayer(layer)
         is Maximum -> createKerasMaximumLayer(layer)
@@ -154,7 +148,7 @@ private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegulariz
     }
 }
 
-private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer? {
+private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer {
     val className: String
     val config: KerasInitializerConfig
     if (isKerasFullyCompatible) {
@@ -243,13 +237,14 @@ private fun convertToKerasPadding(padding: ConvPadding): KerasPadding {
     }
 }
 
-private fun convertToKerasActivation(activation: Activations): String? {
+private fun convertToKerasActivation(activation: Activations): String {
     return when (activation) {
         Activations.Relu -> ACTIVATION_RELU
         Activations.Sigmoid -> ACTIVATION_SIGMOID
         Activations.Softmax -> ACTIVATION_SOFTMAX
         Activations.Linear -> ACTIVATION_LINEAR
         Activations.Tanh -> ACTIVATION_TANH
+        Activations.TanhShrink -> ACTIVATION_TANHSHRINK
         Activations.Relu6 -> ACTIVATION_RELU6
         Activations.Elu -> ACTIVATION_ELU
         Activations.Selu -> ACTIVATION_SELU
@@ -259,6 +254,11 @@ private fun convertToKerasActivation(activation: Activations): String? {
         Activations.SoftSign -> ACTIVATION_SOFTSIGN
         Activations.HardSigmoid -> ACTIVATION_HARD_SIGMOID
         Activations.Swish -> ACTIVATION_SWISH
+        Activations.Mish -> ACTIVATION_MISH
+        Activations.HardShrink -> ACTIVATION_HARDSHRINK
+        Activations.LiSHT -> ACTIVATION_LISHT
+        Activations.Snake -> ACTIVATION_SNAKE
+        Activations.Gelu -> ACTIVATION_GELU
     }
 }
 
@@ -291,6 +291,24 @@ private fun createKerasGlobalMaxPool1DLayer(layer: GlobalMaxPool1D): KerasLayer 
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_1D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool2DLayer(layer: GlobalMaxPool2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_2D, config = configX)
+}
+
+private fun createKerasGlobalMaxPool3DLayer(layer: GlobalMaxPool3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_GLOBAL_MAX_POOL_3D, config = configX)
 }
 
 private fun createKerasGlobalAvgPool3DLayer(layer: GlobalAvgPool3D): KerasLayer {
@@ -484,6 +502,15 @@ private fun createKerasDenseLayer(layer: Dense, isKerasFullyCompatible: Boolean)
     return KerasLayer(class_name = LAYER_DENSE, config = configX)
 }
 
+private fun createKerasPermuteLayer(layer: Permute): KerasLayer {
+    val configX = LayerConfig(
+        dims = layer.dims,
+        name = layer.name,
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_PERMUTE, config = configX)
+}
+
 private fun createKerasMaxPool1DLayer(layer: MaxPool1D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
@@ -572,6 +599,17 @@ private fun createKerasFlattenLayer(layer: Flatten): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
+}
+
+private fun createKerasRepeatVectorLayer(layer: RepeatVector): KerasLayer {
+    val configX = LayerConfig(
+        data_format = CHANNELS_LAST,
+        dtype = DATATYPE_FLOAT32,
+        trainable = layer.isTrainable,
+        name = layer.name,
+        n = layer.n
+    )
+    return KerasLayer(class_name = LAYER_REPEAT_VECTOR, config = configX)
 }
 
 private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
@@ -681,6 +719,16 @@ private fun createKerasSeparableConv2DLayer(layer: SeparableConv2D, isKerasFully
     return KerasLayer(class_name = LAYER_SEPARABLE_CONV2D, config = configX)
 }
 
+private fun createKerasZeroPadding1DLayer(layer: ZeroPadding1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = KerasPadding.ZeroPadding1D(layer.padding),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_ZERO_PADDING_1D, config = configX)
+}
+
 private fun createKerasZeroPadding2DLayer(layer: ZeroPadding2D): KerasLayer {
     val configX = LayerConfig(
         data_format = CHANNELS_LAST,
@@ -690,4 +738,75 @@ private fun createKerasZeroPadding2DLayer(layer: ZeroPadding2D): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ZERO_PADDING_2D, config = configX)
+}
+
+private fun createKerasZeroPadding3DLayer(layer: ZeroPadding3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        padding = KerasPadding.ZeroPadding3D(layer.padding),
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_ZERO_PADDING_3D, config = configX)
+}
+
+private fun createKerasCropping1DLayer(layer: Cropping1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        cropping = layer.cropping.toList(),
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_CROPPING_1D, config = configX)
+}
+
+private fun createKerasCropping2DLayer(layer: Cropping2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        cropping = layer.cropping.toList().map { it.toList() },
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_CROPPING_2D, config = configX)
+}
+
+private fun createKerasCropping3DLayer(layer: Cropping3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        cropping = layer.cropping.toList().map { it.toList() },
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_CROPPING_3D, config = configX)
+}
+
+private fun createKerasUpSampling1DLayer(layer: UpSampling1D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_1D, config = configX)
+}
+
+private fun createKerasUpSampling2DLayer(layer: UpSampling2D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size.toList(),
+        interpolation = layer.interpolation.methodName,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_2D, config = configX)
+}
+
+private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        size = layer.size.toList(),
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_UP_SAMPLING_3D, config = configX)
 }

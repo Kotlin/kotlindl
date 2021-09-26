@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
 import java.io.FileReader
@@ -20,7 +21,7 @@ import java.util.*
  *
  * It used simple initializers and training from zero is too long.
  *
- * It's better to to load pretrained model.
+ * It's better to load pretrained model.
  */
 fun main() {
     val (train, test) = fashionMnist()
@@ -35,7 +36,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.init()
         var accuracy = it.evaluate(dataset = test, batchSize = 1000).metrics[Metrics.ACCURACY]

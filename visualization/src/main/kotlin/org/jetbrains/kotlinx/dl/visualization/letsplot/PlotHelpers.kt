@@ -28,7 +28,10 @@ internal fun cartesianProductIndices(x: Int, y: Int): List<Pair<Int, Int>> =
  * @return array with 4 numbers representing the sizes (x, y, input, output) of
  * [inputData] according to given permutation
  */
-internal fun extractXYInputOutputAxeSizes(inputData: TensorImageData, permute: IntArray = intArrayOf(0, 1, 2, 3)): IntArray =
+internal fun extractXYInputOutputAxeSizes(
+    inputData: TensorImageData,
+    permute: IntArray = intArrayOf(0, 1, 2, 3)
+): IntArray =
     with(IntArray(4)) {
         this[permute[0]] = inputData.size // default xSize
         this[permute[1]] = inputData[0].size // default ySize

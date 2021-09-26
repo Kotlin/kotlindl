@@ -11,6 +11,8 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.linalg.Qr
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Initializer that generates an orthogonal matrix.
@@ -20,7 +22,7 @@ import org.tensorflow.op.linalg.Qr
  */
 
 public class Orthogonal(
-    private val gain: Float =  1.0f,
+    private val gain: Float = 1.0f,
     private val seed: Long = 12L
 ) : Initializer() {
     override fun initialize(
@@ -31,37 +33,38 @@ public class Orthogonal(
         name: String
     ): Operand<Float> {
         val dimsShape = shape.asOutput().shape().size(0)
-        require(dimsShape>=2) { "The tensor to initialize must be at least two-dimensional" }
+        require(dimsShape >= 2) { "The tensor to initialize must be at least two-dimensional" }
 
         // Flatten the input shape with the last dimension remaining
-        // its original shape so it works for conv2d
-        var numRows:Long = 1
-        var i:Int = 0
+        // its original shape, so it works for conv2d
+        var numRows: Long = 1
+        var i = 0
         while (i < dimsShape - 1) {
             numRows *= shape.asOutput().shape().size(i)
             i++
         }
 
-        val numCols = shape.asOutput().shape().size(i-1)
-        val flatShape: Shape = Shape.make(Math.max(numRows,numCols),Math.min(numRows,numCols))
+        val numCols = shape.asOutput().shape().size(i - 1)
+        val flatShape: Shape = Shape.make(max(numRows, numCols), min(numRows, numCols))
         val seeds = longArrayOf(seed, 0L)
 
         // Generate a random matrix
-        val distOp: Operand<Float> = tf.random.statelessRandomNormal(shapeOperand(tf,flatShape), tf.constant(seeds), getDType())
+        val distOp: Operand<Float> =
+            tf.random.statelessRandomNormal(shapeOperand(tf, flatShape), tf.constant(seeds), getDType())
 
         // Compute the qr factorization
         val qrOptions = Qr.fullMatrices(false)
         val qrOp: Qr<Float> = tf.linalg.qr(distOp, qrOptions)
-        val qo:Operand<Float> =  qrOp.q()
-        val ro:Operand<Float> = qrOp.r()
+        val qo: Operand<Float> = qrOp.q()
+        val ro: Operand<Float> = qrOp.r()
 
         //Make Q uniform
         val d: Operand<Float> = tf.linalg.tensorDiagPart(ro)
         var qop: Operand<Float> = tf.withName(name).math.mul(qo, tf.math.sign(d))
-        val n:Operand<Float>? = null
+        val n: Operand<Float>? = null
         if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, n)
 
-        return tf.math.mul(tf.reshape(qop,shape), tf.dtypes.cast(tf.constant(this.gain), getDType()));
+        return tf.math.mul(tf.reshape(qop, shape), tf.dtypes.cast(tf.constant(this.gain), getDType()))
     }
 
     override fun toString(): String {

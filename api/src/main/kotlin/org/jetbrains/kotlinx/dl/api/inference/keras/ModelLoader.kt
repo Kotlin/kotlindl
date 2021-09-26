@@ -20,10 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Cropping2D
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Reshape
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L1
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
@@ -61,49 +58,11 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequenti
  * @return Pair of <input layer; list of layers>.
  */
 internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
-    val layers = mutableListOf<Layer>()
+    val kerasLayers = config!!.config!!.layers!!
 
-    (config as KerasModel).config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it)
-                layers.add(layer)
-            }
-        }
-    }
-
-    val input: Input
-
-    val firstLayer = config.config!!.layers!!.first()
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config!!.name ?: "input" else "input"
-    val batchInputShape = config.config.layers!!.first().config!!.batch_input_shape
-
-    // TODO: write more universal code here
-    when (batchInputShape!!.size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
+    val input = createInputLayer(kerasLayers.first())
+    val layers = kerasLayers.filter { !it.class_name.equals(LAYER_INPUT) }.mapTo(mutableListOf()) {
+        convertToLayer(it)
     }
 
     return Pair(input, layers)
@@ -116,6 +75,7 @@ private fun convertToLayer(
         // Core layers
         LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_DENSE -> createDenseLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_PERMUTE -> createPermuteLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         // Convolution layers
         LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -130,6 +90,8 @@ private fun convertToLayer(
         LAYER_AVG_POOL_2D -> createAvgPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_2D -> createGlobalMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_GLOBAL_MAX_POOL_3D -> createGlobalMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(kerasLayer.config!!.name!!)
         LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(kerasLayer.config!!.name!!)
@@ -141,9 +103,17 @@ private fun convertToLayer(
         // Attention layers
         // Reshaping layers
         LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
+        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_1D -> createCropping1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CROPPING_3D -> createCropping3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_1D -> createZeroPadding1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ZERO_PADDING_3D -> createZeroPadding3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_UP_SAMPLING_1D -> createUpSampling1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_UP_SAMPLING_2D -> createUpSampling2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_UP_SAMPLING_3D -> createUpSampling3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         // Merging layers
         LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
         LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
@@ -193,52 +163,17 @@ internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> 
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
-    val input: Input
+    val kerasLayers = config!!.config!!.layers!!
 
-    val firstLayer = (config as KerasModel).config!!.layers!!.first()
-    val batchInputShape =
-        firstLayer.config!!.batch_input_shape
-    val inputLayerName =
-        if (firstLayer.class_name.equals("InputLayer")) firstLayer.config.name ?: "input" else "input"
-
-    // TODO: write more universal code here
-    val size = batchInputShape!!.size
-    when (size) {
-        3 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        4 -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-        else -> {
-            input = Input(
-                batchInputShape[1]?.toLong()!!,
-                batchInputShape[2]?.toLong()!!,
-                batchInputShape[3]?.toLong()!!,
-                name = inputLayerName
-            )
-        }
-    }
-
+    val input = createInputLayer(kerasLayers.first())
     layers.add(input)
     layersByNames[input.name] = input
 
-    config.config!!.layers!!.forEach {
-        run {
-            if (!it.class_name.equals("InputLayer")) {
-                val layer = convertToLayer(it, layersByNames)
-                layers.add(layer)
-                layersByNames[layer.name] = layer
-            }
+    kerasLayers.forEach {
+        if (!it.class_name.equals(LAYER_INPUT)) {
+            val layer = convertToLayer(it, layersByNames)
+            layers.add(layer)
+            layersByNames[layer.name] = layer
         }
     }
 
@@ -285,7 +220,7 @@ private fun convertToLayer(
 private fun convertToRegularizer(regularizer: KerasRegularizer?): Regularizer? {
     return if (regularizer != null) {
         val l1 = regularizer.config!!.l1
-        val l2 = regularizer.config!!.l2
+        val l2 = regularizer.config.l2
         if (l1 != 0.0 && l2 != 0.0) {
             L2L1(l1!!.toFloat(), l2!!.toFloat())
         } else if (l1 == 0.0 && l2 != 0.0) {
@@ -339,7 +274,7 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScalingInitializer(initializer)
-        INITIALIZER_ORTHOGONAL -> Orthogonal( seed = seed, gain = initializer.config.gain!!.toFloat() )
+        INITIALIZER_ORTHOGONAL -> Orthogonal(seed = seed, gain = initializer.config.gain!!.toFloat())
         /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
         INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
@@ -413,6 +348,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SOFTMAX -> Activations.Softmax
         ACTIVATION_LINEAR -> Activations.Linear
         ACTIVATION_TANH -> Activations.Tanh
+        ACTIVATION_TANHSHRINK -> Activations.TanhShrink
         ACTIVATION_RELU6 -> Activations.Relu6
         ACTIVATION_ELU -> Activations.Elu
         ACTIVATION_SELU -> Activations.Selu
@@ -422,13 +358,34 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_SOFTSIGN -> Activations.SoftSign
         ACTIVATION_HARD_SIGMOID -> Activations.HardSigmoid
         ACTIVATION_SWISH -> Activations.Swish
+        ACTIVATION_MISH -> Activations.Mish
+        ACTIVATION_HARDSHRINK -> Activations.HardShrink
+        ACTIVATION_LISHT -> Activations.LiSHT
+        ACTIVATION_SNAKE -> Activations.Snake
+        ACTIVATION_GELU -> Activations.Gelu
         else -> throw IllegalStateException("$activation is not supported yet!")
+    }
+}
+
+private fun convertToInterpolationMethod(interpolation: String): InterpolationMethod {
+    return when (interpolation) {
+        InterpolationMethod.NEAREST.methodName -> InterpolationMethod.NEAREST
+        InterpolationMethod.BILINEAR.methodName -> InterpolationMethod.BILINEAR
+        InterpolationMethod.BICUBIC.methodName -> InterpolationMethod.BICUBIC
+        else -> throw IllegalArgumentException("Interpolation $interpolation is not supported yet!")
     }
 }
 
 /**
  * The layer creator functions should be put below.
  */
+
+private fun createInputLayer(layer: KerasLayer): Input {
+    val batchInputShape = layer.config!!.batch_input_shape!!
+    val inputLayerDims = batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()
+    val inputLayerName = if (layer.class_name.equals(LAYER_INPUT)) layer.config.name ?: "input" else "input"
+    return Input(*inputLayerDims, name = inputLayerName)
+}
 
 private fun createGlobalAvgPool2DLayer(name: String): Layer {
     return GlobalAvgPool2D(
@@ -451,6 +408,18 @@ private fun createGlobalAvgPool3DLayer(name: String): Layer {
 private fun createGlobalMaxPool1DLayer(config: LayerConfig, name: String): Layer {
     return GlobalMaxPool1D(
         name = name
+    )
+}
+
+private fun createGlobalMaxPool2DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool2D(
+        name = name,
+    )
+}
+
+private fun createGlobalMaxPool3DLayer(config: LayerConfig, name: String): Layer {
+    return GlobalMaxPool3D(
+        name = name,
     )
 }
 
@@ -588,6 +557,14 @@ private fun createDenseLayer(config: LayerConfig, name: String): Layer {
         kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        name = name,
+        useBias = config.use_bias ?: true
+    )
+}
+
+private fun createPermuteLayer(config: LayerConfig, name: String): Layer {
+    return Permute(
+        dims = config.dims!!,
         name = name
     )
 }
@@ -713,6 +690,10 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
 
 private fun createFlattenLayer(name: String): Layer {
     return Flatten(name = name)
+}
+
+private fun createRepeatVectorLayer(config: LayerConfig, name: String): Layer {
+    return RepeatVector(name = name, n = config.n!!)
 }
 
 private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
@@ -892,6 +873,14 @@ private fun createSeparableConv2DLayer(config: LayerConfig, name: String): Layer
     )
 }
 
+private fun createZeroPadding1DLayer(config: LayerConfig, name: String): Layer {
+    assert(config.padding is KerasPadding.ZeroPadding1D)
+    return ZeroPadding1D(
+        padding = (config.padding as KerasPadding.ZeroPadding1D).padding,
+        name = name
+    )
+}
+
 private fun createZeroPadding2DLayer(config: LayerConfig, name: String): Layer {
     assert(config.padding is KerasPadding.ZeroPadding2D)
     return ZeroPadding2D(
@@ -901,10 +890,56 @@ private fun createZeroPadding2DLayer(config: LayerConfig, name: String): Layer {
     )
 }
 
+private fun createZeroPadding3DLayer(config: LayerConfig, name: String): Layer {
+    assert(config.padding is KerasPadding.ZeroPadding3D)
+    return ZeroPadding3D(
+        padding = (config.padding as KerasPadding.ZeroPadding3D).padding,
+        name = name
+    )
+}
+
+private fun createCropping1DLayer(config: LayerConfig, name: String): Layer {
+    val cropping = config.cropping!!.map { it as Int }.toTypedArray().toIntArray()
+    return Cropping1D(
+        cropping = cropping,
+        name = name,
+    )
+}
+
 private fun createCropping2DLayer(config: LayerConfig, name: String): Layer {
-    val cropping = config.cropping!!.map { it.toIntArray() }.toTypedArray()
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping2D(
         cropping = cropping,
-        name = name
+        name = name,
+    )
+}
+
+private fun createCropping3DLayer(config: LayerConfig, name: String): Layer {
+    val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
+    return Cropping3D(
+        cropping = cropping,
+        name = name,
+    )
+}
+
+private fun createUpSampling1DLayer(config: LayerConfig, name: String): Layer {
+    return UpSampling1D(
+        size = config.size!! as Int,
+        name = name,
+    )
+}
+
+private fun createUpSampling2DLayer(config: LayerConfig, name: String): Layer {
+    return UpSampling2D(
+        size = (config.size!! as List<Int>).toIntArray(),
+        interpolation = convertToInterpolationMethod(config.interpolation!!),
+        name = name,
+    )
+}
+
+private fun createUpSampling3DLayer(config: LayerConfig, name: String): Layer {
+    return UpSampling3D(
+        size = (config.size!! as List<Int>).toIntArray(),
+        name = name,
     )
 }

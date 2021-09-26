@@ -5,6 +5,7 @@
 
 package examples.cnn.dogscats
 
+import org.jetbrains.kotlinx.dl.api.core.model.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -17,26 +18,26 @@ class CatDogTestSuite {
 
     @Test
     fun resnet50v2onCatDogDatasetTest() {
-        resnet50v2onDogsVsCatsDataset()
+        runResNetTraining(::resnet50v2Light)
     }
 
     @Test
     fun resnet101onCatDogDatasetTest() {
-        resnet101onDogsVsCatsDataset()
+        runResNetTraining(::resnet101Light)
     }
 
     @Test
     fun resnet101v2onCatDogDatasetTest() {
-        resnet101v2onDogsVsCatsDataset()
+        runResNetTraining(::resnet101v2Light)
     }
 
     @Test
     fun resnet152onCatDogDatasetTest() {
-        resnet152onDogsVsCatsDataset()
+        runResNetTraining(::resnet152Light)
     }
 
     @Test
     fun resnet152v2OnCatDogDatasetTest() {
-        resnet152v2onDogsVsCatsDataset()
+        runResNetTraining(::resnet152v2Light)
     }
 }

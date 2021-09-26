@@ -25,10 +25,12 @@ def pomConfig = {
     }
 }
 
+def moduleName = "kotlin-deeplearning-" + project.name
+
 project.ext.configureMavenCentralMetadata = { pom ->
     def root = asNode()
-    root.appendNode('name', 'Kotlin Deep Learning API') // TODO: should be customized for every module
-    root.appendNode('description', 'Deep Learning library for Kotlin.')
+    root.appendNode('name', moduleName)
+    root.appendNode('description', project.description)
     root.appendNode('url', 'https://github.com/JetBrains/KotlinDL')
     root.children().last() + pomConfig
 }

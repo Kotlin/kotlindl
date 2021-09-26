@@ -41,7 +41,7 @@ internal class GlobalMaxPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.

@@ -16,7 +16,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 
 /**
- * Average pooling operation for 1D temporal data (e.g. audio, timseries).
+ * Average pooling operation for 1D temporal data (e.g. audio, time-series).
  *
  * Downsamples the input by taking the average over a temporal window of size [poolSize].
  *
@@ -65,10 +65,12 @@ public class AvgPool1D(
     ): Operand<Float> {
         val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))
+
         val tfPoolSize = longArrayOf(1, 1, 1, 1)
         val tfStrides = longArrayOf(1, 1, 1, 1)
-        tfPoolSize[expandAxis-1] = poolSize[1]
-        tfStrides[expandAxis-1] = strides[1]
+        tfPoolSize[expandAxis - 1] = poolSize[1]
+        tfStrides[expandAxis - 1] = strides[1]
+
         val tfPadding = padding.paddingName
 
         val avgPool = tf.nn.avgPool(
@@ -77,6 +79,7 @@ public class AvgPool1D(
             tfStrides.toList(),
             tfPadding
         )
+
         return tf.squeeze(avgPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 

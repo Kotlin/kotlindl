@@ -20,7 +20,7 @@ internal class MaxPool3DTest {
         ) {
             Array(30) {
                 Array(30) {
-                    FloatArray(3, { 0f })
+                    FloatArray(3) { 0f }
                 }
             }
         }
@@ -116,13 +116,13 @@ internal class MaxPool3DTest {
 
     @Test
     fun defaultTest() {
-        var expected = Array(1) {
+        val expected = Array(1) {
             Array(
                 15
             ) {
                 Array(15) {
                     Array(15) {
-                        FloatArray(3, { 0f })
+                        FloatArray(3) { 0f }
                     }
                 }
             }
@@ -134,13 +134,13 @@ internal class MaxPool3DTest {
 
     @Test
     fun poolSizeTest() {
-        var expected = Array(1) {
+        val expected = Array(1) {
             Array(
                 14
             ) {
                 Array(14) {
                     Array(14) {
-                        FloatArray(3, { 0f })
+                        FloatArray(3) { 0f }
                     }
                 }
             }
@@ -151,13 +151,13 @@ internal class MaxPool3DTest {
 
     @Test
     fun strideSizeTest() {
-        var expected = Array(1) {
+        val expected = Array(1) {
             Array(
                 8
             ) {
                 Array(8) {
                     Array(8) {
-                        FloatArray(3, { 0f })
+                        FloatArray(3) { 0f }
                     }
                 }
             }

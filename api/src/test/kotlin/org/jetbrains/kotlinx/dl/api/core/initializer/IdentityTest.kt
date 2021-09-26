@@ -2,12 +2,10 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 
 import org.jetbrains.kotlinx.dl.api.core.exception.IdentityDimensionalityException
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.assertAll
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -33,20 +31,20 @@ class IdentityTest {
             operand.asOutput().tensor().copyTo(actual)
 
             assertArrayEquals(
-                    expected[0],
-                    actual[0],
-                    EPS
+                expected[0],
+                actual[0],
+                EPS
             )
 
             assertArrayEquals(
-                    expected[1],
-                    actual[1],
-                    EPS
+                expected[1],
+                actual[1],
+                EPS
             )
 
             assertEquals(
-                    "Identity(scale=1.0)",
-                    instance.toString()
+                "Identity(scale=1.0)",
+                instance.toString()
             )
         }
     }
@@ -67,20 +65,20 @@ class IdentityTest {
             operand.asOutput().tensor().copyTo(actual)
 
             assertArrayEquals(
-                    expected[0],
-                    actual[0],
-                    EPS
+                expected[0],
+                actual[0],
+                EPS
             )
 
             assertArrayEquals(
-                    expected[1],
-                    actual[1],
-                    EPS
+                expected[1],
+                actual[1],
+                EPS
             )
 
             assertEquals(
-                    "Identity(scale=3.4)",
-                    instance.toString()
+                "Identity(scale=3.4)",
+                instance.toString()
             )
         }
     }
@@ -102,20 +100,20 @@ class IdentityTest {
 
 
             assertArrayEquals(
-                    expected[0],
-                    actual[0],
-                    EPS
+                expected[0],
+                actual[0],
+                EPS
             )
 
             assertArrayEquals(
-                    expected[1],
-                    actual[1],
-                    EPS
+                expected[1],
+                actual[1],
+                EPS
             )
 
             assertEquals(
-                    "Identity(scale=1.0)",
-                    instance.toString()
+                "Identity(scale=1.0)",
+                instance.toString()
             )
         }
     }
@@ -137,32 +135,32 @@ class IdentityTest {
 
 
             assertArrayEquals(
-                    expected[0],
-                    actual[0],
-                    EPS
+                expected[0],
+                actual[0],
+                EPS
             )
 
             assertArrayEquals(
-                    expected[1],
-                    actual[1],
-                    EPS
+                expected[1],
+                actual[1],
+                EPS
             )
 
             assertArrayEquals(
-                    expected[2],
-                    actual[2],
-                    EPS
+                expected[2],
+                actual[2],
+                EPS
             )
 
             assertEquals(
-                    "Identity(scale=1.0)",
-                    instance.toString()
+                "Identity(scale=1.0)",
+                instance.toString()
             )
         }
     }
 
     @Test
-    fun initializeWith1DShapeFails(){
+    fun initializeWith1DShapeFails() {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val shape = Shape.make(5)
@@ -172,14 +170,14 @@ class IdentityTest {
             }
 
             assertEquals(
-                    "Identity matrix is not defined for order 1 tensors.",
-                    exception.message
+                "Identity matrix is not defined for order 1 tensors.",
+                exception.message
             )
         }
     }
 
     @Test
-    fun initializeWith3DShapeFails(){
+    fun initializeWith3DShapeFails() {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val shape = Shape.make(5, 5, 5)
@@ -189,8 +187,8 @@ class IdentityTest {
             }
 
             assertEquals(
-                    "Identity matrix is not defined for order 3 tensors.",
-                    exception.message
+                "Identity matrix is not defined for order 3 tensors.",
+                exception.message
             )
         }
     }

@@ -136,31 +136,33 @@ Here, the last layer of the model gives us 10 numbers, each representing the pro
 *Softmax Crossentropy with logits* measures the probability of error. *Softmax Crossentropy with logits* measures the probability error. 
 * Metrics allow you to monitor the training and evaluation of the model. Accuracy simply represents the percentage of correct predictions out of all the predictions made.  
 
-At this point, we can call the `summary()` method to get a printout of the neural network's architecture. 
+At this point, we can call the `logSummary()` method to get a printout of the neural network's architecture. 
 
 ```kotlin
-it.summary()
+it.printSummary()
 ```
 
 ```
-INFO  api.core.Sequential - =================================================================
-INFO  api.core.Sequential - Model: Sequential
-INFO  api.core.Sequential - _________________________________________________________________
-INFO  api.core.Sequential - Layer (type)                 Output Shape              Param #   
-INFO  api.core.Sequential - =================================================================
-INFO  api.core.Sequential - flatten_1(Flatten)           [784]                     0
-INFO  api.core.Sequential - _________________________________________________________________
-INFO  api.core.Sequential - dense_2(Dense)               [300]                     235500
-INFO  api.core.Sequential - _________________________________________________________________
-INFO  api.core.Sequential - dense_3(Dense)               [100]                     30100
-INFO  api.core.Sequential - _________________________________________________________________
-INFO  api.core.Sequential - dense_4(Dense)               [10]                      1010
-INFO  api.core.Sequential - _________________________________________________________________
-INFO  api.core.Sequential - =================================================================
-INFO  api.core.Sequential - Total trainable params: 266610
-INFO  api.core.Sequential - Total frozen params: 0
-INFO  api.core.Sequential - Total params: 266610
-INFO  api.core.Sequential - =================================================================
+==============================================================================
+Model type: Sequential
+______________________________________________________________________________
+Layer (type)                           Output Shape              Param #      
+==============================================================================
+input_1(Input)                         [None, 28, 28, 1]         0            
+______________________________________________________________________________
+flatten_2(Flatten)                     [None, 784]               0            
+______________________________________________________________________________
+dense_3(Dense)                         [None, 300]               235500       
+______________________________________________________________________________
+dense_4(Dense)                         [None, 100]               30100        
+______________________________________________________________________________
+dense_5(Dense)                         [None, 10]                1010         
+______________________________________________________________________________
+==============================================================================
+Total trainable params: 266610
+Total frozen params: 0
+Total params: 266610
+==============================================================================
 
 ```
 Great! We have now defined the structure of our neural network, specified the optimization algorithm that will be used during its training, and identified accuracy as the metric we will use to gauge its success.
