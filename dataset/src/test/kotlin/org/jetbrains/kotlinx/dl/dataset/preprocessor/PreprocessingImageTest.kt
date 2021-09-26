@@ -136,13 +136,15 @@ class PreprocessingImageTest {
 
     }
 
-    private fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorOrder: ColorOrder) {
-        val colorComponents = when (colorOrder) {
-            ColorOrder.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
-            ColorOrder.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
-        }
-        for (i in colorComponents.indices) {
-            set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels.toInt(), colorComponents[i])
+    companion object {
+        internal fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorOrder: ColorOrder) {
+            val colorComponents = when (colorOrder) {
+                ColorOrder.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
+                ColorOrder.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
+            }
+            for (i in colorComponents.indices) {
+                set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels.toInt(), colorComponents[i])
+            }
         }
     }
 }
