@@ -55,7 +55,7 @@ public object ImageConverter {
     }
 
     /** */
-    public fun toBufferedImage(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): BufferedImage {
+    public fun toBufferedImage(inputStream: InputStream): BufferedImage {
         return getImage(inputStream)
     }
 
@@ -142,10 +142,10 @@ public object ImageConverter {
     }
 
     /**
-     * Returns [BufferedImage] extracted from [inputStream] with [imageType].
+     * Returns [BufferedImage] extracted from [inputStream].
      */
     @Throws(IOException::class)
-    public fun getImage(inputStream: InputStream, imageType: String = "png"): BufferedImage {
+    public fun getImage(inputStream: InputStream): BufferedImage {
         ImageIO.setUseCache(false)
         return ImageIO.read(inputStream)
     }
