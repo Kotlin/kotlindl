@@ -4,8 +4,8 @@
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
-Under the hood, it uses TensorFlow Java API. KotlinDL offers simple APIs for training deep learning models from scratch, 
-importing existing Keras models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
+Under the hood, it uses TensorFlow Java API and ONNX Runtime API for Java. KotlinDL offers simple APIs for training deep learning models from scratch, 
+importing existing Keras and ONNX models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
 This project aims to make Deep Learning easier for JVM developers and simplify deploying deep learning models in JVM production environments.
  
@@ -161,6 +161,7 @@ At this point, please feel free to check out the following tutorials we have pre
 - [Running inference with a trained model](docs/loading_trained_model_for_inference.md)
 - [Importing a Keras model](docs/importing_keras_model.md) 
 - [Transfer learning](docs/transfer_learning.md)
+- [Transfer learning with Functional API](docs/transfer_learning_functional.md)
 
 For more inspiration, take a look at the [code examples](examples) in this repo.
 

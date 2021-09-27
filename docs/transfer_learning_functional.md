@@ -1,13 +1,13 @@
 Transfer learning is a popular deep learning technique that allows you to save time on training a neural network while achieving great performance too. 
 It leverages existing pre-trained models and allows you to tweak them to your task by training only a part of the neural network.
 
-In this tutorial, we will take a pre-trained VGG-19 Keras model that has been trained on a large dataset (ImageNet) to classify color images into 1000 categories. 
+In this tutorial, we will take a pre-trained ResNet'50 Keras model that has been trained on a large dataset (ImageNet) to classify color images into 1000 categories. 
 We will load this model with KotlinDL, and fine-tune it by training only some of its layers to classify images from our own dataset.
 
 ## Data preparation
 For the purposes of this tutorial, we downloaded a dataset containing images of dogs and cats 
 (it's a subset of the dataset from the famous Kaggle competition with only 50 images per class instead of 12500 images per class like the original dataset). 
-Next, we resized the images to be 224 x 224 pixels. This is the same image size as VGG-19 was trained on. 
+Next, we resized the images to be 224 x 224 pixels. This is the same image size as ResNet'50 was trained on. 
 It is important for all the images to be the same size, however, 
 it is not critical for them to be of the exact size as what the model was trained on – if needed, we can replace the input layer.
 
@@ -45,7 +45,7 @@ val preprocessing: Preprocessing = preprocess {
     }
     transformTensor {
         sharpen {
-            modelType = TFModels.CV.VGG19
+            modelType = TFModels.CV.ResNet50
         }
     }
 }
@@ -55,15 +55,15 @@ val (train, test) = dataset.split(0.7)
 ```  
 In the final lines, after creating a dataset, we shuffle the data, so that when we split it into training and testing portions, we do not get a test set containing only images of one class.    
  
-## VGG-19
+## ResNet'50
 KotlinDL bundles a lot of pre-trained models available via ModelZoo object. 
 You can either train a model from scratch yourself and store it for later use on other tasks, or you can import a pre-trained Keras model with compatible architecture.  
 
-In this tutorial, we will load VGG-19 model and weights that are made available in the ModelHub: 
+In this tutorial, we will load ResNet'50 model and weights that are made available in the ModelHub: 
 
 ```kotlin
 val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-val modelType = TFModels.CV.VGG19
+val modelType = TFModels.CV.ResNet50
 val model = modelHub.loadModel(modelType)
 ```
 
@@ -81,32 +81,43 @@ So this is what we will do:
 ```kotlin
 val layers = mutableListOf<Layer>()
 
-for (layer in model.layers.dropLast(1)) {
+for (layer in model.layers) {
     layer.isTrainable = false
     layers.add(layer)
 }
-layers.forEach { it.isTrainable = false }
 
-layers.add(
-    Dense(
-        name = "new_dense_1",
-        kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
-        outputSize = 64,
-        activation = Activations.Relu
-    )
+val lastLayer = layers.last()
+for (outboundLayer in lastLayer.inboundLayers)
+    outboundLayer.outboundLayers.remove(lastLayer)
+
+layers.removeLast()
+
+val newDenseLayer = Dense(
+    name = "new_dense_1",
+    kernelInitializer = HeNormal(),
+    biasInitializer = HeNormal(),
+    outputSize = 64,
+    activation = Activations.Relu
 )
+newDenseLayer.inboundLayers.add(layers.last())
 layers.add(
-    Dense(
-        name = "new_dense_2",
-        kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
-        outputSize = 2,
-        activation = Activations.Linear
-    )
+    newDenseLayer
 )
 
-val newModel = Sequential.of(layers)
+val newDenseLayer2 = Dense(
+    name = "new_dense_2",
+    kernelInitializer = HeNormal(),
+    biasInitializer = HeNormal(),
+    outputSize = 2,
+    activation = Activations.Linear
+)
+newDenseLayer2.inboundLayers.add(layers.last())
+
+layers.add(
+    newDenseLayer2
+)
+
+val newModel = Functional.of(layers)
 ```
 
 Finally, we can train this model. The only difference to training a model from scratch will be loading the weights for the frozen layers. 
@@ -136,28 +147,6 @@ These will not be further trained – that's how we can leverage the fact that t
 
     println("Accuracy after training $accuracyAfterTraining")
 }
-``` 
-
----
-**NOTE**
-
-If you have obtained the pre-trained model's weights in HDF5 format differently from how it is described in this tutorial, 
-you may not be able to load them with the default `loadWeightsForFrozenLayers` method.  
-
-
-If the default method fails to load the weights from a *.h5 file, you can use the helper method 
-`recursivePrintGroupInHDF5File(hdfFile, hdfFile)`  to inspect the HDF5 file structure and figure out the custom templates that are used to store the kernel and weights data. 
-With those, you can use the `loadWeightsForFrozenLayersByPathTemplates` 
-method to load nearly any Keras model weights stored in HDF5. 
-
-Here's an example: 
-```kotlin
-val kernelDataPathTemplate = "/%s/%s_W_1:0"
-val biasDataPathTemplate = "/%s/%s_b_1:0"
-
-it.loadWeightsForFrozenLayersByPathTemplates(hdfFile, kernelDataPathTemplate, biasDataPathTemplate)
-
 ```
---- 
 
-That is it! Congratulations! You have learned how to use the transfer learning technique with KotlinDL.  
+That is it! Congratulations! You have learned how to use the transfer learning technique with KotlinDL and Functional API.  
