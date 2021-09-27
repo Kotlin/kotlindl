@@ -56,7 +56,7 @@ val (train, test) = dataset.split(0.7)
 In the final lines, after creating a dataset, we shuffle the data, so that when we split it into training and testing portions, we do not get a test set containing only images of one class.    
  
 ## VGG-19
-KotlinDL bundles a lot of pre-trained models available via ModelZoo object. 
+KotlinDL bundles a lot of pre-trained models available via ModelHub object. 
 You can either train a model from scratch yourself and store it for later use on other tasks, or you can import a pre-trained Keras model with compatible architecture.  
 
 In this tutorial, we will load VGG-19 model and weights that are made available in the ModelHub: 

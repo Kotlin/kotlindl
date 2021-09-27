@@ -24,7 +24,7 @@ This way makes it easier to get the labels for all the examples based on the fol
 Now we need to create a `Dataset` from these images. 
 You can do so via the Image Preprocessing Pipeline description, and building a dataset from those. 
 
-Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
+Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the ResNet'50 specific preprocessing.
 
 ```kotlin
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
@@ -56,7 +56,7 @@ val (train, test) = dataset.split(0.7)
 In the final lines, after creating a dataset, we shuffle the data, so that when we split it into training and testing portions, we do not get a test set containing only images of one class.    
  
 ## ResNet'50
-KotlinDL bundles a lot of pre-trained models available via ModelZoo object. 
+KotlinDL bundles a lot of pre-trained models available via ModelHub object. 
 You can either train a model from scratch yourself and store it for later use on other tasks, or you can import a pre-trained Keras model with compatible architecture.  
 
 In this tutorial, we will load ResNet'50 model and weights that are made available in the ModelHub: 
