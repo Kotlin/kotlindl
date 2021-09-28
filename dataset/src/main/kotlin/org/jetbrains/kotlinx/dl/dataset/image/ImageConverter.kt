@@ -98,14 +98,6 @@ public object ImageConverter {
         for (i in data.indices) data[i] /= scale
     }
 
-    private fun BufferedImage.colorOrder(): ColorOrder {
-        return when (type) {
-            BufferedImage.TYPE_INT_RGB -> ColorOrder.RGB
-            BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR -> ColorOrder.BGR
-            else -> throw UnsupportedOperationException("Images with type $type are not supported.")
-        }
-    }
-
     /** Converts [image] with [colorOrder] to the 3D array. */
     public fun imageTo3DFloatArray(
         image: BufferedImage,
@@ -174,4 +166,19 @@ public enum class ColorOrder {
 
     /** Blue, green, red. */
     BGR
+}
+
+internal fun BufferedImage.colorOrder(): ColorOrder {
+    return when (type) {
+        BufferedImage.TYPE_INT_RGB -> ColorOrder.RGB
+        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR -> ColorOrder.BGR
+        else -> throw UnsupportedOperationException("Images with type $type are not supported.")
+    }
+}
+
+internal fun ColorOrder.imageType(): Int {
+    return when (this) {
+        ColorOrder.RGB -> BufferedImage.TYPE_INT_RGB
+        ColorOrder.BGR -> BufferedImage.TYPE_3BYTE_BGR
+    }
 }

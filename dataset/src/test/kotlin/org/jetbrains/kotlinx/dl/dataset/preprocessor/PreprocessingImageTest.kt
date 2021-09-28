@@ -2,6 +2,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.extension.set3D
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -134,6 +135,21 @@ class PreprocessingImageTest {
 
         Assertions.assertArrayEquals(expectedImage, imageFloats)
 
+    }
+
+    @Test
+    fun convertTest() {
+        val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
+        inputImage.setRGB(0, 0, Color.BLUE.rgb)
+        inputImage.setRGB(1, 1, Color.RED.rgb)
+        val rgbImage = Convert(colorOrder = ColorOrder.RGB).apply(inputImage)
+        val rgbImageFloats = ImageConverter.toNormalizedFloatArray(rgbImage)
+
+        val imageShape = ImageShape(2, 2, 3)
+        val expectedImageFloats = FloatArray(imageShape.numberOfElements.toInt()) { 0f }
+        expectedImageFloats.setRGB(0, 0, Color.BLUE, imageShape, ColorOrder.RGB)
+        expectedImageFloats.setRGB(1, 1, Color.RED, imageShape, ColorOrder.RGB)
+        Assertions.assertArrayEquals(expectedImageFloats, rgbImageFloats)
     }
 
     companion object {

@@ -44,3 +44,8 @@ public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
 public fun ImagePreprocessing.pad(block: Padding.() -> Unit) {
     addOperation(Padding().apply(block))
 }
+
+/** */
+public fun ImagePreprocessing.convert(block: Convert.() -> Unit) {
+    addOperation(Convert().apply(block))
+}
