@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.Companion.imageToByteArray
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.imageToByteArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
