@@ -48,33 +48,3 @@ fun runImageRecognitionPrediction(
         }
     }
 }
-
-private fun preprocessing(
-    resizeTo: Pair<Int, Int>,
-    i: Int
-): Preprocessing {
-    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        preprocess {
-            load {
-                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
-            }
-        }
-    } else {
-        preprocess {
-            load {
-                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.RGB
-            }
-            transformImage {
-                resize {
-                    outputWidth = 299
-                    outputHeight = 299
-                }
-            }
-        }
-    }
-    return preprocessing
-}
