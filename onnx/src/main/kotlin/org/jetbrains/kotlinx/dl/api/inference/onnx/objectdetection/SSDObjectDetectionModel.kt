@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -79,13 +80,13 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
             load {
                 pathToData = imageFile
                 imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 resize {
                     outputHeight = 1200
                     outputWidth = 1200
                 }
+                convert { colorOrder = ColorOrder.BGR }
             }
         }
 

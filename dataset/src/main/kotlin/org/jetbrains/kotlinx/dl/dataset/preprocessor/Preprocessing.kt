@@ -66,7 +66,7 @@ public class Preprocessing {
             }
         }
 
-        var tensor = ImageConverter.toRawFloatArray(image, load.colorMode)
+        var tensor = ImageConverter.toRawFloatArray(image)
         val shape = image.getShape()
 
         if (::tensorPreprocessingStage.isInitialized) {

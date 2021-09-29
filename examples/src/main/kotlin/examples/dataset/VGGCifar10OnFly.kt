@@ -188,7 +188,6 @@ fun main() {
         load {
             pathToData = File(cifarImagesArchive)
             imageShape = ImageShape(32, 32, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             crop {
@@ -205,6 +204,7 @@ fun main() {
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.NEAREST
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

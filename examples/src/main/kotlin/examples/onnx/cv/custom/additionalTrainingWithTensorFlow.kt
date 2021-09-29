@@ -24,6 +24,7 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -72,7 +73,6 @@ fun resnet50additionalTraining() {
             load {
                 pathToData = File(dogsVsCatsDatasetPath)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
-                colorMode = ColorOrder.BGR
                 labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
             }
             transformImage {
@@ -81,6 +81,7 @@ fun resnet50additionalTraining() {
                     outputWidth = IMAGE_SIZE.toInt()
                     interpolation = InterpolationType.BILINEAR
                 }
+                convert { colorOrder = ColorOrder.BGR }
             }
             transformTensor {
                 sharpen {

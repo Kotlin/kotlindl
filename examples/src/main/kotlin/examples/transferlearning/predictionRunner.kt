@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 import java.net.URISyntaxException
@@ -79,21 +80,21 @@ private fun preprocessing(
             load {
                 pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                 imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
             }
+            transformImage { convert { colorOrder = ColorOrder.BGR } }
         }
     } else {
         preprocess {
             load {
                 pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                 imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.RGB
             }
             transformImage {
                 resize {
                     outputWidth = resizeTo.first
                     outputHeight = resizeTo.second
                 }
+                convert { colorOrder = ColorOrder.BGR }
             }
         }
     }

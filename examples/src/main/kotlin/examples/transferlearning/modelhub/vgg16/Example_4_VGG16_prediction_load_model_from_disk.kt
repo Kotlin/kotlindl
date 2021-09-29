@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
+import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -56,7 +57,8 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val floatArray = ImageConverter.toRawFloatArray(getFileFromResource("datasets/vgg/image$i.jpg"))
+            val floatArray = ImageConverter.toRawFloatArray(getFileFromResource("datasets/vgg/image$i.jpg"),
+                                                            colorOrder = ColorOrder.BGR)
 
             val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
 

@@ -7,12 +7,12 @@ package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
 import java.io.File
@@ -45,13 +45,13 @@ fun visualiseLandMarks(
         load {
             pathToData = imageFile
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             resize {
                 outputWidth = 192
                 outputHeight = 192
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

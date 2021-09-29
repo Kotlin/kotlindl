@@ -13,9 +13,6 @@ class PreprocessingImageTest {
     @Test
     fun resizeTest() {
         val preprocess = preprocess {
-            load {
-                colorMode = ColorOrder.BGR
-            }
             transformImage {
                 resize {
                     outputWidth = 4
@@ -46,9 +43,6 @@ class PreprocessingImageTest {
     @Test
     fun cropTest() {
         val preprocess = preprocess {
-            load {
-                colorMode = ColorOrder.BGR
-            }
             transformImage {
                 crop {
                     left = 1
@@ -77,9 +71,6 @@ class PreprocessingImageTest {
     @Test
     fun rotateTest() {
         val preprocess = preprocess {
-            load {
-                colorMode = ColorOrder.BGR
-            }
             transformImage {
                 rotate {
                     degrees = 90f
@@ -104,9 +95,6 @@ class PreprocessingImageTest {
     @Test
     fun constantPaddingTest() {
         val preprocess = preprocess {
-            load {
-                colorMode = ColorOrder.BGR
-            }
             transformImage {
                 pad {
                     top = 1

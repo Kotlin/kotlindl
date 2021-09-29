@@ -21,6 +21,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
@@ -64,8 +65,8 @@ fun main() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
+                transformImage { convert { colorOrder = ColorOrder.BGR } }
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
@@ -101,8 +102,8 @@ fun main() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
+                transformImage { convert { colorOrder = ColorOrder.BGR } }
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
@@ -133,8 +134,8 @@ fun main() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
+                transformImage { convert { colorOrder = ColorOrder.BGR } }
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model2.inputDimensions)

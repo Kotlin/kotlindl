@@ -33,7 +33,6 @@ fun main() {
         load {
             pathToData = imageDirectory
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
             labelGenerator = EmptyLabels()
         }
         transformImage {
@@ -51,6 +50,7 @@ fun main() {
                 outputHeight = 300
                 interpolation = InterpolationType.NEAREST
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

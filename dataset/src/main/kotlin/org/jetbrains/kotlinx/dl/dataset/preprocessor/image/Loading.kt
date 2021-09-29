@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
@@ -24,14 +23,11 @@ import kotlin.streams.toList
  * @property [pathToData] The image will be cropped from the top by the given number of pixels.
  * @property [imageShape] The shape of input image. If height and width are different for different images, need to skip the filling of these properties of [ImageShape].
  * @property [labelGenerator] A way to generate labels.
- * @property [colorMode] Color mode.
  */
 public class Loading(
     public var pathToData: File? = null,
     public var imageShape: ImageShape? = null,
     public var labelGenerator: LabelGenerator? = null,
-    /** Keep channels in the given order after loading. */
-    public var colorMode: ColorOrder = ColorOrder.BGR
 ) {
     internal fun fileToImage(file: File): BufferedImage {
         return file.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }

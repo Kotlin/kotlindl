@@ -18,6 +18,7 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 import kotlin.reflect.KFunction4
@@ -58,7 +59,6 @@ internal fun runResNetTraining(modelBuilderFunction: KFunction4<Long, Int, Long,
         load {
             pathToData = File(dogsVsCatsDatasetPath)
             imageShape = ImageShape(channels = NUM_CHANNELS)
-            colorMode = ColorOrder.BGR
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
         }
         transformImage {
@@ -67,6 +67,7 @@ internal fun runResNetTraining(modelBuilderFunction: KFunction4<Long, Int, Long,
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.BILINEAR
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

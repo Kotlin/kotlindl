@@ -17,32 +17,32 @@ import javax.imageio.ImageIO
 /** Helper object to convert images to [FloatArray]. */
 public object ImageConverter {
     /** All pixels has values in range [0; 255]. */
-    public fun toRawFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toRawFloatArray(image: BufferedImage, colorOrder: ColorOrder? = null): FloatArray {
         return imageToFloatArray(image, colorOrder)
     }
 
     /** All pixels has values in range [0; 255]. */
-    public fun toRawFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toRawFloatArray(inputStream: InputStream, colorOrder: ColorOrder? = null): FloatArray {
         return toRawFloatArray(toBufferedImage(inputStream), colorOrder)
     }
 
     /** All pixels has values in range [0; 255]. */
-    public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toRawFloatArray(imageFile: File, colorOrder: ColorOrder? = null): FloatArray {
         return imageFile.inputStream().use { toRawFloatArray(it, colorOrder) }
     }
 
     /** All pixels in range [0;1) */
-    public fun toNormalizedFloatArray(image: BufferedImage, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toNormalizedFloatArray(image: BufferedImage, colorOrder: ColorOrder? = null): FloatArray {
         return toRawFloatArray(image, colorOrder).also { normalize(it) }
     }
 
     /** All pixels in range [0;1) */
-    public fun toNormalizedFloatArray(inputStream: InputStream, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toNormalizedFloatArray(inputStream: InputStream, colorOrder: ColorOrder? = null): FloatArray {
         return toNormalizedFloatArray(toBufferedImage(inputStream), colorOrder)
     }
 
     /** All pixels in range [0;1) */
-    public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder = ColorOrder.BGR): FloatArray {
+    public fun toNormalizedFloatArray(imageFile: File, colorOrder: ColorOrder? = null): FloatArray {
         return imageFile.inputStream().use { toNormalizedFloatArray(it, colorOrder) }
     }
 
@@ -59,7 +59,14 @@ public object ImageConverter {
         BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB
     )
 
-    private fun imageToFloatArray(image: BufferedImage, colorOrder: ColorOrder): FloatArray {
+    private fun imageToFloatArray(image: BufferedImage, colorOrder: ColorOrder?): FloatArray {
+        if (colorOrder != null && image.colorOrder() != colorOrder) {
+            return imageToFloatArray(image).also { swapRandB(it) }
+        }
+        return imageToFloatArray(image)
+    }
+
+    private fun imageToFloatArray(image: BufferedImage): FloatArray {
         check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
         check(supportedImageTypes.contains(image.type)) {
             "Images with type ${image.type} are not supported yet. " +
@@ -68,19 +75,11 @@ public object ImageConverter {
 
         val raster = image.raster
         if (raster.dataBuffer is DataBufferByte) {
-            return byteBufferToFloatArray(raster.dataBuffer as DataBufferByte, image.colorOrder(), colorOrder)
+            return OnHeapDataset.toRawVector((raster.dataBuffer as DataBufferByte).data)
         }
         val buffer = FloatArray(raster.numBands * raster.width * raster.height)
         val result = raster.getPixels(0, 0, raster.width, raster.height, buffer)
-        if (colorOrder == ColorOrder.BGR) { // getPixels returns data in RGB order
-            swapRandB(result)
-        }
-        return result
-    }
-
-    private fun byteBufferToFloatArray(buffer: DataBufferByte, sourceColorOrder: ColorOrder, targetColorOrder: ColorOrder): FloatArray {
-        val result = OnHeapDataset.toRawVector(buffer.data)
-        if (sourceColorOrder != targetColorOrder) {
+        if (image.colorOrder() == ColorOrder.BGR) { // getPixels returns data in RGB order
             swapRandB(result)
         }
         return result

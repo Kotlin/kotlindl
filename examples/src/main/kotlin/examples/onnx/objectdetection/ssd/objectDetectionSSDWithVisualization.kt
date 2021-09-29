@@ -50,13 +50,13 @@ private fun visualise(
         load {
             pathToData = imageFile
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             resize {
                 outputWidth = 1200
                 outputHeight = 1200
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

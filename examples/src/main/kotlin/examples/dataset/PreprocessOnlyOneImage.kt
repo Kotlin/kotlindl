@@ -30,7 +30,6 @@ fun main() {
         load {
             pathToData = image
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             crop {
@@ -57,6 +56,7 @@ fun main() {
                 right = 10
                 mode = PaddingMode.Fill(Color.WHITE)
             }
+            convert { colorOrder = ColorOrder.BGR }
         }
         transformTensor {
             rescale {

@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHuman
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -57,8 +58,8 @@ fun main() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
+                transformImage { convert { colorOrder = ColorOrder.BGR } }
             }
 
             val inputData = preprocessInput(preprocessing().first, model.inputDimensions, inputType = InputType.CAFFE)
