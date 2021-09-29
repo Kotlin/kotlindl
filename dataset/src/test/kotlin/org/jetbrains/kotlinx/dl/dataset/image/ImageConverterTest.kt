@@ -46,4 +46,20 @@ class ImageConverterTest {
         expectedImage.setRGB(1, 1, color4, sourceImage.getShape(), targetColorMode)
         Assertions.assertArrayEquals(expectedImage, targetImage)
     }
+
+    @Test
+    fun grayscaleImageToFloatsTest() {
+        val expectedImage = floatArrayOf(0.2f, 0.4f, 0.6f, 0.8f)
+
+        val sourceImage = BufferedImage(2, 2, BufferedImage.TYPE_BYTE_GRAY)
+        sourceImage.raster.setDataElements(0, 0, gray(expectedImage[0]))
+        sourceImage.raster.setDataElements(1, 0, gray(expectedImage[1]))
+        sourceImage.raster.setDataElements(0, 1, gray(expectedImage[2]))
+        sourceImage.raster.setDataElements(1, 1, gray(expectedImage[3]))
+
+        val targetImage = ImageConverter.toNormalizedFloatArray(sourceImage)
+        Assertions.assertArrayEquals(expectedImage, targetImage)
+    }
+
+    private fun gray(value : Float) = byteArrayOf((value * 255).toInt().toByte())
 }

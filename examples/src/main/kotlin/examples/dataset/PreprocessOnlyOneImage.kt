@@ -68,7 +68,7 @@ fun main() {
     val rawImage = preprocessing().first
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape))
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.BGR))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

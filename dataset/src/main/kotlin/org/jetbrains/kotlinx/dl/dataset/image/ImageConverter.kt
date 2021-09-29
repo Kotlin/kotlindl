@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.image
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Convert
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.File
@@ -56,12 +57,13 @@ public object ImageConverter {
     }
 
     private val supportedImageTypes = setOf(
-        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB
+        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR,
+        BufferedImage.TYPE_INT_RGB, BufferedImage.TYPE_BYTE_GRAY
     )
 
     private fun imageToFloatArray(image: BufferedImage, colorMode: ColorMode?): FloatArray {
         if (colorMode != null && image.colorMode() != colorMode) {
-            return imageToFloatArray(image).also { swapRandB(it) }
+            return imageToFloatArray(Convert(colorMode = colorMode).apply(image))
         }
         return imageToFloatArray(image)
     }
@@ -85,7 +87,7 @@ public object ImageConverter {
         return result
     }
 
-    private fun swapRandB(res: FloatArray) {
+    public fun swapRandB(res: FloatArray) {
         for (i in res.indices step 3) {
             val tmp = res[i]
             res[i] = res[i + 2]
@@ -158,26 +160,31 @@ public object ImageConverter {
     }
 }
 
-/** Represents the order of colors in pixel reading. */
-public enum class ColorMode {
+/** Represents the number and order of color channels in the image */
+public enum class ColorMode(public val channels: Int) {
     /** Red, green, blue. */
-    RGB,
+    RGB(3),
 
     /** Blue, green, red. */
-    BGR
+    BGR(3),
+
+    /** Grayscale **/
+    GRAYSCALE(1)
 }
 
 internal fun BufferedImage.colorMode(): ColorMode {
     return when (type) {
         BufferedImage.TYPE_INT_RGB -> ColorMode.RGB
         BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR -> ColorMode.BGR
+        BufferedImage.TYPE_BYTE_GRAY -> ColorMode.GRAYSCALE
         else -> throw UnsupportedOperationException("Images with type $type are not supported.")
     }
 }
 
-internal fun ColorMode.imageType(): Int {
+public fun ColorMode.imageType(): Int {
     return when (this) {
         ColorMode.RGB -> BufferedImage.TYPE_INT_RGB
         ColorMode.BGR -> BufferedImage.TYPE_3BYTE_BGR
+        ColorMode.GRAYSCALE -> BufferedImage.TYPE_BYTE_GRAY
     }
 }

@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage
  */
 public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImagePreprocessorBase() {
     override fun getOutputShape(inputShape: ImageShape?): ImageShape {
-        return ImageShape(inputShape?.width, inputShape?.height, 3)
+        return ImageShape(inputShape?.width, inputShape?.height, colorMode.channels.toLong())
     }
 
     override fun apply(image: BufferedImage): BufferedImage {

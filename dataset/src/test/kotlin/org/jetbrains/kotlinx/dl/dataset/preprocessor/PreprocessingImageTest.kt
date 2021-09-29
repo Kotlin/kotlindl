@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.image.BufferedImage
+import kotlin.math.roundToInt
 
 class PreprocessingImageTest {
     @Test
@@ -145,6 +146,12 @@ class PreprocessingImageTest {
             val colorComponents = when (colorMode) {
                 ColorMode.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
                 ColorMode.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
+                ColorMode.GRAYSCALE -> {
+                    floatArrayOf(((0.299 * color.red) +
+                                  (0.587 * color.green) +
+                                  (0.114 * color.blue)).roundToInt() / 255f
+                    )
+                }
             }
             for (i in colorComponents.indices) {
                 set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels.toInt(), colorComponents[i])
