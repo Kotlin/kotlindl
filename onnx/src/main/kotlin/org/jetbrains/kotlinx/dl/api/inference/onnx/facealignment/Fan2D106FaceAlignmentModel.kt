@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
@@ -62,7 +62,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
                     outputHeight = 192
                     outputWidth = 192
                 }
-                convert { colorOrder = ColorOrder.BGR }
+                convert { colorMode = ColorMode.BGR }
             }
         }
 

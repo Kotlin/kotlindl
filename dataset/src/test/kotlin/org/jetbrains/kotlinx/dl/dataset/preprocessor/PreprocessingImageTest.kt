@@ -1,7 +1,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.extension.set3D
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions
@@ -32,10 +32,10 @@ class PreprocessingImageTest {
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { 0f }.apply {
             for (i in 0..1)
                 for (j in 0..1)
-                    setRGB(i, j, Color.BLUE, imageShape, ColorOrder.BGR)
+                    setRGB(i, j, Color.BLUE, imageShape, ColorMode.BGR)
             for (i in 2..3)
                 for (j in 2..3)
-                    setRGB(i, j, Color.RED, imageShape, ColorOrder.BGR)
+                    setRGB(i, j, Color.RED, imageShape, ColorMode.BGR)
         }
         Assertions.assertArrayEquals(expectedImage, imageFloats)
     }
@@ -64,7 +64,7 @@ class PreprocessingImageTest {
         val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
         Assertions.assertEquals(ImageShape(1, 1, 3), imageShape)
 
-        val expectedImage = FloatArray(3).apply { setRGB(0, 0, Color.GREEN, imageShape, ColorOrder.BGR) }
+        val expectedImage = FloatArray(3).apply { setRGB(0, 0, Color.GREEN, imageShape, ColorMode.BGR) }
         Assertions.assertArrayEquals(expectedImage, imageFloats)
     }
 
@@ -87,8 +87,8 @@ class PreprocessingImageTest {
 
         Assertions.assertEquals(ImageShape(2, 2, 3), imageShape)
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { 0f }
-        expectedImage.setRGB(1, 0, Color.BLUE, imageShape, ColorOrder.BGR)
-        expectedImage.setRGB(0, 1, Color.RED, imageShape, ColorOrder.BGR)
+        expectedImage.setRGB(1, 0, Color.BLUE, imageShape, ColorMode.BGR)
+        expectedImage.setRGB(0, 1, Color.RED, imageShape, ColorMode.BGR)
         Assertions.assertArrayEquals(expectedImage, imageFloats)
     }
 
@@ -116,10 +116,10 @@ class PreprocessingImageTest {
         Assertions.assertEquals(ImageShape(9, 5, 3), imageShape)
 
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { Color.GRAY.red / 255f }
-        expectedImage.setRGB(3, 1, Color.BLUE, imageShape, ColorOrder.BGR)
-        expectedImage.setRGB(4, 1, Color.BLACK, imageShape, ColorOrder.BGR)
-        expectedImage.setRGB(4, 2, Color.RED, imageShape, ColorOrder.BGR)
-        expectedImage.setRGB(3, 2, Color.BLACK, imageShape, ColorOrder.BGR)
+        expectedImage.setRGB(3, 1, Color.BLUE, imageShape, ColorMode.BGR)
+        expectedImage.setRGB(4, 1, Color.BLACK, imageShape, ColorMode.BGR)
+        expectedImage.setRGB(4, 2, Color.RED, imageShape, ColorMode.BGR)
+        expectedImage.setRGB(3, 2, Color.BLACK, imageShape, ColorMode.BGR)
 
         Assertions.assertArrayEquals(expectedImage, imageFloats)
 
@@ -130,21 +130,21 @@ class PreprocessingImageTest {
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
         inputImage.setRGB(1, 1, Color.RED.rgb)
-        val rgbImage = Convert(colorOrder = ColorOrder.RGB).apply(inputImage)
+        val rgbImage = Convert(colorMode = ColorMode.RGB).apply(inputImage)
         val rgbImageFloats = ImageConverter.toNormalizedFloatArray(rgbImage)
 
         val imageShape = ImageShape(2, 2, 3)
         val expectedImageFloats = FloatArray(imageShape.numberOfElements.toInt()) { 0f }
-        expectedImageFloats.setRGB(0, 0, Color.BLUE, imageShape, ColorOrder.RGB)
-        expectedImageFloats.setRGB(1, 1, Color.RED, imageShape, ColorOrder.RGB)
+        expectedImageFloats.setRGB(0, 0, Color.BLUE, imageShape, ColorMode.RGB)
+        expectedImageFloats.setRGB(1, 1, Color.RED, imageShape, ColorMode.RGB)
         Assertions.assertArrayEquals(expectedImageFloats, rgbImageFloats)
     }
 
     companion object {
-        internal fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorOrder: ColorOrder) {
-            val colorComponents = when (colorOrder) {
-                ColorOrder.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
-                ColorOrder.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
+        internal fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorMode: ColorMode) {
+            val colorComponents = when (colorMode) {
+                ColorMode.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
+                ColorMode.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
             }
             for (i in colorComponents.indices) {
                 set3D(y, x, i, imageShape.width!!.toInt(), imageShape.channels.toInt(), colorComponents[i])

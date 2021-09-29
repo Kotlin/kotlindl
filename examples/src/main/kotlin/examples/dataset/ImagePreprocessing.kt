@@ -7,7 +7,7 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
@@ -50,7 +50,7 @@ fun main() {
                 outputHeight = 300
                 interpolation = InterpolationType.NEAREST
             }
-            convert { colorOrder = ColorOrder.BGR }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {

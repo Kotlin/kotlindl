@@ -5,7 +5,7 @@
 
 package examples.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.awt.Color
@@ -56,7 +56,7 @@ fun main() {
                 right = 10
                 mode = PaddingMode.Fill(Color.WHITE)
             }
-            convert { colorOrder = ColorOrder.BGR }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {

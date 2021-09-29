@@ -8,7 +8,7 @@ package examples.onnx.faces
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
@@ -50,7 +50,7 @@ class FacesTestSuite {
                             outputHeight = 192
                             outputWidth = 192
                         }
-                        convert { colorOrder = ColorOrder.BGR }
+                        convert { colorMode = ColorMode.BGR }
                     }
                 }
 

@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
@@ -86,7 +86,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
                     outputHeight = 1200
                     outputWidth = 1200
                 }
-                convert { colorOrder = ColorOrder.BGR }
+                convert { colorMode = ColorMode.BGR }
             }
         }
 

@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
@@ -72,7 +72,7 @@ fun denseNet169Prediction() {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
                 }
-                transformImage { convert { colorOrder = ColorOrder.BGR } }
+                transformImage { convert { colorMode = ColorMode.BGR } }
             }
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)

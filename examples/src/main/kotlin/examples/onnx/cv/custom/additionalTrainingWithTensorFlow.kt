@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
@@ -81,7 +81,7 @@ fun resnet50additionalTraining() {
                     outputWidth = IMAGE_SIZE.toInt()
                     interpolation = InterpolationType.BILINEAR
                 }
-                convert { colorOrder = ColorOrder.BGR }
+                convert { colorMode = ColorMode.BGR }
             }
             transformTensor {
                 sharpen {

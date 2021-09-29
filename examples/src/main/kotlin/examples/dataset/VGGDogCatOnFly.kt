@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
@@ -198,7 +198,7 @@ fun main() {
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.NEAREST
             }
-            convert { colorOrder = ColorOrder.BGR }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {
