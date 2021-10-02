@@ -48,7 +48,7 @@ public class ONNXModelHub(cacheDirectory: File) :
     @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
-        loadingMode: LoadingMode
+        loadingMode: LoadingMode,
     ): T {
         val modelFile = "/" + modelType.modelRelativePath + ".onnx"
 

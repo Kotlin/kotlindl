@@ -2,6 +2,9 @@ project.setDescription("This module contains the Kotlin API for loading and exec
 
 dependencies {
     api project(":api")
+
+    implementation 'io.github.microutils:kotlin-logging:2.0.11' // for logging
+
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
     implementation 'com.microsoft.onnxruntime:onnxruntime:1.9.0'
     implementation "org.jetbrains.kotlinx:multik-api:0.0.1"
