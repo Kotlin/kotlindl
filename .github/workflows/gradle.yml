@@ -24,33 +24,34 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-cache-
+            ${{ runner.os }}-gradle-
 
-      - name: Build
+
+      - name: Gradle Build
         #        Test takes too long on ci with github, maybe manually trigger with teamcity?
         run: ./gradlew build -x test
 
+
       - name: 'Upload API artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: 'API Jars'
           path: api/build/libs/*.jar
 
-
       - name: 'Upload DataSet artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: 'DataSet Jars'
           path: dataset/build/libs/*.jar
 
       - name: 'Upload Example artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: 'API Jars'
           path: examples/build/libs/*.jar
 
       - name: 'Upload ONNX artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: 'API Jars'
           path: onnx/build/libs/*.jar
