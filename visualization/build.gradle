@@ -12,10 +12,10 @@ dependencies {
     api 'org.jetbrains.lets-plot:lets-plot-common:2.0.4', excludeSLF4JImpl
     api 'org.jetbrains.lets-plot:lets-plot-kotlin-api:2.0.1', excludeSLF4JImpl
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.7.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-params:5.8.1'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 compileKotlin {
