@@ -47,11 +47,11 @@ jobs:
       - name: 'Upload Example artifacts'
         uses: actions/upload-artifact@v2
         with:
-          name: 'API Jars'
+          name: 'Example Jars'
           path: examples/build/libs/*.jar
 
       - name: 'Upload ONNX artifacts'
         uses: actions/upload-artifact@v2
         with:
-          name: 'API Jars'
+          name: 'ONNX Jars'
           path: onnx/build/libs/*.jar
