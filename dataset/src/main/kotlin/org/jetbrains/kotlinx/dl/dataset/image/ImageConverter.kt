@@ -12,6 +12,7 @@ import java.awt.image.DataBufferByte
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.util.*
 import javax.imageio.ImageIO
 
 
@@ -57,25 +58,22 @@ public object ImageConverter {
     }
 
     private fun imageToByteArray(image: BufferedImage, colorOrder: ColorOrder): ByteArray {
-        var res = (image.raster.dataBuffer as DataBufferByte).data // pixels
         check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
         check(image.type == TYPE_3BYTE_BGR) { "Images with image type (constant from BufferedImage class) ${image.type} are not supported!" }
 
+        val res = (image.raster.dataBuffer as DataBufferByte).data // pixels
         if (image.type == TYPE_3BYTE_BGR && colorOrder == ColorOrder.RGB) {
-            res = swapRandB(res)
+            return Arrays.copyOf(res, res.size).also { swapRandB(it) }
         }
         return res
     }
 
-    private fun swapRandB(res: ByteArray): ByteArray {
-        for (i in res.indices) {
-            if (i % 3 == 2) { // swap i and i-2 elements from BGR to RGB
-                val tmp = res[i]
-                res[i] = res[i - 2]
-                res[i - 2] = tmp
-            }
+    private fun swapRandB(res: ByteArray) {
+        for (i in res.indices step 3) {
+            val tmp = res[i]
+            res[i] = res[i + 2]
+            res[i + 2] = tmp
         }
-        return res
     }
 
     /** Converts [image] with [colorOrder] to the 3D array. */
