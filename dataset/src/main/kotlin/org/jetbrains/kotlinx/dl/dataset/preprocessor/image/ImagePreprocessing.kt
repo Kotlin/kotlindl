@@ -56,3 +56,7 @@ public fun ImagePreprocessing.convert(block: Convert.() -> Unit) {
 public fun ImagePreprocessing.grayscale() {
     addOperation(Convert(colorMode = ColorMode.GRAYSCALE))
 }
+
+public fun ImagePreprocessing.centerCrop(block: CenterCrop.() -> Unit) {
+    addOperation(CenterCrop().apply(block))
+}
