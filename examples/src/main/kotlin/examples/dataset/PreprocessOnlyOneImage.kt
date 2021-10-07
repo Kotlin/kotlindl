@@ -8,6 +8,7 @@ package examples.dataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import java.awt.Color
 import java.io.File
 import javax.swing.JFrame
 
@@ -48,6 +49,13 @@ fun main() {
                 save {
                     dirLocation = preprocessedImagesDirectory
                 }
+            }
+            pad {
+                top = 10
+                bottom = 40
+                left = 10
+                right = 10
+                mode = PaddingMode.Fill(Color.WHITE)
             }
         }
         transformTensor {

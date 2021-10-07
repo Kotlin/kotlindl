@@ -131,4 +131,23 @@ class PreprocessingFinalShapeTest {
         }
         assertEquals(ImageShape(200, 200, 3), preprocess.finalShape)
     }
+
+    @Test
+    fun padImage() {
+        val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(300, 200, 1)
+            }
+            transformImage {
+                pad {
+                    top = 5
+                    bottom = 7
+                    left = 11
+                    right = 13
+                }
+            }
+        }
+        assertEquals(ImageShape(324, 212, 1), preprocess.finalShape)
+    }
 }

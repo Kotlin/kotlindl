@@ -2,10 +2,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.extension.set3D
 import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.crop
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.rotate
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -101,6 +98,42 @@ class PreprocessingImageTest {
         expectedImage.setRGB(1, 0, Color.BLUE, imageShape, ColorOrder.BGR)
         expectedImage.setRGB(0, 1, Color.RED, imageShape, ColorOrder.BGR)
         Assertions.assertArrayEquals(expectedImage, imageFloats)
+    }
+
+    @Test
+    fun constantPaddingTest() {
+        val preprocess = preprocess {
+            load {
+                colorMode = ColorOrder.BGR
+            }
+            transformImage {
+                pad {
+                    top = 1
+                    bottom = 2
+                    left = 3
+                    right = 4
+                    mode = PaddingMode.Fill(Color.GRAY)
+                }
+            }
+            transformTensor {
+                rescale { }
+            }
+        }
+        val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
+        inputImage.setRGB(0, 0, Color.BLUE.rgb)
+        inputImage.setRGB(1, 1, Color.RED.rgb)
+        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+
+        Assertions.assertEquals(ImageShape(9, 5, 3), imageShape)
+
+        val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { Color.GRAY.red / 255f }
+        expectedImage.setRGB(3, 1, Color.BLUE, imageShape, ColorOrder.BGR)
+        expectedImage.setRGB(4, 1, Color.BLACK, imageShape, ColorOrder.BGR)
+        expectedImage.setRGB(4, 2, Color.RED, imageShape, ColorOrder.BGR)
+        expectedImage.setRGB(3, 2, Color.BLACK, imageShape, ColorOrder.BGR)
+
+        Assertions.assertArrayEquals(expectedImage, imageFloats)
+
     }
 
     private fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorOrder: ColorOrder) {
