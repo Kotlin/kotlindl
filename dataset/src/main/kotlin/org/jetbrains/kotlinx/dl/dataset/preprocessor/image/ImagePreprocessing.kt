@@ -39,3 +39,8 @@ public fun ImagePreprocessing.crop(block: Cropping.() -> Unit) {
 public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
     addOperation(Resize().apply(block))
 }
+
+/** */
+public fun ImagePreprocessing.pad(block: Padding.() -> Unit) {
+    addOperation(Padding().apply(block))
+}
