@@ -15,6 +15,9 @@ jobs:
       - name: CheckOut
         uses: actions/checkout@v2
 
+      - name: Gradle wrapper validation
+        uses: gradle/wrapper-validation-action@v1
+
 
       - name: Gradle cache
         uses: actions/cache@v2
