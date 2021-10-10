@@ -21,8 +21,6 @@ public interface ImageSaver {
  * This [ImageSaver] allows saving image preprocessing result to file or directory in jpg format.
  *
  * @property [dirLocation] Could be link to the file or directory.
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Save(
     public var dirLocation: File? = null
