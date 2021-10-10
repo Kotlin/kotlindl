@@ -31,5 +31,5 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) : Prepro
 
 /** Image DSL Preprocessing extension.*/
 public fun TensorPreprocessing.transpose(sharpBlock: Transpose.() -> Unit) {
-    addOperation(CustomPreprocessor(Transpose().apply(sharpBlock)))
+    addOperation(Transpose().apply(sharpBlock))
 }
