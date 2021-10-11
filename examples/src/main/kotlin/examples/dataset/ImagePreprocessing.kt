@@ -7,7 +7,7 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
@@ -33,7 +33,6 @@ fun main() {
         load {
             pathToData = imageDirectory
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
             labelGenerator = EmptyLabels()
         }
         transformImage {
@@ -51,6 +50,7 @@ fun main() {
                 outputHeight = 300
                 interpolation = InterpolationType.NEAREST
             }
+            grayscale()
         }
         transformTensor {
             rescale {
@@ -67,7 +67,7 @@ fun main() {
     val rawImage = batchIter.next().x[2]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape))
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.GRAYSCALE))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

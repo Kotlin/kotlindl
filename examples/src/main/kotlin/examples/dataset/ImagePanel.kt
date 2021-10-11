@@ -1,15 +1,16 @@
 package examples.dataset
 
-import org.jetbrains.kotlinx.dl.api.extension.get3D
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.image.imageType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import javax.swing.JPanel
 
-class ImagePanel(image: FloatArray, imageShape: ImageShape) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
+class ImagePanel(image: FloatArray, imageShape: ImageShape, colorMode: ColorMode) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape, colorMode)
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
@@ -23,15 +24,12 @@ class ImagePanel(image: FloatArray, imageShape: ImageShape) : JPanel() {
     }
 }
 
-private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
-    val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
-    for (i in 0 until imageShape.height!!.toInt()) { // rows
-        for (j in 0 until imageShape.width!!.toInt()) { // columns
-            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            result.setRGB(j, i, Color(r, g, b).rgb)
-        }
+private fun FloatArray.toBufferedImage(imageShape: ImageShape, colorMode: ColorMode): BufferedImage {
+    val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), colorMode.imageType())
+    val rgbArray = copyOf().also {
+        if (colorMode == ColorMode.BGR) ImageConverter.swapRandB(it)
     }
+    rgbArray.forEachIndexed { index, value -> rgbArray[index] = value * 255f }
+    result.raster.setPixels(0, 0, result.width, result.height, rgbArray)
     return result
 }

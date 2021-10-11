@@ -14,9 +14,9 @@ public data class ImageShape(
     /** */
     public val height: Long? = null,
     /** */
-    public val channels: Long = 3
+    public val channels: Long? = 3
 ) {
     /** Returns number of elements in tensor with the given shape. */
     public val numberOfElements: Long
-        get() = width!! * height!! * channels
+        get() = width!! * height!! * channels!!
 }
