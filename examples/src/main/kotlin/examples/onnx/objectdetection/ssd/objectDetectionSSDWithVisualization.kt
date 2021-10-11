@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
@@ -50,13 +50,13 @@ private fun visualise(
         load {
             pathToData = imageFile
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             resize {
                 outputWidth = 1200
                 outputHeight = 1200
             }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {

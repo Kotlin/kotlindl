@@ -21,8 +21,6 @@ import java.awt.image.BufferedImage
  * @property [bottom] The image will be cropped from the bottom by the given number of pixels.
  * @property [left] The image will be cropped from the left by the given number of pixels.
  * @property [right] The image will be cropped from the right by the given number of pixels.
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Cropping(
     public var top: Int = 1,
@@ -34,9 +32,9 @@ public class Cropping(
     override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
         if (inputShape == null) return null
         return ImageShape(
-            width = inputShape.width?.let { it - left - right },
-            height = inputShape.height?.let { it - top - bottom },
-            channels = 3
+            width = inputShape.width?.minus(left)?.minus(right),
+            height = inputShape.height?.minus(top)?.minus(bottom),
+            channels = inputShape.channels
         )
     }
 
@@ -47,7 +45,7 @@ public class Cropping(
             left, top, croppedImageShape.width!!.toInt(), croppedImageShape.height!!.toInt(),
         )
 
-        val croppedImage = BufferedImage(img.width, img.height, BufferedImage.TYPE_3BYTE_BGR)
+        val croppedImage = BufferedImage(img.width, img.height, image.type)
         val g: Graphics = croppedImage.createGraphics()
         g.drawImage(img, 0, 0, null)
 

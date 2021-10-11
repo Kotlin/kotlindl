@@ -10,8 +10,9 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 
 /**
@@ -67,8 +68,8 @@ public class ImageRecognitionModel(
             load {
                 pathToData = imageFile
                 imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
-                colorMode = ColorOrder.BGR
             }
+            transformImage { convert { colorMode = ColorMode.BGR } }
         }
 
         return modelType.preprocessInput(preprocessing)
@@ -84,8 +85,8 @@ public class ImageRecognitionModel(
             load {
                 pathToData = imageFile
                 imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
-                colorMode = ColorOrder.BGR
             }
+            transformImage { convert { colorMode = ColorMode.BGR } }
         }
 
         val inputData = modelType.preprocessInput(preprocessing)

@@ -8,8 +8,9 @@ package examples.onnx.objectdetection.ssd
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -32,13 +33,13 @@ fun predictionSSD() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
                 transformImage {
                     resize {
                         outputHeight = 1200
                         outputWidth = 1200
                     }
+                    convert { colorMode = ColorMode.BGR }
                 }
             }
 

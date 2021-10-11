@@ -207,7 +207,7 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
         val (data, shape) = preprocessing()
         return preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels)
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         ) // TODO: need to be 4 or 3 in all cases
     }
 

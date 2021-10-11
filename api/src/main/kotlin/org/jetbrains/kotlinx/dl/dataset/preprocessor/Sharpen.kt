@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
  */
 public class Sharpen(public var modelType: ModelType<*, *> = TFModels.CV.VGG16) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
+        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels!!)
         return modelType.preprocessInput(data, tensorShape)
     }
 }

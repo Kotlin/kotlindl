@@ -23,7 +23,7 @@ import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.io.File
@@ -188,7 +188,6 @@ fun main() {
         load {
             pathToData = File(cifarImagesArchive)
             imageShape = ImageShape(32, 32, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             crop {
@@ -205,6 +204,7 @@ fun main() {
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.NEAREST
             }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {

@@ -23,8 +23,6 @@ import java.awt.image.BufferedImage
  * @property [interpolation] Interpolation algorithm.
  * @property [renderingSpeed] Speed of preprocessing.
  * @property [enableAntialiasing] The image will be cropped from the right by the given number of pixels.
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Resize(
     public var outputWidth: Int = 100,
@@ -35,11 +33,11 @@ public class Resize(
 ) : ImagePreprocessorBase() {
 
     override fun getOutputShape(inputShape: ImageShape?): ImageShape {
-        return ImageShape(outputWidth.toLong(), outputHeight.toLong(), 3)
+        return ImageShape(outputWidth.toLong(), outputHeight.toLong(), inputShape?.channels)
     }
 
     override fun apply(image: BufferedImage): BufferedImage {
-        val resizedImage = BufferedImage(outputWidth, outputHeight, BufferedImage.TYPE_3BYTE_BGR)
+        val resizedImage = BufferedImage(outputWidth, outputHeight, image.type)
         val graphics2D = resizedImage.createGraphics()
 
         val renderingHint = when (interpolation) {

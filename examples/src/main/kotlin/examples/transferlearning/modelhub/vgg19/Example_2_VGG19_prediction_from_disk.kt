@@ -18,6 +18,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.FileReader
@@ -57,7 +58,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream, colorMode = ColorMode.BGR)
 
             val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
 
