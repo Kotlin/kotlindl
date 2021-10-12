@@ -12,13 +12,19 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv1DTest : ConvLayerTest() {
+    private fun createFloatConv1DTensor(
+        batchSize: Int,
+        size: Int,
+        channels: Int,
+        initValue: Float
+    ) = Array(batchSize) { Array(size) { FloatArray(channels) { initValue } } }
 
     @Test
     fun zeroedInputTensorWithDefaultValues() {
         val input = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 0.0f)
         val expected = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 32, initValue = 0.0f)
 
-        assertFloatConv1DTensorsEquals(
+        assertTensorsEquals(
             Conv1D(
                 name = "TestConv1D_1",
                 biasInitializer = Zeros()
@@ -33,7 +39,7 @@ internal class Conv1DTest : ConvLayerTest() {
         val input = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 1.0f)
         val expected = createFloatConv1DTensor(batchSize = 1, size = 2, channels = 16, initValue = 2.0f)
 
-        assertFloatConv1DTensorsEquals(
+        assertTensorsEquals(
             Conv1D(
                 name = "TestConv1D_2",
                 filters = 16,
@@ -58,7 +64,7 @@ internal class Conv1DTest : ConvLayerTest() {
         )
         val expected = arrayOf(arrayOf(floatArrayOf(input.sum())))
 
-        assertFloatConv1DTensorsEquals(
+        assertTensorsEquals(
             Conv1D(
                 name = "TestConv1D_3",
                 filters = 1,

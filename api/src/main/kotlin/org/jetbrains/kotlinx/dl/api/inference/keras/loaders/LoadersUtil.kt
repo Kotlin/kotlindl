@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
+import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 
@@ -78,7 +78,7 @@ public fun torchStylePreprocessing(
         }
     }
 
-    return reshape3DTo1D(reshapedInput, height * width * channels)
+    return reshapedInput.flattenFloats()
 }
 
 /** Caffe-style preprocessing. */
@@ -127,7 +127,7 @@ public fun caffeStylePreprocessing(
         }
     }
 
-    return reshape3DTo1D(reshapedInput, height * width * channels)
+    return reshapedInput.flattenFloats()
 }
 
 /** Reshapes [inputData] according [imageShape]. */

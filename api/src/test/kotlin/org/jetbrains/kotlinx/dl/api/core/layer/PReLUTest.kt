@@ -8,7 +8,9 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.RandomUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
-import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
@@ -77,12 +79,11 @@ class PReLUTest : LayerTest() {
             alphaTensor.close()
         }
 
-        val expected = getFloatArrayOfShape(input.shape).cast3D<FloatArray>()
-        for (i in expected.indices) {
-            for (j in expected[i].indices) {
-                for (k in expected[i][j].indices) {
+        val expected = Array(inputShape[0].toInt()) { i ->
+            Array(inputShape[1].toInt()) { j ->
+                FloatArray(inputShape[2].toInt()) { k ->
                     val it = input[i][j][k]
-                    expected[i][j][k] = if (it < 0) it * alpha[0][k] else it
+                    if (it < 0) it * alpha[0][k] else it
                 }
             }
         }
