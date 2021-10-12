@@ -36,47 +36,18 @@ public class Reshape(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
-        units = when (targetShape.size) {
-            1 -> tf.constant(intArrayOf(-1, targetShape[0]))
-            2 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1]))
-            3 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1], targetShape[2]))
-            4 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1], targetShape[2], targetShape[3]))
-            5 -> tf.constant(
-                intArrayOf(
-                    -1,
-                    targetShape[0],
-                    targetShape[1],
-                    targetShape[2],
-                    targetShape[3],
-                    targetShape[4]
-                )
-            )
-            else -> throw UnsupportedOperationException("Reshaping for ${targetShape.size} is not supported yet!")
-        }
+
+        units = tf.constant(IntArray(targetShape.size + 1) {
+            if (it == 0) -1 else targetShape[it - 1]
+        })
 
         fanIn = tensorShape.numElements().toInt()
         fanOut = amountOfNeuronsInFlattenLayer
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        // leaves unknown dimensions unknown
-        val tensorShape = TensorShape(inputShape)
-        return when (targetShape.size) {
-            3 -> Shape.make(
-                tensorShape.head(),
-                targetShape[0].toLong(),
-                targetShape[1].toLong(),
-                targetShape[2].toLong()
-            )
-            2 -> Shape.make(
-                tensorShape.head(),
-                targetShape[0].toLong(),
-                targetShape[1].toLong(),
-            )
-            1 -> Shape.make(tensorShape.head(), targetShape[0].toLong())
-            else -> throw UnsupportedOperationException("Input shape with ${targetShape.size} dimensions is not supported.")
-        }
-    }
+    // leaves unknown dimensions unknown
+    override fun computeOutputShape(inputShape: Shape): Shape =
+        Shape.make(inputShape.size(0), *targetShape.map { it.toLong() }.toLongArray())
 
     override fun forward(
         tf: Ops,
