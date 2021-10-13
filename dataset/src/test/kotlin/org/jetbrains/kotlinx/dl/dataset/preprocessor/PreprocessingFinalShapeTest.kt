@@ -143,4 +143,18 @@ class PreprocessingFinalShapeTest {
         }
         assertEquals(ImageShape(324, 212, 1), preprocess.finalShape)
     }
+
+    @Test
+    fun centerCropImage() {
+        val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(10, 20, 1)
+            }
+            transformImage {
+                centerCrop { size = 15 }
+            }
+        }
+        assertEquals(ImageShape(15, 15, 1), preprocess.finalShape)
+    }
 }
