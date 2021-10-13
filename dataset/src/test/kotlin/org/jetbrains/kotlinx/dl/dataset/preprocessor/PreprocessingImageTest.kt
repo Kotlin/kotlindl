@@ -171,6 +171,35 @@ class PreprocessingImageTest {
         Assertions.assertArrayEquals(expectedImage, imageFloats)
     }
 
+    @Test
+    fun centerCropTest() {
+        val preprocess = preprocess {
+            transformImage {
+                centerCrop { size = 2 }
+            }
+            transformTensor {
+                rescale { }
+            }
+        }
+
+        val color1 = Color(50, 150, 200)
+        val color2 = Color(10, 190, 70)
+        val color3 = Color(210, 40, 40)
+
+        val inputImage = BufferedImage(1, 3, BufferedImage.TYPE_3BYTE_BGR)
+        inputImage.setRGB(0, 0, color1.rgb)
+        inputImage.setRGB(0, 1, color2.rgb)
+        inputImage.setRGB(0, 2, color3.rgb)
+
+        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        Assertions.assertEquals(ImageShape(2, 2, 3), imageShape)
+
+        val expectedImage = FloatArray(12)
+        expectedImage.setRGB(0, 0, color1, imageShape, ColorMode.BGR)
+        expectedImage.setRGB(0, 1, color2, imageShape, ColorMode.BGR)
+        Assertions.assertArrayEquals(expectedImage, imageFloats)
+    }
+
     companion object {
         internal fun FloatArray.setRGB(x: Int, y: Int, color: Color, imageShape: ImageShape, colorMode: ColorMode) {
             val colorComponents = when (colorMode) {

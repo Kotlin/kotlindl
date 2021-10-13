@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.image.getShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
@@ -97,8 +98,4 @@ public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {
 /** */
 public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) {
     tensorPreprocessingStage = TensorPreprocessing().apply(block)
-}
-
-internal fun BufferedImage.getShape(): ImageShape {
-    return ImageShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
 }

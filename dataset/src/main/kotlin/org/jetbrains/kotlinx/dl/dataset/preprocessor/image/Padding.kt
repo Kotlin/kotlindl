@@ -1,5 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.dataset.image.draw
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Color
 import java.awt.Graphics2D
@@ -64,13 +65,4 @@ public sealed interface PaddingMode {
      * Pad with black.
      */
     public object Black : Fill(Color.BLACK)
-}
-
-private fun BufferedImage.draw(block: (Graphics2D) -> Unit) {
-    val graphics2D = createGraphics()
-    try {
-        block(graphics2D)
-    } finally {
-        graphics2D.dispose()
-    }
 }
