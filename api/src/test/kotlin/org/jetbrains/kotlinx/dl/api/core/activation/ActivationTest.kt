@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.core.activation
 
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
@@ -18,29 +20,56 @@ open class ActivationTest {
         actual: FloatArray,
         expected: FloatArray
     ) {
+        assertActivationFunction(instance, input, expected)
+    }
+
+    protected fun assertActivationFunction(
+        act: Activation,
+        inp: FloatArray,
+        exp: FloatArray
+    ) {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-
-            val operand = instance.apply(tf, tf.constant(input))
-            operand.asOutput().tensor().copyTo(actual)
-
-            Assertions.assertArrayEquals(
-                expected,
-                actual,
-                EPS
-            )
+            Assertions.assertArrayEquals(exp, act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp), EPS)
         }
     }
 
-    protected fun Activation.apply(input: FloatArray): FloatArray = EagerSession.create().use { session ->
-        val tf = Ops.create(session)
+    protected fun assertActivationFunction(
+        act: Activation,
+        inp: Array<FloatArray>,
+        exp: Array<FloatArray>
+    ) {
+        /**
+         * Accepts 2D float input values
+         */
 
-        val operand = this.apply(tf, tf.constant(input))
-
-        operand.asOutput().tensor().copyTo(FloatArray(input.size))
+        // Higher Dimensional assertArrayEquals have no delta option
+        // Due to numeric instability we loop and use 1D version with EPS value
+        EagerSession.create().use { session ->
+            val tf = Ops.create(session)
+            val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
+            for (i in 0..exp.lastIndex) {
+                Assertions.assertArrayEquals(exp[i], actual[i], EPS)
+            }
+        }
     }
 
-    protected fun assertActivationFunction(activation: Activation, input: FloatArray, expected: FloatArray) {
-        Assertions.assertArrayEquals(expected, activation.apply(input), EPS)
+    protected fun assertActivationFunction(
+        act: Activation,
+        inp: Array<Array<FloatArray>>,
+        exp: Array<Array<FloatArray>>
+    ) {
+        /**
+         * Accepts 3D float input values
+         */
+        EagerSession.create().use { session ->
+            val tf = Ops.create(session)
+            val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
+            for (i in 0..exp.lastIndex) {
+                for (j in 0..exp[i].lastIndex) {
+                    Assertions.assertArrayEquals(exp[i][j], actual[i][j], EPS)
+                }
+            }
+        }
     }
 }
