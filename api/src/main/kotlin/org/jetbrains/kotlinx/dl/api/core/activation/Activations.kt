@@ -5,8 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.activation
 
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
-import org.tensorflow.*
+import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Stack
 

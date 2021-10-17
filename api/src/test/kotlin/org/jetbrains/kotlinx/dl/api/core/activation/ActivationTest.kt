@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.activation
 
-import org.jetbrains.kotlinx.dl.api.core.shape.shape
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
