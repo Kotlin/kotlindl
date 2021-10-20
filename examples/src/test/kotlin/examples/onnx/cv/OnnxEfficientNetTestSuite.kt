@@ -5,10 +5,8 @@
 
 package examples.onnx.cv
 
-import examples.onnx.cv.custom.efficientnet.efficientNetB0AdditionalTraining
-import examples.onnx.cv.custom.efficientnet.efficientNetB0Prediction
-import examples.onnx.cv.custom.efficientnet.runONNXAdditionalTraining
-import examples.onnx.cv.custom.efficientnet.runONNXImageRecognitionPrediction
+import examples.onnx.cv.custom.efficientnet.*
+import examples.onnx.cv.resnet.resnet18easyPrediction
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
@@ -21,6 +19,11 @@ class OnnxEfficientNetTestSuite {
     @Test
     fun efficientNetB0AdditionalTrainingTest() {
         efficientNetB0AdditionalTraining()
+    }
+
+    @Test
+    fun efficientNetB0EasyPredictionTest() {
+        efficientNetB0EasyPrediction()
     }
 
     @Test
@@ -91,6 +94,11 @@ class OnnxEfficientNetTestSuite {
     @Test
     fun efficientNetB7AdditionalTrainingTest() {
         runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB7noTop, resizeTo = Pair(600, 600))
+    }
+
+    @Test
+    fun efficientNetB7EasyPredictionTest() {
+        efficientNetB7EasyPrediction()
     }
 }
 

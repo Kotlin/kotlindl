@@ -29,8 +29,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 64
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
