@@ -28,7 +28,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 10 // TODO: bug if 64
+private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
@@ -39,13 +39,13 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * This is a simple model based on Dense layers only.
  */
 private val topModel = Sequential.of(
-    Input(7, 7, 2048),
+    Input(7, 7, 1280),
     GlobalAvgPool2D(),
     Dense(NUM_CLASSES, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
 )
 
 /**
- * This examples demonstrates the transfer learning concept on ResNet'50 model:
+ * This examples demonstrates the transfer learning concept on EfficientNetB0 model:
  * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - ONNX frozen model is used as a preprocessing stage via `onnx` stage of the Image Preprocessing DSL.
