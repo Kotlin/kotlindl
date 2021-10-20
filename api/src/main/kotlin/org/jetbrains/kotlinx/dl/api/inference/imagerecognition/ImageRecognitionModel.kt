@@ -12,7 +12,9 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 /**
@@ -64,12 +66,25 @@ public class ImageRecognitionModel(
     }
 
     private fun preprocessData(imageFile: File): FloatArray {
+        val (weight, height) = if (modelType.channelsFirst)
+            Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])
+        else
+            Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
+
+
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
+                imageShape = ImageShape(null, null, 3)
             }
-            transformImage { convert { colorMode = ColorMode.BGR } }
+            transformImage {
+                resize {
+                    outputHeight = height.toInt()
+                    outputWidth = weight.toInt()
+                    interpolation = InterpolationType.BILINEAR
+                }
+                convert { colorMode = ColorMode.BGR }
+            }
         }
 
         return modelType.preprocessInput(preprocessing)
@@ -81,15 +96,7 @@ public class ImageRecognitionModel(
      * @return The label of the recognized object with the highest probability.
      */
     public fun predictObject(imageFile: File): String {
-        val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3) // TODO: it should be empty or became a parameter
-            }
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
-
-        val inputData = modelType.preprocessInput(preprocessing)
+        val inputData = preprocessData(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
     }
 }
