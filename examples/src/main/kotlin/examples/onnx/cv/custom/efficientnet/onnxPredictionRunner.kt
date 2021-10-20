@@ -10,25 +10,20 @@ import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import java.net.URISyntaxException
+import java.net.URL
 
-private const val IMAGE_SIZE = 260L
-
-/**
- * This examples demonstrates the inference concept on ResNet'50 (exported from Keras to ONNX) model:
- * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
- * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
- */
-
-fun efficientNetB2Prediction() {
+fun runONNXImageRecognitionPrediction(
+    modelType: ONNXModels.CV<out OnnxInferenceModel>,
+    resizeTo: Pair<Int, Int> = Pair(224, 224)
+) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.EfficientNetB2
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = loadImageNetClassLabels()
@@ -37,20 +32,7 @@ fun efficientNetB2Prediction() {
         println(it)
 
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                }
-                transformImage {
-                    resize {
-                        outputHeight = IMAGE_SIZE.toInt()
-                        outputWidth = IMAGE_SIZE.toInt()
-                        interpolation = InterpolationType.BILINEAR
-                    }
-                    convert { colorMode = ColorMode.BGR }
-                }
-            }
+            val preprocessing: Preprocessing = preprocessing(resizeTo, i)
 
             val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
 
@@ -64,6 +46,33 @@ fun efficientNetB2Prediction() {
     }
 }
 
-/** */
-fun main(): Unit = efficientNetB2Prediction()
-
+// TODO: copy-paste from predictionRunner (refactor it)
+private fun preprocessing(
+    resizeTo: Pair<Int, Int>,
+    i: Int
+): Preprocessing {
+    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        preprocess {
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+            }
+            transformImage { convert { colorMode = ColorMode.BGR } }
+        }
+    } else {
+        preprocess {
+            load {
+                pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
+                imageShape = ImageShape(224, 224, 3)
+            }
+            transformImage {
+                resize {
+                    outputWidth = resizeTo.first
+                    outputHeight = resizeTo.second
+                }
+                convert { colorMode = ColorMode.BGR }
+            }
+        }
+    }
+    return preprocessing
+}
