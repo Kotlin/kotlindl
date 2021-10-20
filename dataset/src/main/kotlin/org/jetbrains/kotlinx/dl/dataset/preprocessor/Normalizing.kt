@@ -37,6 +37,8 @@ public class Normalizing : Preprocessor {
 /**
  * Computes mean value for each channel of the provided arrays.
  *
+ * NOTE: might be migrated to multik in the future.
+ *
  * @param [arrays] input arrays. Size of each array should be divisible by the passed [channels] number.
  * @param [channels] number of channels to compute mean value for.
  * @return an array of size [channels] containing mean value for each channel.
@@ -59,6 +61,8 @@ public fun mean(vararg arrays: FloatArray, channels: Int = 1): FloatArray {
 
 /**
  * Computes std value for each channel of the provided arrays.
+ *
+ * NOTE: might be migrated to multik in the future.
  *
  * @param [arrays] input arrays. Size of each array should be divisible by the passed [channels] number.
  * @param [channels] number of channels to compute std value for.
@@ -85,6 +89,8 @@ public fun std(vararg arrays: FloatArray, channels: Int = 1): FloatArray {
 /**
  * Computes mean value for each channel of the array. Array size should be divisible by the passed [channels] number.
  *
+ * NOTE: might be migrated to multik in the future.
+ *
  * @param [channels] number of channels to compute mean value for.
  * @return an array of size [channels] containing mean value for each channel.
  */
@@ -92,6 +98,8 @@ public fun FloatArray.mean(channels: Int = 1): FloatArray = mean(this, channels 
 
 /**
  * Computes std value for each channel of the array. Array size should be divisible by the passed [channels] number.
+ *
+ * NOTE: might be migrated to multik in the future.
  *
  * @param [channels] number of channels to compute std value for.
  * @return an array of size [channels] containing std value for each channel.
