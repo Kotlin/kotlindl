@@ -27,6 +27,10 @@ public fun TensorPreprocessing.rescale(block: Rescaling.() -> Unit) {
     addOperation(Rescaling().apply(block))
 }
 
+public fun TensorPreprocessing.normalize(block: Normalizing.() -> Unit) {
+    addOperation(Normalizing().apply(block))
+}
+
 
 
 
