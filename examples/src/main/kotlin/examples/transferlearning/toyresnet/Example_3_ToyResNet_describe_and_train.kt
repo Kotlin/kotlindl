@@ -6,7 +6,6 @@
 package examples.transferlearning.toyresnet
 
 
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
@@ -21,6 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
+import org.jetbrains.kotlinx.dl.api.extension.dsl.functional
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 
@@ -139,45 +139,51 @@ internal val dense_2 = Dense(
     biasInitializer = Constant(0.1f),
     name = "dense_2"
 )
-private val model = Functional.of(
-    input,
-    conv2D_1(input),
-    conv2D_2(conv2D_1),
-    maxPool2D(conv2D_2),
-    conv2D_4(maxPool2D),
-    conv2D_5(conv2D_4),
-    add(conv2D_5, maxPool2D),
-    conv2D_6(add),
-    conv2D_7(conv2D_6),
-    add_1(conv2D_7, add),
-    conv2D_8(add_1),
-    globalAvgPool2D(conv2D_8),
-    dense_1(globalAvgPool2D),
-    dense_2(dense_1)
-)
+
 
 fun main() {
-    val (train, test) = fashionMnist()
 
-    model.use {
-        it.compile(
-            optimizer = Adam(),
-            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Metrics.ACCURACY
-        )
+    functional {
+        layers {
+            +input
+            +conv2D_1(input)
+            +conv2D_2(conv2D_1)
+            +maxPool2D(conv2D_2)
+            +conv2D_4(maxPool2D)
+            +conv2D_5(conv2D_4)
+            +add(conv2D_5, maxPool2D)
+            +conv2D_6(add)
+            +conv2D_7(conv2D_6)
+            +add_1(conv2D_7, add)
+            +conv2D_8(add_1)
+            +globalAvgPool2D(conv2D_8)
+            +dense_1(globalAvgPool2D)
+            +dense_2(dense_1)
+        }
 
-        it.logSummary()
+        use {
+            val (train, test) = fashionMnist()
 
-        it.init()
-        var accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
 
-        println("Accuracy before: $accuracy")
+            logSummary()
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+            init()
+            var accuracy = evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            println("Accuracy before: $accuracy")
 
-        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-        println("Accuracy after: $accuracy")
+            accuracy = evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+            println("Accuracy after: $accuracy")
+
+        }
     }
+
 }
 
