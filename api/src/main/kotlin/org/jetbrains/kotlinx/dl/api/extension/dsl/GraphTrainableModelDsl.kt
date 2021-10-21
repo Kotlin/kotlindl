@@ -9,6 +9,7 @@ public class GraphTrainableModelDsl<T : GraphTrainableModel>(private val initial
 
     private var handler: T.() -> Unit = {}
     private var layerProvider: LayerBuilder.() -> Unit = {}
+    private var use: ((T) -> Unit)? = null
 
     public fun model(builder: T.() -> Unit) {
         this.handler = builder
@@ -18,7 +19,13 @@ public class GraphTrainableModelDsl<T : GraphTrainableModel>(private val initial
         this.layerProvider = builder
     }
 
-    public fun build(): T = initializer.invoke(LayerBuilder().apply(layerProvider).toArray()).apply(handler)
+    public fun use(builder: T.() -> Unit) {
+        use = builder
+    }
+
+    public fun build(): T = initializer.invoke(LayerBuilder().apply(layerProvider).toArray()).apply(handler).apply {
+        use?.let { use(it) }
+    }
 }
 
 @JvmInline
