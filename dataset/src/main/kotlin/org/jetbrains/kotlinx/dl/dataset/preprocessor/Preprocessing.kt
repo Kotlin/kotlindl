@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -31,13 +31,13 @@ public class Preprocessing {
     /** Returns the final shape of data when image preprocessing is applied to the image. */
     public val finalShape: ImageShape
         get() {
-            var imageShape = if (::load.isInitialized) load.imageShape else null
+            var imageShape = if (::load.isInitialized) load.imageShape ?: ImageShape() else ImageShape()
             if (::imagePreprocessingStage.isInitialized) {
                 for (operation in imagePreprocessingStage.operations) {
                     imageShape = operation.getOutputShape(imageShape)
                 }
             }
-            if (imageShape == null) {
+            if (imageShape.width == null && imageShape.height == null && imageShape.channels == null) {
                 throw IllegalStateException(
                     "Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
                             "or imageShape with height, weight and channels should be initialized."
