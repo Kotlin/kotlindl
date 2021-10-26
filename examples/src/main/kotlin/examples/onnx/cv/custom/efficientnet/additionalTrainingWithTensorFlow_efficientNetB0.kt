@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.custom
+package examples.onnx.cv.custom.efficientnet
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
@@ -29,25 +28,25 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val EPOCHS = 3
-private const val TRAINING_BATCH_SIZE = 16
+private const val EPOCHS = 1
+private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 64L
+private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 /**
  * This is a simple model based on Dense layers only.
  */
 private val topModel = Sequential.of(
-    Input(2, 2, 2048),
+    Input(7, 7, 1280),
     GlobalAvgPool2D(),
     Dense(NUM_CLASSES, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
 )
 
 /**
- * This examples demonstrates the transfer learning concept on ResNet'50 model:
+ * This examples demonstrates the transfer learning concept on EfficientNetB0 model:
  * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - ONNX frozen model is used as a preprocessing stage via `onnx` stage of the Image Preprocessing DSL.
@@ -58,16 +57,14 @@ private val topModel = Sequential.of(
  * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
-fun resnet50additionalTraining() {
+fun efficientNetB0AdditionalTraining() {
     val modelHub = ONNXModelHub(
         cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel(ONNXModels.CV.ResNet50noTopCustom)
+    val model = modelHub.loadModel(ONNXModels.CV.EfficientNetB0noTop)
 
     model.use {
         println(it)
-        it.reshape(64, 64, 3)
-
         val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
         val preprocessing: Preprocessing = preprocess {
@@ -85,9 +82,6 @@ fun resnet50additionalTraining() {
                 convert { colorMode = ColorMode.BGR }
             }
             transformTensor {
-                sharpen {
-                    modelType = TFModels.CV.ResNet50
-                }
                 onnx {
                     onnxModel = model
                 }
@@ -114,6 +108,6 @@ fun resnet50additionalTraining() {
 }
 
 /** */
-fun main(): Unit = resnet50additionalTraining()
+fun main(): Unit = efficientNetB0AdditionalTraining()
 
 

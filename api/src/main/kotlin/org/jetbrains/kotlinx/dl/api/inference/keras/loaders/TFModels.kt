@@ -23,7 +23,10 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
  */
 public object TFModels {
     /** Image recognition models and preprocessing. */
-    public sealed class CV<T : GraphTrainableModel>(override val modelRelativePath: String) :
+    public sealed class CV<T : GraphTrainableModel>(
+        override val modelRelativePath: String,
+        override val channelsFirst: Boolean = false
+    ) :
         ModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return buildImageRecognitionModel(modelHub, this)
@@ -188,6 +191,8 @@ public object TFModels {
 public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
+
+    public val channelsFirst: Boolean
 
     /**
      * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.

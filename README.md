@@ -8,7 +8,7 @@ Under the hood, it uses TensorFlow Java API and ONNX Runtime API for Java. Kotli
 importing existing Keras and ONNX models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
 This project aims to make Deep Learning easier for JVM developers and simplify deploying deep learning models in JVM production environments.
- 
+
 Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
 ```kotlin
@@ -181,7 +181,7 @@ You will also need to add the following dependencies in your project if you wish
 
 On Windows, the following distributions are required:
 - CUDA cuda_10.0.130_411.31_win10
-- [cudnn-10.0](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
+- [cudnn-7.6.3](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
 ## Logging
@@ -222,7 +222,7 @@ If you wish to use Logback, include the following dependency and configuration f
 
 ```
   compile 'ch.qos.logback:logback-classic:1.2.3'
-``` 
+```
 
 ```
 <configuration>
@@ -255,6 +255,8 @@ One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issu
 Below you can find an example of a Gradle build task for Fat Jar creation.
 
 ```
+// build.gradle
+
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Version': '1.15'
@@ -265,7 +267,26 @@ task fatJar(type: Jar) {
 }
 ```
 
+```
+// build.gradle.kts
+
+plugins {
+    kotlin("jvm") version "1.5.31"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+}
+
+tasks{
+    shadowJar {
+        manifest {
+            attributes(Pair("Main-Class", "MainKt"))
+            attributes(Pair("Implementation-Version", "1.15"))
+        }
+    }
+}
+```
+
 ## Limitations
+
 Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
 
 - Input
