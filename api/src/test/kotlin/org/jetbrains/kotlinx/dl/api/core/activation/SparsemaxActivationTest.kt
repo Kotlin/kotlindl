@@ -3,28 +3,46 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 import org.junit.jupiter.api.Test
 
 internal class SparsemaxActivationTest : ActivationTest() {
+    private val inp1 = floatArrayOf(-5.0f, 1.0f, 2.0f)
+    private val inp2 = floatArrayOf(-1.0f, 0.0f, 1.0f)
+    private val inp3 = floatArrayOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
+    private val inp4 = floatArrayOf(-0.49786797f, -1.18600456f, -1.88243873f)
+    private val inp3D = arrayOf(
+        arrayOf(
+            floatArrayOf(-0.49786797f, 1.32194696f, -2.99931375f),
+            floatArrayOf(-1.18600456f, -2.11946466f, -2.44596843f),
+            floatArrayOf(-1.88243873f, -0.92663564f, -0.61939515f)
+        ),
+        arrayOf(
+            floatArrayOf(0.2329004f, -0.48483291f, 1.111317f),
+            floatArrayOf(-1.7732865f, 2.26870462f, -2.83567444f),
+            floatArrayOf(1.02280506f, -0.49617119f, 0.35213897f)
+        ),
+        arrayOf(
+            floatArrayOf(-2.15767837f, -1.81139107f, 1.80446741f),
+            floatArrayOf(2.80956945f, -1.11945493f, 1.15393569f),
+            floatArrayOf(2.25833491f, 2.36763998f, -2.48973473f)
+        )
+    )
+
     @Test
     fun testSparsemaxOfOneDim() {
-        val input = floatArrayOf(-5.0f, 1.0f, 2.0f)
         val expected = floatArrayOf(0.0f, 0.0f, 1.0f)
-        assertActivationFunction(SparsemaxActivation(), input, expected)
+        assertActivationFunction(SparsemaxActivation(), inp1, expected)
 
-        val input2 = floatArrayOf(-1.0f, 0.0f, 1.0f)
         val expected2 = floatArrayOf(0.0f, 0.0f, 1.0f)
-        assertActivationFunction(SparsemaxActivation(), input2, expected2)
+        assertActivationFunction(SparsemaxActivation(), inp2, expected2)
 
-        val input3 = floatArrayOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
         val expected3 = floatArrayOf(0.0f, 0.0f, 0.0f, 0.13333333f, 0.3333333f, 0.5333333f)
-        assertActivationFunction(SparsemaxActivation(), input3, expected3)
+        assertActivationFunction(SparsemaxActivation(), inp3, expected3)
 
-        val input4 = floatArrayOf(-0.49786797f, -1.18600456f, -1.88243873f)
         val expected4 = floatArrayOf(0.8440683f, 0.1559317f, 0f)
-        assertActivationFunction(SparsemaxActivation(), input4, expected4)
+        assertActivationFunction(SparsemaxActivation(), inp4, expected4)
     }
 
     @Test
     fun testSparsemaxOfMultiDim() {
-        val inp = arrayOf(floatArrayOf(-5.0f, 1.0f, 2.0f), floatArrayOf(-1.0f, 0.0f, 1.0f))
+        val inp = arrayOf(inp1, inp2)
         val exp = arrayOf(floatArrayOf(0.0f, 0.0f, 1.0f), floatArrayOf(0.0f, 0.0f, 1.0f))
 
         assertActivationFunction(SparsemaxActivation(), inp, exp)
@@ -32,25 +50,6 @@ internal class SparsemaxActivationTest : ActivationTest() {
 
     @Test
     fun testSparsemaxOfMultiDimAxisIsZero() {
-
-        val inp = arrayOf(
-            arrayOf(
-                floatArrayOf(-0.49786797f, 1.32194696f, -2.99931375f),
-                floatArrayOf(-1.18600456f, -2.11946466f, -2.44596843f),
-                floatArrayOf(-1.88243873f, -0.92663564f, -0.61939515f)
-            ),
-            arrayOf(
-                floatArrayOf(0.2329004f, -0.48483291f, 1.111317f),
-                floatArrayOf(-1.7732865f, 2.26870462f, -2.83567444f),
-                floatArrayOf(1.02280506f, -0.49617119f, 0.35213897f)
-            ),
-            arrayOf(
-                floatArrayOf(-2.15767837f, -1.81139107f, 1.80446741f),
-                floatArrayOf(2.80956945f, -1.11945493f, 1.15393569f),
-                floatArrayOf(2.25833491f, 2.36763998f, -2.48973473f)
-            )
-        )
-
         // testing axis = 0
         val expWhenAxisIsZero = arrayOf(
             arrayOf(
@@ -70,31 +69,11 @@ internal class SparsemaxActivationTest : ActivationTest() {
             )
         )
 
-        assertActivationFunction(SparsemaxActivation(0), inp, expWhenAxisIsZero)
-
-
+        assertActivationFunction(SparsemaxActivation(0), inp3D, expWhenAxisIsZero)
     }
 
     @Test
     fun testSparsemaxOfMultiDimAxisIsOne() {
-
-        val inp = arrayOf(
-            arrayOf(
-                floatArrayOf(-0.49786797f, 1.32194696f, -2.99931375f),
-                floatArrayOf(-1.18600456f, -2.11946466f, -2.44596843f),
-                floatArrayOf(-1.88243873f, -0.92663564f, -0.61939515f)
-            ),
-            arrayOf(
-                floatArrayOf(0.2329004f, -0.48483291f, 1.111317f),
-                floatArrayOf(-1.7732865f, 2.26870462f, -2.83567444f),
-                floatArrayOf(1.02280506f, -0.49617119f, 0.35213897f)
-            ),
-            arrayOf(
-                floatArrayOf(-2.15767837f, -1.81139107f, 1.80446741f),
-                floatArrayOf(2.80956945f, -1.11945493f, 1.15393569f),
-                floatArrayOf(2.25833491f, 2.36763998f, -2.48973473f)
-            )
-        )
         // testing axis = 1
         val expWhenAxisIsOne = arrayOf(
             arrayOf(
@@ -114,30 +93,11 @@ internal class SparsemaxActivationTest : ActivationTest() {
             )
         )
 
-        assertActivationFunction(SparsemaxActivation(1), inp, expWhenAxisIsOne)
+        assertActivationFunction(SparsemaxActivation(1), inp3D, expWhenAxisIsOne)
     }
 
     @Test
     fun testSparsemaxOfMultiDimAxisIsTwo() {
-
-        val inp = arrayOf(
-            arrayOf(
-                floatArrayOf(-0.49786797f, 1.32194696f, -2.99931375f),
-                floatArrayOf(-1.18600456f, -2.11946466f, -2.44596843f),
-                floatArrayOf(-1.88243873f, -0.92663564f, -0.61939515f)
-            ),
-            arrayOf(
-                floatArrayOf(0.2329004f, -0.48483291f, 1.111317f),
-                floatArrayOf(-1.7732865f, 2.26870462f, -2.83567444f),
-                floatArrayOf(1.02280506f, -0.49617119f, 0.35213897f)
-            ),
-            arrayOf(
-                floatArrayOf(-2.15767837f, -1.81139107f, 1.80446741f),
-                floatArrayOf(2.80956945f, -1.11945493f, 1.15393569f),
-                floatArrayOf(2.25833491f, 2.36763998f, -2.48973473f)
-            )
-        )
-
         // Same as axis = -1 in 3D case
         val expWhenAxisIsTwo = arrayOf(
             arrayOf(
@@ -157,8 +117,7 @@ internal class SparsemaxActivationTest : ActivationTest() {
             )
         )
 
-        assertActivationFunction(SparsemaxActivation(2), inp, expWhenAxisIsTwo)
-
+        assertActivationFunction(SparsemaxActivation(2), inp3D, expWhenAxisIsTwo)
     }
 
     @Test
@@ -219,6 +178,39 @@ internal class SparsemaxActivationTest : ActivationTest() {
     }
 
     @Test
+    fun testSparsemaxOfToInf() {
+        // Proposition 2 part 1.2
+        // If you divide vector z with very small number
+        // or multiply it with very large number
+        // sparsemax(z * veryLargeNumber) is equal to one-hot like vector where one is the biggest number in vector z
+        val veryLargeNumber = 9999f
+        val inp =
+            inp3D.map { arrayOfFloatArrays ->
+                arrayOfFloatArrays.map { floats ->
+                    floats.map { it * veryLargeNumber }.toFloatArray()
+                }.toTypedArray()
+            }.toTypedArray()
+        val exp = arrayOf(
+            arrayOf(
+                floatArrayOf(0f, 1f, 0f),
+                floatArrayOf(1f, 0f, 0f),
+                floatArrayOf(0f, 0f, 1f)
+            ),
+            arrayOf(
+                floatArrayOf(0f, 0f, 1f),
+                floatArrayOf(0f, 1f, 0f),
+                floatArrayOf(1f, 0f, 0f)
+            ),
+            arrayOf(
+                floatArrayOf(0f, 0f, 1f),
+                floatArrayOf(1f, 0f, 0f),
+                floatArrayOf(0f, 1f, 0f)
+            )
+        )
+        assertActivationFunction(SparsemaxActivation(), inp, exp)
+    }
+
+    @Test
     fun testSparsemaxOfAddConstant() {
         // Proposition 2 part 2. Adding constant to vector x doesn't change result of sparsemax
         // i.e. Sparsemax(x) = Sparsemax(x + c)
@@ -248,7 +240,8 @@ internal class SparsemaxActivationTest : ActivationTest() {
         assertActivationFunction(SparsemaxActivation(), inp, exp)
 
         // using perm1
-        val inpPerm1 = arrayOf(floatArrayOf(-1f, 0f, 1f), floatArrayOf(-1.2f, -5f, -1.3f), floatArrayOf(-5f, 1f, 2f))
+        val inpPerm1 =
+            arrayOf(floatArrayOf(-1f, 0f, 1f), floatArrayOf(-1.2f, -5f, -1.3f), floatArrayOf(-5f, 1f, 2f))
         val expPerm1 =
             arrayOf(floatArrayOf(0f, 0f, 1f), floatArrayOf(0.54999995f, 0f, 0.45000005f), floatArrayOf(0f, 0f, 1f))
         assertActivationFunction(SparsemaxActivation(), inpPerm1, expPerm1)
@@ -276,5 +269,4 @@ internal class SparsemaxActivationTest : ActivationTest() {
             assert(s in 0f..(inp[i] - inp[i - 1]))
         }
     }
-
 }

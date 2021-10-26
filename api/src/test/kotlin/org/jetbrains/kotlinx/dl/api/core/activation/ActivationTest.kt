@@ -12,15 +12,23 @@ import org.tensorflow.op.Ops
 const val EPS: Float = 1e-2f
 
 open class ActivationTest {
-    protected fun assertActivationFunction(
-        instance: Activation,
-        input: FloatArray,
-        actual: FloatArray,
-        expected: FloatArray
-    ) {
-        assertActivationFunction(instance, input, expected)
-    }
 
+    /**
+     * Checks if an Activation-function object with input [inp] gives valid result of [exp].
+     *
+     * For example, if you want to test [ReluActivation] with [inp] and [exp]
+     * ```
+     *      val act = ReluActivation()
+     *      val inp = floatArrayOf(-1f, 0f, 1f)
+     *      val exp = floatArrayOf( 0f, 0f, 1f)
+     *
+     *      assertActivationFunction(act, inp, exp) // Test passes
+     * ```
+     *
+     * @param act activation function object
+     * @param inp FloatArray applied to the activation function
+     * @param exp FloatArray expected output for an activation function object [act] with input [inp]
+     */
     protected fun assertActivationFunction(
         act: Activation,
         inp: FloatArray,
@@ -32,17 +40,34 @@ open class ActivationTest {
         }
     }
 
+    /**
+     * Checks if an Activation-function object with input [inp] gives a valid result of [exp].
+     *
+     * For example, if you want to test [ReluActivation] with [inp] and [exp]
+     * ```
+     *      val act = ReluActivation()
+     *      val inp = arrayOf(floatArrayOf(-1f, -1f, -1f),
+     *                        floatArrayOf(0f, 0f, 0f),
+     *                        floatArrayOf(1f, 1f, 1f)
+     *                        )
+     *      val exp = arrayOf(floatArrayOf( 0f, 0f, 0f),
+     *                        floatArrayOf(0f, 0f, 0f),
+     *                        floatArrayOf(1f, 1f, 1f)
+     *                        )
+     *
+     *      assertActivationFunction(act, inp, exp) // Test passes
+     * ```
+     *
+     * @param act activation function object
+     * @param inp Array`<FloatArray`> applied to the activation function
+     * @param exp Array`<FloatArray`> expected output for an activation function object [act] with input [inp]
+     */
     protected fun assertActivationFunction(
         act: Activation,
         inp: Array<FloatArray>,
         exp: Array<FloatArray>
     ) {
-        /**
-         * Accepts 2D float input values
-         */
-
         // Higher Dimensional assertArrayEquals have no delta option
-        // Due to numeric instability we loop and use 1D version with EPS value
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
@@ -52,14 +77,16 @@ open class ActivationTest {
         }
     }
 
+    /**
+     * Accepts 3D float input values
+     *
+     * @see assertActivationFunction
+     */
     protected fun assertActivationFunction(
         act: Activation,
         inp: Array<Array<FloatArray>>,
         exp: Array<Array<FloatArray>>
     ) {
-        /**
-         * Accepts 3D float input values
-         */
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
@@ -69,5 +96,17 @@ open class ActivationTest {
                 }
             }
         }
+    }
+
+    /**
+     * @see assertActivationFunction
+     */
+    protected fun assertActivationFunction(
+        instance: Activation,
+        input: FloatArray,
+        actual: FloatArray,
+        expected: FloatArray
+    ) {
+        assertActivationFunction(instance, input, expected)
     }
 }
