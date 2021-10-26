@@ -368,7 +368,55 @@ public object ONNXModels {
             }
         }
     }
+
+    /** Face alignment models and preprocessing. */
+    public sealed class PoseEstimation<T : InferenceModel, U : InferenceModel>(
+        override val modelRelativePath: String,
+        override val channelsFirst: Boolean = true
+    ) :
+        ModelType<T, U> {
+        /** */
+        public object MoveNetSinglePoseLighting :
+            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            // TODO: add Easy API model
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            }
+        }
+
+        /** */
+        public object MoveNetMultiPoseLighting :
+            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            // TODO: add Easy API model
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            }
+        }
+
+        /** */
+        public object MoveNetSinglePoseThunder :
+            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_thunder") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            // TODO: add Easy API model
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            }
+        }
+    }
 }
+
+
 
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
     val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(

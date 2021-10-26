@@ -236,6 +236,17 @@ fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Ar
     frame.isResizable = false
 }
 
+fun drawRawPosePoints(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
+    val frame = JFrame("Landmarks")
+    @Suppress("UNCHECKED_CAST")
+    frame.contentPane.add(RawPosePointsJPanel(dst, imageShape, posepoints))
+    frame.pack()
+    frame.setLocationRelativeTo(null)
+    frame.isVisible = true
+    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    frame.isResizable = false
+}
+
 fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
@@ -247,7 +258,49 @@ fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landm
     frame.isResizable = false
 }
 
-class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) : JPanel() {
+
+class RawPosePointsJPanel(
+    val image: FloatArray,
+    val imageShape: ImageShape,
+    private val rawPosePoints: Array<FloatArray>
+) : JPanel() {
+    private val bufferedImage = image.toBufferedImage(imageShape)
+
+    override fun paint(graphics: Graphics) {
+        super.paint(graphics)
+        val posePoints = mutableListOf<Triple<Float, Float, Float>>()
+        for (i in rawPosePoints.indices) {
+            posePoints.add(Triple(rawPosePoints[i][1], rawPosePoints[i][0], rawPosePoints[i][2])) //(y, x, score)
+        }
+
+        //val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
+        //val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
+
+        graphics.drawImage(bufferedImage, 0, 0, null)
+
+        for (i in posePoints.indices) {
+            val xLM = (size.width) * (posePoints[i].first)
+            val yLM = (size.height) * (posePoints[i].second)
+
+            graphics as Graphics2D
+            val stroke1: Stroke = BasicStroke(3f)
+            graphics.setColor(Color.RED)
+            graphics.stroke = stroke1
+            graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
+        }
+    }
+
+    override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+
+    override fun getMinimumSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+}
+
+class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) :
+    JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {

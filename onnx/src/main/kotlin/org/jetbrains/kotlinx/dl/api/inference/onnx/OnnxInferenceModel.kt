@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import java.nio.FloatBuffer
+import java.nio.IntBuffer
 import java.util.*
 
 
@@ -138,8 +139,14 @@ public open class OnnxInferenceModel : InferenceModel() {
     public fun predictRaw(inputData: FloatArray): List<Array<*>> {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
-        val preparedData = FloatBuffer.wrap(inputData)
+        // TODO: should support different types (ints/floats) depends on model signature
+        val preparedData = IntBuffer.wrap(inputData.map { it.toInt() }.toIntArray())
 
+        // TODO: should be handled for common case and add warning for this case in ONNXInferenceModel
+        if (inputShape[1] == -1L) {
+            inputShape[1] = 256
+            inputShape[2] = 256 // for multipose
+        }
         val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
 
