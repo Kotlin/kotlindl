@@ -109,7 +109,7 @@ internal const val ACTIVATION_LISHT: String = "lisht"
 internal const val ACTIVATION_SNAKE: String = "snake"
 internal const val ACTIVATION_GELU: String = "gelu"
 internal const val ACTIVATION_TANHSHRINK: String = "tanhshrink"
-internal const val ACTIVATION_SPARSEMAX: String = "spasemax"
+internal const val ACTIVATION_SPARSEMAX: String = "sparsemax"
 
 // Layer settings
 internal const val CHANNELS_LAST: String = "channels_last"
