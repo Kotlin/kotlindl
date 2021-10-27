@@ -416,8 +416,6 @@ public object ONNXModels {
     }
 }
 
-
-
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
     val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
         data,

@@ -236,7 +236,7 @@ fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Ar
     frame.isResizable = false
 }
 
-fun drawRawPosePoints(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
+fun drawRawPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(RawPosePointsJPanel(dst, imageShape, posepoints))
