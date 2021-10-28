@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAli
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
@@ -377,20 +378,19 @@ public object ONNXModels {
         ModelType<T, U> {
         /** */
         public object MoveNetSinglePoseLighting :
-            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
+            PoseEstimation<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
 
-            // TODO: add Easy API model
-            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
-                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
+                return modelHub.loadModel(this) as SinglePoseDetectionModel
             }
         }
 
         /** */
         public object MoveNetMultiPoseLighting :
-            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
+            PoseEstimation<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -403,14 +403,13 @@ public object ONNXModels {
 
         /** */
         public object MoveNetSinglePoseThunder :
-            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_thunder") {
+            PoseEstimation<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
 
-            // TODO: add Easy API model
-            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
-                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
+                return modelHub.loadModel(this) as SinglePoseDetectionModel
             }
         }
     }

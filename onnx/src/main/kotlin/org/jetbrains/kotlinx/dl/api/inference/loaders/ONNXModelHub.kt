@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -52,10 +53,19 @@ public class ONNXModelHub(cacheDirectory: File) :
     ): T {
         val modelFile = "/" + modelType.modelRelativePath + ".onnx"
 
-        val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
-            SSDObjectDetectionModel()
-        } else {
-            OnnxInferenceModel()
+        val inferenceModel = when (modelType) {
+            ONNXModels.ObjectDetection.SSD -> {
+                SSDObjectDetectionModel()
+            }
+            ONNXModels.PoseEstimation.MoveNetSinglePoseLighting -> {
+                SinglePoseDetectionModel()
+            }
+            ONNXModels.PoseEstimation.MoveNetSinglePoseThunder -> {
+                SinglePoseDetectionModel()
+            }
+            else -> {
+                OnnxInferenceModel()
+            }
         }
         return OnnxInferenceModel.initializeONNXModel(
             inferenceModel,

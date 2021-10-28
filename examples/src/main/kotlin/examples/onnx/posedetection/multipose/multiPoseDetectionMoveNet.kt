@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.posedetection.singlepose
+package examples.onnx.posedetection.multipose
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.visualization.swing.drawRawPoseLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.drawRawMultiPoseLandMarks
 import java.io.File
 
 /**
@@ -21,15 +21,15 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing is applied to images before prediction.
  */
-fun visualisationPoseNetThunder() {
+fun multiPoseDetectionMoveNet() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.PoseEstimation.MoveNetSinglePoseThunder
+    val modelType = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting
     val model = modelHub.loadModel(modelType)
 
     model.use {
         println(it)
 
-        val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
+        val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
@@ -46,36 +46,29 @@ fun visualisationPoseNetThunder() {
 
         val inputData = modelType.preprocessInput(preprocessing)
 
+        /*
+
+        A float32 tensor of shape [1, 6, 56].
+
+The first dimension is the batch dimension, which is always equal to 1.
+The second dimension corresponds to the maximum number of instance detections.
+The model can detect up to 6 people in the image frame simultaneously.
+The third dimension represents the predicted bounding box/keypoint locations and scores.
+The first 17 * 3 elements are the keypoint locations and scores in the format: [y_0, x_0, s_0, y_1, x_1, s_1, …, y_16, x_16, s_16],
+where y_i, x_i, s_i are the yx-coordinates (normalized to image frame, e.g. range in [0.0, 1.0])
+and confidence scores of the i-th joint correspondingly.
+The order of the 17 keypoint joints is: [nose, left eye, right eye, left ear, right ear, left shoulder, right shoulder, left elbow, right elbow, left wrist, right wrist, left hip, right hip, left knee, right knee, left ankle, right ankle].
+The remaining 5 elements [ymin, xmin, ymax, xmax, score] represent the region of the bounding box (in normalized coordinates) and the confidence score of the instance.
+
+         */
+
         val yhat = it.predictRaw(inputData)
         println(yhat.toTypedArray().contentDeepToString())
-
-        visualisePoseLandmarks(imageFile, (yhat as List<Array<Array<Array<FloatArray>>>>)[0][0][0])
-
-        // Dictionary that maps from joint names to keypoint indices.
-        val keypoints = {
-            "nose" to 0
-            "left_eye" to 1
-            "right_eye" to 2
-            "left_ear" to 3
-            "right_ear" to 4
-            "left_shoulder" to 5
-            "right_shoulder" to 6
-            "left_elbow" to 7
-            "right_elbow" to 8
-            "left_wrist" to 9
-            "right_wrist" to 10
-            "left_hip" to 11
-            "right_hip" to 12
-            "left_knee" to 13
-            "right_knee" to 14
-            "left_ankle" to 15
-            "right_ankle" to 16
-        }
-
+        visualisePoseLandmarks(imageFile, (yhat  as List<Array<Array<FloatArray>>>)[0][0])
     }
 }
 
-fun visualisePoseLandmarks(
+private fun visualisePoseLandmarks(
     imageFile: File,
     poseLandmarks: Array<FloatArray>
 ) {
@@ -99,56 +92,11 @@ fun visualisePoseLandmarks(
     }
 
     val rawImage = preprocessing().first
-    drawRawPoseLandMarks(rawImage, ImageShape(256, 256, 3), poseLandmarks)
+    drawRawMultiPoseLandMarks(rawImage, ImageShape(256, 256, 3), poseLandmarks)
 }
 
 
 /*
-
-#@title Helper functions for visualization
-
-# Dictionary that maps from joint names to keypoint indices.
-KEYPOINT_DICT = {
-    'nose': 0,
-    'left_eye': 1,
-    'right_eye': 2,
-    'left_ear': 3,
-    'right_ear': 4,
-    'left_shoulder': 5,
-    'right_shoulder': 6,
-    'left_elbow': 7,
-    'right_elbow': 8,
-    'left_wrist': 9,
-    'right_wrist': 10,
-    'left_hip': 11,
-    'right_hip': 12,
-    'left_knee': 13,
-    'right_knee': 14,
-    'left_ankle': 15,
-    'right_ankle': 16
-}
-
-# Maps bones to a matplotlib color name.
-KEYPOINT_EDGE_INDS_TO_COLOR = {
-    (0, 1): 'm',
-    (0, 2): 'c',
-    (1, 3): 'm',
-    (2, 4): 'c',
-    (0, 5): 'm',
-    (0, 6): 'c',
-    (5, 7): 'm',
-    (7, 9): 'm',
-    (6, 8): 'c',
-    (8, 10): 'c',
-    (5, 6): 'y',
-    (5, 11): 'm',
-    (6, 12): 'c',
-    (11, 12): 'y',
-    (11, 13): 'm',
-    (13, 15): 'm',
-    (12, 14): 'c',
-    (14, 16): 'c'
-}
 
 def _keypoints_and_edges_for_display(keypoints_with_scores,
                                      height,
@@ -207,5 +155,5 @@ def _keypoints_and_edges_for_display(keypoints_with_scores,
  */
 
 /** */
-fun main(): Unit = visualisationPoseNetThunder()
+fun main(): Unit = multiPoseDetectionMoveNet()
 

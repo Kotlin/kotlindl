@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.visualization.swing.drawRawPoseLandMarks
 import java.io.File
 
 /**
@@ -28,7 +29,7 @@ fun poseDetectionMoveNet() {
     model.use {
         println(it)
 
-        val imageFile = getFileFromResource("datasets/poses/single/2.jpg")
+        val imageFile = getFileFromResource("datasets/poses/single/3.jpg")
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
@@ -77,6 +78,33 @@ fun poseDetectionMoveNet() {
 
         visualisePoseLandmarks(imageFile, rawPoseLandMarks)
     }
+}
+
+private fun visualisePoseLandmarks(
+    imageFile: File,
+    poseLandmarks: Array<FloatArray>
+) {
+    val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = imageFile
+            imageShape = ImageShape(null, null, 3)
+        }
+        transformImage {
+            resize {
+                outputHeight = 256
+                outputWidth = 256
+            }
+            convert { colorMode = ColorMode.BGR }
+        }
+        transformTensor {
+            rescale {
+                scalingCoefficient = 255f
+            }
+        }
+    }
+
+    val rawImage = preprocessing().first
+    drawRawPoseLandMarks(rawImage, ImageShape(256, 256, 3), poseLandmarks)
 }
 
 /** */
