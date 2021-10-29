@@ -38,6 +38,7 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
                 foundPoseLandmarks.add(poseLandmark)
             }
 
+            // TODO: change order in visualisation
             // [ymin, xmin, ymax, xmax, score]
             val detectedObject = DetectedObject(
                 classLabel = "person",

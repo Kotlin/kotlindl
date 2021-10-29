@@ -20,7 +20,7 @@ public object ONNXModels {
     /** Image recognition models and preprocessing. */
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean
+        override val channelsFirst: Boolean // TODO: add to all models
     ) :
         ModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {

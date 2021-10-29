@@ -39,6 +39,10 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
     }
 
     public fun detectPose(imageFile: File): DetectedPose {
+        // TODO: could be differnt for channelLast/First
+        val height = inputShape[1]
+        val width = inputShape[2]
+
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
@@ -46,8 +50,8 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
             }
             transformImage {
                 resize {
-                    outputHeight = 192 // TODO: resize to OnnxModelInputs
-                    outputWidth = 192
+                    outputHeight = height.toInt()
+                    outputWidth = width.toInt()
                 }
                 convert { colorMode = ColorMode.BGR }
             }
@@ -66,9 +70,9 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
 
 internal fun buildPoseEdges(foundPoseLandmarks: MutableList<PoseLandmark>): MutableList<PoseEdge> {
     val foundPoseEdges = mutableListOf<PoseEdge>()
-    edgeKeyPointsPairs.entries.forEach {
-        val startPoint = foundPoseLandmarks[it.key]
-        val endPoint = foundPoseLandmarks[it.value]
+    edgeKeyPointsPairs.forEach {
+        val startPoint = foundPoseLandmarks[it.first]
+        val endPoint = foundPoseLandmarks[it.second]
         foundPoseEdges.add(
             PoseEdge(
                 poseEdgeLabel = startPoint.poseLandmarkLabel + "_" + endPoint.poseLandmarkLabel,
@@ -102,23 +106,23 @@ internal val keyPoints = mapOf(
     16 to "right_ankle"
 )
 
-internal val edgeKeyPointsPairs = mapOf(
-    0 to 1,
-    0 to 2,
-    1 to 3,
-    2 to 4,
-    0 to 5,
-    0 to 6,
-    5 to 7,
-    7 to 9,
-    6 to 8,
-    8 to 10,
-    5 to 6,
-    5 to 11,
-    6 to 12,
-    11 to 12,
-    11 to 13,
-    13 to 15,
-    12 to 14,
-    14 to 16
+internal val edgeKeyPointsPairs = listOf(
+    Pair(0, 1),
+    Pair(0, 2),
+    Pair(1, 3),
+    Pair(2, 4),
+    Pair(0, 5),
+    Pair(0, 6),
+    Pair(5, 7),
+    Pair(7, 9),
+    Pair(6, 8),
+    Pair(8, 10),
+    Pair(5, 6),
+    Pair(5, 11),
+    Pair(6, 12),
+    Pair(11, 12),
+    Pair(11, 13),
+    Pair(13, 15),
+    Pair(12, 14),
+    Pair(14, 16)
 )

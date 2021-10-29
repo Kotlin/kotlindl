@@ -22,33 +22,42 @@ class PoseDetectionTestSuite {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
         val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
-        model.use {
-            for (i in 0..8) {
-                val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-                // TODO
-               /* val landmarks = it.detectPoseLandmarks(imageFile = imageFile)
-                assertEquals(17, landmarks.size)
-                val edges = it.detectPoseEdges(imageFile = imageFile)
-                assertEquals(17, edges.size)*/
-            }
+        model.use { poseDetectionModel ->
+            val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
+            val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
+            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(18, detectedPose.edges.size)
         }
     }
 
     @Test
     fun easyPoseDetectionMoveNetSinglePoseThunderTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = ONNXModels.PoseEstimation.MoveNetSinglePoseThunder.pretrainedModel(modelHub)
+        val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
-        model.use {
-            for (i in 0..8) {
-                val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-                // TODO
-                /* val landmarks = it.detectPoseLandmarks(imageFile = imageFile)
-                 assertEquals(17, landmarks.size)
-                 val edges = it.detectPoseEdges(imageFile = imageFile)
-                 assertEquals(17, edges.size)*/
+        model.use { poseDetectionModel ->
+            val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
+            val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
+            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(18, detectedPose.edges.size)
+        }
+    }
+
+    @Test
+    fun easyPoseDetectionMoveNetMultiPoseLightingTest() {
+        val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+        val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+
+        model.use { poseDetectionModel ->
+            val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
+            val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile)
+            assertEquals(3, detectedPoses.multiplePoses.size)
+            detectedPoses.multiplePoses.forEach {
+                assertEquals(17, it.second.poseLandmarks.size)
+                assertEquals(18, it.second.edges.size)
             }
         }
+
     }
 
     @Test
@@ -112,6 +121,41 @@ class PoseDetectionTestSuite {
             val rawPoseLandMarks = (yhat as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
 
             assertEquals(17, rawPoseLandMarks.size)
+        }
+    }
+
+    @Test
+    fun poseDetectionMoveNetMultiPoseLightingTest() {
+        val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+        val modelType = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting
+        val model = modelHub.loadModel(modelType)
+
+        model.use { inferenceModel ->
+            val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
+            val preprocessing: Preprocessing = preprocess {
+                load {
+                    pathToData = imageFile
+                    imageShape = ImageShape(null, null, 3)
+                }
+                transformImage {
+                    resize {
+                        outputHeight = 256
+                        outputWidth = 256
+                    }
+                    convert { colorMode = ColorMode.BGR }
+                }
+            }
+
+            val inputData = modelType.preprocessInput(preprocessing)
+            val yhat = inferenceModel.predictRaw(inputData)
+            println(yhat.toTypedArray().contentDeepToString())
+
+            val rawPosesLandMarks = (yhat as List<Array<Array<FloatArray>>>)[0][0]
+
+            assertEquals(6, rawPosesLandMarks.size)
+            rawPosesLandMarks.forEach {
+                assertEquals(56, it.size)
+            }
         }
     }
 }

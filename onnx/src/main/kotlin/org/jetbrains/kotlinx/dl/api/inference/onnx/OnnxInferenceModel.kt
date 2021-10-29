@@ -36,7 +36,6 @@ public open class OnnxInferenceModel : InferenceModel() {
 
     /** Data shape for prediction. */
     public lateinit var inputShape: LongArray
-        private set
 
     /** Data type for input tensor. */
     public lateinit var inputDataType: OnnxJavaType
@@ -49,7 +48,6 @@ public open class OnnxInferenceModel : InferenceModel() {
     /** Data type for output tensor. */
     public lateinit var outputDataType: OnnxJavaType
         private set
-
 
     public companion object {
         /**
@@ -67,21 +65,26 @@ public open class OnnxInferenceModel : InferenceModel() {
         ): OnnxInferenceModel {
             require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
-            require(!model::inputShape.isInitialized) { "The model $model is initialized!" }
-            require(!model::outputShape.isInitialized) { "The model $model is initialized!" }
+            // require(!model::inputShape.isInitialized) { "The model $model is initialized!" }
+            // require(!model::outputShape.isInitialized) { "The model $model is initialized!" }
 
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
 
             val inputTensorInfo = model.session.inputInfo.toList()[0].second.info as TensorInfo
-            val inputDims =
-                inputTensorInfo.shape.takeLast(3).toLongArray()
-            model.inputShape = TensorShape(1, *inputDims).dims()
+            if (!model::inputShape.isInitialized) {
+                val inputDims =
+                    inputTensorInfo.shape.takeLast(3).toLongArray()
+                model.inputShape = TensorShape(1, *inputDims).dims()
+            }
             model.inputDataType = inputTensorInfo.type
 
             val outputTensorInfo = model.session.outputInfo.toList()[0].second.info as TensorInfo
-            val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
-            model.outputShape = TensorShape(1, *outputDims).dims()
+
+            if (!model::outputShape.isInitialized) {
+                val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
+                model.outputShape = TensorShape(1, *outputDims).dims()
+            }
             model.outputDataType = outputTensorInfo.type
 
             return model
@@ -149,11 +152,6 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         val inputTensor = createInputTensor(inputData)
 
-        // TODO: should be handled for common case and add warning for this case in ONNXInferenceModel
-        if (inputShape[1] == -1L) {
-            inputShape[1] = 256
-            inputShape[2] = 256 // for multipose
-        }
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
         val result = mutableListOf<Array<*>>()

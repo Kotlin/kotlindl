@@ -31,7 +31,7 @@ fun easyMultiPoseDetectionMoveNet() {
     model.use { poseDetectionModel ->
         for (i in 1..3) {
             val imageFile = getFileFromResource("datasets/poses/multi/$i.jpg")
-            val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile)
+            val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile, confidence = 0.0f)
 
             detectedPoses.multiplePoses.forEach { detectedPose ->
                 println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")

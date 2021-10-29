@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 
 import mu.KLogger
 import mu.KotlinLogging
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
@@ -65,7 +66,9 @@ public class ONNXModelHub(cacheDirectory: File) :
                 SinglePoseDetectionModel()
             }
             ONNXModels.PoseEstimation.MoveNetMultiPoseLighting -> {
-                MultiPoseDetectionModel()
+                val model = MultiPoseDetectionModel()
+                model.inputShape = longArrayOf(1L, 256L, 256L, 3L)
+                model
             }
             else -> {
                 OnnxInferenceModel()
