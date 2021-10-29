@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import java.io.File
 import java.net.URL
@@ -62,6 +63,9 @@ public class ONNXModelHub(cacheDirectory: File) :
             }
             ONNXModels.PoseEstimation.MoveNetSinglePoseThunder -> {
                 SinglePoseDetectionModel()
+            }
+            ONNXModels.PoseEstimation.MoveNetMultiPoseLighting -> {
+                MultiPoseDetectionModel()
             }
             else -> {
                 OnnxInferenceModel()

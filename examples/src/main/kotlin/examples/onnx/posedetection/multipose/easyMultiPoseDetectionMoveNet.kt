@@ -8,52 +8,45 @@ package examples.onnx.posedetection.multipose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.visualization.swing.drawRawMultiPoseLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedPose
+import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on SSD model:
+ * This examples demonstrates the inference concept on MoveNetSinglePoseLighting model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
  * - Special preprocessing is applied to images before prediction.
  */
-fun multiPoseDetectionMoveNet() {
+fun easyMultiPoseDetectionMoveNet() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting
-    val model = modelHub.loadModel(modelType)
+    val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
-    model.use {
-        println(it)
+    model.use { poseDetectionModel ->
+        for (i in 1..3) {
+            val imageFile = getFileFromResource("datasets/poses/multi/$i.jpg")
+            val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile)
 
-        val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-        val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(null, null, 3)
-            }
-            transformImage {
-                resize {
-                    outputHeight = 256
-                    outputWidth = 256
+            detectedPoses.multiplePoses.forEach { detectedPose ->
+                println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")
+                detectedPose.second.poseLandmarks.forEach {
+                    println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
                 }
-                convert { colorMode = ColorMode.BGR }
             }
+            visualise(imageFile, detectedPoses)
         }
-
-        val inputData = modelType.preprocessInput(preprocessing)
-        val yhat = it.predictRaw(inputData)
-        println(yhat.toTypedArray().contentDeepToString())
-        visualisePoseLandmarks(imageFile, (yhat  as List<Array<Array<FloatArray>>>)[0][0])
     }
 }
 
-private fun visualisePoseLandmarks(
+private fun visualise(
     imageFile: File,
-    poseLandmarks: Array<FloatArray>
+    multiPoseDetectionResult: MultiPoseDetectionResult
 ) {
     val preprocessing: Preprocessing = preprocess {
         load {
@@ -75,9 +68,9 @@ private fun visualisePoseLandmarks(
     }
 
     val rawImage = preprocessing().first
-    drawRawMultiPoseLandMarks(rawImage, ImageShape(256, 256, 3), poseLandmarks)
+    drawMultiPoseLandMarks(rawImage, ImageShape(256, 256, 3), multiPoseDetectionResult)
 }
 
 /** */
-fun main(): Unit = multiPoseDetectionMoveNet()
+fun main(): Unit = easyMultiPoseDetectionMoveNet()
 

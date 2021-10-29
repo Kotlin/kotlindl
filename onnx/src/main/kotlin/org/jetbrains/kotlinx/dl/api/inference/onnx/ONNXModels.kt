@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAli
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
@@ -388,16 +389,27 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         *
+         *   The ```predictRaw``` method returns a float32 tensor of shape (1, 6, 56).
+         *
+         *   - The first dimension is the batch dimension, which is always equal to 1.
+         *   - The second dimension corresponds to the maximum number of instance detections.
+         *   - The model can detect up to 6 people in the image frame simultaneously.
+         *   - The third dimension represents the predicted bounding box/keypoint locations and scores.
+         *   - The first 17 * 3 elements are the keypoint locations and scores in the format: ```[y_0, x_0, s_0, y_1, x_1, s_1, …, y_16, x_16, s_16]```,
+         *     where y_i, x_i, s_i are the yx-coordinates (normalized to image frame, e.g. range in ```[0.0, 1.0]```) and confidence scores of the i-th joint correspondingly.
+         *   - The order of the 17 keypoint joints is: ```[nose, left eye, right eye, left ear, right ear, left shoulder, right shoulder, left elbow, right elbow, left wrist, right wrist, left hip, right hip, left knee, right knee, left ankle, right ankle]```.
+         *   - The remaining 5 elements ```[ymin, xmin, ymax, xmax, score]``` represent the region of the bounding box (in normalized coordinates) and the confidence score of the instance.
+         */
         public object MoveNetMultiPoseLighting :
-            PoseEstimation<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
+            PoseEstimation<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
 
-            // TODO: add Easy API model
-            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
-                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
+                return modelHub.loadModel(this) as MultiPoseDetectionModel
             }
         }
 

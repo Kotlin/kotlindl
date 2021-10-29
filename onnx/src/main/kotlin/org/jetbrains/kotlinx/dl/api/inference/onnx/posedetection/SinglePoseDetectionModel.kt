@@ -8,15 +8,17 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import java.lang.Float.min
 
 public class SinglePoseDetectionModel : OnnxInferenceModel() {
-    public fun detectPose(inputData: FloatArray, confidence: Float = 0.1f): DetectedPose {
+    public fun detectPose(inputData: FloatArray): DetectedPose {
         val rawPrediction = this.predictRaw(inputData)
         val rawPoseLandMarks = (rawPrediction as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
 
@@ -25,16 +27,18 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
             val poseLandmark = PoseLandmark(
                 poseLandmarkLabel = keyPoints[i]!!,
                 x = rawPoseLandMarks[i][1],
-                y =  rawPoseLandMarks[i][0],
+                y = rawPoseLandMarks[i][0],
                 probability = rawPoseLandMarks[i][2]
             )
-            foundPoseLandmarks.add(poseLandmark)
+            foundPoseLandmarks.add(i, poseLandmark)
         }
 
-        return DetectedPose(foundPoseLandmarks)
+        val foundPoseEdges = buildPoseEdges(foundPoseLandmarks)
+
+        return DetectedPose(foundPoseLandmarks, foundPoseEdges)
     }
 
-    public fun detectPose(imageFile: File, confidence: Float = 0.1f): DetectedPose {
+    public fun detectPose(imageFile: File): DetectedPose {
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
@@ -42,7 +46,7 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
             }
             transformImage {
                 resize {
-                    outputHeight = 192
+                    outputHeight = 192 // TODO: resize to OnnxModelInputs
                     outputWidth = 192
                 }
                 convert { colorMode = ColorMode.BGR }
@@ -56,12 +60,29 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
         )
 
-        return this.detectPose(preprocessedData, confidence)
+        return this.detectPose(preprocessedData)
     }
 }
 
+internal fun buildPoseEdges(foundPoseLandmarks: MutableList<PoseLandmark>): MutableList<PoseEdge> {
+    val foundPoseEdges = mutableListOf<PoseEdge>()
+    edgeKeyPointsPairs.entries.forEach {
+        val startPoint = foundPoseLandmarks[it.key]
+        val endPoint = foundPoseLandmarks[it.value]
+        foundPoseEdges.add(
+            PoseEdge(
+                poseEdgeLabel = startPoint.poseLandmarkLabel + "_" + endPoint.poseLandmarkLabel,
+                probability = min(startPoint.probability, endPoint.probability),
+                start = startPoint,
+                end = endPoint
+            )
+        )
+    }
+    return foundPoseEdges
+}
+
 // Dictionary that maps from joint names to keypoint indices.
-private val keyPoints = mapOf(
+internal val keyPoints = mapOf(
     0 to "nose",
     1 to "left_eye",
     2 to "right_eye",
@@ -79,4 +100,25 @@ private val keyPoints = mapOf(
     14 to "right_knee",
     15 to "left_ankle",
     16 to "right_ankle"
+)
+
+internal val edgeKeyPointsPairs = mapOf(
+    0 to 1,
+    0 to 2,
+    1 to 3,
+    2 to 4,
+    0 to 5,
+    0 to 6,
+    5 to 7,
+    7 to 9,
+    6 to 8,
+    8 to 10,
+    5 to 6,
+    5 to 11,
+    6 to 12,
+    11 to 12,
+    11 to 13,
+    13 to 15,
+    12 to 14,
+    14 to 16
 )

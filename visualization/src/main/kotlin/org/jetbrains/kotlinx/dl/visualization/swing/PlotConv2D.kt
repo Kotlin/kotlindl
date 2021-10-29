@@ -17,6 +17,7 @@ import java.awt.*
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import javax.swing.JPanel
+import kotlin.math.log2
 import kotlin.math.max
 import kotlin.math.min
 
@@ -366,6 +367,38 @@ class MultiPosePointsJPanel(
                 graphics.stroke = stroke1
                 graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
             }
+
+            val onePoseEdges = it.second.edges
+            for (j in onePoseEdges.indices) {
+                val x1 = (size.width) * (onePoseEdges[j].start.x)
+                val y1 = (size.height) * (onePoseEdges[j].start.y)
+                val x2 = (size.width) * (onePoseEdges[j].end.x)
+                val y2 = (size.height) * (onePoseEdges[j].end.y)
+
+                graphics as Graphics2D
+                val stroke1: Stroke = BasicStroke(2f)
+                graphics.setColor(Color.MAGENTA)
+                graphics.stroke = stroke1
+                graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
+            }
+
+            val detectedObject = it.first
+
+            val top = detectedObject.yMin * imageShape.height!!
+            val left = detectedObject.xMin * imageShape.width!!
+            val bottom = detectedObject.yMax * imageShape.height!!
+            val right = detectedObject.xMax * imageShape.width!!
+            // left, bot, right, top
+
+            // y = columnIndex
+            // x = rowIndex
+            val yRect = bottom
+            val xRect = left
+            graphics as Graphics2D
+            val stroke: Stroke = BasicStroke(6f * detectedObject.probability)
+            graphics.setColor(Color.ORANGE)
+            graphics.stroke = stroke
+            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
         }
     }
 
