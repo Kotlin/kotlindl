@@ -5,18 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
-import ai.onnxruntime.OnnxTensor
-import ai.onnxruntime.OrtEnvironment
-import ai.onnxruntime.OrtSession
-import ai.onnxruntime.TensorInfo
+import ai.onnxruntime.*
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
+import java.nio.*
 import java.util.*
 
 
@@ -42,9 +38,18 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var inputShape: LongArray
         private set
 
+    /** Data type for input tensor. */
+    public lateinit var inputDataType: OnnxJavaType
+        private set
+
     /** Data shape for prediction. */
     public lateinit var outputShape: LongArray
         private set
+
+    /** Data type for output tensor. */
+    public lateinit var outputDataType: OnnxJavaType
+        private set
+
 
     public companion object {
         /**
@@ -68,13 +73,16 @@ public open class OnnxInferenceModel : InferenceModel() {
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
 
+            val inputTensorInfo = model.session.inputInfo.toList()[0].second.info as TensorInfo
             val inputDims =
-                (model.session.inputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+                inputTensorInfo.shape.takeLast(3).toLongArray()
             model.inputShape = TensorShape(1, *inputDims).dims()
+            model.inputDataType = inputTensorInfo.type
 
-            val outputDims =
-                (model.session.outputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
+            val outputTensorInfo = model.session.outputInfo.toList()[0].second.info as TensorInfo
+            val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
             model.outputShape = TensorShape(1, *outputDims).dims()
+            model.outputDataType = outputTensorInfo.type
 
             return model
         }
@@ -117,9 +125,8 @@ public open class OnnxInferenceModel : InferenceModel() {
     public fun predictSoftly(inputData: FloatArray): FloatArray {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
-        val preparedData = FloatBuffer.wrap(inputData)
+        val inputTensor = createInputTensor(inputData)
 
-        val inputTensor = OnnxTensor.createTensor(env, preparedData, inputShape)
         val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
         val outputProbs = outputTensor[0].value as Array<FloatArray>
@@ -130,6 +137,7 @@ public open class OnnxInferenceModel : InferenceModel() {
         return outputProbs[0]
     }
 
+
     /**
      * Returns list of multidimensional arrays with data from model outputs.
      *
@@ -139,16 +147,14 @@ public open class OnnxInferenceModel : InferenceModel() {
     public fun predictRaw(inputData: FloatArray): List<Array<*>> {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
-        // TODO: should support different types (ints/floats) depends on model signature
-        val preparedData = IntBuffer.wrap(inputData.map { it.toInt() }.toIntArray())
+        val inputTensor = createInputTensor(inputData)
 
         // TODO: should be handled for common case and add warning for this case in ONNXInferenceModel
         if (inputShape[1] == -1L) {
             inputShape[1] = 256
             inputShape[2] = 256 // for multipose
         }
-        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
-        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
+        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
         val result = mutableListOf<Array<*>>()
 
@@ -157,7 +163,7 @@ public open class OnnxInferenceModel : InferenceModel() {
         }
 
         output.close()
-        tensor.close()
+        inputTensor.close()
 
         return result.toList()
     }
@@ -213,5 +219,41 @@ public open class OnnxInferenceModel : InferenceModel() {
         println(session.outputNames)
         println(session.outputInfo)
         return "OnnxModel(session=$session)"
+    }
+
+    private fun createInputTensor(inputData: FloatArray): OnnxTensor {
+        val inputTensor = when (inputDataType) {
+            OnnxJavaType.FLOAT -> OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), inputShape)
+            OnnxJavaType.DOUBLE -> OnnxTensor.createTensor(
+                env,
+                DoubleBuffer.wrap(inputData.map { it.toDouble() }.toDoubleArray()),
+                inputShape
+            )
+            OnnxJavaType.INT8 -> OnnxTensor.createTensor(
+                env,
+                ByteBuffer.wrap(inputData.map { it.toInt().toByte() }.toByteArray()),
+                inputShape
+            )
+            OnnxJavaType.INT16 -> OnnxTensor.createTensor(
+                env,
+                ShortBuffer.wrap(inputData.map { it.toInt().toShort() }.toShortArray()),
+                inputShape
+            )
+            OnnxJavaType.INT32 -> OnnxTensor.createTensor(
+                env,
+                IntBuffer.wrap(inputData.map { it.toInt() }.toIntArray()),
+                inputShape
+            )
+            OnnxJavaType.INT64 -> OnnxTensor.createTensor(
+                env,
+                LongBuffer.wrap(inputData.map { it.toLong() }.toLongArray()),
+                inputShape
+            )
+            OnnxJavaType.STRING -> TODO()
+            OnnxJavaType.UINT8 -> TODO()
+            OnnxJavaType.UNKNOWN -> TODO()
+            else -> TODO()
+        }
+        return inputTensor
     }
 }
