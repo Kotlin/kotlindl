@@ -172,7 +172,23 @@ public abstract class Layer(public var name: String) {
     public abstract val paramCount: Int
 }
 
-internal fun requireArraySize(array: LongArray, size: Int, name: String) =
+internal fun requireArraySize(array: IntArray, size: Int, name: String) =
     require(array.size == size) {
         "$name is expected to have size equal $size but got ${array.size}"
     }
+
+internal fun IntArray.toLongList(): List<Long> {
+    return when (size) {
+        0 -> emptyList()
+        1 -> listOf(this[0].toLong())
+        else -> this.mapTo(ArrayList(size)) { it.toLong() }
+    }
+}
+
+internal fun IntArray.toLongArray(): LongArray {
+    return when (size) {
+        0 -> longArrayOf()
+        1 -> longArrayOf(this[0].toLong())
+        else -> LongArray(size) { this[it].toLong() }
+    }
+}

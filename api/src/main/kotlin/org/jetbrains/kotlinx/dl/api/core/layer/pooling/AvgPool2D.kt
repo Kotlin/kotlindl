@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -54,24 +55,11 @@ public class AvgPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        // data conversion due to different signatures of nn.avgPool and nn.maxPool
-        val poolSizeLongList: MutableList<Long> = mutableListOf()
-        poolSize.forEach {
-            poolSizeLongList.add(it.toLong())
-        }
-
-        val stridesLongList: MutableList<Long> = mutableListOf()
-        strides.forEach {
-            stridesLongList.add(it.toLong())
-        }
-
-        val paddingName = padding.paddingName
-
         return tf.nn.avgPool(
             input,
-            poolSizeLongList,
-            stridesLongList,
-            paddingName
+            poolSize.toLongList(),
+            strides.toLongList(),
+            padding.paddingName
         )
     }
 

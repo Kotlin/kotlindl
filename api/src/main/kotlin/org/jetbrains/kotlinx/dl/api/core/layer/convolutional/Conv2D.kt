@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -55,10 +56,10 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  * @constructor Creates [Conv2D] object.
  */
 public class Conv2D(
-    public val filters: Long = 32,
-    public val kernelSize: LongArray = longArrayOf(3, 3),
-    public val strides: LongArray = longArrayOf(1, 1, 1, 1),
-    public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
+    public val filters: Int = 32,
+    public val kernelSize: IntArray = intArrayOf(3, 3),
+    public val strides: IntArray = intArrayOf(1, 1, 1, 1),
+    public val dilations: IntArray = intArrayOf(1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
@@ -95,8 +96,8 @@ public class Conv2D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = dilations(dilationsInternal.toList()).dataFormat("NHWC")
-        return tf.nn.conv2d(input, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+        val options = dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
+        return tf.nn.conv2d(input, kernel, stridesInternal.toLongList(), paddingInternal.paddingName, options)
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -106,20 +107,20 @@ public class Conv2D(
 
         val rows = convOutputLength(
             rowsCount,
-            kernelSizeInternal[0].toInt(),
+            kernelSizeInternal[0],
             paddingInternal,
-            stridesInternal[1].toInt(),
-            dilationsInternal[1].toInt()
+            stridesInternal[1],
+            dilationsInternal[1]
         )
         val cols = convOutputLength(
             colsCount,
-            kernelSizeInternal[1].toInt(),
+            kernelSizeInternal[1],
             paddingInternal,
-            stridesInternal[2].toInt(),
-            dilationsInternal[2].toInt()
+            stridesInternal[2],
+            dilationsInternal[2]
         )
 
-        return Shape.make(batchSize, rows, cols, filtersInternal)
+        return Shape.make(batchSize, rows, cols, filtersInternal.toLong())
     }
 
     override fun toString(): String =

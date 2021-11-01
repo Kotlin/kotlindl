@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
@@ -60,10 +61,10 @@ private const val EXTRA_DIM = 1L
  * @since 0.3
  */
 public class Conv1D(
-    public val filters: Long = 32,
-    public val kernelSize: Long = 3,
-    public val strides: LongArray = longArrayOf(1, 1, 1),
-    public val dilations: LongArray = longArrayOf(1, 1, 1),
+    public val filters: Int = 32,
+    public val kernelSize: Int = 3,
+    public val strides: IntArray = intArrayOf(1, 1, 1),
+    public val dilations: IntArray = intArrayOf(1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val kernelInitializer: Initializer = HeNormal(),
     public val biasInitializer: Initializer = HeUniform(),
@@ -75,9 +76,9 @@ public class Conv1D(
     name: String = "",
 ) : AbstractConv(
     filtersInternal = filters,
-    kernelSizeInternal = longArrayOf(1, kernelSize),
-    stridesInternal = longArrayOf(strides[0], 1, strides[1], strides[2]),
-    dilationsInternal = longArrayOf(dilations[0], 1, dilations[1], dilations[2]),
+    kernelSizeInternal = intArrayOf(1, kernelSize),
+    stridesInternal = intArrayOf(strides[0], 1, strides[1], strides[2]),
+    dilationsInternal = intArrayOf(dilations[0], 1, dilations[1], dilations[2]),
     activationInternal = activation,
     kernelInitializerInternal = kernelInitializer,
     biasInitializerInternal = biasInitializer,
@@ -107,10 +108,10 @@ public class Conv1D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = Conv2d.dilations(dilationsInternal.toList()).dataFormat("NHWC")
+        val options = Conv2d.dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
         val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
-        val result =
-            tf.nn.conv2d(reshapedInput, kernel, stridesInternal.toMutableList(), paddingInternal.paddingName, options)
+        val result = tf.nn.conv2d(reshapedInput, kernel, stridesInternal.toLongList(),
+                                  paddingInternal.paddingName, options)
         return tf.squeeze(result, squeezeAxis)
     }
 
@@ -120,13 +121,13 @@ public class Conv1D(
 
         val cols = convOutputLength(
             colsCount,
-            kernelSize.toInt(),
+            kernelSize,
             paddingInternal,
-            strides[1].toInt(),
-            dilations[1].toInt()
+            strides[1],
+            dilations[1]
         )
 
-        return Shape.make(batchSize, cols, filtersInternal)
+        return Shape.make(batchSize, cols, filtersInternal.toLong())
     }
 
     override fun toString(): String =
