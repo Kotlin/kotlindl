@@ -120,7 +120,7 @@ This, however, does not affect the high-level API.
 
 ## How to configure KotlinDL in your project
 To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
-```kotlin
+```groovy
    repositories {
       mavenCentral()
    }
