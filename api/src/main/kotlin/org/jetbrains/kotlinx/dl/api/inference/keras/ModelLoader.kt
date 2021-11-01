@@ -505,105 +505,57 @@ private fun createPermuteLayer(config: LayerConfig): Layer {
 }
 
 private fun createMaxPool1DLayer(config: LayerConfig): Layer {
-    val poolSize = config.pool_size!!
-    val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
-    val strides = config.strides!!
-    val addedOnesStrides = intArrayOf(1, strides[0], 1)
     return MaxPool1D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, config.pool_size!![0], 1),
+        strides = intArrayOf(1, config.strides!![0], 1),
         padding = convertPadding(config.padding!!)
     )
 }
 
 private fun createMaxPool2DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
-    val addedOnesPoolSize = IntArray(4)
-    addedOnesPoolSize[0] = 1
-    addedOnesPoolSize[1] = poolSize[0]
-    addedOnesPoolSize[2] = poolSize[1]
-    addedOnesPoolSize[3] = 1
-
     val strides = config.strides!!.toIntArray()
-    val addedOnesStrides = IntArray(4)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = 1
-
     return MaxPool2D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, *poolSize, 1),
+        strides = intArrayOf(1, *strides, 1),
         padding = convertPadding(config.padding!!)
     )
 }
 
 private fun createAvgPool1DLayer(config: LayerConfig): Layer {
-    val poolSize = config.pool_size!!
-    val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
-    val strides = config.strides!!
-    val addedOnesStrides = intArrayOf(1, strides[0], 1)
     return AvgPool1D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, config.pool_size!![0], 1),
+        strides = intArrayOf(1, config.strides!![0], 1),
         padding = convertPadding(config.padding!!)
     )
 }
 
 private fun createAvgPool2DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
-    val addedOnesPoolSize = IntArray(4)
-    addedOnesPoolSize[0] = 1
-    addedOnesPoolSize[1] = poolSize[0]
-    addedOnesPoolSize[2] = poolSize[1]
-    addedOnesPoolSize[3] = 1
-
     val strides = config.strides!!.toIntArray()
-    val addedOnesStrides = IntArray(4)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = 1
-
     return AvgPool2D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, *poolSize, 1),
+        strides = intArrayOf(1, *strides, 1),
         padding = convertPadding(config.padding!!)
     )
 }
 
 private fun createAvgPool3DLayer(config: LayerConfig): Layer {
-    val poolSize = config.pool_size!!
-    val addedOnesPoolSize = intArrayOf(1, poolSize[0], poolSize[1], poolSize[2], 1)
-    val strides = config.strides!!
-    val addedOnesStrides = intArrayOf(1, strides[0], strides[1], strides[2], 1)
+    val poolSize = config.pool_size!!.toIntArray()
+    val strides = config.strides!!.toIntArray()
     return AvgPool3D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, *poolSize, 1),
+        strides = intArrayOf(1, *strides, 1),
         padding = convertPadding(config.padding!!)
     )
 }
 
 private fun createMaxPool3DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
-    val addedOnesPoolSize = IntArray(5)
-    addedOnesPoolSize[0] = 1
-    addedOnesPoolSize[1] = poolSize[0]
-    addedOnesPoolSize[2] = poolSize[1]
-    addedOnesPoolSize[3] = poolSize[2]
-    addedOnesPoolSize[0] = 1
-
     val strides = config.strides!!.toIntArray()
-    val addedOnesStrides = IntArray(5)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = strides[2]
-    addedOnesStrides[4] = 1
-
     return MaxPool3D(
-        poolSize = addedOnesPoolSize,
-        strides = addedOnesStrides,
+        poolSize = intArrayOf(1, *poolSize, 1),
+        strides = intArrayOf(1, *strides, 1),
         padding = convertPadding(config.padding!!)
     )
 }
@@ -626,25 +578,11 @@ private fun createReshapeLayer(config: LayerConfig): Layer {
 }
 
 private fun createConv1DLayer(config: LayerConfig): Layer {
-    val kernelSize = config.kernel_size!![0]
-    val strides = config.strides!!
-
-    val addedOnesStrides = IntArray(3)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = 1
-
-    val dilation = config.dilation_rate!!
-    val addedOnesDilation = IntArray(3)
-    addedOnesDilation[0] = 1
-    addedOnesDilation[1] = dilation[0]
-    addedOnesDilation[2] = 1
-
     return Conv1D(
         filters = config.filters!!,
-        kernelSize = kernelSize,
-        strides = addedOnesStrides,
-        dilations = addedOnesDilation,
+        kernelSize = config.kernel_size!![0],
+        strides = intArrayOf(1, config.strides!![0], 1),
+        dilations = intArrayOf(1, config.dilation_rate!![0], 1),
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
@@ -658,26 +596,13 @@ private fun createConv1DLayer(config: LayerConfig): Layer {
 
 private fun createConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
-    val strides = config.strides!!
-
-    val addedOnesStrides = IntArray(4)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = 1
-
-    val dilation = config.dilation_rate!!
-    val addedOnesDilation = IntArray(4)
-    addedOnesDilation[0] = 1
-    addedOnesDilation[1] = dilation[0]
-    addedOnesDilation[2] = dilation[1]
-    addedOnesDilation[3] = 1
-
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
     return Conv2D(
         filters = config.filters!!,
         kernelSize = kernelSize,
-        strides = addedOnesStrides,
-        dilations = addedOnesDilation,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
@@ -691,28 +616,13 @@ private fun createConv2DLayer(config: LayerConfig): Layer {
 
 private fun createConv3DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
-    val strides = config.strides!!
-
-    val addedOnesStrides = IntArray(5)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = strides[2]
-    addedOnesStrides[4] = 1
-
-    val dilation = config.dilation_rate!!
-    val addedOnesDilation = IntArray(5)
-    addedOnesDilation[0] = 1
-    addedOnesDilation[1] = dilation[0]
-    addedOnesDilation[2] = dilation[1]
-    addedOnesDilation[3] = dilation[2]
-    addedOnesDilation[4] = 1
-
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
     return Conv3D(
         filters = config.filters!!,
         kernelSize = kernelSize,
-        strides = addedOnesStrides,
-        dilations = addedOnesDilation,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
         activation = convertToActivation(config.activation!!),
         kernelInitializer = convertToInitializer(config.kernel_initializer!!),
         biasInitializer = convertToInitializer(config.bias_initializer!!),
@@ -726,25 +636,12 @@ private fun createConv3DLayer(config: LayerConfig): Layer {
 
 private fun createDepthwiseConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
-    val strides = config.strides!!
-
-    val addedOnesStrides = IntArray(4)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = 1
-
-    val dilation = config.dilation_rate!!
-    val addedOnesDilation = IntArray(4)
-    addedOnesDilation[0] = 1
-    addedOnesDilation[1] = dilation[0]
-    addedOnesDilation[2] = dilation[1]
-    addedOnesDilation[3] = 1
-
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
     return DepthwiseConv2D(
         kernelSize = kernelSize,
-        strides = addedOnesStrides,
-        dilations = addedOnesDilation,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
         activation = convertToActivation(config.activation!!),
         depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
         depthMultiplier = config.depth_multiplier!!,
@@ -759,26 +656,14 @@ private fun createDepthwiseConv2DLayer(config: LayerConfig): Layer {
 
 private fun createSeparableConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
-    val strides = config.strides!!
-
-    val addedOnesStrides = IntArray(4)
-    addedOnesStrides[0] = 1
-    addedOnesStrides[1] = strides[0]
-    addedOnesStrides[2] = strides[1]
-    addedOnesStrides[3] = 1
-
-    val dilation = config.dilation_rate!!
-    val addedOnesDilation = IntArray(4)
-    addedOnesDilation[0] = 1
-    addedOnesDilation[1] = dilation[0]
-    addedOnesDilation[2] = dilation[1]
-    addedOnesDilation[3] = 1
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
 
     return SeparableConv2D(
         filters = config.filters!!,
         kernelSize = kernelSize,
-        strides = addedOnesStrides,
-        dilations = addedOnesDilation,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
         activation = convertToActivation(config.activation!!),
         depthwiseInitializer = convertToInitializer(config.depthwise_initializer!!),
         pointwiseInitializer = convertToInitializer(config.pointwise_initializer!!),
