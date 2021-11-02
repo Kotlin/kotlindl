@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
@@ -50,10 +51,10 @@ import kotlin.math.roundToInt
  * @param name of the layer to name its variables
  */
 public abstract class AbstractConv(
-    protected val filtersInternal: Long,
-    protected val kernelSizeInternal: LongArray,
-    protected val stridesInternal: LongArray,
-    protected val dilationsInternal: LongArray,
+    protected val filtersInternal: Int,
+    protected val kernelSizeInternal: IntArray,
+    protected val stridesInternal: IntArray,
+    protected val dilationsInternal: IntArray,
     protected val activationInternal: Activations,
     protected val kernelInitializerInternal: Initializer,
     protected val biasInitializerInternal: Initializer,
@@ -92,9 +93,9 @@ public abstract class AbstractConv(
         // should be calculated before addWeight because it's used in calculation
         val inputDepth = numberOfChannels // number of input channels
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
-        fanIn = (inputDepth * multiply(*kernelSizeInternal)).toInt()
-        fanOut = ((outputDepth * multiply(*kernelSizeInternal)).toDouble() /
-                multiply(*stridesInternal).toDouble()).roundToInt()
+        fanIn = (inputDepth * multiply(*kernelSizeInternal.toLongArray())).toInt()
+        fanOut = ((outputDepth * multiply(*kernelSizeInternal.toLongArray())).toDouble() /
+                multiply(*stridesInternal.toLongArray()).toDouble()).roundToInt()
 
         createConvVariables(tf, kGraph)
     }
@@ -137,7 +138,7 @@ public abstract class AbstractConv(
 
     /** Define the number of output channels given the number of input channels.
      *  Defaults to the number of filter in convolutional layer. */
-    protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal
+    protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal.toLong()
 
     /**
      * Define the [kernelShape] by default from its [kernelSizeInternal],
@@ -146,7 +147,7 @@ public abstract class AbstractConv(
      * @param numberOfChannels for input of this layer
      */
     protected open fun computeKernelShape(numberOfChannels: Long): Shape =
-        shapeFromDims(*kernelSizeInternal, numberOfChannels, filtersInternal)
+        shapeFromDims(*kernelSizeInternal.toLongArray(), numberOfChannels, filtersInternal.toLong())
 
     /**
      * Define the [biasShape] by default from its [filtersInternal] and
@@ -155,7 +156,7 @@ public abstract class AbstractConv(
      * @param numberOfChannels for input of this layer
      */
     protected open fun computeBiasShape(numberOfChannels: Long): Shape =
-        Shape.make(filtersInternal)
+        Shape.make(filtersInternal.toLong())
 
     /** Given a layer name specify its kernel name. */
     protected abstract fun kernelVarName(name: String): String
