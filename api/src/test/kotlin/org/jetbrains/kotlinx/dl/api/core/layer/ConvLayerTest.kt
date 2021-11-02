@@ -34,7 +34,7 @@ open class ConvLayerTest {
                     layer.build(tf, kGraph, input.shape)
                     layer.computeOutputShape(input.shape)
                     val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-                    kGraph.initializeGraphVariables(session)
+                    (layer as? ParametrizedLayer)?.initialize(session)
                     session.runner().fetch(output).run().first().use { outputTensor ->
                         val outputShape = outputTensor.shape()
                         val expectedShape = expectedOutput.shape.toLongArray()

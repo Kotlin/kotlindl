@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -64,6 +63,9 @@ public abstract class AbstractConv(
     /** Tensor with bias weights */
     internal var bias: KVariable? = null
 
+    public override val variables: List<KVariable>
+        get() = listOfNotNull(kernel, bias)
+
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
@@ -76,9 +78,7 @@ public abstract class AbstractConv(
 
         kernel = createVariable(
             tf,
-            kGraph,
             kernelVarName(name),
-            isTrainable,
             computeKernelShape(numberOfChannels),
             fanIn,
             fanOut,
@@ -89,9 +89,7 @@ public abstract class AbstractConv(
         if (useBias) {
             bias = createVariable(
                 tf,
-                kGraph,
                 biasVarName(name),
-                isTrainable,
                 computeBiasShape(numberOfChannels),
                 fanIn,
                 fanOut,
@@ -125,9 +123,6 @@ public abstract class AbstractConv(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int
-        get() = (kernel.shape.numElements() + (bias?.shape?.numElements() ?: 0)).toInt()
 
     /** Define the number of output channels given the number of input channels.
      *  Defaults to the number of filter in convolutional layer. */

@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
@@ -119,6 +118,9 @@ public class SeparableConv2D(
     internal lateinit var pointwiseKernel: KVariable
     internal var bias: KVariable? = null
 
+    override val variables: List<KVariable>
+        get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias)
+
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
         requireArraySize(strides, 4, "strides")
@@ -139,9 +141,7 @@ public class SeparableConv2D(
         val depthwiseKernelShape = shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, depthMultiplier.toLong())
         depthwiseKernel = createVariable(
             tf,
-            kGraph,
             separableConv2dDepthwiseKernelVarName(name),
-            isTrainable,
             depthwiseKernelShape,
             fanIn,
             fanOut,
@@ -151,9 +151,7 @@ public class SeparableConv2D(
         val pointwiseKernelShape = shapeFromDims(1, 1, numberOfChannels * depthMultiplier, filters.toLong())
         pointwiseKernel = createVariable(
             tf,
-            kGraph,
             separableConv2dPointwiseKernelVarName(name),
-            isTrainable,
             pointwiseKernelShape,
             fanIn,
             fanOut,
@@ -164,9 +162,7 @@ public class SeparableConv2D(
             val biasShape = Shape.make(filters.toLong())
             bias = createVariable(
                 tf,
-                kGraph,
                 separableConv2dBiasVarName(name),
-                isTrainable,
                 biasShape,
                 fanIn,
                 fanOut,
@@ -240,9 +236,4 @@ public class SeparableConv2D(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int
-        get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias).sumOf { it.shape.numElements() }.toInt()
-
-
 }

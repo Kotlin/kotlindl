@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -33,9 +32,7 @@ public data class KVariable(
 
 internal fun createVariable(
     tf: Ops,
-    kGraph: KGraph,
     variableName: String,
-    isTrainable: Boolean,
     shape: Shape,
     fanIn: Int,
     fanOut: Int,
@@ -43,12 +40,7 @@ internal fun createVariable(
     regularizer: Regularizer?
 ): KVariable {
     val tfVariable = tf.withName(variableName).variable(shape, getDType())
-
     val initOp = initializer.apply(fanIn, fanOut, tf, tfVariable, variableName)
-    kGraph.addLayerVariable(tfVariable, isTrainable)
-    kGraph.addInitializer(variableName, initOp)
-    if (regularizer != null) kGraph.addVariableRegularizer(tfVariable, regularizer)
-
     return KVariable(
         name = variableName,
         shape = shape,

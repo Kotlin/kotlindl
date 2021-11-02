@@ -56,7 +56,7 @@ open class LayerTest {
                 val tf = Ops.create(graph)
                 KGraph(graph.toGraphDef()).use { kGraph ->
                     val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
-                    kGraph.initializeGraphVariables(session)
+                    (layer as? ParametrizedLayer)?.initialize(session)
                     val outputTensor = session.runner().fetch(outputOp).run().first()
                     return outputTensor
                 }

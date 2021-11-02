@@ -13,7 +13,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 import org.tensorflow.Operand
@@ -56,6 +55,9 @@ public class Dense(
     internal lateinit var kernel: KVariable
     internal var bias: KVariable? = null
 
+    override val variables: List<KVariable>
+        get() = listOfNotNull(kernel, bias)
+
     override var isTrainable: Boolean = true
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
@@ -65,9 +67,7 @@ public class Dense(
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         kernel = createVariable(
             tf,
-            kGraph,
             denseKernelVarName(name),
-            isTrainable,
             kernelShape,
             fanIn,
             fanOut,
@@ -79,9 +79,7 @@ public class Dense(
             val biasShape = Shape.make(outputSize.toLong())
             bias = createVariable(
                 tf,
-                kGraph,
                 denseBiasVarName(name),
-                isTrainable,
                 biasShape,
                 fanIn,
                 fanOut,
@@ -118,7 +116,4 @@ public class Dense(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
-
-    override val paramCount: Int
-        get() = listOfNotNull(kernel, bias).sumOf { it.shape.numElements() }.toInt()
 }

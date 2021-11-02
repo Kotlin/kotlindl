@@ -35,7 +35,6 @@ public abstract class Layer(public var name: String) {
      * Extend this function to define variables in layer.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [kGraph] [KGraph] to update it.
      * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
      */
     public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)

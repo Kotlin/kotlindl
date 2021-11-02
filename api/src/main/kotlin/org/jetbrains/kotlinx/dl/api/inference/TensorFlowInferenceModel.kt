@@ -61,6 +61,9 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
+    protected open fun variables(): List<Variable<Float>> = emptyList()
+    protected open fun frozenVariables(): List<Variable<Float>> = emptyList()
+
     /**
      * Generates output prediction for the input sample.
      *
@@ -197,14 +200,14 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
     protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
+        return variableName.startsWith("optimizer") && frozenVariables()
             .map { it.ref().op().name() } // extract names
             .any { variableName.contains(it) }
     }
 
     /** Returns a list of variables paired with their data. */
     protected fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
-        var variables = kGraph.layerVariables()
+        var variables = variables()
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
         }

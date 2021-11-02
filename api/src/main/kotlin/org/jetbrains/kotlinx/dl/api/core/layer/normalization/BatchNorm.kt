@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingMeanVarName
@@ -59,6 +58,9 @@ public class BatchNorm(
     internal lateinit var movingMean: KVariable
     internal lateinit var movingVariance: KVariable
 
+    override val variables: List<KVariable>
+        get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
+
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         val weightShape = Shape.make(inputShape.size(axis[0]))
@@ -70,9 +72,7 @@ public class BatchNorm(
 
         movingMean = createVariable(
             tf,
-            kGraph,
             batchNormMovingMeanVarName(name),
-            isTrainable,
             weightShape,
             fanIn,
             fanOut,
@@ -82,9 +82,7 @@ public class BatchNorm(
 
         movingVariance = createVariable(
             tf,
-            kGraph,
             batchNormMovingVarianceVarName(name),
-            isTrainable,
             weightShape,
             fanIn,
             fanOut,
@@ -95,9 +93,7 @@ public class BatchNorm(
         if (scale) {
             gamma = createVariable(
                 tf,
-                kGraph,
                 batchNormGammaVarName(name),
-                isTrainable,
                 weightShape,
                 fanIn,
                 fanOut,
@@ -109,9 +105,7 @@ public class BatchNorm(
         if (center) {
             beta = createVariable(
                 tf,
-                kGraph,
                 batchNormBetaVarName(name),
-                isTrainable,
                 weightShape,
                 fanIn,
                 fanOut,
@@ -188,8 +182,5 @@ public class BatchNorm(
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int
-        get() = listOfNotNull(gamma, beta, movingMean, movingVariance).sumOf { it.shape.numElements() }.toInt()
 }
 

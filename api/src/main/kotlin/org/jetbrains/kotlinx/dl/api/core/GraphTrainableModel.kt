@@ -10,12 +10,10 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
-import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
@@ -37,6 +35,7 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
+import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.FloatBuffer
@@ -115,6 +114,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         session = Session(kGraph.tfGraph)
     }
 
+    override fun variables(): List<Variable<Float>> = layers.tfVariables()
+    override fun frozenVariables(): List<Variable<Float>> = layers.frozenTfVariables()
+
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
@@ -171,7 +173,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         yPredOp = forward(xOp, inputLayer)
         lossOp = buildLossFunction(loss)
-        targets = optimizer.prepareTargets(kGraph, tf, lossOp)
+        targets = optimizer.prepareTargets(kGraph, layers.trainableTfVariables(), tf, lossOp)
 
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
@@ -189,9 +191,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         var totalLoss = basicLoss
         // TODO: probably regularization output should be divided on numberOfLossesOp and changed together with loss before averaging
-        kGraph.variableRegularizers.forEach { (variable, regularizer) ->
-            run {
-                totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable))
+        layers.variables().forEach { variable ->
+            variable.regularizer?.let { regularizer ->
+                totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable.variable))
             }
         }
         return tf.withName(TRAINING_LOSS).identity(totalLoss)
@@ -259,7 +261,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
 
         logger.debug { "Initialization of TensorFlow Graph variables." }
-        kGraph.initializeGraphVariables(session)
+        layers.initializeVariables(session)
         isModelInitialized = true
     }
 
@@ -274,7 +276,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         logger.debug { "Initialization of TensorFlow Graph variables." }
-        kGraph.initializeGraphVariables(session)
+        layers.initializeVariables(session)
         isModelInitialized = true
         isOptimizerVariableInitialized = false
     }
@@ -292,7 +294,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         if (!isModelInitialized) {
             logger.debug { "Initialization of TensorFlow Graph variables." }
-            kGraph.initializeGraphVariables(session)
+            layers.initializeVariables(session)
             isModelInitialized = true
         }
 

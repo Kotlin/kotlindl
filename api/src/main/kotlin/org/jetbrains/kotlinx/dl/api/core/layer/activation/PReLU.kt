@@ -13,7 +13,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -50,8 +49,9 @@ public class PReLU(
     override var weights: Map<String, Array<*>>
         get() = extractWeights(alpha)
         set(value) = assignWeights(value)
-    override val paramCount: Int
-        get() = alpha.shape.numElements().toInt()
+
+    override val variables: List<KVariable>
+        get() = listOf(alpha)
 
     override var isTrainable: Boolean = true
 
@@ -69,9 +69,7 @@ public class PReLU(
         val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
         alpha = createVariable(
             tf,
-            kGraph,
             alphaVariableName(),
-            isTrainable,
             alphaShape,
             fanIn,
             fanOut,
