@@ -10,9 +10,9 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -68,10 +68,10 @@ private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
  * @since 0.2
  */
 public class SeparableConv2D(
-    public val filters: Long = 32,
-    public val kernelSize: LongArray = longArrayOf(3, 3),
-    public val strides: LongArray = longArrayOf(1, 1, 1, 1),
-    public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
+    public val filters: Int = 32,
+    public val kernelSize: IntArray = intArrayOf(3, 3),
+    public val strides: IntArray = intArrayOf(1, 1, 1, 1),
+    public val dilations: IntArray = intArrayOf(1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val depthMultiplier: Int = 1,
     public val depthwiseInitializer: Initializer = HeNormal(),
@@ -107,9 +107,9 @@ public class SeparableConv2D(
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
-        pointwiseKernelShape = shapeFromDims(1, 1, numberOfChannels * this.depthMultiplier, filters)
-        if (useBias) biasShape = Shape.make(filters)
+        depthwiseKernelShape = shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, this.depthMultiplier.toLong())
+        pointwiseKernelShape = shapeFromDims(1, 1, numberOfChannels * this.depthMultiplier, filters.toLong())
+        if (useBias) biasShape = Shape.make(filters.toLong())
 
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
         // calculate fanIn, fanOut
@@ -165,15 +165,15 @@ public class SeparableConv2D(
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(
-            rows, kernelSize[0].toInt(), padding,
-            strides[1].toInt(), dilations[1].toInt()
+            rows, kernelSize[0], padding,
+            strides[1], dilations[1]
         )
         cols = convOutputLength(
-            cols, kernelSize[1].toInt(), padding,
-            strides[2].toInt(), dilations[2].toInt()
+            cols, kernelSize[1], padding,
+            strides[2], dilations[2]
         )
 
-        val shape = Shape.make(inputShape.size(0), rows, cols, filters)
+        val shape = Shape.make(inputShape.size(0), rows, cols, filters.toLong())
         outputShape = TensorShape(shape)
         return shape
     }
@@ -185,13 +185,13 @@ public class SeparableConv2D(
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val paddingName = padding.paddingName
-        val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
+        val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toLongList()).dataFormat("NHWC")
 
         val depthwiseOutput: Operand<Float> =
             tf.nn.depthwiseConv2dNative(
                 input,
                 depthwiseKernel,
-                strides.toMutableList(),
+                strides.toLongList(),
                 paddingName,
                 depthwiseConv2DOptions
             )

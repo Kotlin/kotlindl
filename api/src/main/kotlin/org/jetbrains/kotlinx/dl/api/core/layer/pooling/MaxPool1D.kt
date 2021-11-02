@@ -27,8 +27,8 @@ import org.tensorflow.op.core.Squeeze
  * as the input.
  */
 public class MaxPool1D(
-    public val poolSize: LongArray = longArrayOf(1, 2, 1),
-    public val strides: LongArray = longArrayOf(1, 2, 1),
+    public val poolSize: IntArray = intArrayOf(1, 2, 1),
+    public val strides: IntArray = intArrayOf(1, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
@@ -52,8 +52,7 @@ public class MaxPool1D(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        var steps = inputShape.size(1)
-        steps = convOutputLength(steps, poolSize[1].toInt(), padding, strides[1].toInt())
+        val steps = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
@@ -83,8 +82,8 @@ public class MaxPool1D(
          * However, it seems it does not work for the case of "channels_first". So, instead
          * we are choosing to set the value of pool size and strides based on the data format.
          */
-        tfPoolSize[expandAxis - 1] = poolSize[1].toInt()
-        tfStrides[expandAxis - 1] = strides[1].toInt()
+        tfPoolSize[expandAxis - 1] = poolSize[1]
+        tfStrides[expandAxis - 1] = strides[1]
 
         val maxPool = tf.nn.maxPool(
             tfInput,

@@ -40,8 +40,8 @@ private fun modifiedLenet5(): Sequential = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
@@ -55,8 +55,8 @@ private fun modifiedLenet5(): Sequential = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Elu,
         kernelInitializer = kernelInitializer,
         biasInitializer = biasInitializer,
