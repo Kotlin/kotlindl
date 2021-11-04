@@ -109,7 +109,7 @@ internal class AvgPool3DTest {
 
     @Test
     fun withPaddingAndStride() {
-        val layer = AvgPool3D(strides = longArrayOf(1, 1, 1, 1, 1), padding = ConvPadding.SAME)
+        val layer = AvgPool3D(strides = intArrayOf(1, 1, 1, 1, 1), padding = ConvPadding.SAME)
         val expected = arrayOf(
             arrayOf(
                 arrayOf(
@@ -188,7 +188,7 @@ internal class AvgPool3DTest {
 
     @Test
     fun withPoolSizeAndStride() {
-        val layer = AvgPool3D(poolSize = longArrayOf(1, 2, 2, 3, 1), strides = longArrayOf(1, 1, 1, 1, 1))
+        val layer = AvgPool3D(poolSize = intArrayOf(1, 2, 2, 3, 1), strides = intArrayOf(1, 1, 1, 1, 1))
         val expected = arrayOf(
             arrayOf(
                 arrayOf(

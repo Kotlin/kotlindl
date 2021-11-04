@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -26,8 +27,8 @@ import org.tensorflow.op.Ops
  * has the same dimension as the input.
  */
 public class AvgPool3D(
-    public val poolSize: LongArray = longArrayOf(1, 2, 2, 2, 1),
-    public val strides: LongArray = longArrayOf(1, 2, 2, 2, 1),
+    public val poolSize: IntArray = intArrayOf(1, 2, 2, 2, 1),
+    public val strides: IntArray = intArrayOf(1, 2, 2, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
@@ -51,12 +52,9 @@ public class AvgPool3D(
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape): Unit = Unit
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        var dim1 = inputShape.size(1)
-        var dim2 = inputShape.size(2)
-        var dim3 = inputShape.size(3)
-        dim1 = convOutputLength(dim1, poolSize[1].toInt(), padding, strides[1].toInt())
-        dim2 = convOutputLength(dim2, poolSize[2].toInt(), padding, strides[2].toInt())
-        dim3 = convOutputLength(dim3, poolSize[3].toInt(), padding, strides[3].toInt())
+        val dim1 = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
+        val dim2 = convOutputLength(inputShape.size(2), poolSize[2], padding, strides[2])
+        val dim3 = convOutputLength(inputShape.size(3), poolSize[3], padding, strides[3])
 
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
@@ -67,12 +65,11 @@ public class AvgPool3D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val tfPadding = padding.paddingName
         return tf.nn.avgPool3d(
             input,
-            poolSize.toList(),
-            strides.toList(),
-            tfPadding
+            poolSize.toLongList(),
+            strides.toLongList(),
+            padding.paddingName
         )
     }
 

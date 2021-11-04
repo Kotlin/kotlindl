@@ -50,8 +50,8 @@ class SequentialInferenceTest {
         ),
         Conv2D(
             filters = 32,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = kernelInitializer,
             biasInitializer = biasInitializer,
@@ -65,8 +65,8 @@ class SequentialInferenceTest {
         ),
         Conv2D(
             filters = 64,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = kernelInitializer,
             biasInitializer = biasInitializer,

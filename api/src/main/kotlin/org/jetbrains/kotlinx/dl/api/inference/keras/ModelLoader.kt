@@ -572,9 +572,9 @@ private fun createPermuteLayer(config: LayerConfig, name: String): Layer {
 
 private fun createMaxPool1DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
-    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
+    val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
     val strides = config.strides!!
-    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), 1)
+    val addedOnesStrides = intArrayOf(1, strides[0], 1)
     return MaxPool1D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
@@ -608,9 +608,9 @@ private fun createMaxPool2DLayer(config: LayerConfig, name: String): Layer {
 
 private fun createAvgPool1DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
-    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), 1)
+    val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
     val strides = config.strides!!
-    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), 1)
+    val addedOnesStrides = intArrayOf(1, strides[0], 1)
     return AvgPool1D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
@@ -644,9 +644,9 @@ private fun createAvgPool2DLayer(config: LayerConfig, name: String): Layer {
 
 private fun createAvgPool3DLayer(config: LayerConfig, name: String): Layer {
     val poolSize = config.pool_size!!
-    val addedOnesPoolSize = longArrayOf(1, poolSize[0].toLong(), poolSize[1].toLong(), poolSize[2].toLong(), 1)
+    val addedOnesPoolSize = intArrayOf(1, poolSize[0], poolSize[1], poolSize[2], 1)
     val strides = config.strides!!
-    val addedOnesStrides = longArrayOf(1, strides[0].toLong(), strides[1].toLong(), strides[2].toLong(), 1)
+    val addedOnesStrides = intArrayOf(1, strides[0], strides[1], strides[2], 1)
     return AvgPool3D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
@@ -702,22 +702,22 @@ private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createConv1DLayer(config: LayerConfig, name: String): Layer {
-    val kernelSize = config.kernel_size!!.map { it.toLong() }[0]
-    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+    val kernelSize = config.kernel_size!![0]
+    val strides = config.strides!!
 
-    val addedOnesStrides = LongArray(3)
+    val addedOnesStrides = IntArray(3)
     addedOnesStrides[0] = 1
     addedOnesStrides[1] = strides[0]
     addedOnesStrides[2] = 1
 
-    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilation = LongArray(3)
+    val dilation = config.dilation_rate!!
+    val addedOnesDilation = IntArray(3)
     addedOnesDilation[0] = 1
     addedOnesDilation[1] = dilation[0]
     addedOnesDilation[2] = 1
 
     return Conv1D(
-        filters = config.filters!!.toLong(),
+        filters = config.filters!!,
         kernelSize = kernelSize,
         strides = addedOnesStrides,
         dilations = addedOnesDilation,
@@ -734,24 +734,24 @@ private fun createConv1DLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createConv2DLayer(config: LayerConfig, name: String): Layer {
-    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
-    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!
 
-    val addedOnesStrides = LongArray(4)
+    val addedOnesStrides = IntArray(4)
     addedOnesStrides[0] = 1
     addedOnesStrides[1] = strides[0]
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilation = LongArray(4)
+    val dilation = config.dilation_rate!!
+    val addedOnesDilation = IntArray(4)
     addedOnesDilation[0] = 1
     addedOnesDilation[1] = dilation[0]
     addedOnesDilation[2] = dilation[1]
     addedOnesDilation[3] = 1
 
     return Conv2D(
-        filters = config.filters!!.toLong(),
+        filters = config.filters!!,
         kernelSize = kernelSize,
         strides = addedOnesStrides,
         dilations = addedOnesDilation,
@@ -768,18 +768,18 @@ private fun createConv2DLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createConv3DLayer(config: LayerConfig, name: String): Layer {
-    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
-    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!
 
-    val addedOnesStrides = LongArray(5)
+    val addedOnesStrides = IntArray(5)
     addedOnesStrides[0] = 1
     addedOnesStrides[1] = strides[0]
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = strides[2]
     addedOnesStrides[4] = 1
 
-    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilation = LongArray(5)
+    val dilation = config.dilation_rate!!
+    val addedOnesDilation = IntArray(5)
     addedOnesDilation[0] = 1
     addedOnesDilation[1] = dilation[0]
     addedOnesDilation[2] = dilation[1]
@@ -787,7 +787,7 @@ private fun createConv3DLayer(config: LayerConfig, name: String): Layer {
     addedOnesDilation[4] = 1
 
     return Conv3D(
-        filters = config.filters!!.toLong(),
+        filters = config.filters!!,
         kernelSize = kernelSize,
         strides = addedOnesStrides,
         dilations = addedOnesDilation,
@@ -804,17 +804,17 @@ private fun createConv3DLayer(config: LayerConfig, name: String): Layer {
 }
 
 private fun createDepthwiseConv2DLayer(config: LayerConfig, name: String): Layer {
-    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
-    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!
 
-    val addedOnesStrides = LongArray(4)
+    val addedOnesStrides = IntArray(4)
     addedOnesStrides[0] = 1
     addedOnesStrides[1] = strides[0]
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilation = LongArray(4)
+    val dilation = config.dilation_rate!!
+    val addedOnesDilation = IntArray(4)
     addedOnesDilation[0] = 1
     addedOnesDilation[1] = dilation[0]
     addedOnesDilation[2] = dilation[1]
@@ -838,24 +838,24 @@ private fun createDepthwiseConv2DLayer(config: LayerConfig, name: String): Layer
 }
 
 private fun createSeparableConv2DLayer(config: LayerConfig, name: String): Layer {
-    val kernelSize = config.kernel_size!!.map { it.toLong() }.toLongArray()
-    val strides = config.strides!!.map { it.toLong() }.toLongArray()
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!
 
-    val addedOnesStrides = LongArray(4)
+    val addedOnesStrides = IntArray(4)
     addedOnesStrides[0] = 1
     addedOnesStrides[1] = strides[0]
     addedOnesStrides[2] = strides[1]
     addedOnesStrides[3] = 1
 
-    val dilation = config.dilation_rate!!.map { it.toLong() }.toLongArray()
-    val addedOnesDilation = LongArray(4)
+    val dilation = config.dilation_rate!!
+    val addedOnesDilation = IntArray(4)
     addedOnesDilation[0] = 1
     addedOnesDilation[1] = dilation[0]
     addedOnesDilation[2] = dilation[1]
     addedOnesDilation[3] = 1
 
     return SeparableConv2D(
-        filters = config.filters!!.toLong(),
+        filters = config.filters!!,
         kernelSize = kernelSize,
         strides = addedOnesStrides,
         dilations = addedOnesDilation,
