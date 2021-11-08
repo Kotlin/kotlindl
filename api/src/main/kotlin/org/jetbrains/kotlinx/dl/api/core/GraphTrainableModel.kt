@@ -191,7 +191,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         var totalLoss = basicLoss
         // TODO: probably regularization output should be divided on numberOfLossesOp and changed together with loss before averaging
-        layers.variables().forEach { variable ->
+        layers.trainableVariables().forEach { variable ->
             variable.regularizer?.let { regularizer ->
                 totalLoss = tf.math.add(totalLoss, regularizer.apply(tf, variable.variable))
             }
