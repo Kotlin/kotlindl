@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Stack
 
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
@@ -306,7 +307,18 @@ public enum class Activations {
      * ```
      * Calls [TanhActivation] under the hood.
      */
-    TanhShrink;
+    TanhShrink,
+
+    /**
+     * Sparsemax activation function is similar to softmax but able to output sparse probabilities.
+     *
+     * for batch `i` and class `j`
+     *
+     * sparsemax(x)`[i,j]` = max(0, logits`[i,j]` - `τ`(logits`[i,:]`))
+     *
+     * @see <a href="https://arxiv.org/abs/1602.02068">From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label Classification</a>
+     */
+    Sparsemax;
 
     public companion object {
         /**
@@ -335,6 +347,7 @@ public enum class Activations {
                 LiSHT -> LishtActivation()
                 Snake -> SnakeActivation()
                 Gelu -> GeluActivation()
+                Sparsemax -> SparsemaxActivation()
             }
         }
     }
@@ -581,5 +594,112 @@ public class GeluActivation(public val approximate: Boolean = false) : Activatio
                 )
             )
         }
+    }
+}
+
+/**
+ * @property [axis] axis along which the sparsemax operation is applied.
+ * @see [Activations.Sparsemax]
+ */
+public class SparsemaxActivation(private val axis: Int = -1) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+
+        // Keep references to shape because we perform sparsemax on 2D.
+        // If required, we need to reshape features to 2D and back.
+        val shape = features.asOutput().shape()
+        val rank = shape.numDimensions()
+
+        val isLastAxis = (axis == -1) || (axis == rank - 1)
+        if (isLastAxis) {
+            val output = compute2DSparsemax(tf, features)
+            return tf.ensureShape(output, shape)
+        }
+
+        // compute2DSparsemax only calculates sparsemax operation along it's last axis.
+        // If different axis is required for sparsemax, we first swap axes, then calculate compute2DSparsemax then
+        // swap axes back.
+        val axisNorm = axis % rank //ensure axis is within rank
+        val logits = swapAxis(tf, features, axisNorm, rank - 1)
+
+        val output = compute2DSparsemax(tf, logits)
+        return tf.ensureShape(swapAxis(tf, output, axisNorm, rank - 1), shape)
+    }
+
+    private fun swapAxis(tf: Ops, features: Operand<Float>, axis: Int, lastIndex: Int): Operand<Float> {
+        /**
+         * swaps features Operand's lastIndex with axis
+         */
+
+        val range = (tf.range(tf.constant(0), tf.constant(lastIndex + 1), tf.constant(1)))
+        return tf.linalg.transpose(
+            features,
+            tf.tensorScatterUpdate(
+                range,
+                tf.constant(arrayOf(intArrayOf(axis), intArrayOf(lastIndex))),
+                tf.constant(intArrayOf(lastIndex, axis))
+            )
+        )
+    }
+
+    private fun compute2DSparsemax(tf: Ops, features: Operand<Float>): Operand<Float> {
+        val shape = features.asOutput().tensor().shape()
+        val dims = shape[shape.lastIndex]
+        val dimsOp = tf.constant(dims.toInt())
+        val obs = shape.reduce { acc, l -> acc * l } / dims
+        val one = tf.constant(1f)
+
+        val z = tf.reshape(features, tf.constant(longArrayOf(obs, dims)))
+        val zSorted = tf.nn.topK(z, dimsOp)
+        val zCumSum = tf.math.cumsum(zSorted.values(), tf.constant(-1))
+
+        val k = tf.range(one, tf.math.add(tf.dtypes.cast(dimsOp, Float::class.javaObjectType), one), one)
+
+        // check where (k * z_sorted + 1 > cumsum(z)
+        val zCheck = tf.math.greater(tf.math.add(one, tf.math.mul(k, zSorted.values())), zCumSum)
+
+        // casting boolean values to Int makes true = 1, false = 0,
+        // then summing each row is same as finding last value that is one in such vector [1,1,..1,0,0,..,0]
+        val kz = tf.reduceSum(tf.dtypes.cast(zCheck, Int::class.javaObjectType), tf.constant(-1))
+
+
+        // If there are inf values or all values are -inf, the k_z will be zero,
+        // this is mathematically invalid and will also cause the gather_nd to fail.
+        // Prevent this issue for now by setting k_z = 1 if k_z = 0, this is then
+        // fixed later (see p_safe) by returning p = nan. This results in the same
+        // behavior as softmax.
+        // (This comment is taken from original python implementation)
+        val kzSafe = tf.math.maximum(kz, tf.constant(1))
+        val indices = tf.stack(
+            listOf(
+                tf.range(tf.constant(0), tf.constant(obs.toInt()), tf.constant(1)),
+                tf.math.sub(tf.reshape(kzSafe, tf.constant(intArrayOf(-1))), tf.constant(1))
+            ), Stack.axis(1)
+        )
+
+        val tauSum = tf.gatherNd(zCumSum, indices)
+        val tauZ = tf.math.div(tf.math.sub(tauSum, one), tf.dtypes.cast(kz, Float::class.javaObjectType))
+
+        val p = tf.math.maximum(tf.constant(0f), tf.math.sub(z, tf.expandDims(tauZ, tf.constant(-1))))
+
+        // getting a reference to last index. Similar to slicing  the last index of a python array [:, -1]
+        val zCumsumLastIndex = tf.stack(
+            listOf(
+                tf.range(tf.constant(0), tf.constant(obs.toInt()), tf.constant(1)),
+                tf.fill(tf.constant(longArrayOf(obs)), tf.math.sub(dimsOp, tf.constant(1)))
+            ), Stack.axis(1)
+        )
+
+        val pSafe = tf.where3(
+            tf.math.logicalOr(
+                tf.math.equal(kz, tf.constant(0)),
+                tf.math.isNan(
+                    tf.gatherNd(zCumSum, zCumsumLastIndex)
+                )
+            ),
+            tf.fill(tf.constant(longArrayOf(obs, dims)), tf.constant(Float.NaN)),
+            p
+        )
+
+        return tf.reshape(pSafe, tf.constant(shape))
     }
 }

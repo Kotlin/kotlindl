@@ -260,6 +260,7 @@ private fun convertToKerasActivation(activation: Activations): String {
         Activations.LiSHT -> ACTIVATION_LISHT
         Activations.Snake -> ACTIVATION_SNAKE
         Activations.Gelu -> ACTIVATION_GELU
+        Activations.Sparsemax -> ACTIVATION_SPARSEMAX
     }
 }
 
