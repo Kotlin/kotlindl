@@ -363,6 +363,7 @@ private fun convertToActivation(activation: String): Activations {
         ACTIVATION_LISHT -> Activations.LiSHT
         ACTIVATION_SNAKE -> Activations.Snake
         ACTIVATION_GELU -> Activations.Gelu
+        ACTIVATION_SPARSEMAX -> Activations.Sparsemax
         else -> throw IllegalStateException("$activation is not supported yet!")
     }
 }
