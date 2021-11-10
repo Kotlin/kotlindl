@@ -59,6 +59,7 @@ internal const val LAYER_AVERAGE: String = "Average"
 internal const val LAYER_MAXIMUM: String = "Maximum"
 internal const val LAYER_MINIMUM: String = "Minimum"
 internal const val LAYER_CONCATENATE: String = "Concatenate"
+internal const val LAYER_DOT:String = "Dot"
 // Locally-connected layers
 // Activation layers
 internal const val LAYER_RELU: String = "ReLU"
