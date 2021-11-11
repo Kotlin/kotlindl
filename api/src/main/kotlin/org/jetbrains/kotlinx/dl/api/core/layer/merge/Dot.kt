@@ -74,7 +74,7 @@ public class Dot(
             } else {
                 out = ReduceSum.create(
                     scope,
-                    Mul.create(scope, Transpose.create(scope, x, Constant.create(scope, intArrayOf(0, 1))), y),
+                    Mul.create(scope, Transpose.create(scope, x2, Constant.create(scope, intArrayOf(1, 0))), y2),
                     Constant.create(scope, axis[1])
                 )
             }
@@ -87,7 +87,7 @@ public class Dot(
                 true -> true
                 false -> null
             }
-            out = MatMul.create(scope, x, y, MatMul.transposeA(adjX), MatMul.transposeB(adjY))
+            out = MatMul.create(scope, x2, y2, MatMul.transposeA(adjX), MatMul.transposeB(adjY))
         }
         val idx: Float
         if (diff != 0) {
@@ -96,12 +96,10 @@ public class Dot(
             } else {
                 idx = (xDim - 1).toFloat()
             }
-            out = Squeeze.create(scope, Constant.create(scope, FloatArray(diff + 1) { it + idx }))
+            out = Squeeze.create(scope, Constant.create(scope, FloatArray(diff) { it + idx }))
         }
-        if (out != null) {
-            if (out.asOutput().shape().numDimensions() == 1) {
-                ExpandDims.create(scope, out, Constant.create(scope, 1))
-            }
+        if (out.asOutput().shape().numDimensions() == 1) {
+            ExpandDims.create(scope, out, Constant.create(scope, 1))
         }
         return out
     }
@@ -110,7 +108,8 @@ public class Dot(
         require(input.size == 2) { "A `Dot` layer should be called on exactly 2 input. 'Received: input=${input}" }
         var x1 = input[0]
         var x2 = input[1]
-        var axes: IntArray = IntArray(2)
+        val axes: IntArray = IntArray(2)
+        val scope: Scope = tf.scope()
         for (i in 0..2) {
             if (axis[i] < 0) {
                 axes[i] = axis[i] % input[i].asOutput().shape().numDimensions()
@@ -119,9 +118,9 @@ public class Dot(
             }
         }
         if (normalize) {
-            x1 = l2Normalize(tf.scope(), x1, intArrayOf(axes[0]))
-            x2 = l2Normalize(tf.scope(), x2, intArrayOf(axes[1]))
+            x1 = l2Normalize(scope, x1, intArrayOf(axes[0]))
+            x2 = l2Normalize(scope, x2, intArrayOf(axes[1]))
         }
-        return batchDot(tf.scope(), x1, x2, axes)
+        return batchDot(scope, x1, x2, axes)
     }
 }
