@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -104,8 +104,9 @@ public class Conv1D(
     ): Operand<Float> {
         val options = Conv2d.dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
         val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
-        val result = tf.nn.conv2d(reshapedInput, kernel, stridesInternal.toLongList(),
-                                  paddingInternal.paddingName, options)
+        val result = tf.nn.conv2d(
+            reshapedInput, kernel.variable, stridesInternal.toLongList(), paddingInternal.paddingName, options
+        )
         return tf.squeeze(result, squeezeAxis)
     }
 
@@ -127,6 +128,6 @@ public class Conv1D(
     override fun toString(): String =
         "Conv1D(filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, " +
                 "dilation=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }

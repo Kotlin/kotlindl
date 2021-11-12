@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -106,7 +106,7 @@ public class DepthwiseConv2D(
         input: Operand<Float>
     ): Operand<Float> {
         val options = DepthwiseConv2dNative.dilations(dilations.toLongList()).dataFormat("NHWC")
-        return tf.nn.depthwiseConv2dNative(input, kernel, strides.toLongList(), padding.paddingName, options)
+        return tf.nn.depthwiseConv2dNative(input, kernel.variable, strides.toLongList(), padding.paddingName, options)
     }
 
     override fun defineOutputShape(inputShape: Shape): Shape {
@@ -138,6 +138,6 @@ public class DepthwiseConv2D(
         "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, " +
                 "depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, " +
-                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=$biasShape, " +
-                "depthwiseKernelShape=$kernelShape)"
+                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=${bias?.shape}, " +
+                "depthwiseKernelShape=${kernel.shape})"
 }

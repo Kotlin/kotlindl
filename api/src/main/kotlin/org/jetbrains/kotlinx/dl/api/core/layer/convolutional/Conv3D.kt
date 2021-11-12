@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -99,7 +99,13 @@ public class Conv3D(
         input: Operand<Float>
     ): Operand<Float> {
         val options = dilations(dilationsInternal.toLongList()).dataFormat("NDHWC")
-        return tf.nn.conv3d(input, kernel, stridesInternal.toLongList(), paddingInternal.paddingName, options)
+        return tf.nn.conv3d(
+            input,
+            kernel.variable,
+            stridesInternal.toLongList(),
+            paddingInternal.paddingName,
+            options
+        )
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -136,6 +142,6 @@ public class Conv3D(
     override fun toString(): String =
         "Conv3D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }
