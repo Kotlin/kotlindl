@@ -37,12 +37,9 @@ fun additionalTrainingAndNewTopDenseLayers() {
 
     val layers = mutableListOf<Layer>()
     layers.add(input)
-    for (layer in otherLayers) {
-        if (layer is Conv2D || layer is MaxPool2D) {
-            layer.isTrainable = false
-            layers.add(layer)
-        }
-    }
+    layers.addAll(
+        otherLayers.filter { it is Conv2D || it is MaxPool2D }.onEach { if (it is Conv2D) it.isTrainable = false }
+    )
 
     layers.add(Flatten("new_flatten"))
     layers.add(

@@ -7,14 +7,11 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
-import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 /**
  * Base abstract class for all layers.
@@ -106,31 +103,6 @@ public abstract class Layer(public var name: String) {
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return forward(tf, input[0], isTraining, numberOfLosses)
-    }
-
-    /**
-     * Adds a new weight tensor to the layer
-     *
-     * @param name     variable name
-     * @param variable variable to add
-     * @return the created variable.
-     */
-    protected fun addWeight(
-        tf: Ops,
-        kGraph: KGraph,
-        name: String,
-        variable: Variable<Float>,
-        initializer: Initializer,
-        regularizer: Regularizer? = null
-    ): Variable<Float> {
-        // require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
-        // require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
-
-        val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
-        kGraph.addLayerVariable(variable, isTrainable)
-        kGraph.addInitializer(name, initOp)
-        if (regularizer != null) kGraph.addVariableRegularizer(variable, regularizer)
-        return variable
     }
 
     /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */

@@ -8,14 +8,14 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.Parameter
+import org.jetbrains.kotlinx.dl.api.core.layer.parameter
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 /**
  * Parametric Rectified Linear Unit.
@@ -40,15 +40,16 @@ public class PReLU(
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */
-    private lateinit var alphaShape: Shape
-    private lateinit var alpha: Variable<Float>
-    private val alphaVariableName = if (name.isNotEmpty()) name + "_" + "alpha" else "alpha"
+
+    private lateinit var alpha: Parameter
+    private fun alphaVariableName(): String =
+        if (name.isNotEmpty()) "${name}_alpha" else "alpha"
 
     override var weights: Map<String, Array<*>>
-        get() = extractWeights(listOf(alphaVariableName))
+        get() = extractWeights(listOf(alpha.name))
         set(value) = assignWeights(value)
     override val paramCount: Int
-        get() = alphaShape.numElements().toInt()
+        get() = alpha.shape.numElements().toInt()
 
     init {
         isTrainable = true
@@ -61,19 +62,28 @@ public class PReLU(
                 alphaShapeArray[axis - 1] = 1
             }
         }
-        alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
 
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = fanIn
 
-        alpha = tf.withName(alphaVariableName).variable(alphaShape, getDType())
-        alpha = addWeight(tf, kGraph, alphaVariableName, alpha, alphaInitializer, alphaRegularizer)
+        val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
+        alpha = parameter(
+            tf,
+            kGraph,
+            alphaVariableName(),
+            isTrainable,
+            alphaShape,
+            fanIn,
+            fanOut,
+            alphaInitializer,
+            alphaRegularizer
+        )
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
         // It's equivalent to: `-alpha * relu(-x) + relu(x)`
         val positive = tf.nn.relu(input)
-        val negative = tf.math.mul(tf.math.neg(alpha), tf.nn.relu(tf.math.neg(input)))
+        val negative = tf.math.mul(tf.math.neg(alpha.tfVar), tf.nn.relu(tf.math.neg(input)))
         return tf.math.add(positive, negative)
     }
 

@@ -11,10 +11,15 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.Parameter
+import org.jetbrains.kotlinx.dl.api.core.layer.parameter
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
-import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
+import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
+import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingMeanVarName
+import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingVarianceVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -53,11 +58,10 @@ public class BatchNorm(
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
 ) : Layer(name), NoGradients {
-    private lateinit var weightShape: Shape
-    private var gamma: Variable<Float>? = null
-    private var beta: Variable<Float>? = null
-    private lateinit var movingMean: Variable<Float>
-    private lateinit var movingVariance: Variable<Float>
+    private var gamma: Parameter? = null
+    private var beta: Parameter? = null
+    private lateinit var movingMean: Parameter
+    private lateinit var movingVariance: Parameter
 
     init {
         isTrainable = false
@@ -65,46 +69,67 @@ public class BatchNorm(
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
-        weightShape = Shape.make(inputShape.size(axis[0]))
+        val weightShape = Shape.make(inputShape.size(axis[0]))
 
-        if (name.isNotEmpty()) {
-            val movingMeanVariableName = batchNormMovingMeanVarName(name)
-            val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
+        if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
-            movingMean = tf.withName(movingMeanVariableName).variable(weightShape, getDType())
-            movingVariance = tf.withName(movingVarianceVariableName).variable(weightShape, getDType())
+        isTrainable = false // TODO: add isTrainable to addWeight method as a flag
 
-            isTrainable = false // TODO: add isTrainable to addWeight method as a flag
+        val movingMeanVariableName = batchNormMovingMeanVarName(name)
+        movingMean = parameter(
+            tf,
+            kGraph,
+            movingMeanVariableName,
+            isTrainable,
+            weightShape,
+            fanIn,
+            fanOut,
+            movingMeanInitializer,
+            null
+        )
 
-            movingMean = addWeight(
+        val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
+        movingVariance =
+            parameter(
                 tf,
                 kGraph,
-                movingMeanVariableName,
-                movingMean,
-                movingMeanInitializer,
+                movingVarianceVariableName,
+                isTrainable,
+                weightShape,
+                fanIn,
+                fanOut,
+                movingVarianceInitializer,
                 null
             )
-            movingVariance =
-                addWeight(
-                    tf,
-                    kGraph,
-                    movingVarianceVariableName,
-                    movingVariance,
-                    movingVarianceInitializer,
-                    null
-                )
 
-            if (scale) {
-                val gammaVariableName = batchNormGammaVarName(name)
-                gamma = tf.withName(gammaVariableName).variable(weightShape, getDType())
-                gamma = addWeight(tf, kGraph, gammaVariableName, gamma!!, gammaInitializer, gammaRegularizer)
-            }
+        if (scale) {
+            val gammaVariableName = batchNormGammaVarName(name)
+            gamma = parameter(
+                tf,
+                kGraph,
+                gammaVariableName,
+                isTrainable,
+                weightShape,
+                fanIn,
+                fanOut,
+                gammaInitializer,
+                gammaRegularizer
+            )
+        }
 
-            if (center) {
-                val betaVariableName = batchNormBetaVarName(name)
-                beta = tf.withName(betaVariableName).variable(weightShape, getDType())
-                beta = addWeight(tf, kGraph, betaVariableName, beta!!, betaInitializer, betaRegularizer)
-            }
+        if (center) {
+            val betaVariableName = batchNormBetaVarName(name)
+            beta = parameter(
+                tf,
+                kGraph,
+                betaVariableName,
+                isTrainable,
+                weightShape,
+                fanIn,
+                fanOut,
+                betaInitializer,
+                betaRegularizer
+            )
         }
     }
 
@@ -118,8 +143,16 @@ public class BatchNorm(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.withName("BatchNorm")
-            .identity(batchNorm(tf, input, gamma, beta, movingMean, movingVariance, tf.constant(epsilon.toFloat())))
+        val tf = tf.withName("BatchNorm")
+        return batchNorm(
+            tf,
+            input,
+            gamma?.tfVar,
+            beta?.tfVar,
+            movingMean.tfVar,
+            movingVariance.tfVar,
+            tf.constant(epsilon.toFloat())
+        )
     }
 
     /**
@@ -144,7 +177,7 @@ public class BatchNorm(
     ): Operand<Float> {
         var inv: Operand<Float> = tf.math.rsqrt(tf.math.add(movingVar, eps))
 
-        if (scale) inv = tf.math.mul(inv, gamma!!)
+        if (scale) inv = tf.math.mul(inv, gamma)
 
         // NOTE: Y = X * inv + (beta - moving_mean * inv) = X * (inv - moving_mean) + beta
         val xNorm = tf.math.mul(tf.math.sub(x, movingMean), inv)
@@ -156,46 +189,30 @@ public class BatchNorm(
         get() = extractBatchNormWeights()
         set(value) = assignWeights(value)
 
-    private fun extractBatchNormWeights(): Map<String, Array<*>> {
-        val variableNames = mutableListOf<String>()
-        variableNames.add(batchNormMovingMeanVarName(name))
-        variableNames.add(batchNormMovingVarianceVarName(name))
-        if (scale) variableNames.add(batchNormGammaVarName(name))
-        if (center) variableNames.add(batchNormBetaVarName(name))
-        return extractWeights(variableNames)
-    }
+    private fun extractBatchNormWeights(): Map<String, Array<*>> =
+        extractWeights(listOfNotNull(gamma, beta, movingMean, movingVariance).map { it.name })
 
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int
-        get() {
-            var paramCount = weightShape.numElements() + weightShape.numElements()
-            if (scale) paramCount += weightShape.numElements()
-            if (center) paramCount += weightShape.numElements()
-            return paramCount.toInt()
-        }
+        get() = listOfNotNull(gamma, beta, movingMean, movingVariance).sumOf { it.shape.numElements() }.toInt()
+
 
     /** Returns the shape of gamma variable weights. */
     public val gammaShapeArray: LongArray?
-        get() {
-            return if (scale) TensorShape(weightShape).dims()
-            else null
-        }
+        get() = gamma?.let { TensorShape(it.shape).dims() }
 
     /** Returns the shape of beta variable weights. */
     public val betaShapeArray: LongArray?
-        get() {
-            return if (center) TensorShape(weightShape).dims()
-            else null
-        }
+        get() = beta?.let { TensorShape(it.shape).dims() }
 
     /** Returns the shape of movingMean variable weights. */
     public val movingMeanShapeArray: LongArray
-        get() = TensorShape(weightShape).dims()
+        get() = TensorShape(movingMean.shape).dims()
 
     /** Returns the shape of movingVariance variable weights. */
     public val movingVarianceShapeArray: LongArray
-        get() = TensorShape(weightShape).dims()
+        get() = TensorShape(movingVariance.shape).dims()
 
     override fun toString(): String {
         return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"

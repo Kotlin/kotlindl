@@ -87,8 +87,8 @@ public class Conv1D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
+    defaultKernelVariableName = KERNEL_VARIABLE_NAME,
+    defaultBiasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ) {
     init {
@@ -110,8 +110,9 @@ public class Conv1D(
     ): Operand<Float> {
         val options = Conv2d.dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
         val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
-        val result = tf.nn.conv2d(reshapedInput, kernel, stridesInternal.toLongList(),
-                                  paddingInternal.paddingName, options)
+        val result = tf.nn.conv2d(
+            reshapedInput, kernel.tfVar, stridesInternal.toLongList(), paddingInternal.paddingName, options
+        )
         return tf.squeeze(result, squeezeAxis)
     }
 
@@ -133,6 +134,6 @@ public class Conv1D(
     override fun toString(): String =
         "Conv1D(filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, " +
                 "dilation=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
+                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
                 "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 }

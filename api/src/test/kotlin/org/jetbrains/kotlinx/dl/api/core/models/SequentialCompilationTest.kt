@@ -422,7 +422,7 @@ internal class SequentialModelTest {
         val exception =
             assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
         assertEquals(
-            "lateinit property kernelShape has not been initialized",
+            "lateinit property kernel has not been initialized",
             exception.message
         )
 

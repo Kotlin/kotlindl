@@ -11,16 +11,16 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.Parameter
+import org.jetbrains.kotlinx.dl.api.core.layer.parameter
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 private const val KERNEL_VARIABLE_NAME = "dense_kernel"
 private const val BIAS_VARIABLE_NAME = "dense_bias"
@@ -58,43 +58,48 @@ public class Dense(
     public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name) {
-    private lateinit var kernelShape: Shape
-    private var biasShape: Shape? = null
-
-    // weight tensors
-    private lateinit var kernel: Variable<Float>
-    private var bias: Variable<Float>? = null
+    // weight tensors with additional information
+    private lateinit var kernel: Parameter
+    private var bias: Parameter? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        // Compute shapes of kernel and bias matrices
-        kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
-        if (useBias) {
-            biasShape = Shape.make(outputSize.toLong())
-        }
-
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
-        createDenseVariables(tf, kGraph)
-    }
-
-    private fun defineKernelVariableName(): String =
-        if (name.isNotEmpty()) denseKernelVarName(name) else KERNEL_VARIABLE_NAME
-
-    private fun defineBiasVariableName(): String =
-        if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
-
-    private fun createDenseVariables(tf: Ops, kGraph: KGraph) {
-        val kernelVariableName = defineKernelVariableName()
-        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
+        val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
+        kernel = parameter(
+            tf,
+            kGraph,
+            kernelVariableName,
+            isTrainable,
+            kernelShape,
+            fanIn,
+            fanOut,
+            kernelInitializer,
+            kernelRegularizer
+        )
 
         if (useBias) {
-            val biasVariableName = defineBiasVariableName()
-            val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
-            bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
+            val biasShape = Shape.make(outputSize.toLong())
+            bias = parameter(
+                tf,
+                kGraph,
+                biasVariableName,
+                isTrainable,
+                biasShape,
+                fanIn,
+                fanOut,
+                biasInitializer,
+                biasRegularizer
+            )
         }
     }
+
+    private val kernelVariableName: String
+        get() = if (name.isNotEmpty()) denseKernelVarName(name) else KERNEL_VARIABLE_NAME
+
+    private val biasVariableName: String
+        get() = if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
@@ -106,8 +111,8 @@ public class Dense(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val signalWithoutBias = tf.linalg.matMul(input, kernel)
-        val signal = bias?.let { tf.math.add(signalWithoutBias, it) } ?: signalWithoutBias
+        val matMul = tf.linalg.matMul(input, kernel.tfVar)
+        val signal = bias?.let { tf.math.add(matMul, it.tfVar) } ?: matMul
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
@@ -115,25 +120,21 @@ public class Dense(
         get() = extractDenseWeights()
         set(value) = assignWeights(value)
 
-    private fun extractDenseWeights(): Map<String, Array<*>> {
-        return extractWeights(
-            if (useBias) listOf(defineKernelVariableName(), defineBiasVariableName())
-            else listOf(defineKernelVariableName())
-        )
-    }
+    private fun extractDenseWeights(): Map<String, Array<*>> =
+        extractWeights(listOfNotNull(kernel, bias).map { it.name })
 
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (kernelShape.numElements() + (biasShape?.numElements() ?: 0)).toInt()
+        get() = listOfNotNull(kernel, bias).sumOf { it.shape.numElements() }.toInt()
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
+    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override fun toString(): String {
-        return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"
+        return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer)"
     }
 }

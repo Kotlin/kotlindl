@@ -82,8 +82,8 @@ public class DepthwiseConv2D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
+    defaultKernelVariableName = KERNEL_VARIABLE_NAME,
+    defaultBiasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ), NoGradients {
 
@@ -111,7 +111,7 @@ public class DepthwiseConv2D(
         input: Operand<Float>
     ): Operand<Float> {
         val options = DepthwiseConv2dNative.dilations(dilations.toLongList()).dataFormat("NHWC")
-        return tf.nn.depthwiseConv2dNative(input, kernel, strides.toLongList(), padding.paddingName, options)
+        return tf.nn.depthwiseConv2dNative(input, kernel.tfVar, strides.toLongList(), padding.paddingName, options)
     }
 
     override fun defineOutputShape(inputShape: Shape): Shape {
@@ -143,6 +143,6 @@ public class DepthwiseConv2D(
         "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
                 "dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, " +
                 "depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, " +
-                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=$biasShape, " +
-                "depthwiseKernelShape=$kernelShape)"
+                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=${bias?.shape}, " +
+                "depthwiseKernelShape=${kernel.shape})"
 }
