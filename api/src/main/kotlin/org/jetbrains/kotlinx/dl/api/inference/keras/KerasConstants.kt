@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -15,6 +15,9 @@ internal const val LAYER_PERMUTE: String = "Permute"
 internal const val LAYER_CONV1D: String = "Conv1D"
 internal const val LAYER_CONV2D: String = "Conv2D"
 internal const val LAYER_CONV3D: String = "Conv3D"
+internal const val LAYER_CONV1D_TRANSPOSE: String = "Conv1DTranspose"
+internal const val LAYER_CONV2D_TRANSPOSE: String = "Conv2DTranspose"
+internal const val LAYER_CONV3D_TRANSPOSE: String = "Conv3DTranspose"
 internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_SEPARABLE_CONV2D: String = "SeparableConv2D"
 // Pooling layers

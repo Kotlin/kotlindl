@@ -61,6 +61,9 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Conv1D -> createKerasConv1DLayer(layer, isKerasFullyCompatible)
         is Conv2D -> createKerasConv2DLayer(layer, isKerasFullyCompatible)
         is Conv3D -> createKerasConv3DLayer(layer, isKerasFullyCompatible)
+        is Conv1DTranspose -> createKerasConv1DTransposeLayer(layer, isKerasFullyCompatible)
+        is Conv2DTranspose -> createKerasConv2DTransposeLayer(layer, isKerasFullyCompatible)
+        is Conv3DTranspose -> createKerasConv3DTransposeLayer(layer, isKerasFullyCompatible)
         is DepthwiseConv2D -> createKerasDepthwiseConv2DLayer(layer, isKerasFullyCompatible)
         is SeparableConv2D -> createKerasSeparableConv2DLayer(layer, isKerasFullyCompatible)
         // Pooling layers
@@ -649,7 +652,7 @@ private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
     return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
 }
 
-private fun createKerasDotLayer(layer: Dot):KerasLayer{
+private fun createKerasDotLayer(layer: Dot): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         axis = layer.axis,
@@ -716,6 +719,73 @@ private fun createKerasConv3DLayer(layer: Conv3D, isKerasFullyCompatible: Boolea
         use_bias = layer.useBias
     )
     return KerasLayer(class_name = LAYER_CONV3D, config = configX)
+}
+
+private fun createKerasConv1DTransposeLayer(layer: Conv1DTranspose, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters,
+        kernel_size = listOf(layer.kernelLength),
+        strides = listOf(layer.strides[1]),
+        dilation_rate = listOf(layer.dilations[1]),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
+        padding = convertToKerasPadding(layer.padding),
+        output_padding = layer.outputPadding?.convertToKerasOutputPadding(),
+        trainable = layer.isTrainable,
+        use_bias = layer.useBias,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_CONV1D_TRANSPOSE, config = configX)
+}
+
+private fun createKerasConv2DTransposeLayer(layer: Conv2DTranspose, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters,
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2]),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
+        padding = convertToKerasPadding(layer.padding),
+        output_padding = layer.outputPadding?.convertToKerasOutputPadding(),
+        trainable = layer.isTrainable,
+        use_bias = layer.useBias,
+        name = layer.name
+    )
+    return KerasLayer(class_name = LAYER_CONV2D_TRANSPOSE, config = configX)
+}
+
+private fun createKerasConv3DTransposeLayer(layer: Conv3DTranspose, isKerasFullyCompatible: Boolean): KerasLayer {
+    val configX = LayerConfig(
+        filters = layer.filters,
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2], layer.strides[3]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2], layer.dilations[3]),
+        activation = convertToKerasActivation(layer.activation),
+        kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
+        bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
+        kernel_regularizer = convertToKerasRegularizer(layer.kernelRegularizer),
+        bias_regularizer = convertToKerasRegularizer(layer.biasRegularizer),
+        activity_regularizer = convertToKerasRegularizer(layer.activityRegularizer),
+        padding = convertToKerasPadding(layer.padding),
+        name = layer.name,
+        use_bias = layer.useBias
+    )
+    return KerasLayer(class_name = LAYER_CONV3D_TRANSPOSE, config = configX)
+}
+
+private fun IntArray.convertToKerasOutputPadding(): List<Int> {
+    return (0 until (size - 4) / 2).map { dimension ->
+        get(2 * (dimension + 1)) + get(2 * (dimension + 1) + 1)
+    }
 }
 
 private fun createKerasDepthwiseConv2DLayer(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean): KerasLayer {

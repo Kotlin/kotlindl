@@ -165,3 +165,11 @@ internal fun IntArray.toLongArray(): LongArray {
         else -> LongArray(size) { this[it].toLong() }
     }
 }
+
+internal fun LongArray.toIntArray(): IntArray {
+    return when (size) {
+        0 -> intArrayOf()
+        1 -> intArrayOf(this[0].toInt())
+        else -> IntArray(size) { this[it].toInt() }
+    }
+}

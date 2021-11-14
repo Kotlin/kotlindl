@@ -59,7 +59,7 @@ public abstract class AbstractConv(
     protected abstract val biasRegularizer: Regularizer?
     protected abstract val activityRegularizer: Regularizer?
     protected abstract val padding: ConvPadding
-    protected abstract val useBias: Boolean
+    internal abstract val useBias: Boolean
 
     /** Tensor with kernel weights */
     protected lateinit var kernel: KVariable

@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
@@ -20,8 +21,6 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 import org.tensorflow.op.nn.Conv2d
-
-private const val EXTRA_DIM = 1L
 
 /**
  * 1D convolution layer (e.g. convolution over audio data).
@@ -79,10 +78,6 @@ public class Conv1D(
 
     override val kernelSize: IntArray = intArrayOf(kernelLength)
 
-    /** Axis of height for which the extra dimension is added (unsqueezed) before actual
-     * convolution operation and the output from actual implementation are squeezed. */
-    private val squeezeAxis = Squeeze.axis(listOf(EXTRA_DIM))
-
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 1)
 
     override fun biasVarName(name: String): String = convBiasVarName(name, dim = 1)
@@ -91,15 +86,13 @@ public class Conv1D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val expandedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
-        val expandedKernel = tf.expandDims(kernel.variable, tf.constant(EXTRA_DIM - 1))
-        val expandedStrides = intArrayOf(strides[0], 1, strides[1], strides[2])
-        val expandedDilations = intArrayOf(dilations[0], 1, dilations[1], dilations[2])
-        val options = Conv2d.dilations(expandedDilations.toLongList()).dataFormat("NHWC")
-        val result = tf.nn.conv2d(
-            expandedInput, expandedKernel, expandedStrides.toLongList(), padding.paddingName, options
-        )
-        return tf.squeeze(result, squeezeAxis)
+        return tf.withExpandedDimensions(input) { expandedInput ->
+            val options = Conv2d.dilations(expand(dilations).toLongList()).dataFormat("NHWC")
+            return@withExpandedDimensions tf.nn.conv2d(
+                expandedInput, tf.expandKernel(kernel.variable), expand(strides).toLongList(),
+                padding.paddingName, options
+            )
+        }
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -121,5 +114,52 @@ public class Conv1D(
         return "Conv1D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
     }
 
+    internal companion object {
+        internal const val EXTRA_DIM = 1
 
+        /** Axis of height for which the extra dimension is added (unsqueezed) before actual
+         * convolution operation and the output from actual implementation are squeezed. */
+        private val squeezeAxis = Squeeze.axis(listOf(EXTRA_DIM.toLong()))
+
+        internal fun expandKernel(kernel: IntArray): IntArray {
+            return kernel.withAdded(EXTRA_DIM - 1, 1)
+        }
+
+        internal fun Ops.expandKernel(kernel: Operand<Float>): Operand<Float> {
+            return expandDims(kernel, constant(EXTRA_DIM - 1))
+        }
+
+        internal fun expand(tensorShape: TensorShape): TensorShape {
+            return TensorShape(tensorShape.dims().withAdded(EXTRA_DIM, 1))
+        }
+
+        internal fun expand(array: IntArray): IntArray {
+            return array.withAdded(EXTRA_DIM, 1)
+        }
+
+        /**
+         * Adds an extra dimension to the input, performs the provided operation
+         * and squeezes the result by removing the dimension added previously.
+         * This allows to perform 2D operations on 1D inputs.
+         */
+        internal fun Ops.withExpandedDimensions(input: Operand<Float>,
+                                                operation: (Operand<Float>) -> Operand<Float>
+        ): Operand<Float> {
+            val expandedInput = expandDims(input, constant(EXTRA_DIM))
+            val expandedOutput = operation(expandedInput)
+            return squeeze(expandedOutput, squeezeAxis)
+        }
+
+        internal fun LongArray.withAdded(position: Int, element: Long): LongArray {
+            return toMutableList().apply { add(position, element) }.toLongArray()
+        }
+
+        internal fun IntArray.withAdded(position: Int, element: Int): IntArray {
+            return toMutableList().apply { add(position, element) }.toIntArray()
+        }
+
+        internal fun IntArray.withAdded(position: Int, elements: List<Int>): IntArray {
+            return toMutableList().apply { addAll(position, elements) }.toIntArray()
+        }
+    }
 }

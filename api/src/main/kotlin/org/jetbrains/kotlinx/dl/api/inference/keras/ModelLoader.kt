@@ -82,6 +82,9 @@ private fun convertToLayer(
         LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!)
         LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!)
         LAYER_CONV3D -> createConv3DLayer(kerasLayer.config!!)
+        LAYER_CONV1D_TRANSPOSE -> createConv1DTransposeLayer(kerasLayer.config!!)
+        LAYER_CONV2D_TRANSPOSE -> createConv2DTransposeLayer(kerasLayer.config!!)
+        LAYER_CONV3D_TRANSPOSE -> createConv3DTransposeLayer(kerasLayer.config!!)
         LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2DLayer(kerasLayer.config!!)
         LAYER_SEPARABLE_CONV2D -> createSeparableConv2DLayer(kerasLayer.config!!)
         // Pooling layers
@@ -631,6 +634,73 @@ private fun createConv3DLayer(config: LayerConfig): Layer {
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
         useBias = config.use_bias!!
+    )
+}
+
+private fun createConv1DTransposeLayer(config: LayerConfig): Layer {
+    return Conv1DTranspose(
+        filters = config.filters!!,
+        kernelLength = config.kernel_size!![0],
+        strides = intArrayOf(1, config.strides!![0], 1),
+        dilations = intArrayOf(1, config.dilation_rate!![0], 1),
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        padding = convertPadding(config.padding!!),
+        outputPadding = config.output_padding?.convertToOutputPadding(),
+        useBias = config.use_bias!!,
+    )
+}
+
+private fun createConv2DTransposeLayer(config: LayerConfig): Layer {
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
+    return Conv2DTranspose(
+        filters = config.filters!!,
+        kernelSize = kernelSize,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        padding = convertPadding(config.padding!!),
+        outputPadding = config.output_padding?.convertToOutputPadding(),
+        useBias = config.use_bias!!,
+    )
+}
+
+private fun createConv3DTransposeLayer(config: LayerConfig): Layer {
+    val kernelSize = config.kernel_size!!.toIntArray()
+    val strides = config.strides!!.toIntArray()
+    val dilation = config.dilation_rate!!.toIntArray()
+    return Conv3DTranspose(
+        filters = config.filters!!,
+        kernelSize = kernelSize,
+        strides = intArrayOf(1, *strides, 1),
+        dilations = intArrayOf(1, *dilation, 1),
+        activation = convertToActivation(config.activation!!),
+        kernelInitializer = convertToInitializer(config.kernel_initializer!!),
+        biasInitializer = convertToInitializer(config.bias_initializer!!),
+        kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
+        biasRegularizer = convertToRegularizer(config.bias_regularizer),
+        activityRegularizer = convertToRegularizer(config.activity_regularizer),
+        padding = convertPadding(config.padding!!),
+        useBias = config.use_bias!!,
+    )
+}
+
+private fun List<Int>.convertToOutputPadding(): IntArray {
+    return intArrayOf(
+        0, 0,
+        *flatMap { padding -> listOf(padding / 2, padding - padding / 2) }.toIntArray(),
+        0, 0
     )
 }
 
