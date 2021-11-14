@@ -24,43 +24,43 @@ private fun layerVarName(layerName: String, varName: String): String {
     return layerName + "_" + varName
 }
 
-/** Default Conv bias variable name in TensorFlow graph, based on variable's name. */
+/** Default Conv bias variable name in TensorFlow graph, based on layer's name. */
 internal fun convBiasVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_bias")
 
-/** Default Conv kernel variable name in TensorFlow graph, based on variable's name. */
+/** Default Conv kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun convKernelVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_kernel")
 
-/** Default DepthwiseConv2d bias variable name in TensorFlow graph, based on variable's name. */
+/** Default DepthwiseConv2d bias variable name in TensorFlow graph, based on layer's name. */
 internal fun depthwiseConv2dBiasVarName(name: String): String = layerVarName(name, "depthwise_conv2d_bias")
 
-/** Default DepthwiseConv2d kernel variable name in TensorFlow graph, based on variable's name. */
+/** Default DepthwiseConv2d kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun depthwiseConv2dKernelVarName(name: String): String = layerVarName(name, "depthwise_conv2d_kernel")
 
-/** Default SeparableConv2d bias variable name in TensorFlow graph, based on variable's name. */
+/** Default SeparableConv2d bias variable name in TensorFlow graph, based on layer's name. */
 internal fun separableConv2dBiasVarName(name: String) = layerVarName(name, "separable_conv2d_bias")
 
-/** Default SeparableConv2d depthwise kernel variable name in TensorFlow graph, based on variable's name. */
+/** Default SeparableConv2d depthwise kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun separableConv2dDepthwiseKernelVarName(name: String) =
     layerVarName(name, "separable_conv2d_depthwise_kernel")
 
-/** Default SeparableConv2d pointwise kernel variable name in TensorFlow graph, based on variable's name. */
+/** Default SeparableConv2d pointwise kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun separableConv2dPointwiseKernelVarName(name: String) =
     layerVarName(name, "separable_conv2d_pointwise_kernel")
 
-/** Default Dense bias variable name in TensorFlow graph, based on variable's name. */
+/** Default Dense bias variable name in TensorFlow graph, based on layer's name. */
 internal fun denseBiasVarName(name: String) = layerVarName(name, "dense_bias")
 
-/** Default Dense kernel variable name in TensorFlow graph, based on variable's name. */
+/** Default Dense kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun denseKernelVarName(name: String) = layerVarName(name, "dense_kernel")
 
-/** Default BatchNorm gamma variable name in TensorFlow graph, based on variable's name. */
+/** Default BatchNorm gamma variable name in TensorFlow graph, based on layer's name. */
 internal fun batchNormGammaVarName(name: String) = layerVarName(name, "batch_norm_gamma")
 
-/** Default BatchNorm beta variable name in TensorFlow graph, based on variable's name. */
+/** Default BatchNorm beta variable name in TensorFlow graph, based on layer's name. */
 internal fun batchNormBetaVarName(name: String) = layerVarName(name, "batch_norm_beta")
 
-/** Default BatchNorm moving mean variable name in TensorFlow graph, based on variable's name. */
+/** Default BatchNorm moving mean variable name in TensorFlow graph, based on layer's name. */
 internal fun batchNormMovingMeanVarName(name: String) = layerVarName(name, "batch_norm_moving_mean")
 
-/** Default BatchNorm moving variance variable name in TensorFlow graph, based on variable's name. */
+/** Default BatchNorm moving variance variable name in TensorFlow graph, based on layer's name. */
 internal fun batchNormMovingVarianceVarName(name: String) = layerVarName(name, "batch_norm_moving_variance")
