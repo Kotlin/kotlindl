@@ -34,7 +34,7 @@ private val SECOND_BETA_POWER_NAME = defaultOptimizerVariableName("beta2_power")
  * lr_t := learning_rate * sqrt{1 - beta_2^t} / (1 - beta_1^t)
  * m_t := beta_1 * m_{t-1} + (1 - beta_1) * g
  * v_t := beta_2 * v_{t-1} + (1 - beta_2) * g * g
- * variable := variable - lr_t * m_t / sqrt{v_t} + epsilon)
+ * variable := variable - lr_t * m_t / sqrt{v_t} + epsilon
  * ```
  *
  * It is recommended to leave the parameters of this optimizer at their default values.

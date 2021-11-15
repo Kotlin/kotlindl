@@ -40,7 +40,7 @@ public class GlobalMaxPool2D(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return tf.max(input, tf.constant(intArrayOf(1,2)))
+        return tf.max(input, tf.constant(intArrayOf(1, 2)))
     }
 
     override fun toString(): String =

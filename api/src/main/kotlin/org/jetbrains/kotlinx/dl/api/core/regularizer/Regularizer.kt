@@ -9,10 +9,10 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /**
- *
  * Regularizers allow you to apply penalties on layer parameters or layer
  * activity during optimization. These penalties are summed into the loss
  * function that the network optimizes.
+ * 
  * Regularization penalties are applied on a per-layer basis.
  * The exact API will depend on the layer, but many layers (e.g. `Dense`, `Conv1D`, `Conv2D` and `Conv3D`) have a unified API.
  * These layers expose 3 keyword arguments:

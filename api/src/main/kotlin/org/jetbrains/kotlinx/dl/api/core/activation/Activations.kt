@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Stack
 
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
@@ -80,7 +81,7 @@ public enum class Activations {
      * The exponential linear unit (ELU) with `alpha > 0` is:
      * `x` if `x > 0` and `alpha * (exp(x) - 1)` if `x < 0`
      *
-     * For this implementations alpha is equal to 1.0.
+     * For this implementation alpha is equal to 1.0.
      *
      * The ELU hyperparameter `alpha` controls the value to which an
      * ELU saturates for negative net inputs. ELUs diminish the
@@ -98,7 +99,7 @@ public enum class Activations {
      * Calls [EluActivation] under the hood.
      *
      * @see <a href="https://arxiv.org/abs/1511.07289">Fast and Accurate Deep Network Learning by Exponential Linear Units
-     * (ELUs) (Clevert et al, 2016)</a>
+     * (ELUs) (Clevert et al., 2016)</a>
      */
     Elu,
 
@@ -142,7 +143,12 @@ public enum class Activations {
     Softmax,
 
     /**
+     * Log softmax activation function.
      *
+     *  For each batch `i` and class `j` we have
+     *  ```
+     *  logsoftmax = logits - log(reduce_sum(exp(logits), axis))
+     *  ```
      */
     LogSoftmax,
 
@@ -213,7 +219,91 @@ public enum class Activations {
      *
      * @see <a href="https://arxiv.org/abs/1710.05941">Ramachandran et al., 2017</a>
      */
-    Swish;
+    Swish,
+
+    /**
+     * Mish activation function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * mish(x) = x * tanh(softplus(x))
+     * ```
+     *
+     * It is a smooth, non-monotonic function that consistently matches
+     * or outperforms ReLU and Swish on deep networks, it is unbounded above and
+     * bounded below. It also smoothens the loss landscape of the network.
+     *
+     * Calls [MishActivation] under the hood.
+     *
+     * @see <a href="https://arxiv.org/abs/1908.08681">Misra, 2019</a>
+     */
+    Mish,
+
+    /**
+     * HardShrink Function
+     *
+     * Computes hard shrink function:
+     *
+     * hardshrink(x) = x if x < lower
+     *                 x if x > upper
+     *                 0 otherwise
+     *
+     * Calls [HardShrinkActivation] under the hood.
+     */
+    HardShrink,
+
+    /**
+     * Gelu Function
+     *
+     * Computes the Gaussian Error Linear Unit (GELU):
+     *
+     * gelu(x) = x * P(X <= x) where P(X) ~ N(0, 1)
+     *
+     * Calls [GeluActivation] under the hood.
+     */
+    Gelu,
+
+    /**
+     * Non-Parametric Linearly Scaled Hyperbolic Tangent (LiSHT) Activation Function.
+     *
+     * ```
+     * LiSHT(x) = x * tanh(x)
+     * ```
+     */
+    LiSHT,
+
+    /**
+     * Snake Activation Function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * snake(x) = x + (1 - cos(2 * frequency * x)) / (2 * frequency)
+     * ```
+     * @see [Neural Networks Fail to Learn Periodic Functions and How to Fix It](https://arxiv.org/abs/2006.08195).
+     */
+    Snake,
+
+    /**
+     * TanhShrink Activation Function.
+     *
+     * This is a hyperbolic tangent (TanH) shrink activation type that implements the element wise function:
+     * ```
+     * TanhShrink(x) = x − tanh(x)
+     * ```
+     * Calls [TanhActivation] under the hood.
+     */
+    TanhShrink,
+
+    /**
+     * Sparsemax activation function is similar to softmax but able to output sparse probabilities.
+     *
+     * for batch `i` and class `j`
+     *
+     * sparsemax(x)`[i,j]` = max(0, logits`[i,j]` - `τ`(logits`[i,:]`))
+     *
+     * @see <a href="https://arxiv.org/abs/1602.02068">From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label Classification</a>
+     */
+    Sparsemax;
 
     public companion object {
         /**
@@ -224,6 +314,7 @@ public enum class Activations {
                 Sigmoid -> SigmoidActivation()
                 Linear -> LinearActivation()
                 Tanh -> TanhActivation()
+                TanhShrink -> TanhShrinkActivation()
                 Relu -> ReluActivation()
                 Relu6 -> Relu6Activation()
                 Elu -> EluActivation()
@@ -235,6 +326,12 @@ public enum class Activations {
                 SoftSign -> SoftSignActivation()
                 HardSigmoid -> HardSigmoidActivation()
                 Swish -> SwishActivation()
+                Mish -> MishActivation()
+                HardShrink -> HardShrinkActivation()
+                LiSHT -> LishtActivation()
+                Snake -> SnakeActivation()
+                Gelu -> GeluActivation()
+                Sparsemax -> SparsemaxActivation()
             }
         }
     }
@@ -275,6 +372,14 @@ public class Relu6Activation : Activation {
  */
 public class TanhActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
+}
+
+/**
+ * @see [Activations.TanhShrink]
+ */
+public class TanhShrinkActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.sub(features, tf.math.tanh(features))
 }
 
 /**
@@ -356,4 +461,202 @@ public class HardSigmoidActivation : Activation {
 public class SwishActivation : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
         tf.math.mul(features, tf.math.sigmoid(features))
+}
+
+/**
+ * @see [Activations.Mish]
+ */
+public class MishActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.mul(features, tf.math.tanh(tf.math.softplus(features)))
+}
+
+/**
+ * @property [lower] lower bound for setting values to zeros
+ * @property [upper] upper bound for setting values to zeros
+ *
+ * @see [Activations.HardShrink]
+ */
+public class HardShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        require(lower < upper) {
+            "The value of lower should not be higher than upper"
+        }
+        val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
+        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(upper)
+        val mask = (maskLower || maskUpper)
+        return when (mask) {
+            false -> tf.constant(0) as Operand<Float>
+            true -> features
+        }
+    }
+}
+
+/**
+ * @see [Activations.LiSHT]
+ */
+public class LishtActivation : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+        tf.math.mul(features, tf.math.tanh(features))
+}
+
+/**
+ * @property [frequency] A scalar, frequency of the periodic part.
+ * @see [Activations.Snake]
+ */
+public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        val doubleFreqConstant = tf.constant(2 * frequency)
+
+        return tf.math.add(
+            features,
+            tf.math.div(
+                tf.math.sub(tf.constant(1.0f), tf.math.cos(tf.math.mul(doubleFreqConstant, features))),
+                doubleFreqConstant
+            )
+        )
+    }
+}
+
+/**
+ * @property [approximate] The boolean flag to toggle approximation.
+ *
+ * @see [Activations.Gelu]
+ */
+public class GeluActivation(public val approximate: Boolean = false) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        if (approximate) {
+            val coefficient = tf.constant(0.044715f)
+            return tf.math.mul(
+                tf.constant(0.5f), tf.math.mul(
+                    features, tf.math.add(
+                        tf.constant(1.0f), tf.math.tanh(
+                            tf.math.mul(
+                                tf.constant(0.7978845608028654f),       // This value is equal to sqrt(2/pi) to avoid a constant division
+                                tf.math.add(features, tf.math.mul(coefficient, tf.math.pow(features, tf.constant(3f))))
+                            )
+                        )
+                    )
+                )
+            )
+        } else {
+            return tf.math.mul(
+                tf.constant(0.5f),
+                tf.math.mul(
+                    features,
+                    tf.math.add(
+                        tf.constant(1f),
+                        tf.math.erf(tf.math.div(features, tf.constant(1.4142135623730951f)))
+                    )
+                )
+            )
+        }
+    }
+}
+
+/**
+ * @property [axis] axis along which the sparsemax operation is applied.
+ * @see [Activations.Sparsemax]
+ */
+public class SparsemaxActivation(private val axis: Int = -1) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+
+        // Keep references to shape because we perform sparsemax on 2D.
+        // If required, we need to reshape features to 2D and back.
+        val shape = features.asOutput().shape()
+        val rank = shape.numDimensions()
+
+        val isLastAxis = (axis == -1) || (axis == rank - 1)
+        if (isLastAxis) {
+            val output = compute2DSparsemax(tf, features)
+            return tf.ensureShape(output, shape)
+        }
+
+        // compute2DSparsemax only calculates sparsemax operation along it's last axis.
+        // If different axis is required for sparsemax, we first swap axes, then calculate compute2DSparsemax then
+        // swap axes back.
+        val axisNorm = axis % rank //ensure axis is within rank
+        val logits = swapAxis(tf, features, axisNorm, rank - 1)
+
+        val output = compute2DSparsemax(tf, logits)
+        return tf.ensureShape(swapAxis(tf, output, axisNorm, rank - 1), shape)
+    }
+
+    private fun swapAxis(tf: Ops, features: Operand<Float>, axis: Int, lastIndex: Int): Operand<Float> {
+        /**
+         * swaps features Operand's lastIndex with axis
+         */
+
+        val range = (tf.range(tf.constant(0), tf.constant(lastIndex + 1), tf.constant(1)))
+        return tf.linalg.transpose(
+            features,
+            tf.tensorScatterUpdate(
+                range,
+                tf.constant(arrayOf(intArrayOf(axis), intArrayOf(lastIndex))),
+                tf.constant(intArrayOf(lastIndex, axis))
+            )
+        )
+    }
+
+    private fun compute2DSparsemax(tf: Ops, features: Operand<Float>): Operand<Float> {
+        val shape = features.asOutput().tensor().shape()
+        val dims = shape[shape.lastIndex]
+        val dimsOp = tf.constant(dims.toInt())
+        val obs = shape.reduce { acc, l -> acc * l } / dims
+        val one = tf.constant(1f)
+
+        val z = tf.reshape(features, tf.constant(longArrayOf(obs, dims)))
+        val zSorted = tf.nn.topK(z, dimsOp)
+        val zCumSum = tf.math.cumsum(zSorted.values(), tf.constant(-1))
+
+        val k = tf.range(one, tf.math.add(tf.dtypes.cast(dimsOp, Float::class.javaObjectType), one), one)
+
+        // check where (k * z_sorted + 1 > cumsum(z)
+        val zCheck = tf.math.greater(tf.math.add(one, tf.math.mul(k, zSorted.values())), zCumSum)
+
+        // casting boolean values to Int makes true = 1, false = 0,
+        // then summing each row is same as finding last value that is one in such vector [1,1,..1,0,0,..,0]
+        val kz = tf.reduceSum(tf.dtypes.cast(zCheck, Int::class.javaObjectType), tf.constant(-1))
+
+
+        // If there are inf values or all values are -inf, the k_z will be zero,
+        // this is mathematically invalid and will also cause the gather_nd to fail.
+        // Prevent this issue for now by setting k_z = 1 if k_z = 0, this is then
+        // fixed later (see p_safe) by returning p = nan. This results in the same
+        // behavior as softmax.
+        // (This comment is taken from original python implementation)
+        val kzSafe = tf.math.maximum(kz, tf.constant(1))
+        val indices = tf.stack(
+            listOf(
+                tf.range(tf.constant(0), tf.constant(obs.toInt()), tf.constant(1)),
+                tf.math.sub(tf.reshape(kzSafe, tf.constant(intArrayOf(-1))), tf.constant(1))
+            ), Stack.axis(1)
+        )
+
+        val tauSum = tf.gatherNd(zCumSum, indices)
+        val tauZ = tf.math.div(tf.math.sub(tauSum, one), tf.dtypes.cast(kz, Float::class.javaObjectType))
+
+        val p = tf.math.maximum(tf.constant(0f), tf.math.sub(z, tf.expandDims(tauZ, tf.constant(-1))))
+
+        // getting a reference to last index. Similar to slicing  the last index of a python array [:, -1]
+        val zCumsumLastIndex = tf.stack(
+            listOf(
+                tf.range(tf.constant(0), tf.constant(obs.toInt()), tf.constant(1)),
+                tf.fill(tf.constant(longArrayOf(obs)), tf.math.sub(dimsOp, tf.constant(1)))
+            ), Stack.axis(1)
+        )
+
+        val pSafe = tf.where3(
+            tf.math.logicalOr(
+                tf.math.equal(kz, tf.constant(0)),
+                tf.math.isNan(
+                    tf.gatherNd(zCumSum, zCumsumLastIndex)
+                )
+            ),
+            tf.fill(tf.constant(longArrayOf(obs, dims)), tf.constant(Float.NaN)),
+            p
+        )
+
+        return tf.reshape(pSafe, tf.constant(shape))
+    }
 }

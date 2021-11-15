@@ -5,17 +5,23 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 
 /**
  * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelType].
  *
  * @property [modelType] One the supported models pre-trained on ImageNet.
  */
-public class Sharpen(public var modelType: ModelType = ModelType.VGG_16) : Preprocessor {
+public class Sharpen(public var modelType: ModelType<*, *> = TFModels.CV.VGG16) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels)
-        return preprocessInput(data, tensorShape, modelType)
+        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels!!)
+        return modelType.preprocessInput(data, tensorShape)
     }
+}
+
+
+/** Image DSL Preprocessing extension.*/
+public fun TensorPreprocessing.sharpen(sharpBlock: Sharpen.() -> Unit) {
+    addOperation(Sharpen().apply(sharpBlock))
 }

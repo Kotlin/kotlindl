@@ -16,7 +16,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 
 /**
- * Average pooling operation for 1D temporal data (e.g. audio, timseries).
+ * Average pooling operation for 1D temporal data (e.g. audio, time-series).
  *
  * Downsamples the input by taking the average over a temporal window of size [poolSize].
  *
@@ -27,8 +27,8 @@ import org.tensorflow.op.core.Squeeze
  * has the same dimension as the input.
  */
 public class AvgPool1D(
-    public val poolSize: LongArray = longArrayOf(1, 2, 1),
-    public val strides: LongArray = longArrayOf(1, 2, 1),
+    public val poolSize: IntArray = intArrayOf(1, 2, 1),
+    public val strides: IntArray = intArrayOf(1, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
@@ -53,7 +53,7 @@ public class AvgPool1D(
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var steps = inputShape.size(1)
-        steps = convOutputLength(steps, poolSize[1].toInt(), padding, strides[1].toInt())
+        steps = convOutputLength(steps, poolSize[1], padding, strides[1])
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
@@ -65,10 +65,12 @@ public class AvgPool1D(
     ): Operand<Float> {
         val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))
+
         val tfPoolSize = longArrayOf(1, 1, 1, 1)
         val tfStrides = longArrayOf(1, 1, 1, 1)
-        tfPoolSize[expandAxis-1] = poolSize[1]
-        tfStrides[expandAxis-1] = strides[1]
+        tfPoolSize[expandAxis - 1] = poolSize[1].toLong()
+        tfStrides[expandAxis - 1] = strides[1].toLong()
+
         val tfPadding = padding.paddingName
 
         val avgPool = tf.nn.avgPool(
@@ -77,6 +79,7 @@ public class AvgPool1D(
             tfStrides.toList(),
             tfPadding
         )
+
         return tf.squeeze(avgPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 

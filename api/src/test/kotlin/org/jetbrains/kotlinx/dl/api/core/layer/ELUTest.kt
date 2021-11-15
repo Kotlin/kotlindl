@@ -14,7 +14,7 @@ internal class ELUTest : ActivationLayerTest() {
     @Test
     fun defaultELU() {
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
-        val expected = floatArrayOf(-0.9502f, -0.6321f,  0.0f,  2.0f)
+        val expected = floatArrayOf(-0.9502f, -0.6321f, 0.0f, 2.0f)
 
         assertActivationFunctionSameOutputShape(ELU(), input, expected)
     }
@@ -23,7 +23,7 @@ internal class ELUTest : ActivationLayerTest() {
     fun positiveAlphaParametrizedELU() {
         val alpha = 2.42f
         val input = floatArrayOf(-3.0f, -1.0f, 0.0f, 2.0f)
-        val expected = floatArrayOf(-2.2995f, -1.5297f,  0.0f,  2.0f)
+        val expected = floatArrayOf(-2.2995f, -1.5297f, 0.0f, 2.0f)
 
         assertActivationFunctionSameOutputShape(ELU(alpha = alpha), input, expected)
     }

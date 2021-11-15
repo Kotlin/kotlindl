@@ -13,7 +13,7 @@ it is not critical for them to be of the exact size as what the model was traine
 
 We've stored the image dataset so each class is in its own folder: 
 ```
-small-catdogs/
+small-dogs-vs-cats/
     cat/
     dogs/
 ```
@@ -24,28 +24,28 @@ This way makes it easier to get the labels for all the examples based on the fol
 Now we need to create a `Dataset` from these images. 
 You can do so via the Image Preprocessing Pipeline description, and building a dataset from those. 
 
-Here's code that will go through a folder structure received via ```catDogsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
+Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
 
 ```kotlin
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
 val preprocessing: Preprocessing = preprocess {
+    load {
+        pathToData = File(dogsVsCatsDatasetPath)
+        imageShape = ImageShape(channels = 3)
+        colorMode = ColorOrder.BGR
+        labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+    }
     transformImage {
-        load {
-            pathToData = File(dogsVsCatsDatasetPath)
-            imageShape = ImageShape(channels = NUM_CHANNELS)
-            colorMode = ColorOrder.BGR
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
+            outputHeight = 224
+            outputWidth = 224
             interpolation = InterpolationType.BILINEAR
         }
     }
     transformTensor {
         sharpen {
-            modelType = ModelType.VGG_19
+            modelType = TFModels.CV.VGG19
         }
     }
 }
@@ -56,21 +56,22 @@ val (train, test) = dataset.split(0.7)
 In the final lines, after creating a dataset, we shuffle the data, so that when we split it into training and testing portions, we do not get a test set containing only images of one class.    
  
 ## VGG-19
-KotlinDL bundles a lot of pre-trained models available via ModelZoo object. 
+KotlinDL bundles a lot of pre-trained models available via ModelHub object. 
 You can either train a model from scratch yourself and store it for later use on other tasks, or you can import a pre-trained Keras model with compatible architecture.  
 
-In this tutorial, we will load VGG-19 model and weights that are made available in the Model Zoo: 
+In this tutorial, we will load VGG-19 model and weights that are made available in the ModelHub: 
 
 ```kotlin
-val modelZoo = ModelZoo(commonModelDirectory = File("cache/pretrainedModels"), modelType = ModelType.VGG_19)
-val model = modelZoo.loadModel() as Sequential
+val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+val modelType = TFModels.CV.VGG19
+val model = modelHub.loadModel(modelType)
 ```
 
 ## Transfer Learning
 Now we have created the dataset, and we have a model, we can put everything together, and apply the transfer learning technique.
 
 At this point, we need to decide which layers of this model we want to fine-tune, which ones we want to leave as is and if we want to add or remove layers. 
-You can use `model.summary()` to inspect the model's architecture.
+You can use `model.logSummary()` to inspect the model's architecture.
 
 This model consists mainly of Conv2D and MaxPool2D layers and has a couple of dense layers at the end. One way to do transfer learning (although, of course, not the only one) is to leave the convolutional layers as they are, and re-train the dense layers. 
 So this is what we will do:
@@ -112,14 +113,14 @@ Finally, we can train this model. The only difference to training a model from s
 These will not be further trained – that's how we can leverage the fact that this model has already learned some patterns on a much larger dataset.  
 
 ```kotlin
-newModel.use {
+ newModel.use {
     it.compile(
         optimizer = Adam(),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric = Metrics.ACCURACY
     )
 
-    val hdfFile = modelZoo.loadWeights()
+    val hdfFile = modelHub.loadWeights(modelType)
     it.loadWeightsForFrozenLayers(hdfFile)
 
     val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]
@@ -128,7 +129,7 @@ newModel.use {
     it.fit(
         dataset = train,
         batchSize = 8,
-        epochs = 3
+        epochs = 2
     )
 
     val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]

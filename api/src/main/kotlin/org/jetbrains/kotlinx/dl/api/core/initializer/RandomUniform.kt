@@ -12,8 +12,8 @@ import org.tensorflow.op.Ops
 /**
  * Initializer that generates tensors with a uniform distribution.
  *
- * @property [maxVal] Lower bound of the range of random values to generate (inclusive).
- * @property [minVal] Upper bound of the range of random values to generate (exclusive).
+ * @property [minVal] Lower bound of the range of random values to generate (inclusive).
+ * @property [maxVal] Upper bound of the range of random values to generate (exclusive).
  * @property [seed] Used to create random seeds.
  * @constructor Creates a [RandomUniform] initializer.
  */
@@ -35,7 +35,7 @@ public class RandomUniform(
         val seeds = longArrayOf(seed, 0L)
         var distOp: Operand<Float> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())
         if (minVal == 0.0f) {
-            if (minVal != 1.0f) {
+            if (maxVal != 1.0f) {
                 distOp = tf.math.mul(distOp, tf.constant(maxVal))
             }
         } else {

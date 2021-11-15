@@ -5,19 +5,23 @@
 
 package examples.cnn.dogscats
 
+import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.model.resnet50Light
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import kotlin.reflect.KFunction4
 
 private const val EPOCHS = 20
 private const val TRAINING_BATCH_SIZE = 64
@@ -44,21 +48,26 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * - model evaluation
  */
 fun resnet50onDogsVsCatsDataset() {
+    val modelBuilderFunction = ::resnet50Light
+    runResNetTraining(modelBuilderFunction)
+}
+
+internal fun runResNetTraining(modelBuilderFunction: KFunction4<Long, Int, Long, Activations, Functional>) {
     val dogsVsCatsDatasetPath = dogsCatsDatasetPath()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(dogsVsCatsDatasetPath)
+            imageShape = ImageShape(channels = NUM_CHANNELS)
+            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+        }
         transformImage {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                imageShape = ImageShape(channels = NUM_CHANNELS)
-                colorMode = ColorOrder.BGR
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.BILINEAR
             }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {
@@ -70,14 +79,15 @@ fun resnet50onDogsVsCatsDataset() {
     val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    resnet50Light(imageSize = IMAGE_SIZE, numberOfClasses = NUM_CLASSES).use {
+    val model = modelBuilderFunction.invoke(IMAGE_SIZE, NUM_CLASSES, NUM_CHANNELS, Activations.Linear)
+    model.use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val start = System.currentTimeMillis()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)

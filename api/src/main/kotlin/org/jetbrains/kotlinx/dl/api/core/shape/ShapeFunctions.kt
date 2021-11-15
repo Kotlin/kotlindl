@@ -89,69 +89,33 @@ internal fun numElementsInShape(shape: LongArray): Long {
 /** Returns amount of elements in [Shape]. */
 internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
 
-/** Reshapes 2D array of floats to 1D array of floats. */
-internal fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
-    val result = FloatArray(size) { 0.0f }
+public fun Array<*>.flattenFloats(): FloatArray {
+    val result = mutableListOf<Float>()
 
-    var pos = 0
-
-    for (i in dst.indices) {
-        for (j in dst[i].indices) {
-            result[pos] = dst[i][j]
-            pos++
-        }
+    fun flatten(array: Any?): Unit = when (array) {
+        is FloatArray -> array.forEach { result.add(it) }
+        is Array<*> -> array.forEach { flatten(it) }
+        else -> throw IllegalArgumentException("Cannot flatten object: '$array'")
     }
 
-    return result
-}
+    flatten(this)
 
-/** Reshapes 3D array of floats to 1D array of floats. */
-public fun reshape3DTo1D(dst: Array<Array<FloatArray>>, size: Int): FloatArray {
-    val result = FloatArray(size) { 0.0f }
-
-    var pos = 0
-    for (i in dst.indices) {
-        for (j in dst[i].indices) {
-            for (k in dst[i][j].indices) {
-                result[pos] = dst[i][j][k]
-                pos++
-            }
-
-        }
-    }
-    return result
-}
-
-/** Reshapes 4D array of floats to 1D array of floats. */
-internal fun reshape4DTo1D(dst: Array<Array<Array<FloatArray>>>, size: Int): FloatArray {
-    val result = FloatArray(size) { 0.0f }
-
-    var pos = 0
-    for (i in dst.indices) {
-        for (j in dst[i].indices) {
-            for (k in dst[i][j].indices) {
-                for (m in dst[i][j][k].indices) {
-                    result[pos] = dst[i][j][k][m]
-                    pos++
-                }
-            }
-        }
-    }
-    return result
+    return result.toFloatArray()
 }
 
 /**
  * Get shape of array of arrays (of arrays...) of Array of elems of any type.
  * If the most inner array does not have any elements its size is missed in result */
-internal fun getShapeOfArray(data: Array<*>): Shape {
+private fun getShapeOfArray(data: Array<*>): Shape {
     fun appendPrimitiveArraySize(size: Int, acc: MutableList<Long>): LongArray {
         acc += size.toLong()
         return acc.toLongArray()
     }
+
     tailrec fun collectDims(data: Array<*>, acc: MutableList<Long>): LongArray {
         val firstElem = data[0] ?: return acc.toLongArray()
         acc += data.size.toLong()
-        return when(firstElem) {
+        return when (firstElem) {
             is Array<*> -> collectDims(firstElem, acc)
             is BooleanArray -> appendPrimitiveArraySize(firstElem.size, acc)
             is ByteArray -> appendPrimitiveArraySize(firstElem.size, acc)
@@ -167,42 +131,8 @@ internal fun getShapeOfArray(data: Array<*>): Shape {
     return shapeFromDims(*collectDims(data, mutableListOf()))
 }
 
-/** Shape property of standard JVM array for better readability of code */
-internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
-
 /**
- * Create an array of arrays (of arrays...) of Floats with specified [shape] and
- * initialized with given [initValue]. When the number of dimensions in result tensor
- * is bigger than 1, the last dimension array is FloatArray (instead of Array<Float>).
+ * Get shape of array of arrays (of arrays...) of Array of elems of any type.
+ * If the most inner array does not have any elements its size is missed in result
  */
-internal fun getFloatArrayOfShape(shape: Shape, initValue: Float = 0.0f): Array<*> {
-    fun getFloatArrayOfShape(shape: Shape, dimIndex: Int): Any = if (shape.numDimensions() - 1 == dimIndex) {
-        FloatArray(shape.size(dimIndex).toInt()) { initValue }
-    } else {
-        Array(shape.size(dimIndex).toInt()) { getFloatArrayOfShape(shape, dimIndex + 1) }
-    }
-    return if (shape.numDimensions() == 1) {
-        Array(shape.size(0).toInt()) { initValue }
-    }
-    else {
-        getFloatArrayOfShape(shape, 0) as Array<*>
-    }
-}
-
-internal fun Any?.castArray(): Array<*> = this as Array<*>
-
-/** Cast Array<*> to Array<T> when sure about its dimensions where usually T is [FloatArray] */
-internal inline fun <reified T> Array<*>.cast2D(): Array<T> =
-    this.map { it as T }.toTypedArray()
-
-/** Cast Array<*> to Array<Array<T>> when sure about its dimensions where usually T is [FloatArray] */
-internal inline fun <reified T> Array<*>.cast3D(): Array<Array<T>> =
-    this.map { it.castArray().cast2D<T>() }.toTypedArray()
-
-/** Cast Array<*> to Array<Array<Array<T>>> when sure about its dimensions where usually T is [FloatArray] */
-internal inline fun <reified T> Array<*>.cast4D(): Array<Array<Array<T>>> =
-    this.map { it.castArray().cast3D<T>() }.toTypedArray()
-
-/** Cast Array<*> to Array<Array<Array<Array<T>>>> when sure about its dimensions where usually T is [FloatArray] */
-internal inline fun <reified T> Array<*>.cast5D(): Array<Array<Array<Array<T>>>> =
-    this.map { it.castArray().cast4D<T>() }.toTypedArray()
+internal val Array<*>.shape: Shape get() = getShapeOfArray(this)

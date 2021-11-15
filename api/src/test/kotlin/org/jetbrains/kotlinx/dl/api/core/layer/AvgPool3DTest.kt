@@ -63,8 +63,8 @@ internal class AvgPool3DTest {
             arrayOf(
                 arrayOf(
                     arrayOf(
-                        floatArrayOf(18.0f/8, 4.5f/8, 16.0f/8),
-                        floatArrayOf(9.5f/8, 12.0f/8, 13.5f/8),
+                        floatArrayOf(18.0f / 8, 4.5f / 8, 16.0f / 8),
+                        floatArrayOf(9.5f / 8, 12.0f / 8, 13.5f / 8),
                     ),
                 ),
             ),
@@ -76,7 +76,7 @@ internal class AvgPool3DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -109,35 +109,35 @@ internal class AvgPool3DTest {
 
     @Test
     fun withPaddingAndStride() {
-        val layer = AvgPool3D(strides = longArrayOf(1, 1, 1, 1, 1), padding = ConvPadding.SAME)
+        val layer = AvgPool3D(strides = intArrayOf(1, 1, 1, 1, 1), padding = ConvPadding.SAME)
         val expected = arrayOf(
             arrayOf(
                 arrayOf(
                     arrayOf(
-                        floatArrayOf(18.0f/8, 4.5f/8, 16.0f/8),
-                        floatArrayOf(17.0f/8, 15.5f/8, 19.5f/8),
-                        floatArrayOf(9.5f/8, 12.0f/8, 13.5f/8),
-                        floatArrayOf(5.0f/8, 2.0f/8, 12.0f/8)
+                        floatArrayOf(18.0f / 8, 4.5f / 8, 16.0f / 8),
+                        floatArrayOf(17.0f / 8, 15.5f / 8, 19.5f / 8),
+                        floatArrayOf(9.5f / 8, 12.0f / 8, 13.5f / 8),
+                        floatArrayOf(5.0f / 8, 2.0f / 8, 12.0f / 8)
                     ),
                     arrayOf(
-                        floatArrayOf(19.0f/8, 8.0f/8, 6.0f/8),
-                        floatArrayOf(9.0f/8, 26.0f/8, 7.0f/8),
-                        floatArrayOf(2.0f/8, 16.0f/8, 4.0f/8),
-                        floatArrayOf(0.0f/8, 0.0f/8, 6.0f/8)
+                        floatArrayOf(19.0f / 8, 8.0f / 8, 6.0f / 8),
+                        floatArrayOf(9.0f / 8, 26.0f / 8, 7.0f / 8),
+                        floatArrayOf(2.0f / 8, 16.0f / 8, 4.0f / 8),
+                        floatArrayOf(0.0f / 8, 0.0f / 8, 6.0f / 8)
                     ),
                 ),
                 arrayOf(
                     arrayOf(
-                        floatArrayOf(30.0f/8, -1.0f/8, 18.0f/8),
-                        floatArrayOf(34.0f/8, 9.0f/8, 18.0f/8),
-                        floatArrayOf(28.0f/8, 12.0f/8, 14.0f/8),
-                        floatArrayOf(16.0f/8, 4.0f/8, 16.0f/8)
+                        floatArrayOf(30.0f / 8, -1.0f / 8, 18.0f / 8),
+                        floatArrayOf(34.0f / 8, 9.0f / 8, 18.0f / 8),
+                        floatArrayOf(28.0f / 8, 12.0f / 8, 14.0f / 8),
+                        floatArrayOf(16.0f / 8, 4.0f / 8, 16.0f / 8)
                     ),
                     arrayOf(
-                        floatArrayOf(32.0f/8, -4.0f/8, 16.0f/8),
-                        floatArrayOf(16.0f/8, 28.0f/8, 0.0f/8),
-                        floatArrayOf(24.0f/8, 16.0f/8, -8.0f/8),
-                        floatArrayOf(24.0f/8, -8.0f/8, 0.0f/8)
+                        floatArrayOf(32.0f / 8, -4.0f / 8, 16.0f / 8),
+                        floatArrayOf(16.0f / 8, 28.0f / 8, 0.0f / 8),
+                        floatArrayOf(24.0f / 8, 16.0f / 8, -8.0f / 8),
+                        floatArrayOf(24.0f / 8, -8.0f / 8, 0.0f / 8)
                     ),
                 ),
             ),
@@ -149,7 +149,7 @@ internal class AvgPool3DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -188,13 +188,13 @@ internal class AvgPool3DTest {
 
     @Test
     fun withPoolSizeAndStride() {
-        val layer = AvgPool3D(poolSize = longArrayOf(1, 2, 2, 3, 1), strides = longArrayOf(1, 1, 1, 1, 1))
+        val layer = AvgPool3D(poolSize = intArrayOf(1, 2, 2, 3, 1), strides = intArrayOf(1, 1, 1, 1, 1))
         val expected = arrayOf(
             arrayOf(
                 arrayOf(
                     arrayOf(
-                        floatArrayOf(25.0f/12, 15.5f/12, 23.5f/12),
-                        floatArrayOf(19.5f/12, 16.5f/12, 25.5f/12),
+                        floatArrayOf(25.0f / 12, 15.5f / 12, 23.5f / 12),
+                        floatArrayOf(19.5f / 12, 16.5f / 12, 25.5f / 12),
                     ),
                 ),
             ),
@@ -206,7 +206,7 @@ internal class AvgPool3DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.

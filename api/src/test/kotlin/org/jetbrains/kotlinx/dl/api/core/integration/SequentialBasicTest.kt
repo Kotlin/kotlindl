@@ -22,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
@@ -40,8 +41,8 @@ internal class SequentialBasicTest : IntegrationTest() {
         ),
         Conv2D(
             filters = 32,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeUniform(SEED),
@@ -55,13 +56,14 @@ internal class SequentialBasicTest : IntegrationTest() {
         ),
         Conv2D(
             filters = 64,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeUniform(SEED),
             padding = ConvPadding.SAME,
-            name = "conv2d_2"
+            name = "conv2d_2",
+            useBias = false
         ),
         MaxPool2D(
             poolSize = intArrayOf(1, 2, 2, 1),
@@ -81,7 +83,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             activation = Activations.Linear,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeUniform(SEED),
-            name = "dense_2"
+            name = "dense_2",
+            useBias = false
         )
     )
 
@@ -133,7 +136,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.7)
             }
 
-            it.summary()
+            it.logSummary()
 
             // Prediction testing
             val label = it.predict(test.getX(0))
@@ -201,7 +204,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 assertTrue(accuracy > 0.7)
             }
 
-            it.summary()
+            it.logSummary()
 
             // Prediction testing
             val label = it.predict(test.getX(0))
@@ -301,7 +304,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.fit(
                         dataset = train,
                         epochs = EPOCHS,
@@ -321,7 +324,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
                 }
             assertEquals(
@@ -337,7 +340,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predict(train.getX(0))
                 }
             assertEquals(
@@ -353,7 +356,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predictSoftly(train.getX(0))
                 }
             assertEquals(
@@ -369,7 +372,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
+                assertThrows(IllegalArgumentException::class.java) {
                     it.predict(test, 256)
                 }
             assertEquals(
@@ -380,7 +383,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predict(test, 100)
                 }
             assertEquals(
@@ -396,7 +399,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
         testModel.use {
             val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
+                assertThrows(IllegalStateException::class.java) {
                     it.predictAndGetActivations(test.getX(0))
                 }
             assertEquals(
@@ -416,8 +419,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 32,
-                kernelSize = longArrayOf(3, 3),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(3, 3),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Selu,
                 kernelInitializer = HeNormal(),
                 biasInitializer = HeNormal(),
@@ -431,8 +434,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 64,
-                kernelSize = longArrayOf(3, 3),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(3, 3),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Elu,
                 kernelInitializer = HeNormal(),
                 biasInitializer = HeNormal(),
@@ -501,7 +504,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
@@ -582,7 +585,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
@@ -610,8 +613,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 32,
-                kernelSize = longArrayOf(5, 5),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(5, 5),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = HeNormal(SEED),
                 biasInitializer = HeNormal(SEED),
@@ -623,8 +626,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 64,
-                kernelSize = longArrayOf(5, 5),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(5, 5),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = HeNormal(SEED),
                 biasInitializer = HeNormal(SEED),
@@ -662,7 +665,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 metric = Accuracy()
             )
 
-            it.summary()
+            it.logSummary()
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = 1000)

@@ -32,3 +32,10 @@ public fun FloatArray.set2D(rowIndex: Int, columnIndex: Int, width: Int, value: 
 public fun FloatArray.get2D(rowIndex: Int, columnIndex: Int, width: Int): Float {
     return this[width * rowIndex + columnIndex]
 }
+
+/**
+ * Returns the index of the maximum element in the given FloatArray.
+ * TODO: Should be replaced with Multik in future.
+ */
+public fun FloatArray.argmax(): Int =
+    maxOrNull()?.let { max -> indexOfFirst { it == max } } ?: -1

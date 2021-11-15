@@ -33,7 +33,7 @@ class SavedModelTest {
 
             assertEquals(train.getY(0), prediction.toFloat())
 
-            val predictions = it.predictAll(test)
+            val predictions = it.predict(test)
 
             assertEquals(10000, predictions.size)
             assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
@@ -53,7 +53,7 @@ class SavedModelTest {
 
             assertEquals(train.getY(0), prediction.toFloat())
 
-            val predictions = it.predictAll(test, "Placeholder", "ArgMax")
+            val predictions = it.predict(test, "Placeholder", "ArgMax")
 
             assertEquals(10000, predictions.size)
             assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)

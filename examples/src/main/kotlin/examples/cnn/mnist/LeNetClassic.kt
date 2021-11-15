@@ -5,21 +5,13 @@
 
 package examples.cnn.mnist
 
-import org.jetbrains.kotlinx.dl.api.core.Sequential
+import examples.cnn.models.buildLetNet5Classic
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
-import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
-import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
@@ -30,65 +22,14 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
 
-/**
- * This is an implementation of LeNet-5 from classic paper.
- *
- * @see <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf">
- *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
- */
-private val lenet5Classic = Sequential.of(
-    Input(
-        IMAGE_SIZE,
-        IMAGE_SIZE,
-        NUM_CHANNELS
-    ),
-    Conv2D(
-        filters = 6,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Tanh,
-        kernelInitializer = GlorotNormal(SEED),
-        biasInitializer = Zeros(),
-        padding = ConvPadding.SAME
-    ),
-    AvgPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
-        padding = ConvPadding.VALID
-    ),
-    Conv2D(
-        filters = 16,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
-        activation = Activations.Tanh,
-        kernelInitializer = GlorotNormal(SEED),
-        biasInitializer = Zeros(),
-        padding = ConvPadding.SAME
-    ),
-    AvgPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
-        padding = ConvPadding.VALID
-    ),
-    Flatten(), // 3136
-    Dense(
-        outputSize = 120,
-        activation = Activations.Tanh,
-        kernelInitializer = GlorotNormal(SEED),
-        biasInitializer = Constant(0.1f)
-    ),
-    Dense(
-        outputSize = 84,
-        activation = Activations.Tanh,
-        kernelInitializer = GlorotNormal(SEED),
-        biasInitializer = Constant(0.1f)
-    ),
-    Dense(
-        outputSize = NUMBER_OF_CLASSES,
-        activation = Activations.Linear,
-        kernelInitializer = GlorotNormal(SEED),
-        biasInitializer = Constant(0.1f)
-    )
+private val lenet5Classic = buildLetNet5Classic(
+    image_width = IMAGE_SIZE,
+    image_height = IMAGE_SIZE,
+    num_channels = NUM_CHANNELS,
+    num_classes = NUMBER_OF_CLASSES,
+    layers_activation = Activations.Tanh,
+    classifier_activation = Activations.Linear,
+    random_seed = SEED,
 )
 
 /**
@@ -112,7 +53,7 @@ fun lenetClassic() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 

@@ -19,10 +19,11 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.io.File
@@ -53,8 +54,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -66,8 +67,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -79,8 +80,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -88,8 +89,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -101,8 +102,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -110,8 +111,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -123,8 +124,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -132,8 +133,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -184,26 +185,26 @@ fun main() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(cifarImagesArchive)
+            imageShape = ImageShape(32, 32, 3)
+        }
         transformImage {
-            load {
-                pathToData = File(cifarImagesArchive)
-                imageShape = ImageShape(32, 32, 3)
-                colorMode = ColorOrder.BGR
-            }
-            rotate {
-                degrees = 90f
-            }
             crop {
                 left = 2
                 right = 2
                 top = 2
                 bottom = 2
             }
+            rotate {
+                degrees = 90f
+            }
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.NEAREST
             }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {
@@ -224,7 +225,7 @@ fun main() {
             metric = Metrics.ACCURACY
         )
 
-        it.summary()
+        it.logSummary()
 
         val start = System.currentTimeMillis()
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)

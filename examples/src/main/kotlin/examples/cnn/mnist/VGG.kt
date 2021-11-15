@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
 private const val EPOCHS = 5
@@ -30,7 +31,7 @@ private const val SEED = 12L
 private val heNormal = HeNormal(SEED)
 
 /**
- * Kotlin implementation of VGG'11 on Keras with minor changes of number of neurons to be successfully applied to the MNIST dataset.
+ * The implementation in Kotlin of VGG'11 model with minor changes of number of neurons to be successfully applied to the MNIST dataset.
  */
 private val vgg11 = Sequential.of(
     Input(
@@ -40,8 +41,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -54,8 +55,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -68,8 +69,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -77,8 +78,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -91,8 +92,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -100,8 +101,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -114,8 +115,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -123,8 +124,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -174,7 +175,7 @@ fun vgg() {
     vgg11.use {
         it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Metrics.ACCURACY)
 
-        it.summary()
+        it.logSummary()
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 

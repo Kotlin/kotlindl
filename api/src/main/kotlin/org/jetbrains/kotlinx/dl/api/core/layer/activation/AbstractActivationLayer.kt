@@ -15,20 +15,25 @@ import org.tensorflow.op.Ops
 /**
  * Base class for all layer class representing activation functions.
  *
- * By default it is marked as __not trainable__ layer with no extra
+ * By default, it is marked as __not trainable__ layer with no extra
  * parameters and weights but having the activation on it.
  *
- * By default it defines returning the output with the same shape
- * as the input Operand
+ * By default, it defines returning the output with the same shape
+ * as the input Operand.
  *
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
 public abstract class AbstractActivationLayer(name: String) : Layer(name) {
-
     init {
         isTrainable = false
     }
 
+    /**
+     * Applies the activation functions to the [input] to produce the output.
+     *
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [input] TensorFlow graph leaf node representing layer output before activation function.
+     */
     public abstract fun forward(
         tf: Ops,
         input: Operand<Float>

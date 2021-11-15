@@ -52,7 +52,7 @@ internal class MaxPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -106,7 +106,7 @@ internal class MaxPool1DTest {
                 floatArrayOf(1.0f, 2.0f, 4.0f)
             )
         )
-        val layer = MaxPool1D(strides = longArrayOf(1, 1, 1), padding = ConvPadding.SAME)
+        val layer = MaxPool1D(strides = intArrayOf(1, 1, 1), padding = ConvPadding.SAME)
 
         EagerSession.create().use {
             val tf = Ops.create()
@@ -115,7 +115,7 @@ internal class MaxPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
@@ -165,7 +165,7 @@ internal class MaxPool1DTest {
                 floatArrayOf(7.0f, 2.0f, 5.0f),
             )
         )
-        val layer = MaxPool1D(poolSize = longArrayOf(1, 3, 1), strides = longArrayOf(1, 1, 1))
+        val layer = MaxPool1D(poolSize = intArrayOf(1, 3, 1), strides = intArrayOf(1, 1, 1))
 
         EagerSession.create().use {
             val tf = Ops.create()
@@ -174,7 +174,7 @@ internal class MaxPool1DTest {
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
-            val numberOfLosses =  tf.constant(1.0f)
+            val numberOfLosses = tf.constant(1.0f)
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.

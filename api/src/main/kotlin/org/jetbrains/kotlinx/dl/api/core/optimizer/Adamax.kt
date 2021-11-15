@@ -37,7 +37,7 @@ private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
  * ```
  * It is a variant of Adam based on the infinity norm. Default parameters follow those provided in the paper.
  *
- * NOTE: This optimizers works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
+ * NOTE: This optimizer works on CPU only. It has known bug on GPU: NaN instead of gradient values https://github.com/tensorflow/tensorflow/issues/26256
  *
  * It is recommended to leave the parameters of this optimizer at their default values.
  *

@@ -21,9 +21,9 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
 /**
- * NOTE: This layer is not trainable and does not updates its weights. It's frozen by default.
+ * NOTE: This layer is not trainable and does not update its weights. It's frozen by default.
  *
- * @property [axis] Integer or a list of integers, the axis that should be normalized (typically the features axis).
+ * @property [axis] Integer or a list of integers, the axis that should be normalized (typically the features' axis).
  * @property [momentum] Momentum for the moving average.
  * @property [center] If True, add offset of beta to normalized tensor. If False, beta is ignored.
  * @property [epsilon] Small float added to variance to avoid dividing by zero.

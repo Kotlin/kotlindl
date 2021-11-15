@@ -5,60 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.extension
 
-import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
-import org.jetbrains.kotlinx.dl.api.core.shape.reshape2DTo1D
-import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
-import org.jetbrains.kotlinx.dl.api.core.shape.reshape4DTo1D
 import org.tensorflow.Tensor
+import java.nio.FloatBuffer
 
 /** Copies tensor data to float array. */
 public fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
-    val tensorForCopying = this
-
-    val shape = tensorForCopying.shape()
-    val reshaped: FloatArray
-    return when (shape.size) {
-        0 -> {
-            floatArrayOf(tensorForCopying.floatValue())
-        }
-        1 -> {
-            reshaped = FloatArray(shape[0].toInt()) { 0.0f }
-            tensorForCopying.copyTo(reshaped)
-            reshaped
-        }
-        2 -> {
-            val dst =
-                Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape2DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        3 -> {
-            val dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    FloatArray(shape[2].toInt())
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape3DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        4 -> {
-            val dst = Array(shape[0].toInt()) {
-                Array(shape[1].toInt()) {
-                    Array(shape[2].toInt()) {
-                        FloatArray(shape[3].toInt())
-                    }
-                }
-            }
-            tensorForCopying.copyTo(dst)
-            reshaped = reshape4DTo1D(dst, numElementsInShape(shape).toInt())
-            reshaped
-        }
-        else -> {
-            throw UnsupportedOperationException("Parsing for ${shape.size} dimensions is not supported yet!")
-        }
-    }
+    val buffer = FloatBuffer.allocate(numElements())
+    writeTo(buffer)
+    return buffer.array()
 }
 
 /** Copies tensor to multi-dimensional float array. Array rank is equal to tensor rank. */

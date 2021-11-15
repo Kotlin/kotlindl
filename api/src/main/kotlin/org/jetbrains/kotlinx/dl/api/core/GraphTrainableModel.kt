@@ -24,7 +24,10 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
@@ -38,6 +41,7 @@ import java.io.FileNotFoundException
 import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 
 /**
  * [GraphTrainableModel] model groups a linear stack of layers into a graph-based TensorFlow Model.
@@ -57,7 +61,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         get() = layers[0] as Input
 
     /** Returns input dimensions in order HWC (height, width, channels) */
-    public val inputDimensions: LongArray
+    public override val inputDimensions: LongArray
         get() {
             return (layers[0] as Input).packedDims
         }
@@ -117,7 +121,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             var cnt = 1
             for (layer in layers) {
                 if (layer.name.isEmpty()) {
-                    val generatedLayerName = (layer::class.simpleName ?: return).toLowerCase() + "_" + cnt
+                    val generatedLayerName =
+                        (layer::class.simpleName ?: return).lowercase(Locale.getDefault()) + "_" + cnt
                     layer.name = generatedLayerName
                     cnt++
                 }
@@ -543,7 +548,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
 
                     dst.forEachIndexed { index, element ->
-                        argMaxBatchPrediction[index] = element.indexOfFirst { it == element.maxOrNull()!! }
+                        argMaxBatchPrediction[index] = element.argmax()
                     }
 
                     callback.onPredictBatchEnd(batchCounter, batchSize)
@@ -558,17 +563,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predict(inputData: FloatArray): Int {
         val softPrediction = predictSoftly(inputData)
-        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
+        return softPrediction.argmax()
     }
 
     override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
-        return softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }
+        return softPrediction.argmax()
     }
 
     override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
-        return Pair(softPrediction.indexOfFirst { it == softPrediction.maxOrNull()!! }, activations)
+        return Pair(softPrediction.argmax(), activations)
     }
 
     override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
@@ -749,7 +754,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /**
      * Returns KGraph.
      *
-     * NOTE: Be careful, this is a direct access to the model graph, not a copy.
+     * NOTE: Be careful, this is direct access to the model graph, not a copy.
      */
     public fun kGraph(): KGraph {
         return kGraph
@@ -823,19 +828,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Saves variables and optimizer state if [saveOptimizerState] is enabled in txt format to the [pathToModelDirectory] directory.*/
     protected fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        val modelWeightsExtractorRunner = session.runner()
-
-        var variables = kGraph.layerVariables()
-
-        if (saveOptimizerState) {
-            variables = variables + kGraph.optimizerVariables()
-        }
-
-        variables.forEach {
-            modelWeightsExtractorRunner.fetch(it)
-        }
-
-        val modelWeights = modelWeightsExtractorRunner.run()
+        val pair = getVariablesAndTensors(saveOptimizerState)
+        val variables = pair.first
+        val modelWeights = pair.second
 
         Files.createDirectories(Paths.get(pathToModelDirectory))
         val file = File("$pathToModelDirectory/variableNames.txt")
@@ -880,7 +875,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
 
         val variableNames = file.readLines()
-
+        // TODO: common code could be refactored with the link to the function (load variable)
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
                 if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
@@ -895,12 +890,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         if (loadOptimizerState) isOptimizerVariableInitialized = true
     }
 
-    private fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph().frozenLayerVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
-    }
-
     /**
      * Return layer by [layerName].
      *
@@ -912,5 +901,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun toString(): String {
         return "GraphTrainableModel(numberOfLayers=${layers.size}) ${super.toString()}"
+    }
+
+    public override fun summary(): ModelSummary {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+
+        val (trainableLayers, frozenLayers) = layers.partition { it.isTrainable }
+
+        return ModelSummary(
+            type = this::class.simpleName.toString(),
+            name = name,
+            layersSummaries = layers.map { layer ->
+                LayerSummary(
+                    name = layer.name,
+                    type = layer::class.simpleName.toString(),
+                    outputShape = layer.outputShape,
+                    paramsCount = layer.paramCount.toLong(),
+                    inboundLayers = layer.inboundLayers.map { it.name }
+                )
+            },
+            trainableParamsCount = trainableLayers.sumOf { it.paramCount.toLong() },
+            frozenParamsCount = frozenLayers.sumOf { it.paramCount.toLong() },
+        )
     }
 }

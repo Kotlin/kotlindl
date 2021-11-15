@@ -16,7 +16,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
@@ -25,7 +26,7 @@ import java.io.FileNotFoundException
 /**
  * Base abstract class for all trainable models.
  */
-public abstract class TrainableModel : InferenceModel() {
+public abstract class TrainableModel : TensorFlowInferenceModel() {
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
@@ -141,7 +142,7 @@ public abstract class TrainableModel : InferenceModel() {
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
      *
-     * @return A [TrainingHistory] object. Its History.history attribute is a record of training loss values and metrics values per each batch and epoch.
+     * @return A [TrainingHistory] object. Its [TrainingHistory.batchHistory] attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     public abstract fun fit(
         dataset: Dataset,
@@ -198,16 +199,9 @@ public abstract class TrainableModel : InferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
-     * @return Array of labels. Each labels is a vector that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
+     * @return Array of labels. All labels are vectors that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
      */
     public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
-
-    /**
-     * Generates output prediction for the input sample.
-     *
-     * @param [inputData] Unlabeled input data to define label.
-     */
-    public abstract override fun predict(inputData: FloatArray): Int
 
     /**
      * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.
@@ -310,15 +304,11 @@ public abstract class TrainableModel : InferenceModel() {
     }
 
     /**
-     * Formats and builds the model description.
+     * Returns model summary.
      *
-     * @return list of layer descriptions.
+     * @return model summary
      */
-    public abstract fun summary(
-        stringLayerNameTypeSize: Int = 40,
-        stringOutputShapeSize: Int = 26,
-        stringParamSize: Int = 14
-    ): List<String>
+    public abstract fun summary(): ModelSummary
 
     override fun toString(): String {
         return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"

@@ -62,7 +62,8 @@ fun main() {
         )
 
         val fashionPlots = List(3) { imageIndex ->
-            flattenImagePlot(imageIndex, test,
+            flattenImagePlot(
+                imageIndex, test,
                 predict = it::predict,
                 labelEncoding = fashionMnistLabelEncoding::get,
                 plotFeature = PlotFeature.GRAY

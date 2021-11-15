@@ -1,0 +1,72 @@
+/*
+ * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+apply plugin: 'maven-publish'
+apply from: project.rootProject.file('gradle/maven-metadata.gradle')
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier 'javadoc'
+    from javadoc
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+artifacts {
+    archives javadocJar
+}
+
+def sonatypeUser = System.getenv('SONATYPE_USER')
+def sonatypePassword = System.getenv('SONATYPE_PASSWORD')
+
+def moduleName = "kotlin-deeplearning-" + project.name
+
+nexusStaging {
+    username sonatypeUser
+    password sonatypePassword
+    packageGroup project.group.toString()
+    repositoryDescription "kotlinx.kotlindl staging repository, version: $version"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            pom.withXml(configureMavenCentralMetadata)
+            from components.java
+            groupId project.group
+            artifactId moduleName
+            version project.version
+            artifact sourcesJar { classifier "sources" }
+            artifact javadocJar { classifier "javadoc" }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = sonatypeUser
+                password = sonatypePassword
+            }
+        }
+    }
+}
+
+def signingKey = System.getenv("SIGN_KEY_ID")
+def signingKeyPassphrase = System.getenv("SIGN_KEY_PASSPHRASE")
+def signingPrivateKey = System.getenv("SIGN_KEY_PRIVATE")
+
+if (signingKey != null) {
+    apply plugin: 'signing'
+    signing {
+        useInMemoryPgpKeys(signingKey, signingPrivateKey, signingKeyPassphrase)
+        sign publishing.publications
+    }
+}

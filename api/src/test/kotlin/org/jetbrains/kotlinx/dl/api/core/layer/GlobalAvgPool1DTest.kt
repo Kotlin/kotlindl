@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 
 internal class GlobalAvgPool1DTest : LayerTest() {
-    private val input = arrayOf (
-        arrayOf (
+    private val input = arrayOf(
+        arrayOf(
             floatArrayOf(1.0f, 2.5f, -3.0f, 2.0f),
             floatArrayOf(-3.0f, -1.0f, 5.0f, 4.5f),
             floatArrayOf(-1.0f, 0.0f, 5.0f, 4.5f),
@@ -30,8 +30,8 @@ internal class GlobalAvgPool1DTest : LayerTest() {
     fun default() {
         val layer = GlobalAvgPool1D()
         val expected = arrayOf(
-            floatArrayOf(-1.0f, 0.5f, 7.0f/3, 11.0f/3),
-            floatArrayOf(1.0f/3, 13.0f/3, -1.0f/3, 1.0f/3)
+            floatArrayOf(-1.0f, 0.5f, 7.0f / 3, 11.0f / 3),
+            floatArrayOf(1.0f / 3, 13.0f / 3, -1.0f / 3, 1.0f / 3)
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         assertLayerOutputIsCorrect(layer, input, expected, RunMode.GRAPH)

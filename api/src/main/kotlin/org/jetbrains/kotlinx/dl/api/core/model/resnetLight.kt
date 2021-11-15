@@ -304,10 +304,10 @@ private fun block1(
 
     if (conv_shortcut) {
         shortcut = Conv2D(
-            filters = (4 * filters).toLong(),
-            kernelSize = longArrayOf(1, 1),
-            strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
-            dilations = longArrayOf(1, 1, 1, 1),
+            filters = 4 * filters,
+            kernelSize = intArrayOf(1, 1),
+            strides = intArrayOf(1, stride, stride, 1),
+            dilations = intArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
             kernelInitializer = HeNormal(),
             biasInitializer = HeUniform(),
@@ -322,10 +322,10 @@ private fun block1(
     }
 
     var x: Layer = Conv2D(
-        filters = filters.toLong(),
-        kernelSize = longArrayOf(1, 1),
-        strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        filters = filters,
+        kernelSize = intArrayOf(1, 1),
+        strides = intArrayOf(1, stride, stride, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
@@ -336,10 +336,10 @@ private fun block1(
     x = ActivationLayer(activation = Activations.Relu, name = name + "_1_relu")(x)
 
     x = Conv2D(
-        filters = filters.toLong(),
-        kernelSize = longArrayOf(kernelSize.toLong(), kernelSize.toLong()),
-        strides = longArrayOf(1, 1, 1, 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        filters = filters,
+        kernelSize = intArrayOf(kernelSize, kernelSize),
+        strides = intArrayOf(1, 1, 1, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
@@ -351,10 +351,10 @@ private fun block1(
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
 
     x = Conv2D(
-        filters = (4 * filters).toLong(),
-        kernelSize = longArrayOf(1, 1),
-        strides = longArrayOf(1, 1, 1, 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        filters = 4 * filters,
+        kernelSize = intArrayOf(1, 1),
+        strides = intArrayOf(1, 1, 1, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
@@ -386,10 +386,10 @@ private fun block2(
 
     if (conv_shortcut) {
         shortcut = Conv2D(
-            filters = (4 * filters).toLong(),
-            kernelSize = longArrayOf(1, 1),
-            strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
-            dilations = longArrayOf(1, 1, 1, 1),
+            filters = 4 * filters,
+            kernelSize = intArrayOf(1, 1),
+            strides = intArrayOf(1, stride, stride, 1),
+            dilations = intArrayOf(1, 1, 1, 1),
             activation = Activations.Linear,
             kernelInitializer = HeNormal(),
             biasInitializer = HeUniform(),
@@ -409,11 +409,11 @@ private fun block2(
     }
 
     x = Conv2D(
-        filters = filters.toLong(),
-        kernelSize = longArrayOf(1, 1),
-        strides = longArrayOf(1, 1, 1, 1),
+        filters = filters,
+        kernelSize = intArrayOf(1, 1),
+        strides = intArrayOf(1, 1, 1, 1),
         useBias = false,
-        dilations = longArrayOf(1, 1, 1, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
@@ -428,10 +428,10 @@ private fun block2(
     x = ZeroPadding2D(intArrayOf(1, 1, 1, 1), dataFormat = CHANNELS_LAST, name = name + "_2_pad")(x)
 
     x = Conv2D(
-        filters = filters.toLong(),
-        kernelSize = longArrayOf(kernelSize.toLong(), kernelSize.toLong()),
-        strides = longArrayOf(1, stride.toLong(), stride.toLong(), 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        filters = filters,
+        kernelSize = intArrayOf(kernelSize, kernelSize),
+        strides = intArrayOf(1, stride, stride, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         useBias = true,
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
@@ -443,10 +443,10 @@ private fun block2(
     x = ActivationLayer(activation = Activations.Relu, name = name + "_2_relu")(x)
 
     x = Conv2D(
-        filters = (4 * filters).toLong(),
-        kernelSize = longArrayOf(1, 1),
-        strides = longArrayOf(1, 1, 1, 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        filters = 4 * filters,
+        kernelSize = intArrayOf(1, 1),
+        strides = intArrayOf(1, 1, 1, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
@@ -480,9 +480,9 @@ private fun resnetLight(
 
     x = Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(7, 7),
-        strides = longArrayOf(1, 2, 2, 1),
-        dilations = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(7, 7),
+        strides = intArrayOf(1, 2, 2, 1),
+        dilations = intArrayOf(1, 1, 1, 1),
         activation = Activations.Linear,
         kernelInitializer = HeNormal(),
         biasInitializer = HeUniform(),
