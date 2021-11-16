@@ -60,11 +60,11 @@ public enum class Metrics {
 
         /** Converts sub-class of [Metric] to enum value. */
         public fun convertBack(metric: Metric): Metrics {
-            return when (metric::class) {
-                Accuracy::class -> ACCURACY
-                org.jetbrains.kotlinx.dl.api.core.metric.MAE::class -> MAE
-                org.jetbrains.kotlinx.dl.api.core.metric.MSE::class -> MSE
-                org.jetbrains.kotlinx.dl.api.core.metric.MSLE::class -> MSLE
+            return when (metric) {
+                is Accuracy -> ACCURACY
+                is org.jetbrains.kotlinx.dl.api.core.metric.MAE -> MAE
+                is org.jetbrains.kotlinx.dl.api.core.metric.MSE -> MSE
+                is org.jetbrains.kotlinx.dl.api.core.metric.MSLE -> MSLE
                 else -> ACCURACY
             }
         }
