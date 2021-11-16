@@ -55,7 +55,9 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         val jsonConfigFile = getJSONConfigFile(modelType, loadingMode)
         return when (modelType) {
             TFModels.CV.VGG16 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
+            TFModels.CV.VGG16noTop -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.VGG19 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
+            TFModels.CV.VGG19noTop -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
@@ -77,7 +79,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         }
     }
 
-    private fun freezeAllLayers(model: Functional): GraphTrainableModel {
+    private fun freezeAllLayers(model: GraphTrainableModel): GraphTrainableModel {
         for (layer in model.layers) {
             layer.isTrainable = false
         }

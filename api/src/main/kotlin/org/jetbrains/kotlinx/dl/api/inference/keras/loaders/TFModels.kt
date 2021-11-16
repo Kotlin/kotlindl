@@ -40,7 +40,21 @@ public object TFModels {
         }
 
         /** */
+        public object VGG16noTop : CV<Sequential>("models/tensorflow/cv/vgg16/notop") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        }
+
+        /** */
         public object VGG19 : CV<Sequential>("models/tensorflow/cv/vgg19") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        }
+
+        /** */
+        public object VGG19noTop : CV<Sequential>("models/tensorflow/cv/vgg19/notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -68,6 +82,13 @@ public object TFModels {
         }
 
         /** */
+        public object ResNet50noTop : CV<Functional>("models/tensorflow/cv/resnet50/notop") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+            }
+        }
+
+        /** */
         public object ResNet101 : CV<Functional>("models/tensorflow/cv/resnet101") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
@@ -83,6 +104,13 @@ public object TFModels {
 
         /** */
         public object ResNet50v2 : CV<Functional>("models/tensorflow/cv/resnet50v2") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+            }
+        }
+
+        /** */
+        public object ResNet50v2noTop : CV<Functional>("models/tensorflow/cv/resnet50v2/notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
