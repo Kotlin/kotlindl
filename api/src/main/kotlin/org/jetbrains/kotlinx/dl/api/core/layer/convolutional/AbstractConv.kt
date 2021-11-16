@@ -75,9 +75,9 @@ public abstract class AbstractConv(
 
         val inputDepth = numberOfChannels // number of input channels
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
-        fanIn = (inputDepth * multiply(kernelSizeInternal.toLongArray())).toInt()
-        fanOut = ((outputDepth * multiply(kernelSizeInternal.toLongArray())).toDouble() /
-                multiply(stridesInternal.toLongArray()).toDouble()).roundToInt()
+        val fanIn = (inputDepth * multiply(kernelSizeInternal.toLongArray())).toInt()
+        val fanOut = ((outputDepth * multiply(kernelSizeInternal.toLongArray())).toDouble() /
+                     multiply(stridesInternal.toLongArray()).toDouble()).roundToInt()
 
         kernel = createVariable(
             tf,

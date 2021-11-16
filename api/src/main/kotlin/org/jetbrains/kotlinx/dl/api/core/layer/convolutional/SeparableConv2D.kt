@@ -97,8 +97,8 @@ public class SeparableConv2D(
         val inputDepth = numberOfChannels // amount of channels
         val outputDepth = numberOfChannels * this.depthMultiplier // amount of channels for the next layer
 
-        fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
-        fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
+        val fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
+        val fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
         val depthwiseKernelShape = shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, depthMultiplier.toLong())
         depthwiseKernel = createVariable(

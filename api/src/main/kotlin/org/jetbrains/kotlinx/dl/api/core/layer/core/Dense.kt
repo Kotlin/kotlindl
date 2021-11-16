@@ -59,8 +59,8 @@ public class Dense(
     private var bias: KVariable? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
-        fanOut = outputSize
+        val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
+        val fanOut = outputSize
 
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         kernel = createVariable(

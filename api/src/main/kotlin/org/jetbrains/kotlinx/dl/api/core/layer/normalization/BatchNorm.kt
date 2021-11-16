@@ -74,6 +74,8 @@ public class BatchNorm(
         if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
         isTrainable = false // TODO: add isTrainable to addWeight method as a flag
+        val fanIn = Int.MIN_VALUE
+        val fanOut = Int.MIN_VALUE
 
         movingMean = createVariable(
             tf,

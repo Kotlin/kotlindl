@@ -31,12 +31,6 @@ public abstract class Layer(public var name: String) {
     /** Model where this layer is used. */
     public var parentModel: TrainableModel? = null
 
-    /** Returns number of input parameters. */
-    protected var fanIn: Int = Int.MIN_VALUE
-
-    /** Returns number of output parameters. */
-    protected var fanOut: Int = Int.MIN_VALUE
-
     /** Returns inbound layers. */
     public var inboundLayers: MutableList<Layer> = mutableListOf()
 
