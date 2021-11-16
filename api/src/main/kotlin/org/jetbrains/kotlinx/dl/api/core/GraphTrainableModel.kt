@@ -157,10 +157,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         buildLayers()
 
         // should be after outputShape calculation
-        numberOfClasses = when (layers.last()::class) {
-            Dense::class -> (layers.last() as Dense).outputSize.toLong()
-            ActivationLayer::class -> (layers.last() as ActivationLayer).outputShape.tail()
-                .last()  // valid for mobileNet/DenseNet
+        numberOfClasses = when (val lastLayer = layers.last()) {
+            is Dense -> lastLayer.outputSize.toLong()
+            is ActivationLayer -> lastLayer.outputShape.tail().last()  // valid for mobileNet/DenseNet
             else -> 1
         }
 
