@@ -44,8 +44,6 @@ import kotlin.math.roundToInt
  * @property [activityRegularizerInternal] regularizer function applied to the output of the layer
  * @property [paddingInternal] numbers to keep for the padding for implementation
  * @property [useBiasInternal] flag if bias should be used during actual [forward] implementation
- * @property [kernelVariableName] name of kernel used when no layer name is defined
- * @property [biasVariableName] name of bias used when no layer name is defined
  * @constructor Creates [AbstractConv] object
  *
  * @param name of the layer to name its variables
@@ -63,8 +61,6 @@ public abstract class AbstractConv(
     protected val activityRegularizerInternal: Regularizer?,
     protected val paddingInternal: ConvPadding,
     protected val useBiasInternal: Boolean,
-    protected val kernelVariableName: String,
-    protected val biasVariableName: String,
     name: String
 ) : Layer(name) {
 
@@ -176,27 +172,20 @@ public abstract class AbstractConv(
      */
     protected abstract fun defineOutputShape(inputShape: Shape): Shape
 
-    /** Extract weights of the layer with the names from [defineKernelVariableName] and [defineBiasVariableName]. */
+    /** Extract weights of the layer by kernel and bias variable names returned by [kernelVarName] and [biasVarName] methods. */
     private fun extractConvWeights(): Map<String, Array<*>> = extractWeights(
-        if (useBiasInternal) listOf(defineKernelVariableName(), defineBiasVariableName())
-        else listOf(defineKernelVariableName())
+        if (useBiasInternal) listOf(kernelVarName(name), biasVarName(name))
+        else listOf(kernelVarName(name))
     )
-
-    /** Create the names of variables of the layer based on layer name or not if not present. */
-    private fun defineKernelVariableName(): String =
-        if (name.isNotEmpty()) kernelVarName(name) else kernelVariableName
-
-    private fun defineBiasVariableName(): String =
-        if (name.isNotEmpty()) biasVarName(name) else biasVariableName
 
     /** Create the variables of the layer in proper order. */
     private fun createConvVariables(tf: Ops, kGraph: KGraph) {
-        val kernelVariableName = defineKernelVariableName()
+        val kernelVariableName = kernelVarName(name)
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
 
         if (useBiasInternal) {
-            val biasVariableName = defineBiasVariableName()
+            val biasVariableName = biasVarName(name)
             val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
             bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializerInternal, biasRegularizerInternal)
         }

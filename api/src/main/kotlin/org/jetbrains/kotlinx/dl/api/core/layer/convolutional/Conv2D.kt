@@ -11,18 +11,14 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
-import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2d.dilations
-
-private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
-
-private const val BIAS_VARIABLE_NAME = "conv2d_bias"
 
 /**
  * 2D convolution layer (e.g. spatial convolution over images).
@@ -82,8 +78,6 @@ public class Conv2D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ) {
     init {

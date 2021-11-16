@@ -23,9 +23,6 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.DepthwiseConv2dNative
 
-private const val KERNEL_VARIABLE_NAME = "depthwise_conv2d_kernel"
-private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
-
 /**
  * Depthwise separable 2D convolution. (e.g. spatial convolution over images).
  *
@@ -82,8 +79,6 @@ public class DepthwiseConv2D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ), NoGradients {
 
