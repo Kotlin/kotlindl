@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.printSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
@@ -29,7 +30,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 300
+private const val IMAGE_SIZE = 224
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
@@ -97,7 +98,7 @@ fun vgg16noTopAdditionalTraining() {
             kernelInitializer = HeNormal(),
             biasInitializer = HeNormal(),
             outputSize = 64,
-            activation = Activations.Relu
+            activation = Activations.Relu,
         )
     )
     layers.add(
@@ -121,6 +122,8 @@ fun vgg16noTopAdditionalTraining() {
 
         val hdfFile = modelHub.loadWeights(modelType)
         it.loadWeightsForFrozenLayers(hdfFile)
+
+        it.printSummary()
 
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBeforeTraining")

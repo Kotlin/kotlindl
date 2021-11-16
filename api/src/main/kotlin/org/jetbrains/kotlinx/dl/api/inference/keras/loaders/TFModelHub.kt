@@ -54,8 +54,8 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     ): T {
         val jsonConfigFile = getJSONConfigFile(modelType, loadingMode, (modelType as TFModels.CV.VGG16).noTop)
         return when (modelType) {
-            is TFModels.CV.VGG16 -> Sequential.loadModelConfiguration(jsonConfigFile, (modelType as TFModels.CV.VGG16).inputShape) as T
-            TFModels.CV.VGG19 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
+            is TFModels.CV.VGG16 -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile, (modelType as TFModels.CV.VGG16).inputShape)) as T
+            TFModels.CV.VGG19 -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
             TFModels.CV.ResNet50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
