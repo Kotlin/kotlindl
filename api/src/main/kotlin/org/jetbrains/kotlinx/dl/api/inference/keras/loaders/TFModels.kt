@@ -35,7 +35,8 @@ public object TFModels {
         /** */
         public class VGG16(public val noTop: Boolean = false, public val inputShape: IntArray? = null) : CV<Sequential>("models/tensorflow/cv/vgg16") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                //return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return data
             }
         }
 
