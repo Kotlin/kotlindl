@@ -11,8 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -30,10 +28,6 @@ import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.DepthwiseConv2dNative
 import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
 import kotlin.math.roundToInt
-
-private const val DEPTHWISE_KERNEL_VARIABLE_NAME = "separable_conv2d_depthwise_kernel"
-private const val POINTWISE_KERNEL_VARIABLE_NAME = "separable_conv2d_pointwise_kernel"
-private const val BIAS_VARIABLE_NAME = "separable_conv2d_bias"
 
 /**
  * 2-D convolution with separable filters.
@@ -122,17 +116,8 @@ public class SeparableConv2D(
         createSeparableConv2DVariables(tf, kGraph)
     }
 
-    private fun defineDepthwiseKernelVariableName(): String =
-        if (name.isNotEmpty()) separableConv2dDepthwiseKernelVarName(name) else DEPTHWISE_KERNEL_VARIABLE_NAME
-
-    private fun definePointwiseKernelVariableName(): String =
-        if (name.isNotEmpty()) separableConv2dPointwiseKernelVarName(name) else POINTWISE_KERNEL_VARIABLE_NAME
-
-    private fun defineBiasVariableName(): String =
-        if (name.isNotEmpty()) separableConv2dBiasVarName(name) else BIAS_VARIABLE_NAME
-
     private fun createSeparableConv2DVariables(tf: Ops, kGraph: KGraph) {
-        val depthwiseKernelVariableName = defineDepthwiseKernelVariableName()
+        val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
         depthwiseKernel = tf.withName(depthwiseKernelVariableName).variable(depthwiseKernelShape, getDType())
         depthwiseKernel = addWeight(
             tf,
@@ -143,7 +128,7 @@ public class SeparableConv2D(
             depthwiseRegularizer
         )
 
-        val pointwiseKernelVariableName = definePointwiseKernelVariableName()
+        val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
         pointwiseKernel = tf.withName(pointwiseKernelVariableName).variable(pointwiseKernelShape, getDType())
         pointwiseKernel = addWeight(
             tf,
@@ -155,7 +140,7 @@ public class SeparableConv2D(
         )
 
         if (useBias) {
-            val biasVariableName = defineBiasVariableName()
+            val biasVariableName = separableConv2dBiasVarName(name)
             val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
             bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
         }
@@ -216,12 +201,12 @@ public class SeparableConv2D(
     private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
         return extractWeights(
             if (useBias) listOf(
-                defineDepthwiseKernelVariableName(),
-                definePointwiseKernelVariableName(),
-                defineBiasVariableName()
+                separableConv2dDepthwiseKernelVarName(name),
+                separableConv2dPointwiseKernelVarName(name),
+                separableConv2dBiasVarName(name)
             ) else listOf(
-                defineDepthwiseKernelVariableName(),
-                definePointwiseKernelVariableName()
+                separableConv2dDepthwiseKernelVarName(name),
+                separableConv2dPointwiseKernelVarName(name)
             )
         )
     }

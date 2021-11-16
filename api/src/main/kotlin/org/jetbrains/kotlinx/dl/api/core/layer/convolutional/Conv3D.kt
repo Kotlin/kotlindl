@@ -20,10 +20,6 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv3d.dilations
 
-private const val KERNEL_VARIABLE_NAME = "conv3d_kernel"
-
-private const val BIAS_VARIABLE_NAME = "conv3d_bias"
-
 /**
  * 3D convolution layer (e.g. spatial convolution over video frames or 3D images).
  *
@@ -85,8 +81,6 @@ public class Conv3D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ) {
     init {
