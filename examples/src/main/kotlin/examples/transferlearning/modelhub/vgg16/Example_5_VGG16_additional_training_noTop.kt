@@ -29,7 +29,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 300
+private const val IMAGE_SIZE = 224
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
@@ -51,10 +51,10 @@ private const val EPOCHS = 2
  * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">
  *    Detailed description of VGG'16 model and an approach to build it in Keras.</a>
  */
-fun vgg19additionalTraining() {
+fun vgg16noTopAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG16
-    val model = modelHub.loadModel(modelType = modelType, noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
+    val modelType = TFModels.CV.VGG16(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
+    val model = modelHub.loadModel(modelType)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
@@ -74,7 +74,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                TFModels.CV.VGG16noTop
+                TFModels.CV.VGG16()
             }
         }
     }
@@ -138,6 +138,6 @@ fun vgg19additionalTraining() {
 }
 
 /** */
-fun main(): Unit = vgg19additionalTraining()
+fun main(): Unit = vgg16noTopAdditionalTraining()
 
 

@@ -33,14 +33,7 @@ public object TFModels {
         }
 
         /** */
-        public object VGG16 : CV<Sequential>("models/tensorflow/cv/vgg16") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            }
-        }
-
-        /** */
-        public object VGG16noTop : CV<Sequential>("models/tensorflow/cv/vgg16/notop") {
+        public class VGG16(public val noTop: Boolean = false, public val inputShape: IntArray? = null) : CV<Sequential>("models/tensorflow/cv/vgg16") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -48,13 +41,6 @@ public object TFModels {
 
         /** */
         public object VGG19 : CV<Sequential>("models/tensorflow/cv/vgg19") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
-            }
-        }
-
-        /** */
-        public object VGG19noTop : CV<Sequential>("models/tensorflow/cv/vgg19/notop") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
