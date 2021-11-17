@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -32,7 +32,7 @@ private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 224
+private const val IMAGE_SIZE = 300
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
@@ -84,12 +84,13 @@ fun resnet50noTopAdditionalTraining() {
         layers.add(layer)
     }
 
-    val newFlattenLayer = Flatten(
-        name = "top_flatten"
-    )
-    newFlattenLayer.inboundLayers.add(layers.last())
+    val newGlobalAvgPool2DLayer = GlobalAvgPool2D(
+        name = "top_avg_pool",
+
+        )
+    newGlobalAvgPool2DLayer.inboundLayers.add(layers.last())
     layers.add(
-        newFlattenLayer
+        newGlobalAvgPool2DLayer
     )
 
     val newDenseLayer = Dense(

@@ -30,7 +30,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 224
+private const val IMAGE_SIZE = 200
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16

@@ -216,8 +216,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         modelType: ModelType<*, *>,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
     ): HdfFile {
-
-        val noTop = (modelType as TFModels.CV.VGG16).noTop
+        val noTop = if (modelType is TFModels.CV) modelType.noTop else false
         return getWeightsFile(modelType, loadingMode, noTop)
     }
 

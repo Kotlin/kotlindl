@@ -70,7 +70,7 @@ fun mobilenetWithAdditionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = TFModels.CV.MobileNet()
+                modelTypePreprocessing = TFModels.CV.MobileNet()
             }
         }
     }
