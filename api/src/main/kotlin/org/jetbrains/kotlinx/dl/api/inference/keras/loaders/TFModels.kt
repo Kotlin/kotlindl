@@ -179,16 +179,20 @@ public object TFModels {
         }
 
         /** */
-        public class NASNetMobile(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = inputShape, noTop = noTop) {
+        public class NASNetMobile(noTop: Boolean = false) :
+            CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3), noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public class NASNetLarge(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class NASNetLarge(noTop: Boolean = false, inputShape: IntArray? = intArrayOf(331, 331, 3)) :
             CV<Functional>("models/tensorflow/cv/nasnetlarge", inputShape = inputShape, noTop = noTop) {
+            init {
+                require(inputShape!![0] >= 331 && inputShape[1] >= 331) { "Width and height should be no smaller than 331 for the model ${this.javaClass.kotlin.simpleName}." }
+            }
+
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }

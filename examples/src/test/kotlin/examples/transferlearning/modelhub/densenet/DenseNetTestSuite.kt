@@ -5,6 +5,8 @@
 
 package examples.transferlearning.modelhub.densenet
 
+import examples.transferlearning.runImageRecognitionTransferLearning
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class DenseNetTestSuite {
@@ -14,12 +16,43 @@ class DenseNetTestSuite {
     }
 
     @Test
+    fun denseNet121AdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.DenseNet121(
+                noTop = true,
+                inputShape = intArrayOf(90, 90, 3)
+            )
+        )
+    }
+
+    @Test
     fun denseNet169PredictionTest() {
         denseNet169Prediction()
     }
 
     @Test
+    fun denseNet169AdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.DenseNet169(
+                noTop = true,
+                inputShape = intArrayOf(80, 80, 3)
+            )
+        )
+    }
+
+
+    @Test
     fun denseNet201PredictionTest() {
         denseNet201Prediction()
+    }
+
+    @Test
+    fun denseNet201AdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.DenseNet201(
+                noTop = true,
+                inputShape = intArrayOf(110, 110, 3)
+            )
+        )
     }
 }

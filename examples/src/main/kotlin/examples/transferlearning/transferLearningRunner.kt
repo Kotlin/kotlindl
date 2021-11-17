@@ -3,9 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelhub.resnet
+package examples.transferlearning
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
@@ -14,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
@@ -27,28 +28,17 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val EPOCHS = 3
+private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 300
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
-/**
- * This examples demonstrates the transfer learning concept on ResNet'50 model:
- * - Model configuration, model weights and labels are obtained from [TFModelHub].
- * - Weights are loaded from .h5 file, configuration is loaded from .json file.
- * - All layers, are added to the new Neural Network, its weights are frozen.
- * - New GlobalAvgPool2D and Dense layers are added and initialized via defined initializers.
- * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
- *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
- * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
- */
-fun resnet50noTopAdditionalTraining() {
+fun runImageRecognitionTransferLearning(
+    modelType: TFModels.CV<out GraphTrainableModel>
+) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -61,8 +51,8 @@ fun resnet50noTopAdditionalTraining() {
         }
         transformImage {
             resize {
-                outputHeight = IMAGE_SIZE
-                outputWidth = IMAGE_SIZE
+                outputHeight = modelType.inputShape?.get(0) ?: 224
+                outputWidth = modelType.inputShape?.get(0) ?: 224
                 interpolation = InterpolationType.BILINEAR
             }
             convert { colorMode = ColorMode.BGR }
@@ -127,7 +117,25 @@ fun resnet50noTopAdditionalTraining() {
             metric = Metrics.ACCURACY
         )
 
-        it.loadWeightsForFrozenLayers(hdfFile)
+        if (modelType is TFModels.CV.DenseNet121 || modelType is TFModels.CV.DenseNet169 || modelType is TFModels.CV.DenseNet201) {
+            val weightPaths = listOf(
+                LayerConvOrDensePaths(
+                    "conv1_conv",
+                    "/conv1/conv/conv1/conv/kernel:0",
+                    "/conv1/conv/conv1/conv/bias:0"
+                ),
+                LayerBatchNormPaths(
+                    "conv1_bn",
+                    "/conv1/bn/conv1/bn/gamma:0",
+                    "/conv1/bn/conv1/bn/beta:0",
+                    "/conv1/bn/conv1/bn/moving_mean:0",
+                    "/conv1/bn/conv1/bn/moving_variance:0"
+                )
+            )
+            it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH)
+        } else {
+            it.loadWeightsForFrozenLayers(hdfFile)
+        }
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBeforeTraining")
 
@@ -142,8 +150,3 @@ fun resnet50noTopAdditionalTraining() {
         println("Accuracy after training $accuracyAfterTraining")
     }
 }
-
-/** */
-fun main(): Unit = resnet50noTopAdditionalTraining()
-
-
