@@ -80,7 +80,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
             val config = loadSerializedModel(configuration)
-            return loadSequentialModelLayers(config)
+            return loadSequentialModelLayers(config, inputShape)
         }
 
         /**
@@ -91,7 +91,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Sequential model.
          */
         @JvmStatic
-        public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
+        public fun loadDefaultModelConfiguration(modelDirectory: File, inputShape: IntArray? = null): Sequential {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -102,7 +102,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             )
 
             return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(
-                configuration
+                configuration, inputShape
             )
         }
 
@@ -114,7 +114,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromDefaultConfiguration(
+            modelDirectory: File,
+            inputShape: IntArray? = null
+        ): Pair<Input, MutableList<Layer>> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -125,7 +128,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             )
 
             val config = loadSerializedModel(configuration)
-            return loadSequentialModelLayers(config)
+            return loadSequentialModelLayers(config, inputShape)
         }
     }
 

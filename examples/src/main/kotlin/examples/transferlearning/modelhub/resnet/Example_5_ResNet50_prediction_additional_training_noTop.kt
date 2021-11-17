@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -31,7 +32,7 @@ private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 224L
+private const val IMAGE_SIZE = 224
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
@@ -47,7 +48,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun resnet50noTopAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    var modelType = TFModels.CV.ResNet50
+    val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -60,15 +61,15 @@ fun resnet50noTopAdditionalTraining() {
         }
         transformImage {
             resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
+                outputHeight = IMAGE_SIZE
+                outputWidth = IMAGE_SIZE
                 interpolation = InterpolationType.BILINEAR
             }
             convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             sharpen {
-                modelType = TFModels.CV.ResNet50
+                modelTypePreprocessing = modelType
             }
         }
     }
@@ -80,15 +81,16 @@ fun resnet50noTopAdditionalTraining() {
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {
-        layer.isTrainable = false
         layers.add(layer)
     }
 
-    val lastLayer = layers.last()
-    for (outboundLayer in lastLayer.inboundLayers)
-        outboundLayer.outboundLayers.remove(lastLayer)
-
-    layers.removeLast()
+    val newFlattenLayer = Flatten(
+        name = "top_flatten"
+    )
+    newFlattenLayer.inboundLayers.add(layers.last())
+    layers.add(
+        newFlattenLayer
+    )
 
     val newDenseLayer = Dense(
         name = "top_dense",
@@ -141,6 +143,6 @@ fun resnet50noTopAdditionalTraining() {
 }
 
 /** */
-fun main(): Unit = resnet50additionalTraining()
+fun main(): Unit = resnet50noTopAdditionalTraining()
 
 

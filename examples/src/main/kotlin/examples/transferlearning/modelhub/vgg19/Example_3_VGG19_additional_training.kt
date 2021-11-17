@@ -52,7 +52,7 @@ private const val EPOCHS = 2
  */
 fun vgg19additionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG19
+    val modelType = TFModels.CV.VGG19()
     val model = modelHub.loadModel(modelType)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
@@ -73,7 +73,7 @@ fun vgg19additionalTraining() {
         }
         transformTensor {
             sharpen {
-                TFModels.CV.VGG19
+                TFModels.CV.VGG19()
             }
         }
     }

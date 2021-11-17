@@ -143,14 +143,15 @@ private fun convertToLayer(
  * @return Non-compiled and non-trained Sequential model.
  */
 internal fun loadFunctionalModelConfiguration(
-    configuration: File
+    configuration: File,
+    inputShape: IntArray? = null
 ): Functional {
     val functionalConfig = loadSerializedModel(configuration)
-    return deserializeFunctionalModel(functionalConfig)
+    return deserializeFunctionalModel(functionalConfig, inputShape)
 }
 
-internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
-    Functional.of(loadFunctionalModelLayers(functionalConfig).toList())
+internal fun deserializeFunctionalModel(functionalConfig: KerasModel?, inputShape: IntArray? = null) =
+    Functional.of(loadFunctionalModelLayers(functionalConfig, inputShape).toList())
 
 /**
  * Loads a [Functional] model layers from json file with model configuration.
@@ -160,13 +161,12 @@ internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> {
+internal fun loadFunctionalModelLayers(config: KerasModel?, inputShape: IntArray? = null): MutableList<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
     val kerasLayers = config!!.config!!.layers!!
-
-    val input = createInputLayer(kerasLayers.first())
+    val input = createInputLayer(kerasLayers.first(), inputShape)
     layers.add(input)
     layersByNames[input.name] = input
 

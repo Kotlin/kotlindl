@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * NOTE: Input resolution is 224*224
  */
 fun nasNetMobilePrediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetMobile)
+    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetMobile())
 }
 
 /** */

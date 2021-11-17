@@ -75,7 +75,7 @@ fun vgg16noTopAdditionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelTypePreprocessing = TFModels.CV.VGG16()
+                modelTypePreprocessing = modelType
             }
         }
     }

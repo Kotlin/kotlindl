@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
  *
  * @property [modelTypePreprocessing] One the supported models pre-trained on ImageNet.
  */
-public class Sharpen(public var modelTypePreprocessing: ModelType<*, *> = TFModels.CV.VGG19) : Preprocessor {
+public class Sharpen(public var modelTypePreprocessing: ModelType<*, *> = TFModels.CV.VGG16()) : Preprocessor {
     override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
         val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels!!)
         return modelTypePreprocessing.preprocessInput(data, tensorShape)

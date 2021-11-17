@@ -52,27 +52,127 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val jsonConfigFile = getJSONConfigFile(modelType, loadingMode, (modelType as TFModels.CV.VGG16).noTop)
+        val jsonConfigFile = if (modelType is TFModels.CV) {
+            getJSONConfigFile(modelType, loadingMode, modelType.noTop)
+        } else {
+            getJSONConfigFile(modelType, loadingMode)
+        }
+
         return when (modelType) {
-            is TFModels.CV.VGG16 -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile, (modelType as TFModels.CV.VGG16).inputShape)) as T
-            TFModels.CV.VGG19 -> freezeAllLayers(Sequential.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet50v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet101v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet152v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.MobileNetV2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            is TFModels.CV.VGG16 -> freezeAllLayers(
+                Sequential.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.VGG19 -> freezeAllLayers(
+                Sequential.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet18 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet34 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet50 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet101 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet152 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet50v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet101v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet152v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.MobileNet -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.MobileNetV2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.Inception -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.Xception -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet121 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet169 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet201 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.NASNetMobile -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.NASNetLarge -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
             else -> TODO()
         }
     }

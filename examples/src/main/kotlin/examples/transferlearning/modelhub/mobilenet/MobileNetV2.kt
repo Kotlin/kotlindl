@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * - Special preprocessing (used in MobileNetV2 during training on ImageNet dataset) is applied to images before prediction.
  */
 fun mobileNetV2Prediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.MobileNetV2)
+    runImageRecognitionPrediction(modelType = TFModels.CV.MobileNetV2())
 }
 
 /** */

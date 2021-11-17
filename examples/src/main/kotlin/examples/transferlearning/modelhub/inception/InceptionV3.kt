@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * NOTE: Input resolution is 299*299
  */
 fun inceptionV3Prediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.Inception, resizeTo = Pair(299, 299))
+    runImageRecognitionPrediction(modelType = TFModels.CV.Inception(), resizeTo = Pair(299, 299))
 }
 
 /** */
