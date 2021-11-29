@@ -516,22 +516,25 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
  */
 public class SoftShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
     override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
-        require(upper < lower) {
-            "The value of lambda must be no less than zero"
+        require((lower < upper) && (lower < 0) && (upper > 0)) {
+            "The boundary values have to be non zero and the lower bound has to be lower as the upper"
         }
-        val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
-        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(upper)
-        val mask = (maskLower || maskUpper)
-        return when (mask) {
-            false -> tf.constant(0) as Operand<Float>
-            true -> {
-                if (maskUpper)
-                    tf.math.add(features, tf.constant(upper))
-                else tf.math.sub(
-                    features, tf.constant(lower)
-                )
-            }
-        }
+        val zeros = tf.math.mul(features, tf.constant(0f))
+        val valuesBelowLower = tf.where3(
+            tf.math.less(features, tf.constant(lower)),
+            tf.math.sub(
+                features, tf.constant(lower)
+            ),
+            zeros
+        )
+        val valuesAboveUpper = tf.where3(
+            tf.math.less(tf.constant(upper), features),
+            tf.math.sub(
+                features, tf.constant(upper)
+            ),
+            zeros
+        )
+        return tf.math.add(valuesBelowLower, valuesAboveUpper)
     }
 }
 
