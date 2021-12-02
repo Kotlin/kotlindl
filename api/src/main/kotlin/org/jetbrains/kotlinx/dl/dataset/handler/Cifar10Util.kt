@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.handler
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 import java.io.IOException
@@ -27,7 +28,7 @@ private fun loadImagesFromDirectory(
     archiveName: String
 ): Array<FloatArray> {
     val images = Array(subDatasetSize) {
-        ImageConverter.toNormalizedFloatArray(File(archiveName, "${it + 1}.png"))
+        ImageConverter.toNormalizedFloatArray(File(archiveName, "${it + 1}.png"), colorMode = ColorMode.BGR)
     }
 
     return images

@@ -9,8 +9,9 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -79,13 +80,13 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
             load {
                 pathToData = imageFile
                 imageShape = ImageShape(224, 224, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 resize {
                     outputHeight = 1200
                     outputWidth = 1200
                 }
+                convert { colorMode = ColorMode.BGR }
             }
         }
 
@@ -93,7 +94,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels) // TODO: refactor to the imageShape
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
         )
 
         return this.detectObjects(preprocessedData, topK)

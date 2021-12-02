@@ -259,6 +259,7 @@ private fun convertToKerasActivation(activation: Activations): String {
         Activations.LiSHT -> ACTIVATION_LISHT
         Activations.Snake -> ACTIVATION_SNAKE
         Activations.Gelu -> ACTIVATION_GELU
+        Activations.Sparsemax -> ACTIVATION_SPARSEMAX
     }
 }
 
@@ -514,8 +515,8 @@ private fun createKerasPermuteLayer(layer: Permute): KerasLayer {
 private fun createKerasMaxPool1DLayer(layer: MaxPool1D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        pool_size = listOf(layer.poolSize[1].toInt()),
-        strides = listOf(layer.strides[1].toInt()),
+        pool_size = listOf(layer.poolSize[1]),
+        strides = listOf(layer.strides[1]),
         padding = convertToKerasPadding(layer.padding),
         name = layer.name,
         trainable = layer.isTrainable
@@ -541,8 +542,8 @@ private fun createKerasMaxPool2DLayer(layer: MaxPool2D): KerasLayer {
 private fun createKerasAvgPool1DLayer(layer: AvgPool1D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        pool_size = listOf(layer.poolSize[1].toInt()),
-        strides = listOf(layer.strides[1].toInt()),
+        pool_size = listOf(layer.poolSize[1]),
+        strides = listOf(layer.strides[1]),
         padding = convertToKerasPadding(layer.padding),
         name = layer.name,
         trainable = layer.isTrainable
@@ -582,8 +583,8 @@ private fun createKerasAvgPool2DLayer(layer: AvgPool2D): KerasLayer {
 private fun createKerasAvgPool3DLayer(layer: AvgPool3D): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
-        pool_size = layer.poolSize.slice(1..3).map { it.toInt() },
-        strides = layer.strides.slice(1..3).map { it.toInt() },
+        pool_size = layer.poolSize.slice(1..3),
+        strides = layer.strides.slice(1..3),
         padding = convertToKerasPadding(layer.padding),
         name = layer.name,
         trainable = layer.isTrainable
@@ -624,10 +625,10 @@ private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
 
 private fun createKerasConv1DLayer(layer: Conv1D, isKerasFullyCompatible: Boolean): KerasLayer {
     val configX = LayerConfig(
-        filters = layer.filters.toInt(),
-        kernel_size = listOf(layer.kernelSize.toInt()),
-        strides = listOf(layer.strides[1].toInt()),
-        dilation_rate = listOf(layer.dilations[1].toInt()),
+        filters = layer.filters,
+        kernel_size = listOf(layer.kernelSize),
+        strides = listOf(layer.strides[1]),
+        dilation_rate = listOf(layer.dilations[1]),
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
@@ -643,12 +644,11 @@ private fun createKerasConv1DLayer(layer: Conv1D, isKerasFullyCompatible: Boolea
 }
 
 private fun createKerasConv2DLayer(layer: Conv2D, isKerasFullyCompatible: Boolean): KerasLayer {
-    val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
     val configX = LayerConfig(
-        filters = layer.filters.toInt(),
-        kernel_size = kernelSize,
-        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
-        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
+        filters = layer.filters,
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2]),
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
@@ -664,12 +664,11 @@ private fun createKerasConv2DLayer(layer: Conv2D, isKerasFullyCompatible: Boolea
 }
 
 private fun createKerasConv3DLayer(layer: Conv3D, isKerasFullyCompatible: Boolean): KerasLayer {
-    val kernelSize = layer.kernelSize.map { it.toInt() }.toList()
     val configX = LayerConfig(
-        filters = layer.filters.toInt(),
-        kernel_size = kernelSize,
-        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt(), layer.strides[3].toInt()),
-        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt(), layer.dilations[3].toInt()),
+        filters = layer.filters,
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2], layer.strides[3]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2], layer.dilations[3]),
         activation = convertToKerasActivation(layer.activation),
         kernel_initializer = convertToKerasInitializer(layer.kernelInitializer, isKerasFullyCompatible),
         bias_initializer = convertToKerasInitializer(layer.biasInitializer, isKerasFullyCompatible),
@@ -685,9 +684,9 @@ private fun createKerasConv3DLayer(layer: Conv3D, isKerasFullyCompatible: Boolea
 
 private fun createKerasDepthwiseConv2DLayer(layer: DepthwiseConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
     val configX = LayerConfig(
-        kernel_size = layer.kernelSize.map { it.toInt() },
-        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
-        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2]),
         activation = convertToKerasActivation(layer.activation),
         depthwise_initializer = convertToKerasInitializer(layer.depthwiseInitializer, isKerasFullyCompatible),
         depth_multiplier = layer.depthMultiplier,
@@ -702,10 +701,10 @@ private fun createKerasDepthwiseConv2DLayer(layer: DepthwiseConv2D, isKerasFully
 
 private fun createKerasSeparableConv2DLayer(layer: SeparableConv2D, isKerasFullyCompatible: Boolean): KerasLayer {
     val configX = LayerConfig(
-        filters = layer.filters.toInt(),
-        kernel_size = layer.kernelSize.map { it.toInt() },
-        strides = listOf(layer.strides[1].toInt(), layer.strides[2].toInt()),
-        dilation_rate = listOf(layer.dilations[1].toInt(), layer.dilations[2].toInt()),
+        filters = layer.filters,
+        kernel_size = layer.kernelSize.toList(),
+        strides = listOf(layer.strides[1], layer.strides[2]),
+        dilation_rate = listOf(layer.dilations[1], layer.dilations[2]),
         activation = convertToKerasActivation(layer.activation),
         depthwise_initializer = convertToKerasInitializer(layer.depthwiseInitializer, isKerasFullyCompatible),
         pointwise_initializer = convertToKerasInitializer(layer.pointwiseInitializer, isKerasFullyCompatible),

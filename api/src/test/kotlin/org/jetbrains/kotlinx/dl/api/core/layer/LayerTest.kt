@@ -1,11 +1,15 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.shape.*
-import org.junit.jupiter.api.Assertions
+import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.tensorflow.*
 import org.tensorflow.op.Ops
-import kotlin.IllegalArgumentException
+import java.nio.FloatBuffer
 
 enum class RunMode {
     EAGER,
@@ -13,17 +17,8 @@ enum class RunMode {
 }
 
 open class LayerTest {
-
-    private fun getInputOp(tf: Ops, input: Array<*>): Operand<Float> {
-        return when (input.shape.numDimensions()) {
-            1 -> tf.constant(input.map { it as Float }.toFloatArray())
-            2 -> tf.constant(input.cast2D<FloatArray>())
-            3 -> tf.constant(input.cast3D<FloatArray>())
-            4 -> tf.constant(input.cast4D<FloatArray>())
-            5 -> tf.constant(input.cast5D<FloatArray>())
-            else -> throw IllegalArgumentException("Inputs with more than 5 dimensions are not supported yet!")
-        }
-    }
+    private fun getInputOp(tf: Ops, input: Array<*>): Operand<Float> =
+        tf.constant(input.shape.toLongArray(), FloatBuffer.wrap(input.flattenFloats()))
 
     private fun getLayerOutputOp(
         tf: Ops,
@@ -89,22 +84,13 @@ open class LayerTest {
             RunMode.GRAPH -> runLayerInGraphMode(layer, input)
         }
         output.use {
-            val outputShape = shapeFromDims(*output.shape())
-            val outputArray = getFloatArrayOfShape(outputShape).let {
-                when (outputShape.numDimensions()) {
-                    1 -> it as Array<Float>
-                    2 -> it.cast2D<FloatArray>()
-                    3 -> it.cast3D<FloatArray>()
-                    4 -> it.cast4D<FloatArray>()
-                    5 -> it.cast5D<FloatArray>()
-                    else -> throw IllegalArgumentException("Arrays with more than 5 dimensions are not supported yet!")
-                }
-            }
-            output.copyTo(outputArray)
-            Assertions.assertArrayEquals(
-                expectedOutput,
-                outputArray
-            )
+            val outputShape = output.shape()
+            val expectedShape = expectedOutput.shape.toLongArray()
+            assertArrayEquals(expectedShape, outputShape)
+
+            val result = it.convertTensorToFlattenFloatArray()
+            val expected = expectedOutput.flattenFloats()
+            assertArrayEquals(expected, result)
         }
     }
 
@@ -122,7 +108,7 @@ open class LayerTest {
     ) {
         val inputShape = shapeFromDims(*inputShapeArray)
         val outputShape = layer.computeOutputShape(inputShape).toLongArray()
-        Assertions.assertArrayEquals(
+        assertArrayEquals(
             expectedOutputShape,
             outputShape,
             "Computed output shape differs from expected output shape!",

@@ -8,7 +8,7 @@ Under the hood, it uses TensorFlow Java API and ONNX Runtime API for Java. Kotli
 importing existing Keras and ONNX models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
 This project aims to make Deep Learning easier for JVM developers and simplify deploying deep learning models in JVM production environments.
- 
+
 Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
 ```kotlin
@@ -27,8 +27,8 @@ private val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 6,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
@@ -41,8 +41,8 @@ private val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 16,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
@@ -120,7 +120,7 @@ This, however, does not affect the high-level API.
 
 ## How to configure KotlinDL in your project
 To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
-```kotlin
+```groovy
    repositories {
       mavenCentral()
    }
@@ -137,7 +137,7 @@ For more details, as well as for `pom.xml` and `build.gradle.kts` examples, plea
 ## Working with KotlinDL in Jupyter Notebook
 You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the following dependency in your notebook: 
 
-```
+```kotlin
    @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
 ```
 
@@ -174,14 +174,14 @@ Note that only NVIDIA devices are supported.
 
 You will also need to add the following dependencies in your project if you wish to leverage a GPU: 
 
-```
+```groovy
   compile 'org.tensorflow:libtensorflow:1.15.0'_
   compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
 ```
 
 On Windows, the following distributions are required:
 - CUDA cuda_10.0.130_411.31_win10
-- [cudnn-10.0](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
+- [cudnn-7.6.3](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
 ## Logging
@@ -192,13 +192,13 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
-```
+```groovy
   implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
   implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
   implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
 ```
 
-```
+```xml
 <Configuration status="WARN">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
@@ -220,11 +220,11 @@ You will also need to add the following dependencies and configuration file ``lo
 
 If you wish to use Logback, include the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project
 
-```
+```groovy
   compile 'ch.qos.logback:logback-classic:1.2.3'
-``` 
-
 ```
+
+```xml
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -254,7 +254,9 @@ it was not fully fixed and required an additional line in the build script.
 One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a TensorFlow version specification to the Jar's Manifest. 
 Below you can find an example of a Gradle build task for Fat Jar creation.
 
-```
+```groovy
+// build.gradle
+
 task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Version': '1.15'
@@ -265,7 +267,26 @@ task fatJar(type: Jar) {
 }
 ```
 
+```kotlin
+// build.gradle.kts
+
+plugins {
+    kotlin("jvm") version "1.5.31"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+}
+
+tasks{
+    shadowJar {
+        manifest {
+            attributes(Pair("Main-Class", "MainKt"))
+            attributes(Pair("Implementation-Version", "1.15"))
+        }
+    }
+}
+```
+
 ## Limitations
+
 Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
 
 - Input

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+
 /**
  * The whole image preprocessing pipeline DSL.
  *
@@ -38,4 +40,23 @@ public fun ImagePreprocessing.crop(block: Cropping.() -> Unit) {
 /** */
 public fun ImagePreprocessing.resize(block: Resize.() -> Unit) {
     addOperation(Resize().apply(block))
+}
+
+/** */
+public fun ImagePreprocessing.pad(block: Padding.() -> Unit) {
+    addOperation(Padding().apply(block))
+}
+
+/** */
+public fun ImagePreprocessing.convert(block: Convert.() -> Unit) {
+    addOperation(Convert().apply(block))
+}
+
+/** */
+public fun ImagePreprocessing.grayscale() {
+    addOperation(Convert(colorMode = ColorMode.GRAYSCALE))
+}
+
+public fun ImagePreprocessing.centerCrop(block: CenterCrop.() -> Unit) {
+    addOperation(CenterCrop().apply(block))
 }

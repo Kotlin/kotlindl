@@ -19,9 +19,10 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -68,8 +69,8 @@ fun main() {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
                     imageShape = ImageShape(224, 224, 3)
-                    colorMode = ColorOrder.BGR
                 }
+                transformImage { convert { colorMode = ColorMode.BGR } }
             }
 
             val inputData = preprocessInput(preprocessing().first, model.inputDimensions, inputType = InputType.CAFFE)
@@ -168,7 +169,7 @@ fun main() {
 
         for (i in 1..8) {
             val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream)
+            val floatArray = ImageConverter.toRawFloatArray(inputStream, colorMode = ColorMode.BGR)
 
             val xTensorShape = it.inputLayer.input.asOutput().shape()
             val tensorShape = longArrayOf(

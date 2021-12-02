@@ -5,9 +5,10 @@
 
 package examples.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import java.awt.Color
 import java.io.File
 import javax.swing.JFrame
 
@@ -29,7 +30,6 @@ fun main() {
         load {
             pathToData = image
             imageShape = ImageShape(224, 224, 3)
-            colorMode = ColorOrder.BGR
         }
         transformImage {
             crop {
@@ -49,6 +49,14 @@ fun main() {
                     dirLocation = preprocessedImagesDirectory
                 }
             }
+            pad {
+                top = 10
+                bottom = 40
+                left = 10
+                right = 10
+                mode = PaddingMode.Fill(Color.WHITE)
+            }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {
@@ -60,7 +68,7 @@ fun main() {
     val rawImage = preprocessing().first
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape))
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.BGR))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

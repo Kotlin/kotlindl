@@ -143,24 +143,12 @@ private fun fillLayerWeights(
     group: Group,
     model: GraphTrainableModel
 ) {
-    when (it::class) {
-        Dense::class -> fillDenseVariablesFromKeras(it.name, group, model)
-        Conv2D::class -> fillConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        DepthwiseConv2D::class -> fillDepthwiseConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        SeparableConv2D::class -> fillSeparableConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
+    when (it) {
+        is Dense -> fillDenseVariablesFromKeras(it.name, group, model)
+        is Conv2D -> fillConv2DVariablesFromKeras(it.name, group, model)
+        is DepthwiseConv2D -> fillDepthwiseConv2DVariablesFromKeras(it.name, group, model)
+        is SeparableConv2D -> fillSeparableConv2DVariablesFromKeras(it.name, group, model)
+        is BatchNorm -> fillBatchNormVariablesFromKeras(it.name, group, model)
     }
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
@@ -474,41 +462,12 @@ private fun fillLayerWeights(
     layerPaths: LayerPaths?,
     model: GraphTrainableModel
 ) {
-    when (it::class) {
-        Dense::class -> fillDenseVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as Dense).useBias,
-            layerPaths
-        )
-        Conv2D::class -> fillConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as Conv2D).useBias,
-            layerPaths
-        )
-        DepthwiseConv2D::class -> fillDepthwiseConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as DepthwiseConv2D).useBias,
-            layerPaths
-        )
-        SeparableConv2D::class -> fillSeparableConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as SeparableConv2D).useBias,
-            layerPaths
-        )
-        BatchNorm::class -> fillBatchNormVariables(
-            it.name,
-            hdfFile,
-            model,
-            layerPaths
-        )
+    when (it) {
+        is Dense -> fillDenseVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is Conv2D -> fillConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is DepthwiseConv2D -> fillDepthwiseConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is SeparableConv2D -> fillSeparableConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is BatchNorm -> fillBatchNormVariables(it.name, hdfFile, model, layerPaths)
     }
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
@@ -541,12 +500,12 @@ private fun fillLayerWeights(
 }*/
 
 private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
-    when (it::class) {
-        Dense::class -> initDenseVariablesByDefaultInitializer(it.name, model)
-        Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
-        DepthwiseConv2D::class -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
-        SeparableConv2D::class -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
-        BatchNorm::class -> initBatchNormVariablesByDefaultInitializer(it.name, model)
+    when (it) {
+        is Dense -> initDenseVariablesByDefaultInitializer(it.name, model)
+        is Conv2D -> initConv2DVariablesByDefaultInitializer(it.name, model)
+        is DepthwiseConv2D -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
+        is SeparableConv2D -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
+        is BatchNorm -> initBatchNormVariablesByDefaultInitializer(it.name, model)
     }
     model.logger.debug { "${it.paramCount} parameters initialized for the layer ${it.name}." }
 }

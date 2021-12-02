@@ -5,13 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import java.awt.image.BufferedImage
-
 /**
  * This preprocessor defines the Rescaling operation.
  * It scales each pixel  pixel_i = pixel_i / [scalingCoefficient].
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  *
  * @property [scalingCoefficient] Scaling coefficient.
  */

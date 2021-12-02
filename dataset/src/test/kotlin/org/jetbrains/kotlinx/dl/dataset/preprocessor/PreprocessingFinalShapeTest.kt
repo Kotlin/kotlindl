@@ -1,6 +1,5 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -12,7 +11,6 @@ class PreprocessingFinalShapeTest {
         val preprocess = preprocess {
             load {
                 pathToData = File("test.jpg")
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 resize {
@@ -22,7 +20,7 @@ class PreprocessingFinalShapeTest {
                 }
             }
         }
-        assertEquals(ImageShape(100, 100, 3), preprocess.finalShape)
+        assertEquals(ImageShape(100, 100, null), preprocess.finalShape)
     }
 
     @Test
@@ -31,7 +29,6 @@ class PreprocessingFinalShapeTest {
             load {
                 pathToData = File("test.jpg")
                 imageShape = ImageShape(20, 20, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 resize {
@@ -50,7 +47,6 @@ class PreprocessingFinalShapeTest {
             load {
                 pathToData = File("test.jpg")
                 imageShape = ImageShape(200, 200, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 crop {
@@ -70,7 +66,6 @@ class PreprocessingFinalShapeTest {
             load {
                 pathToData = File("test.jpg")
                 imageShape = ImageShape(200, 200, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 crop {
@@ -96,7 +91,6 @@ class PreprocessingFinalShapeTest {
             load {
                 pathToData = File("test.jpg")
                 imageShape = ImageShape(200, 200, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 resize {
@@ -121,7 +115,6 @@ class PreprocessingFinalShapeTest {
             load {
                 pathToData = File("test.jpg")
                 imageShape = ImageShape(200, 200, 3)
-                colorMode = ColorOrder.BGR
             }
             transformImage {
                 rotate {
@@ -130,5 +123,38 @@ class PreprocessingFinalShapeTest {
             }
         }
         assertEquals(ImageShape(200, 200, 3), preprocess.finalShape)
+    }
+
+    @Test
+    fun padImage() {
+        val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(300, 200, 1)
+            }
+            transformImage {
+                pad {
+                    top = 5
+                    bottom = 7
+                    left = 11
+                    right = 13
+                }
+            }
+        }
+        assertEquals(ImageShape(324, 212, 1), preprocess.finalShape)
+    }
+
+    @Test
+    fun centerCropImage() {
+        val preprocess = preprocess {
+            load {
+                pathToData = File("test.jpg")
+                imageShape = ImageShape(10, 20, 1)
+            }
+            transformImage {
+                centerCrop { size = 15 }
+            }
+        }
+        assertEquals(ImageShape(15, 15, 1), preprocess.finalShape)
     }
 }

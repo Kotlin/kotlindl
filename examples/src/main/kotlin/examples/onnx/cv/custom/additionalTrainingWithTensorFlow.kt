@@ -20,15 +20,17 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val EPOCHS = 1
-private const val TRAINING_BATCH_SIZE = 64
+private const val EPOCHS = 3
+private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
@@ -66,13 +68,12 @@ fun resnet50additionalTraining() {
         println(it)
         it.reshape(64, 64, 3)
 
-        val dogsVsCatsDatasetPath = dogsCatsDatasetPath()
+        val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = File(dogsVsCatsDatasetPath)
                 imageShape = ImageShape(channels = NUM_CHANNELS)
-                colorMode = ColorOrder.BGR
                 labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
             }
             transformImage {
@@ -81,6 +82,7 @@ fun resnet50additionalTraining() {
                     outputWidth = IMAGE_SIZE.toInt()
                     interpolation = InterpolationType.BILINEAR
                 }
+                convert { colorMode = ColorMode.BGR }
             }
             transformTensor {
                 sharpen {

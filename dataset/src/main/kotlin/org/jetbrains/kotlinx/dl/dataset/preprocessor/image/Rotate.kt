@@ -24,8 +24,6 @@ import kotlin.math.sin
  * @property [interpolation] Interpolation algorithm.
  * @property [renderingSpeed] Speed of preprocessing.
  * @property [enableAntialiasing] The image will be cropped from the right by the given number of pixels.
- *
- * NOTE: currently it supports [BufferedImage.TYPE_3BYTE_BGR] image type only.
  */
 public class Rotate(
     public var degrees: Float = 90f,
@@ -36,7 +34,7 @@ public class Rotate(
 
     override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
         if (inputShape == null) return null
-        return ImageShape(inputShape.width, inputShape.height, 3)
+        return ImageShape(inputShape.width, inputShape.height, inputShape.channels)
     }
 
     override fun apply(image: BufferedImage): BufferedImage {
@@ -75,7 +73,7 @@ public class Rotate(
 
         val rotatedImage = BufferedImage(
             maxX - minX, maxY - minY,
-            BufferedImage.TYPE_3BYTE_BGR
+            image.type
         )
 
         val g2d = rotatedImage.createGraphics()

@@ -37,12 +37,12 @@ private const val SEED = 12L
  * @param poolStride stride for poolSize and stride in maxpooling layer
  * @return array of layers to be registered in [Sequential] as vararg
  */
-internal fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Array<Layer> =
+internal fun soundBlock(filters: Int, kernelSize: Int, poolStride: Int): Array<Layer> =
     arrayOf(
         Conv1D(
             filters = filters,
             kernelSize = kernelSize,
-            strides = longArrayOf(1, 1, 1),
+            strides = intArrayOf(1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeNormal(SEED),
@@ -51,15 +51,15 @@ internal fun soundBlock(filters: Long, kernelSize: Long, poolStride: Long): Arra
         Conv1D(
             filters = filters,
             kernelSize = kernelSize,
-            strides = longArrayOf(1, 1, 1),
+            strides = intArrayOf(1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
             biasInitializer = HeNormal(SEED),
             padding = ConvPadding.SAME
         ),
         MaxPool1D(
-            poolSize = longArrayOf(1, poolStride, 1),
-            strides = longArrayOf(1, poolStride, 1),
+            poolSize = intArrayOf(1, poolStride, 1),
+            strides = intArrayOf(1, poolStride, 1),
             padding = ConvPadding.SAME
         )
     )

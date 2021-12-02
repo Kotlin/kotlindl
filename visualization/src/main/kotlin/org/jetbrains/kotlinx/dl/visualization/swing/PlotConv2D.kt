@@ -291,14 +291,11 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
 
-        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
-        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
-
         graphics.drawImage(bufferedImage, 0, 0, null)
 
         for (i in landmarks.indices) {
-            val xLM = (size.width / 2) * (1 + landmarks[i].xRate) / xCoefficient
-            val yLM = (size.height / 2) * (1 + landmarks[i].yRate) / yCoefficient
+            val xLM = (size.width / 2) * (1 + landmarks[i].xRate)
+            val yLM = (size.height / 2) * (1 + landmarks[i].yRate)
 
             graphics as Graphics2D
             val stroke1: Stroke = BasicStroke(3f)
@@ -326,8 +323,6 @@ class DetectedObjectJPanel(
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
-        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
-        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
 
         graphics.drawImage(bufferedImage, 0, 0, null)
 
@@ -335,10 +330,10 @@ class DetectedObjectJPanel(
             val pixelWidth = 1
             val pixelHeight = 1
 
-            val top = yCoefficient * it.yMin * imageShape.height!! * pixelHeight
-            val left = xCoefficient * it.xMin * imageShape.width!! * pixelWidth
-            val bottom = yCoefficient * it.yMax * imageShape.height!! * pixelHeight
-            val right = xCoefficient * it.xMax * imageShape.width!! * pixelWidth
+            val top = it.yMin * imageShape.height!! * pixelHeight
+            val left = it.xMin * imageShape.width!! * pixelWidth
+            val bottom = it.yMax * imageShape.height!! * pixelHeight
+            val right = it.xMax * imageShape.width!! * pixelWidth
             // left, bot, right, top
 
             // y = columnIndex
@@ -384,11 +379,11 @@ class ImagesJPanel3(
                 val x = 100 + j * pixelHeight
 
                 val r =
-                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val g =
-                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val b =
-                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt())
+                    dst.get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels!!.toInt())
                 val r1 = (min(1.0f, max(r * 0.8f, 0.0f)) * 255).toInt()
                 val g1 = (min(1.0f, max(g * 0.8f, 0.0f)) * 255).toInt()
                 val b1 = (min(1.0f, max(b * 0.8f, 0.0f)) * 255).toInt()
@@ -435,9 +430,9 @@ private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
     val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
     for (i in 0 until imageShape.height!!.toInt()) { // rows
         for (j in 0 until imageShape.width!!.toInt()) { // columns
-            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
-            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels.toInt()).coerceIn(0f, 1f)
+            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
+            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
+            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
             result.setRGB(j, i, Color(r, g, b).rgb)
         }
     }

@@ -23,8 +23,9 @@ import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -53,8 +54,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -66,8 +67,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -79,8 +80,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -88,8 +89,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -101,8 +102,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -110,8 +111,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -123,8 +124,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -132,8 +133,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -181,8 +182,8 @@ fun vgg() {
         load {
             pathToData = File(cifarImagesArchive)
             imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
-            colorMode = ColorOrder.BGR
         }
+        transformImage { convert { colorMode = ColorMode.BGR } }
         transformTensor {
             rescale {
                 scalingCoefficient = 255f

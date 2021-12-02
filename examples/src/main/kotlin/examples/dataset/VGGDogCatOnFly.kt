@@ -22,10 +22,11 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorOrder
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
@@ -55,8 +56,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -68,8 +69,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 64,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -81,8 +82,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -90,8 +91,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -103,8 +104,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -112,8 +113,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -125,8 +126,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -134,8 +135,8 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = longArrayOf(3, 3),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(3, 3),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -189,7 +190,6 @@ fun main() {
         load {
             pathToData = File(dogsCatsImages)
             imageShape = ImageShape(channels = 3)
-            colorMode = ColorOrder.BGR
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
         }
         transformImage {
@@ -198,6 +198,7 @@ fun main() {
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.NEAREST
             }
+            convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             rescale {

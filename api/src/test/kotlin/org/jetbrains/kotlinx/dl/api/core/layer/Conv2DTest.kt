@@ -12,13 +12,20 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv2DTest : ConvLayerTest() {
+    private fun createFloatConv2DTensor(
+        batchSize: Int,
+        height: Int,
+        width: Int,
+        channels: Int,
+        initValue: Float
+    ) = Array(batchSize) { Array(height) { Array(width) { FloatArray(channels) { initValue } } } }
 
     @Test
     fun zeroedInputTensorWithDefaultValues() {
         val input = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 0.0f)
         val expected = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 32, initValue = 0.0f)
 
-        assertFloatConv2DTensorsEquals(
+        assertTensorsEquals(
             Conv2D(
                 name = "TestConv2D_1",
                 biasInitializer = Zeros()
@@ -33,13 +40,13 @@ internal class Conv2DTest : ConvLayerTest() {
         val input = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 1.0f)
         val expected = createFloatConv2DTensor(batchSize = 1, height = 2, width = 2, channels = 16, initValue = 4.0f)
 
-        assertFloatConv2DTensorsEquals(
+        assertTensorsEquals(
             Conv2D(
                 name = "TestConv2D_2",
                 filters = 16,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = longArrayOf(2, 2),
+                kernelSize = intArrayOf(2, 2),
                 padding = ConvPadding.VALID
             ),
             input,
@@ -64,13 +71,13 @@ internal class Conv2DTest : ConvLayerTest() {
         )
         val expected = arrayOf(arrayOf(arrayOf(floatArrayOf(input.sum()))))
 
-        assertFloatConv2DTensorsEquals(
+        assertTensorsEquals(
             Conv2D(
                 name = "TestConv2D_3",
                 filters = 1,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = longArrayOf(2, 2),
+                kernelSize = intArrayOf(2, 2),
                 padding = ConvPadding.VALID
             ),
             input,
