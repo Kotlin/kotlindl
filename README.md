@@ -119,7 +119,22 @@ This, however, does not affect the high-level API.
 
 
 ## How to configure KotlinDL in your project
-To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
+To use the full power of KotlinDL (including the `onnx` and `visualization` modules) in your project, add the following dependencies to your build.gradle file:
+
+```groovy
+   repositories {
+      mavenCentral()
+   }
+   
+   dependencies {
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
+   }
+```
+
+Or add just one dependency if you don’t need ONNX and visualization:
+
 ```groovy
    repositories {
       mavenCentral()
