@@ -18,7 +18,8 @@ public object ONNXModels {
     /** Image recognition models and preprocessing. */
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean
+        override val channelsFirst: Boolean,
+        internal var noTop: Boolean = false
     ) :
         ModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
@@ -26,21 +27,21 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
+        public class ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
         }
 
         /** */
-        public object ResNet34 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
+        public class ResNet34 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
         }
 
         /** */
-        public object ResNet50 :
+        public class ResNet50 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -48,7 +49,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet101 :
+        public class ResNet101 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -56,7 +57,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet152 :
+        public class ResNet152 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -64,7 +65,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet18v2 :
+        public class ResNet18v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -72,7 +73,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet34v2 :
+        public class ResNet34v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -80,7 +81,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet50v2 :
+        public class ResNet50v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -88,7 +89,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet101v2 :
+        public class ResNet101v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -96,7 +97,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object ResNet152v2 :
+        public class ResNet152v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
@@ -104,15 +105,7 @@ public object ONNXModels {
         }
 
         /** */
-        public object DenseNet121 :
-            CV<OnnxInferenceModel>("models/onnx/cv/densenet/densenet121", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
-            }
-        }
-
-        /** */
-        public object EfficientNet4Lite :
+        public class EfficientNet4Lite :
             CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(
@@ -149,135 +142,71 @@ public object ONNXModels {
         }
 
         /** */
-        public object EfficientNetB0 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b0", channelsFirst = false) {
+        public class EfficientNetB0(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b0", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB0noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b0-notop", channelsFirst = false) {
+        public class EfficientNetB1(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b1", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB1 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b1", channelsFirst = false) {
+        public class EfficientNetB2(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b2", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB1noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b1-notop", channelsFirst = false) {
+        public class EfficientNetB3(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b3", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b2", channelsFirst = false) {
+        public class EfficientNetB4(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b4", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB2noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b2-notop", channelsFirst = false) {
+        public class EfficientNetB5(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b5", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB3 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b3", channelsFirst = false) {
+        public class EfficientNetB6(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b6", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB3noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b3-notop", channelsFirst = false) {
+        public class EfficientNetB7(noTop: Boolean = false) :
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b7", channelsFirst = false, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
         }
 
         /** */
-        public object EfficientNetB4 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b4", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB4noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b4-notop", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB5 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b5", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB5noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b5-notop", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB6 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b6", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB6noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b6-notop", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB7 :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b7", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object EfficientNetB7noTop :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b7-notop", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
-
-        /** */
-        public object Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false) {
+        public class Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
             }

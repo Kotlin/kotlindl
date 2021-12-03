@@ -61,7 +61,7 @@ fun efficientNetB0AdditionalTraining() {
     val modelHub = ONNXModelHub(
         cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel(ONNXModels.CV.EfficientNetB0noTop)
+    val model = modelHub.loadModel(ONNXModels.CV.EfficientNetB0(noTop = true))
 
     model.use {
         println(it)

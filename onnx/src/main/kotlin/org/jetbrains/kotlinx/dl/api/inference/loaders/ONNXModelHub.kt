@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
@@ -50,7 +51,11 @@ public class ONNXModelHub(cacheDirectory: File) :
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
+            "/" + modelType.modelRelativePath + "-notop.onnx"
+        } else {
+            "/" + modelType.modelRelativePath + ".onnx"
+        }
 
         val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
             SSDObjectDetectionModel()
