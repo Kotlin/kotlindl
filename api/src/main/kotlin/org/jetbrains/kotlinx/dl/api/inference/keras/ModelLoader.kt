@@ -123,6 +123,7 @@ private fun convertToLayer(
         LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
         LAYER_MULTIPLY -> createMultiplyLayer(kerasLayer.config!!.name!!)
         LAYER_CONCATENATE -> createConcatenateLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DOT -> createDotLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         // Locally-connected layers
         // Activation layers
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -469,6 +470,13 @@ private fun createMultiplyLayer(name: String): Layer {
 private fun createConcatenateLayer(config: LayerConfig, name: String): Layer {
     return Concatenate(
         axis = config.axis!! as Int,
+        name = name
+    )
+}
+
+private fun createDotLayer(config: LayerConfig, name: String): Layer {
+    return Dot(
+        axis = config.axis!! as IntArray,
         name = name
     )
 }
