@@ -25,141 +25,174 @@ public object TFModels {
     /** Image recognition models and preprocessing. */
     public sealed class CV<T : GraphTrainableModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean = false
+        override val channelsFirst: Boolean = false,
+        public var inputShape: IntArray? = null,
+        internal var noTop: Boolean = false
     ) :
         ModelType<T, ImageRecognitionModel> {
+
+        init {
+            if (inputShape != null) {
+                require(inputShape!!.size == 3) { "Input shape for the model ${this.javaClass.kotlin.simpleName} should contain 3 number: height, weight and number of channels." }
+                require(inputShape!![0] >= 32 && inputShape!![1] >= 32) { "Width and height should be no smaller than 32 for the model ${this.javaClass.kotlin.simpleName}." }
+            }
+        }
+
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return buildImageRecognitionModel(modelHub, this)
         }
 
         /** */
-        public object VGG16 : CV<Sequential>("models/tensorflow/cv/vgg16") {
+        public class VGG16(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Sequential>("models/tensorflow/cv/vgg16", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object VGG19 : CV<Sequential>("models/tensorflow/cv/vgg19") {
+        public class VGG19(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Sequential>("models/tensorflow/cv/vgg19", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet18 : CV<Functional>("models/tensorflow/cv/resnet18") {
+        public class ResNet18(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet18", inputShape = inputShape) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet34 : CV<Functional>("models/tensorflow/cv/resnet34") {
+        public class ResNet34(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet34", inputShape = inputShape) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet50 : CV<Functional>("models/tensorflow/cv/resnet50") {
+        public class ResNet50(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet50", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet101 : CV<Functional>("models/tensorflow/cv/resnet101") {
+        public class ResNet101(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet101", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet152 : CV<Functional>("models/tensorflow/cv/resnet152") {
+        public class ResNet152(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet152", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
         }
 
         /** */
-        public object ResNet50v2 : CV<Functional>("models/tensorflow/cv/resnet50v2") {
+        public class ResNet50v2(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet50v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet101v2 : CV<Functional>("models/tensorflow/cv/resnet101v2") {
+        public class ResNet101v2(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet101v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object ResNet152v2 : CV<Functional>("models/tensorflow/cv/resnet152v2") {
+        public class ResNet152v2(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet152v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object MobileNet : CV<Functional>("models/tensorflow/cv/mobilenet") {
+        public class MobileNet(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/mobilenet", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object MobileNetV2 : CV<Functional>("models/tensorflow/cv/mobilenetv2") {
+        public class MobileNetV2(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/mobilenetv2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object Inception : CV<Functional>("models/tensorflow/cv/inception") {
+        public class Inception(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/inception", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object Xception : CV<Functional>("models/tensorflow/cv/xception") {
+        public class Xception(noTop: Boolean = false, inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/xception", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object DenseNet121 : CV<Functional>("models/tensorflow/cv/densenet121") {
+        public class DenseNet121(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object DenseNet169 : CV<Functional>("models/tensorflow/cv/densenet169") {
+        public class DenseNet169(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object DenseNet201 : CV<Functional>("models/tensorflow/cv/densenet201") {
+        public class DenseNet201(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public object NASNetMobile : CV<Functional>("models/tensorflow/cv/nasnetmobile") {
+        public class NASNetMobile(noTop: Boolean = false) :
+            CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3), noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }
         }
 
         /** */
-        public object NASNetLarge : CV<Functional>("models/tensorflow/cv/nasnetlarge") {
+        public class NASNetLarge(noTop: Boolean = false, inputShape: IntArray? = intArrayOf(331, 331, 3)) :
+            CV<Functional>("models/tensorflow/cv/nasnetlarge", inputShape = inputShape, noTop = noTop) {
+            init {
+                require(inputShape!![0] >= 331 && inputShape[1] >= 331) { "Width and height should be no smaller than 331 for the model ${this.javaClass.kotlin.simpleName}." }
+            }
+
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TF)
             }

@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * NOTE: Input resolution is 331*331
  */
 fun nasNetLargePrediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetLarge, resizeTo = Pair(331, 331))
+    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetLarge(), resizeTo = Pair(331, 331))
 }
 
 /** */

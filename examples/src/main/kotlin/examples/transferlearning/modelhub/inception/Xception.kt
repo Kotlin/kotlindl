@@ -19,7 +19,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * NOTE: Input resolution is 299*299
  */
 fun xceptionPrediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.Xception, resizeTo = Pair(299, 299))
+    runImageRecognitionPrediction(modelType = TFModels.CV.Xception(), resizeTo = Pair(299, 299))
 }
 
 /** */

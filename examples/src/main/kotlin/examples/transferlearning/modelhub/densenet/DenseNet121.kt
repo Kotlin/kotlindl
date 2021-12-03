@@ -12,10 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
-import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
-import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
@@ -35,7 +32,7 @@ import java.io.File
  */
 fun denseNet121Prediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.DenseNet121
+    val modelType = TFModels.CV.DenseNet121()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = loadImageNetClassLabels()
@@ -65,6 +62,7 @@ fun denseNet121Prediction() {
                 "/conv1/bn/conv1/bn/moving_variance:0"
             )
         )
+        recursivePrintGroupInHDF5File(hdfFile, hdfFile)
         it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH)
 
         for (i in 1..8) {

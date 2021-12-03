@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
  * - Special preprocessing (used in ResNet'18 during training on ImageNet dataset) is applied to images before prediction.
  */
 fun resnet18prediction() {
-    runImageRecognitionPrediction(ONNXModels.CV.ResNet18)
+    runImageRecognitionPrediction(ONNXModels.CV.ResNet18())
 }
 
 /** */

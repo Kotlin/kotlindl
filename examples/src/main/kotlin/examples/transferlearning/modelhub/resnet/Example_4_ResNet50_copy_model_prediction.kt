@@ -32,7 +32,7 @@ import java.io.File
  */
 fun resnet50copyModelPrediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.ResNet50
+    val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
