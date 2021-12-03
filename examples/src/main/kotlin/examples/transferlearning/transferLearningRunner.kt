@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
@@ -28,7 +29,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
@@ -36,7 +36,8 @@ private const val NUM_CHANNELS = 3L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 fun runImageRecognitionTransferLearning(
-    modelType: TFModels.CV<out GraphTrainableModel>
+    modelType: TFModels.CV<out GraphTrainableModel>,
+    epochs: Int = 2
 ) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
@@ -116,33 +117,17 @@ fun runImageRecognitionTransferLearning(
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
+        model2.logSummary()
 
-        if (modelType is TFModels.CV.DenseNet121 || modelType is TFModels.CV.DenseNet169 || modelType is TFModels.CV.DenseNet201) {
-            val weightPaths = listOf(
-                LayerConvOrDensePaths(
-                    "conv1_conv",
-                    "/conv1/conv/conv1/conv/kernel:0",
-                    "/conv1/conv/conv1/conv/bias:0"
-                ),
-                LayerBatchNormPaths(
-                    "conv1_bn",
-                    "/conv1/bn/conv1/bn/gamma:0",
-                    "/conv1/bn/conv1/bn/beta:0",
-                    "/conv1/bn/conv1/bn/moving_mean:0",
-                    "/conv1/bn/conv1/bn/moving_variance:0"
-                )
-            )
-            it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH)
-        } else {
-            it.loadWeightsForFrozenLayers(hdfFile)
-        }
+        it.loadWeightsForFrozenLayers(hdfFile)
+
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBeforeTraining")
 
         it.fit(
             dataset = train,
             batchSize = TRAINING_BATCH_SIZE,
-            epochs = EPOCHS
+            epochs = epochs
         )
 
         val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

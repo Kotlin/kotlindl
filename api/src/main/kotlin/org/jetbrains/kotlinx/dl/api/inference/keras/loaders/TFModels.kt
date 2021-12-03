@@ -155,24 +155,24 @@ public object TFModels {
         }
 
         /** */
-        public class DenseNet121(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = noTop) {
+        public class DenseNet121(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public class DenseNet169(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = noTop) {
+        public class DenseNet169(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }
         }
 
         /** */
-        public class DenseNet201(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = noTop) {
+        public class DenseNet201(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
             }

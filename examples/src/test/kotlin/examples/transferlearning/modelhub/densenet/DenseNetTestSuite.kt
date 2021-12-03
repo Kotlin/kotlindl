@@ -15,30 +15,32 @@ class DenseNetTestSuite {
         denseNet121Prediction()
     }
 
-    @Test
+    // TODO: add special tests based on the existing models with top
+   /* @Test
     fun denseNet121AdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
             modelType = TFModels.CV.DenseNet121(
-                noTop = true,
-                inputShape = intArrayOf(90, 90, 3)
-            )
+                inputShape = intArrayOf(80, 80, 3)
+            ),
+            epochs = 2
         )
-    }
+    }*/
 
     @Test
     fun denseNet169PredictionTest() {
         denseNet169Prediction()
     }
 
+    /*// TODO: add special tests based on the existing models with top
     @Test
+    @Ignore
     fun denseNet169AdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
             modelType = TFModels.CV.DenseNet169(
-                noTop = true,
                 inputShape = intArrayOf(80, 80, 3)
             )
         )
-    }
+    }*/
 
 
     @Test
@@ -46,13 +48,14 @@ class DenseNetTestSuite {
         denseNet201Prediction()
     }
 
-    @Test
+    // TODO: add special tests based on the existing models with top
+   /* @Test
+    @Ignore
     fun denseNet201AdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
             modelType = TFModels.CV.DenseNet201(
-                noTop = true,
                 inputShape = intArrayOf(110, 110, 3)
             )
         )
-    }
+    }*/
 }

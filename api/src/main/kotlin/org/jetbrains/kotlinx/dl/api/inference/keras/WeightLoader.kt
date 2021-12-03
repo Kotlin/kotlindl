@@ -472,32 +472,7 @@ private fun fillLayerWeights(
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
 
-/*private fun fillLayerWeights(
-    it: Layer,
-    hdfFile: HdfFile,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String,
-    model: Sequential
-) {
-    when (it::class) {
-        Dense::class -> fillDenseVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        Conv2D::class -> fillConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        else -> println("No weights loading for ${it.name}")
-    }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
-}*/
+
 
 private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
     when (it) {
