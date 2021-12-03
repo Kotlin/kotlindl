@@ -135,3 +135,108 @@ fun runImageRecognitionTransferLearning(
         println("Accuracy after training $accuracyAfterTraining")
     }
 }
+
+fun runImageRecognitionTransferLearningOnTopModel(
+    modelType: TFModels.CV<out GraphTrainableModel>,
+    epochs: Int = 2
+) {
+    val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val model = modelHub.loadModel(modelType)
+
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
+
+    val preprocessing: Preprocessing = preprocess {
+        load {
+            pathToData = File(dogsCatsImages)
+            imageShape = ImageShape(channels = NUM_CHANNELS)
+            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
+        }
+        transformImage {
+            resize {
+                outputHeight = modelType.inputShape?.get(0) ?: 224
+                outputWidth = modelType.inputShape?.get(0) ?: 224
+                interpolation = InterpolationType.BILINEAR
+            }
+            convert { colorMode = ColorMode.BGR }
+        }
+        transformTensor {
+            sharpen {
+                modelTypePreprocessing = modelType
+            }
+        }
+    }
+
+    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
+    val hdfFile = modelHub.loadWeights(modelType)
+    val layers = mutableListOf<Layer>()
+
+    for (layer in model.layers) {
+        layer.isTrainable = false
+        layers.add(layer)
+    }
+
+    val lastLayer = layers.last()
+    for (outboundLayer in lastLayer.inboundLayers)
+        outboundLayer.outboundLayers.remove(lastLayer)
+
+    layers.removeLast()
+
+    var x = Dense(
+        name = "top_dense",
+        kernelInitializer = GlorotUniform(),
+        biasInitializer = GlorotUniform(),
+        outputSize = 200,
+        activation = Activations.Relu
+    )(layers.last())
+
+    x = Dense(
+        name = "pred",
+        kernelInitializer = GlorotUniform(),
+        biasInitializer = GlorotUniform(),
+        outputSize = NUM_CLASSES,
+        activation = Activations.Linear
+    )(x)
+
+    val model2 = Functional.fromOutput(x)
+
+    model2.use {
+        it.compile(
+            optimizer = Adam(),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY
+        )
+        model2.logSummary()
+
+        val weightPaths = listOf(
+            LayerConvOrDensePaths(
+                "conv1_conv",
+                "/conv1/conv/conv1/conv/kernel:0",
+                "/conv1/conv/conv1/conv/bias:0"
+            ),
+            LayerBatchNormPaths(
+                "conv1_bn",
+                "/conv1/bn/conv1/bn/gamma:0",
+                "/conv1/bn/conv1/bn/beta:0",
+                "/conv1/bn/conv1/bn/moving_mean:0",
+                "/conv1/bn/conv1/bn/moving_variance:0"
+            )
+        )
+
+        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH, forFrozenLayersOnly = true)
+
+        val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy before training $accuracyBeforeTraining")
+
+        it.fit(
+            dataset = train,
+            batchSize = TRAINING_BATCH_SIZE,
+            epochs = epochs
+        )
+
+        val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+        println("Accuracy after training $accuracyAfterTraining")
+    }
+}

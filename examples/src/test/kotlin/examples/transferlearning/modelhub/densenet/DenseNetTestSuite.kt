@@ -5,7 +5,7 @@
 
 package examples.transferlearning.modelhub.densenet
 
-import examples.transferlearning.runImageRecognitionTransferLearning
+import examples.transferlearning.runImageRecognitionTransferLearningOnTopModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
@@ -15,32 +15,29 @@ class DenseNetTestSuite {
         denseNet121Prediction()
     }
 
-    // TODO: add special tests based on the existing models with top
-   /* @Test
-    fun denseNet121AdditionalTrainingNoTopTest() {
-        runImageRecognitionTransferLearning(
+    @Test
+    fun denseNet121AdditionalTrainingTest() {
+        runImageRecognitionTransferLearningOnTopModel(
             modelType = TFModels.CV.DenseNet121(
                 inputShape = intArrayOf(80, 80, 3)
             ),
             epochs = 2
         )
-    }*/
+    }
 
     @Test
     fun denseNet169PredictionTest() {
         denseNet169Prediction()
     }
 
-    /*// TODO: add special tests based on the existing models with top
     @Test
-    @Ignore
-    fun denseNet169AdditionalTrainingNoTopTest() {
-        runImageRecognitionTransferLearning(
+    fun denseNet169AdditionalTrainingTest() {
+        runImageRecognitionTransferLearningOnTopModel(
             modelType = TFModels.CV.DenseNet169(
                 inputShape = intArrayOf(80, 80, 3)
             )
         )
-    }*/
+    }
 
 
     @Test
@@ -48,14 +45,12 @@ class DenseNetTestSuite {
         denseNet201Prediction()
     }
 
-    // TODO: add special tests based on the existing models with top
-   /* @Test
-    @Ignore
-    fun denseNet201AdditionalTrainingNoTopTest() {
-        runImageRecognitionTransferLearning(
+    @Test
+    fun denseNet201AdditionalTrainingTest() {
+        runImageRecognitionTransferLearningOnTopModel(
             modelType = TFModels.CV.DenseNet201(
                 inputShape = intArrayOf(110, 110, 3)
             )
         )
-    }*/
+    }
 }
