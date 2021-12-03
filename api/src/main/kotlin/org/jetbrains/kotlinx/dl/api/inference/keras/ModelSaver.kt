@@ -256,6 +256,7 @@ private fun convertToKerasActivation(activation: Activations): String {
         Activations.Swish -> ACTIVATION_SWISH
         Activations.Mish -> ACTIVATION_MISH
         Activations.HardShrink -> ACTIVATION_HARDSHRINK
+        Activations.SoftShrink -> ACTIVATION_SOFTSHRINK
         Activations.LiSHT -> ACTIVATION_LISHT
         Activations.Snake -> ACTIVATION_SNAKE
         Activations.Gelu -> ACTIVATION_GELU
