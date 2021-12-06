@@ -26,7 +26,7 @@ import java.io.File
  * NOTE: Model and weights are resources in `examples` module.
  */
 fun loadModelWithWeightsAndEvaluate() {
-    val (train, test) = fashionMnist()
+    val (_, test) = fashionMnist()
 
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
