@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
@@ -58,6 +59,11 @@ public class ONNXModelHub(cacheDirectory: File) :
         val inferenceModel = when (modelType) {
             ONNXModels.ObjectDetection.SSD -> {
                 SSDObjectDetectionModel()
+            }
+            ONNXModels.ObjectDetection.SSDMobileNetV1 -> {
+                val model =  SSDMobileNetV1ObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1000L, 1000L, 3L)
+                model
             }
             ONNXModels.PoseEstimation.MoveNetSinglePoseLighting -> {
                 SinglePoseDetectionModel()

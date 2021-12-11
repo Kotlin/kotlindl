@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
@@ -328,6 +329,23 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
                 return modelHub.loadModel(this) as SSDObjectDetectionModel
+            }
+        }
+
+        public object SSDMobileNetV1 :
+            ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+                /*return preprocessInput(
+                    data,
+                    tensorShape,
+                    inputType = InputType.TORCH,
+                    channelsLast = true
+                )*/
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
+                return modelHub.loadModel(this) as SSDMobileNetV1ObjectDetectionModel
             }
         }
 

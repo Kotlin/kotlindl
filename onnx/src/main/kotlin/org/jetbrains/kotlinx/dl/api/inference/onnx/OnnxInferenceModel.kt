@@ -248,7 +248,7 @@ public open class OnnxInferenceModel : InferenceModel() {
                 inputShape
             )
             OnnxJavaType.STRING -> TODO()
-            OnnxJavaType.UINT8 -> TODO()
+            OnnxJavaType.UINT8 -> OnnxTensor.createTensor(env,  ByteBuffer.wrap(inputData.map { it.toInt().toUByte().toByte() }.toByteArray()), inputShape, OnnxJavaType.UINT8)
             OnnxJavaType.UNKNOWN -> TODO()
             else -> TODO()
         }
