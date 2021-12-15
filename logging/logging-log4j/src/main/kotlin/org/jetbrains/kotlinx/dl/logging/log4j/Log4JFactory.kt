@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.logging.api.Logger as ILogger
 
 public class Log4JFactoryConfig : LogFactoryConfig
 
-public object DefaultLogFactory : ILogFactory<Log4JFactoryConfig> {
+public object Log4JFactory : ILogFactory<Log4JFactoryConfig> {
 
     override val defaultConfig: Log4JFactoryConfig = Log4JFactoryConfig()
 
