@@ -2,8 +2,6 @@ package org.jetbrains.kotlinx.dl.logging.log4j
 
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.kotlinx.dl.logging.api.LogFactoryConfig
-import org.jetbrains.kotlinx.dl.logging.api.LoggerInternal
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KClass
 import org.jetbrains.kotlinx.dl.logging.api.LogFactory as ILogFactory
 import org.jetbrains.kotlinx.dl.logging.api.Logger as ILogger
