@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:Suppress("LeakingThis")
+
 package org.jetbrains.kotlinx.dl.api.core
 
 import mu.KLogger
@@ -163,6 +165,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             else -> 1
         }
 
+        @Suppress("LeakingThis")
         xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
@@ -214,10 +217,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         require(layers.none { it is NoGradients && it.isTrainable })
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
-                    "But the following layers violates this rule: ${
-                        layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
-                            .contentDeepToString()
-                    }"
+              "But the following layers violates this rule: ${
+                  layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
+                      .contentDeepToString()
+              }"
         }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         //  require(layers.last().hasActivation()) { "Last layer must have an activation function." }
@@ -235,7 +238,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int
+        validationBatchSize: Int,
     ): TrainingHistory {
         return internalFit(
             trainBatchSize,
@@ -250,7 +253,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     override fun fit(
         dataset: Dataset,
         epochs: Int,
-        batchSize: Int
+        batchSize: Int,
     ): TrainingHistory {
         return internalFit(
             batchSize,
@@ -283,14 +286,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         trainingDataset: Dataset,
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
-        validationBatchSize: Int?
+        validationBatchSize: Int?,
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         for (layer in layers) {
             check(!(layer is NoGradients && layer.isTrainable)) {
                 "Layer $layer has no gradients implementations in TensorFlow and should be non-trainable only. " +
-                        "Set 'isTrainable' to 'false'."
+                  "Set 'isTrainable' to 'false'."
             }
         }
 
@@ -411,7 +414,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         batchLabels: Tensor<Float>,
         numberOfLosses: Tensor<Float>,
         isTraining: Tensor<Float>,
-        metricOp: Operand<Float>
+        metricOp: Operand<Float>,
     ): Pair<Float, Float> {
         val runner = session.runner()
 
@@ -626,7 +629,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predictSoftlyAndGetActivations(
         inputData: FloatArray,
-        predictionTensorName: String
+        predictionTensorName: String,
     ): Pair<FloatArray, List<*>> {
         return internalPredict(inputData, true, predictionTensorName)
     }
@@ -634,7 +637,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun internalPredict(
         inputData: FloatArray,
         visualizationIsEnabled: Boolean,
-        predictionTensorName: String
+        predictionTensorName: String,
     ): Pair<FloatArray, List<*>> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -669,7 +672,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun formPredictionAndActivationsTensors(
         predictionTensorName: String,
         testImages: Tensor<Float>,
-        visualizationIsEnabled: Boolean
+        visualizationIsEnabled: Boolean,
     ): List<Tensor<*>> {
         val runner = session
             .runner()
@@ -717,7 +720,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun batchValidation(
         batch: DataBatch,
         xBatchShape: LongArray,
-        yBatchShape: LongArray
+        yBatchShape: LongArray,
     ) {
         check(
             TensorShape(xBatchShape).numElements().toInt() == batch.x.size * batch.x[0].size
@@ -734,8 +737,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             "The calculated [from the model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
                 batch.y.size * numberOfClasses.toInt()
             }. " +
-                    "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
-                    "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
+              "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
+              "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
         }
     }
 
@@ -763,7 +766,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         modelDirectory: File,
         savingFormat: SavingFormat,
         saveOptimizerState: Boolean,
-        writingMode: WritingMode
+        writingMode: WritingMode,
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -870,7 +873,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         if (!file.exists()) throw FileNotFoundException(
             "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+              "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
         val variableNames = file.readLines()
