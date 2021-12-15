@@ -4,7 +4,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
 
     api(project(":logging:logging-api"))
-    api('org.apache.logging.log4j:log4j-api:2.15.0')
+    api('org.apache.logging.log4j:log4j-api:2.16.0')
 }
 
 
