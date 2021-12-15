@@ -208,9 +208,9 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```groovy
-  implementation 'org.apache.logging.log4j:log4j-api:2.15.0'
-  implementation 'org.apache.logging.log4j:log4j-core:2.15.0'
-  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.15.0'
+  implementation 'org.apache.logging.log4j:log4j-api:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.16.0'
 ```
 
 ```xml
