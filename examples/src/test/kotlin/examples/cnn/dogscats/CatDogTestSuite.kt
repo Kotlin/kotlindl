@@ -5,12 +5,13 @@
 
 package examples.cnn.dogscats
 
+import examples.Basic
 import org.jetbrains.kotlinx.dl.api.core.model.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
-class CatDogTestSuite {
+class CatDogTestSuite  {
     @Test
     fun resnet50onCatDogDatasetTest() {
         resnet50onDogsVsCatsDataset()

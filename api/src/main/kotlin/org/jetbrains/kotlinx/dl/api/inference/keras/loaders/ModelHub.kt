@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.Logger
 import java.io.File
 import java.nio.file.Files
 
@@ -27,7 +27,7 @@ public abstract class ModelHub(public val cacheDirectory: File) {
     protected val awsS3Url: String = AWS_S3_URL
 
     /** Logger for modelZoo model. */
-    private val logger: KLogger = KotlinLogging.logger {}
+    private val logger: Logger = GlobalLogFactory.newLogger(this::class.java)
 
     init {
         if (!cacheDirectory.exists()) {
@@ -44,7 +44,7 @@ public abstract class ModelHub(public val cacheDirectory: File) {
      */
     public abstract fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
-        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
     ): T
 
     /**
@@ -56,7 +56,7 @@ public abstract class ModelHub(public val cacheDirectory: File) {
      */
     public fun <T : InferenceModel, U : InferenceModel> loadPretrainedModel(
         modelType: ModelType<T, U>,
-        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
     ): U {
         return modelType.pretrainedModel(this)
     }

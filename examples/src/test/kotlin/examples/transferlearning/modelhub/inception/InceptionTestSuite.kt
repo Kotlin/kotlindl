@@ -5,11 +5,12 @@
 
 package examples.transferlearning.modelhub.inception
 
+import examples.Basic
 import examples.transferlearning.runImageRecognitionTransferLearning
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
-class InceptionTestSuite {
+class InceptionTestSuite  {
     @Test
     fun inceptionV3PredictionTest() {
         inceptionV3Prediction()

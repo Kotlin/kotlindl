@@ -5,9 +5,10 @@
 
 package examples.transferlearning.modelhub.vgg19
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class VGG19TestSuite {
+class VGG19TestSuite  {
     @Test
     fun vgg19predictionTest() {
         vgg19prediction()

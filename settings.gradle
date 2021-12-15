@@ -5,4 +5,6 @@ include("examples")
 include("dataset")
 include("onnx")
 
+include("logging:logging-api")
+include("logging:logging-core")
 

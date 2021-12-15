@@ -4,12 +4,13 @@
  */
 
 package examples.cnn.mnist
+import examples.Basic
 import examples.cnn.mnist.advanced.lenetWithAlternativeLossFunction
 import examples.cnn.mnist.advanced.lenetWithEarlyStoppingCallback
 import examples.cnn.mnist.advanced.modernLenetWithRegularizers
 import org.junit.jupiter.api.Test
 
-class MnistTestSuite {
+class MnistTestSuite  {
     @Test
     fun denseOnlyTest() {
         denseOnly()

@@ -5,9 +5,10 @@
 
 package examples.inference.fashionmnist
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class FashionMnistExportImportTestSuite {
+class FashionMnistExportImportTestSuite  {
     @Test
     fun lenetOnFashionMnistExportImportToTxtTest() {
         lenetOnFashionMnistExportImportToTxt()

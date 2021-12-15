@@ -5,12 +5,12 @@
 
 package examples.onnx.cv
 
+import examples.Basic
 import examples.onnx.cv.custom.efficientnet.*
-import examples.onnx.cv.resnet.resnet18easyPrediction
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
-class OnnxEfficientNetTestSuite {
+class OnnxEfficientNetTestSuite  {
     @Test
     fun efficientNetB0PredictionTest() {
         efficientNetB0Prediction()

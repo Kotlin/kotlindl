@@ -5,6 +5,7 @@
 
 package examples.onnx.faces
 
+import examples.Basic
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
 
-class FacesTestSuite {
+class FacesTestSuite  {
     @Test
     fun easyFan2D106Test() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

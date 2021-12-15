@@ -5,9 +5,10 @@
 
 package examples.inference.optimizers
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class MnistExportImportOptimizerStateTestSuite {
+class MnistExportImportOptimizerStateTestSuite  {
     @Test
     fun lenetOnMnistExportImportToJSONWithAdamOptimizerStateTest() {
         lenetOnMnistExportImportToJSONWithAdamOptimizerState()

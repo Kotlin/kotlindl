@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.serializeModel
+import org.jetbrains.kotlinx.dl.logging.api.debug
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import java.io.File

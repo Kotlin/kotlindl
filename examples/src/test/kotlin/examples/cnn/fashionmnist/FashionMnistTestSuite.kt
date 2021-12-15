@@ -5,9 +5,10 @@
 
 package examples.cnn.fashionmnist
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class FashionMnistTestSuite {
+class FashionMnistTestSuite  {
     @Test
     fun vggTest() {
         vgg()

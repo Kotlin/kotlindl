@@ -5,9 +5,10 @@
 
 package examples.inference.mnist
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class MnistExportImportTestSuite {
+class MnistExportImportTestSuite  {
     @Test
     fun lenetOnMnistDatasetExportImportToTxtTest() {
         lenetOnMnistDatasetExportImportToTxt()

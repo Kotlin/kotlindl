@@ -5,6 +5,7 @@
 
 package examples.cnn.cifar10
 
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class Cifar10TestSuite {

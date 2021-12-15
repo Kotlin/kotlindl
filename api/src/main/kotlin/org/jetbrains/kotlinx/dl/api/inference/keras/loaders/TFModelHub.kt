@@ -9,12 +9,14 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import io.jhdf.HdfFile
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.Logger
+import org.jetbrains.kotlinx.dl.logging.api.debug
+import org.jetbrains.kotlinx.dl.logging.api.info
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -32,7 +34,7 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  */
 public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Logger for modelZoo model. */
-    private val logger: KLogger = KotlinLogging.logger {}
+    private val logger: Logger = GlobalLogFactory.newLogger(TFModelHub::class.java)
 
     init {
         if (!cacheDirectory.exists()) {
@@ -50,7 +52,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
-        loadingMode: LoadingMode
+        loadingMode: LoadingMode,
     ): T {
         val jsonConfigFile = if (modelType is TFModels.CV) {
             getJSONConfigFile(modelType, loadingMode, modelType.noTop)
@@ -214,7 +216,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
      */
     public fun loadWeights(
         modelType: ModelType<*, *>,
-        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
     ): HdfFile {
         val noTop = if (modelType is TFModels.CV) modelType.noTop else false
         return getWeightsFile(modelType, loadingMode, noTop)
@@ -223,7 +225,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
     private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): File {
         var modelDirectory = "/" + modelType.modelRelativePath
-        if(noTop) modelDirectory += "/notop"
+        if (noTop) modelDirectory += "/notop"
 
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
@@ -247,7 +249,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Returns .h5 file with model weights, saved from Keras 2.x. */
     private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): HdfFile {
         var modelDirectory = "/" + modelType.modelRelativePath
-        if(noTop) modelDirectory += "/notop"
+        if (noTop) modelDirectory += "/notop"
 
         val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
         val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME

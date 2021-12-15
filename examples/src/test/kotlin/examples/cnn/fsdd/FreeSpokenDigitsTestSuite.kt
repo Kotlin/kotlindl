@@ -5,9 +5,10 @@
 
 package examples.cnn.fsdd
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class FreeSpokenDigitsTestSuite {
+class FreeSpokenDigitsTestSuite  {
 
     @Test
     fun soundNetTest() {

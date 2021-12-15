@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
+import org.jetbrains.kotlinx.dl.logging.api.debug
 import org.tensorflow.Operand
 import java.io.File
 import java.io.FileNotFoundException

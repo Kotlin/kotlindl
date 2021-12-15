@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.callback
 
 import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
+import org.jetbrains.kotlinx.dl.logging.api.info
+import org.jetbrains.kotlinx.dl.logging.api.warn
 import java.util.function.BiFunction
 import kotlin.reflect.KProperty1
 

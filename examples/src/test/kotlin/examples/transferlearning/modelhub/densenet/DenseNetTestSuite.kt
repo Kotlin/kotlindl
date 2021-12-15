@@ -5,11 +5,12 @@
 
 package examples.transferlearning.modelhub.densenet
 
+import examples.Basic
 import examples.transferlearning.runImageRecognitionTransferLearningOnTopModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
-class DenseNetTestSuite {
+class DenseNetTestSuite  {
     @Test
     fun denseNet121PredictionTest() {
         denseNet121Prediction()

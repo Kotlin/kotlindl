@@ -17,6 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.logging.api.debug
+import org.jetbrains.kotlinx.dl.logging.api.error
+import org.jetbrains.kotlinx.dl.logging.api.info
+import org.jetbrains.kotlinx.dl.logging.api.warn
 
 private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
 private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
@@ -34,7 +38,7 @@ private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
  * @param [hdfFile] File in hdf5 file format containing weights of the model.
  */
 public fun GraphTrainableModel.loadWeights(
-    hdfFile: HdfFile
+    hdfFile: HdfFile,
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -64,7 +68,7 @@ public fun GraphTrainableModel.loadWeights(
  */
 public fun GraphTrainableModel.loadWeights(
     hdfFile: HdfFile,
-    layerList: MutableList<Layer>
+    layerList: MutableList<Layer>,
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -92,7 +96,7 @@ public fun GraphTrainableModel.loadWeights(
  * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
  */
 public fun GraphTrainableModel.loadWeightsForFrozenLayers(
-    hdfFile: HdfFile
+    hdfFile: HdfFile,
 ) {
     val frozenLayers = mutableListOf<Layer>()
     this.layers.forEach {
@@ -114,7 +118,7 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
     ) {
         throw UnsupportedOperationException(
             "The weights loading from Keras 1.x is not supported by default!" +
-                    "\nUse loadWeightsViaPathTemplates() method to make custom loading!"
+              "\nUse loadWeightsViaPathTemplates() method to make custom loading!"
         )
     }
 
@@ -141,7 +145,7 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
 private fun fillLayerWeights(
     it: Layer,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     when (it) {
         is Dense -> fillDenseVariablesFromKeras(it.name, group, model)
@@ -156,15 +160,15 @@ private fun fillLayerWeights(
 private fun fillConv2DVariablesFromKeras(
     layerName: String,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
         "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+          "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+          "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
     }
 
     val firstLevelGroup: Group = layerWeightsNode as Group
@@ -203,15 +207,15 @@ private fun fillConv2DVariablesFromKeras(
 private fun fillDepthwiseConv2DVariablesFromKeras(
     layerName: String,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
         "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+          "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+          "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
     }
 
     val firstLevelGroup: Group = layerWeightsNode as Group
@@ -249,15 +253,15 @@ private fun fillDepthwiseConv2DVariablesFromKeras(
 private fun fillSeparableConv2DVariablesFromKeras(
     layerName: String,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
     val modelLayerNames = model.layers.map { e -> e.name }.toList()
     val layerWeightsNode = group.children[layerName]
     check(layerWeightsNode != null) {
         "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+          "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+          "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
     }
 
     val firstLevelGroup: Group = layerWeightsNode as Group
@@ -303,7 +307,7 @@ private fun fillSeparableConv2DVariablesFromKeras(
 private fun fillDenseVariablesFromKeras(
     layerName: String,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     val firstLevelGroup: Group = group.children[layerName] as Group
     val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
@@ -340,7 +344,7 @@ private fun fillDenseVariablesFromKeras(
 private fun fillBatchNormVariablesFromKeras(
     layerName: String,
     group: Group,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     val firstLevelGroup: Group = group.children[layerName] as Group
     val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
@@ -400,7 +404,7 @@ private fun fillBatchNormVariablesFromKeras(
 public fun GraphTrainableModel.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE, // TODO: doesnt' work for batchnorm/depthwise
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE,
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -433,7 +437,7 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
     layerList: MutableList<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE,
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -460,7 +464,7 @@ private fun fillLayerWeights(
     it: Layer,
     hdfFile: HdfFile,
     layerPaths: LayerPaths?,
-    model: GraphTrainableModel
+    model: GraphTrainableModel,
 ) {
     when (it) {
         is Dense -> fillDenseVariables(it.name, hdfFile, model, it.useBias, layerPaths)
@@ -471,7 +475,6 @@ private fun fillLayerWeights(
     }
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
-
 
 
 private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
@@ -497,7 +500,7 @@ private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
 public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE,
 ) {
     val frozenLayers = mutableListOf<Layer>()
     this.layers.forEach {
@@ -560,7 +563,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
     weightPaths: List<LayerPaths>,
     missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE,
-    forFrozenLayersOnly: Boolean = false // TODO: probably it should be a flag in all methods
+    forFrozenLayersOnly: Boolean = false, // TODO: probably it should be a flag in all methods
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -626,7 +629,7 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
     layerList: MutableList<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE,
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
@@ -654,7 +657,7 @@ private fun fillConv2DVariables(
     hdfFile: HdfFile,
     model: GraphTrainableModel,
     useBias: Boolean,
-    layerPaths: LayerPaths?
+    layerPaths: LayerPaths?,
 ) {
     val kernelDataPathTemplate: String
     val biasDataPathTemplate: String
@@ -684,7 +687,7 @@ private fun fillDepthwiseConv2DVariables(
     hdfFile: HdfFile,
     model: GraphTrainableModel,
     useBias: Boolean,
-    layerPaths: LayerPaths?
+    layerPaths: LayerPaths?,
 ) {
     val kernelDataPathTemplate: String
     val biasDataPathTemplate: String
@@ -715,7 +718,7 @@ private fun fillSeparableConv2DVariables(
     hdfFile: HdfFile,
     model: GraphTrainableModel,
     useBias: Boolean,
-    layerPaths: LayerPaths?
+    layerPaths: LayerPaths?,
 ) {
     val depthwiseKernelDataPathTemplate: String
     val pointwiseKernelDataPathTemplate: String
@@ -752,7 +755,7 @@ private fun fillBatchNormVariables(
     name: String,
     hdfFile: HdfFile,
     model: GraphTrainableModel,
-    layerPaths: LayerPaths?
+    layerPaths: LayerPaths?,
 ) {
     val gammaDataPathTemplate: String
     val betaDataPathTemplate: String
@@ -793,7 +796,7 @@ private fun fillDenseVariables(
     hdfFile: HdfFile,
     model: GraphTrainableModel,
     useBias: Boolean,
-    layerPaths: LayerPaths?
+    layerPaths: LayerPaths?,
 ) {
     val kernelDataPathTemplate: String
     val biasDataPathTemplate: String
@@ -822,7 +825,8 @@ private fun fillDenseVariables(
  * Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
 public open class LayerPaths(
     /** */
-    public val layerName: String)
+    public val layerName: String,
+)
 
 /**
  * Contains [layerName], [kernelPath], [biasPath] for specific layer, found in hdf5 file via
@@ -836,7 +840,7 @@ public class LayerConvOrDensePaths(
     /** */
     public val kernelPath: String,
     /** */
-    public val biasPath: String
+    public val biasPath: String,
 ) : LayerPaths(layerName)
 
 /**
@@ -853,7 +857,7 @@ public class LayerSeparableConv2DPaths(
     /** */
     public val pointwiseKernelPath: String,
     /** */
-    public val biasPath: String
+    public val biasPath: String,
 ) : LayerPaths(layerName)
 
 /**
@@ -872,5 +876,5 @@ public class LayerBatchNormPaths(
     /** */
     public val movingMeanPath: String,
     /** */
-    public val movingVariancePath: String
+    public val movingVariancePath: String,
 ) : LayerPaths(layerName)

@@ -26,8 +26,8 @@ import org.jetbrains.kotlinx.dl.api.core.summary.HelpersKt;
 import org.jetbrains.kotlinx.dl.dataset.EmbeddedDatasetsKt;
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset;
 import org.jetbrains.kotlinx.dl.dataset.handler.MnistUtilKt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.kotlinx.dl.logging.api.LogFactoryKt;
+import org.jetbrains.kotlinx.dl.logging.api.Logger;
 
 import java.io.File;
 
@@ -35,14 +35,13 @@ import java.io.File;
  * This example demonstrates the ability to define and train LeNet-5 model in Java.
  */
 public class LeNetClassic {
-    private static final Logger logger = LoggerFactory.getLogger(LeNetClassic.class);
-
     public static final Integer EPOCHS = 2;
     public static final Integer TRAINING_BATCH_SIZE = 1000;
     public static final Long NUM_CHANNELS = 1L;
     public static final Long IMAGE_SIZE = 28L;
     public static final Long SEED = 12L;
     public static final Integer TEST_BATCH_SIZE = 1000;
+    private static final Logger logger = LogFactoryKt.GlobalLogFactory.newLogger(LeNetClassic.class);
 
     public static void main(String[] args) {
         Pair<OnHeapDataset, OnHeapDataset> result = EmbeddedDatasetsKt.mnist(new File("cache"));

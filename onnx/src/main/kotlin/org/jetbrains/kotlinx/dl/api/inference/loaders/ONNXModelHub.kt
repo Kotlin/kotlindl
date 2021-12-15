@@ -5,8 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.loaders
 
-import mu.KLogger
-import mu.KotlinLogging
+
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
@@ -14,6 +13,9 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.Logger
+import org.jetbrains.kotlinx.dl.logging.api.debug
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -31,7 +33,7 @@ public class ONNXModelHub(cacheDirectory: File) :
     ModelHub(cacheDirectory) {
 
     /** Logger. */
-    private val logger: KLogger = KotlinLogging.logger {}
+    private val logger: Logger = GlobalLogFactory.newLogger(this::class.java)
 
     init {
         if (!cacheDirectory.exists()) {

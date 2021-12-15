@@ -5,9 +5,20 @@
 
 package examples.ml
 
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.core.DefaultLogFactory
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class MLTestSuite {
+    @BeforeEach
+    fun initLogger() {
+        GlobalLogFactory = DefaultLogFactory.also {
+            it.setup()
+        }
+    }
+
+
     @Test
     fun irisClassificationTest() {
         irisClassification()

@@ -1,13 +1,17 @@
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
 dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
+
+
     api project(":dataset")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0'
     api group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
-    api 'io.github.microutils:kotlin-logging:2.0.4' // for logging
     api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     api 'com.beust:klaxon:5.5'
+    api project(":logging:logging-api")
+
+
     testImplementation 'ch.qos.logback:logback-classic:1.2.7'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'

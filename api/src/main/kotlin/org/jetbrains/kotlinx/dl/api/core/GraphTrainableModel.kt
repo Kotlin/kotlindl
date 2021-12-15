@@ -7,8 +7,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
@@ -35,6 +33,7 @@ import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.logging.api.*
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
@@ -53,7 +52,7 @@ import java.util.*
  */
 public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     /** Logger for the model. */
-    public val logger: KLogger = KotlinLogging.logger {}
+    public val logger: Logger = GlobalLogFactory.newLogger(this::class.java)
 
     /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
