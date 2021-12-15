@@ -1,4 +1,4 @@
-project.setDescription("Default implementation of logging api")
+project.setDescription("log4j implementation of logging api")
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
