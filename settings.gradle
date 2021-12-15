@@ -7,4 +7,5 @@ include("onnx")
 
 include("logging:logging-api")
 include("logging:logging-core")
+include("logging:logging-log4j")
 

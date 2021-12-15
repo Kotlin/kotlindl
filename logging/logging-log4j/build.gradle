@@ -1,0 +1,27 @@
+project.setDescription("Default implementation of logging api")
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
+
+    api(project(":logging:logging-api"))
+    api('org.apache.logging.log4j:log4j-api:2.15.0')
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn", "-Xlambdas=indy"]
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn", "-Xlambdas=indy"]
+}
+
+kotlin {
+    explicitApiWarning()
+}
+
+test {
+    useJUnitPlatform()
+}
