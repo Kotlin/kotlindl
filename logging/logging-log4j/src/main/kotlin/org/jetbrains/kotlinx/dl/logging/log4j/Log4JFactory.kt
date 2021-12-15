@@ -14,9 +14,6 @@ public object Log4JFactory : ILogFactory<Log4JFactoryConfig> {
 
     override val defaultConfig: Log4JFactoryConfig = Log4JFactoryConfig()
 
-    @LoggerInternal
-    public val maxClassNameLength: AtomicInteger = AtomicInteger(26)
-
     override fun newLogger(name: String): ILogger = LoggerWrapper(LogManager.getLogger(name))
 
     override fun newLogger(kClass: KClass<*>): ILogger = LoggerWrapper(LogManager.getLogger(kClass.java))
