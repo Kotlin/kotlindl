@@ -35,14 +35,15 @@ import java.io.File
  * @return Non-compiled and non-trained Sequential model.
  */
 internal fun loadSequentialModelConfiguration(
-    configuration: File
+    configuration: File,
+    inputShape: IntArray? = null
 ): Sequential {
     val sequentialConfig = loadSerializedModel(configuration)
-    return deserializeSequentialModel(sequentialConfig)
+    return deserializeSequentialModel(sequentialConfig, inputShape)
 }
 
-internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequential {
-    val pair = loadSequentialModelLayers(sequentialConfig)
+internal fun deserializeSequentialModel(sequentialConfig: KerasModel?,  inputShape: IntArray? = null): Sequential {
+    val pair = loadSequentialModelLayers(sequentialConfig, inputShape)
     val input: Input = pair.first
     val layers = pair.second
 
@@ -57,10 +58,10 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequenti
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadSequentialModelLayers(config: KerasModel?): Pair<Input, MutableList<Layer>> {
+internal fun loadSequentialModelLayers(config: KerasModel?, inputShape: IntArray? = null): Pair<Input, MutableList<Layer>> {
     val kerasLayers = config!!.config!!.layers!!
 
-    val input = createInputLayer(kerasLayers.first())
+    val input = createInputLayer(kerasLayers.first(), inputShape)
     val layers = kerasLayers.filter { !it.class_name.equals(LAYER_INPUT) }.mapTo(mutableListOf()) {
         convertToLayer(it)
     }
@@ -122,6 +123,7 @@ private fun convertToLayer(
         LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
         LAYER_MULTIPLY -> createMultiplyLayer(kerasLayer.config!!.name!!)
         LAYER_CONCATENATE -> createConcatenateLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DOT -> createDotLayer(kerasLayer.config!!, kerasLayer.config.name!!)
         // Locally-connected layers
         // Activation layers
         LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
@@ -142,14 +144,15 @@ private fun convertToLayer(
  * @return Non-compiled and non-trained Sequential model.
  */
 internal fun loadFunctionalModelConfiguration(
-    configuration: File
+    configuration: File,
+    inputShape: IntArray? = null
 ): Functional {
     val functionalConfig = loadSerializedModel(configuration)
-    return deserializeFunctionalModel(functionalConfig)
+    return deserializeFunctionalModel(functionalConfig, inputShape)
 }
 
-internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
-    Functional.of(loadFunctionalModelLayers(functionalConfig).toList())
+internal fun deserializeFunctionalModel(functionalConfig: KerasModel?, inputShape: IntArray? = null) =
+    Functional.of(loadFunctionalModelLayers(functionalConfig, inputShape).toList())
 
 /**
  * Loads a [Functional] model layers from json file with model configuration.
@@ -159,13 +162,12 @@ internal fun deserializeFunctionalModel(functionalConfig: KerasModel?) =
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(config: KerasModel?): MutableList<Layer> {
+internal fun loadFunctionalModelLayers(config: KerasModel?, inputShape: IntArray? = null): MutableList<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
     val kerasLayers = config!!.config!!.layers!!
-
-    val input = createInputLayer(kerasLayers.first())
+    val input = createInputLayer(kerasLayers.first(), inputShape)
     layers.add(input)
     layersByNames[input.name] = input
 
@@ -381,10 +383,15 @@ private fun convertToInterpolationMethod(interpolation: String): InterpolationMe
  * The layer creator functions should be put below.
  */
 
-private fun createInputLayer(layer: KerasLayer): Input {
-    val batchInputShape = layer.config!!.batch_input_shape!!
-    val inputLayerDims = batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()
-    val inputLayerName = if (layer.class_name.equals(LAYER_INPUT)) layer.config.name ?: "input" else "input"
+private fun createInputLayer(layer: KerasLayer, inputShape: IntArray? = null): Input {
+    val inputLayerDims = if (inputShape!= null) {
+       inputShape.map { it.toLong() }.toLongArray()
+    } else {
+        val batchInputShape = layer.config!!.batch_input_shape!!
+        batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()
+    }
+
+    val inputLayerName = if (layer.class_name.equals(LAYER_INPUT)) layer.config!!.name ?: "input" else "input"
     return Input(*inputLayerDims, name = inputLayerName)
 }
 
@@ -463,6 +470,13 @@ private fun createMultiplyLayer(name: String): Layer {
 private fun createConcatenateLayer(config: LayerConfig, name: String): Layer {
     return Concatenate(
         axis = config.axis!! as Int,
+        name = name
+    )
+}
+
+private fun createDotLayer(config: LayerConfig, name: String): Layer {
+    return Dot(
+        axis = config.axis!! as IntArray,
         name = name
     )
 }

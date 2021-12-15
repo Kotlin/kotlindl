@@ -5,6 +5,8 @@
 
 package examples.transferlearning.modelhub.mobilenet
 
+import examples.transferlearning.runImageRecognitionTransferLearning
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class MobileNetTestSuite {
@@ -19,7 +21,27 @@ class MobileNetTestSuite {
     }
 
     @Test
+    fun mobilenetAdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.MobileNet(
+                noTop = true,
+                inputShape = intArrayOf(100, 100, 3)
+            )
+        )
+    }
+
+    @Test
     fun mobilenetv2PredictionTest() {
         mobileNetV2Prediction()
+    }
+
+    @Test
+    fun mobilenetv2AdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.MobileNetV2(
+                noTop = true,
+                inputShape = intArrayOf(120, 120, 3)
+            )
+        )
     }
 }

@@ -50,7 +50,11 @@ public class ONNXModelHub(cacheDirectory: File) :
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode,
     ): T {
-        val modelFile = "/" + modelType.modelRelativePath + ".onnx"
+        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
+            "/" + modelType.modelRelativePath + "-notop.onnx"
+        } else {
+            "/" + modelType.modelRelativePath + ".onnx"
+        }
 
         val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
             SSDObjectDetectionModel()

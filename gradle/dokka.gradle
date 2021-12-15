@@ -28,7 +28,7 @@ subprojects {
 
 
 tasks.named('dokkaHtmlMultiModule') {
-  def configuredVersion = "0.3"
+  def configuredVersion = "0.4"
   def olderVersionsDir = "older_versions"
   pluginsMapConfiguration.set(["org.jetbrains.dokka.versioning.VersioningPlugin" : """{ "version": "$configuredVersion", "olderVersionsDir":"$olderVersionsDir"}"""])
 }

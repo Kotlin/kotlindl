@@ -204,6 +204,21 @@ public enum class Activations {
     HardSigmoid,
 
     /**
+     * Softshrink activation function.
+     *
+     * Transforms input 'x' according formula:
+     * ```
+     * if x > lambda: return x − lambda
+     * if x < -lambda: return x + lambda
+     * otherwise return 0
+     * ```
+     * A faster approximation of the sigmoid activation.
+     *
+     * Calls [SoftShrinkActivation] under the hood.
+     */
+    SoftShrink,
+
+    /**
      * Swish activation function.
      *
      * Transforms input 'x' according formula:
@@ -328,6 +343,7 @@ public enum class Activations {
                 Swish -> SwishActivation()
                 Mish -> MishActivation()
                 HardShrink -> HardShrinkActivation()
+                SoftShrink -> SoftShrinkActivation()
                 LiSHT -> LishtActivation()
                 Snake -> SnakeActivation()
                 Gelu -> GeluActivation()
@@ -489,6 +505,36 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
             false -> tf.constant(0) as Operand<Float>
             true -> features
         }
+    }
+}
+
+/**
+ * @property [lower] lower bound for setting values to zeros
+ * @property [upper] upper bound for setting values to zeros
+
+ * @see [Activations.SoftShrink]
+ */
+public class SoftShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
+    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+        require((lower < upper) && (lower < 0) && (upper > 0)) {
+            "The boundary values have to be non zero and the lower bound has to be lower as the upper"
+        }
+        val zeros = tf.math.mul(features, tf.constant(0f))
+        val valuesBelowLower = tf.where3(
+            tf.math.less(features, tf.constant(lower)),
+            tf.math.sub(
+                features, tf.constant(lower)
+            ),
+            zeros
+        )
+        val valuesAboveUpper = tf.where3(
+            tf.math.less(tf.constant(upper), features),
+            tf.math.sub(
+                features, tf.constant(upper)
+            ),
+            zeros
+        )
+        return tf.math.add(valuesBelowLower, valuesAboveUpper)
     }
 }
 

@@ -119,7 +119,22 @@ This, however, does not affect the high-level API.
 
 
 ## How to configure KotlinDL in your project
-To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
+To use the full power of KotlinDL (including the `onnx` and `visualization` modules) in your project, add the following dependencies to your build.gradle file:
+
+```groovy
+   repositories {
+      mavenCentral()
+   }
+   
+   dependencies {
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
+   }
+```
+
+Or add just one dependency if you don’t need ONNX and visualization:
+
 ```groovy
    repositories {
       mavenCentral()
@@ -193,9 +208,9 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```groovy
-  implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-api:2.15.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.15.0'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.15.0'
 ```
 
 ```xml

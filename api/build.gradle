@@ -2,20 +2,17 @@ project.setDescription("This module contains the Kotlin API for building, traini
 
 dependencies {
     api project(":dataset")
-
-
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0'
     api group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
-    api 'com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0' // for csv parsing
-    api 'io.github.microutils:kotlin-logging:2.0.11' // for logging
-    api 'io.jhdf:jhdf:0.6.4' // for hdf5 parsing
+    api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
+    api 'io.github.microutils:kotlin-logging:2.0.4' // for logging
+    api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     api 'com.beust:klaxon:5.5'
-
     testImplementation 'ch.qos.logback:logback-classic:1.2.7'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 compileKotlin {
@@ -35,14 +32,13 @@ test {
 }
 
 task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
     manifest {
         attributes 'Implementation-Version': '1.15'
     }
     classifier 'all'
-    from {
-        exclude '**/module-info.class'
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 

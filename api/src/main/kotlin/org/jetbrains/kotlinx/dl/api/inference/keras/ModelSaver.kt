@@ -100,6 +100,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is Multiply -> createKerasMultiplyLayer(layer)
         is Average -> createKerasAverageLayer(layer)
         is Concatenate -> createKerasConcatenateLayer(layer)
+        is Dot -> createKerasDotLayer(layer)
         // Locally-connected layers
         // Activation layers
         is Softmax -> createKerasSoftmaxLayer(layer)
@@ -256,6 +257,7 @@ private fun convertToKerasActivation(activation: Activations): String {
         Activations.Swish -> ACTIVATION_SWISH
         Activations.Mish -> ACTIVATION_MISH
         Activations.HardShrink -> ACTIVATION_HARDSHRINK
+        Activations.SoftShrink -> ACTIVATION_SOFTSHRINK
         Activations.LiSHT -> ACTIVATION_LISHT
         Activations.Snake -> ACTIVATION_SNAKE
         Activations.Gelu -> ACTIVATION_GELU
@@ -621,6 +623,16 @@ private fun createKerasConcatenateLayer(layer: Concatenate): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_CONCATENATE, config = configX)
+}
+
+private fun createKerasDotLayer(layer: Dot):KerasLayer{
+    val configX = LayerConfig(
+        dtype = DATATYPE_FLOAT32,
+        axis = layer.axis,
+        name = layer.name,
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_DOT, config = configX)
 }
 
 private fun createKerasConv1DLayer(layer: Conv1D, isKerasFullyCompatible: Boolean): KerasLayer {

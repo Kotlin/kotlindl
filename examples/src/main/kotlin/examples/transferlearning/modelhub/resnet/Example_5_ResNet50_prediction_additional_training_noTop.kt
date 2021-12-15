@@ -3,21 +3,21 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.transferlearning.modelhub.mobilenet
+package examples.transferlearning.modelhub.resnet
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -32,24 +32,23 @@ private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
 private const val NUM_CHANNELS = 3L
-private const val IMAGE_SIZE = 224L
+private const val IMAGE_SIZE = 300
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
- * This examples demonstrates the transfer learning concept on MobileNet model:
+ * This examples demonstrates the transfer learning concept on ResNet'50 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
- * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
- * - New Dense layers are added and initialized via defined initializers.
+ * - All layers, are added to the new Neural Network, its weights are frozen.
+ * - New GlobalAvgPool2D and Dense layers are added and initialized via defined initializers.
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
- * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to images before prediction via [Sharpen] stage.
  *
  * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
-fun mobilenetWithAdditionalTraining() {
+fun resnet50noTopAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    var modelType = TFModels.CV.MobileNet()
+    val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -62,66 +61,64 @@ fun mobilenetWithAdditionalTraining() {
         }
         transformImage {
             resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
+                outputHeight = IMAGE_SIZE
+                outputWidth = IMAGE_SIZE
                 interpolation = InterpolationType.BILINEAR
             }
             convert { colorMode = ColorMode.BGR }
         }
         transformTensor {
             sharpen {
-                modelTypePreprocessing = TFModels.CV.MobileNet()
+                modelTypePreprocessing = modelType
             }
         }
     }
 
-    val dataset = OnHeapDataset.create(preprocessing).shuffle()
+    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
-
-    model.use {
-        it.layers.last().isTrainable = true
-
-        it.compile(
-            optimizer = Adam(),
-            loss = Losses.MAE,
-            metric = Metrics.ACCURACY
-        )
-
-        it.logSummary()
-    }
-
     val layers = mutableListOf<Layer>()
 
     for (layer in model.layers) {
-        layer.isTrainable = false
         layers.add(layer)
     }
 
-    val lastLayer = layers.last()
-    for (outboundLayer in lastLayer.inboundLayers)
-        outboundLayer.outboundLayers.remove(lastLayer)
+    val newGlobalAvgPool2DLayer = GlobalAvgPool2D(
+        name = "top_avg_pool",
 
-    layers.removeLast()
+        )
+    newGlobalAvgPool2DLayer.inboundLayers.add(layers.last())
+    layers.add(
+        newGlobalAvgPool2DLayer
+    )
 
-    var x = Dense(
+    val newDenseLayer = Dense(
         name = "top_dense",
         kernelInitializer = GlorotUniform(),
         biasInitializer = GlorotUniform(),
         outputSize = 200,
         activation = Activations.Relu
-    )(layers.last())
+    )
+    newDenseLayer.inboundLayers.add(layers.last())
+    layers.add(
+        newDenseLayer
+    )
 
-    x = Dense(
+    val newDenseLayer2 = Dense(
         name = "pred",
         kernelInitializer = GlorotUniform(),
         biasInitializer = GlorotUniform(),
         outputSize = NUM_CLASSES,
         activation = Activations.Linear
-    )(x)
+    )
+    newDenseLayer2.inboundLayers.add(layers.last())
 
-    val model2 = Functional.fromOutput(x)
+    layers.add(
+        newDenseLayer2
+    )
+
+    val model2 = Functional.of(layers)
 
     model2.use {
         it.compile(
@@ -129,8 +126,6 @@ fun mobilenetWithAdditionalTraining() {
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-
-        it.logSummary()
 
         it.loadWeightsForFrozenLayers(hdfFile)
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -149,4 +144,6 @@ fun mobilenetWithAdditionalTraining() {
 }
 
 /** */
-fun main(): Unit = mobilenetWithAdditionalTraining()
+fun main(): Unit = resnet50noTopAdditionalTraining()
+
+

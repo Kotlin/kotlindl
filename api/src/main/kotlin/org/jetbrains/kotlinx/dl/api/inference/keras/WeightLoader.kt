@@ -472,32 +472,7 @@ private fun fillLayerWeights(
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
 
-/*private fun fillLayerWeights(
-    it: Layer,
-    hdfFile: HdfFile,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String,
-    model: Sequential
-) {
-    when (it::class) {
-        Dense::class -> fillDenseVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        Conv2D::class -> fillConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        else -> println("No weights loading for ${it.name}")
-    }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
-}*/
+
 
 private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
     when (it) {
@@ -584,12 +559,25 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: GraphTra
 public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
     weightPaths: List<LayerPaths>,
-    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE
+    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE,
+    forFrozenLayersOnly: Boolean = false // TODO: probably it should be a flag in all methods
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
-    this.layers.forEach {
+
+    var layersToLoad = this.layers
+    var layersToInit = this.layers
+
+    if (forFrozenLayersOnly) {
+        layersToLoad = layersToLoad.filter { !it.isTrainable }
+        layersToInit = layersToInit.filter { it.isTrainable }
+        layersToInit.forEach {
+            initLayerWeights(it, this)
+        }
+    }
+
+    layersToLoad.forEach {
         run {
             val initializedLayerName = it.name
             val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
@@ -610,8 +598,9 @@ public fun GraphTrainableModel.loadWeightsByPaths(
             }
         }
     }
+
     this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    this.isModelInitialized = true // TODO: it should depend on what is happened with missed weights
 }
 
 /** This strategy defines the behaviour during weights' loading if the weights are not found in the h5 file by the standard Keras paths. */

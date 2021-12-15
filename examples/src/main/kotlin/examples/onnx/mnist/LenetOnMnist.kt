@@ -15,7 +15,7 @@ fun main() {
     val (train, test) = mnist()
 
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.Lenet
+    val modelType = ONNXModels.CV.Lenet()
     val model = modelHub.loadModel(modelType)
 
     model.use {

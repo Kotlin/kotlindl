@@ -22,7 +22,7 @@ fun resnet50easyPrediction() {
     val modelHub =
         TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = TFModels.CV.ResNet50.pretrainedModel(modelHub)
+    val model = TFModels.CV.ResNet50().pretrainedModel(modelHub)
 
     model.use {
         for (i in 1..8) {

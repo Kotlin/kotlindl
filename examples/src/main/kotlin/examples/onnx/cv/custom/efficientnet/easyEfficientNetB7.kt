@@ -19,7 +19,7 @@ fun efficientNetB7EasyPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = ONNXModels.CV.EfficientNetB7.pretrainedModel(modelHub)
+    val model = ONNXModels.CV.EfficientNetB7().pretrainedModel(modelHub)
 
     model.use {
         for (i in 1..8) {
