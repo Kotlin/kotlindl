@@ -11,11 +11,23 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KClass
 import org.jetbrains.kotlinx.dl.logging.api.Logger as ILogger
 
+/**
+ * Default log config
+ *
+ * @property saveLogs save logs to file
+ * @property logDirectory the directory to save logs
+ * @constructor Creates a config
+ */
 public data class DefaultLogConfig(
     val saveLogs: Boolean,
     val logDirectory: File,
 ) : LogFactoryConfig
 
+/**
+ * Default log factory
+ *
+ *  A lightweight implementation of logging
+ */
 public object DefaultLogFactory : LogFactory<DefaultLogConfig> {
 
     override val defaultConfig: DefaultLogConfig = DefaultLogConfig(true, File("logs"))
@@ -46,6 +58,14 @@ public object DefaultLogFactory : LogFactory<DefaultLogConfig> {
     }
 
 
+    /**
+     * Setup Default Implementation
+     *
+     * Inject Console appender, so we can see output in console
+     * Inject File appender(if needed) to save logs
+     *
+     * @param config the config
+     */
     override fun setup(config: DefaultLogConfig) {
         super.setup(config)
         val (saveLogs, logDirectory) = config
@@ -57,7 +77,7 @@ public object DefaultLogFactory : LogFactory<DefaultLogConfig> {
                 ?: ConsoleAppender().also { appenders += it }
 
         if (saveLogs && appenders.filterIsInstance<FileAppender>().isEmpty()) {
-            appenders += FileAppender(config.logDirectory, consoleAppender)
+            appenders += FileAppender(logDirectory, consoleAppender)
         }
     }
 

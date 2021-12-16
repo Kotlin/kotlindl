@@ -17,7 +17,7 @@ import kotlin.concurrent.thread
  * File appender
  *
  * @constructor Creates a new File Appender
- * @param dir the location of logs file directory
+ * @param [loggingDir] the location of logs file directory
  * @property [consoleAppender] used formatter in the console appender
  */
 public class FileAppender(private val loggingDir: File = File("logs"), private val consoleAppender: ConsoleAppender) : Appender {

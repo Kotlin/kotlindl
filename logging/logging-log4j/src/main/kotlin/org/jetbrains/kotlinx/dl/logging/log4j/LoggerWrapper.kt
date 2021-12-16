@@ -24,7 +24,7 @@ internal value class LoggerWrapper(internal val internalLogger: Log4jLogger) : L
     override var level: LogLevel
         get() = log4j2internal[internalLogger.level]!!
         set(value) {
-            // can't change level in log4j
+            // log4j has their own way to change it through configs
         }
 
     override fun log(level: LogLevel, msg: String) {

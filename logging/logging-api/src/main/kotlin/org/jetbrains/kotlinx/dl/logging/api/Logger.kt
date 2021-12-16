@@ -5,7 +5,7 @@ public interface Logger {
     public var level: LogLevel
 
 
-    public fun log(level: LogLevel, msg: String): Unit
+    public fun log(level: LogLevel, msg: String)
 
     /**
      * Log a warn message.
