@@ -163,6 +163,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             is RandomUniform -> convertToRandomUniformInitializer(initializer)
             is Identity -> convertToIdentityInitializer(initializer)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
+            // TODO: support Constant initializer
         }
 
         className = _className
