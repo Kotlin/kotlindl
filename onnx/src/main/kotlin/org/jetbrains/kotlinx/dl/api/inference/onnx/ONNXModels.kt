@@ -349,6 +349,17 @@ public object ONNXModels {
             }
         }
 
+        public object EfficientDetD2 :
+            ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
+                return modelHub.loadModel(this) as SSDMobileNetV1ObjectDetectionModel
+            }
+        }
+
         /** */
         public object YOLOv4 :
             ObjectDetection<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/objectdetection/yolov4") {
