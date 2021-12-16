@@ -36,8 +36,8 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
                         event: BatchTrainingEvent,
                         logs: TrainingHistory
                     ) {
-                        if (event.metricValue > accuracyThreshold) {
-                            println("Stopping training at ${event.metricValue} accuracy")
+                        if (event.metricValues[0] > accuracyThreshold) { // TODO: handle case with multiple metrics and accuracy metric
+                            println("Stopping training at ${event.metricValues[0]} accuracy") // TODO: handle case with multiple metrics and accuracy metric
                             model.stopTraining = true
                         }
                     }

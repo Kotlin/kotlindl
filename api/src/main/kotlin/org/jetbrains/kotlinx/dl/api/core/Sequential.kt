@@ -173,7 +173,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             deserializedModel.compile(
                 optimizer = this.optimizer,
                 loss = this.loss,
-                metric = this.metric
+                metrics = this.metrics
             )
 
             deserializedModel.layers.forEach {
