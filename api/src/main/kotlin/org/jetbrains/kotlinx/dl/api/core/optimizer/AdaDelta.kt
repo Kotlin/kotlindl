@@ -14,6 +14,8 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyAdadelta
+import org.tensorflow.op.train.ApplyAdam
 import java.util.*
 
 private const val ACCUMULATOR = "accum"
@@ -86,7 +88,8 @@ public class AdaDelta(
                     learningRateConst,
                     rhoConst,
                     epsilonConstant,
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyAdadelta.useLocking(true)
                 )
             )
 

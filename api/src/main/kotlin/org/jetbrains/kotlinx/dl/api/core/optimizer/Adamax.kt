@@ -101,7 +101,8 @@ public class Adamax(
                     betaOneConst,
                     betaTwoConst,
                     epsilonConstant,
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyAdaMax.useLocking(true)
                 )
             )
         }
