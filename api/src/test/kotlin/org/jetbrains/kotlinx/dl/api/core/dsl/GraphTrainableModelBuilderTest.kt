@@ -2,9 +2,7 @@ package org.jetbrains.kotlinx.dl.api.core.dsl
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class GraphTrainableModelBuilderTest {
@@ -19,6 +17,20 @@ internal class GraphTrainableModelBuilderTest {
                 layers {
                     +Input(128, 128)
                     +Conv1D()
+                }
+            }.let {
+                it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
+            }
+        )
+
+        assert(
+            sequential {
+                model {
+                    name = "Test Sequential"
+                }
+
+                layers {
+                    +Conv1D()(+Input(128, 128))
                 }
             }.let {
                 it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
