@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
@@ -349,14 +350,97 @@ public object ONNXModels {
             }
         }
 
-        public object EfficientDetD2 :
-            ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
+        // TODO: download from here https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md#tensorflow-2-detection-model-zoo
+        // TODO: interesting visualisation https://github.com/tensorflow/models/blob/master/research/object_detection/utils/visualization_utils.py
+        // TODO: good tutorial https://www.tensorflow.org/hub/tutorials/tf2_object_detection
+        // TODO: looks like the right models were exported https://github.com/google/automl/tree/master/efficientdet
+
+
+        public object EfficientDetD0 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d0") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
 
-            override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
-                return modelHub.loadModel(this) as SSDMobileNetV1ObjectDetectionModel
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD1 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d1") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD2 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD3 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d3") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD4 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d4") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD5 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d5") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD6 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d6") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+        }
+
+        public object EfficientDetD7 :
+            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d7") {
+            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
+                return data
+            }
+
+            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
+                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
         }
 

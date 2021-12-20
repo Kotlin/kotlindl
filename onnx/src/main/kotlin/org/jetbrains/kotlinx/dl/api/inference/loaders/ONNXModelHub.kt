@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
@@ -59,6 +60,46 @@ public class ONNXModelHub(cacheDirectory: File) :
         val inferenceModel = when (modelType) {
             ONNXModels.ObjectDetection.SSD -> {
                 SSDObjectDetectionModel()
+            }
+            ONNXModels.ObjectDetection.EfficientDetD0 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 512L, 512L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD1 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 640L, 640L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD2 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 768L, 768L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD3 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 896L, 896L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD4 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1024L, 1024L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD5 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD6 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                model
+            }
+            ONNXModels.ObjectDetection.EfficientDetD7 -> {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1536L, 1536L, 3L)
+                model
             }
             ONNXModels.ObjectDetection.SSDMobileNetV1 -> {
                 val model =  SSDMobileNetV1ObjectDetectionModel()

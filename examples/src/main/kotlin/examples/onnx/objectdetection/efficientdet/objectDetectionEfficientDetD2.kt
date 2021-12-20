@@ -24,11 +24,10 @@ import java.io.File
  */
 fun main() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.ObjectDetection.EfficientDetD2 // TODO: input/output https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb
+    val modelType = ONNXModels.ObjectDetection.EfficientDetD7 // TODO: input/output https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb
     val model = modelHub.loadModel(modelType)
 
     model.use {
-        it.inputShape = longArrayOf(1, 1920, 1280, 3)
         println(it)
 
         for (i in 0..9) {
@@ -39,8 +38,8 @@ fun main() {
                 }
                 transformImage {
                     resize {
-                        outputHeight = 1920
-                        outputWidth = 1280
+                        outputHeight = it.inputShape[1].toInt()
+                        outputWidth = it.inputShape[1].toInt()
                     }
                     convert { colorMode = ColorMode.BGR }
                 }
