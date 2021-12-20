@@ -14,6 +14,8 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyCenteredRmsProp
+import org.tensorflow.op.train.ApplyRmsProp
 import java.util.*
 
 private const val RMS = "rms"
@@ -83,7 +85,8 @@ public class RMSProp(
                         decayConst,
                         momentumConst,
                         epsilonConstant,
-                        clipGradient.clipGradient(tf, gradients.dy(i))
+                        clipGradient.clipGradient(tf, gradients.dy(i)),
+                        ApplyCenteredRmsProp.useLocking(true)
                     )
                 )
             } else {
@@ -96,7 +99,8 @@ public class RMSProp(
                         decayConst,
                         momentumConst,
                         epsilonConstant,
-                        gradients.dy(i)
+                        gradients.dy(i),
+                        ApplyRmsProp.useLocking(true)
                     )
                 )
             }

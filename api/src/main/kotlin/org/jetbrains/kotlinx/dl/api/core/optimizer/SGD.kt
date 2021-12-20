@@ -11,6 +11,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyGradientDescent
 import java.util.*
 
 /**
@@ -45,7 +46,8 @@ public class SGD(
                 tf.train.applyGradientDescent(
                     weights[i],
                     tf.constant(learningRate, getDType()),
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyGradientDescent.useLocking(true)
                 )
             )
         }

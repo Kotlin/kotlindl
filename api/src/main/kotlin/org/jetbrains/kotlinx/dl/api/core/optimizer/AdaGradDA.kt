@@ -18,6 +18,7 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyAdagradDa
 import java.util.*
 
 private val GLOBAL_STEP = defaultOptimizerVariableName("adagrad-da-global-step")
@@ -92,7 +93,8 @@ public class AdaGradDA(
                     learningRateConst,
                     l1StrengthConst,
                     l2StrengthConst,
-                    tf.dtypes.cast(globalStep, Long::class.javaObjectType)
+                    tf.dtypes.cast(globalStep, Long::class.javaObjectType),
+                    ApplyAdagradDa.useLocking(true)
                 )
             )
         }

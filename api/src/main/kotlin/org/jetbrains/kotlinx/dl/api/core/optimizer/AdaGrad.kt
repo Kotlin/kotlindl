@@ -14,6 +14,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.op.train.ApplyAdagrad
 import java.util.*
 
 private const val ACCUMULATOR = "accumulator"
@@ -75,7 +76,9 @@ public class AdaGrad(
                     variable,
                     slot,
                     learningRateConst,
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyAdagrad.useLocking(true),
+                    ApplyAdagrad.updateSlots(true)
                 )
             )
         }
