@@ -157,7 +157,7 @@ public open class OnnxInferenceModel : InferenceModel() {
         val result = mutableListOf<Array<*>>()
 
         output.forEach {
-            result.add(it.value.value as Array<*>)
+            result.add(it.value.value as Array<*>) // TODO: could be a FloatArray (need to parse output types correctly
         }
 
         output.close()
