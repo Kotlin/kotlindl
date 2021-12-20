@@ -2,6 +2,7 @@ package org.jetbrains.kotlinx.dl.api.core.dsl
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test
 internal class GraphTrainableModelBuilderTest {
     @Test
     fun buildSequential() {
-        assertDoesNotThrow {
+        assert(
             sequential {
                 model {
                     name = "Test Sequential"
@@ -19,14 +20,16 @@ internal class GraphTrainableModelBuilderTest {
                     +Input(128, 128)
                     +Conv1D()
                 }
+            }.let {
+                it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
             }
-        }
+        )
 
     }
 
     @Test
     fun buildFunctional() {
-        assertDoesNotThrow {
+        assert(
             functional {
                 model {
                     name = "Test Functional"
@@ -34,21 +37,24 @@ internal class GraphTrainableModelBuilderTest {
 
                 layers {
                     +Input(128, 128)
-                    +Conv1D()
                 }
+            }.let {
+                it.layers.size == 1 && it.layers[0] is Input
             }
-        }
+        )
     }
 
     @Test
     fun genericBuilder() {
-        assertDoesNotThrow {
+        assert(
             ::Functional {
                 layers {
                     +Input(128, 128, name = "First Layer")
                     +Conv1D(name = "Second Layer")
                 }
+            }.let {
+                it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
             }
-        }
+        )
     }
 }
