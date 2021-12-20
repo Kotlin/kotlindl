@@ -164,6 +164,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     /** Returns a copy of this model. */
+    // TODO: implement the saving of optimizer state
     public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
         val serializedModel = serializeModel(true)
         val deserializedModel = deserializeSequentialModel(serializedModel)
@@ -173,7 +174,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             deserializedModel.compile(
                 optimizer = this.optimizer,
                 loss = this.loss,
-                metric = this.metric
+                metrics = this.metrics
             )
 
             deserializedModel.layers.forEach {

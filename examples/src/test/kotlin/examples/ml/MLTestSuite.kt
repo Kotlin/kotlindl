@@ -19,6 +19,11 @@ class MLTestSuite {
     }
 
     @Test
+    fun linearRegressionWithTwoMetricsTest() {
+        linearRegressionWithTwoMetrics()
+    }
+
+    @Test
     fun sineRegressionTest() {
         sineRegression()
     }

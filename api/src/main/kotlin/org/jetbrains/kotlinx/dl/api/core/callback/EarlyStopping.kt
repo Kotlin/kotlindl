@@ -99,7 +99,7 @@ public class EarlyStopping(
                 best = Double.MIN_VALUE
             }
             // If metric
-            else -> if (this.monitor == EpochTrainingEvent::metricValue || this.monitor == EpochTrainingEvent::valMetricValue) {
+            else -> if (this.monitor == EpochTrainingEvent::metricValues || this.monitor == EpochTrainingEvent::valMetricValues) { // TODO: correctly handle the case with monitoring of multiple metrics
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MAX_VALUE

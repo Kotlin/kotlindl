@@ -70,8 +70,8 @@ fun lenetWithAlternativeLossFunction() {
 
         println("Accuracy: $accuracy")
 
-        val accuracyByEpoch = history[EpochTrainingEvent::metricValue]
-        println(accuracyByEpoch.contentToString())
+        /*val accuracyByEpoch = history[EpochTrainingEvent::metricValues] // TODO: fix a bug with an access
+        println(accuracyByEpoch.contentToString())*/
     }
 }
 
