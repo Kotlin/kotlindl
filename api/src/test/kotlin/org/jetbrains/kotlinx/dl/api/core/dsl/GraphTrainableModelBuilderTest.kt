@@ -6,7 +6,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-internal class GraphTrainableModelDslTest {
+internal class GraphTrainableModelBuilderTest {
     @Test
     fun buildSequential() {
         assertDoesNotThrow {
