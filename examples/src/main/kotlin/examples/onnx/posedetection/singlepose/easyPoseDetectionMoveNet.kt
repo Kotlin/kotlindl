@@ -40,6 +40,7 @@ fun easyPoseDetectionMoveNet() {
     }
 }
 
+// TODO: add edges visualisation
 private fun visualise(
     imageFile: File,
     detectedPose: DetectedPose

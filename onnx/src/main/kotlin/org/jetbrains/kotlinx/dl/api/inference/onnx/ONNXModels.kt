@@ -30,6 +30,10 @@ public object ONNXModels {
             return ImageRecognitionModel(modelHub.loadModel(this), this)
         }
 
+        override fun preInit(): InferenceModel {
+            return OnnxInferenceModel()
+        }
+
         /** */
         public class ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -260,6 +264,10 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
                 return modelHub.loadModel(this) as SSDObjectDetectionModel
             }
+
+            override fun preInit(): SSDObjectDetectionModel {
+                return SSDObjectDetectionModel()
+            }
         }
 
         public object SSDMobileNetV1 :
@@ -276,6 +284,12 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
                 return modelHub.loadModel(this) as SSDMobileNetV1ObjectDetectionModel
+            }
+
+            override fun preInit(): SSDMobileNetV1ObjectDetectionModel {
+                val model =  SSDMobileNetV1ObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1000L, 1000L, 3L)
+                return model
             }
         }
 
@@ -294,6 +308,12 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 512L, 512L, 3L)
+                return model
+            }
         }
 
         public object EfficientDetD1 :
@@ -304,6 +324,12 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 640L, 640L, 3L)
+                return model
             }
         }
 
@@ -316,6 +342,12 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 768L, 768L, 3L)
+                return model
+            }
         }
 
         public object EfficientDetD3 :
@@ -326,6 +358,12 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 896L, 896L, 3L)
+                return model
             }
         }
 
@@ -338,6 +376,12 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1024L, 1024L, 3L)
+                return model
+            }
         }
 
         public object EfficientDetD5 :
@@ -348,6 +392,12 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            }
+
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                return model
             }
         }
 
@@ -360,16 +410,11 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
-        }
 
-        public object EfficientDetD7 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d7") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
-            override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
+            override fun preInit(): EfficientDetObjectDetectionModel {
+                val model =  EfficientDetObjectDetectionModel()
+                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                return model
             }
         }
 
@@ -381,6 +426,10 @@ public object ONNXModels {
             }
 
             override fun pretrainedModel(modelHub: ModelHub): OnnxInferenceModel {
+                TODO("Not yet implemented")
+            }
+
+            override fun preInit(): OnnxInferenceModel {
                 TODO("Not yet implemented")
             }
         }
@@ -410,6 +459,10 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
                 return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
             }
+
+            override fun preInit(): OnnxInferenceModel {
+                return OnnxInferenceModel()
+            }
         }
     }
 
@@ -428,6 +481,10 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return modelHub.loadModel(this) as SinglePoseDetectionModel
+            }
+
+            override fun preInit(): SinglePoseDetectionModel {
+                return SinglePoseDetectionModel()
             }
         }
 
@@ -453,6 +510,12 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
                 return modelHub.loadModel(this) as MultiPoseDetectionModel
             }
+
+            override fun preInit(): MultiPoseDetectionModel {
+                val model = MultiPoseDetectionModel()
+                model.inputShape = longArrayOf(1L, 256L, 256L, 3L)
+                return model
+            }
         }
 
         /** */
@@ -464,6 +527,10 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return modelHub.loadModel(this) as SinglePoseDetectionModel
+            }
+
+            override fun preInit(): SinglePoseDetectionModel {
+                return SinglePoseDetectionModel()
             }
         }
     }
