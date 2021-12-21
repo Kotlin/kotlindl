@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.callback
 
 import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
+import org.jetbrains.kotlinx.dl.logging.api.info
 
 /**
  * Callback for stopping training of a model when a specified amount of time has passed.

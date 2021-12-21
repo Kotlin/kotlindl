@@ -5,9 +5,10 @@
 
 package examples.transferlearning.modelhub.vgg16
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class VGG16TestSuite {
+class VGG16TestSuite  {
     @Test
     fun vgg16predictionTest() {
         vgg16prediction()

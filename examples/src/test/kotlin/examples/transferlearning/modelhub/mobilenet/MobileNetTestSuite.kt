@@ -5,11 +5,12 @@
 
 package examples.transferlearning.modelhub.mobilenet
 
+import examples.Basic
 import examples.transferlearning.runImageRecognitionTransferLearning
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
-class MobileNetTestSuite {
+class MobileNetTestSuite  {
     @Test
     fun mobilenetPredictionTest() {
         mobileNetPrediction()

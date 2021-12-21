@@ -1,0 +1,24 @@
+project.setDescription("Logging factory")
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn"]
+}
+
+kotlin {
+    explicitApiWarning()
+}
+
+test {
+    useJUnitPlatform()
+}

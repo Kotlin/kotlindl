@@ -1,15 +1,16 @@
 package org.jetbrains.kotlinx.dl.api.core.summary
 
-import mu.KLogging
+
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
-import org.slf4j.Logger
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.Logger
 import java.io.PrintStream
 
 private data class SummaryRow(
     val layerName: String,
     val outputShape: String,
     val paramsCount: String,
-    val inboundLayers: List<String>
+    val inboundLayers: List<String>,
 )
 
 /**
@@ -33,7 +34,7 @@ public fun ModelSummary.format(
     columnSeparator: String = " ",
     lineSeparator: Char = '_',
     thickLineSeparator: Char = '=',
-    withConnectionsColumn: Boolean = layersSummaries.any { it.inboundLayers.size > 1 }
+    withConnectionsColumn: Boolean = layersSummaries.any { it.inboundLayers.size > 1 },
 ): List<String> {
     // Prepare string data for resulting table
     val table = layersSummaries.map { layer ->
@@ -121,7 +122,9 @@ public fun ModelSummary.print(out: PrintStream = System.out): Unit =
 public fun TrainableModel.printSummary(out: PrintStream = System.out): Unit =
     summary().print(out)
 
-private object ModelSummaryLogger : KLogging()
+private object ModelSummaryLogger {
+    val logger = GlobalLogFactory.newLogger(ModelSummaryLogger::class.java)
+}
 
 /**
  * Formats and log model summary to logger

@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.callback
 
 import org.jetbrains.kotlinx.dl.api.core.history.BatchTrainingEvent
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
+import org.jetbrains.kotlinx.dl.logging.api.info
 
 /**
  * This callback is used to stop the training if loss is not a number (NaN or INFINITY).

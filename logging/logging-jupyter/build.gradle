@@ -1,0 +1,26 @@
+project.setDescription("Jupyter compatible logging")
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10'
+
+    api(project(":logging:logging-api"))
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn", "-Xlambdas=indy"]
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs += ["-opt-in=kotlin.RequiresOptIn", "-Xlambdas=indy"]
+}
+
+kotlin {
+    explicitApiWarning()
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -9,12 +9,12 @@ import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import ai.onnxruntime.TensorInfo
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.Logger
 import java.nio.FloatBuffer
 import java.util.*
 
@@ -26,7 +26,7 @@ import java.util.*
  */
 public open class OnnxInferenceModel : InferenceModel() {
     /** Logger for the model. */
-    private val logger: KLogger = KotlinLogging.logger {}
+    private val logger: Logger = GlobalLogFactory.newLogger(OnnxInferenceModel::class.java)
 
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
@@ -57,7 +57,7 @@ public open class OnnxInferenceModel : InferenceModel() {
 
         internal fun initializeONNXModel(
             model: OnnxInferenceModel,
-            pathToModel: String
+            pathToModel: String,
         ): OnnxInferenceModel {
             require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
@@ -91,7 +91,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     override fun copy(
         copiedModelName: String?,
         saveOptimizerState: Boolean,
-        copyWeights: Boolean
+        copyWeights: Boolean,
     ): TensorFlowInferenceModel {
         TODO("Not yet implemented")
     }

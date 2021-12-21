@@ -5,12 +5,13 @@
 
 package examples.transferlearning.modelhub.resnet
 
+import examples.Basic
 import examples.transferlearning.runImageRecognitionPrediction
 import examples.transferlearning.runImageRecognitionTransferLearning
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
-class ResNetTestSuite {
+class ResNetTestSuite  {
     @Test
     fun resnet18predictionTest() {
         runImageRecognitionPrediction(modelType = TFModels.CV.ResNet18())

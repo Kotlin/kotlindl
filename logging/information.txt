@@ -1,0 +1,5 @@
+Library port of
+
+"club.eridani.logging:logging-core:0.0.1"
+
+https://docs.eridani.club/frameworks/logging/logging-core/

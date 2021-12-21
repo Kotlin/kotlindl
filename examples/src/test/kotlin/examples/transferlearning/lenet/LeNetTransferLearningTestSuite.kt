@@ -5,9 +5,10 @@
 
 package examples.transferlearning.lenet
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class LeNetTransferLearningTestSuite {
+class LeNetTransferLearningTestSuite  {
     @Test
     fun loadModelWithWeightsAndEvaluateTest() {
         loadModelWithWeightsAndEvaluate()

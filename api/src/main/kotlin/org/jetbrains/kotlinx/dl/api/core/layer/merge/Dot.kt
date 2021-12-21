@@ -80,7 +80,7 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
     val xDim = x.asOutput().shape().numDimensions()
     val yDim = y.asOutput().shape().numDimensions()
     val diff: Int
-    var x2: Operand<Float> = x;
+    var x2: Operand<Float> = x
     var y2: Operand<Float> = y
     if (xDim > yDim) {
         diff = xDim - yDim

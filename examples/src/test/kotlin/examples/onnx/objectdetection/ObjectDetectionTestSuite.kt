@@ -5,11 +5,12 @@
 
 package examples.onnx.objectdetection
 
+import examples.Basic
 import examples.onnx.objectdetection.ssd.objectDetectionSSD
 import examples.onnx.objectdetection.ssd.predictionSSD
 import org.junit.jupiter.api.Test
 
-class ObjectDetectionTestSuite {
+class ObjectDetectionTestSuite  {
     @Test
     fun predictionSSDTest() {
         predictionSSD()

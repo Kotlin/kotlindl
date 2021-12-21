@@ -5,13 +5,15 @@
 
 package org.jetbrains.kotlinx.dl.api.inference
 
-import mu.KotlinLogging
+
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
+import org.jetbrains.kotlinx.dl.logging.api.GlobalLogFactory
+import org.jetbrains.kotlinx.dl.logging.api.debug
 import org.tensorflow.Session
 import org.tensorflow.Shape
 import org.tensorflow.Tensor
@@ -57,7 +59,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         internal set
 
     /** Logger. */
-    private val logger = KotlinLogging.logger {}
+    private val logger = GlobalLogFactory.newLogger(this::class.java)
 
     public companion object {
         /**
@@ -69,7 +71,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
          */
         public fun load(
             modelDirectory: File,
-            loadOptimizerState: Boolean = false
+            loadOptimizerState: Boolean = false,
         ): TensorFlowInferenceModel {
             val model = TensorFlowInferenceModel()
 
@@ -173,7 +175,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     override fun copy(
         copiedModelName: String?,
         saveOptimizerState: Boolean, // TODO, check this case
-        copyWeights: Boolean
+        copyWeights: Boolean,
     ): TensorFlowInferenceModel {
         val model = TensorFlowInferenceModel()
         model.kGraph = this.kGraph.copy()
@@ -189,7 +191,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             val variableNames = kGraph.variableNames()
             check(variableNames.isNotEmpty()) {
                 "Found 0 variable names in TensorFlow graph $kGraph. " +
-                        "If copied model has no weights, set flag `copyWeights` to `false`."
+                  "If copied model has no weights, set flag `copyWeights` to `false`."
             }
 
             // TODO: the same code-block related to saveOptimizerState
@@ -255,7 +257,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [variableName] Name of variable to be assigned.
      */
     internal fun runAssignOpByVarName(
-        variableName: String
+        variableName: String,
     ) {
         val assignOpName = defaultAssignOpName(variableName)
 
@@ -272,7 +274,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      */
     internal fun fillVariable(
         variableName: String,
-        kernelData: Any
+        kernelData: Any,
     ) {
         val initializerName = defaultInitializerOpName(variableName)
         val assignOpName = defaultAssignOpName(variableName)
@@ -291,7 +293,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
         if (!file.exists()) throw FileNotFoundException(
             "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+              "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
         val variableNames = file.readLines()
@@ -318,7 +320,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
         if (!file.exists()) throw FileNotFoundException(
             "File '$variableName.txt' is not found. This file must be in the model directory." +
-                    "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+              "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
         Scanner(file.inputStream()).use { scanner ->
@@ -329,7 +331,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             val initOp = kGraph.tfGraph.operation(initializerName)
             check(initOp != null) {
                 "Operation $initializerName is not found in static graph.\n" +
-                        "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+                  "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
             }
 
             val assignOp = kGraph.tfGraph.operation(assignOpName)
@@ -358,7 +360,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         variableName: String,
         data: Array<*>,
         kGraph: KGraph = this.kGraph,
-        session: Session = this.session
+        session: Session = this.session,
     ) {
         val operation = kGraph.tfGraph.operation(variableName)
         check(operation != null) { "Operation $variableName is not found in static graph." }
@@ -369,7 +371,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         val initOp = kGraph.tfGraph.operation(initializerName)
         check(initOp != null) {
             "Operation $initializerName is not found in static graph.\n" +
-                    "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+              "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
         }
 
         val assignOp = kGraph.tfGraph.operation(assignOpName)
@@ -395,7 +397,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
         if (!file.exists()) throw FileNotFoundException(
             "File 'graph.pb' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
+              "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
         )
 
         kGraph = KGraph(file.readBytes())
@@ -430,7 +432,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         initializerName: String,
         data: Any,
         assignOpName: String,
-        session: Session = this.session
+        session: Session = this.session,
     ) {
         var tensorData = data
         if (data is Array<*> && data.isArrayOf<Float>()) {
@@ -448,7 +450,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     private fun create4DimFloatArray(
         shape: Shape,
-        scanner: Scanner
+        scanner: Scanner,
     ): Array<Array<Array<FloatArray>>> {
         val result = Array(shape.size(0).toInt()) {
             Array(shape.size(1).toInt()) {
@@ -481,7 +483,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     private fun create3DimFloatArray(
         shape: Shape,
-        scanner: Scanner
+        scanner: Scanner,
     ): Array<Array<FloatArray>> {
         val result = Array(shape.size(0).toInt()) {
             Array(shape.size(1).toInt()) {
@@ -503,7 +505,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     private fun create2DimFloatArray(
         shape: Shape,
-        scanner: Scanner
+        scanner: Scanner,
     ): Array<FloatArray> {
         val result = Array(shape.size(0).toInt()) {
             FloatArray(shape.size(1).toInt()) { 0.0f }
@@ -521,7 +523,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     private fun create1DimFloatArray(
         shape: Shape,
-        scanner: Scanner
+        scanner: Scanner,
     ): FloatArray {
         val result = FloatArray(shape.size(0).toInt()) { 0.0f }
 

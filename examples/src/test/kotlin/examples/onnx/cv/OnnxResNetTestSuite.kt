@@ -5,6 +5,7 @@
 
 package examples.onnx.cv
 
+import examples.Basic
 import examples.onnx.cv.custom.resnet50CustomPrediction
 import examples.onnx.cv.custom.resnet50additionalTraining
 import examples.onnx.cv.efficicentnet.efficientNet4LitePrediction
@@ -13,7 +14,7 @@ import examples.onnx.cv.runImageRecognitionPrediction
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
-class OnnxResNetTestSuite {
+class OnnxResNetTestSuite  {
     @Test
     fun resnet18predictionTest() {
         resnet18prediction()

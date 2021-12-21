@@ -5,9 +5,10 @@
 
 package examples.custom
 
+import examples.Basic
 import org.junit.jupiter.api.Test
 
-class CustomTestSuite {
+class CustomTestSuite  {
     @Test
     fun lenetMnistWithCustomCallbackTest() {
         lenetMnistWithCustomCallback()
