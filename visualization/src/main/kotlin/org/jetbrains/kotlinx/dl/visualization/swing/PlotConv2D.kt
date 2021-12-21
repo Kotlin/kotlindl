@@ -560,13 +560,13 @@ class DetectedObjectJPanel(
 
         graphics.drawImage(bufferedImage, 0, 0, null)
 
-        detectedObjects.forEach{
+        detectedObjects.forEach {
             val pixelWidth = 1
             val pixelHeight = 1
 
-            val top = it.yMin * imageShape.height!! * pixelHeight
+            val top = it.yMax * imageShape.height!! * pixelHeight
             val left = it.xMin * imageShape.width!! * pixelWidth
-            val bottom = it.yMax * imageShape.height!! * pixelHeight
+            val bottom = it.yMin * imageShape.height!! * pixelHeight
             val right = it.xMax * imageShape.width!! * pixelWidth
             // left, bot, right, top
 
@@ -583,7 +583,6 @@ class DetectedObjectJPanel(
             graphics.setColor(Color.RED)
             graphics.stroke = stroke1
             graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
-
         }
     }
 

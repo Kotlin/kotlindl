@@ -29,7 +29,7 @@ import java.nio.IntBuffer
  */
 public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the top N detected object for the given image file sorted by the score.
      *
      * NOTE: this method doesn't include the SSD - related preprocessing.
      *
@@ -60,8 +60,9 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
             foundObjects.add(detectedObject)
         }
 
+        foundObjects.sortByDescending { it.probability }
+
         if (topK > 0) {
-            foundObjects.sortByDescending { it.probability }
             return foundObjects.take(topK)
         }
 
@@ -69,7 +70,7 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
     }
 
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the top N detected object for the given image file sorted by the score.
      *
      * NOTE: this method includes the SSD - related preprocessing.
      *

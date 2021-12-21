@@ -205,7 +205,7 @@ public object TFModels {
     ): ImageRecognitionModel {
         modelHub as TFModelHub
         val model = modelHub.loadModel(modelType)
-
+        // TODO: this part is not needed for inference (if we could add manually Softmax at the end of the graph)
         model.compile(
             optimizer = Adam(),
             loss = Losses.MAE,

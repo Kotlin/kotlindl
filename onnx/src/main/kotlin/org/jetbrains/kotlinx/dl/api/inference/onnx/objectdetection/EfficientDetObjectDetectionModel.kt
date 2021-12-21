@@ -5,86 +5,63 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
+import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.nio.IntBuffer
 
-/**
- * Special model class for detection objects on images
- * with built-in preprocessing and post-processing.
- *
- * It internally uses SSD model trained on the COCO dataset.
- *
- * @since 0.4
- *
- * @see <a href="https://arxiv.org/abs/1512.02325">
- *     SSD: Single Shot MultiBox Detector.</a>
- */
+// TODO: add KDocs
 public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
-    // TODO: add to support different preprocessors and inputs // private val modelType: ModelType<out InferenceModel, out InferenceModel>
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the detected object for the given image file sorted by the score.
      *
      * NOTE: this method doesn't include the SSD - related preprocessing.
      *
      * @param [inputData] Preprocessed data from the image file.
-     * @param [topK] The number of the detected objects with the highest score to be returned.
      * @return List of [DetectedObject] sorted by score.
      */
-    public fun detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
-        //this.inputShape = longArrayOf(100, 100, 3) // TODO: refactor like in MoveNet
+    public fun detectObjects(inputData: FloatArray): List<DetectedObject> {
         val rawPrediction = this.predictRaw(inputData)
-
         val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = rawPrediction[0][0] as Array<FloatArray>
-        val classIndices = rawPrediction[1][0] as LongArray
-        val probabilities = rawPrediction[2][0] as FloatArray
-        val numberOfFoundObjects = boxes.size
+        val items = rawPrediction[0][0] as Array<FloatArray>
 
-        for (i in 0 until numberOfFoundObjects) {
-            val detectedObject = DetectedObject(
-                classLabel = cocoCategories[classIndices[i].toInt()]!!,
-                probability = probabilities[i],
-                // left, bot, right, top
-                xMin = boxes[i][0],
-                yMax = boxes[i][1],
-                xMax = boxes[i][2],
-                yMin = boxes[i][3]
-            )
-            foundObjects.add(detectedObject)
+        for (i in items.indices) {
+            val probability = items[i][5]
+            if (probability != 0.0f) {
+                val detectedObject = DetectedObject(
+                    classLabel = cocoCategoriesForEfficientDet[items[i][6].toInt()]!!,
+                    probability = probability,
+                    // left, bot, right, top
+                    xMin = minOf (items[i][2]/inputShape[2], 1.0f),
+                    yMax = minOf (items[i][3]/inputShape[1], 1.0f),
+                    xMax = minOf (items[i][4]/inputShape[2], 1.0f),
+                    yMin = minOf (items[i][1]/inputShape[1], 1.0f)
+                )
+                foundObjects.add(detectedObject)
+            }
         }
 
-        if (topK > 0) {
-            foundObjects.sortByDescending { it.probability }
-            return foundObjects.take(topK)
-        }
-
+        foundObjects.sortByDescending { it.probability }
         return foundObjects
     }
 
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the detected object for the given image file sorted by the score.
      *
      * NOTE: this method includes the SSD - related preprocessing.
      *
      * @param [imageFile] File, should be an image.
-     * @param [topK] The number of the detected objects with the highest score to be returned.
      * @return List of [DetectedObject] sorted by score.
      */
-    public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
+    public fun detectObjects(imageFile: File): List<DetectedObject> {
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3)
+                imageShape = ImageShape(null, null, 3)
             }
             transformImage {
                 resize {
@@ -95,13 +72,8 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, shape) = preprocessing()
-
-        val preprocessedData = ONNXModels.ObjectDetection.EfficientDetD2.preprocessInput(
-            data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
-        )
-
-        return this.detectObjects(preprocessedData, topK)
+        val (data, _) = preprocessing()
+        // we don't need special preprocessing here
+        return this.detectObjects(data)
     }
 }

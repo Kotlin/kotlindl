@@ -28,7 +28,7 @@ import java.io.File
  */
 public class SSDObjectDetectionModel : OnnxInferenceModel() {
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the top N detected object for the given image file sorted by the score.
      *
      * NOTE: this method doesn't include the SSD - related preprocessing.
      *
@@ -51,15 +51,16 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
                 probability = probabilities[i],
                 // left, bot, right, top
                 xMin = boxes[i][0],
-                yMax = boxes[i][1],
+                yMin = boxes[i][1],
                 xMax = boxes[i][2],
-                yMin = boxes[i][3]
+                yMax = boxes[i][3]
             )
             foundObjects.add(detectedObject)
         }
 
+        foundObjects.sortByDescending { it.probability }
+
         if (topK > 0) {
-            foundObjects.sortByDescending { it.probability }
             return foundObjects.take(topK)
         }
 
@@ -67,7 +68,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
     }
 
     /**
-     * Returns the top N detected object for the given image file.
+     * Returns the top N detected object for the given image file sorted by the score.
      *
      * NOTE: this method includes the SSD - related preprocessing.
      *
