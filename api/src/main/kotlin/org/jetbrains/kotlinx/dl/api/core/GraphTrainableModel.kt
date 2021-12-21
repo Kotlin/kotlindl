@@ -3,10 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-@file:Suppress("LeakingThis")
-
 package org.jetbrains.kotlinx.dl.api.core
 
+import mu.KLogger
+import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.history.*
@@ -33,7 +33,6 @@ import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
-import org.jetbrains.kotlinx.dl.logging.api.*
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
@@ -52,7 +51,7 @@ import java.util.*
  */
 public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     /** Logger for the model. */
-    public val logger: Logger = GlobalLogFactory.newLogger(this::class.java)
+    public val logger: KLogger = KotlinLogging.logger {}
 
     /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
@@ -80,7 +79,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private lateinit var predictionOp: Operand<Float>
 
     /** TensorFlow prediction operand. */
-    private lateinit var metricOp: Operand<Float>
+    private lateinit var metricOps: MutableList<Operand<Float>>
 
     /** A list of targets to be optimized. */
     protected lateinit var targets: List<Operand<Float>>
@@ -142,13 +141,16 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
+        compile(optimizer, loss, listOf(metric), callback)
+    }
+
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>, callback: Callback) {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
 
         this.loss = loss
-        this.metric = metric
-        this.metrics = listOf(metric)
+        this.metrics = metrics
         this.optimizer = optimizer
 
         // callback binding
@@ -164,7 +166,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             else -> 1
         }
 
-        @Suppress("LeakingThis")
         xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
@@ -185,7 +186,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
         }
-        metricOp = metric.apply(tf, predictionOp, yTrueOp, numberOfLossesOp)
+        metricOps = mutableListOf()
+        metrics.forEach {
+            metricOps.add(it.apply(tf, predictionOp, yTrueOp, numberOfLossesOp))
+        }
 
         isModelCompiled = true
     }
@@ -216,10 +220,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         require(layers.none { it is NoGradients && it.isTrainable })
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +
-              "But the following layers violates this rule: ${
-                  layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
-                      .contentDeepToString()
-              }"
+                    "But the following layers violates this rule: ${
+                        layers.filter { it is NoGradients && it.isTrainable }.map { it.name }.toTypedArray()
+                            .contentDeepToString()
+                    }"
         }
         //  require(layers.last() is Dense) { "DL architectures are not finished with Dense layer are not supported yet!" }
         //  require(layers.last().hasActivation()) { "Last layer must have an activation function." }
@@ -237,7 +241,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int,
+        validationBatchSize: Int
     ): TrainingHistory {
         return internalFit(
             trainBatchSize,
@@ -252,7 +256,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     override fun fit(
         dataset: Dataset,
         epochs: Int,
-        batchSize: Int,
+        batchSize: Int
     ): TrainingHistory {
         return internalFit(
             batchSize,
@@ -285,14 +289,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         trainingDataset: Dataset,
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
-        validationBatchSize: Int?,
+        validationBatchSize: Int?
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         for (layer in layers) {
             check(!(layer is NoGradients && layer.isTrainable)) {
                 "Layer $layer has no gradients implementations in TensorFlow and should be non-trainable only. " +
-                  "Set 'isTrainable' to 'false'."
+                        "Set 'isTrainable' to 'false'."
             }
         }
 
@@ -320,8 +324,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 )
 
                 var batchCounter = 0
-                var averageTrainingMetricAccum = 0.0f
                 var averageTrainingLossAccum = 0.0f
+                val averageTrainingMetricAccum = FloatArray(metrics.size) { 0.0f }
 
                 while (batchIter.hasNext() && !stopTraining) {
                     callback.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)
@@ -338,30 +342,34 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                 Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
                                     .use { numberOfLossesTensor ->
                                         Tensor.create(true).use { isTraining ->
-                                            val (lossValue, metricValue) = trainOnBatch(
+                                            val (lossValue, metricValues) = trainOnBatch(
                                                 targets,
                                                 batchImagesTensor,
                                                 batchLabelsTensor,
                                                 numberOfLossesTensor as Tensor<Float>,
                                                 isTraining as Tensor<Float>,
-                                                metricOp
+                                                metricOps
                                             )
                                             if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
                                                 logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
                                             }
 
                                             averageTrainingLossAccum += lossValue
-                                            averageTrainingMetricAccum += metricValue
+                                            metrics.forEachIndexed { i, _ ->
+                                                averageTrainingMetricAccum[i] += metricValues[i]
+                                            }
+
                                             val batchTrainingEvent =
                                                 BatchTrainingEvent(
                                                     i,
                                                     batchCounter,
                                                     lossValue.toDouble(),
-                                                    metricValue.toDouble()
+                                                    averageTrainingMetricAccum.map { it.toDouble() }
                                                 )
                                             trainingHistory.appendBatch(batchTrainingEvent)
 
-                                            logger.debug { "Batch stat: { lossValue: $lossValue metricValue: $metricValue }" }
+                                            // TODO: create map (metric name and metric value)
+                                            logger.debug { "Batch stat: { lossValue: $lossValue metricValues: $metricValues }" }
 
                                             callback.onTrainBatchEnd(
                                                 batchCounter,
@@ -376,21 +384,28 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     batchCounter++
                 }
 
-                val avgTrainingMetricValue = (averageTrainingMetricAccum / batchCounter)
+                val avgTrainingMetricValue = FloatArray(metrics.size) { 0.0f }
+                averageTrainingMetricAccum.forEachIndexed { index, metricValue ->  avgTrainingMetricValue[index] = metricValue / batchCounter}
+
                 val avgLossValue = (averageTrainingLossAccum / batchCounter)
+
+                val nanList = mutableListOf<Double>()
+                for(j in 1 .. metrics.size) {
+                    nanList.add(Double.NaN)
+                }
 
                 val epochTrainingEvent = EpochTrainingEvent(
                     i,
-                    avgLossValue.toDouble(), avgTrainingMetricValue.toDouble(), Double.NaN, Double.NaN
+                    avgLossValue.toDouble(), avgTrainingMetricValue.map { it.toDouble() }.toMutableList(), Double.NaN, nanList
                 )
 
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!)
-                    val validationMetricValue = evaluationResult.metrics[Metrics.convertBack(metric)]
+                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metrics.convertBack(it)] }.toList()// TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
-                    epochTrainingEvent.valMetricValue = validationMetricValue!!
-                    logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metric: $validationMetricValue" }
+                    epochTrainingEvent.valMetricValues = validationMetricValues!!
+                    logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metrics: $validationMetricValues" }
                 } else {
                     logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue" }
 
@@ -413,8 +428,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         batchLabels: Tensor<Float>,
         numberOfLosses: Tensor<Float>,
         isTraining: Tensor<Float>,
-        metricOp: Operand<Float>,
-    ): Pair<Float, Float> {
+        metricOps: MutableList<Operand<Float>>
+    ): Pair<Float, List<Float>> {
         val runner = session.runner()
 
         targets.forEach {
@@ -429,14 +444,22 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         runner
             .fetch(TRAINING_LOSS)
-            .fetch(metricOp)
+
+        metricOps.forEach {
+            runner.fetch(it)
+        }
 
         try {
             val tensorList = runner.run()
             val lossValue = tensorList[0].floatValue()
-            val metricValue = tensorList[1].floatValue()
+            val metricValues = mutableListOf<Float>()
 
-            return Pair(lossValue, metricValue)
+            check(tensorList.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensorList.size - 1} metrics are returned!" }
+            for (i in 1 .. metricOps.size) {
+                metricValues.add(tensorList[i].floatValue())
+            }
+
+            return Pair(lossValue, metricValues)
         } catch (e: TensorFlowException) {
             e.printStackTrace()
             throw RuntimeException(e.message)
@@ -455,7 +478,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             batchSize
         )
 
-        var averageMetricAccum = 0.0f
+        val averageMetricAccum = FloatArray(metrics.size) { 0.0f }
         var averageLossAccum = 0.0f
         var batchCounter = 0
 
@@ -471,9 +494,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 Tensor.create(labelShape, serializeLabelsToBuffer(batch.y, numberOfClasses)).use { testLabelsTensor ->
                     Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
                         Tensor.create(false).use { isTraining ->
-                            val lossAndMetricsTensors = session.runner()
-                                .fetch(metricOp)
+                            val runner = session.runner()
                                 .fetch(TRAINING_LOSS)
+
+                            metricOps.forEach {
+                                runner.fetch(it)
+                            }
+
+                            val lossAndMetricsTensors = runner
                                 .feed(xOp.asOutput(), testImagesTensor)
                                 .feed(yTrueOp.asOutput(), testLabelsTensor)
                                 .feed(training.asOutput(), isTraining)
@@ -483,13 +511,20 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                 )
                                 .run()
 
-                            val metricValue = lossAndMetricsTensors[0].floatValue()
-                            val lossValue = lossAndMetricsTensors[1].floatValue()
+                            val lossValue = lossAndMetricsTensors[0].floatValue()
+                            val metricValues = mutableListOf<Float>()
 
-                            averageMetricAccum += metricValue
+                            check(lossAndMetricsTensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${lossAndMetricsTensors.size - 1} metrics are returned!" }
+                            for (i in 1 .. metricOps.size) {
+                                metricValues.add(lossAndMetricsTensors[i].floatValue())
+                            }
+
                             averageLossAccum += lossValue
+                            metrics.forEachIndexed { i, _ ->
+                                averageMetricAccum[i] += metricValues[i]
+                            }
 
-                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), metricValue.toDouble())
+                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), averageMetricAccum.map { it.toDouble() })
                             evaluationHistory.appendBatch(batchEvent)
 
                             callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
@@ -502,11 +537,18 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             batchCounter++
         }
 
-        val avgMetricValue = (averageMetricAccum / batchCounter).toDouble()
+        val avgMetricValue = FloatArray(metrics.size) { 0.0f }
+        averageMetricAccum.forEachIndexed { index, metricValue ->  avgMetricValue[index] = metricValue / batchCounter}
+
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 
         callback.onTestEnd(evaluationHistory)
-        return EvaluationResult(avgLossValue, mapOf(Metrics.convertBack(metric) to avgMetricValue))
+        val metricValues = mutableMapOf<Metrics, Double>() // TODO: Metrics -> Metric class
+        metrics.forEachIndexed { index, metric ->
+            metricValues[Metrics.convertBack(metric)] = avgMetricValue[index].toDouble()
+        }
+
+        return EvaluationResult(avgLossValue, metricValues)
     }
 
     override fun predict(dataset: Dataset, batchSize: Int): IntArray {
@@ -628,7 +670,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predictSoftlyAndGetActivations(
         inputData: FloatArray,
-        predictionTensorName: String,
+        predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         return internalPredict(inputData, true, predictionTensorName)
     }
@@ -636,7 +678,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun internalPredict(
         inputData: FloatArray,
         visualizationIsEnabled: Boolean,
-        predictionTensorName: String,
+        predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -671,7 +713,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun formPredictionAndActivationsTensors(
         predictionTensorName: String,
         testImages: Tensor<Float>,
-        visualizationIsEnabled: Boolean,
+        visualizationIsEnabled: Boolean
     ): List<Tensor<*>> {
         val runner = session
             .runner()
@@ -719,7 +761,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private fun batchValidation(
         batch: DataBatch,
         xBatchShape: LongArray,
-        yBatchShape: LongArray,
+        yBatchShape: LongArray
     ) {
         check(
             TensorShape(xBatchShape).numElements().toInt() == batch.x.size * batch.x[0].size
@@ -736,8 +778,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             "The calculated [from the model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
                 batch.y.size * numberOfClasses.toInt()
             }. " +
-              "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
-              "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
+                    "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
+                    "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
         }
     }
 
@@ -765,7 +807,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         modelDirectory: File,
         savingFormat: SavingFormat,
         saveOptimizerState: Boolean,
-        writingMode: WritingMode,
+        writingMode: WritingMode
     ) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
@@ -872,7 +914,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         if (!file.exists()) throw FileNotFoundException(
             "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-              "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
         val variableNames = file.readLines()

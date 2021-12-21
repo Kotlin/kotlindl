@@ -102,7 +102,8 @@ public class Adam(
                     betaTwoConst,
                     epsilonConstant,
                     clipGradient.clipGradient(tf, gradients.dy(i)),
-                    ApplyAdam.useNesterov(useNesterov)
+                    ApplyAdam.useNesterov(useNesterov),
+                    ApplyAdam.useLocking(true)
                 )
             )
         }

@@ -36,9 +36,6 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
     /** Callback. */
     protected var callback: Callback = Callback()
 
-    /** Metric on validation dataset for training phase. */
-    protected var metric: Metric = Accuracy()
-
     /** List of metrics for evaluation phase. */
     protected var metrics: List<Metric> = listOf(Accuracy())
 
@@ -132,6 +129,18 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
         metric: Metrics,
         callback: Callback = Callback()
     )
+
+    /**
+     * Configures the model for training.
+     *
+     * NOTE: Set up [isModelCompiled] to True.
+     *
+     * @param [optimizer] Optimizer instance.
+     * @param [loss] Loss function.
+     * @param [metrics] Metrics to evaluate during training.
+     * @param [callback] Callback to be used during training, evaluation and prediction phases.
+     */
+    public abstract fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>, callback: Callback = Callback())
 
     /**
      * Trains the model for a fixed number of [epochs] (iterations over a dataset).

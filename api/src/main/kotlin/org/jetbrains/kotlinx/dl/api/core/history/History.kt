@@ -22,8 +22,8 @@ public class History {
     /**
      * Appends tracked data from one batch event.
      */
-    public fun appendBatch(batch: Int, lossValue: Double, metricValue: Double) {
-        val newEvent = BatchEvent(batch, lossValue, metricValue)
+    public fun appendBatch(batch: Int, lossValue: Double, metricValues: List<Double>) {
+        val newEvent = BatchEvent(batch, lossValue, metricValues)
         addNewBatchEvent(newEvent, batch)
     }
 
@@ -50,13 +50,13 @@ public class History {
 /**
  * One record in [History] objects containing tracked data from one batch.
  *
- * @constructor Creates [BatchEvent] from [batchIndex], [lossValue], [metricValue].
+ * @constructor Creates [BatchEvent] from [batchIndex], [lossValue], [metricValues].
  * @param batchIndex Batch index.
  * @param lossValue Final value of loss function.
- * @param metricValue Final value of chosen metric.
+ * @param metricValues Final values of chosen metrics.
  */
-public class BatchEvent(public val batchIndex: Int, public val lossValue: Double, public val metricValue: Double) {
+public class BatchEvent(public val batchIndex: Int, public val lossValue: Double, public val metricValues: List<Double>) {
     override fun toString(): String {
-        return "BatchEvent(batchIndex=$batchIndex, lossValue=$lossValue, metricValue=$metricValue)"
+        return "BatchEvent(batchIndex=$batchIndex, lossValue=$lossValue, metricValues=$metricValues)"
     }
 }

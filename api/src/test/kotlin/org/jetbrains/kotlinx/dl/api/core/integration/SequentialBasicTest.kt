@@ -17,7 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
+import org.jetbrains.kotlinx.dl.api.core.metric.MAE
+import org.jetbrains.kotlinx.dl.api.core.metric.MSE
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
@@ -113,6 +116,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         }
     }
 
+
     @Test
     fun trainingLeNetModel() {
         val (train, test) = mnist()
@@ -127,13 +131,89 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
-            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             // Evaluation testing
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
             if (accuracy != null) {
                 assertTrue(accuracy > 0.7)
+            }
+
+            it.logSummary()
+
+            // Prediction testing
+            val label = it.predict(test.getX(0))
+            assertEquals(test.getY(0), label.toFloat())
+
+            val softPrediction = it.predictSoftly(test.getX(0))
+
+            assertEquals(
+                test.getY(0),
+                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
+            )
+
+            // Test predict method with specified tensor name
+            val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
+            assertEquals(test.getY(0), label2.toFloat())
+
+            // Test predictAndGetActivations method
+            val (label3, activations) = it.predictAndGetActivations(test.getX(0))
+            assertEquals(test.getY(0), label3.toFloat())
+            assertEquals(3, activations.size)
+
+            // TODO: flaky test due to TF non-determinism
+            /*val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.43086472153663635, conv2d1Activations[0][0][0][0].toDouble(), EPS)
+            val conv2d2Activations = activations[1] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.0, conv2d2Activations[0][0][0][0].toDouble(), EPS)
+            val denseActivations = activations[2] as Array<FloatArray>
+            assertEquals(2.8752777576446533, denseActivations[0][0].toDouble(), EPS)*/
+
+            val predictions = it.predict(test, TEST_BATCH_SIZE)
+            assertEquals(test.xSize(), predictions.size)
+
+            val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
+            assertEquals(test.xSize(), softPredictions.size)
+            assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
+
+            var manualAccuracy = 0
+            predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
+            assertTrue(manualAccuracy > 0.7)
+        }
+    }
+
+    @Test
+    fun trainingLeNetModelWithThreeMetrics() {
+        val (train, test) = mnist()
+
+        testModel.use {
+            it.compile(optimizer = Adam(), loss = SoftmaxCrossEntropyWithLogits(), metrics = listOf(Accuracy(), MSE(), MAE()))
+
+            val trainingHistory =
+                it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+
+            assertEquals(trainingHistory.batchHistory.size, 60)
+            assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
+            assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
+            assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[1] > 0.05f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[2] > 0.05f)
+
+            // Evaluation testing
+            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+            val mse = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MSE]
+            val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
+
+            if (accuracy != null) {
+                assertTrue(accuracy > 0.7)
+            }
+            if (mse != null) {
+                assertTrue(mse < 0.02)
+            }
+            if (mae != null) {
+                assertTrue(mae < 0.02)
             }
 
             it.logSummary()
@@ -195,7 +275,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
-            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             // Evaluation testing
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -288,7 +368,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
-            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
@@ -513,7 +593,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
             assertTrue(trainingHistory.batchHistory[0].lossValue > 100.0f)
-            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             // Evaluation testing
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -674,7 +754,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
-            assertTrue(trainingHistory.batchHistory[0].metricValue < 0.2f)
+            assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             // Evaluation testing
             val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

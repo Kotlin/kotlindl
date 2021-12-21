@@ -63,7 +63,8 @@ public class Momentum(
                     learningRateConst,
                     clipGradient.clipGradient(tf, gradients.dy(i)),
                     momentumConst,
-                    ApplyMomentum.useNesterov(useNesterov)
+                    ApplyMomentum.useNesterov(useNesterov),
+                    ApplyMomentum.useLocking(true)
                 )
             )
         }
