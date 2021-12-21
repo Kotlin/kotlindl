@@ -86,7 +86,7 @@ fun resnet50additionalTraining() {
             }
             transformTensor {
                 sharpen {
-                    modelType = TFModels.CV.ResNet50
+                    modelTypePreprocessing = TFModels.CV.ResNet50()
                 }
                 onnx {
                     onnxModel = model

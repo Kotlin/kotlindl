@@ -154,10 +154,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
-        public fun loadModelConfiguration(configuration: File): Functional {
+        public fun loadModelConfiguration(configuration: File, inputShape: IntArray? = null): Functional {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -167,10 +167,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File): MutableList<Layer> {
+        public fun loadModelLayersFromConfiguration(
+            configuration: File,
+            inputShape: IntArray? = null
+        ): MutableList<Layer> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadModelLayersFromConfiguration(configuration)
+            return loadModelLayersFromConfiguration(configuration, inputShape)
         }
 
         /**
@@ -181,7 +184,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
-        public fun loadDefaultModelConfiguration(modelDirectory: File): Functional {
+        public fun loadDefaultModelConfiguration(modelDirectory: File, inputShape: IntArray? = null): Functional {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -191,7 +194,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -202,7 +205,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
-        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): MutableList<Layer> {
+        public fun loadModelLayersFromDefaultConfiguration(
+            modelDirectory: File,
+            inputShape: IntArray? = null
+        ): MutableList<Layer> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -213,7 +219,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             )
 
             val functionalConfig = loadSerializedModel(configuration)
-            return loadFunctionalModelLayers(functionalConfig)
+            return loadFunctionalModelLayers(functionalConfig, inputShape)
         }
     }
 

@@ -46,7 +46,7 @@ internal class Conv2DTest : ConvLayerTest() {
                 filters = 16,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = longArrayOf(2, 2),
+                kernelSize = intArrayOf(2, 2),
                 padding = ConvPadding.VALID
             ),
             input,
@@ -77,7 +77,7 @@ internal class Conv2DTest : ConvLayerTest() {
                 filters = 1,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = longArrayOf(2, 2),
+                kernelSize = intArrayOf(2, 2),
                 padding = ConvPadding.VALID
             ),
             input,

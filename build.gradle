@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
-    id 'maven'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.0'
+    id 'maven-publish'
     id 'io.codearte.nexus-staging' version '0.22.0'
     id 'org.jetbrains.dokka' version '1.5.30'
 }
@@ -10,9 +10,9 @@ apply from: project.rootProject.file('gradle/dokka.gradle')
 
 allprojects {
     group = 'org.jetbrains.kotlinx'
-    version = '0.3.0-alpha-5'
+    version = '0.4.0-alpha-1'
 
-    apply plugin: "maven"
+    apply plugin: "maven-publish"
     apply plugin: "kotlin"
 }
 

@@ -106,7 +106,7 @@ internal class MaxPool1DTest {
                 floatArrayOf(1.0f, 2.0f, 4.0f)
             )
         )
-        val layer = MaxPool1D(strides = longArrayOf(1, 1, 1), padding = ConvPadding.SAME)
+        val layer = MaxPool1D(strides = intArrayOf(1, 1, 1), padding = ConvPadding.SAME)
 
         EagerSession.create().use {
             val tf = Ops.create()
@@ -165,7 +165,7 @@ internal class MaxPool1DTest {
                 floatArrayOf(7.0f, 2.0f, 5.0f),
             )
         )
-        val layer = MaxPool1D(poolSize = longArrayOf(1, 3, 1), strides = longArrayOf(1, 1, 1))
+        val layer = MaxPool1D(poolSize = intArrayOf(1, 3, 1), strides = intArrayOf(1, 1, 1))
 
         EagerSession.create().use {
             val tf = Ops.create()

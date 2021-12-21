@@ -11,6 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
@@ -20,9 +22,6 @@ import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.DepthwiseConv2dNative
-
-private const val KERNEL_VARIABLE_NAME = "depthwise_conv2d_kernel"
-private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
 
 /**
  * Depthwise separable 2D convolution. (e.g. spatial convolution over images).
@@ -51,9 +50,9 @@ private const val BIAS_VARIABLE_NAME = "depthwise_conv2d_bias"
  * @since 0.2
  */
 public class DepthwiseConv2D(
-    public val kernelSize: LongArray = longArrayOf(3, 3),
-    public val strides: LongArray = longArrayOf(1, 1, 1, 1),
-    public val dilations: LongArray = longArrayOf(1, 1, 1, 1),
+    public val kernelSize: IntArray = intArrayOf(3, 3),
+    public val strides: IntArray = intArrayOf(1, 1, 1, 1),
+    public val dilations: IntArray = intArrayOf(1, 1, 1, 1),
     public val activation: Activations = Activations.Relu,
     public val depthMultiplier: Int = 1,
     public val depthwiseInitializer: Initializer = HeNormal(),
@@ -80,8 +79,6 @@ public class DepthwiseConv2D(
     activityRegularizerInternal = activityRegularizer,
     paddingInternal = padding,
     useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
     name = name
 ), NoGradients {
 
@@ -93,7 +90,7 @@ public class DepthwiseConv2D(
     }
 
     protected override fun computeKernelShape(numberOfChannels: Long): Shape =
-        shapeFromDims(*kernelSize, numberOfChannels, depthMultiplier.toLong())
+        shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, depthMultiplier.toLong())
 
     protected override fun computeBiasShape(numberOfChannels: Long): Shape =
         Shape.make(numberOfChannels * depthMultiplier)
@@ -108,8 +105,8 @@ public class DepthwiseConv2D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = DepthwiseConv2dNative.dilations(dilations.toList()).dataFormat("NHWC")
-        return tf.nn.depthwiseConv2dNative(input, kernel, strides.toMutableList(), padding.paddingName, options)
+        val options = DepthwiseConv2dNative.dilations(dilations.toLongList()).dataFormat("NHWC")
+        return tf.nn.depthwiseConv2dNative(input, kernel, strides.toLongList(), padding.paddingName, options)
     }
 
     override fun defineOutputShape(inputShape: Shape): Shape {
@@ -120,17 +117,17 @@ public class DepthwiseConv2D(
 
         val rows = convOutputLength(
             rowsCount,
-            kernelSizeInternal[0].toInt(),
+            kernelSizeInternal[0],
             paddingInternal,
-            stridesInternal[1].toInt(),
-            dilationsInternal[1].toInt()
+            stridesInternal[1],
+            dilationsInternal[1]
         )
         val cols = convOutputLength(
             colsCount,
-            kernelSizeInternal[1].toInt(),
+            kernelSizeInternal[1],
             paddingInternal,
-            stridesInternal[2].toInt(),
-            dilationsInternal[2].toInt()
+            stridesInternal[2],
+            dilationsInternal[2]
         )
         val filters = channelsCount * depthMultiplier
 

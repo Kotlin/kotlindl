@@ -38,7 +38,7 @@ import java.io.File
  */
 fun vgg19copyModelPrediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG19
+    val modelType = TFModels.CV.VGG19()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()

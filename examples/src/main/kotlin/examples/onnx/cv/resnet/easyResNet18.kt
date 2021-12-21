@@ -20,7 +20,7 @@ fun resnet18easyPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = ONNXModels.CV.ResNet18.pretrainedModel(modelHub)
+    val model = ONNXModels.CV.ResNet18().pretrainedModel(modelHub)
 
     model.use {
         for (i in 1..8) {

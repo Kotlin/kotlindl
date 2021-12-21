@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
  * NOTE: Model and weights are resources in `examples` module.
  */
 fun loadModelWithoutWeightsInitAndEvaluate() {
-    val (train, test) = fashionMnist()
+    val (_, test) = fashionMnist()
 
     val jsonConfigFile = getJSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)

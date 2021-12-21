@@ -42,7 +42,7 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
  */
 fun main() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.ResNet50
+    val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()

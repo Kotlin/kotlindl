@@ -36,7 +36,7 @@ import java.io.File
  */
 fun vgg16prediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG16
+    val modelType = TFModels.CV.VGG16()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()

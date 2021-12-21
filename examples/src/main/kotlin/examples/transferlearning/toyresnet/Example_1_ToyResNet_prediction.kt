@@ -20,7 +20,7 @@ import java.util.*
 
 /** Just loading ToyResNet trained in Keras. */
 fun main() {
-    val (train, test) = fashionMnist()
+    val (_, test) = fashionMnist()
 
     val jsonConfigFile = getToyResNetJSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)

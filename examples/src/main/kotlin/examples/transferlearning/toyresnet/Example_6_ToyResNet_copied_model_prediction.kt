@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /** Just loading ToyResNet trained in Keras, making a copy and using for prediction. */
 fun main() {
-    val (train, test) = fashionMnist()
+    val (_, test) = fashionMnist()
 
     val jsonConfigFile = getToyResNetJSONConfigFile()
     val model = Functional.loadModelConfiguration(jsonConfigFile)

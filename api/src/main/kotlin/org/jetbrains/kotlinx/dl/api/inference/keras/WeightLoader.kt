@@ -143,24 +143,12 @@ private fun fillLayerWeights(
     group: Group,
     model: GraphTrainableModel
 ) {
-    when (it::class) {
-        Dense::class -> fillDenseVariablesFromKeras(it.name, group, model)
-        Conv2D::class -> fillConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        DepthwiseConv2D::class -> fillDepthwiseConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        SeparableConv2D::class -> fillSeparableConv2DVariablesFromKeras(
-            it.name,
-            group,
-            model
-        )
-        BatchNorm::class -> fillBatchNormVariablesFromKeras(it.name, group, model)
+    when (it) {
+        is Dense -> fillDenseVariablesFromKeras(it.name, group, model)
+        is Conv2D -> fillConv2DVariablesFromKeras(it.name, group, model)
+        is DepthwiseConv2D -> fillDepthwiseConv2DVariablesFromKeras(it.name, group, model)
+        is SeparableConv2D -> fillSeparableConv2DVariablesFromKeras(it.name, group, model)
+        is BatchNorm -> fillBatchNormVariablesFromKeras(it.name, group, model)
     }
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
@@ -474,79 +462,25 @@ private fun fillLayerWeights(
     layerPaths: LayerPaths?,
     model: GraphTrainableModel
 ) {
-    when (it::class) {
-        Dense::class -> fillDenseVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as Dense).useBias,
-            layerPaths
-        )
-        Conv2D::class -> fillConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as Conv2D).useBias,
-            layerPaths
-        )
-        DepthwiseConv2D::class -> fillDepthwiseConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as DepthwiseConv2D).useBias,
-            layerPaths
-        )
-        SeparableConv2D::class -> fillSeparableConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            (it as SeparableConv2D).useBias,
-            layerPaths
-        )
-        BatchNorm::class -> fillBatchNormVariables(
-            it.name,
-            hdfFile,
-            model,
-            layerPaths
-        )
+    when (it) {
+        is Dense -> fillDenseVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is Conv2D -> fillConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is DepthwiseConv2D -> fillDepthwiseConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is SeparableConv2D -> fillSeparableConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
+        is BatchNorm -> fillBatchNormVariables(it.name, hdfFile, model, layerPaths)
     }
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
 
-/*private fun fillLayerWeights(
-    it: Layer,
-    hdfFile: HdfFile,
-    kernelDataPathTemplate: String,
-    biasDataPathTemplate: String,
-    model: Sequential
-) {
-    when (it::class) {
-        Dense::class -> fillDenseVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        Conv2D::class -> fillConv2DVariables(
-            it.name,
-            hdfFile,
-            model,
-            kernelDataPathTemplate,
-            biasDataPathTemplate
-        )
-        else -> println("No weights loading for ${it.name}")
-    }
-    model.logger.info { " Weights loaded for ${it.name}. ${it.paramCount} parameters are loaded. " }
-}*/
+
 
 private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
-    when (it::class) {
-        Dense::class -> initDenseVariablesByDefaultInitializer(it.name, model)
-        Conv2D::class -> initConv2DVariablesByDefaultInitializer(it.name, model)
-        DepthwiseConv2D::class -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
-        SeparableConv2D::class -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
-        BatchNorm::class -> initBatchNormVariablesByDefaultInitializer(it.name, model)
+    when (it) {
+        is Dense -> initDenseVariablesByDefaultInitializer(it.name, model)
+        is Conv2D -> initConv2DVariablesByDefaultInitializer(it.name, model)
+        is DepthwiseConv2D -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
+        is SeparableConv2D -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
+        is BatchNorm -> initBatchNormVariablesByDefaultInitializer(it.name, model)
     }
     model.logger.debug { "${it.paramCount} parameters initialized for the layer ${it.name}." }
 }
@@ -625,12 +559,25 @@ private fun initDenseVariablesByDefaultInitializer(name: String, model: GraphTra
 public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
     weightPaths: List<LayerPaths>,
-    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE
+    missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE,
+    forFrozenLayersOnly: Boolean = false // TODO: probably it should be a flag in all methods
 ) {
     check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
-    this.layers.forEach {
+
+    var layersToLoad = this.layers
+    var layersToInit = this.layers
+
+    if (forFrozenLayersOnly) {
+        layersToLoad = layersToLoad.filter { !it.isTrainable }
+        layersToInit = layersToInit.filter { it.isTrainable }
+        layersToInit.forEach {
+            initLayerWeights(it, this)
+        }
+    }
+
+    layersToLoad.forEach {
         run {
             val initializedLayerName = it.name
             val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
@@ -651,8 +598,9 @@ public fun GraphTrainableModel.loadWeightsByPaths(
             }
         }
     }
+
     this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    this.isModelInitialized = true // TODO: it should depend on what is happened with missed weights
 }
 
 /** This strategy defines the behaviour during weights' loading if the weights are not found in the h5 file by the standard Keras paths. */

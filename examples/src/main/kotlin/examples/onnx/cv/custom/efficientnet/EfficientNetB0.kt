@@ -23,7 +23,7 @@ import java.io.File
  */
 fun efficientNetB0Prediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.EfficientNetB0
+    val modelType = ONNXModels.CV.EfficientNetB0()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = loadImageNetClassLabels()

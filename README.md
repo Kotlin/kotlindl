@@ -27,8 +27,8 @@ private val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 6,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
@@ -41,8 +41,8 @@ private val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 16,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
@@ -119,8 +119,23 @@ This, however, does not affect the high-level API.
 
 
 ## How to configure KotlinDL in your project
-To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
-```kotlin
+To use the full power of KotlinDL (including the `onnx` and `visualization` modules) in your project, add the following dependencies to your build.gradle file:
+
+```groovy
+   repositories {
+      mavenCentral()
+   }
+   
+   dependencies {
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
+   }
+```
+
+Or add just one dependency if you don’t need ONNX and visualization:
+
+```groovy
    repositories {
       mavenCentral()
    }
@@ -137,7 +152,7 @@ For more details, as well as for `pom.xml` and `build.gradle.kts` examples, plea
 ## Working with KotlinDL in Jupyter Notebook
 You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the following dependency in your notebook: 
 
-```
+```kotlin
    @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
 ```
 
@@ -174,7 +189,7 @@ Note that only NVIDIA devices are supported.
 
 You will also need to add the following dependencies in your project if you wish to leverage a GPU: 
 
-```
+```groovy
   compile 'org.tensorflow:libtensorflow:1.15.0'_
   compile 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'_
 ```
@@ -192,13 +207,13 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
-```
-  implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
+```groovy
+  implementation 'org.apache.logging.log4j:log4j-api:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.16.0'
 ```
 
-```
+```xml
 <Configuration status="WARN">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
@@ -220,11 +235,11 @@ You will also need to add the following dependencies and configuration file ``lo
 
 If you wish to use Logback, include the following dependency and configuration file ``logback.xml`` to ``src/resource`` folder in your project
 
-```
+```groovy
   compile 'ch.qos.logback:logback-classic:1.2.3'
 ```
 
-```
+```xml
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -254,7 +269,7 @@ it was not fully fixed and required an additional line in the build script.
 One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a TensorFlow version specification to the Jar's Manifest. 
 Below you can find an example of a Gradle build task for Fat Jar creation.
 
-```
+```groovy
 // build.gradle
 
 task fatJar(type: Jar) {
@@ -267,7 +282,7 @@ task fatJar(type: Jar) {
 }
 ```
 
-```
+```kotlin
 // build.gradle.kts
 
 plugins {

@@ -40,8 +40,8 @@ internal fun buildLetNet5Classic(
         ),
         Conv2D(
             filters = 6,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = layers_activation,
             kernelInitializer = GlorotNormal(random_seed),
             biasInitializer = Zeros(),
@@ -54,8 +54,8 @@ internal fun buildLetNet5Classic(
         ),
         Conv2D(
             filters = 16,
-            kernelSize = longArrayOf(5, 5),
-            strides = longArrayOf(1, 1, 1, 1),
+            kernelSize = intArrayOf(5, 5),
+            strides = intArrayOf(1, 1, 1, 1),
             activation = layers_activation,
             kernelInitializer = GlorotNormal(random_seed),
             biasInitializer = Zeros(),

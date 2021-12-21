@@ -47,7 +47,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun resnet50additionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    var modelType = TFModels.CV.ResNet50
+    var modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -68,7 +68,7 @@ fun resnet50additionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = TFModels.CV.ResNet50
+                modelTypePreprocessing = TFModels.CV.ResNet50()
             }
         }
     }

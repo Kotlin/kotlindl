@@ -34,7 +34,7 @@ import java.io.File
  */
 fun denseNet169Prediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.DenseNet169
+    val modelType = TFModels.CV.DenseNet169()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()

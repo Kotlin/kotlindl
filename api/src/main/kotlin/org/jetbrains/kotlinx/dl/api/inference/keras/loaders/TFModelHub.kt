@@ -52,32 +52,132 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val jsonConfigFile = getJSONConfigFile(modelType, loadingMode)
+        val jsonConfigFile = if (modelType is TFModels.CV) {
+            getJSONConfigFile(modelType, loadingMode, modelType.noTop)
+        } else {
+            getJSONConfigFile(modelType, loadingMode)
+        }
+
         return when (modelType) {
-            TFModels.CV.VGG16 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
-            TFModels.CV.VGG19 -> Sequential.loadModelConfiguration(jsonConfigFile) as T
-            TFModels.CV.ResNet18 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet34 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet50 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet101 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet152 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet50v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet101v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.ResNet152v2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.MobileNet -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.MobileNetV2 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.Inception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.Xception -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet121 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet169 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.DenseNet201 -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.NASNetMobile -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
-            TFModels.CV.NASNetLarge -> freezeAllLayers(Functional.loadModelConfiguration(jsonConfigFile)) as T
+            is TFModels.CV.VGG16 -> freezeAllLayers(
+                Sequential.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.VGG19 -> freezeAllLayers(
+                Sequential.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet18 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet34 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet50 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet101 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet152 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet50v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet101v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.ResNet152v2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.MobileNet -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.MobileNetV2 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.Inception -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.Xception -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet121 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet169 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.DenseNet201 -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.NASNetMobile -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
+            is TFModels.CV.NASNetLarge -> freezeAllLayers(
+                Functional.loadModelConfiguration(
+                    jsonConfigFile,
+                    modelType.inputShape
+                )
+            ) as T
             else -> TODO()
         }
     }
 
-    private fun freezeAllLayers(model: Functional): GraphTrainableModel {
+    private fun freezeAllLayers(model: GraphTrainableModel): GraphTrainableModel {
         for (layer in model.layers) {
             layer.isTrainable = false
         }
@@ -116,12 +216,15 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         modelType: ModelType<*, *>,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
     ): HdfFile {
-        return getWeightsFile(modelType, loadingMode)
+        val noTop = if (modelType is TFModels.CV) modelType.noTop else false
+        return getWeightsFile(modelType, loadingMode, noTop)
     }
 
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
-    private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode): File {
-        val modelDirectory = "/" + modelType.modelRelativePath
+    private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): File {
+        var modelDirectory = "/" + modelType.modelRelativePath
+        if(noTop) modelDirectory += "/notop"
+
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
 
@@ -142,8 +245,10 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     }
 
     /** Returns .h5 file with model weights, saved from Keras 2.x. */
-    private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode): HdfFile {
-        val modelDirectory = "/" + modelType.modelRelativePath
+    private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): HdfFile {
+        var modelDirectory = "/" + modelType.modelRelativePath
+        if(noTop) modelDirectory += "/notop"
+
         val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
         val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
 

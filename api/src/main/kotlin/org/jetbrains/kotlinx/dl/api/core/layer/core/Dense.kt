@@ -22,9 +22,6 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
 
-private const val KERNEL_VARIABLE_NAME = "dense_kernel"
-private const val BIAS_VARIABLE_NAME = "dense_bias"
-
 /**
  * Densely-connected (fully-connected) layer class.
  *
@@ -78,19 +75,13 @@ public class Dense(
         createDenseVariables(tf, kGraph)
     }
 
-    private fun defineKernelVariableName(): String =
-        if (name.isNotEmpty()) denseKernelVarName(name) else KERNEL_VARIABLE_NAME
-
-    private fun defineBiasVariableName(): String =
-        if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
-
     private fun createDenseVariables(tf: Ops, kGraph: KGraph) {
-        val kernelVariableName = defineKernelVariableName()
+        val kernelVariableName = denseKernelVarName(name)
         kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
         kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializer, kernelRegularizer)
 
         if (useBias) {
-            val biasVariableName = defineBiasVariableName()
+            val biasVariableName = denseBiasVarName(name)
             val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
             bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializer, biasRegularizer)
         }
@@ -117,8 +108,8 @@ public class Dense(
 
     private fun extractDenseWeights(): Map<String, Array<*>> {
         return extractWeights(
-            if (useBias) listOf(defineKernelVariableName(), defineBiasVariableName())
-            else listOf(defineKernelVariableName())
+            if (useBias) listOf(denseKernelVarName(name), denseBiasVarName(name))
+            else listOf(denseKernelVarName(name))
         )
     }
 
