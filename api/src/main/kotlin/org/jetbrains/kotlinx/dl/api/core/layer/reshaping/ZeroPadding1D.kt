@@ -33,8 +33,8 @@ public class ZeroPadding1D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding1D layer
-     * @param [padding] triple of padding values - [padding.first] represents padding on left side
-     * and [padding.second] is padding on right side
+     * @param [padding] triple of padding values - [Pair.first] represents padding on left side
+     * and [Pair.second] is padding on right side
      * @param [name] layer name
      */
     public constructor(

@@ -33,8 +33,8 @@ public class ZeroPadding3D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding3D layer
-     * @param [padding] triple of padding values - [padding.first] represents vertical padding (applied to top and
-     * bottom of image, and [padding.second] is horizontal padding (left and right sides), [padding.third] is depth padding
+     * @param [padding] triple of padding values - [Triple.first] represents vertical padding (applied to top and
+     * bottom of image, and [Triple.second] is horizontal padding (left and right sides), [Triple.third] is depth padding
      * @param [name] layer name
      */
     public constructor(
