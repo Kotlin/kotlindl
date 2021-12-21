@@ -17,6 +17,7 @@ import java.awt.*
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import javax.swing.JPanel
+import kotlin.math.log10
 import kotlin.math.log2
 import kotlin.math.max
 import kotlin.math.min
@@ -579,7 +580,7 @@ class DetectedObjectJPanel(
             graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8)
 
             graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(6f)
+            val stroke1: Stroke = BasicStroke(10f * it.probability)
             graphics.setColor(Color.RED)
             graphics.stroke = stroke1
             graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
