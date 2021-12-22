@@ -40,9 +40,9 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
         val rawPrediction = this.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = rawPrediction[0][0] as Array<FloatArray>
-        val classIndices = rawPrediction[1][0] as LongArray
-        val probabilities = rawPrediction[2][0] as FloatArray
+        val boxes = (rawPrediction["bboxes"] as Array<Array<FloatArray>>)[0]
+        val classIndices = (rawPrediction["labels"] as Array<LongArray>)[0]
+        val probabilities = (rawPrediction["scores"] as Array<FloatArray>)[0]
         val numberOfFoundObjects = boxes.size
 
         for (i in 0 until numberOfFoundObjects) {
@@ -80,7 +80,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
-                imageShape = ImageShape(224, 224, 3)
+                imageShape = ImageShape(null, null, 3)
             }
             transformImage {
                 resize {

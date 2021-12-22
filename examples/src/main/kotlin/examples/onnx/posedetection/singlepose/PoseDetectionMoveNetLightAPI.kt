@@ -22,7 +22,7 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing is applied to images before prediction.
  */
-fun easyPoseDetectionMoveNet() {
+fun poseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
@@ -69,5 +69,5 @@ private fun visualise(
 }
 
 /** */
-fun main(): Unit = easyPoseDetectionMoveNet()
+fun main(): Unit = poseDetectionMoveNetLightAPI()
 

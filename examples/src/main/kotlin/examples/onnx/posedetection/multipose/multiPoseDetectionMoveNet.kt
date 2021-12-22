@@ -46,8 +46,8 @@ fun multiPoseDetectionMoveNet() {
 
         val inputData = modelType.preprocessInput(preprocessing)
         val yhat = it.predictRaw(inputData)
-        println(yhat.toTypedArray().contentDeepToString())
-        visualisePoseLandmarks(imageFile, (yhat  as List<Array<Array<FloatArray>>>)[0][0])
+        println(yhat.values.toTypedArray().contentDeepToString())
+        visualisePoseLandmarks(imageFile, (yhat["output_0"]  as Array<Array<FloatArray>>)[0])
     }
 }
 

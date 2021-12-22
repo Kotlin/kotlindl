@@ -2,7 +2,7 @@
  * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
-package examples.onnx.cv.custom.efficientnet
+package examples.onnx.cv.efficicentnet.lightAPI
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
@@ -15,11 +15,11 @@ import java.io.File
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
  */
-fun efficientNetB0EasyPrediction() {
+fun efficientNetB7LightAPIPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = ONNXModels.CV.EfficientNetB0().pretrainedModel(modelHub)
+    val model = ONNXModels.CV.EfficientNetB7().pretrainedModel(modelHub)
 
     model.use {
         for (i in 1..8) {
@@ -35,4 +35,4 @@ fun efficientNetB0EasyPrediction() {
 }
 
 /** */
-fun main(): Unit = efficientNetB0EasyPrediction()
+fun main(): Unit = efficientNetB7LightAPIPrediction()

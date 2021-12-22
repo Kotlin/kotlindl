@@ -20,7 +20,7 @@ import java.lang.Float.min
 public class SinglePoseDetectionModel : OnnxInferenceModel() {
     public fun detectPose(inputData: FloatArray): DetectedPose {
         val rawPrediction = this.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
+        val rawPoseLandMarks = (rawPrediction["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
 
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()
         for (i in rawPoseLandMarks.indices) {

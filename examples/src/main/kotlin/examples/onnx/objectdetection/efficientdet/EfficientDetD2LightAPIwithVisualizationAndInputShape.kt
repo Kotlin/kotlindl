@@ -37,33 +37,4 @@ fun main() {
     }
 }
 
-private fun visualise(
-    imageFile: File,
-    detectedObjects: List<DetectedObject>,
-    inputShape: LongArray
-) {
-    val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(null, null, 3)
-        }
-        transformImage {
-            resize {
-                outputWidth = inputShape[1].toInt()
-                outputHeight = inputShape[2].toInt()
-            }
-            convert { colorMode = ColorMode.BGR }
-        }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
-        }
-    }
-
-    val rawImage = preprocessing().first
-
-    drawDetectedObjects(rawImage, ImageShape(inputShape[1], inputShape[2], 3), detectedObjects)
-}
-
 

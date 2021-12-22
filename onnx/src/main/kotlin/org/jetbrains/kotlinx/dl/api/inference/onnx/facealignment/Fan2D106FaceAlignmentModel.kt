@@ -70,7 +70,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         val yhat = internalModel.predictRaw(inputData)
 
         val landMarks = mutableListOf<Landmark>()
-        val floats = yhat[0][0] as FloatArray
+        val floats = (yhat["fc1"] as Array<*>)[0] as FloatArray
         for (i in floats.indices step 2) {
             landMarks.add(Landmark(floats[i], floats[i + 1]))
         }

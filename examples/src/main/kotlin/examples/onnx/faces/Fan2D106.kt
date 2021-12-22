@@ -49,7 +49,7 @@ fun main() {
             val inputData = modelType.preprocessInput(preprocessing)
 
             val yhat = it.predictRaw(inputData)
-            println(yhat.toTypedArray().contentDeepToString())
+            println(yhat.values.toTypedArray().contentDeepToString())
 
             visualiseLandMarks(imageFile, yhat)
         }
@@ -58,7 +58,7 @@ fun main() {
 
 fun visualiseLandMarks(
     imageFile: File,
-    landmarks: List<Array<*>>
+    landmarks: Map<String, Any>
 ) {
     val preprocessing: Preprocessing = preprocess {
         load {

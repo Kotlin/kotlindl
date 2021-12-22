@@ -36,7 +36,7 @@ fun main() {
     }
 }
 
-private fun visualise(
+internal fun visualise(
     imageFile: File,
     detectedObjects: List<DetectedObject>,
     inputShape: LongArray

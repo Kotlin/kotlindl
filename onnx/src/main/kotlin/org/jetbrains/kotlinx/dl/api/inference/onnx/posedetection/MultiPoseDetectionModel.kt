@@ -20,7 +20,7 @@ import java.io.File
 public class MultiPoseDetectionModel : OnnxInferenceModel() {
     public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
         val rawPrediction = this.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction as List<Array<Array<FloatArray>>>)[0][0]
+        val rawPoseLandMarks = (rawPrediction["output_0"] as Array<Array<FloatArray>>)[0]
 
         val result = MultiPoseDetectionResult(mutableListOf())
 

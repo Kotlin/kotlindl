@@ -47,9 +47,9 @@ fun poseDetectionMoveNet() {
         val inputData = modelType.preprocessInput(preprocessing)
 
         val yhat = it.predictRaw(inputData)
-        println(yhat.toTypedArray().contentDeepToString())
+        println(yhat.values.toTypedArray().contentDeepToString())
 
-        val rawPoseLandMarks = (yhat as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
+        val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
 
         // Dictionary that maps from joint names to keypoint indices.
         val keypoints = mapOf(

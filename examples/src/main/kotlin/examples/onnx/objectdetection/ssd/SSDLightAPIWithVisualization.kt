@@ -30,7 +30,7 @@ fun main() {
     model.use { detectionModel ->
         println(detectionModel)
 
-        val imageFile = getFileFromResource("datasets/detection/image3.jpg")
+        val imageFile = getFileFromResource("datasets/detection/image2.jpg")
         val detectedObjects =
             detectionModel.detectObjects(imageFile = imageFile, topK = 20)
 

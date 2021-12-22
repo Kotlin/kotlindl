@@ -8,7 +8,6 @@ package examples.onnx.objectdetection.efficientdet
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
@@ -22,7 +21,7 @@ fun main() {
     model.use {
         println(it)
 
-        for (i in 0..9) {
+        for (i in 1..6) {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = getFileFromResource("datasets/detection/image$i.jpg")
@@ -40,7 +39,7 @@ fun main() {
             val inputData = modelType.preprocessInput(preprocessing)
 
             val yhat = it.predictRaw(inputData)
-            println(yhat.toTypedArray().contentDeepToString())
+            println(yhat.values.toTypedArray().contentDeepToString())
         }
     }
 }

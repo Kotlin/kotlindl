@@ -27,7 +27,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
     public fun detectObjects(inputData: FloatArray): List<DetectedObject> {
         val rawPrediction = this.predictRaw(inputData)
         val foundObjects = mutableListOf<DetectedObject>()
-        val items = rawPrediction[0][0] as Array<FloatArray>
+        val items = (rawPrediction["detections:0"] as Array<Array<FloatArray>>)[0]
 
         for (i in items.indices) {
             val probability = items[i][5]

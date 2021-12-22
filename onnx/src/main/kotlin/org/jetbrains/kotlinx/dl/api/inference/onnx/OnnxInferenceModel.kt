@@ -79,6 +79,7 @@ public open class OnnxInferenceModel : InferenceModel() {
             }
             model.inputDataType = inputTensorInfo.type
 
+            // TODO: known bug at the https://github.com/JetBrains/KotlinDL/issues/285
             val outputTensorInfo = model.session.outputInfo.toList()[0].second.info as TensorInfo
 
             if (!model::outputShape.isInitialized) {
@@ -147,23 +148,23 @@ public open class OnnxInferenceModel : InferenceModel() {
      * NOTE: This operation can be quite slow for high dimensional tensors,
      * you should prefer [predictRawWithShapes] in this case.
      */
-    public fun predictRaw(inputData: FloatArray): List<Array<*>> {
+    public fun predictRaw(inputData: FloatArray): Map<String, Any> {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 
         val inputTensor = createInputTensor(inputData)
 
         val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
-        val result = mutableListOf<Array<*>>()
+        val result = mutableMapOf<String, Any>()
 
         output.forEach {
-            result.add(it.value.value as Array<*>) // TODO: could be a FloatArray (need to parse output types correctly
+            result[it.key] = it.value.value
         }
 
         output.close()
         inputTensor.close()
 
-        return result.toList()
+        return result.toMap()
     }
 
     // TODO: refactor predictRaw and predictRawWithShapes to extract the common functionality
@@ -171,6 +172,8 @@ public open class OnnxInferenceModel : InferenceModel() {
     /**
      *  Returns list of pairs <data; shape> from model outputs.
      */
+    // TODO: add tests for many available models
+    // TODO: return map
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
         require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
 

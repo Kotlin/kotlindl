@@ -8,13 +8,11 @@ package examples.onnx.posedetection.multipose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedPose
 import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
 import java.io.File
 
@@ -24,7 +22,7 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing is applied to images before prediction.
  */
-fun easyMultiPoseDetectionMoveNet() {
+fun multiPoseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
@@ -72,5 +70,5 @@ private fun visualise(
 }
 
 /** */
-fun main(): Unit = easyMultiPoseDetectionMoveNet()
+fun main(): Unit = multiPoseDetectionMoveNetLightAPI()
 

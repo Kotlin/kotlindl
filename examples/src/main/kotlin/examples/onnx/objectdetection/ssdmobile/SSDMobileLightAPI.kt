@@ -38,7 +38,7 @@ fun main() {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        //visualise(imageFile, detectedObjects)
+        visualise(imageFile, detectedObjects)
     }
 }
 

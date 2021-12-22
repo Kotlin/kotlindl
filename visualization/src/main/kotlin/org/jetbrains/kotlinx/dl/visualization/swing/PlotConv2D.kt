@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.visualization.swing
 
-import org.apache.xpath.operations.Mult
 import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
@@ -17,8 +16,6 @@ import java.awt.*
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import javax.swing.JPanel
-import kotlin.math.log10
-import kotlin.math.log2
 import kotlin.math.max
 import kotlin.math.min
 
@@ -230,7 +227,7 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
     frame.isResizable = false
 }
 
-fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Array<*>>) {
+fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: Map<String, Any>) {
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(RawLandMarksJPanel(dst, imageShape, landmarks))
@@ -481,14 +478,14 @@ class RawPosePointsJPanel(
     }
 }
 
-class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Array<*>>) :
+class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: Map<String, Any>) :
     JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
         val tempLandMarks = mutableListOf<Pair<Float, Float>>()
-        val floats = landmarks[0][0] as FloatArray
+        val floats = (landmarks.values.toTypedArray()[0] as Array<FloatArray>)[0]
         for (i in floats.indices step 2) {
             tempLandMarks.add(Pair(floats[i], floats[i + 1]))
         }

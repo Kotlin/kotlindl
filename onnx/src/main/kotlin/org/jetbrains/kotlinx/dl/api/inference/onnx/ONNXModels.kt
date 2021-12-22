@@ -274,12 +274,6 @@ public object ONNXModels {
             ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
-                /*return preprocessInput(
-                    data,
-                    tensorShape,
-                    inputType = InputType.TORCH,
-                    channelsLast = true
-                )*/
             }
 
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {

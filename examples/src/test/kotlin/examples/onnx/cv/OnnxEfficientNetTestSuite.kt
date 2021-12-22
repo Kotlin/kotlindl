@@ -5,8 +5,10 @@
 
 package examples.onnx.cv
 
-import examples.onnx.cv.custom.efficientnet.*
-import examples.onnx.cv.resnet.resnet18easyPrediction
+import examples.onnx.cv.efficicentnet.efficientNetB0Prediction
+import examples.onnx.cv.efficicentnet.lightAPI.efficientNetB0EasyPrediction
+import examples.onnx.cv.efficicentnet.lightAPI.efficientNetB7LightAPIPrediction
+import examples.onnx.cv.efficicentnet.notop.efficientNetB0AdditionalTraining
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
@@ -98,7 +100,7 @@ class OnnxEfficientNetTestSuite {
 
     @Test
     fun efficientNetB7EasyPredictionTest() {
-        efficientNetB7EasyPrediction()
+        efficientNetB7LightAPIPrediction()
     }
 }
 
