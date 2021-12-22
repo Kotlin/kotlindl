@@ -148,9 +148,9 @@ class PoseDetectionTestSuite {
 
             val inputData = modelType.preprocessInput(preprocessing)
             val yhat = inferenceModel.predictRaw(inputData)
-            println(yhat.toTypedArray().contentDeepToString())
+            println(yhat.values.toTypedArray().contentDeepToString())
 
-            val rawPosesLandMarks = (yhat as List<Array<Array<FloatArray>>>)[0][0]
+            val rawPosesLandMarks = (yhat["output_0"] as Array<Array<FloatArray>>)[0]
 
             assertEquals(6, rawPosesLandMarks.size)
             rawPosesLandMarks.forEach {

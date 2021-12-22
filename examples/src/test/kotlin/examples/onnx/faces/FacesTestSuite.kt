@@ -57,7 +57,7 @@ class FacesTestSuite {
                 val inputData = modelType.preprocessInput(preprocessing)
 
                 val yhat = it.predictRaw(inputData)
-                assertEquals(212, (yhat[0][0] as FloatArray).size)
+                assertEquals(212, (yhat.values.toTypedArray()[0] as Array<FloatArray>)[0].size)
             }
         }
     }
