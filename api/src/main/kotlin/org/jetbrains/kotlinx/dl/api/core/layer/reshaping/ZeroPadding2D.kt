@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -41,8 +41,8 @@ public class ZeroPadding2D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding2D layer
-     * @param [padding] pair of padding values - [padding.first] represents vertical padding (applied to top and
-     * bottom of image, and [padding.last] is horizontal padding (left and right sides)
+     * @param [padding] pair of padding values - [Pair.first] represents vertical padding (applied to top and
+     * bottom of image, and [Pair.second] is horizontal padding (left and right sides)
      * @param [dataFormat] one of [CHANNELS_FIRST]
      * or [CHANNELS_LAST], depending on dataFormat of
      * input to this layer

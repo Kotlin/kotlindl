@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -131,7 +131,7 @@ public class TrainingHistory {
     }
 
     /**
-     * Returns all values of one filed in [EpochTrainingEvent] for all epochs. All [EpochTrainingEvent.metricValue] for example.
+     * Returns all values of one filed in [EpochTrainingEvent] for all epochs. All [EpochTrainingEvent.metricValues] for example.
      */
     public operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
         val result = DoubleArray(_epochHistory.size)
@@ -145,7 +145,7 @@ public class TrainingHistory {
 /**
  * One record in [TrainingHistory] objects containing tracked data from one batch in the specific epoch.
  *
- * @constructor Creates [BatchTrainingEvent] from [epochIndex], [batchIndex], [lossValue], [metricValue].
+ * @constructor Creates [BatchTrainingEvent] from [epochIndex], [batchIndex], [lossValue], [metricValues].
  * @param epochIndex Batch index.
  * @param batchIndex Batch index.
  * @param lossValue Final value of loss function.
