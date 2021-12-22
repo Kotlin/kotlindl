@@ -17,6 +17,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 import java.lang.Float.min
 
+/**
+ * SinglePoseDetectionModel is an ultra-fast and accurate model that detects 17 keypoints and 18 basic edges of a body.
+ *
+ * It internally uses [ONNXModels.PoseEstimation.MoveNetSinglePoseLighting]
+ * or [ONNXModels.PoseEstimation.MoveNetSinglePoseThunder] under the hood to make predictions.
+ */
 public class SinglePoseDetectionModel : OnnxInferenceModel() {
     public fun detectPose(inputData: FloatArray): DetectedPose {
         val rawPrediction = this.predictRaw(inputData)
@@ -85,8 +91,10 @@ internal fun buildPoseEdges(foundPoseLandmarks: MutableList<PoseLandmark>): Muta
     return foundPoseEdges
 }
 
-// Dictionary that maps from joint names to keypoint indices.
-internal val keyPoints = mapOf(
+/**
+ * Dictionary that maps from joint names to keypoint indices.
+ */
+public val keyPoints: Map<Int, String> = mapOf(
     0 to "nose",
     1 to "left_eye",
     2 to "right_eye",
@@ -106,7 +114,10 @@ internal val keyPoints = mapOf(
     16 to "right_ankle"
 )
 
-internal val edgeKeyPointsPairs = listOf(
+/**
+ * Pair of points which define body edges.
+ */
+public val edgeKeyPointsPairs: List<Pair<Int, Int>> = listOf(
     Pair(0, 1),
     Pair(0, 2),
     Pair(1, 3),

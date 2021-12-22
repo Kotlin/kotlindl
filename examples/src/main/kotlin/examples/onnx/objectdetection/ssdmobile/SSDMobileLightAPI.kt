@@ -49,12 +49,12 @@ private fun visualise(
     val preprocessing: Preprocessing = preprocess {
         load {
             pathToData = imageFile
-            imageShape = ImageShape(224, 224, 3)
+            imageShape = ImageShape(null, null, 3)
         }
         transformImage {
             resize {
-                outputWidth = 1200
-                outputHeight = 1200
+                outputWidth = 1000
+                outputHeight = 1000
             }
             convert { colorMode = ColorMode.BGR }
         }
@@ -67,6 +67,6 @@ private fun visualise(
 
     val rawImage = preprocessing().first
 
-    drawDetectedObjects(rawImage, ImageShape(1200, 1200, 3), detectedObjects)
+    drawDetectedObjects(rawImage, ImageShape(1000, 1000, 3), detectedObjects)
 }
 

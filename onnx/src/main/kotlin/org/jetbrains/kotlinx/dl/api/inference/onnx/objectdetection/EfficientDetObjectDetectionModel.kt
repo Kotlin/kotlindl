@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
+import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
@@ -14,12 +15,17 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
-// TODO: add KDocs
+/**
+ * Special model class for detection objects on images
+ * with built-in preprocessing and post-processing.
+ *
+ * It internally uses [ONNXModels.ObjectDetection.EfficientDetD0] or other EfficientDet models trained on the COCO dataset.
+ *
+ * @since 0.4
+ */
 public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
     /**
      * Returns the detected object for the given image file sorted by the score.
-     *
-     * NOTE: this method doesn't include the SSD - related preprocessing.
      *
      * @param [inputData] Preprocessed data from the image file.
      * @return List of [DetectedObject] sorted by score.

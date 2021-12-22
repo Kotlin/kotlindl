@@ -16,7 +16,14 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 import java.nio.IntBuffer
 
-// TODO: refactor and merge with SSDObjectDetectionModel
+/**
+ * Special model class for detection objects on images
+ * with built-in preprocessing and post-processing.
+ *
+ * It internally uses [ONNXModels.ObjectDetection.SSDMobileNetV1] model trained on the COCO dataset.
+ *
+ * @since 0.4
+ */
 public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
     /**
      * Returns the top N detected object for the given image file sorted by the score.
@@ -36,16 +43,15 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
         val probabilities = (rawPrediction["detection_scores:0"] as Array<FloatArray>)[0]
         val numberOfFoundObjects = (rawPrediction["num_detections:0"] as FloatArray)[0].toInt()
 
-        // TODO: fix coordinates according spec
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
                 classLabel = cocoCategories[classIndices[i].toInt()]!!,
                 probability = probabilities[i],
-                // left, bot, right, top
-                xMin = boxes[i][0],
-                yMin = boxes[i][1],
-                xMax = boxes[i][2],
-                yMax = boxes[i][3]
+                // top, left, bottom, right
+                yMin = boxes[i][0],
+                xMin = boxes[i][1],
+                yMax = boxes[i][2],
+                xMax = boxes[i][3]
             )
             foundObjects.add(detectedObject)
         }

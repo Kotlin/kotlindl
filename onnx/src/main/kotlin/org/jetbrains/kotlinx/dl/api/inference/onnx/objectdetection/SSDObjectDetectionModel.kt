@@ -22,9 +22,6 @@ import java.io.File
  * It internally uses SSD model trained on the COCO dataset.
  *
  * @since 0.3
- *
- * @see <a href="https://arxiv.org/abs/1512.02325">
- *     SSD: Single Shot MultiBox Detector.</a>
  */
 public class SSDObjectDetectionModel : OnnxInferenceModel() {
     /**

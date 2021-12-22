@@ -17,6 +17,11 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
 
+/**
+ * MultiPoseDetectionModel is an ultra-fast and accurate model that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
+ *
+ * It internally uses [ONNXModels.PoseEstimation.MoveNetMultiPoseLighting] under the hood to make predictions.
+ */
 public class MultiPoseDetectionModel : OnnxInferenceModel() {
     public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
         val rawPrediction = this.predictRaw(inputData)
