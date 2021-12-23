@@ -14,18 +14,19 @@ import java.nio.FloatBuffer
 
 internal class MergeLayerTest {
 
-    private fun getInputOp(tf:Ops, input:Array<*>): List<Operand<Float>> =
-        input.map { tf.constant(input.shape.toLongArray(), FloatBuffer.wrap(input.flattenFloats())) }
+    private fun getInputOp(tf:Ops, input:Array<*>): Operand<Float> =
+        tf.constant(input.shape.toLongArray(), FloatBuffer.wrap(input.flattenFloats()))
 
     private fun getLayerOutputOp(
         tf: Ops,
         layer: AbstractMerge,
-        input: Array<*>,
+        input: List<Array<*>>,
         kGraph: KGraph,
     ): Output<*> {
-        val inputShape = input.shape
+        val inputShape = input.first().shape
         layer.build(tf, kGraph, inputShape)
-        val inputOp = getInputOp(tf, input)
+        val inputOp = mutableListOf<Operand<Float>>()
+        input.forEach { inputOp.add(getInputOp(tf,it)) }
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
         val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
@@ -34,7 +35,7 @@ internal class MergeLayerTest {
 
     private fun runLayerInEagerMode(
         layer: AbstractMerge,
-        input: Array<*>,
+        input: List<Array<*>>,
     ): Tensor<*> {
         EagerSession.create().use {
             val tf = Ops.create()
@@ -46,7 +47,7 @@ internal class MergeLayerTest {
 
     protected fun assertLayerOutputIsCorrect(
         layer:AbstractMerge,
-        input: Array<*>,
+        input: List<Array<*>>,
         expectedOutput: Array<*>,
     ) {
         val output = runLayerInEagerMode(layer,input)
@@ -63,19 +64,19 @@ internal class MergeLayerTest {
 
     @Test
     fun add() {
-        val x1 = FloatArray(10) { it.toFloat() }
-        val x2 = FloatArray(10) { it.toFloat() }
-        val input = arrayOf(x1, x2)
-        val expected = Array(2) { FloatArray(10) { 2*it.toFloat() } }
+        val x1 = Array(1){ FloatArray(10) { it.toFloat() } }
+        val x2 = Array(1){ FloatArray(10) { it.toFloat() } }
+        val input = listOf(x1, x2)
+        val expected = Array(1) { FloatArray(10) { 2 * it.toFloat() } }
         assertLayerOutputIsCorrect(Add(), input, expected)
     }
 
     @Test
     fun subtract() {
-        val x1 = FloatArray(10) { it.toFloat() }
-        val x2 = FloatArray(10) { it.toFloat() }
-        val input = arrayOf(x1, x2)
-        val expected = Array(2) { FloatArray(10) { 0f } }
+        val x1 = Array(1){ FloatArray(10) { it.toFloat() } }
+        val x2 = Array(1){ FloatArray(10) { it.toFloat() } }
+        val input = listOf(x1, x2)
+        val expected = Array(1) { FloatArray(10) { 0f } }
         assertLayerOutputIsCorrect(Subtract(), input, expected)
     }
 
@@ -83,8 +84,8 @@ internal class MergeLayerTest {
     fun average() {
         val x1 =  Array(2) { FloatArray(2) { 0f } }
         val x2 = Array(2){ FloatArray(2) { 1f } }
-        val input = arrayOf(x1,x2)
-        val expected = Array(2){ Array(2) { FloatArray(2) { 0.5f } } }
+        val input = listOf(x1, x2)
+        val expected = Array(2) { FloatArray(2) { 0.5f } }
         assertLayerOutputIsCorrect(Average(), input, expected)
     }
 
@@ -92,19 +93,31 @@ internal class MergeLayerTest {
     fun concat(){}
 
     @Test
-    fun maximum(){}
+    fun maximum(){
+        val x1 =  Array(5) { FloatArray(1) { it.toFloat() } }
+        val x2 = Array(5){ FloatArray(1) { it.toFloat()+5 } }
+        val input = listOf(x1, x2)
+        val expected = Array(5) { FloatArray(1) { it.toFloat()+5 } }
+        assertLayerOutputIsCorrect(Maximum(), input, expected)
+    }
 
     @Test
     fun minimum(){
         val x1 =  Array(5) { FloatArray(1) { it.toFloat() } }
         val x2 = Array(5){ FloatArray(1) { it.toFloat()+5 } }
-        val input = arrayOf(x1, x2)
-        val expected = Array(2){ Array(5) { FloatArray(1) { it.toFloat() } } }
+        val input = listOf(x1, x2)
+        val expected = Array(5) { FloatArray(1) { it.toFloat() } }
         assertLayerOutputIsCorrect(Minimum(), input, expected)
     }
 
     @Test
-    fun multiply(){}
+    fun multiply(){
+        val x1 =  Array(2) { FloatArray(2) { 0f } }
+        val x2 = Array(2){ FloatArray(2) { 1f } }
+        val input = listOf(x1, x2)
+        val expected = Array(2) { FloatArray(2) { 0f } }
+        assertLayerOutputIsCorrect(Multiply(), input, expected)
+    }
 
     @Test
     fun dot(){
@@ -118,7 +131,7 @@ internal class MergeLayerTest {
             )
         )
         val y = arrayOf(arrayOf(floatArrayOf(10f, 11f, 12f, 14f, 15f), floatArrayOf(15f, 16f, 17f, 18f, 19f)))
-        val input = arrayOf(x, y)
+        val input = listOf(x, y)
         val expected = arrayOf(arrayOf(floatArrayOf(260f, 360f), floatArrayOf(320f, 445f)))
         assertLayerOutputIsCorrect(Dot(axis = intArrayOf(1, 2)), input, expected)
     }
