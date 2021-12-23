@@ -86,7 +86,7 @@ class PoseDetectionTestSuite {
 
             val yhat = it.predictRaw(inputData)
 
-            val rawPoseLandMarks = (yhat as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
+            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -118,7 +118,7 @@ class PoseDetectionTestSuite {
 
             val yhat = it.predictRaw(inputData)
 
-            val rawPoseLandMarks = (yhat as List<Array<Array<Array<FloatArray>>>>)[0][0][0]
+            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
 
             assertEquals(17, rawPoseLandMarks.size)
         }
