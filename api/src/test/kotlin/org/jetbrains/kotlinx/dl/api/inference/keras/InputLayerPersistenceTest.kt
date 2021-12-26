@@ -1,3 +1,8 @@
+/*
+ * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
@@ -5,25 +10,11 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.dsl.functional
 import org.jetbrains.kotlinx.dl.api.core.dsl.sequential
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
+import org.jetbrains.kotlinx.dl.api.inference.keras.ConvTransposePersistenceTest.Companion.testFunctionalModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.ConvTransposePersistenceTest.Companion.testSequentialModel
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class InputLayerPersistenceTest {
-    private lateinit var tempFile: File
-
-    @BeforeEach
-    fun createTempFile() {
-        tempFile = File.createTempFile("model", ".json")
-    }
-
-    @AfterEach
-    fun deleteTempFile() {
-        tempFile.delete()
-    }
-
     @Test
     fun inputLayerSequential() {
         testSequentialModel(Sequential.of(Input(4)))
@@ -102,17 +93,5 @@ class InputLayerPersistenceTest {
                 }
             }
         )
-    }
-
-    private fun testSequentialModel(originalModel: Sequential) {
-        originalModel.saveModelConfiguration(tempFile)
-        val restoredModel = Sequential.loadModelConfiguration(tempFile)
-        assertTrue(originalModel.inputDimensions.contentEquals(restoredModel.inputDimensions))
-    }
-
-    private fun testFunctionalModel(originalModel: Functional) {
-        originalModel.saveModelConfiguration(tempFile)
-        val restoredModel = Functional.loadModelConfiguration(tempFile)
-        assertTrue(originalModel.inputDimensions.contentEquals(restoredModel.inputDimensions))
     }
 }
