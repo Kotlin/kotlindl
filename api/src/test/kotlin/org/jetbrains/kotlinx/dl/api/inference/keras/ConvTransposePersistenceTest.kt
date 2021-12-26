@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
-import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
@@ -15,17 +13,13 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2DTranspose
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv3DTranspose
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.loss.Losses
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class ConvTransposePersistenceTest {
     @Test
     fun conv1DTranspose() {
-        testSequentialModel(
+        LayerPersistenceTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3)),
                 Conv1DTranspose(
@@ -48,7 +42,7 @@ class ConvTransposePersistenceTest {
 
     @Test
     fun conv2DTranspose() {
-        testSequentialModel(
+        LayerPersistenceTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3, 3)),
                 Conv2DTranspose(
@@ -71,7 +65,7 @@ class ConvTransposePersistenceTest {
 
     @Test
     fun conv3DTranspose() {
-        testSequentialModel(
+        LayerPersistenceTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3, 3, 3)),
                 Conv3DTranspose(
@@ -89,27 +83,5 @@ class ConvTransposePersistenceTest {
                 )
             )
         )
-    }
-
-    companion object {
-        internal fun testSequentialModel(originalModel: Sequential) {
-            val kerasModel = originalModel.serializeModel(false)
-            val restoredModel = deserializeSequentialModel(kerasModel)
-            assertSameModel(originalModel, restoredModel)
-        }
-
-        internal fun testFunctionalModel(originalModel: Functional) {
-            val kerasModel = originalModel.serializeModel(false)
-            val restoredModel = deserializeFunctionalModel(kerasModel)
-            assertSameModel(originalModel, restoredModel)
-        }
-
-        internal fun assertSameModel(expectedModel: GraphTrainableModel, actualModel: GraphTrainableModel) {
-            listOf(expectedModel, actualModel).forEach {
-                it.compile(Adam(), Losses.MSE, Metrics.ACCURACY)
-            }
-            Assertions.assertEquals(expectedModel.layers.joinToString("\n") { it.toString() },
-                                    actualModel.layers.joinToString("\n") { it.toString() })
-        }
     }
 }

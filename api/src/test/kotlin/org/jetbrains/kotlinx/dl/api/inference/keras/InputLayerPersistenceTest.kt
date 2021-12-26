@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,51 +10,49 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.dsl.functional
 import org.jetbrains.kotlinx.dl.api.core.dsl.sequential
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.inference.keras.ConvTransposePersistenceTest.Companion.testFunctionalModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.ConvTransposePersistenceTest.Companion.testSequentialModel
 import org.junit.jupiter.api.Test
 
 class InputLayerPersistenceTest {
     @Test
     fun inputLayerSequential() {
-        testSequentialModel(Sequential.of(Input(4)))
-        testSequentialModel(Sequential.of(Input(128, 128)))
-        testSequentialModel(Sequential.of(Input(128, 128, 3)))
-        testSequentialModel(Sequential.of(Input(10, 10, 10, 10)))
+        LayerPersistenceTest.run(Sequential.of(Input(4)))
+        LayerPersistenceTest.run(Sequential.of(Input(128, 128)))
+        LayerPersistenceTest.run(Sequential.of(Input(128, 128, 3)))
+        LayerPersistenceTest.run(Sequential.of(Input(10, 10, 10, 10)))
     }
 
     @Test
     fun inputLayerFunctional() {
-        testFunctionalModel(Functional.of(Input(10)))
-        testFunctionalModel(Functional.of(Input(128, 128)))
-        testFunctionalModel(Functional.of(Input(128, 128, 3)))
-        testFunctionalModel(Functional.of(Input(10, 10, 10, 10)))
+        LayerPersistenceTest.run(Functional.of(Input(10)))
+        LayerPersistenceTest.run(Functional.of(Input(128, 128)))
+        LayerPersistenceTest.run(Functional.of(Input(128, 128, 3)))
+        LayerPersistenceTest.run(Functional.of(Input(10, 10, 10, 10)))
     }
 
     @Test
     fun dslBuilderSequential() {
-        testSequentialModel(
+        LayerPersistenceTest.run(
             sequential {
                 layers {
                     +Input(4)
                 }
             }
         )
-        testSequentialModel(
+        LayerPersistenceTest.run(
             sequential {
                 layers {
                     +Input(128, 128)
                 }
             }
         )
-        testSequentialModel(
+        LayerPersistenceTest.run(
             sequential {
                 layers {
                     +Input(128, 128, 3)
                 }
             }
         )
-        testSequentialModel(
+        LayerPersistenceTest.run(
             sequential {
                 layers {
                     +Input(10, 10, 10, 10)
@@ -65,28 +63,28 @@ class InputLayerPersistenceTest {
 
     @Test
     fun dslBuilderFunctional() {
-        testFunctionalModel(
+        LayerPersistenceTest.run(
             functional {
                 layers {
                     +Input(4)
                 }
             }
         )
-        testFunctionalModel(
+        LayerPersistenceTest.run(
             functional {
                 layers {
                     +Input(128, 128)
                 }
             }
         )
-        testFunctionalModel(
+        LayerPersistenceTest.run(
             functional {
                 layers {
                     +Input(128, 128, 3)
                 }
             }
         )
-        testFunctionalModel(
+        LayerPersistenceTest.run(
             functional {
                 layers {
                     +Input(10, 10, 10, 10)
