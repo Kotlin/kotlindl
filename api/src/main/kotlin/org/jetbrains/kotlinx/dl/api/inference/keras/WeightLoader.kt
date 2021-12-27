@@ -188,42 +188,58 @@ private fun fillLayerVariablesFromKeras(layerName: String,
 }
 
 private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
-    return mapOf(
-        Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray)),
-        Pair("bias:0", Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!))
+    val variables = mutableMapOf(
+        Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray))
     )
+    if (layer.useBias) {
+        variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!)
+    }
+    return variables
 }
 
 private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
-    return mapOf(
-        Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray)),
-        Pair("depthwise_bias:0", Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!))
+    val variables = mutableMapOf(
+        Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray))
     )
+    if (layer.useBias) {
+        variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
+    }
+    return variables
 }
 
 private fun getSeparableConv2DVariables(layer: SeparableConv2D): Map<String, Pair<String, LongArray>> {
-    return mapOf(
+    val variables = mutableMapOf(
         Pair("depthwise_kernel:0", Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray)),
-        Pair("pointwise_kernel:0", Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray)),
-        Pair("depthwise_bias:0", Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!))
+        Pair("pointwise_kernel:0", Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray))
     )
+    if (layer.useBias) {
+        variables["bias:0"] = Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
+    }
+    return variables
 }
 
 private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
-    return mapOf(
-        Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray)),
-        Pair("bias:0", Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!))
+    val variables = mutableMapOf(
+        Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray))
     )
+    if (layer.useBias) {
+        variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!)
+    }
+    return variables
 }
 
-// TODO: gamma and beta could be misssed due to batchNorm formula https://stackoverflow.com/questions/43813549/restoring-tensorflow-model-cannot-find-gamma-scale-for-batch-norm-layers-in-the
 private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
-    return mapOf(
-        Pair("gamma:0", Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)),
-        Pair("beta:0", Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)),
+    val variables = mutableMapOf(
         Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray)),
         Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray))
     )
+    if (layer.scale) {
+        variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)
+    }
+    if (layer.center) {
+        variables["beta:0"] = Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)
+    }
+    return variables
 }
 
 /**
