@@ -138,20 +138,12 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
     }
 }
 
-// TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
 private fun fillLayerWeights(
     layer: Layer,
     group: Group,
     model: GraphTrainableModel
 ) {
-    val variables = when (layer) {
-        is Dense -> getDenseVariables(layer)
-        is Conv2D -> getConv2DVariables(layer)
-        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
-        is SeparableConv2D -> getSeparableConv2DVariables(layer)
-        is BatchNorm -> getBatchNormVariables(layer)
-        else -> null
-    }
+    val variables = getLayerVariables(layer)
     if (variables == null) return
     fillLayerVariablesFromKeras(layer.name, variables, model, group)
     model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
@@ -324,17 +316,28 @@ private fun fillLayerWeights(
     model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
 }
 
+private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
+    val variables = getLayerVariableNames(layer)
+    if (variables == null) return
+    variables.forEach(model::runAssignOpByVarName)
+    model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
+}
 
+private fun getLayerVariableNames(layer: Layer): List<String>? {
+    return getLayerVariables(layer)?.map { (_, variable) -> variable.first }
+}
 
-private fun initLayerWeights(it: Layer, model: GraphTrainableModel) {
-    when (it) {
-        is Dense -> initDenseVariablesByDefaultInitializer(it.name, model)
-        is Conv2D -> initConv2DVariablesByDefaultInitializer(it.name, model)
-        is DepthwiseConv2D -> initDepthwiseConv2DVariablesByDefaultInitializer(it.name, model)
-        is SeparableConv2D -> initSeparableConv2DVariablesByDefaultInitializer(it.name, model)
-        is BatchNorm -> initBatchNormVariablesByDefaultInitializer(it.name, model)
+// TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
+private fun getLayerVariables(layer: Layer): Map<String, Pair<String, LongArray>>? {
+    val variables = when (layer) {
+        is Dense -> getDenseVariables(layer)
+        is Conv2D -> getConv2DVariables(layer)
+        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
+        is SeparableConv2D -> getSeparableConv2DVariables(layer)
+        is BatchNorm -> getBatchNormVariables(layer)
+        else -> null
     }
-    model.logger.debug { "${it.paramCount} parameters initialized for the layer ${it.name}." }
+    return variables
 }
 
 /**
@@ -356,48 +359,6 @@ public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
         if (!it.isTrainable) frozenLayers.add(it)
     }
     this.loadWeightsByPathTemplates(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
-}
-
-private fun initConv2DVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val kernelVariableName = convKernelVarName(name, dim = 2)
-    val biasVariableName = convBiasVarName(name, dim = 2)
-    model.runAssignOpByVarName(kernelVariableName)
-    model.runAssignOpByVarName(biasVariableName)
-}
-
-private fun initDepthwiseConv2DVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val kernelVariableName = depthwiseConv2dKernelVarName(name)
-    val biasVariableName = depthwiseConv2dBiasVarName(name)
-    model.runAssignOpByVarName(kernelVariableName)
-    model.runAssignOpByVarName(biasVariableName)
-}
-
-private fun initSeparableConv2DVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
-    val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
-    val biasVariableName = depthwiseConv2dBiasVarName(name)
-    model.runAssignOpByVarName(depthwiseKernelVariableName)
-    model.runAssignOpByVarName(pointwiseKernelVariableName)
-    model.runAssignOpByVarName(biasVariableName)
-}
-
-private fun initBatchNormVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val betaVariableName = batchNormBetaVarName(name)
-    val gammaVariableName = batchNormGammaVarName(name)
-    val movingMeanVariableName = batchNormMovingMeanVarName(name)
-    val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
-
-    model.runAssignOpByVarName(betaVariableName)
-    model.runAssignOpByVarName(gammaVariableName)
-    model.runAssignOpByVarName(movingMeanVariableName)
-    model.runAssignOpByVarName(movingVarianceVariableName)
-}
-
-private fun initDenseVariablesByDefaultInitializer(name: String, model: GraphTrainableModel) {
-    val kernelVariableName = denseKernelVarName(name)
-    val biasVariableName = denseBiasVarName(name)
-    model.runAssignOpByVarName(kernelVariableName)
-    model.runAssignOpByVarName(biasVariableName)
 }
 
 /**
