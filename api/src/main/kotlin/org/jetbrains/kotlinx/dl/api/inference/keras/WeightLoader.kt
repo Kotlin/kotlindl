@@ -24,26 +24,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVaria
  *
  * @param [hdfFile] File in hdf5 file format containing weights of the model.
  */
-public fun GraphTrainableModel.loadWeights(
-    hdfFile: HdfFile
-) {
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
-
-    when {
-        hdfFile.attributes.containsKey("layer_names") -> loadWeightsFromHdf5Group(hdfFile, this, null)
-        hdfFile.children.containsKey("model_weights") -> {
-            loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, null)
-        }
-        else -> {
-            logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
-        }
-    }
-
-    logger.info { "Weights are loaded." }
-    isModelInitialized = true
-}
+public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile): Unit = loadWeights(hdfFile, layers)
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
@@ -53,10 +34,7 @@ public fun GraphTrainableModel.loadWeights(
  * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
  * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
  */
-public fun GraphTrainableModel.loadWeights(
-    hdfFile: HdfFile,
-    layerList: MutableList<Layer>
-) {
+public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile, layerList: List<Layer>) {
     check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
     logger.info { "Starting weights loading.." }
@@ -92,7 +70,7 @@ public fun GraphTrainableModel.loadWeightsForFrozenLayers(
     loadWeights(hdfFile, frozenLayers)
 }
 
-private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: MutableList<Layer>?) {
+private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: List<Layer>) {
     if (group.getKerasVersion() == 1) {
         throw UnsupportedOperationException(
             "The weights loading from Keras 1.x is not supported by default!" +
@@ -100,17 +78,12 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
         )
     }
 
-    if (layerList != null) {
-        model.layers.forEach {
-            if (layerList.contains(it)) {
-                fillLayerWeights(it, group, model)
-            } else {
-                initLayerWeights(it, model)
-            }
-        }
-    } else {
-        model.layers.forEach {
+    val layersSet = layerList.toSet()
+    model.layers.forEach {
+        if (layersSet.contains(it)) {
             fillLayerWeights(it, group, model)
+        } else {
+            initLayerWeights(it, model)
         }
     }
 }
@@ -176,21 +149,7 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE, // TODO: doesnt' work for batchnorm/depthwise
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
-) {
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
-    layers.forEach {
-        fillLayerWeights(
-            it,
-            hdfFile,
-            LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-            this
-        ) // TODO: doesnt' work for batchnorm/depthwise
-    }
-    logger.info { "Weights are loaded." }
-    isModelInitialized = true
-}
+): Unit = loadWeightsByPathTemplates(hdfFile, layers, kernelDataPathTemplate, biasDataPathTemplate)
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
@@ -204,15 +163,16 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
  */
 public fun GraphTrainableModel.loadWeightsByPathTemplates(
     hdfFile: HdfFile,
-    layerList: MutableList<Layer>,
+    layerList: List<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
+    logger.info { "Starting weights loading..." }
+    val layerSet = layerList.toSet()
     layers.forEach {
-        if (layerList.contains(it)) {
+        if (layerSet.contains(it)) {
             fillLayerWeights(
                 it,
                 hdfFile,
@@ -290,43 +250,23 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE,
     forFrozenLayersOnly: Boolean = false // TODO: probably it should be a flag in all methods
 ) {
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
+    val layersToLoad = if (forFrozenLayersOnly) layers.filterNot(Layer::isTrainable) else layers
 
-    var layersToLoad = layers
-    var layersToInit = layers
-
-    if (forFrozenLayersOnly) {
-        layersToLoad = layersToLoad.filter { !it.isTrainable }
-        layersToInit = layersToInit.filter { it.isTrainable }
-        layersToInit.forEach {
-            initLayerWeights(it, this)
-        }
-    }
-
-    layersToLoad.forEach {
-        val initializedLayerName = it.name
-        val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
-        if (layerWeightPaths != null) {
-            fillLayerWeights(it, hdfFile, layerWeightPaths, this)
-        } else {
-            if (missedWeights == MissedWeightsStrategy.LOAD_CUSTOM_PATH) {
-                fillLayerWeights(
-                    it,
-                    hdfFile,
-                    null, // TODO: refactor = it doesn't work for batchnorm or depthwise
-                    this
-                )
-            } else {
-                logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
-                initLayerWeights(it, this)
+    val layersToWeightPaths = layersToLoad.mapNotNull { layer ->
+        val layerPaths = weightPaths.find { layer.name == it.layerName }
+        if (layerPaths == null && missedWeights == MissedWeightsStrategy.INITIALIZE) {
+            logger.warn {
+                "Layer weight paths for ${layer.name} are not found in 'weightPaths' object." +
+                        " Initialization is going to be done by default initializer."
             }
+            return@mapNotNull null
         }
-    }
+        layer to layerPaths
+        // TODO: refactor when weight path is not provided and strategy is not INITIALIZE it won't work for batchnorm or depthwise
+    }.toMap()
 
-    logger.info { "Weights are loaded." }
-    isModelInitialized = true // TODO: it should depend on what is happened with missed weights
+    loadWeightsByPaths(hdfFile, layersToWeightPaths)
+    // TODO: isModelInitialized should depend on what is happened with missed weights
 }
 
 /** This strategy defines the behaviour during weights' loading if the weights are not found in the h5 file by the standard Keras paths. */
@@ -350,21 +290,22 @@ public enum class MissedWeightsStrategy {
  */
 public fun GraphTrainableModel.loadWeightsByPaths(
     hdfFile: HdfFile,
-    layerList: MutableList<Layer>,
+    layerList: List<Layer>,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
+    // TODO: does not work for BatchNorm/Depthwise
+    val layerConvOrDensePaths = LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate)
+    loadWeightsByPaths(hdfFile, layerList.associateWith { layerConvOrDensePaths })
+}
+
+private fun GraphTrainableModel.loadWeightsByPaths(hdfFile: HdfFile, layersToWeightPaths: Map<Layer, LayerPaths?>) {
     check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
+    logger.info { "Starting weights loading..." }
     layers.forEach {
-        if (layerList.contains(it)) {
-            fillLayerWeights(
-                it,
-                hdfFile,
-                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-                this
-            ) // TODO: does not work for BatchNorm/Depthwise
+        if (layersToWeightPaths.contains(it)) {
+            fillLayerWeights(it, hdfFile, layersToWeightPaths[it], this)
         } else {
             initLayerWeights(it, this)
         }
