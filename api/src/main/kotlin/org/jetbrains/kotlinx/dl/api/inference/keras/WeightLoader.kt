@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import io.jhdf.HdfFile
 import io.jhdf.api.Group
+import io.jhdf.api.Node
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
@@ -139,255 +140,90 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
 
 // TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
 private fun fillLayerWeights(
-    it: Layer,
+    layer: Layer,
     group: Group,
     model: GraphTrainableModel
 ) {
-    when (it) {
-        is Dense -> fillDenseVariablesFromKeras(it.name, group, model)
-        is Conv2D -> fillConv2DVariablesFromKeras(it.name, group, model)
-        is DepthwiseConv2D -> fillDepthwiseConv2DVariablesFromKeras(it.name, group, model)
-        is SeparableConv2D -> fillSeparableConv2DVariablesFromKeras(it.name, group, model)
-        is BatchNorm -> fillBatchNormVariablesFromKeras(it.name, group, model)
+    val variables = when (layer) {
+        is Dense -> getDenseVariables(layer)
+        is Conv2D -> getConv2DVariables(layer)
+        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
+        is SeparableConv2D -> getSeparableConv2DVariables(layer)
+        is BatchNorm -> getBatchNormVariables(layer)
+        else -> null
     }
-    model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
+    if (variables == null) return
+    fillLayerVariablesFromKeras(layer.name, variables, model, group)
+    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
 
-private fun fillConv2DVariablesFromKeras(
-    layerName: String,
-    group: Group,
-    model: GraphTrainableModel
+private fun fillLayerVariablesFromKeras(layerName: String,
+                                        variables: Map<String, Pair<String, LongArray>>,
+                                        model: GraphTrainableModel,
+                                        group: Group
 ) {
-    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
-    val modelLayerNames = model.layers.map { e -> e.name }.toList()
-    val layerWeightsNode = group.children[layerName]
+    val layerWeightsNode = group.children[layerName] as? Group
     check(layerWeightsNode != null) {
-        "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
+        val availableLayerNames = group.children.values.map(Node::getName)
+        val modelLayerNames = model.layers.map(Layer::name)
+        "Weights for the loaded layer $layerName are not found in .h5 file! " +
                 "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
                 "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
     }
 
-    val firstLevelGroup: Group = layerWeightsNode as Group
-    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
-    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
+    val nameOfWeightSubGroup = layerWeightsNode.children.keys.first()
+    val dataNodes = (layerWeightsNode.children[nameOfWeightSubGroup] as Group).children
 
     dataNodes.values.map { it as DatasetBase }.forEach {
+        val (name, shape) = variables[it.name]
+            ?: throw IllegalArgumentException(
+                "Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!"
+            )
         val dims = it.dimensions
-        val data = it.data
-        when (it.name) {
-            "kernel:0" -> {
-                val kernelVariableName = convKernelVarName(layerName, dim = 2)
-                val kernelShape = (model.getLayer(layerName) as Conv2D).kernelShapeArray
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }
-            "bias:0" -> {
-                val biasVariableName = convBiasVarName(layerName, dim = 2)
-                val biasShape = (model.getLayer(layerName) as Conv2D).biasShapeArray!!
-                require(
-                    biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
-                model.fillVariable(biasVariableName, data)
-            }
-            else -> {
-                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
-            }
+        require(shape.map(Long::toInt).toIntArray().contentEquals(dims)) {
+            "$name variable shape in loaded data is ${dims.contentToString()}. Should be ${shape.contentToString()}"
         }
-
+        model.fillVariable(name, it.data)
     }
 }
 
-// TODO: copy-paste from the Conv2D method
-private fun fillDepthwiseConv2DVariablesFromKeras(
-    layerName: String,
-    group: Group,
-    model: GraphTrainableModel
-) {
-    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
-    val modelLayerNames = model.layers.map { e -> e.name }.toList()
-    val layerWeightsNode = group.children[layerName]
-    check(layerWeightsNode != null) {
-        "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
-    }
-
-    val firstLevelGroup: Group = layerWeightsNode as Group
-    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
-    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
-
-    dataNodes.values.map { it as DatasetBase }.forEach {
-        val dims = it.dimensions
-        val data = it.data
-        when (it.name) {
-            "depthwise_kernel:0" -> {
-                val kernelVariableName = depthwiseConv2dKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as DepthwiseConv2D).kernelShapeArray
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }
-            "depthwise_bias:0" -> {
-                val biasVariableName = depthwiseConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as DepthwiseConv2D).biasShapeArray!!
-                require(
-                    biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
-                model.fillVariable(biasVariableName, data)
-            }
-            else -> {
-                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
-            }
-        }
-
-    }
+private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
+    return mapOf(
+        Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray)),
+        Pair("bias:0", Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!))
+    )
 }
 
-private fun fillSeparableConv2DVariablesFromKeras(
-    layerName: String,
-    group: Group,
-    model: GraphTrainableModel
-) {
-    val availableLayerNames = group.children.map { (key) -> group.children[key]!!.name }.toList()
-    val modelLayerNames = model.layers.map { e -> e.name }.toList()
-    val layerWeightsNode = group.children[layerName]
-    check(layerWeightsNode != null) {
-        "Weights for the loaded Conv2D layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
-    }
-
-    val firstLevelGroup: Group = layerWeightsNode as Group
-    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
-    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
-
-    dataNodes.values.map { it as DatasetBase }.forEach {
-        val dims = it.dimensions
-        val data = it.data
-        when (it.name) {
-            "depthwise_kernel:0" -> {
-                val kernelVariableName = separableConv2dDepthwiseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as SeparableConv2D).depthwiseShapeArray
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }
-            "pointwise_kernel:0" -> {
-                val kernelVariableName = separableConv2dPointwiseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as SeparableConv2D).pointwiseShapeArray
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }
-            "depthwise_bias:0" -> {
-                val biasVariableName = separableConv2dBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as SeparableConv2D).biasShapeArray!!
-                require(
-                    biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
-                model.fillVariable(biasVariableName, data)
-            }
-            else -> {
-                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
-            }
-        }
-
-    }
+private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
+    return mapOf(
+        Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray)),
+        Pair("depthwise_bias:0", Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!))
+    )
 }
 
-private fun fillDenseVariablesFromKeras(
-    layerName: String,
-    group: Group,
-    model: GraphTrainableModel
-) {
-    val firstLevelGroup: Group = group.children[layerName] as Group
-    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
-    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
+private fun getSeparableConv2DVariables(layer: SeparableConv2D): Map<String, Pair<String, LongArray>> {
+    return mapOf(
+        Pair("depthwise_kernel:0", Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray)),
+        Pair("pointwise_kernel:0", Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray)),
+        Pair("depthwise_bias:0", Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!))
+    )
+}
 
-    dataNodes.values.map { it as DatasetBase }.forEach {
-        val dims = it.dimensions
-        val data = it.data
-        when (it.name) {
-            "kernel:0" -> {
-                val kernelVariableName = denseKernelVarName(layerName)
-                val kernelShape = (model.getLayer(layerName) as Dense).kernelShapeArray
-                require(
-                    kernelShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${kernelShape.contentToString()}" }
-                model.fillVariable(kernelVariableName, data)
-            }
-            "bias:0" -> {
-                val biasVariableName = denseBiasVarName(layerName)
-                val biasShape = (model.getLayer(layerName) as Dense).biasShapeArray!!
-                require(
-                    biasShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Kernel shape in loaded data is ${dims.contentToString()}. Should be ${biasShape.contentToString()}" }
-                model.fillVariable(biasVariableName, data)
-            }
-            else -> {
-                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
-            }
-        }
-    }
+private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
+    return mapOf(
+        Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray)),
+        Pair("bias:0", Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!))
+    )
 }
 
 // TODO: gamma and beta could be misssed due to batchNorm formula https://stackoverflow.com/questions/43813549/restoring-tensorflow-model-cannot-find-gamma-scale-for-batch-norm-layers-in-the
-private fun fillBatchNormVariablesFromKeras(
-    layerName: String,
-    group: Group,
-    model: GraphTrainableModel
-) {
-    val firstLevelGroup: Group = group.children[layerName] as Group
-    val nameOfWeightSubGroup = firstLevelGroup.children.keys.first()
-    val dataNodes = (firstLevelGroup.children[nameOfWeightSubGroup] as Group).children
-
-    dataNodes.values.map { it as DatasetBase }.forEach {
-        val dims = it.dimensions
-        val data = it.data
-        when (it.name) {
-            "gamma:0" -> {
-                val gammaVariableName = batchNormGammaVarName(layerName)
-                val gammaShape = (model.getLayer(layerName) as BatchNorm).gammaShapeArray!!
-                require(
-                    gammaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Gamma shape in loaded data is ${dims.contentToString()}. Should be ${gammaShape.contentToString()}" }
-                model.fillVariable(gammaVariableName, data)
-            }
-            "beta:0" -> {
-                val betaVariableName = batchNormBetaVarName(layerName)
-                val betaShape = (model.getLayer(layerName) as BatchNorm).betaShapeArray!!
-                require(
-                    betaShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Beta shape in loaded data is ${dims.contentToString()}. Should be ${betaShape.contentToString()}" }
-                model.fillVariable(betaVariableName, data)
-            }
-            "moving_mean:0" -> {
-                val movingMeanVariableName = batchNormMovingMeanVarName(layerName)
-                val movingMeanShape = (model.getLayer(layerName) as BatchNorm).movingMeanShapeArray
-                require(
-                    movingMeanShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Moving mean shape in loaded data is ${dims.contentToString()}. Should be ${movingMeanShape.contentToString()}" }
-                model.fillVariable(movingMeanVariableName, data)
-            }
-            "moving_variance:0" -> {
-                val movingVarianceVariableName = batchNormMovingVarianceVarName(layerName)
-                val movingVarianceShape = (model.getLayer(layerName) as BatchNorm).movingVarianceShapeArray
-                require(
-                    movingVarianceShape.map { e -> e.toInt() }.toIntArray().contentEquals(dims)
-                ) { "Moving variance shape in loaded data is ${dims.contentToString()}. Should be ${movingVarianceShape.contentToString()}" }
-                model.fillVariable(movingVarianceVariableName, data)
-            }
-            else -> {
-                throw IllegalArgumentException("Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!")
-            }
-        }
-
-    }
+private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
+    return mapOf(
+        Pair("gamma:0", Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)),
+        Pair("beta:0", Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)),
+        Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray)),
+        Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray))
+    )
 }
 
 /**
