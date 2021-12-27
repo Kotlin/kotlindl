@@ -111,19 +111,15 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
 
     if (layerList != null) {
         model.layers.forEach {
-            run {
-                if (layerList.contains(it)) {
-                    fillLayerWeights(it, group, model)
-                } else {
-                    initLayerWeights(it, model)
-                }
+            if (layerList.contains(it)) {
+                fillLayerWeights(it, group, model)
+            } else {
+                initLayerWeights(it, model)
             }
         }
     } else {
         model.layers.forEach {
-            run {
-                fillLayerWeights(it, group, model)
-            }
+            fillLayerWeights(it, group, model)
         }
     }
 }
@@ -188,14 +184,12 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
-        run {
-            fillLayerWeights(
-                it,
-                hdfFile,
-                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-                this
-            ) // TODO: doesnt' work for batchnorm/depthwise
-        }
+        fillLayerWeights(
+            it,
+            hdfFile,
+            LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+            this
+        ) // TODO: doesnt' work for batchnorm/depthwise
     }
     this.logger.info { "Weights are loaded." }
     this.isModelInitialized = true
@@ -221,17 +215,15 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
-        run {
-            if (layerList.contains(it)) {
-                fillLayerWeights(
-                    it,
-                    hdfFile,
-                    LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-                    this
-                ) // TODO: doesnt' work for batchnorm/depthwise
-            } else {
-                initLayerWeights(it, this)
-            }
+        if (layerList.contains(it)) {
+            fillLayerWeights(
+                it,
+                hdfFile,
+                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+                this
+            ) // TODO: doesnt' work for batchnorm/depthwise
+        } else {
+            initLayerWeights(it, this)
         }
     }
     this.logger.info { "Weights are loaded." }
@@ -317,23 +309,21 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     }
 
     layersToLoad.forEach {
-        run {
-            val initializedLayerName = it.name
-            val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
-            if (layerWeightPaths != null) {
-                fillLayerWeights(it, hdfFile, layerWeightPaths, this)
+        val initializedLayerName = it.name
+        val layerWeightPaths = weightPaths.find { initializedLayerName == it.layerName }
+        if (layerWeightPaths != null) {
+            fillLayerWeights(it, hdfFile, layerWeightPaths, this)
+        } else {
+            if (missedWeights == MissedWeightsStrategy.LOAD_CUSTOM_PATH) {
+                fillLayerWeights(
+                    it,
+                    hdfFile,
+                    null, // TODO: refactor = it doesn't work for batchnorm or depthwise
+                    this
+                )
             } else {
-                if (missedWeights == MissedWeightsStrategy.LOAD_CUSTOM_PATH) {
-                    fillLayerWeights(
-                        it,
-                        hdfFile,
-                        null, // TODO: refactor = it doesn't work for batchnorm or depthwise
-                        this
-                    )
-                } else {
-                    this.logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
-                    initLayerWeights(it, this)
-                }
+                this.logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
+                initLayerWeights(it, this)
             }
         }
     }
@@ -371,17 +361,15 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     check(!isModelInitialized) { "Model is initialized already!" }
     this.logger.info { "Starting weights loading.." }
     this.layers.forEach {
-        run {
-            if (layerList.contains(it)) {
-                fillLayerWeights(
-                    it,
-                    hdfFile,
-                    LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-                    this
-                ) // TODO: does not work for BatchNorm/Depthwise
-            } else {
-                initLayerWeights(it, this)
-            }
+        if (layerList.contains(it)) {
+            fillLayerWeights(
+                it,
+                hdfFile,
+                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
+                this
+            ) // TODO: does not work for BatchNorm/Depthwise
+        } else {
+            initLayerWeights(it, this)
         }
     }
     this.logger.info { "Weights are loaded." }
