@@ -22,8 +22,8 @@ import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 
-private const val EPOCHS = 10
-private const val TRAINING_BATCH_SIZE = 500
+private const val EPOCHS = 20 // 20, at least, is recommended
+private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 500
 private const val NUM_CHANNELS = 1L
 private const val SEED = 12L
@@ -122,6 +122,7 @@ private val soundNet = Sequential.of(
  */
 fun soundNet() {
     val (train, test) = freeSpokenDigits()
+    train.shuffle()
 
     soundNet.use {
         it.compile(

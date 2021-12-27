@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
-private const val EPOCHS = 5
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 200
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
