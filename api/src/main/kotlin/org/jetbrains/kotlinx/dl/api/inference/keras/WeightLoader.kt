@@ -144,7 +144,10 @@ private fun fillLayerWeights(
     model: GraphTrainableModel
 ) {
     val variables = getLayerVariables(layer)
-    if (variables == null) return
+    if (variables == null) {
+        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
     fillLayerVariablesFromKeras(layer.name, variables, model, group)
     model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
@@ -314,7 +317,10 @@ private fun fillLayerWeights(
         is BatchNorm -> getBatchNormVariables(layer, layerPaths)
         else -> null
     }
-    if (variables == null) return
+    if (variables == null) {
+        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
     variables.forEach { (variableName, variableDataPathTemplate) ->
         val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
         model.fillVariable(variableName, data)
@@ -324,7 +330,10 @@ private fun fillLayerWeights(
 
 private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
     val variables = getLayerVariableNames(layer)
-    if (variables == null) return
+    if (variables == null) {
+        model.logger.warn { "Initializing weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
     variables.forEach(model::runAssignOpByVarName)
     model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
 }
