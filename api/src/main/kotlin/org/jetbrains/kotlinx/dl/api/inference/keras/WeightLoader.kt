@@ -60,14 +60,8 @@ public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile, layerList: List<Lay
  *
  * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
  */
-public fun GraphTrainableModel.loadWeightsForFrozenLayers(
-    hdfFile: HdfFile
-) {
-    val frozenLayers = mutableListOf<Layer>()
-    layers.forEach {
-        if (!it.isTrainable) frozenLayers.add(it)
-    }
-    loadWeights(hdfFile, frozenLayers)
+public fun GraphTrainableModel.loadWeightsForFrozenLayers(hdfFile: HdfFile) {
+    loadWeights(hdfFile, layers.filterNot(Layer::isTrainable))
 }
 
 private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: List<Layer>) {
@@ -229,11 +223,10 @@ public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
-    val frozenLayers = mutableListOf<Layer>()
-    layers.forEach {
-        if (!it.isTrainable) frozenLayers.add(it)
-    }
-    loadWeightsByPathTemplates(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
+    loadWeightsByPathTemplates(
+        hdfFile, layers.filterNot(Layer::isTrainable),
+        kernelDataPathTemplate, biasDataPathTemplate
+    )
 }
 
 /**
