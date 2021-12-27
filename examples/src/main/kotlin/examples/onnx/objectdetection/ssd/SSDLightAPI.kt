@@ -16,7 +16,7 @@ import java.io.File
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts rectangles for the detected objects on a few images located in resources.
  */
-fun objectDetectionSSD() {
+fun ssdLightAPI() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
@@ -35,6 +35,6 @@ fun objectDetectionSSD() {
 }
 
 /** */
-fun main(): Unit = objectDetectionSSD()
+fun main(): Unit = ssdLightAPI()
 
 

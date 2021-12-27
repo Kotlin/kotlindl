@@ -19,7 +19,7 @@ import java.io.File
  * Special model class for detection objects on images
  * with built-in preprocessing and post-processing.
  *
- * It internally uses SSD model trained on the COCO dataset.
+ * It internally uses [ONNXModels.ObjectDetection.SSD] trained on the COCO dataset.
  *
  * @since 0.3
  */
