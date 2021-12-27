@@ -301,19 +301,25 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
 }
 
 private fun fillLayerWeights(
-    it: Layer,
+    layer: Layer,
     hdfFile: HdfFile,
     layerPaths: LayerPaths?,
     model: GraphTrainableModel
 ) {
-    when (it) {
-        is Dense -> fillDenseVariables(it.name, hdfFile, model, it.useBias, layerPaths)
-        is Conv2D -> fillConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
-        is DepthwiseConv2D -> fillDepthwiseConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
-        is SeparableConv2D -> fillSeparableConv2DVariables(it.name, hdfFile, model, it.useBias, layerPaths)
-        is BatchNorm -> fillBatchNormVariables(it.name, hdfFile, model, layerPaths)
+    val variables = when (layer) {
+        is Dense -> getDenseVariables(layer, layerPaths)
+        is Conv2D -> getConv2DVariables(layer, layerPaths)
+        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer, layerPaths)
+        is SeparableConv2D -> getSeparableConv2DVariables(layer, layerPaths)
+        is BatchNorm -> getBatchNormVariables(layer, layerPaths)
+        else -> null
     }
-    model.logger.debug { "${it.paramCount} parameters loaded for the layer ${it.name}." }
+    if (variables == null) return
+    variables.forEach { (variableName, variableDataPathTemplate) ->
+        val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
+        model.fillVariable(variableName, data)
+    }
+    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
 
 private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
@@ -462,173 +468,94 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     this.isModelInitialized = true
 }
 
-private fun fillConv2DVariables(
-    name: String,
-    hdfFile: HdfFile,
-    model: GraphTrainableModel,
-    useBias: Boolean,
-    layerPaths: LayerPaths?
-) {
-    val kernelDataPathTemplate: String
-    val biasDataPathTemplate: String
-
-    if (layerPaths == null) {
-        kernelDataPathTemplate = KERNEL_DATA_PATH_TEMPLATE
-        biasDataPathTemplate = BIAS_DATA_PATH_TEMPLATE
-    } else {
-        layerPaths as LayerConvOrDensePaths
-        kernelDataPathTemplate = layerPaths.kernelPath
-        biasDataPathTemplate = layerPaths.biasPath
+private fun getConv2DVariables(layer: Conv2D,
+                               layerPaths: LayerPaths?
+): Map<String, String> {
+    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
+        ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
+    val variables = mutableMapOf(
+        Pair(convKernelVarName(layer.name, dim = 2), layerConvOrDensePaths.kernelPath)
+    )
+    if (layer.useBias) {
+        variables[convBiasVarName(layer.name, dim = 2)] = layerConvOrDensePaths.biasPath
     }
-
-    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val kernelVariableName = convKernelVarName(name, dim = 2)
-    model.fillVariable(kernelVariableName, kernelData)
-
-    if (useBias) {
-        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-        val biasVariableName = convBiasVarName(name, dim = 2)
-        model.fillVariable(biasVariableName, biasData)
-    }
+    return variables
 }
 
-private fun fillDepthwiseConv2DVariables(
-    name: String,
-    hdfFile: HdfFile,
-    model: GraphTrainableModel,
-    useBias: Boolean,
-    layerPaths: LayerPaths?
-) {
-    val kernelDataPathTemplate: String
-    val biasDataPathTemplate: String
-
-    if (layerPaths == null) {
-        kernelDataPathTemplate = DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE
-        biasDataPathTemplate = DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
-    } else {
-        layerPaths as LayerConvOrDensePaths
-        kernelDataPathTemplate = layerPaths.kernelPath
-        biasDataPathTemplate = layerPaths.biasPath
+private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D,
+                                        layerPaths: LayerPaths?
+): Map<String, String> {
+    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
+        ?: LayerConvOrDensePaths(
+            layer.name,
+            DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE,
+            DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
+        )
+    val variables = mutableMapOf(
+        Pair(depthwiseConv2dKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
+    )
+    if (layer.useBias) {
+        variables[depthwiseConv2dBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
     }
-
-    layerPaths as LayerConvOrDensePaths
-    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val kernelVariableName = depthwiseConv2dKernelVarName(name)
-    model.fillVariable(kernelVariableName, kernelData)
-
-    if (useBias) {
-        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-        val biasVariableName = depthwiseConv2dBiasVarName(name)
-        model.fillVariable(biasVariableName, biasData)
-    }
+    return variables
 }
 
-private fun fillSeparableConv2DVariables(
-    name: String,
-    hdfFile: HdfFile,
-    model: GraphTrainableModel,
-    useBias: Boolean,
-    layerPaths: LayerPaths?
-) {
-    val depthwiseKernelDataPathTemplate: String
-    val pointwiseKernelDataPathTemplate: String
-    val biasDataPathTemplate: String
-
-    if (layerPaths == null) {
-        depthwiseKernelDataPathTemplate = DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE
-        pointwiseKernelDataPathTemplate = POINTWISE_KERNEL_DATA_PATH_TEMPLATE
-        biasDataPathTemplate = DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
-    } else {
-        layerPaths as LayerSeparableConv2DPaths
-        depthwiseKernelDataPathTemplate = layerPaths.depthwiseKernelPath
-        pointwiseKernelDataPathTemplate = layerPaths.depthwiseKernelPath
-        biasDataPathTemplate = layerPaths.biasPath
+private fun getSeparableConv2DVariables(layer: SeparableConv2D,
+                                        layerPaths: LayerPaths?
+): Map<String, String> {
+    val layerSeparableConv2DPaths = layerPaths as? LayerSeparableConv2DPaths
+        ?: LayerSeparableConv2DPaths(
+            layer.name,
+            DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE,
+            POINTWISE_KERNEL_DATA_PATH_TEMPLATE,
+            DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
+        )
+    val variables = mutableMapOf(
+        Pair(separableConv2dDepthwiseKernelVarName(layer.name), layerSeparableConv2DPaths.depthwiseKernelPath),
+        Pair(separableConv2dPointwiseKernelVarName(layer.name), layerSeparableConv2DPaths.pointwiseKernelPath)
+    )
+    if (layer.useBias) {
+        variables[separableConv2dBiasVarName(layer.name)] = layerSeparableConv2DPaths.biasPath
     }
-
-    layerPaths as LayerConvOrDensePaths
-    val depthwiseKernelData = hdfFile.getDatasetByPath(depthwiseKernelDataPathTemplate.format(name, name)).data
-    val depthwiseKernelVariableName = separableConv2dDepthwiseKernelVarName(name)
-    model.fillVariable(depthwiseKernelVariableName, depthwiseKernelData)
-
-    val pointwiseKernelData = hdfFile.getDatasetByPath(pointwiseKernelDataPathTemplate.format(name, name)).data
-    val pointwiseKernelVariableName = separableConv2dPointwiseKernelVarName(name)
-    model.fillVariable(pointwiseKernelVariableName, pointwiseKernelData)
-
-    if (useBias) {
-        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-        val biasVariableName = depthwiseConv2dBiasVarName(name)
-        model.fillVariable(biasVariableName, biasData)
-    }
+    return variables
 }
 
-private fun fillBatchNormVariables(
-    name: String,
-    hdfFile: HdfFile,
-    model: GraphTrainableModel,
-    layerPaths: LayerPaths?
-) {
-    val gammaDataPathTemplate: String
-    val betaDataPathTemplate: String
-    val movingMeanDataPathTemplate: String
-    val movingVarianceDataPathTemplate: String
-
-    if (layerPaths == null) {
-        gammaDataPathTemplate = GAMMA_DATA_PATH_TEMPLATE
-        betaDataPathTemplate = BETA_DATA_PATH_TEMPLATE
-        movingMeanDataPathTemplate = MOVING_MEAN_DATA_PATH_TEMPLATE
-        movingVarianceDataPathTemplate = MOVING_VARIANCE_DATA_PATH_TEMPLATE
-    } else {
-        layerPaths as LayerBatchNormPaths
-        gammaDataPathTemplate = layerPaths.gammaPath
-        betaDataPathTemplate = layerPaths.betaPath
-        movingMeanDataPathTemplate = layerPaths.movingMeanPath
-        movingVarianceDataPathTemplate = layerPaths.movingVariancePath
+private fun getBatchNormVariables(layer: BatchNorm,
+                                  layerPaths: LayerPaths?
+): Map<String, String> {
+    val layerBatchNormPaths = layerPaths as? LayerBatchNormPaths
+        ?: LayerBatchNormPaths(
+            layer.name,
+            GAMMA_DATA_PATH_TEMPLATE,
+            BETA_DATA_PATH_TEMPLATE,
+            MOVING_MEAN_DATA_PATH_TEMPLATE,
+            MOVING_VARIANCE_DATA_PATH_TEMPLATE
+        )
+    val variables = mutableMapOf(
+        Pair(batchNormMovingMeanVarName(layer.name), layerBatchNormPaths.movingMeanPath),
+        Pair(batchNormMovingVarianceVarName(layer.name), layerBatchNormPaths.movingVariancePath)
+    )
+    if (layer.scale) {
+        variables[batchNormGammaVarName(layer.name)] = layerBatchNormPaths.gammaPath
     }
-
-    val gammaData = hdfFile.getDatasetByPath(gammaDataPathTemplate.format(name, name)).data
-    val betaData = hdfFile.getDatasetByPath(betaDataPathTemplate.format(name, name)).data
-    val movingMeanData = hdfFile.getDatasetByPath(movingMeanDataPathTemplate.format(name, name)).data
-    val movingVarianceData = hdfFile.getDatasetByPath(movingVarianceDataPathTemplate.format(name, name)).data
-
-    val gammaVariableName = batchNormGammaVarName(name)
-    val betaVariableName = batchNormBetaVarName(name)
-    val movingMeanVariableName = batchNormMovingMeanVarName(name)
-    val movingVarianceVariableName = batchNormMovingVarianceVarName(name)
-
-    model.fillVariable(gammaVariableName, gammaData)
-    model.fillVariable(betaVariableName, betaData)
-    model.fillVariable(movingMeanVariableName, movingMeanData)
-    model.fillVariable(movingVarianceVariableName, movingVarianceData)
+    if (layer.center) {
+        variables[batchNormBetaVarName(layer.name)] = layerBatchNormPaths.betaPath
+    }
+    return variables
 }
 
-private fun fillDenseVariables(
-    name: String,
-    hdfFile: HdfFile,
-    model: GraphTrainableModel,
-    useBias: Boolean,
-    layerPaths: LayerPaths?
-) {
-    val kernelDataPathTemplate: String
-    val biasDataPathTemplate: String
-
-    if (layerPaths == null) {
-        kernelDataPathTemplate = KERNEL_DATA_PATH_TEMPLATE
-        biasDataPathTemplate = BIAS_DATA_PATH_TEMPLATE
-    } else {
-        layerPaths as LayerConvOrDensePaths
-        kernelDataPathTemplate = layerPaths.kernelPath
-        biasDataPathTemplate = layerPaths.biasPath
+private fun getDenseVariables(layer: Dense,
+                              layerPaths: LayerPaths?
+): Map<String, String> {
+    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
+        ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
+    val variables = mutableMapOf(
+        Pair(denseKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
+    )
+    if (layer.useBias) {
+        variables[denseBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
     }
-
-    val kernelData = hdfFile.getDatasetByPath(kernelDataPathTemplate.format(name, name)).data
-    val kernelVariableName = denseKernelVarName(name)
-    model.fillVariable(kernelVariableName, kernelData)
-
-    if (useBias) {
-        val biasData = hdfFile.getDatasetByPath(biasDataPathTemplate.format(name, name)).data
-        val biasVariableName = denseBiasVarName(name)
-        model.fillVariable(biasVariableName, biasData)
-    }
+    return variables
 }
 
 /**
