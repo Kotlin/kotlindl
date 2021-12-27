@@ -12,22 +12,12 @@ import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
-import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.BIAS_DATA_PATH_TEMPLATE
+import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.KERNEL_DATA_PATH_TEMPLATE
+import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVariableNames
+import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVariablePathTemplates
+import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVariables
 
-private const val KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/kernel:0"
-private const val BIAS_DATA_PATH_TEMPLATE = "/%s/%s/bias:0"
-private const val GAMMA_DATA_PATH_TEMPLATE = "/%s/%s/gamma:0"
-private const val BETA_DATA_PATH_TEMPLATE = "/%s/%s/beta:0"
-private const val MOVING_MEAN_DATA_PATH_TEMPLATE = "/%s/%s/moving_mean:0"
-private const val MOVING_VARIANCE_DATA_PATH_TEMPLATE = "/%s/%s/moving_variance:0"
-private const val DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_kernel:0"
-private const val POINTWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/pointwise_kernel:0"
-private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
@@ -182,61 +172,6 @@ private fun fillLayerVariablesFromKeras(layerName: String,
     }
 }
 
-private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
-    val variables = mutableMapOf(
-        Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray))
-    )
-    if (layer.useBias) {
-        variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!)
-    }
-    return variables
-}
-
-private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
-    val variables = mutableMapOf(
-        Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray))
-    )
-    if (layer.useBias) {
-        variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
-    }
-    return variables
-}
-
-private fun getSeparableConv2DVariables(layer: SeparableConv2D): Map<String, Pair<String, LongArray>> {
-    val variables = mutableMapOf(
-        Pair("depthwise_kernel:0", Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray)),
-        Pair("pointwise_kernel:0", Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray))
-    )
-    if (layer.useBias) {
-        variables["bias:0"] = Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
-    }
-    return variables
-}
-
-private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
-    val variables = mutableMapOf(
-        Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray))
-    )
-    if (layer.useBias) {
-        variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!)
-    }
-    return variables
-}
-
-private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
-    val variables = mutableMapOf(
-        Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray)),
-        Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray))
-    )
-    if (layer.scale) {
-        variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)
-    }
-    if (layer.center) {
-        variables["beta:0"] = Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)
-    }
-    return variables
-}
-
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
  *
@@ -309,14 +244,7 @@ private fun fillLayerWeights(
     layerPaths: LayerPaths?,
     model: GraphTrainableModel
 ) {
-    val variables = when (layer) {
-        is Dense -> getDenseVariables(layer, layerPaths)
-        is Conv2D -> getConv2DVariables(layer, layerPaths)
-        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer, layerPaths)
-        is SeparableConv2D -> getSeparableConv2DVariables(layer, layerPaths)
-        is BatchNorm -> getBatchNormVariables(layer, layerPaths)
-        else -> null
-    }
+    val variables = getLayerVariablePathTemplates(layer, layerPaths)
     if (variables == null) {
         model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
         return
@@ -336,23 +264,6 @@ private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
     }
     variables.forEach(model::runAssignOpByVarName)
     model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
-}
-
-private fun getLayerVariableNames(layer: Layer): List<String>? {
-    return getLayerVariables(layer)?.map { (_, variable) -> variable.first }
-}
-
-// TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
-private fun getLayerVariables(layer: Layer): Map<String, Pair<String, LongArray>>? {
-    val variables = when (layer) {
-        is Dense -> getDenseVariables(layer)
-        is Conv2D -> getConv2DVariables(layer)
-        is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
-        is SeparableConv2D -> getSeparableConv2DVariables(layer)
-        is BatchNorm -> getBatchNormVariables(layer)
-        else -> null
-    }
-    return variables
 }
 
 /**
@@ -476,150 +387,3 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     this.logger.info { "Weights are loaded." }
     this.isModelInitialized = true
 }
-
-private fun getConv2DVariables(layer: Conv2D,
-                               layerPaths: LayerPaths?
-): Map<String, String> {
-    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
-        ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
-    val variables = mutableMapOf(
-        Pair(convKernelVarName(layer.name, dim = 2), layerConvOrDensePaths.kernelPath)
-    )
-    if (layer.useBias) {
-        variables[convBiasVarName(layer.name, dim = 2)] = layerConvOrDensePaths.biasPath
-    }
-    return variables
-}
-
-private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D,
-                                        layerPaths: LayerPaths?
-): Map<String, String> {
-    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
-        ?: LayerConvOrDensePaths(
-            layer.name,
-            DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE,
-            DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
-        )
-    val variables = mutableMapOf(
-        Pair(depthwiseConv2dKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
-    )
-    if (layer.useBias) {
-        variables[depthwiseConv2dBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
-    }
-    return variables
-}
-
-private fun getSeparableConv2DVariables(layer: SeparableConv2D,
-                                        layerPaths: LayerPaths?
-): Map<String, String> {
-    val layerSeparableConv2DPaths = layerPaths as? LayerSeparableConv2DPaths
-        ?: LayerSeparableConv2DPaths(
-            layer.name,
-            DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE,
-            POINTWISE_KERNEL_DATA_PATH_TEMPLATE,
-            DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
-        )
-    val variables = mutableMapOf(
-        Pair(separableConv2dDepthwiseKernelVarName(layer.name), layerSeparableConv2DPaths.depthwiseKernelPath),
-        Pair(separableConv2dPointwiseKernelVarName(layer.name), layerSeparableConv2DPaths.pointwiseKernelPath)
-    )
-    if (layer.useBias) {
-        variables[separableConv2dBiasVarName(layer.name)] = layerSeparableConv2DPaths.biasPath
-    }
-    return variables
-}
-
-private fun getBatchNormVariables(layer: BatchNorm,
-                                  layerPaths: LayerPaths?
-): Map<String, String> {
-    val layerBatchNormPaths = layerPaths as? LayerBatchNormPaths
-        ?: LayerBatchNormPaths(
-            layer.name,
-            GAMMA_DATA_PATH_TEMPLATE,
-            BETA_DATA_PATH_TEMPLATE,
-            MOVING_MEAN_DATA_PATH_TEMPLATE,
-            MOVING_VARIANCE_DATA_PATH_TEMPLATE
-        )
-    val variables = mutableMapOf(
-        Pair(batchNormMovingMeanVarName(layer.name), layerBatchNormPaths.movingMeanPath),
-        Pair(batchNormMovingVarianceVarName(layer.name), layerBatchNormPaths.movingVariancePath)
-    )
-    if (layer.scale) {
-        variables[batchNormGammaVarName(layer.name)] = layerBatchNormPaths.gammaPath
-    }
-    if (layer.center) {
-        variables[batchNormBetaVarName(layer.name)] = layerBatchNormPaths.betaPath
-    }
-    return variables
-}
-
-private fun getDenseVariables(layer: Dense,
-                              layerPaths: LayerPaths?
-): Map<String, String> {
-    val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
-        ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
-    val variables = mutableMapOf(
-        Pair(denseKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
-    )
-    if (layer.useBias) {
-        variables[denseBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
-    }
-    return variables
-}
-
-/**
- * Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
-public open class LayerPaths(
-    /** */
-    public val layerName: String)
-
-/**
- * Contains [layerName], [kernelPath], [biasPath] for specific layer, found in hdf5 file via
- * ```
- * recursivePrintGroupInHDF5File()
- * ```
- * function call.
- */
-public class LayerConvOrDensePaths(
-    layerName: String,
-    /** */
-    public val kernelPath: String,
-    /** */
-    public val biasPath: String
-) : LayerPaths(layerName)
-
-/**
- * Contains [layerName], [depthwiseKernelPath],  [pointwiseKernelPath], [biasPath] for [SeparableConv2D] layer, found in hdf5 file via
- * ```
- * recursivePrintGroupInHDF5File()
- * ```
- * function call.
- */
-public class LayerSeparableConv2DPaths(
-    layerName: String,
-    /** */
-    public val depthwiseKernelPath: String,
-    /** */
-    public val pointwiseKernelPath: String,
-    /** */
-    public val biasPath: String
-) : LayerPaths(layerName)
-
-/**
- * Contains [layerName], [gammaPath],  [betaPath], [movingMeanPath], [movingVariancePath] for [BatchNorm] layer, found in hdf5 file via
- * ```
- * recursivePrintGroupInHDF5File()
- * ```
- * function call.
- */
-public class LayerBatchNormPaths(
-    layerName: String,
-    /** */
-    public val gammaPath: String,
-    /** */
-    public val betaPath: String,
-    /** */
-    public val movingMeanPath: String,
-    /** */
-    public val movingVariancePath: String
-) : LayerPaths(layerName)
