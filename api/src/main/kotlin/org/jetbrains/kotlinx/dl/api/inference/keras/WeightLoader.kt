@@ -93,16 +93,7 @@ public fun GraphTrainableModel.loadWeightsForFrozenLayers(
 }
 
 private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: MutableList<Layer>?) {
-    var originalKerasVersion = 1
-
-    if (group.attributes.containsKey("keras_version") && ((if (group.attributes["keras_version"] != null) group.attributes["keras_version"]?.data else "1") as String).startsWith(
-            "2"
-        )
-    ) {
-        originalKerasVersion = 2
-    }
-    if (originalKerasVersion == 1
-    ) {
+    if (group.getKerasVersion() == 1) {
         throw UnsupportedOperationException(
             "The weights loading from Keras 1.x is not supported by default!" +
                     "\nUse loadWeightsViaPathTemplates() method to make custom loading!"
@@ -122,6 +113,12 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
             fillLayerWeights(it, group, model)
         }
     }
+}
+
+private fun Group.getKerasVersion(): Int {
+    val kerasVersionAttribute = attributes["keras_version"] ?: return 1
+    if ((kerasVersionAttribute.data as String).startsWith("2")) return 2
+    return 1
 }
 
 private fun fillLayerWeights(
