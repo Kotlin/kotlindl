@@ -27,9 +27,9 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVaria
 public fun GraphTrainableModel.loadWeights(
     hdfFile: HdfFile
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
+    logger.info { "Starting weights loading.." }
 
     when {
         hdfFile.attributes.containsKey("layer_names") -> loadWeightsFromHdf5Group(hdfFile, this, null)
@@ -37,12 +37,12 @@ public fun GraphTrainableModel.loadWeights(
             loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, null)
         }
         else -> {
-            this.logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
+            logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
         }
     }
 
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true
 }
 
 /**
@@ -57,9 +57,9 @@ public fun GraphTrainableModel.loadWeights(
     hdfFile: HdfFile,
     layerList: MutableList<Layer>
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
+    logger.info { "Starting weights loading.." }
 
     when {
         hdfFile.attributes.containsKey("layer_names") -> loadWeightsFromHdf5Group(hdfFile, this, layerList)
@@ -67,12 +67,12 @@ public fun GraphTrainableModel.loadWeights(
             loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, layerList)
         }
         else -> {
-            this.logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
+            logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
         }
     }
 
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true
 }
 
 /**
@@ -86,10 +86,10 @@ public fun GraphTrainableModel.loadWeightsForFrozenLayers(
     hdfFile: HdfFile
 ) {
     val frozenLayers = mutableListOf<Layer>()
-    this.layers.forEach {
+    layers.forEach {
         if (!it.isTrainable) frozenLayers.add(it)
     }
-    this.loadWeights(hdfFile, frozenLayers)
+    loadWeights(hdfFile, frozenLayers)
 }
 
 private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: MutableList<Layer>?) {
@@ -180,10 +180,10 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE, // TODO: doesnt' work for batchnorm/depthwise
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
-    this.layers.forEach {
+    logger.info { "Starting weights loading.." }
+    layers.forEach {
         fillLayerWeights(
             it,
             hdfFile,
@@ -191,8 +191,8 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
             this
         ) // TODO: doesnt' work for batchnorm/depthwise
     }
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true
 }
 
 /**
@@ -211,10 +211,10 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
-    this.layers.forEach {
+    logger.info { "Starting weights loading.." }
+    layers.forEach {
         if (layerList.contains(it)) {
             fillLayerWeights(
                 it,
@@ -226,8 +226,8 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
             initLayerWeights(it, this)
         }
     }
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true
 }
 
 private fun fillLayerWeights(
@@ -273,10 +273,10 @@ public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
     val frozenLayers = mutableListOf<Layer>()
-    this.layers.forEach {
+    layers.forEach {
         if (!it.isTrainable) frozenLayers.add(it)
     }
-    this.loadWeightsByPathTemplates(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
+    loadWeightsByPathTemplates(hdfFile, frozenLayers, kernelDataPathTemplate, biasDataPathTemplate)
 }
 
 /**
@@ -293,12 +293,12 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     missedWeights: MissedWeightsStrategy = MissedWeightsStrategy.INITIALIZE,
     forFrozenLayersOnly: Boolean = false // TODO: probably it should be a flag in all methods
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
+    logger.info { "Starting weights loading.." }
 
-    var layersToLoad = this.layers
-    var layersToInit = this.layers
+    var layersToLoad = layers
+    var layersToInit = layers
 
     if (forFrozenLayersOnly) {
         layersToLoad = layersToLoad.filter { !it.isTrainable }
@@ -322,14 +322,14 @@ public fun GraphTrainableModel.loadWeightsByPaths(
                     this
                 )
             } else {
-                this.logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
+                logger.warn { "Layer weight paths for ${it.name} are not found in 'weightPaths' object. It will be initialized by default initializer." }
                 initLayerWeights(it, this)
             }
         }
     }
 
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true // TODO: it should depend on what is happened with missed weights
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true // TODO: it should depend on what is happened with missed weights
 }
 
 /** This strategy defines the behaviour during weights' loading if the weights are not found in the h5 file by the standard Keras paths. */
@@ -357,10 +357,10 @@ public fun GraphTrainableModel.loadWeightsByPaths(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
-    check(this.isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
-    this.logger.info { "Starting weights loading.." }
-    this.layers.forEach {
+    logger.info { "Starting weights loading.." }
+    layers.forEach {
         if (layerList.contains(it)) {
             fillLayerWeights(
                 it,
@@ -372,6 +372,6 @@ public fun GraphTrainableModel.loadWeightsByPaths(
             initLayerWeights(it, this)
         }
     }
-    this.logger.info { "Weights are loaded." }
-    this.isModelInitialized = true
+    logger.info { "Weights are loaded." }
+    isModelInitialized = true
 }
