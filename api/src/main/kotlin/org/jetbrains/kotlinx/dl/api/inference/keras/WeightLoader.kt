@@ -46,19 +46,23 @@ public fun GraphTrainableModel.loadWeightsForFrozenLayers(hdfFile: HdfFile) {
  * @param [layerList] List of layers to load weights. Weights for other layers will be initialized by initializer later.
  */
 public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile, layerList: List<Layer>) {
+    val group = when {
+        hdfFile.attributes.containsKey("layer_names") -> hdfFile
+        hdfFile.children.containsKey("model_weights") -> (hdfFile as Group).getChild("model_weights") as Group
+        else -> null
+    }
+    if (group == null) {
+        logger.error {
+            "This is unknown path format. Use special method loadWeightsViaPathTemplates()" +
+                    " to specify templates to load weights."
+        }
+        return
+    }
     check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
     check(!isModelInitialized) { "Model is initialized already!" }
     logger.info { "Starting weights loading.." }
 
-    when {
-        hdfFile.attributes.containsKey("layer_names") -> loadWeightsFromHdf5Group(hdfFile, this, layerList)
-        hdfFile.children.containsKey("model_weights") -> {
-            loadWeightsFromHdf5Group((hdfFile as Group).getChild("model_weights") as Group, this, layerList)
-        }
-        else -> {
-            logger.error { "This is unknown path format. Use special method loadWeightsViaPathTemplates() to specify templates to load weights." }
-        }
-    }
+    loadWeightsFromHdf5Group(group, this, layerList)
 
     logger.info { "Weights are loaded." }
     isModelInitialized = true
