@@ -58,17 +58,7 @@ public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile, layerList: List<Lay
         }
         return
     }
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading.." }
 
-    loadWeightsFromHdf5Group(group, this, layerList)
-
-    logger.info { "Weights are loaded." }
-    isModelInitialized = true
-}
-
-private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: List<Layer>) {
     if (group.getKerasVersion() == 1) {
         throw UnsupportedOperationException(
             "The weights loading from Keras 1.x is not supported by default!" +
@@ -76,14 +66,7 @@ private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, l
         )
     }
 
-    val layersSet = layerList.toSet()
-    model.layers.forEach {
-        if (layersSet.contains(it)) {
-            fillLayerWeights(it, group, model)
-        } else {
-            initLayerWeights(it, model)
-        }
-    }
+    loadWeights(layerList) { layer -> fillLayerWeights(layer, group, this) }
 }
 
 private fun Group.getKerasVersion(): Int {
@@ -141,24 +124,11 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ) {
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading..." }
-    val layerSet = layerList.toSet()
-    layers.forEach {
-        if (layerSet.contains(it)) {
-            fillLayerWeights(
-                it,
-                hdfFile,
-                LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate),
-                this
-            ) // TODO: doesnt' work for batchnorm/depthwise
-        } else {
-            initLayerWeights(it, this)
-        }
+    // TODO: doesnt' work for batchnorm/depthwise
+    val layerPaths = LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate)
+    loadWeights(layerList) { layer ->
+        fillLayerWeights(layer, hdfFile, layerPaths, this)
     }
-    logger.info { "Weights are loaded." }
-    isModelInitialized = true
 }
 
 /**
@@ -190,7 +160,9 @@ public fun GraphTrainableModel.loadWeightsByPaths(
         // TODO: refactor when weight path is not provided and strategy is not INITIALIZE it won't work for batchnorm or depthwise
     }.toMap()
 
-    loadWeightsByPaths(hdfFile, layersToWeightPaths)
+    loadWeights(layersToWeightPaths.keys) { layer ->
+        fillLayerWeights(layer, hdfFile, layersToWeightPaths[layer], this)
+    }
     // TODO: isModelInitialized should depend on what is happened with missed weights
 }
 
@@ -221,20 +193,25 @@ public fun GraphTrainableModel.loadWeightsByPaths(
 ) {
     // TODO: does not work for BatchNorm/Depthwise
     val layerConvOrDensePaths = LayerConvOrDensePaths("", kernelDataPathTemplate, biasDataPathTemplate)
-    loadWeightsByPaths(hdfFile, layerList.associateWith { layerConvOrDensePaths })
+    loadWeights(layerList) { layer ->
+        fillLayerWeights(layer, hdfFile, layerConvOrDensePaths, this)
+    }
 }
 
-private fun GraphTrainableModel.loadWeightsByPaths(hdfFile: HdfFile, layersToWeightPaths: Map<Layer, LayerPaths?>) {
-    check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-    check(!isModelInitialized) { "Model is initialized already!" }
-    logger.info { "Starting weights loading..." }
-    layers.forEach {
-        if (layersToWeightPaths.contains(it)) {
-            fillLayerWeights(it, hdfFile, layersToWeightPaths[it], this)
+private fun GraphTrainableModel.loadWeights(layersToLoad: Collection<Layer>, loadWeightsBlock: (Layer) -> Unit) {
+    check(isModelCompiled) { "Model is not compiled yet. Compile the model before loading weights." }
+    check(!isModelInitialized) { "Model is already initialized." }
+    logger.info { "Starting loading weights..." }
+
+    val layerSet = layersToLoad.toSet()
+    layers.forEach { layer ->
+        if (layerSet.contains(layer)) {
+            loadWeightsBlock(layer)
         } else {
-            initLayerWeights(it, this)
+            initLayerWeights(layer, this)
         }
     }
+
     logger.info { "Weights are loaded." }
     isModelInitialized = true
 }
