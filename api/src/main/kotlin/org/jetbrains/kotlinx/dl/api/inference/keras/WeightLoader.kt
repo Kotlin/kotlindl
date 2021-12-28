@@ -27,6 +27,17 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVaria
 public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile): Unit = loadWeights(hdfFile, layers)
 
 /**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
+ *
+ * NOTE: Weights for trainable layers will not be loaded and will be initialized via default initializers.
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ */
+public fun GraphTrainableModel.loadWeightsForFrozenLayers(hdfFile: HdfFile) {
+    loadWeights(hdfFile, layers.filterNot(Layer::isTrainable))
+}
+
+/**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
  *
  * NOTE: Weights for another layers will not be loaded (should be initialized manually).
@@ -53,17 +64,6 @@ public fun GraphTrainableModel.loadWeights(hdfFile: HdfFile, layerList: List<Lay
     isModelInitialized = true
 }
 
-/**
- * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
- *
- * NOTE: Weights for trainable layers will not be loaded and will be initialized via default initializers.
- *
- * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
- */
-public fun GraphTrainableModel.loadWeightsForFrozenLayers(hdfFile: HdfFile) {
-    loadWeights(hdfFile, layers.filterNot(Layer::isTrainable))
-}
-
 private fun loadWeightsFromHdf5Group(group: Group, model: GraphTrainableModel, layerList: List<Layer>) {
     if (group.getKerasVersion() == 1) {
         throw UnsupportedOperationException(
@@ -88,50 +88,6 @@ private fun Group.getKerasVersion(): Int {
     return 1
 }
 
-private fun fillLayerWeights(
-    layer: Layer,
-    group: Group,
-    model: GraphTrainableModel
-) {
-    val variables = getLayerVariables(layer)
-    if (variables == null) {
-        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
-        return
-    }
-    fillLayerVariablesFromKeras(layer.name, variables, model, group)
-    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
-}
-
-private fun fillLayerVariablesFromKeras(layerName: String,
-                                        variables: Map<String, Pair<String, LongArray>>,
-                                        model: GraphTrainableModel,
-                                        group: Group
-) {
-    val layerWeightsNode = group.children[layerName] as? Group
-    check(layerWeightsNode != null) {
-        val availableLayerNames = group.children.values.map(Node::getName)
-        val modelLayerNames = model.layers.map(Layer::name)
-        "Weights for the loaded layer $layerName are not found in .h5 file! " +
-                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
-                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
-    }
-
-    val nameOfWeightSubGroup = layerWeightsNode.children.keys.first()
-    val dataNodes = (layerWeightsNode.children[nameOfWeightSubGroup] as Group).children
-
-    dataNodes.values.map { it as DatasetBase }.forEach {
-        val (name, shape) = variables[it.name]
-            ?: throw IllegalArgumentException(
-                "Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!"
-            )
-        val dims = it.dimensions
-        require(shape.map(Long::toInt).toIntArray().contentEquals(dims)) {
-            "$name variable shape in loaded data is ${dims.contentToString()}. Should be ${shape.contentToString()}"
-        }
-        model.fillVariable(name, it.data)
-    }
-}
-
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework.
  *
@@ -144,6 +100,26 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE, // TODO: doesnt' work for batchnorm/depthwise
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
 ): Unit = loadWeightsByPathTemplates(hdfFile, layers, kernelDataPathTemplate, biasDataPathTemplate)
+
+/**
+ * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
+ *
+ * NOTE: Weights for trainable layers will not be loaded and will be initialized via default initializers.
+ *
+ * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
+ * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
+ * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
+ */
+public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
+    hdfFile: HdfFile,
+    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
+    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
+) {
+    loadWeightsByPathTemplates(
+        hdfFile, layers.filterNot(Layer::isTrainable),
+        kernelDataPathTemplate, biasDataPathTemplate
+    )
+}
 
 /**
  * Loads weights from hdf5 file created in Keras TensorFlow framework for pre-defined list of layers.
@@ -179,54 +155,6 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
     }
     logger.info { "Weights are loaded." }
     isModelInitialized = true
-}
-
-private fun fillLayerWeights(
-    layer: Layer,
-    hdfFile: HdfFile,
-    layerPaths: LayerPaths?,
-    model: GraphTrainableModel
-) {
-    val variables = getLayerVariablePathTemplates(layer, layerPaths)
-    if (variables == null) {
-        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
-        return
-    }
-    variables.forEach { (variableName, variableDataPathTemplate) ->
-        val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
-        model.fillVariable(variableName, data)
-    }
-    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
-}
-
-private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
-    val variables = getLayerVariableNames(layer)
-    if (variables == null) {
-        model.logger.warn { "Initializing weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
-        return
-    }
-    variables.forEach(model::runAssignOpByVarName)
-    model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
-}
-
-/**
- * Loads weights from hdf5 file created in Keras TensorFlow framework for non-trainable (or frozen) layers only.
- *
- * NOTE: Weights for trainable layers will not be loaded and will be initialized via default initializers.
- *
- * @param [hdfFile] File in hdf5 file format containing weights of Sequential model.
- * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
- * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
- */
-public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
-    hdfFile: HdfFile,
-    kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
-    biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
-) {
-    loadWeightsByPathTemplates(
-        hdfFile, layers.filterNot(Layer::isTrainable),
-        kernelDataPathTemplate, biasDataPathTemplate
-    )
 }
 
 /**
@@ -305,4 +233,67 @@ private fun GraphTrainableModel.loadWeightsByPaths(hdfFile: HdfFile, layersToWei
     }
     logger.info { "Weights are loaded." }
     isModelInitialized = true
+}
+
+private fun fillLayerWeights(layer: Layer, group: Group, model: GraphTrainableModel) {
+    val variables = getLayerVariables(layer)
+    if (variables == null) {
+        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
+    fillLayerVariablesFromKeras(layer.name, variables, model, group)
+    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
+}
+
+private fun fillLayerVariablesFromKeras(layerName: String,
+                                        variables: Map<String, Pair<String, LongArray>>,
+                                        model: GraphTrainableModel,
+                                        group: Group
+) {
+    val layerWeightsNode = group.children[layerName] as? Group
+    check(layerWeightsNode != null) {
+        val availableLayerNames = group.children.values.map(Node::getName)
+        val modelLayerNames = model.layers.map(Layer::name)
+        "Weights for the loaded layer $layerName are not found in .h5 file! " +
+                "\nh5 weight file contains weights for the following list of layers: $availableLayerNames" +
+                "\nDouble-check your loaded configuration which contains layers with the following names: $modelLayerNames."
+    }
+
+    val nameOfWeightSubGroup = layerWeightsNode.children.keys.first()
+    val dataNodes = (layerWeightsNode.children[nameOfWeightSubGroup] as Group).children
+
+    dataNodes.values.map { it as DatasetBase }.forEach {
+        val (name, shape) = variables[it.name]
+            ?: throw IllegalArgumentException(
+                "Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!"
+            )
+        val dims = it.dimensions
+        require(shape.map(Long::toInt).toIntArray().contentEquals(dims)) {
+            "$name variable shape in loaded data is ${dims.contentToString()}. Should be ${shape.contentToString()}"
+        }
+        model.fillVariable(name, it.data)
+    }
+}
+
+private fun fillLayerWeights(layer: Layer, hdfFile: HdfFile, layerPaths: LayerPaths?, model: GraphTrainableModel) {
+    val variables = getLayerVariablePathTemplates(layer, layerPaths)
+    if (variables == null) {
+        model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
+    variables.forEach { (variableName, variableDataPathTemplate) ->
+        val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
+        model.fillVariable(variableName, data)
+    }
+    model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
+}
+
+private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
+    val variables = getLayerVariableNames(layer)
+    if (variables == null) {
+        model.logger.warn { "Initializing weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
+        return
+    }
+    variables.forEach(model::runAssignOpByVarName)
+    model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
 }
