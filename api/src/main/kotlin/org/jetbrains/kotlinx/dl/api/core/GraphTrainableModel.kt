@@ -405,10 +405,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
                     epochTrainingEvent.valMetricValues = validationMetricValues!!
-                    logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue val loss: $validationLossValue val metrics: $validationMetricValues" }
+                    logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()} val loss: $validationLossValue val metrics: $validationMetricValues" } // TODO: check printing for validation
                 } else {
-                    logger.info { "epochs: $i loss: $avgLossValue metric: $avgTrainingMetricValue" }
-
+                    logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()}" }
                 }
                 trainingHistory.appendEpoch(epochTrainingEvent)
                 callback.onEpochEnd(i, epochTrainingEvent, trainingHistory)

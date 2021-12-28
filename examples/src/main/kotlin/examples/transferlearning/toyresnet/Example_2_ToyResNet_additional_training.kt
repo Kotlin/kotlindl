@@ -24,8 +24,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 fun main() {
     val (train, test) = fashionMnist()
 
-
-    val jsonConfigFile = getToyResNetJSONConfigFile()
+    val jsonConfigFile = getJSONConfigFileToyResNet()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     model.use {
@@ -37,7 +36,7 @@ fun main() {
 
         it.logSummary()
 
-        val hdfFile = getToyResNetWeightsFile()
+        val hdfFile = getWeightsFileToyResNet()
 
         it.loadWeights(hdfFile)
 

@@ -3,11 +3,6 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-/*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 package examples.transferlearning.toyresnet
 
 
@@ -144,11 +139,15 @@ private val dense_2 = Dense(
     biasInitializer = Constant(0.1f),
     name = "dense_2"
 )
+
+// TODO: move to tests
 private val model = Functional.of(
     input,
-    conv2D_1(input),
     conv2D_2(conv2D_1),
     maxPool2D(conv2D_2),
+    globalAvgPool2D(conv2D_8),
+    dense_1(globalAvgPool2D),
+    conv2D_1(input),
     conv2D_4(maxPool2D),
     conv2D_5(conv2D_4),
     add(conv2D_5, maxPool2D),
@@ -156,8 +155,6 @@ private val model = Functional.of(
     conv2D_7(conv2D_6),
     add_1(conv2D_7, add),
     conv2D_8(add_1),
-    globalAvgPool2D(conv2D_8),
-    dense_1(globalAvgPool2D),
     dense_2(dense_1)
 )
 
@@ -185,3 +182,4 @@ fun main() {
         println("Accuracy after: $accuracy")
     }
 }
+
