@@ -16,6 +16,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImageFormatType
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.loading.FileLoadingStrategy
 
 /**
  * The light-weight API for solving Image Recognition task with one of the Model Hub models trained on ImageNet dataset.
@@ -74,7 +76,10 @@ public class ImageRecognitionModel(
 
         val preprocessing: Preprocessing = preprocess {
             load {
-                pathToData = imageFile
+                loadingStrategy = FileLoadingStrategy(
+                    imageFormat = ImageFormatType.valueOf(imageFile.extension),
+                    imageFile = imageFile
+                )
                 imageShape = ImageShape(null, null, 3)
             }
             transformImage {

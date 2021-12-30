@@ -37,5 +37,5 @@ public interface ImagePreprocessor {
  * Base class for [ImagePreprocessor] implementations.
  */
 public abstract class ImagePreprocessorBase : ImagePreprocessor {
-    internal var save: ImageSaver? = null
+    internal var saver: ImageSaver? = null
 }

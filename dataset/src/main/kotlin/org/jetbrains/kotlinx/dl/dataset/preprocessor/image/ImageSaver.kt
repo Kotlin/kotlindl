@@ -13,8 +13,8 @@ import javax.imageio.ImageIO
  * Interface for saving image preprocessing output result.
  */
 public interface ImageSaver {
-    /** Saves the [image] to the [filename]. */
-    public fun save(filename: String, image: BufferedImage)
+	/** Saves the [image] to the [imageName]. */
+	public fun save(imageName: String, image: BufferedImage)
 }
 
 /**
@@ -22,22 +22,22 @@ public interface ImageSaver {
  *
  * @property [dirLocation] Could be link to the file or directory.
  */
-public class Save(
-    public var dirLocation: File? = null
+public class Saver(
+    public var dirLocation: File? = null,
 ) : ImageSaver {
-    @Throws(IOException::class)
-    override fun save(filename: String, image: BufferedImage) {
-        val outputFile: File = if (dirLocation!!.isDirectory) {
-            File(dirLocation, filename)
-        } else {
-            dirLocation!!
-        }
-        // TODO: file extension is a part of name, need to extract name without extension
-        ImageIO.write(image, "jpg", outputFile)
-    }
+	@Throws(IOException::class)
+	override fun save(imageName: String, image: BufferedImage) {
+		val outputFile: File = if (dirLocation!!.isDirectory) {
+			File(dirLocation, imageName)
+		} else {
+			dirLocation!!
+		}
+		// TODO: file extension is a part of name, need to extract name without extension
+		ImageIO.write(image, "jpg", outputFile)
+	}
 }
 
 /** */
-public fun ImagePreprocessorBase.save(block: Save.() -> Unit) {
-    save = Save().apply(block)
+public fun ImagePreprocessorBase.save(block: Saver.() -> Unit) {
+	saver = Saver().apply(block)
 }

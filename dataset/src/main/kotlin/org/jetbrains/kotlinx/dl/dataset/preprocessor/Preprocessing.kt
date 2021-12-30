@@ -8,10 +8,9 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.image.getShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
-import java.awt.image.BufferedImage
-import java.io.File
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.loading.ImageLoadingFacade
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.loading.ImageLoadingStrategy
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.loading.ImageLoadingFacadeImpl
 
 /**
  * The data preprocessing pipeline presented as Kotlin DSL on receivers.
@@ -19,83 +18,76 @@ import java.io.File
  * Could be used to handle directory of images or one image file.
  */
 public class Preprocessing {
-    /** */
-    public lateinit var load: Loading
+	/** */
+	public var load: ImageLoadingFacade? = null
 
-    /** This stage describes the process of image loading and transformation before converting to tensor. */
-    public lateinit var imagePreprocessingStage: ImagePreprocessing
+	/** This stage describes the process of image loading and transformation before converting to tensor. */
+	public var imagePreprocessingStage: ImagePreprocessing? = null
 
-    /** This stage describes the process of data transformation after converting to tensor. */
-    public lateinit var tensorPreprocessingStage: TensorPreprocessing
+	/** This stage describes the process of data transformation after converting to tensor. */
+	public var tensorPreprocessingStage: TensorPreprocessing? = null
 
-    /** Returns the final shape of data when image preprocessing is applied to the image. */
-    public val finalShape: ImageShape
-        get() {
-            var imageShape = if (::load.isInitialized) load.imageShape else null
-            if (::imagePreprocessingStage.isInitialized) {
-                for (operation in imagePreprocessingStage.operations) {
-                    imageShape = operation.getOutputShape(imageShape)
-                }
-            }
-            if (imageShape == null) {
-                throw IllegalStateException(
-                    "Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
-                            "or imageShape with height, weight and channels should be initialized."
-                )
-            }
-            return imageShape
-        }
+	/** Returns the final shape of data when image preprocessing is applied to the image. */
+	public val finalShape: ImageShape
+		get() {
+			var imageShape = load?.imageShape
 
-    /** Applies the preprocessing pipeline to the specific image file. */
-    public operator fun invoke(): Pair<FloatArray, ImageShape> {
-        val file = load.pathToData
-        require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
+			imagePreprocessingStage?.operations?.forEach { operation ->
+				imageShape = operation.getOutputShape(imageShape)
+			}
 
-        return handleFile(file)
-    }
+			return getImageShapeOrThrow(imageShape)
+		}
 
-    internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        return handleImage(load.fileToImage(file), file.name)
-    }
+	private fun getImageShapeOrThrow(imageShape: ImageShape?): ImageShape =
+		imageShape ?: throw IllegalStateException(
+			"Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
+					"or imageShape with height, weight and channels should be initialized."
+		)
 
-    internal fun handleImage(inputImage: BufferedImage, imageName: String): Pair<FloatArray, ImageShape> {
-        var image = inputImage
-        if (::imagePreprocessingStage.isInitialized) {
-            for (operation in imagePreprocessingStage.operations) {
-                image = operation.apply(image)
-                (operation as? ImagePreprocessorBase)?.save?.save(imageName, image)
-            }
-        }
+	/** Applies the preprocessing pipeline to the specific image file. */
+	public operator fun invoke(): Pair<FloatArray, ImageShape> {
+		val immutableImageLoading = load
+		requireNotNull(immutableImageLoading)
 
-        var tensor = ImageConverter.toRawFloatArray(image)
-        val shape = image.getShape()
+		requireNotNull(immutableImageLoading.loadingStrategy as? ImageLoadingStrategy) { "Invoke call is available for single image preprocessing only." }
 
-        if (::tensorPreprocessingStage.isInitialized) {
-            for (operation in tensorPreprocessingStage.operations) {
-                tensor = operation.apply(tensor, shape)
-            }
-        }
+		return preprocessImage(immutableImageLoading)
+	}
 
-        return Pair(tensor, shape)
-    }
+	internal fun preprocessImage(imageLoadingFacade: ImageLoadingFacade): Pair<FloatArray, ImageShape> {
+		imagePreprocessingStage?.operations?.forEach { operation ->
+			imageLoadingFacade.setImage(newImage = operation.apply(imageLoadingFacade.getImage()))
+			imageLoadingFacade.save()
+		}
+
+		var tensor = ImageConverter.toRawFloatArray(imageLoadingFacade.getImage())
+		val shape = imageLoadingFacade.getImage().getShape()
+
+		tensorPreprocessingStage?.operations?.forEach { operation ->
+			tensor = operation.apply(tensor, shape)
+		}
+
+		return tensor to shape
+	}
 }
 
 /** */
 public fun preprocess(init: Preprocessing.() -> Unit): Preprocessing =
-    Preprocessing()
-        .apply(init)
+	Preprocessing()
+		.apply(init)
 
 /** */
-public fun Preprocessing.load(block: Loading.() -> Unit) {
-    load = Loading().apply(block)
+public fun Preprocessing.load(block: ImageLoadingFacade.() -> Unit) {
+	load = ImageLoadingFacadeImpl().apply(block)
 }
 
 /** */
 public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {
-    imagePreprocessingStage = ImagePreprocessing().apply(block)
+	imagePreprocessingStage = ImagePreprocessing().apply(block)
 }
 
 /** */
 public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) {
-    tensorPreprocessingStage = TensorPreprocessing().apply(block)
+	tensorPreprocessingStage = TensorPreprocessing().apply(block)
 }
