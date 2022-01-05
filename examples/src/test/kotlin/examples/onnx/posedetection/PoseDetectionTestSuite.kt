@@ -71,7 +71,6 @@ class PoseDetectionTestSuite {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = imageFile
-                    imageShape = ImageShape(null, null, 3)
                 }
                 transformImage {
                     resize {
@@ -103,7 +102,6 @@ class PoseDetectionTestSuite {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = imageFile
-                    imageShape = ImageShape(null, null, 3)
                 }
                 transformImage {
                     resize {
@@ -135,7 +133,6 @@ class PoseDetectionTestSuite {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = imageFile
-                    imageShape = ImageShape(null, null, 3)
                 }
                 transformImage {
                     resize {

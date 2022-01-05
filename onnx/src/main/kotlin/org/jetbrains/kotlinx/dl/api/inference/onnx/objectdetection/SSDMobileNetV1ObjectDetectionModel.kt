@@ -78,7 +78,6 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
-                imageShape = ImageShape(null, null, 3)
             }
             transformImage {
                 resize {

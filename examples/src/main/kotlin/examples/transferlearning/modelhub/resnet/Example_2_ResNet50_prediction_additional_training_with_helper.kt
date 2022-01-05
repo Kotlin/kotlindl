@@ -56,7 +56,6 @@ fun resnet50additionalTrainingWithHelper() {
     val preprocessing: Preprocessing = preprocess {
         load {
             pathToData = File(dogsCatsImages)
-            imageShape = ImageShape(channels = NUM_CHANNELS)
             labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
         }
         transformImage {

@@ -49,7 +49,6 @@ private fun visualise(
     val preprocessing: Preprocessing = preprocess {
         load {
             pathToData = imageFile
-            imageShape = ImageShape(null, null, 3)
         }
         transformImage {
             resize {

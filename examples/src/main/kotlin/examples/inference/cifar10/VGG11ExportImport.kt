@@ -172,7 +172,6 @@ fun vgg11OnCifar10ExportImport() {
     val preprocessing: Preprocessing = preprocess {
         load {
             pathToData = File(cifarImagesArchive)
-            imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
         }
         transformImage { convert { colorMode = ColorMode.BGR } }
         transformTensor {

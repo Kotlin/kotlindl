@@ -32,7 +32,6 @@ fun ssdMobile() {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = getFileFromResource("datasets/detection/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
                 }
                 transformImage {
                     resize {

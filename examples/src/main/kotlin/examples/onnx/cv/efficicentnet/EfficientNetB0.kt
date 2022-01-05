@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,8 +11,11 @@ import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
@@ -35,7 +38,6 @@ fun efficientNetB0Prediction() {
             val preprocessing: Preprocessing = preprocess {
                 load {
                     pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
                 }
                 transformImage { convert { colorMode = ColorMode.BGR } }
             }

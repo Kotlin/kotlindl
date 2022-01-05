@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -29,7 +29,6 @@ fun main() {
     val preprocessing: Preprocessing = preprocess {
         load {
             pathToData = image
-            imageShape = ImageShape(224, 224, 3)
         }
         transformImage {
             crop {
@@ -68,7 +67,7 @@ fun main() {
     val rawImage = preprocessing().first
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.BGR))
+    frame.contentPane.add(ImagePanel(rawImage, preprocessing.getFinalShape(), colorMode = ColorMode.BGR))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

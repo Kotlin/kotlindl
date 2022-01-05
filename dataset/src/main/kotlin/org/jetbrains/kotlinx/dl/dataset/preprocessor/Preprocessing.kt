@@ -28,23 +28,26 @@ public class Preprocessing {
     /** This stage describes the process of data transformation after converting to tensor. */
     public lateinit var tensorPreprocessingStage: TensorPreprocessing
 
-    /** Returns the final shape of data when image preprocessing is applied to the image. */
-    public val finalShape: ImageShape
-        get() {
-            var imageShape = if (::load.isInitialized) load.imageShape ?: ImageShape() else ImageShape()
-            if (::imagePreprocessingStage.isInitialized) {
-                for (operation in imagePreprocessingStage.operations) {
-                    imageShape = operation.getOutputShape(imageShape)
-                }
+    /**
+     * Returns the final shape of data when image preprocessing is applied to the image with the given shape.
+     * @param [inputShape] shape of the input image
+     * @return shape of the output image
+     * */
+    public fun getFinalShape(inputShape: ImageShape = ImageShape()): ImageShape {
+        var imageShape = inputShape
+        if (::imagePreprocessingStage.isInitialized) {
+            for (operation in imagePreprocessingStage.operations) {
+                imageShape = operation.getOutputShape(imageShape)
             }
-            if (imageShape.width == null && imageShape.height == null && imageShape.channels == null) {
-                throw IllegalStateException(
-                    "Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
-                            "or imageShape with height, weight and channels should be initialized."
-                )
-            }
-            return imageShape
         }
+        if (imageShape.width == null && imageShape.height == null && imageShape.channels == null) {
+            throw IllegalStateException(
+                "Final image shape is unclear. Operator with fixed output size (such as \"resize\") should be used " +
+                        "or ImageShape with height, weight and channels should be passed as a parameter."
+            )
+        }
+        return imageShape
+    }
 
     /** Applies the preprocessing pipeline to the specific image file. */
     public operator fun invoke(): Pair<FloatArray, ImageShape> {
