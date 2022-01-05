@@ -56,13 +56,7 @@ fun vgg16noTopAdditionalTraining() {
     val modelType = TFModels.CV.VGG16(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
 
-    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsVsCatsDatasetPath)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = IMAGE_SIZE
@@ -78,7 +72,12 @@ fun vgg16noTopAdditionalTraining() {
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsVsCatsDatasetPath),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val layers = mutableListOf<Layer>()

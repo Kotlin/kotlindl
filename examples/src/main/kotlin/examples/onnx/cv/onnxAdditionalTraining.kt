@@ -59,9 +59,13 @@ fun runONNXAdditionalTraining(
     model.use {
         println(it)
 
-        val preprocessing: Preprocessing = preprocessing(resizeTo, dogsVsCatsDatasetPath, it)
+        val preprocessing: Preprocessing = preprocessing(resizeTo, it)
 
-        val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+        val dataset = OnFlyImageDataset.create(
+            File(dogsVsCatsDatasetPath),
+            FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+            preprocessing
+        ).shuffle()
         val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
         /**
@@ -91,15 +95,10 @@ fun runONNXAdditionalTraining(
 
 private fun preprocessing(
     resizeTo: Pair<Int, Int>,
-    dogsVsCatsDatasetPath: String,
     model: OnnxInferenceModel
 ): Preprocessing {
     val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         preprocess {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             transformImage { convert { colorMode = ColorMode.BGR } }
             transformTensor {
                 onnx {
@@ -109,10 +108,6 @@ private fun preprocessing(
         }
     } else {
         preprocess {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             transformImage {
                 resize {
                     outputHeight = resizeTo.first

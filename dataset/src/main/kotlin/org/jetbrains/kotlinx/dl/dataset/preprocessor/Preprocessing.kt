@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.image.getShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Loading
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -19,9 +18,6 @@ import java.io.File
  * Could be used to handle directory of images or one image file.
  */
 public class Preprocessing {
-    /** */
-    public lateinit var load: Loading
-
     /** This stage describes the process of image loading and transformation before converting to tensor. */
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
@@ -50,15 +46,14 @@ public class Preprocessing {
     }
 
     /** Applies the preprocessing pipeline to the specific image file. */
-    public operator fun invoke(): Pair<FloatArray, ImageShape> {
-        val file = load.pathToData
-        require(file!!.isFile) { "Invoke call is available for one file preprocessing only." }
-
-        return handleFile(file)
+    public operator fun invoke(imagePath: File): Pair<FloatArray, ImageShape> {
+        require(imagePath.isFile) { "Invoke call is available for one file preprocessing only." }
+        return handleFile(imagePath)
     }
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
-        return handleImage(load.fileToImage(file), file.name)
+        val image = file.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }
+        return handleImage(image, file.name)
     }
 
     internal fun handleImage(inputImage: BufferedImage, imageName: String): Pair<FloatArray, ImageShape> {
@@ -87,11 +82,6 @@ public class Preprocessing {
 public fun preprocess(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
-
-/** */
-public fun Preprocessing.load(block: Loading.() -> Unit) {
-    load = Loading().apply(block)
-}
 
 /** */
 public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {

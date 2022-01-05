@@ -182,12 +182,7 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun main() {
-    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(cifarImagesArchive)
-        }
         transformImage {
             crop {
                 left = 2
@@ -212,8 +207,9 @@ fun main() {
         }
     }
 
+    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnFlyImageDataset.create(preprocessing, y)
+    val dataset = OnFlyImageDataset.create(File(cifarImagesArchive), y, preprocessing)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 

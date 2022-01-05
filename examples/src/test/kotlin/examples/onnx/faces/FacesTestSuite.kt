@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,22 +40,18 @@ class FacesTestSuite {
         val model = modelHub.loadModel(modelType)
 
         model.use {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
+                    resize {
+                        outputHeight = 192
+                        outputWidth = 192
+                    }
+                    convert { colorMode = ColorMode.BGR }
+                }
+            }
             for (i in 0..8) {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-                val preprocessing: Preprocessing = preprocess {
-                    load {
-                        pathToData = imageFile
-                    }
-                    transformImage {
-                        resize {
-                            outputHeight = 192
-                            outputWidth = 192
-                        }
-                        convert { colorMode = ColorMode.BGR }
-                    }
-                }
-
-                val inputData = modelType.preprocessInput(preprocessing)
+                val inputData = modelType.preprocessInput(imageFile, preprocessing)
 
                 val yhat = it.predictRaw(inputData)
                 assertEquals(212, (yhat.values.toTypedArray()[0] as Array<FloatArray>)[0].size)

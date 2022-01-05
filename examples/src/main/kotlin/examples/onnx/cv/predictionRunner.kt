@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
@@ -31,15 +30,11 @@ fun runImageRecognitionPrediction(
     model.use {
         println(it)
 
+        val preprocessing: Preprocessing = preprocess {
+            transformImage { convert { colorMode = ColorMode.BGR } }
+        }
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                }
-                transformImage { convert { colorMode = ColorMode.BGR } }
-            }
-
-            val inputData = modelType.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(getFileFromResource("datasets/vgg/image$i.jpg"), preprocessing)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -21,21 +21,20 @@ fun main() {
     model.use {
         println(it)
 
-        for (i in 1..6) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/detection/image$i.jpg")
+        val preprocessing: Preprocessing = preprocess {
+            transformImage {
+                resize {
+                    outputHeight = it.inputShape[1].toInt()
+                    outputWidth = it.inputShape[2].toInt()
                 }
-                transformImage {
-                    resize {
-                        outputHeight = it.inputShape[1].toInt()
-                        outputWidth = it.inputShape[2].toInt()
-                    }
-                    convert { colorMode = ColorMode.BGR }
-                }
+                convert { colorMode = ColorMode.BGR }
             }
-
-            val inputData = modelType.preprocessInput(preprocessing)
+        }
+        for (i in 1..6) {
+            val inputData = modelType.preprocessInput(
+                getFileFromResource("datasets/detection/image$i.jpg"),
+                preprocessing
+            )
 
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())

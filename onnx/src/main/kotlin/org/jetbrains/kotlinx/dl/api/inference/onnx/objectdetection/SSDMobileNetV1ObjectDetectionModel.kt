@@ -76,9 +76,6 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
@@ -88,7 +85,7 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, shape) = preprocessing()
+        val (data, shape) = preprocessing(imageFile)
 
         val preprocessedData = ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessInput(
             data,

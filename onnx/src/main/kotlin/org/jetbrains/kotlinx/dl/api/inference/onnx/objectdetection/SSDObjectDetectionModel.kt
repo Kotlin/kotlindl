@@ -13,7 +13,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
@@ -78,9 +77,6 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = 1200
@@ -90,7 +86,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, shape) = preprocessing()
+        val (data, shape) = preprocessing(imageFile)
 
         val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
             data,

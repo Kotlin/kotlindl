@@ -184,13 +184,7 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun main() {
-    val dogsCatsImages = dogsCatsDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsCatsImages)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
@@ -206,7 +200,12 @@ fun main() {
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val dogsCatsImages = dogsCatsDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsImages),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     vgg11.use {

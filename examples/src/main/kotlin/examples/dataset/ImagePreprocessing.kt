@@ -26,14 +26,7 @@ import javax.swing.JFrame
  * - image visualisation
  */
 fun main() {
-    val resource: URL = ImagePreprocessing::class.java.getResource("/datasets/vgg")
-    val imageDirectory = Paths.get(resource.toURI()).toFile()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageDirectory
-            labelGenerator = EmptyLabels()
-        }
         transformImage {
             crop {
                 left = 12
@@ -58,10 +51,10 @@ fun main() {
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing)
-    val batchIter: Dataset.BatchIterator = dataset.batchIterator(
-        8
-    )
+    val resource: URL = ImagePreprocessing::class.java.getResource("/datasets/vgg")
+    val imageDirectory = Paths.get(resource.toURI()).toFile()
+    val dataset = OnFlyImageDataset.create(imageDirectory, EmptyLabels(), preprocessing)
+    val batchIter: Dataset.BatchIterator = dataset.batchIterator(8)
 
     val rawImage = batchIter.next().x[2]
 

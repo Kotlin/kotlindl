@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
@@ -75,9 +74,6 @@ public class ImageRecognitionModel(
             Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
 
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = height.toInt()
@@ -88,7 +84,7 @@ public class ImageRecognitionModel(
             }
         }
 
-        return modelType.preprocessInput(preprocessing)
+        return modelType.preprocessInput(imageFile, preprocessing)
     }
 
     /**

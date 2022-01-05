@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
@@ -56,9 +55,6 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
      */
     public fun detectLandmarks(imageFile: File): List<Landmark> {
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = 192
@@ -68,7 +64,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
             }
         }
 
-        val inputData = ONNXModels.FaceAlignment.Fan2d106.preprocessInput(preprocessing)
+        val inputData = ONNXModels.FaceAlignment.Fan2d106.preprocessInput(imageFile, preprocessing)
         val yhat = internalModel.predictRaw(inputData)
 
         val landMarks = mutableListOf<Landmark>()

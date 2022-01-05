@@ -54,13 +54,7 @@ fun vgg19additionalTraining() {
     val modelType = TFModels.CV.VGG19()
     val model = modelHub.loadModel(modelType)
 
-    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsVsCatsDatasetPath)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
@@ -76,7 +70,12 @@ fun vgg19additionalTraining() {
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsVsCatsDatasetPath),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val layers = mutableListOf<Layer>()

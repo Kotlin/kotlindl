@@ -65,9 +65,6 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
      */
     public fun detectObjects(imageFile: File): List<DetectedObject> {
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = inputShape[1].toInt()
@@ -77,7 +74,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, _) = preprocessing()
+        val (data, _) = preprocessing(imageFile)
         // we don't need special preprocessing here
         return this.detectObjects(data)
     }

@@ -68,9 +68,6 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
 
     public fun detectPoses(imageFile: File, confidence: Float = 0.1f): MultiPoseDetectionResult {
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-            }
             transformImage {
                 resize {
                     outputHeight = 256
@@ -80,7 +77,7 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, shape) = preprocessing()
+        val (data, shape) = preprocessing(imageFile)
 
         val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
             data,

@@ -22,14 +22,9 @@ import javax.swing.JFrame
  * - image visualisation
  */
 fun main() {
-    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
-    val image = File(imageResource!!.toURI())
     val preprocessedImagesDirectory = File("processedImages")
 
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = image
-        }
         transformImage {
             crop {
                 left = 100
@@ -64,7 +59,9 @@ fun main() {
         }
     }
 
-    val rawImage = preprocessing().first
+    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
+    val image = File(imageResource!!.toURI())
+    val rawImage = preprocessing(image).first
 
     val frame = JFrame("Filters")
     frame.contentPane.add(ImagePanel(rawImage, preprocessing.getFinalShape(), colorMode = ColorMode.BGR))

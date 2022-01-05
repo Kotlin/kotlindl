@@ -8,7 +8,6 @@ package examples.onnx.posedetection.multipose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -27,6 +26,8 @@ fun multiPoseDetectionMoveNetLightAPI() {
     val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
     model.use { poseDetectionModel ->
+        val preprocessing = preprocessing()
+
         for (i in 1..3) {
             val imageFile = getFileFromResource("datasets/poses/multi/$i.jpg")
             val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile, confidence = 0.0f)
@@ -37,19 +38,15 @@ fun multiPoseDetectionMoveNetLightAPI() {
                     println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
                 }
             }
-            visualise(imageFile, detectedPoses)
+
+            val (rawImage, shape) = preprocessing(imageFile)
+            drawMultiPoseLandMarks(rawImage, shape, detectedPoses)
         }
     }
 }
 
-private fun visualise(
-    imageFile: File,
-    multiPoseDetectionResult: MultiPoseDetectionResult
-) {
-    val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-        }
+private fun preprocessing(): Preprocessing {
+    return preprocess {
         transformImage {
             resize {
                 outputHeight = 256
@@ -63,9 +60,6 @@ private fun visualise(
             }
         }
     }
-
-    val rawImage = preprocessing().first
-    drawMultiPoseLandMarks(rawImage, ImageShape(256, 256, 3), multiPoseDetectionResult)
 }
 
 /** */

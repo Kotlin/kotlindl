@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.load
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
@@ -31,21 +30,17 @@ fun ssd() {
     model.use {
         println(it)
 
-        for (i in 1..6) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/detection/image$i.jpg")
+        val preprocessing: Preprocessing = preprocess {
+            transformImage {
+                resize {
+                    outputHeight = 1200
+                    outputWidth = 1200
                 }
-                transformImage {
-                    resize {
-                        outputHeight = 1200
-                        outputWidth = 1200
-                    }
-                    convert { colorMode = ColorMode.BGR }
-                }
+                convert { colorMode = ColorMode.BGR }
             }
-
-            val inputData = modelType.preprocessInput(preprocessing)
+        }
+        for (i in 1..6) {
+            val inputData = modelType.preprocessInput(getFileFromResource("datasets/detection/image$i.jpg"), preprocessing)
 
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())

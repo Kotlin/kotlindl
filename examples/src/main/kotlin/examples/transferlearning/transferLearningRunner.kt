@@ -41,13 +41,7 @@ fun runImageRecognitionTransferLearning(
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsCatsImages)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = modelType.inputShape?.get(0) ?: 224
@@ -63,7 +57,12 @@ fun runImageRecognitionTransferLearning(
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsImages),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
@@ -141,13 +140,7 @@ fun runImageRecognitionTransferLearningOnTopModel(
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsCatsImages)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = modelType.inputShape?.get(0) ?: 224
@@ -163,7 +156,12 @@ fun runImageRecognitionTransferLearningOnTopModel(
         }
     }
 
-    val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsImages),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)

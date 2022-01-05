@@ -8,15 +8,11 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class PreprocessingFinalShapeTest {
     @Test
     fun resizeNoInputShape() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 resize {
                     outputWidth = 100
@@ -31,9 +27,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun resizeInputShape() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 resize {
                     outputWidth = 100
@@ -48,9 +41,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun cropImage() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 crop {
                     left = 3
@@ -66,9 +56,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun cropTwice() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 crop {
                     left = 3
@@ -90,9 +77,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun resizeAndCrop() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 resize {
                     outputWidth = 150
@@ -113,9 +97,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun rotateImage() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 rotate {
                     degrees = 30f
@@ -128,9 +109,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun padImage() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 pad {
                     top = 5
@@ -146,9 +124,6 @@ class PreprocessingFinalShapeTest {
     @Test
     fun centerCropImage() {
         val preprocess = preprocess {
-            load {
-                pathToData = File("test.jpg")
-            }
             transformImage {
                 centerCrop { size = 15 }
             }

@@ -69,9 +69,6 @@ class PoseDetectionTestSuite {
         model.use {
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = imageFile
-                }
                 transformImage {
                     resize {
                         outputHeight = 192
@@ -81,7 +78,7 @@ class PoseDetectionTestSuite {
                 }
             }
 
-            val inputData = modelType.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(imageFile, preprocessing)
 
             val yhat = it.predictRaw(inputData)
 
@@ -100,9 +97,6 @@ class PoseDetectionTestSuite {
         model.use {
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = imageFile
-                }
                 transformImage {
                     resize {
                         outputHeight = 256
@@ -112,7 +106,7 @@ class PoseDetectionTestSuite {
                 }
             }
 
-            val inputData = modelType.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(imageFile, preprocessing)
 
             val yhat = it.predictRaw(inputData)
 
@@ -131,9 +125,6 @@ class PoseDetectionTestSuite {
         model.use { inferenceModel ->
             val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
             val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = imageFile
-                }
                 transformImage {
                     resize {
                         outputHeight = 256
@@ -143,7 +134,7 @@ class PoseDetectionTestSuite {
                 }
             }
 
-            val inputData = modelType.preprocessInput(preprocessing)
+            val inputData = modelType.preprocessInput(imageFile, preprocessing)
             val yhat = inferenceModel.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())
 

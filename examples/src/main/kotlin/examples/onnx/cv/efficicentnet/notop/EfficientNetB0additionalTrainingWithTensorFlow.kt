@@ -64,13 +64,7 @@ fun efficientNetB0AdditionalTraining() {
 
     model.use {
         println(it)
-        val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
-
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             transformImage {
                 resize {
                     outputHeight = IMAGE_SIZE.toInt()
@@ -86,7 +80,12 @@ fun efficientNetB0AdditionalTraining() {
             }
         }
 
-        val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+        val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
+        val dataset = OnFlyImageDataset.create(
+            File(dogsVsCatsDatasetPath),
+            FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+            preprocessing
+        ).shuffle()
         val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
         topModel.use {
