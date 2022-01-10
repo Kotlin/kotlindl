@@ -5,10 +5,21 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
 
+import java.io.File
+
 /**
  * This [LabelGenerator] is responsible for extracting labels from the names of folders where the images of the appropriate class are located.
  * It keeps the [mapping] name of classes to int numbers.
  *
  * @property [mapping] The mapping from class names to class labels presented as natural numbers.
  */
-public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator
+public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator {
+    override fun getLabel(file: File): Float {
+        val label = mapping[file.parentFile.name]
+        if (label == null) {
+            error("The parent directory of ${file.absolutePath} is ${file.parentFile.name}. No such class name in mapping $mapping")
+        }
+        return label.toFloat()
+    }
+}
+

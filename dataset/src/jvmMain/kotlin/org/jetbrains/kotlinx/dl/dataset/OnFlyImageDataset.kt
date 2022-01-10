@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -137,7 +138,7 @@ public class OnFlyImageDataset internal constructor(
         ): OnFlyImageDataset {
             return try {
                 val xFiles = OnHeapDataset.prepareFileNames(pathToData)
-                val y = OnHeapDataset.prepareY(xFiles, labelGenerator)
+                val y = labelGenerator.prepareY(xFiles)
                 OnFlyImageDataset(xFiles, y, preprocessors)
             } catch (e: IOException) {
                 throw AssertionError(e)

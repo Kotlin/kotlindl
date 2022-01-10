@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -244,35 +245,11 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             return try {
                 val xFiles = prepareFileNames(pathToData)
                 val x = prepareX(xFiles, preprocessing)
-                val y = prepareY(xFiles, labelGenerator)
+                val y = labelGenerator.prepareY(xFiles)
 
                 OnHeapDataset(x, y)
             } catch (e: IOException) {
                 throw AssertionError(e)
-            }
-        }
-
-        internal fun prepareY(
-            xFiles: Array<File>,
-            labelGenerator: LabelGenerator,
-        ): FloatArray {
-            when (labelGenerator) {
-                is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
-                    val mapping = labelGenerator.mapping
-
-                    val y = FloatArray(xFiles.size) { 0.0f }
-                    for (i in xFiles.indices) {
-                        y[i] = (mapping[xFiles[i].parentFile.name]
-                            ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
-                    }
-                    return y
-                }
-                is EmptyLabels -> {
-                    return FloatArray(xFiles.size) { Float.NaN }
-                }
-                else -> {
-                    throw UnsupportedOperationException("Unknown label generator: ${labelGenerator}") // TODO: labelGenerator.apply(...) will be better solution here.
-                }
             }
         }
 
