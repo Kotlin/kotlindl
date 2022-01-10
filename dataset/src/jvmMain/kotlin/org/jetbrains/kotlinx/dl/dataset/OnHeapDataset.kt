@@ -5,9 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
@@ -28,8 +27,7 @@ import kotlin.streams.toList
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
  */
-public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) :
-    Dataset() {
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
@@ -207,7 +205,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Creates an [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
+         * Creates an [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to load and prepare images.
          */
         @JvmStatic
         public fun create(
@@ -217,7 +215,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
-                val x = prepareX(xFiles, preprocessing)
+                val x = preprocessing.prepareX(xFiles)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -225,26 +223,18 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             }
         }
 
-        private fun prepareX(
-            xFiles: Array<File>,
-            preprocessors: Preprocessing
-        ): Array<FloatArray> {
-            return Array(xFiles.size) { preprocessors.handleFile(xFiles[it]).first }
-        }
-
-
         /**
-         * Creates an [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
+         * Creates an [OnHeapDataset] from [pathToData] and [labelGenerator] with [dataLoader] to load and prepare images.
          */
         @JvmStatic
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator,
-            preprocessing: Preprocessing = Preprocessing()
+            dataLoader: DataLoader = Preprocessing()
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
-                val x = prepareX(xFiles, preprocessing)
+                val x = dataLoader.prepareX(xFiles)
                 val y = labelGenerator.prepareY(xFiles)
 
                 OnHeapDataset(x, y)

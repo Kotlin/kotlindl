@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.image.getShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape.Companion.toTensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImagePreprocessorBase
 import java.awt.image.BufferedImage
@@ -17,12 +20,17 @@ import java.io.File
  *
  * Could be used to handle directory of images or one image file.
  */
-public class Preprocessing {
+public class Preprocessing: DataLoader {
     /** This stage describes the process of image loading and transformation before converting to tensor. */
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
     /** This stage describes the process of data transformation after converting to tensor. */
     public lateinit var tensorPreprocessingStage: TensorPreprocessing
+
+    override fun load(file: File): Pair<FloatArray, TensorShape> {
+        val (floats, imageShape) = invoke(file)
+        return floats to imageShape.toTensorShape()
+    }
 
     /**
      * Returns the final shape of data when image preprocessing is applied to the image with the given shape.

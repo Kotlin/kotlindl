@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
+import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -57,7 +58,7 @@ public class ImageRecognitionModel(
 
     /**
      * Predicts [topK] objects for the given [imageFile].
-     * Default [Preprocessing] is applied to an image.
+     * Default [DataLoader] is used to load and prepare image.
      *
      * @param [imageFile] Input image [File].
      * @param [topK] Number of top ranked predictions to return
@@ -72,16 +73,16 @@ public class ImageRecognitionModel(
     }
 
     /**
-     * Predicts [topK] objects for the given [imageFile] with a custom [Preprocessing] provided.
+     * Predicts [topK] objects for the given [imageFile] with a custom [DataLoader] provided.
      *
      * @param [imageFile] Input image [File].
-     * @param [preprocessing] custom [Preprocessing] instance
+     * @param [dataLoader] custom [DataLoader] instance
      * @param [topK] Number of top ranked predictions to return
      *
      * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
      */
-    public fun predictTopKObjects(imageFile: File, preprocessing: Preprocessing, topK: Int = 5): List<Pair<String, Float>> {
-        val (inputData, _) = preprocessing(imageFile)
+    public fun predictTopKObjects(imageFile: File, dataLoader: DataLoader, topK: Int = 5): List<Pair<String, Float>> {
+        val (inputData, _) = dataLoader.load(imageFile)
         return predictTopKImageNetLabels(internalModel, inputData, imageNetClassLabels, topK)
     }
 
@@ -120,15 +121,15 @@ public class ImageRecognitionModel(
     }
 
     /**
-     * Predicts object for the given [imageFile] with a custom [Preprocessing] provided.
+     * Predicts object for the given [imageFile] with a custom [DataLoader] provided.
      *
      * @param [imageFile] Input image [File].
-     * @param [preprocessing] custom [Preprocessing] instance
+     * @param [dataLoader] custom [DataLoader] instance
      *
      * @return The label of the recognized object with the highest probability.
      */
-    public fun predictObject(imageFile: File, preprocessing: Preprocessing): String {
-        val (inputData, _) = preprocessing(imageFile)
+    public fun predictObject(imageFile: File, dataLoader: DataLoader): String {
+        val (inputData, _) = dataLoader.load(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
     }
 
@@ -136,14 +137,11 @@ public class ImageRecognitionModel(
         /**
          * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
          *
-         * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
+         * It loads the data from file with the provided [dataLoader] and applied the specific preprocessing to it.
          */
-        public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Preprocessing): FloatArray {
-            val (data, shape) = preprocessing(imageFile)
-            return preprocessInput(
-                data,
-                longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-            )
+        public fun ModelType<*, *>.preprocessInput(imageFile: File, dataLoader: DataLoader): FloatArray {
+            val (data, shape) = dataLoader.load(imageFile)
+            return preprocessInput(data, shape.dims())
         }
     }
 }
