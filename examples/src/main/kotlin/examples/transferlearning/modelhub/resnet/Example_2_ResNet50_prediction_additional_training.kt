@@ -75,12 +75,8 @@ fun resnet50additionalTraining() {
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers) {
-        layer.freeze()
-        layers.add(layer)
-    }
+    val layers = model.layers.toMutableList()
+    layers.forEach(Layer::freeze)
 
     val lastLayer = layers.last()
     for (outboundLayer in lastLayer.inboundLayers)

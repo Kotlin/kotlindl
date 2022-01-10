@@ -180,9 +180,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     }
 
     private fun freezeAllLayers(model: GraphTrainableModel): GraphTrainableModel {
-        for (layer in model.layers) {
-            layer.freeze()
-        }
+        model.layers.forEach(Layer::freeze)
         return model
     }
 

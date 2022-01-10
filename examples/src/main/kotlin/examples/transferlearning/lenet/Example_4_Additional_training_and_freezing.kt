@@ -6,6 +6,7 @@
 package examples.transferlearning.lenet
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -32,10 +33,7 @@ fun additionalTrainingAndFreezing() {
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
-        for (layer in it.layers) {
-            if (layer is Conv2D)
-                layer.freeze()
-        }
+        it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
         it.compile(
             optimizer = Adam(),

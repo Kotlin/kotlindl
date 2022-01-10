@@ -9,6 +9,7 @@ import examples.inference.lenet5
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.WritingMode
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -71,10 +72,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
 
     model.use {
         // Freeze conv2d layers, keep dense layers trainable
-        for (layer in it.layers) {
-            if (layer::class == Conv2D::class)
-                layer.freeze()
-        }
+        it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
         it.compile(
             optimizer = optimizer,

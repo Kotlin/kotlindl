@@ -487,10 +487,7 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            for (layer in it.layers) {
-                if (layer is Conv2D)
-                    layer.freeze()
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),
@@ -554,14 +551,8 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            val layerList = mutableListOf<Layer>()
-
-            for (layer in it.layers) {
-                if (layer is Conv2D) {
-                    layer.freeze()
-                    layerList.add(layer)
-                }
-            }
+            val layerList = it.layers.filterIsInstance<Conv2D>()
+            layerList.forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),
@@ -625,14 +616,7 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            val layerList = mutableListOf<Layer>()
-
-            for (layer in it.layers) {
-                if (layer is Conv2D) {
-                    layer.freeze()
-                    layerList.add(layer)
-                }
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),

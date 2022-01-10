@@ -47,9 +47,7 @@ fun main() {
 
         println("Accuracy before: $accuracy")
 
-        for (layer in it.layers) {
-            layer.freeze()
-        }
+        it.layers.forEach(Layer::freeze)
         it.layers.last().unfreeze()
 
         it.fit(dataset = train, epochs = 1, batchSize = 1000)

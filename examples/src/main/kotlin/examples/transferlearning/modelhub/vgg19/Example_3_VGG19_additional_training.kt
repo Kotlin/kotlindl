@@ -79,13 +79,8 @@ fun vgg19additionalTraining() {
     ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers.dropLast(1)) {
-        layer.freeze()
-        layers.add(layer)
-    }
-    layers.forEach { it.freeze() }
+    val layers = model.layers.dropLast(1).toMutableList()
+    layers.forEach(Layer::freeze)
 
     layers.add(
         Dense(

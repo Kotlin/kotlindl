@@ -31,14 +31,9 @@ fun additionalTrainingAndPartialFreezingAndPartialInitialization() {
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
     model.use {
-        val layerList = mutableListOf<Layer>()
         // Freeze conv2d layers, keep dense layers trainable
-        for (layer in it.layers) {
-            if (layer::class == Conv2D::class) {
-                layer.freeze()
-                layerList.add(layer)
-            }
-        }
+        val layerList = it.layers.filterIsInstance<Conv2D>()
+        layerList.forEach(Layer::freeze)
 
         it.compile(
             optimizer = Adam(),

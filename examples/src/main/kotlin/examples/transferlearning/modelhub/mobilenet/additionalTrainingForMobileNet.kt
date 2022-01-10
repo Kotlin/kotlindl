@@ -91,12 +91,8 @@ fun mobilenetWithAdditionalTraining() {
         it.logSummary()
     }
 
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers) {
-        layer.freeze()
-        layers.add(layer)
-    }
+    val layers = model.layers.toMutableList()
+    layers.forEach(Layer::freeze)
 
     val lastLayer = layers.last()
     for (outboundLayer in lastLayer.inboundLayers)
