@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
@@ -15,25 +16,21 @@ import kotlin.math.truncate
 import kotlin.random.Random
 
 /**
- * This dataset keeps all data on disk and generates batches on-fly according [preprocessing] pipeline.
+ * This dataset keeps all data on disk and generates batches on the fly using provided [dataLoader].
  *
  * @param [xFiles] files to load images from
  * @param [y] labels to use for the loaded images
- * @param [preprocessing] preprocessing to apply to the loaded images
+ * @param [dataLoader] loader to load the data with from the provided files
  */
 public class OnFlyImageDataset internal constructor(
     private val xFiles: Array<File>,
     private val y: FloatArray,
-    private val preprocessing: Preprocessing,
+    private val dataLoader: DataLoader,
 ) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyImagesToBatch(src: Array<File>, start: Int, length: Int): Array<FloatArray> {
-        return Array(length) { index -> applyImagePreprocessing(src[start + index]) }
-    }
-
-    private fun applyImagePreprocessing(file: File): FloatArray {
-        return preprocessing.handleFile(file).first
+        return Array(length) { index -> dataLoader.load(src[start + index]).first }
     }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
@@ -50,12 +47,12 @@ public class OnFlyImageDataset internal constructor(
         val train = OnFlyImageDataset(
             xFiles.copyOfRange(0, trainDatasetLastIndex),
             y.copyOfRange(0, trainDatasetLastIndex),
-            preprocessing
+            dataLoader
         )
         val test = OnFlyImageDataset(
             xFiles.copyOfRange(trainDatasetLastIndex, xFiles.size),
             y.copyOfRange(trainDatasetLastIndex, y.size),
-            preprocessing
+            dataLoader
         )
 
         return Pair(train, test)
@@ -68,7 +65,7 @@ public class OnFlyImageDataset internal constructor(
 
     /** Returns row by index [idx]. */
     override fun getX(idx: Int): FloatArray {
-        return applyImagePreprocessing(xFiles[idx])
+        return dataLoader.load(xFiles[idx]).first
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
@@ -121,7 +118,7 @@ public class OnFlyImageDataset internal constructor(
             preprocessing: Preprocessing = Preprocessing()
         ): OnFlyImageDataset {
             return try {
-                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing)
+                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing.dataLoader())
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
@@ -134,12 +131,12 @@ public class OnFlyImageDataset internal constructor(
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator,
-            preprocessors: Preprocessing = Preprocessing()
+            preprocessing: Preprocessing = Preprocessing()
         ): OnFlyImageDataset {
             return try {
                 val xFiles = OnHeapDataset.prepareFileNames(pathToData)
                 val y = labelGenerator.prepareY(xFiles)
-                OnFlyImageDataset(xFiles, y, preprocessors)
+                OnFlyImageDataset(xFiles, y, preprocessing.dataLoader())
             } catch (e: IOException) {
                 throw AssertionError(e)
             }

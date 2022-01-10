@@ -246,4 +246,4 @@ public fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
 /**
  * @see getDimsOfArray
  */
-internal val Array<*>.tensorShape: TensorShape get() = TensorShape(getDimsOfArray(this))
+public val Array<*>.tensorShape: TensorShape get() = TensorShape(getDimsOfArray(this))
