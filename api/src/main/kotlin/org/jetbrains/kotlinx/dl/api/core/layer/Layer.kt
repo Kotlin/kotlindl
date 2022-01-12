@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,14 +7,11 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
-import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
-import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 /**
  * Base abstract class for all layers.
@@ -33,12 +30,6 @@ public abstract class Layer(public var name: String) {
 
     /** Model where this layer is used. */
     public var parentModel: TrainableModel? = null
-
-    /** Returns number of input parameters. */
-    protected var fanIn: Int = Int.MIN_VALUE
-
-    /** Returns number of output parameters. */
-    protected var fanOut: Int = Int.MIN_VALUE
 
     /** Returns inbound layers. */
     public var inboundLayers: MutableList<Layer> = mutableListOf()
@@ -108,47 +99,24 @@ public abstract class Layer(public var name: String) {
         return forward(tf, input[0], isTraining, numberOfLosses)
     }
 
-    /**
-     * Adds a new weight tensor to the layer
-     *
-     * @param name     variable name
-     * @param variable variable to add
-     * @return the created variable.
-     */
-    protected fun addWeight(
-        tf: Ops,
-        kGraph: KGraph,
-        name: String,
-        variable: Variable<Float>,
-        initializer: Initializer,
-        regularizer: Regularizer? = null
-    ): Variable<Float> {
-        // require(fanIn != Int.MIN_VALUE) { "fanIn should be calculated before initialization for variable $name" }
-        // require(fanOut != Int.MIN_VALUE) { "fanOut should be calculated before initialization for variable $name" }
-
-        val initOp = initializer.apply(fanIn, fanOut, tf, variable, name)
-        kGraph.addLayerVariable(variable, isTrainable)
-        kGraph.addInitializer(name, initOp)
-        if (regularizer != null) kGraph.addVariableRegularizer(variable, regularizer)
-        return variable
-    }
-
     /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
     public operator fun invoke(vararg layers: Layer): Layer {
         inboundLayers = layers.toMutableList()
         return this
     }
 
-    /** Extract weights values by variable names. */
-    protected fun extractWeights(variableNames: List<String>): Map<String, Array<*>> {
+    /** Extract weights values for provided variables. */
+    protected fun extractWeights(vararg variables: KVariable?): Map<String, Array<*>> {
         require(parentModel != null) { "Layer $name is not related to any model!" }
 
         val session = parentModel!!.session
         val runner = session.runner()
 
+        val variableNames = variables.mapNotNull { it?.name }
         for (variableName in variableNames) {
             runner.fetch(variableName)
         }
+
         val weights = runner.run().map { it.convertTensorToMultiDimArray() }
         return variableNames.zip(weights).toMap()
     }

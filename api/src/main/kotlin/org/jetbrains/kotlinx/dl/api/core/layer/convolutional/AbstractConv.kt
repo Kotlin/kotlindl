@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,17 +8,17 @@ package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 import kotlin.math.roundToInt
 
 /**
@@ -63,37 +63,47 @@ public abstract class AbstractConv(
     protected val useBiasInternal: Boolean,
     name: String
 ) : Layer(name) {
-
     /** Tensor with kernel weights */
-    protected lateinit var kernel: Variable<Float>
+    protected lateinit var kernel: KVariable
 
     /** Tensor with bias weights */
-    protected var bias: Variable<Float>? = null
-
-    /** Shape of internal implementation of kernel variable */
-    protected var biasShape: Shape? = null
-
-    /** Shape of internal implementation of bias variable */
-    protected lateinit var kernelShape: Shape
+    protected var bias: KVariable? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
-        // Compute shapes of kernel and bias matrices
-        kernelShape = computeKernelShape(numberOfChannels)
-        if (useBiasInternal) {
-            biasShape = computeBiasShape(numberOfChannels)
-        }
-
-        // should be calculated before addWeight because it's used in calculation
         val inputDepth = numberOfChannels // number of input channels
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
-        fanIn = (inputDepth * multiply(*kernelSizeInternal.toLongArray())).toInt()
-        fanOut = ((outputDepth * multiply(*kernelSizeInternal.toLongArray())).toDouble() /
-                multiply(*stridesInternal.toLongArray()).toDouble()).roundToInt()
+        val fanIn = (inputDepth * multiply(kernelSizeInternal.toLongArray())).toInt()
+        val fanOut = ((outputDepth * multiply(kernelSizeInternal.toLongArray())).toDouble() /
+                     multiply(stridesInternal.toLongArray()).toDouble()).roundToInt()
 
-        createConvVariables(tf, kGraph)
+        kernel = createVariable(
+            tf,
+            kGraph,
+            kernelVarName(name),
+            isTrainable,
+            computeKernelShape(numberOfChannels),
+            fanIn,
+            fanOut,
+            kernelInitializerInternal,
+            kernelRegularizerInternal
+        )
+
+        if (useBiasInternal) {
+            bias = createVariable(
+                tf,
+                kGraph,
+                biasVarName(name),
+                isTrainable,
+                computeBiasShape(numberOfChannels),
+                fanIn,
+                fanOut,
+                biasInitializerInternal,
+                biasRegularizerInternal
+            )
+        }
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -108,36 +118,34 @@ public abstract class AbstractConv(
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        var output = convImplementation(tf, input)
+        val convolution = convImplementation(tf, input)
 
-        if (useBiasInternal) {
-            output = tf.nn.biasAdd(output, bias)
-        }
+        val withBias = bias?.let { tf.nn.biasAdd(convolution, it.variable) } ?: convolution
 
-        return Activations.convert(activationInternal).apply(tf, output, name)
+        return Activations.convert(activationInternal).apply(tf, withBias, name)
     }
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
+    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override var weights: Map<String, Array<*>>
-        get() = extractConvWeights()
+        get() = extractWeights(kernel, bias)
         set(value) = assignWeights(value)
 
     override val hasActivation: Boolean get() = true
 
     override val paramCount: Int
-        get() = (kernelShape.numElements() + (biasShape?.numElements() ?: 0)).toInt()
+        get() = (kernel.shape.numElements() + (bias?.shape?.numElements() ?: 0)).toInt()
 
     /** Define the number of output channels given the number of input channels.
      *  Defaults to the number of filter in convolutional layer. */
     protected open fun getOutputDepth(numberOfChannels: Long): Long = filtersInternal.toLong()
 
     /**
-     * Define the [kernelShape] by default from its [kernelSizeInternal],
+     * Define the [kernel] shape by default from its [kernelSizeInternal],
      * [filtersInternal] and the given [numberOfChannels] from input Tensor.
      *
      * @param numberOfChannels for input of this layer
@@ -146,7 +154,7 @@ public abstract class AbstractConv(
         shapeFromDims(*kernelSizeInternal.toLongArray(), numberOfChannels, filtersInternal.toLong())
 
     /**
-     * Define the [biasShape] by default from its [filtersInternal] and
+     * Define the [bias] shape by default from its [filtersInternal] and
      * the given [numberOfChannels] from input Tensor.
      *
      * @param numberOfChannels for input of this layer
@@ -171,25 +179,6 @@ public abstract class AbstractConv(
      * @return the defined output shape that is saved in class variable and returned by [computeOutputShape]]
      */
     protected abstract fun defineOutputShape(inputShape: Shape): Shape
-
-    /** Extract weights of the layer by kernel and bias variable names returned by [kernelVarName] and [biasVarName] methods. */
-    private fun extractConvWeights(): Map<String, Array<*>> = extractWeights(
-        if (useBiasInternal) listOf(kernelVarName(name), biasVarName(name))
-        else listOf(kernelVarName(name))
-    )
-
-    /** Create the variables of the layer in proper order. */
-    private fun createConvVariables(tf: Ops, kGraph: KGraph) {
-        val kernelVariableName = kernelVarName(name)
-        kernel = tf.withName(kernelVariableName).variable(kernelShape, getDType())
-        kernel = addWeight(tf, kGraph, kernelVariableName, kernel, kernelInitializerInternal, kernelRegularizerInternal)
-
-        if (useBiasInternal) {
-            val biasVariableName = biasVarName(name)
-            val biasVariable = tf.withName(biasVariableName).variable(biasShape, getDType())
-            bias = addWeight(tf, kGraph, biasVariableName, biasVariable, biasInitializerInternal, biasRegularizerInternal)
-        }
-    }
 }
 
-private fun multiply(vararg values: Long) = values.fold(1L, Long::times)
+private fun multiply(values: LongArray) = values.fold(1L, Long::times)

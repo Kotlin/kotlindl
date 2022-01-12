@@ -7,12 +7,10 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
-import kotlin.math.abs
 
 /**
  * Layer that reshapes inputs into the given shape.
@@ -34,15 +32,9 @@ public class Reshape(
     private lateinit var units: Constant<Int>
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        val tensorShape = TensorShape(inputShape)
-        val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
-
         units = tf.constant(IntArray(targetShape.size + 1) {
             if (it == 0) -1 else targetShape[it - 1]
         })
-
-        fanIn = tensorShape.numElements().toInt()
-        fanOut = amountOfNeuronsInFlattenLayer
     }
 
     // leaves unknown dimensions unknown

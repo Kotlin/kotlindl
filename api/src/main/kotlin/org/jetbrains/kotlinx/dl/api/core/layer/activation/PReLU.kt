@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,14 +8,14 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
+import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 
 /**
  * Parametric Rectified Linear Unit.
@@ -40,15 +40,16 @@ public class PReLU(
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */
-    private lateinit var alphaShape: Shape
-    private lateinit var alpha: Variable<Float>
-    private val alphaVariableName = if (name.isNotEmpty()) name + "_" + "alpha" else "alpha"
+
+    private lateinit var alpha: KVariable
+    private fun alphaVariableName(): String =
+        if (name.isNotEmpty()) "${name}_alpha" else "alpha"
 
     override var weights: Map<String, Array<*>>
-        get() = extractWeights(listOf(alphaVariableName))
+        get() = extractWeights(alpha)
         set(value) = assignWeights(value)
     override val paramCount: Int
-        get() = alphaShape.numElements().toInt()
+        get() = alpha.shape.numElements().toInt()
 
     init {
         isTrainable = true
@@ -61,19 +62,28 @@ public class PReLU(
                 alphaShapeArray[axis - 1] = 1
             }
         }
-        alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
 
-        fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
-        fanOut = fanIn
+        val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
+        val fanOut = fanIn
 
-        alpha = tf.withName(alphaVariableName).variable(alphaShape, getDType())
-        alpha = addWeight(tf, kGraph, alphaVariableName, alpha, alphaInitializer, alphaRegularizer)
+        val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
+        alpha = createVariable(
+            tf,
+            kGraph,
+            alphaVariableName(),
+            isTrainable,
+            alphaShape,
+            fanIn,
+            fanOut,
+            alphaInitializer,
+            alphaRegularizer
+        )
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
         // It's equivalent to: `-alpha * relu(-x) + relu(x)`
         val positive = tf.nn.relu(input)
-        val negative = tf.math.mul(tf.math.neg(alpha), tf.nn.relu(tf.math.neg(input)))
+        val negative = tf.math.mul(tf.math.neg(alpha.variable), tf.nn.relu(tf.math.neg(input)))
         return tf.math.add(positive, negative)
     }
 

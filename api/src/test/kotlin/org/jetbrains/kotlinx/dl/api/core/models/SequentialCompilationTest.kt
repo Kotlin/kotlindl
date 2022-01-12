@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -22,9 +22,6 @@ import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -429,7 +426,7 @@ internal class SequentialModelTest {
         val exception =
             assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
         assertEquals(
-            "lateinit property kernelShape has not been initialized",
+            "lateinit property kernel has not been initialized",
             exception.message
         )
 
@@ -468,7 +465,7 @@ internal class SequentialModelTest {
         val exception =
             assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
         assertEquals(
-            "lateinit property kernelShape has not been initialized",
+            "lateinit property kernel has not been initialized",
             exception.message
         )
 
