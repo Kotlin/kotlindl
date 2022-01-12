@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.custom.efficientnet
+package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
@@ -16,8 +16,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
-import java.net.URISyntaxException
-import java.net.URL
 
 fun runONNXImageRecognitionPrediction(
     modelType: ONNXModels.CV<out OnnxInferenceModel>,

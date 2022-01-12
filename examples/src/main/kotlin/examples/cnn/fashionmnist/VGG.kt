@@ -19,7 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
-private const val EPOCHS = 2
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 100
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10

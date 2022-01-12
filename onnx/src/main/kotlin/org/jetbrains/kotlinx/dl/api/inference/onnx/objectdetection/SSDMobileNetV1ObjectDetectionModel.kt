@@ -14,16 +14,17 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import java.io.File
+import java.nio.IntBuffer
 
 /**
  * Special model class for detection objects on images
  * with built-in preprocessing and post-processing.
  *
- * It internally uses [ONNXModels.ObjectDetection.SSD] trained on the COCO dataset.
+ * It internally uses [ONNXModels.ObjectDetection.SSDMobileNetV1] model trained on the COCO dataset.
  *
- * @since 0.3
+ * @since 0.4
  */
-public class SSDObjectDetectionModel : OnnxInferenceModel() {
+public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *
@@ -37,20 +38,20 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
         val rawPrediction = this.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = (rawPrediction["bboxes"] as Array<Array<FloatArray>>)[0]
-        val classIndices = (rawPrediction["labels"] as Array<LongArray>)[0]
-        val probabilities = (rawPrediction["scores"] as Array<FloatArray>)[0]
-        val numberOfFoundObjects = boxes.size
+        val boxes = (rawPrediction["detection_boxes:0"] as Array<Array<FloatArray>>)[0]
+        val classIndices = (rawPrediction["detection_classes:0"] as Array<FloatArray>)[0]
+        val probabilities = (rawPrediction["detection_scores:0"] as Array<FloatArray>)[0]
+        val numberOfFoundObjects = (rawPrediction["num_detections:0"] as FloatArray)[0].toInt()
 
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
                 classLabel = cocoCategories[classIndices[i].toInt()]!!,
                 probability = probabilities[i],
-                // left, bot, right, top
-                xMin = boxes[i][0],
-                yMin = boxes[i][1],
-                xMax = boxes[i][2],
-                yMax = boxes[i][3]
+                // top, left, bottom, right
+                yMin = boxes[i][0],
+                xMin = boxes[i][1],
+                yMax = boxes[i][2],
+                xMax = boxes[i][3]
             )
             foundObjects.add(detectedObject)
         }
@@ -81,8 +82,8 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
             }
             transformImage {
                 resize {
-                    outputHeight = 1200
-                    outputWidth = 1200
+                    outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
+                    outputWidth = this@SSDMobileNetV1ObjectDetectionModel.inputShape[2].toInt()
                 }
                 convert { colorMode = ColorMode.BGR }
             }
@@ -90,7 +91,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
 
         val (data, shape) = preprocessing()
 
-        val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
+        val preprocessedData = ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessInput(
             data,
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
         )

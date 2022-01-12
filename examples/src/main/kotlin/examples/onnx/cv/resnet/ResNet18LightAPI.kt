@@ -6,7 +6,6 @@ package examples.onnx.cv.resnet
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import java.io.File
@@ -16,7 +15,7 @@ import java.io.File
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
  */
-fun resnet18easyPrediction() {
+fun resnet18LightAPIPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
@@ -36,4 +35,4 @@ fun resnet18easyPrediction() {
 }
 
 /** */
-fun main(): Unit = resnet18easyPrediction()
+fun main(): Unit = resnet18LightAPIPrediction()

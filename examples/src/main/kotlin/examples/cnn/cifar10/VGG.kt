@@ -29,7 +29,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
-private const val EPOCHS = 3
+private const val EPOCHS = 1 // 10, at least, is recommended
 private const val TRAINING_BATCH_SIZE = 128
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10

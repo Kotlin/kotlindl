@@ -45,7 +45,7 @@ fun additionalTraining() {
         it.fit(
             dataset = train,
             validationRate = 0.1,
-            epochs = 5,
+            epochs = 1,
             trainBatchSize = 1000,
             validationBatchSize = 100
         )

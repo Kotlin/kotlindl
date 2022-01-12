@@ -7,13 +7,18 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 
 import mu.KLogger
 import mu.KotlinLogging
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -56,13 +61,10 @@ public class ONNXModelHub(cacheDirectory: File) :
             "/" + modelType.modelRelativePath + ".onnx"
         }
 
-        val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
-            SSDObjectDetectionModel()
-        } else {
-            OnnxInferenceModel()
-        }
+        val inferenceModel = modelType.preInit()
+
         return OnnxInferenceModel.initializeONNXModel(
-            inferenceModel,
+            inferenceModel as OnnxInferenceModel,
             getONNXModelFile(modelFile, loadingMode).absolutePath
         ) as T
     }

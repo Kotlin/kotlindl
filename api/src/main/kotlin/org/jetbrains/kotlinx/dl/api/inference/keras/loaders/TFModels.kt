@@ -205,7 +205,7 @@ public object TFModels {
     ): ImageRecognitionModel {
         modelHub as TFModelHub
         val model = modelHub.loadModel(modelType)
-
+        // TODO: this part is not needed for inference (if we could add manually Softmax at the end of the graph)
         model.compile(
             optimizer = Adam(),
             loss = Losses.MAE,
@@ -221,6 +221,7 @@ public object TFModels {
 }
 
 /** Basic interface for models loaded from S3. */
+// TODO: add information about T and U types
 public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
@@ -255,5 +256,9 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /** Loads the model, identified by this name, from the [modelHub]. */
     public fun model(modelHub: ModelHub): T {
         return modelHub.loadModel(this)
+    }
+
+    public fun preInit(): InferenceModel {
+        TODO()
     }
 }

@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.onnx.cv.custom
+package examples.onnx.cv.efficicentnet
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
@@ -21,9 +21,9 @@ import java.io.File
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
  */
-fun resnet50CustomPrediction() {
+fun efficientNetB0Prediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.CV.ResNet50custom
+    val modelType = ONNXModels.CV.EfficientNetB0()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = loadImageNetClassLabels()
@@ -53,5 +53,5 @@ fun resnet50CustomPrediction() {
 }
 
 /** */
-fun main(): Unit = resnet50CustomPrediction()
+fun main(): Unit = efficientNetB0Prediction()
 
