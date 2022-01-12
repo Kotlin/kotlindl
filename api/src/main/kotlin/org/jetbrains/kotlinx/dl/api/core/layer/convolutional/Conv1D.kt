@@ -72,9 +72,9 @@ public class Conv1D(
     name: String = "",
 ) : AbstractConv(
     filtersInternal = filters,
-    kernelSizeInternal = intArrayOf(1, kernelSize),
-    stridesInternal = intArrayOf(strides[0], 1, strides[1], strides[2]),
-    dilationsInternal = intArrayOf(dilations[0], 1, dilations[1], dilations[2]),
+    kernelSizeInternal = intArrayOf(kernelSize),
+    stridesInternal = strides,
+    dilationsInternal = dilations,
     activationInternal = activation,
     kernelInitializerInternal = kernelInitializer,
     biasInitializerInternal = biasInitializer,
@@ -102,10 +102,13 @@ public class Conv1D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = Conv2d.dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
         val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
+        val expandedKernel = tf.expandDims(kernel.variable, tf.constant(EXTRA_DIM - 1))
+        val expandedStrides = intArrayOf(stridesInternal[0], 1, stridesInternal[1], stridesInternal[2])
+        val expandedDilations = intArrayOf(dilationsInternal[0], 1, dilationsInternal[1], dilationsInternal[2])
+        val options = Conv2d.dilations(expandedDilations.toLongList()).dataFormat("NHWC")
         val result = tf.nn.conv2d(
-            reshapedInput, kernel.variable, stridesInternal.toLongList(), paddingInternal.paddingName, options
+            reshapedInput, expandedKernel, expandedStrides.toLongList(), paddingInternal.paddingName, options
         )
         return tf.squeeze(result, squeezeAxis)
     }
