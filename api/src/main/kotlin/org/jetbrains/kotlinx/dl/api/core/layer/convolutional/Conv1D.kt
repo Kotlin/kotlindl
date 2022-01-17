@@ -38,7 +38,7 @@ private const val EXTRA_DIM = 1L
  * ```
  *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
- * @property [kernelSize] Long number, specifying the width of the 1D convolution window.
+ * @property [kernelLength] Long number, specifying the width of the 1D convolution window.
  * @property [strides] Three numbers specifying the strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying stride value != 1 is incompatible with specifying `dilation` value != 1.
  * @property [dilations] Three numbers specifying the dilation rate to use for
@@ -57,38 +57,27 @@ private const val EXTRA_DIM = 1L
  * @since 0.3
  */
 public class Conv1D(
-    public val filters: Int = 32,
-    public val kernelSize: Int = 3,
-    public val strides: IntArray = intArrayOf(1, 1, 1),
-    public val dilations: IntArray = intArrayOf(1, 1, 1),
-    public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = HeNormal(),
-    public val biasInitializer: Initializer = HeUniform(),
-    public val kernelRegularizer: Regularizer? = null,
-    public val biasRegularizer: Regularizer? = null,
-    public val activityRegularizer: Regularizer? = null,
-    public val padding: ConvPadding = ConvPadding.SAME,
-    public val useBias: Boolean = true,
+    public override val filters: Int = 32,
+    public val kernelLength: Int = 3,
+    public override val strides: IntArray = intArrayOf(1, 1, 1),
+    public override val dilations: IntArray = intArrayOf(1, 1, 1),
+    public override val activation: Activations = Activations.Relu,
+    public override val kernelInitializer: Initializer = HeNormal(),
+    public override val biasInitializer: Initializer = HeUniform(),
+    public override val kernelRegularizer: Regularizer? = null,
+    public override val biasRegularizer: Regularizer? = null,
+    public override val activityRegularizer: Regularizer? = null,
+    public override val padding: ConvPadding = ConvPadding.SAME,
+    public override val useBias: Boolean = true,
     name: String = "",
-) : AbstractConv(
-    filtersInternal = filters,
-    kernelSizeInternal = intArrayOf(kernelSize),
-    stridesInternal = strides,
-    dilationsInternal = dilations,
-    activationInternal = activation,
-    kernelInitializerInternal = kernelInitializer,
-    biasInitializerInternal = biasInitializer,
-    kernelRegularizerInternal = kernelRegularizer,
-    biasRegularizerInternal = biasRegularizer,
-    activityRegularizerInternal = activityRegularizer,
-    paddingInternal = padding,
-    useBiasInternal = useBias,
-    name = name
-) {
+) : AbstractConv(name = name) {
+
     init {
         requireArraySize(strides, 3, "strides")
         requireArraySize(dilations, 3, "dilations")
     }
+
+    override val kernelSize: IntArray = intArrayOf(kernelLength)
 
     /** Axis of height for which the extra dimension is added (unsqueezed) before actual
      * convolution operation and the output from actual implementation are squeezed. */
@@ -102,13 +91,13 @@ public class Conv1D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val reshapedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
+        val expandedInput = tf.expandDims(input, tf.constant(EXTRA_DIM))
         val expandedKernel = tf.expandDims(kernel.variable, tf.constant(EXTRA_DIM - 1))
-        val expandedStrides = intArrayOf(stridesInternal[0], 1, stridesInternal[1], stridesInternal[2])
-        val expandedDilations = intArrayOf(dilationsInternal[0], 1, dilationsInternal[1], dilationsInternal[2])
+        val expandedStrides = intArrayOf(strides[0], 1, strides[1], strides[2])
+        val expandedDilations = intArrayOf(dilations[0], 1, dilations[1], dilations[2])
         val options = Conv2d.dilations(expandedDilations.toLongList()).dataFormat("NHWC")
         val result = tf.nn.conv2d(
-            reshapedInput, expandedKernel, expandedStrides.toLongList(), paddingInternal.paddingName, options
+            expandedInput, expandedKernel, expandedStrides.toLongList(), padding.paddingName, options
         )
         return tf.squeeze(result, squeezeAxis)
     }
@@ -119,13 +108,13 @@ public class Conv1D(
 
         val cols = convOutputLength(
             colsCount,
-            kernelSize,
-            paddingInternal,
+            kernelLength,
+            padding,
             strides[1],
             dilations[1]
         )
 
-        return Shape.make(batchSize, cols, filtersInternal.toLong())
+        return Shape.make(batchSize, cols, filters.toLong())
     }
 
     override fun toString(): String {

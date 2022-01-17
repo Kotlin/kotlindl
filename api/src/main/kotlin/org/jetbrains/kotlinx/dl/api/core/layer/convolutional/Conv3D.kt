@@ -55,34 +55,21 @@ import org.tensorflow.op.nn.Conv3d.dilations
  * @since 0.3
  */
 public class Conv3D(
-    public val filters: Int = 32,
-    public val kernelSize: IntArray = intArrayOf(3, 3, 3),
-    public val strides: IntArray = intArrayOf(1, 1, 1, 1, 1),
-    public val dilations: IntArray = intArrayOf(1, 1, 1, 1, 1),
-    public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = HeNormal(),
-    public val biasInitializer: Initializer = HeUniform(),
-    public val kernelRegularizer: Regularizer? = null,
-    public val biasRegularizer: Regularizer? = null,
-    public val activityRegularizer: Regularizer? = null,
-    public val padding: ConvPadding = ConvPadding.SAME,
-    public val useBias: Boolean = true,
+    public override val filters: Int = 32,
+    public override val kernelSize: IntArray = intArrayOf(3, 3, 3),
+    public override val strides: IntArray = intArrayOf(1, 1, 1, 1, 1),
+    public override val dilations: IntArray = intArrayOf(1, 1, 1, 1, 1),
+    public override val activation: Activations = Activations.Relu,
+    public override val kernelInitializer: Initializer = HeNormal(),
+    public override val biasInitializer: Initializer = HeUniform(),
+    public override val kernelRegularizer: Regularizer? = null,
+    public override val biasRegularizer: Regularizer? = null,
+    public override val activityRegularizer: Regularizer? = null,
+    public override val padding: ConvPadding = ConvPadding.SAME,
+    public override val useBias: Boolean = true,
     name: String = ""
-) : AbstractConv(
-    filtersInternal = filters,
-    kernelSizeInternal = kernelSize,
-    stridesInternal = strides,
-    dilationsInternal = dilations,
-    activationInternal = activation,
-    kernelInitializerInternal = kernelInitializer,
-    biasInitializerInternal = biasInitializer,
-    kernelRegularizerInternal = kernelRegularizer,
-    biasRegularizerInternal = biasRegularizer,
-    activityRegularizerInternal = activityRegularizer,
-    paddingInternal = padding,
-    useBiasInternal = useBias,
-    name = name
-) {
+) : AbstractConv(name = name) {
+
     init {
         requireArraySize(kernelSize, 3, "kernelSize")
         requireArraySize(strides, 5, "strides")
@@ -98,12 +85,12 @@ public class Conv3D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = dilations(dilationsInternal.toLongList()).dataFormat("NDHWC")
+        val options = dilations(dilations.toLongList()).dataFormat("NDHWC")
         return tf.nn.conv3d(
             input,
             kernel.variable,
-            stridesInternal.toLongList(),
-            paddingInternal.paddingName,
+            strides.toLongList(),
+            padding.paddingName,
             options
         )
     }
@@ -116,27 +103,27 @@ public class Conv3D(
 
         val depths = convOutputLength(
             depthsCount,
-            kernelSizeInternal[0],
-            paddingInternal,
-            stridesInternal[1],
-            dilationsInternal[1]
+            kernelSize[0],
+            padding,
+            strides[1],
+            dilations[1]
         )
         val rows = convOutputLength(
             rowsCount,
-            kernelSizeInternal[1],
-            paddingInternal,
-            stridesInternal[2],
-            dilationsInternal[2]
+            kernelSize[1],
+            padding,
+            strides[2],
+            dilations[2]
         )
         val cols = convOutputLength(
             colsCount,
-            kernelSizeInternal[2],
-            paddingInternal,
-            stridesInternal[3],
-            dilationsInternal[3]
+            kernelSize[2],
+            padding,
+            strides[3],
+            dilations[3]
         )
 
-        return Shape.make(batchSize, depths, rows, cols, filtersInternal.toLong())
+        return Shape.make(batchSize, depths, rows, cols, filters.toLong())
     }
 
     override fun toString(): String {
