@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -9,7 +9,6 @@ import io.jhdf.HdfFile
 import io.jhdf.api.Group
 import io.jhdf.api.Node
 import io.jhdf.dataset.DatasetBase
-import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.BIAS_DATA_PATH_TEMPLATE
@@ -97,7 +96,7 @@ public fun GraphTrainableModel.loadWeightsByPathTemplates(
  * @param [kernelDataPathTemplate] Template path to kernel weights of the specific layer.
  * @param [biasDataPathTemplate] Template path to bias weights of the specific layer.
  */
-public fun Functional.loadWeightsForFrozenLayersByPathTemplates(
+public fun GraphTrainableModel.loadWeightsForFrozenLayersByPathTemplates(
     hdfFile: HdfFile,
     kernelDataPathTemplate: String = KERNEL_DATA_PATH_TEMPLATE,
     biasDataPathTemplate: String = BIAS_DATA_PATH_TEMPLATE
