@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -691,11 +691,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             val tensors =
                 formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
 
-            val predictionsTensor = tensors[0]
-
-            val dst = Array(1) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-            predictionsTensor.copyTo(dst)
+            val prediction = tensors[0].convertTensorToFlattenFloatArray()
 
             val activations = mutableListOf<Any>()
             if (visualizationIsEnabled && tensors.size > 1) {
@@ -705,7 +701,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             }
 
             tensors.forEach { it.close() }
-            return Pair(dst[0], activations.toList())
+            return Pair(prediction, activations.toList())
         }
     }
 

@@ -386,7 +386,7 @@ class TransferLearningTest : IntegrationTest() {
                     it.loadWeights(hdfFile)
                 }
             assertEquals(
-                "Model is initialized already!",
+                "Model is already initialized.",
                 exception.message
             )
         }
