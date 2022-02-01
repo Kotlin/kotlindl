@@ -430,6 +430,20 @@ class DetectedPoseJPanel(
             graphics.stroke = stroke1
             graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
         }
+
+        val onePoseEdges = detectedPose.edges
+        for (j in onePoseEdges.indices) {
+            val x1 = (size.width) * (onePoseEdges[j].start.x)
+            val y1 = (size.height) * (onePoseEdges[j].start.y)
+            val x2 = (size.width) * (onePoseEdges[j].end.x)
+            val y2 = (size.height) * (onePoseEdges[j].end.y)
+
+            graphics as Graphics2D
+            val stroke1: Stroke = BasicStroke(2f)
+            graphics.setColor(Color.MAGENTA)
+            graphics.stroke = stroke1
+            graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
+        }
     }
 
     override fun getPreferredSize(): Dimension {
