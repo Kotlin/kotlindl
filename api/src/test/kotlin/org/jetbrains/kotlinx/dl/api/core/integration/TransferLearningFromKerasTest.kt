@@ -303,6 +303,10 @@ class TransferLearningTest : IntegrationTest() {
 
             it.loadWeights(hdfFile)
 
+            val copy = it.copy()
+            assertTrue(copy.layers.size == 11)
+            copy.close()
+
             val conv2DKernelWeights =
                 it.getLayer("conv2d_12").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
             assertEquals(0.041764896f, conv2DKernelWeights[0][0][0][0])

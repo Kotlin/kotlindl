@@ -19,6 +19,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.*
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.*
+import org.jetbrains.kotlinx.dl.api.core.layer.regularization.Dropout
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -79,6 +80,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         // Normalization layers
         is BatchNorm -> createKerasBatchNormLayer(layer, isKerasFullyCompatible)
         // Regularization layers (e.g. Dropout)
+        is Dropout -> createKerasDropoutLayer(layer)
         // Attention layers
         // Reshaping layers
         is Flatten -> createKerasFlattenLayer(layer)
@@ -161,6 +163,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
             is LeCunNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
             is LeCunUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
             is RandomUniform -> convertToRandomUniformInitializer(initializer)
+            is RandomNormal -> convertToRandomNormalInitializer(initializer)
             is Identity -> convertToIdentityInitializer(initializer)
             else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
             // TODO: support Constant initializer
@@ -194,6 +197,24 @@ private fun convertToRandomUniformInitializer(initializer: RandomUniform): Pair<
         )
     )
 }
+
+private fun convertToRandomNormalInitializer(initializer: RandomNormal): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_RANDOM_NORMAL, KerasInitializerConfig(
+            mean = initializer.mean.toDouble(),
+            stddev = initializer.stdev.toDouble(),
+            seed = initializer.seed.toInt()
+        )
+    )
+}
+
+/**
+ * INITIALIZER_RANDOM_NORMAL -> RandomNormal(
+seed = seed,
+mean = initializer.config.mean!!.toFloat(),
+stdev = initializer.config.stddev!!.toFloat()
+)
+ */
 
 private fun convertToVarianceScalingInitializer(initializer: VarianceScaling): Pair<String, KerasInitializerConfig> {
     return Pair(
@@ -603,6 +624,16 @@ private fun createKerasFlattenLayer(layer: Flatten): KerasLayer {
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_FLATTEN, config = configX)
+}
+
+private fun createKerasDropoutLayer(layer: Dropout): KerasLayer {
+    val configX = LayerConfig(
+        rate = layer.rate.toDouble(),
+        dtype = DATATYPE_FLOAT32,
+        name = layer.name,
+        trainable = layer.isTrainable
+    )
+    return KerasLayer(class_name = LAYER_DROPOUT, config = configX)
 }
 
 private fun createKerasRepeatVectorLayer(layer: RepeatVector): KerasLayer {

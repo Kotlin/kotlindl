@@ -29,8 +29,8 @@ import org.tensorflow.op.Ops
  * @constructor Creates [Dropout] object.
  */
 public class Dropout(
-    private val rate: Float = 0.1f,
-    private val seed: Long = 12L,
+    public val rate: Float = 0.1f,
+    public val seed: Long = 12L,
     name: String = ""
 ) : Layer(name), NoGradients {
     init {
