@@ -136,15 +136,15 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
     }
 
-    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics, callback: Callback) {
-        compile(optimizer, Losses.convert(loss), Metrics.convert(metric), callback)
+    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics) {
+        compile(optimizer, Losses.convert(loss), Metrics.convert(metric))
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric, callback: Callback) {
-        compile(optimizer, loss, listOf(metric), callback)
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric) {
+        compile(optimizer, loss, listOf(metric))
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>, callback: Callback) {
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>) {
         check(!isModelCompiled) { "The model is compiled already. Graph is created. Create new model and compile it." }
 
         validateModelArchitecture()
@@ -152,10 +152,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         this.loss = loss
         this.metrics = metrics
         this.optimizer = optimizer
-
-        // callback binding
-        this.callback = callback
-        this.callback.model = this
 
         buildLayers()
 
@@ -207,12 +203,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
 
-    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric, callback: Callback) {
-        compile(optimizer, Losses.convert(loss), metric, callback)
+    override fun compile(optimizer: Optimizer, loss: Losses, metric: Metric) {
+        compile(optimizer, Losses.convert(loss), metric)
     }
 
-    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metrics, callback: Callback) {
-        compile(optimizer, loss, Metrics.convert(metric), callback)
+    override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metrics) {
+        compile(optimizer, loss, Metrics.convert(metric))
     }
 
     /** Validates architecture. */
@@ -241,7 +237,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         validationDataset: Dataset,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int
+        validationBatchSize: Int,
+        callbacks: List<Callback>
     ): TrainingHistory {
         return internalFit(
             trainBatchSize,
@@ -249,14 +246,16 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             trainingDataset,
             true,
             validationDataset,
-            validationBatchSize
+            validationBatchSize,
+            callbacks
         )
     }
 
     override fun fit(
         dataset: Dataset,
         epochs: Int,
-        batchSize: Int
+        batchSize: Int,
+        callbacks: List<Callback>
     ): TrainingHistory {
         return internalFit(
             batchSize,
@@ -264,7 +263,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             dataset,
             false,
             null,
-            null
+            null,
+            callbacks
         )
     }
 
@@ -289,7 +289,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         trainingDataset: Dataset,
         validationIsEnabled: Boolean,
         validationDataset: Dataset?,
-        validationBatchSize: Int?
+        validationBatchSize: Int?,
+        fitCallbacks: List<Callback>
     ): TrainingHistory {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
@@ -314,11 +315,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             isOptimizerVariableInitialized = true
         }
 
-        callback.onTrainBegin()
+        // callback binding
+        fitCallbacks.forEach { it.model = this }
+        fitCallbacks.forEach { it.onTrainBegin() }
 
         for (i in 1..epochs) {
             if (!stopTraining) {
-                callback.onEpochBegin(i, trainingHistory)
+                fitCallbacks.forEach { it.onEpochBegin(i, trainingHistory) }
                 val batchIter: Dataset.BatchIterator = trainingDataset.batchIterator(
                     trainBatchSize
                 )
@@ -328,7 +331,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 val averageTrainingMetricAccum = FloatArray(metrics.size) { 0.0f }
 
                 while (batchIter.hasNext() && !stopTraining) {
-                    callback.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)
+                    fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)}
                     val batch: DataBatch = batchIter.next()
 
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
@@ -371,12 +374,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                             // TODO: create map (metric name and metric value)
                                             logger.debug { "Batch stat: { lossValue: $lossValue metricValues: $metricValues }" }
 
-                                            callback.onTrainBatchEnd(
+                                            fitCallbacks.forEach { it.onTrainBatchEnd(
                                                 batchCounter,
                                                 trainBatchSize,
                                                 batchTrainingEvent,
                                                 trainingHistory
-                                            )
+                                            ) }
                                         }
                                     }
                             }
@@ -400,7 +403,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 )
 
                 if (validationIsEnabled) {
-                    val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!)
+                    val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
                     val validationMetricValues = metrics.map { evaluationResult.metrics[Metrics.convertBack(it)] }.toList()// TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
@@ -410,10 +413,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()}" }
                 }
                 trainingHistory.appendEpoch(epochTrainingEvent)
-                callback.onEpochEnd(i, epochTrainingEvent, trainingHistory)
+                fitCallbacks.forEach { it.onEpochEnd(i, epochTrainingEvent, trainingHistory) }
             }
         }
-        callback.onTrainEnd(trainingHistory)
+        fitCallbacks.forEach { it.onTrainEnd(trainingHistory) }
         return trainingHistory
     }
 
@@ -465,13 +468,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
     }
 
-    override fun evaluate(dataset: Dataset, batchSize: Int): EvaluationResult {
+    override fun evaluate(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): EvaluationResult {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
         val evaluationHistory = History()
 
-        callback.onTestBegin()
+        callbacks.forEach { it.model = this }
+        callbacks.forEach { it.onTestBegin() }
 
         val batchIter: Dataset.BatchIterator = dataset.batchIterator(
             batchSize
@@ -482,7 +486,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onTestBatchBegin(batchCounter, batchSize, evaluationHistory)
+            callbacks.forEach { it.onTestBatchBegin(batchCounter, batchSize, evaluationHistory) }
             val batch: DataBatch = batchIter.next()
             val (imageShape, labelShape) = calculateXYShapes(batch)
 
@@ -526,7 +530,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                             val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), averageMetricAccum.map { it.toDouble() })
                             evaluationHistory.appendBatch(batchEvent)
 
-                            callback.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                            callbacks.forEach { it.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory) }
                         }
                     }
 
@@ -541,7 +545,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 
-        callback.onTestEnd(evaluationHistory)
+        callbacks.forEach { it.onTestEnd(evaluationHistory) }
         val metricValues = mutableMapOf<Metrics, Double>() // TODO: Metrics -> Metric class
         metrics.forEachIndexed { index, metric ->
             metricValues[Metrics.convertBack(metric)] = avgMetricValue[index].toDouble()
@@ -550,12 +554,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return EvaluationResult(avgLossValue, metricValues)
     }
 
-    override fun predict(dataset: Dataset, batchSize: Int): IntArray {
+    override fun predict(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
-        callback.onPredictBegin()
+        callbacks.forEach { it.model = this }
+        callbacks.forEach { it.onPredictBegin() }
 
         val imageShape = calculateXShape(batchSize)
 
@@ -568,7 +573,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onPredictBatchBegin(batchCounter, batchSize)
+            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
             val batch: DataBatch = batchIter.next()
 
@@ -593,13 +598,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                         argMaxBatchPrediction[index] = element.argmax()
                     }
 
-                    callback.onPredictBatchEnd(batchCounter, batchSize)
+                    callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
                     batchCounter++
                     argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
                 }
             }
         }
-        callback.onPredictEnd()
+        callbacks.forEach { it.onPredictEnd() }
         return predictions
     }
 
@@ -618,12 +623,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return Pair(softPrediction.argmax(), activations)
     }
 
-    override fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray> {
+    override fun predictSoftly(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): Array<FloatArray> {
         require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
 
-        callback.onPredictBegin()
+        callbacks.forEach { it.model = this }
+        callbacks.forEach { it.onPredictBegin() }
 
         val imageShape = calculateXShape(batchSize)
 
@@ -636,7 +642,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         var batchCounter = 0
 
         while (batchIter.hasNext()) {
-            callback.onPredictBatchBegin(batchCounter, batchSize)
+            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
             val batch: DataBatch = batchIter.next()
 
@@ -653,12 +659,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
                 predictionsTensor.copyTo(dst)
 
-                callback.onPredictBatchEnd(batchCounter, batchSize)
+                callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
                 batchCounter++
                 dst.copyInto(predictions, batchSize * (batchCounter - 1))
             }
         }
-        callback.onPredictEnd()
+        callbacks.forEach { it.onPredictEnd() }
         return predictions
     }
 
