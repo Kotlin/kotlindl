@@ -208,14 +208,6 @@ private fun convertToRandomNormalInitializer(initializer: RandomNormal): Pair<St
     )
 }
 
-/**
- * INITIALIZER_RANDOM_NORMAL -> RandomNormal(
-seed = seed,
-mean = initializer.config.mean!!.toFloat(),
-stdev = initializer.config.stddev!!.toFloat()
-)
- */
-
 private fun convertToVarianceScalingInitializer(initializer: VarianceScaling): Pair<String, KerasInitializerConfig> {
     return Pair(
         INITIALIZER_VARIANCE_SCALING, KerasInitializerConfig(
