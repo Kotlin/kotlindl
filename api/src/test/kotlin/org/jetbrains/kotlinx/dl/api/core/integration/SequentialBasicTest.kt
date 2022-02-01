@@ -645,7 +645,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 name = "dense_1"
             ),
             Dropout(
-                keepProbability = 0.3f,
+                rate = 0.3f,
                 seed = 13L,
                 name = "dropout_1"
             ),
