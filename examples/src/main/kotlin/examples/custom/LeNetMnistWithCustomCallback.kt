@@ -157,7 +157,7 @@ class EvaluationCallback : Callback() {
     }
 
     override fun onTestEnd(logs: History) {
-        println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
+        println("Test ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
 }
 
