@@ -483,7 +483,7 @@ private fun createDotLayer(config: LayerConfig, name: String): Layer {
 
 private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
     return Dropout(
-        keepProbability = config.rate!!.toFloat(),
+        rate = config.rate!!.toFloat(),
         name = name
     )
 }

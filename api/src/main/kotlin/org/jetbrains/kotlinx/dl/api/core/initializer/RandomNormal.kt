@@ -17,9 +17,9 @@ import org.tensorflow.op.Ops
  * @constructor Creates a [RandomNormal] initializer.
  */
 public class RandomNormal(
-    private val mean: Float = 0.0f,
-    private val stdev: Float = 1.0f,
-    private val seed: Long = 12L
+    public val mean: Float = 0.0f,
+    public val stdev: Float = 1.0f,
+    public val seed: Long = 12L
 ) :
     Initializer() {
     override fun initialize(
