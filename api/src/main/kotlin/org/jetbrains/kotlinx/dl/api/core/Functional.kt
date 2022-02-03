@@ -114,6 +114,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             while (grayStack.isNotEmpty())
                 sortedListOfLayers.add(grayStack.pop()!!)
 
+            check(sortedListOfLayers.size == layers.size) {
+                "The following layers are not reachable from the input: ${layers.minus(sortedListOfLayers.toSet()).map { it.name + " (" + it::class.simpleName + ")"  }}"
+            }
+
             return sortedListOfLayers
         }
 
@@ -137,11 +141,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return the [Functional] model.
          */
         private fun preprocessAndCreate(layers: List<Layer>): Functional {
-            var layerList = layers
-            val inputLayer = findInputLayer(layerList)
+            val inputLayer = findInputLayer(layers)
 
-            fillOutputLayers(layerList)
-            layerList = topologicalSort(layerList, inputLayer)
+            fillOutputLayers(layers)
+            val layerList = topologicalSort(layers, inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
             return Functional(*layerList.toTypedArray())
