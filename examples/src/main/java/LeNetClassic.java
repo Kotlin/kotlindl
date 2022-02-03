@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * This example demonstrates the ability to define and train LeNet-5 model in Java.
@@ -50,18 +51,19 @@ public class LeNetClassic {
         OnHeapDataset train = result.component1();
         OnHeapDataset test = result.component2();
 
-        try (Sequential lenet5Classic = Sequential.of(
-                new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
-                new Conv2D(6, new int[]{5, 5}, new int[]{1, 1, 1, 1}, new int[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), null, null, null, ConvPadding.SAME, true, "conv2d_1"),
-                new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),
-                new Conv2D(16, new int[]{5, 5}, new int[]{1, 1, 1, 1}, new int[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), null, null, null, ConvPadding.SAME, true, "conv2d_2"),
-                new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_2"),
-                new Flatten(), // 3136
-                new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), null, null, null, true, "dense_1"),
-                new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), null, null, null, true, "dense_2"),
-                new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), new L2(0.001f), new L1(0.0001f), null, true, "dense_3")
+        try (Sequential lenet5Classic = Sequential.of(List.of(
+                        new Input(new long[]{IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS}, "x"),
+                        new Conv2D(6, new int[]{5, 5}, new int[]{1, 1, 1, 1}, new int[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), null, null, null, ConvPadding.SAME, true, "conv2d_1"),
+                        new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_1"),
+                        new Conv2D(16, new int[]{5, 5}, new int[]{1, 1, 1, 1}, new int[]{1, 1, 1, 1}, Activations.Tanh, new GlorotNormal(SEED), new Zeros(), null, null, null, ConvPadding.SAME, true, "conv2d_2"),
+                        new MaxPool2D(new int[]{1, 2, 2, 1}, new int[]{1, 2, 2, 1}, ConvPadding.VALID, "maxPool_2"),
+                        new Flatten(), // 3136
+                        new Dense(120, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), null, null, null, true, "dense_1"),
+                        new Dense(84, Activations.Tanh, new GlorotNormal(SEED), new Constant(0.1f), null, null, null, true, "dense_2"),
+                        new Dense(MnistUtilKt.NUMBER_OF_CLASSES, Activations.Linear, new GlorotNormal(SEED), new Constant(0.1f), new L2(0.001f), new L1(0.0001f), null, true, "dense_3")
+                ),
+                false
         )) {
-
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY);
             HelpersKt.logSummary(lenet5Classic, logger);

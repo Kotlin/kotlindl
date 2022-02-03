@@ -24,39 +24,83 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          *
+         * @property [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be input layer.
+         * NOTE: First layer should be an input layer, if you want to compile model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Functional {
-            layerValidation(layers.toList())
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Functional {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             return preprocessAndCreate(layers.toList())
         }
 
-
         /**
          * Creates the [Functional] model.
          *
+         * @property [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be input layer.
+         * NOTE: First layer should be an input layer, if you want to compile model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>): Functional {
-            layerValidation(layers)
+        public fun of(layers: List<Layer>, noInput: Boolean = false): Functional {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             return preprocessAndCreate(layers)
         }
+
+        /**
+         * Creates the [Functional] model from two models: [pretrainedModel] and [topModel].
+         * All layers of pretrainedModel will be frozen automatically.
+         * The input of the [topModel] will be connected to the output of the [pretrainedModel].
+         *
+         * NOTE: First layer of [pretrainedModel] should be an input layer.
+         * NOTE: Both models should be non-compiled yet.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(pretrainedModel: GraphTrainableModel, topModel: GraphTrainableModel): Functional {
+            require(!pretrainedModel.isModelCompiled) { "Pretrained model should not be compiled!" }
+            require(!topModel.isModelCompiled) { "Top model should not be compiled!" }
+
+            // TODO: make a honest copy of models (pretrained and topModel) or of all layers
+            val pretrainedLayers = pretrainedModel.layers
+            // Freezing
+            pretrainedLayers.forEach { it.isTrainable = false }
+
+            val layers = mutableListOf<Layer>()
+            layers += pretrainedLayers
+
+            val topLayers = topModel.layers
+            layers+= topLayers
+            topLayers[0].inboundLayers.add(pretrainedLayers.last())
+
+            if (topModel is Sequential && layers.size > 1) {
+                // establish edges in DAG
+                topLayers.subList(1, topLayers.size).forEachIndexed { index, layer ->
+                    val topLayersIndex = index - 1 + 1 // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
+                    layer.inboundLayers.add(topLayers[topLayersIndex])
+                }
+            }
+
+            return of(layers)
+        }
+
 
         /**
          * Creates the [Functional] model.
@@ -351,5 +395,24 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             return deserializedModel
         }
+    }
+
+    /** Removes the last layer from the [Functional] model, if it's not compiled yet! . */
+    public fun removeLastLayer(): Functional {
+        require(!this.isModelCompiled) { "It works for non-compiled models only!" }
+
+        val layers = mutableListOf<Layer>()
+
+        for (layer in this.layers) {
+            layers.add(layer)
+        }
+
+        val lastLayer = layers.last()
+        for (outboundLayer in lastLayer.inboundLayers)
+            outboundLayer.outboundLayers.remove(lastLayer)
+
+        layers.removeLast()
+
+        return of(layers)
     }
 }
