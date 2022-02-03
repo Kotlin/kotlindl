@@ -33,9 +33,6 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
     /** Loss function. */
     public var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
 
-    /** Callback. */
-    protected var callback: Callback = Callback()
-
     /** List of metrics for evaluation phase. */
     protected var metrics: List<Metric> = listOf(Accuracy())
 
@@ -70,13 +67,11 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [optimizer] Optimizer instance.
      * @param [loss] Loss function.
      * @param [metric] Metric to evaluate during training.
-     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     public abstract fun compile(
         optimizer: Optimizer,
         loss: Losses,
-        metric: Metrics,
-        callback: Callback = Callback()
+        metric: Metrics
     )
 
     /**
@@ -87,13 +82,11 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [optimizer] Optimizer instance.
      * @param [loss] Loss function.
      * @param [metric] Metric to evaluate during training.
-     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     public abstract fun compile(
         optimizer: Optimizer,
         loss: LossFunction,
-        metric: Metric,
-        callback: Callback = Callback()
+        metric: Metric
     )
 
     /**
@@ -104,13 +97,11 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [optimizer] Optimizer instance.
      * @param [loss] Loss function.
      * @param [metric] Metric to evaluate during training.
-     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     public abstract fun compile(
         optimizer: Optimizer,
         loss: Losses,
-        metric: Metric,
-        callback: Callback = Callback()
+        metric: Metric
     )
 
     /**
@@ -121,13 +112,11 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [optimizer] Optimizer instance.
      * @param [loss] Loss function.
      * @param [metric] Metric to evaluate during training.
-     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
     public abstract fun compile(
         optimizer: Optimizer,
         loss: LossFunction,
-        metric: Metrics,
-        callback: Callback = Callback()
+        metric: Metrics
     )
 
     /**
@@ -138,9 +127,8 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [optimizer] Optimizer instance.
      * @param [loss] Loss function.
      * @param [metrics] Metrics to evaluate during training.
-     * @param [callback] Callback to be used during training, evaluation and prediction phases.
      */
-    public abstract fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>, callback: Callback = Callback())
+    public abstract fun compile(optimizer: Optimizer, loss: LossFunction, metrics: List<Metric>)
 
     /**
      * Trains the model for a fixed number of [epochs] (iterations over a dataset).
@@ -150,13 +138,41 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [batchSize] Number of samples per gradient update.
      * True (default) = Weights are initialized at the beginning of the training phase.
      * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
+     * @param [callback] Callback to be used during training phase.
+     *
+     * @return A [TrainingHistory] object. Its [TrainingHistory.batchHistory] attribute is a record of training loss values and metrics values per each batch and epoch.
+     */
+    public fun fit(
+        dataset: Dataset,
+        epochs: Int = 5,
+        batchSize: Int = 32,
+        callback: Callback
+    ): TrainingHistory {
+        return fit(
+            dataset,
+            epochs,
+            batchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations over a dataset).
+     *
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [batchSize] Number of samples per gradient update.
+     * True (default) = Weights are initialized at the beginning of the training phase.
+     * False = Weights are not initialized during training phase. It should be initialized before (via transfer learning or init() method call).
+     * @param [callbacks] Callbacks to be used during training phase.
      *
      * @return A [TrainingHistory] object. Its [TrainingHistory.batchHistory] attribute is a record of training loss values and metrics values per each batch and epoch.
      */
     public abstract fun fit(
         dataset: Dataset,
         epochs: Int = 5,
-        batchSize: Int = 32
+        batchSize: Int = 32,
+        callbacks: List<Callback> = listOf()
     ): TrainingHistory
 
     /**
@@ -169,6 +185,39 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [validationBatchSize] Number of samples per validation batch.
      * True (default) = optimizer variables are initialized at the beginning of the training phase.
      * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
+     * @param [callback] Callback to be used during training phase.
+     *
+     * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
+     */
+    public fun fit(
+        trainingDataset: Dataset,
+        validationDataset: Dataset,
+        epochs: Int = 5,
+        trainBatchSize: Int = 32,
+        validationBatchSize: Int = 256,
+        callback: Callback
+    ): TrainingHistory {
+        return fit(
+            trainingDataset,
+            validationDataset,
+            epochs,
+            trainBatchSize,
+            validationBatchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations over a dataset).
+     *
+     * @param [trainingDataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [validationDataset] The validation dataset that combines input data (X) and target data (Y).
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [trainBatchSize] Number of samples per gradient update.
+     * @param [validationBatchSize] Number of samples per validation batch.
+     * True (default) = optimizer variables are initialized at the beginning of the training phase.
+     * False = optimizer variables are not initialized during training phase. It should be initialized before (via transfer learning).
+     * @param [callbacks] Callbacks to be used during training phase.
      *
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
@@ -177,7 +226,8 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
         validationDataset: Dataset,
         epochs: Int = 5,
         trainBatchSize: Int = 32,
-        validationBatchSize: Int = 256
+        validationBatchSize: Int = 256,
+        callbacks: List<Callback> = listOf()
     ): TrainingHistory
 
     /**
@@ -185,12 +235,35 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      *
      * @param [dataset] The train dataset that combines input data (X) and target data (Y).
      * @param [batchSize] Number of samples per batch of computation.
+     * @param [callback] Callback to be used during evaluation phase.
+     *
+     * @return Value of calculated metric and loss values.
+     */
+    public fun evaluate(
+        dataset: Dataset,
+        batchSize: Int = 256,
+        callback: Callback
+    ): EvaluationResult {
+        return evaluate(
+            dataset,
+            batchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Returns the metrics and loss values for the model in test (evaluation) mode.
+     *
+     * @param [dataset] The train dataset that combines input data (X) and target data (Y).
+     * @param [batchSize] Number of samples per batch of computation.
+     * @param [callbacks] Callbacks to be used during evaluation phase.
      *
      * @return Value of calculated metric and loss values.
      */
     public abstract fun evaluate(
         dataset: Dataset,
-        batchSize: Int = 256
+        batchSize: Int = 256,
+        callbacks: List<Callback> = listOf()
     ): EvaluationResult
 
     /**
@@ -198,9 +271,36 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
+     * @param [callback] Callback to be used during prediction phase.
+     *
      * @return Array of labels. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predict(dataset: Dataset, batchSize: Int): IntArray
+    public fun predict(
+        dataset: Dataset,
+        batchSize: Int,
+        callback: Callback
+    ): IntArray {
+        return predict(
+            dataset,
+            batchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Generates output predictions for the input samples.
+     *
+     * @param [dataset] Data to predict on.
+     * @param [batchSize] Number of samples per batch of computation.
+     * @param [callbacks] Callbacks to be used during prediction phase.
+     *
+     * @return Array of labels. The length is equal to the Number of samples on the [dataset].
+     */
+    public abstract fun predict(
+        dataset: Dataset,
+        batchSize: Int,
+        callbacks: List<Callback> = listOf()
+    ): IntArray
 
     /**
      * Generates output predictions for the input samples.
@@ -208,9 +308,37 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      *
      * @param [dataset] Data to predict on.
      * @param [batchSize] Number of samples per batch of computation.
+     * @param [callback] Callback to be used during prediction phase.
+     *
      * @return Array of labels. All labels are vectors that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
      */
-    public abstract fun predictSoftly(dataset: Dataset, batchSize: Int): Array<FloatArray>
+    public fun predictSoftly(
+        dataset: Dataset,
+        batchSize: Int,
+        callback: Callback
+    ): Array<FloatArray> {
+        return predictSoftly(
+            dataset,
+            batchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Generates output predictions for the input samples.
+     * Each prediction is a vector of probabilities instead of specific class in [predict] method.
+     *
+     * @param [dataset] Data to predict on.
+     * @param [batchSize] Number of samples per batch of computation.
+     * @param [callbacks] Callbacks to be used during prediction phase.
+     *
+     * @return Array of labels. All labels are vectors that represents the probability distributions of a list of potential outcomes. The length is equal to the Number of samples on the [dataset].
+     */
+    public abstract fun predictSoftly(
+        dataset: Dataset,
+        batchSize: Int,
+        callbacks: List<Callback> = listOf()
+    ): Array<FloatArray>
 
     /**
      * Generates output prediction for the input sample using output of the [predictionTensorName] tensor.
@@ -284,6 +412,8 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
      * @param [trainBatchSize] Number of samples per gradient update.
      * @param [validationBatchSize] Number of samples per validation batch.
+     * @param [callback] Callback to be used during training phase.
+     *
      * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
      */
     public fun fit(
@@ -291,7 +421,8 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
         validationRate: Double,
         epochs: Int,
         trainBatchSize: Int,
-        validationBatchSize: Int
+        validationBatchSize: Int,
+        callback: Callback
     ): TrainingHistory {
         require(validationRate > 0.0 && validationRate < 1.0) {
             "Validation rate should be more than 0.0 and less than 1.0. " +
@@ -304,7 +435,44 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
             validation,
             epochs,
             trainBatchSize,
-            validationBatchSize
+            validationBatchSize,
+            listOf(callback)
+        )
+    }
+
+    /**
+     * Trains the model for a fixed number of [epochs] (iterations on a dataset).
+     *
+     * @param [dataset] The dataset that combines input data (X) and target data (Y). It will be split on train and validation sub-datasets.
+     * @param [validationRate] Number between 0.0 and 1.0. The proportion of validation data from initially passed [dataset].
+     * @param [epochs] Number of epochs to train the model. An epoch is an iteration over the entire x and y data provided.
+     * @param [trainBatchSize] Number of samples per gradient update.
+     * @param [validationBatchSize] Number of samples per validation batch.
+     * @param [callbacks] Callbacks to be used during training phase.
+     *
+     * @return A [TrainingHistory] object. It contains records with training/validation loss values and metrics per each batch and epoch.
+     */
+    public fun fit(
+        dataset: OnHeapDataset,
+        validationRate: Double,
+        epochs: Int,
+        trainBatchSize: Int,
+        validationBatchSize: Int,
+        callbacks: List<Callback> = listOf()
+    ): TrainingHistory {
+        require(validationRate > 0.0 && validationRate < 1.0) {
+            "Validation rate should be more than 0.0 and less than 1.0. " +
+                    "The passed rare is: $validationRate"
+        }
+        val (validation, train) = dataset.split(validationRate)
+
+        return fit(
+            train,
+            validation,
+            epochs,
+            trainBatchSize,
+            validationBatchSize,
+            callbacks
         )
     }
 

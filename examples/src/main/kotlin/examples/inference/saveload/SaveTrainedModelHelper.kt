@@ -28,8 +28,16 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
             it.compile(
                 optimizer = SGD(learningRate = 0.3f),
                 loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                metric = Metrics.ACCURACY,
-                callback = object : Callback() {
+                metric = Metrics.ACCURACY
+            )
+            it.init()
+            var accuracy = 0.0
+            while (accuracy < accuracyThreshold) {
+                it.fit(
+                    dataset = train,
+                    epochs = 1,
+                    batchSize = trainBatchSize,
+                    callback = object : Callback() {
                     override fun onTrainBatchEnd(
                         batch: Int,
                         batchSize: Int,
@@ -41,12 +49,7 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
                             model.stopTraining = true
                         }
                     }
-                }
-            )
-            it.init()
-            var accuracy = 0.0
-            while (accuracy < accuracyThreshold) {
-                it.fit(dataset = train, epochs = 1, batchSize = trainBatchSize)
+                })
                 accuracy = it.evaluate(dataset = test, batchSize = testBatchSize).metrics[Metrics.ACCURACY] ?: 0.0
                 println("Accuracy: $accuracy")
             }
