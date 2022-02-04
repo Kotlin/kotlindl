@@ -44,6 +44,10 @@ public class GlobalAvgPool2D(
         return TF.mean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 
+    override fun toString(): String {
+        return "GlobalAvgPool2D(name = $name, isTrainable=$isTrainable, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -51,8 +55,4 @@ public class GlobalAvgPool2D(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "GlobalAvgPool2D()"
-    }
 }

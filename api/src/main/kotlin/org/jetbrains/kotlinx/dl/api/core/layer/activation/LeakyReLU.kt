@@ -35,5 +35,5 @@ public class LeakyReLU(
     }
 
     override fun toString(): String =
-        "LeakyReLU(alpha=$alpha)"
+        "LeakyReLU(name = $name, isTrainable=$isTrainable, alpha=$alpha)"
 }

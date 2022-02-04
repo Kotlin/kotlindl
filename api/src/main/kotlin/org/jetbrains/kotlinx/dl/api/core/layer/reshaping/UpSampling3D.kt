@@ -58,6 +58,9 @@ public class UpSampling3D(
         return upSampled
     }
 
-    override fun toString(): String =
-        "UpSampling3D(size=$size)"
+    override fun toString(): String {
+        return "UpSampling3D(name = $name, isTrainable=$isTrainable, size=${size.contentToString()}, hasActivation=$hasActivation)"
+    }
+
+
 }

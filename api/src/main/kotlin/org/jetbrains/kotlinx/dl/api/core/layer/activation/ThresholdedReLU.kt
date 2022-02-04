@@ -35,5 +35,5 @@ public class ThresholdedReLU(
     }
 
     override fun toString(): String =
-        "ThresholdedReLU(theta=$theta)"
+        "ThresholdedReLU(name = $name, isTrainable=$isTrainable, theta=$theta)"
 }

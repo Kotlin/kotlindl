@@ -123,13 +123,11 @@ public class Conv2D(
         return Shape.make(batchSize, rows, cols, filtersInternal.toLong())
     }
 
-    override fun toString(): String =
-        "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
-                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
-
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)
 
     override fun biasVarName(name: String): String = convBiasVarName(name, dim = 2)
+
+    override fun toString(): String {
+        return "Conv2D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
+    }
 }

@@ -126,7 +126,7 @@ public abstract class AbstractConv(
     }
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
+    public val kernelShapeArray: LongArray? get() = if (this::kernel.isInitialized)  TensorShape(kernel.shape).dims() else null
 
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }

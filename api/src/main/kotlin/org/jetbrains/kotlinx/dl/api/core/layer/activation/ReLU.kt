@@ -45,5 +45,5 @@ public class ReLU(
     }
 
     override fun toString(): String =
-        "ReLU(maxValue=$maxValue, negativeSlope=$negativeSlope, threshold=$threshold)"
+        "ReLU(name = $name, isTrainable=$isTrainable, maxValue=$maxValue, negativeSlope=$negativeSlope, threshold=$threshold)"
 }

@@ -43,6 +43,7 @@ public class Softmax(
         }
     }
 
-
-    override fun toString(): String = "Softmax(axis=$axis)"
+    override fun toString(): String {
+        return "Softmax(name = $name, isTrainable=$isTrainable, axis=$axis)"
+    }
 }

@@ -134,10 +134,22 @@ public class DepthwiseConv2D(
         return Shape.make(batchSize, rows, cols, filters)
     }
 
-    override fun toString(): String =
-        "DepthwiseConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, " +
-                "depthwiseInitializer=$depthwiseInitializer, biasInitializer=$biasInitializer, padding=$padding, " +
-                "useBias=$useBias, depthwiseKernel=$kernel, bias=$bias, biasShape=${bias?.shape}, " +
-                "depthwiseKernelShape=${kernel.shape})"
+    override fun toString(): String {
+        return "DepthwiseConv2D(name = $name, isTrainable=$isTrainable, " +
+                "kernelSize=${kernelSize.contentToString()}, " +
+                "strides=${strides.contentToString()}, " +
+                "dilations=${dilations.contentToString()}, " +
+                "activation=$activation, " +
+                "depthMultiplier=$depthMultiplier, " +
+                "depthwiseInitializer=$depthwiseInitializer, " +
+                "biasInitializer=$biasInitializer, " +
+                "depthwiseRegularizer=$depthwiseRegularizer, " +
+                "biasRegularizer=$biasRegularizer, " +
+                "activityRegularizer=$activityRegularizer, " +
+                "padding=$padding, " +
+                "useBias=$useBias, " +
+                "hasActivation=$hasActivation, " +
+                "depthwiseKernelShapeArray=${kernelShapeArray?.contentToString()}, " +
+                "biasShapeArray=${biasShapeArray?.contentToString()})"
+    }
 }

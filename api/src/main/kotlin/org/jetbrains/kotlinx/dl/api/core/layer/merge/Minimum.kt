@@ -23,4 +23,8 @@ public class Minimum(name: String = "") : AbstractMerge("MinimumLayer", name) {
             output = tf.math.minimum(output, input[i])
         return output
     }
+
+    override fun toString(): String {
+        return "Minimum(name = $name, isTrainable=$isTrainable,)"
+    }
 }

@@ -23,4 +23,8 @@ public class Add(name: String = "") : AbstractMerge("AddLayer", name) {
             output = tf.math.add(output, input[i])
         return output
     }
+
+    override fun toString(): String {
+        return "Add(name = $name, isTrainable=$isTrainable)"
+    }
 }

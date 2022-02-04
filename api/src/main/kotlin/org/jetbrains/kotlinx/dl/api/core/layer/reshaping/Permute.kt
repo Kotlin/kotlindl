@@ -53,6 +53,10 @@ public class Permute(
         return tf.linalg.transpose(input, perm)
     }
 
+    override fun toString(): String {
+        return "Permute(name = $name, isTrainable=$isTrainable, dims=${dims.contentToString()}, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -60,8 +64,4 @@ public class Permute(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "Permute(name=$name, dims=$dims)"
-    }
 }

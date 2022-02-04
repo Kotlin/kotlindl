@@ -66,4 +66,8 @@ public class Concatenate(
     override fun mergeFunction(input: List<Operand<Float>>, tf: Ops): Operand<Float> {
         return tf.concat(input, tf.constant(axis))
     }
+
+    override fun toString(): String {
+        return "Concatenate(name = $name, isTrainable=$isTrainable, axis=$axis)"
+    }
 }

@@ -54,6 +54,10 @@ public class MaxPool3D(
         return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }
 
+    override fun toString(): String {
+        return "MaxPool3D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -61,9 +65,4 @@ public class MaxPool3D(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "MaxPool3D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
-    }
-
 }

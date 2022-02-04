@@ -47,5 +47,5 @@ public class ELU(
     }
 
     override fun toString(): String =
-        "ELU(alpha=$alpha)"
+        "ELU(name = $name, isTrainable=$isTrainable, alpha=$alpha)"
 }

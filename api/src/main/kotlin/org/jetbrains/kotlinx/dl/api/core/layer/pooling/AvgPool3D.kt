@@ -73,6 +73,7 @@ public class AvgPool3D(
         )
     }
 
-    override fun toString(): String =
-        "AvgPool3D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+    override fun toString(): String {
+        return "AvgPool3D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
 }

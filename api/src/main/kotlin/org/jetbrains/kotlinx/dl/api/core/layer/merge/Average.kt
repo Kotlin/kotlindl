@@ -25,4 +25,8 @@ public class Average(name: String = "") : AbstractMerge("AverageLayer", name) {
         output = tf.math.div(output, tf.constant(input.size.toFloat()))
         return output
     }
+
+    override fun toString(): String {
+        return "Average(name = $name, isTrainable=$isTrainable,)"
+    }
 }

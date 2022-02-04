@@ -182,6 +182,10 @@ public class BatchNorm(
         else xNorm
     }
 
+    override fun toString(): String {
+        return "BatchNorm(name = $name, isTrainable=$isTrainable, axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, betaInitializer=$betaInitializer, gammaRegularizer=$gammaRegularizer, betaRegularizer=$betaRegularizer, movingMeanInitializer=$movingMeanInitializer, movingVarianceInitializer=$movingVarianceInitializer, hasActivation=$hasActivation, gammaShapeArray=${gammaShapeArray?.contentToString()}, betaShapeArray=${betaShapeArray?.contentToString()}, movingMeanShapeArray=${movingMeanShapeArray.contentToString()}, movingVarianceShapeArray=${movingVarianceShapeArray.contentToString()})"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = extractWeights(gamma, beta, movingMean, movingVariance)
         set(value) = assignWeights(value)
@@ -201,15 +205,13 @@ public class BatchNorm(
         get() = beta?.let { TensorShape(it.shape).dims() }
 
     /** Returns the shape of movingMean variable weights. */
-    public val movingMeanShapeArray: LongArray
-        get() = TensorShape(movingMean.shape).dims()
+    public val movingMeanShapeArray: LongArray?
+        get() = if (this::movingMean.isInitialized) TensorShape(movingMean.shape).dims() else null
 
     /** Returns the shape of movingVariance variable weights. */
-    public val movingVarianceShapeArray: LongArray
-        get() = TensorShape(movingVariance.shape).dims()
+    public val movingVarianceShapeArray: LongArray?
+        get() = if (this::movingVariance.isInitialized) TensorShape(movingVariance.shape).dims() else null
 
-    override fun toString(): String {
-        return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"
-    }
+
 }
 

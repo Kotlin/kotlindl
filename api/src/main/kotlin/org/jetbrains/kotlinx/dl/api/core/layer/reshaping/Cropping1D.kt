@@ -58,6 +58,7 @@ public class Cropping1D(
         )
     }
 
-    override fun toString(): String =
-        "Cropping1D(cropping=${cropping.contentToString()})"
+    override fun toString(): String {
+        return "Cropping1D(name = $name, isTrainable=$isTrainable, cropping=${cropping.contentToString()}, hasActivation=$hasActivation)"
+    }
 }

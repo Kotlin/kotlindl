@@ -23,4 +23,8 @@ public class Maximum(name: String = "") : AbstractMerge("MaximumLayer", name) {
             output = tf.math.maximum(output, input[i])
         return output
     }
+
+    override fun toString(): String {
+        return "Maximum(name = $name, isTrainable=$isTrainable,)"
+    }
 }

@@ -53,6 +53,10 @@ public class RepeatVector(
         return tf.tile(x, pattern)
     }
 
+    override fun toString(): String {
+        return "RepeatVector(name = $name, isTrainable=$isTrainable, n=$n, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -60,8 +64,4 @@ public class RepeatVector(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "RepeatVector"
-    }
 }

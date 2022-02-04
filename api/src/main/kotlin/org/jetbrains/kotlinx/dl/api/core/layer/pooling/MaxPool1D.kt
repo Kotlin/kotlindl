@@ -94,6 +94,7 @@ public class MaxPool1D(
         return tf.squeeze(maxPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 
-    override fun toString(): String =
-        "MaxPool1D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+    override fun toString(): String {
+        return "MaxPool1D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
 }

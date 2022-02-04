@@ -23,4 +23,8 @@ public class Multiply(name: String = "") : AbstractMerge("MultiplyLayer", name) 
             output = tf.math.mul(output, input[i])
         return output
     }
+
+    override fun toString(): String {
+        return "Multiply(name = $name, isTrainable=$isTrainable,)"
+    }
 }

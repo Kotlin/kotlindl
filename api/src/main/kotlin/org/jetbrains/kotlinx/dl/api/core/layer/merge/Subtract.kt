@@ -24,4 +24,8 @@ public class Subtract(name: String = "") : AbstractMerge("SubtractLayer", name) 
             output = tf.math.sub(output, input[i])
         return output
     }
+
+    override fun toString(): String {
+        return "Subtract(name = $name, isTrainable=$isTrainable,)"
+    }
 }
