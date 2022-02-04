@@ -6,10 +6,11 @@
 package examples.transferlearning.modelhub.resnet
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -45,7 +46,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
-fun resnet50additionalTraining() {
+fun resnet50additionalTrainingWithHelper() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
@@ -77,45 +78,28 @@ fun resnet50additionalTraining() {
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
-    val layers = mutableListOf<Layer>()
 
-    for (layer in model.layers) {
-        layer.isTrainable = false
-        layers.add(layer)
-    }
+    val pretrainedModel = model.removeLastLayer()
 
-    val lastLayer = layers.last()
-    for (outboundLayer in lastLayer.inboundLayers)
-        outboundLayer.outboundLayers.remove(lastLayer)
-
-    layers.removeLast()
-
-    val newDenseLayer = Dense(
-        name = "top_dense",
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = GlorotUniform(),
-        outputSize = 200,
-        activation = Activations.Relu
-    )
-    newDenseLayer.inboundLayers.add(layers.last())
-    layers.add(
-        newDenseLayer
+    val topModel = Sequential.of(
+        Dense(
+            name = "top_dense",
+            kernelInitializer = GlorotUniform(),
+            biasInitializer = GlorotUniform(),
+            outputSize = 200,
+            activation = Activations.Relu
+        ),
+        Dense(
+            name = "pred",
+            kernelInitializer = GlorotUniform(),
+            biasInitializer = GlorotUniform(),
+            outputSize = NUM_CLASSES,
+            activation = Activations.Linear
+        ),
+        noInput = true
     )
 
-    val newDenseLayer2 = Dense(
-        name = "pred",
-        kernelInitializer = GlorotUniform(),
-        biasInitializer = GlorotUniform(),
-        outputSize = NUM_CLASSES,
-        activation = Activations.Linear
-    )
-    newDenseLayer2.inboundLayers.add(layers.last())
-
-    layers.add(
-        newDenseLayer2
-    )
-
-    val model2 = Functional.of(layers)
+    val model2 = Functional.of(pretrainedModel = pretrainedModel, topModel = topModel)
 
     model2.use {
         it.compile(
@@ -141,6 +125,6 @@ fun resnet50additionalTraining() {
 }
 
 /** */
-fun main(): Unit = resnet50additionalTraining()
+fun main(): Unit = resnet50additionalTrainingWithHelper()
 
 

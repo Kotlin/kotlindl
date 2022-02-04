@@ -109,7 +109,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             layer.parentModel = this
         }
 
-
         kGraph = KGraph(Graph().toGraphDef())
         tf = Ops.create(kGraph.tfGraph)
         session = Session(kGraph.tfGraph)
@@ -213,6 +212,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Validates architecture. */
     private fun validateModelArchitecture() {
+        layerValidation(layers.toList())
+
         require(layers.none { it is NoGradients && it.isTrainable })
         {
             "All layers that implements NoGradient interface should be frozen (status isTrainable==false). " +

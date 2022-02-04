@@ -30,13 +30,18 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Sequential] model.
          *
-         * @property [input] The input layer with initial shapes.
+         * @property [noInput] If true it disables input layer check.
          * @property [layers] The layers to describe the model design.
+         *
+         * NOTE: First layer should be an input layer, if you want to compile model.
+         *
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Sequential {
-            layerValidation(layers.toList())
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Sequential {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             preProcessLayerNames(layers)
             return Sequential(*layers)
@@ -44,13 +49,19 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         /**
          * Creates the [Functional] model.
+         *
+         * @property [noInput] If true it disables input layer check.
          * @property [layers] The layers to describe the model design.
-         * NOTE: First layer should be input layer.
-         * @return the [Functional] model.
+         *
+         * NOTE: First layer should be an input layer, if you want to compile model.
+         *
+         * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>): Sequential {
-            layerValidation(layers.toList())
+        public fun of(layers: List<Layer>, noInput: Boolean = false): Sequential {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             preProcessLayerNames(layers.toTypedArray())
             return Sequential(*layers.toTypedArray())

@@ -32,6 +32,12 @@ class ResNetTestSuite {
     }
 
     @Test
+    fun resnet50additionalTrainingWithHelperTest() {
+        resnet50additionalTrainingWithHelper()
+    }
+
+
+    @Test
     fun resnet50additionalTrainingNoTopTest() {
         resnet50noTopAdditionalTraining()
     }
