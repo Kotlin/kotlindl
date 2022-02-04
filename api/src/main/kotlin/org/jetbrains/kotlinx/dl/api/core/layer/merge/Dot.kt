@@ -43,6 +43,10 @@ public class Dot(
         }
         return batchDot(scope, x1, x2, axes)
     }
+
+    override fun toString(): String {
+        return "Dot(name = $name, isTrainable=$isTrainable, axis=${axis.contentToString()}, normalize=$normalize)"
+    }
 }
 
 /**
@@ -145,3 +149,5 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
     }
     return out
 }
+
+

@@ -125,9 +125,9 @@ public class Conv1D(
         return Shape.make(batchSize, cols, filtersInternal.toLong())
     }
 
-    override fun toString(): String =
-        "Conv1D(filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, " +
-                "dilation=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=${kernel.shape}, biasShape=${bias?.shape}, padding=$padding, " +
-                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
+    override fun toString(): String {
+        return "Conv1D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=$kernelSize, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
+    }
+
+
 }

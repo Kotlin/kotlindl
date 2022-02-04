@@ -50,6 +50,10 @@ public class Reshape(
         return tf.reshape(input, units)
     }
 
+    override fun toString(): String {
+        return "Reshape(name = $name, isTrainable=$isTrainable, targetShape=$targetShape, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -57,8 +61,4 @@ public class Reshape(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "Reshape"
-    }
 }

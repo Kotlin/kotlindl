@@ -87,6 +87,7 @@ public class PReLU(
         return tf.math.add(positive, negative)
     }
 
-    override fun toString(): String =
-        "PReLU(alphaInitializer=$alphaInitializer, alphaRegularizer=$alphaRegularizer, sharedAxes=$sharedAxes)"
+    override fun toString(): String {
+        return "PReLU(name = $name, isTrainable=$isTrainable, alphaInitializer=$alphaInitializer, alphaRegularizer=$alphaRegularizer, sharedAxes=${sharedAxes?.contentToString()})"
+    }
 }

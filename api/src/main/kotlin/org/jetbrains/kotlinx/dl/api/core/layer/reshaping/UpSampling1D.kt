@@ -46,6 +46,7 @@ public class UpSampling1D(
         return repeat(tf, input, repeats = size, axis = 1)
     }
 
-    override fun toString(): String =
-        "UpSampling1D(size=$size)"
+    override fun toString(): String {
+        return "UpSampling1D(name = $name, isTrainable=$isTrainable, size=$size, hasActivation=$hasActivation)"
+    }
 }

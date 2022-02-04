@@ -72,6 +72,7 @@ public class UpSampling2D(
         }
     }
 
-    override fun toString(): String =
-        "UpSampling2D(size=$size, interpolation=$interpolation)"
+    override fun toString(): String {
+        return "UpSampling2D(name = $name, isTrainable=$isTrainable, size=${size.contentToString()}, interpolation=$interpolation, hasActivation=$hasActivation)"
+    }
 }

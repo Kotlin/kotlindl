@@ -106,6 +106,10 @@ public class Dense(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
+    override fun toString(): String {
+        return "Dense(name = $name, isTrainable=$isTrainable, outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = extractWeights(kernel, bias)
         set(value) = assignWeights(value)
@@ -116,12 +120,8 @@ public class Dense(
         get() = listOfNotNull(kernel, bias).sumOf { it.shape.numElements() }.toInt()
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
+    public val kernelShapeArray: LongArray? get() = if (this::kernel.isInitialized) TensorShape(kernel.shape).dims() else null
 
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
-
-    override fun toString(): String {
-        return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer)"
-    }
 }

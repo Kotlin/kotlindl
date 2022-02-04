@@ -182,6 +182,10 @@ public class BatchNorm(
         else xNorm
     }
 
+    override fun toString(): String {
+        return "BatchNorm(name = $name, isTrainable=$isTrainable, axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, betaInitializer=$betaInitializer, gammaRegularizer=$gammaRegularizer, betaRegularizer=$betaRegularizer, movingMeanInitializer=$movingMeanInitializer, movingVarianceInitializer=$movingVarianceInitializer, hasActivation=$hasActivation, gammaShapeArray=${gammaShapeArray?.contentToString()}, betaShapeArray=${betaShapeArray?.contentToString()}, movingMeanShapeArray=${movingMeanShapeArray.contentToString()}, movingVarianceShapeArray=${movingVarianceShapeArray.contentToString()})"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = extractWeights(gamma, beta, movingMean, movingVariance)
         set(value) = assignWeights(value)
@@ -208,8 +212,6 @@ public class BatchNorm(
     public val movingVarianceShapeArray: LongArray
         get() = TensorShape(movingVariance.shape).dims()
 
-    override fun toString(): String {
-        return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"
-    }
+
 }
 

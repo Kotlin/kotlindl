@@ -66,6 +66,7 @@ public class Cropping2D(
         )
     }
 
-    override fun toString(): String =
-        "Cropping2D(cropping=${cropping.contentToString()})"
+    override fun toString(): String {
+        return "Cropping2D(name = $name, isTrainable=$isTrainable, cropping=${cropping.contentToString()}, hasActivation=$hasActivation)"
+    }
 }

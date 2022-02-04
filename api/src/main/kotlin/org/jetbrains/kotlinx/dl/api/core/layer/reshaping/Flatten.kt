@@ -44,6 +44,10 @@ public class Flatten(name: String = "") : Layer(name) {
         return tf.reshape(input, units)
     }
 
+    override fun toString(): String {
+        return "Flatten(name = $name, isTrainable=$isTrainable, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -51,8 +55,4 @@ public class Flatten(name: String = "") : Layer(name) {
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "Flatten"
-    }
 }

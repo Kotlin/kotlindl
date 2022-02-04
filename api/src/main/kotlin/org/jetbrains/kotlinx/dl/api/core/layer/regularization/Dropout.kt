@@ -74,6 +74,10 @@ public class Dropout(
         /* }*/
     }
 
+    override fun toString(): String {
+        return "Dropout(name = $name, isTrainable=$isTrainable, rate=$rate, seed=$seed, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)
@@ -81,8 +85,4 @@ public class Dropout(
     override val hasActivation: Boolean get() = false
 
     override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "Dropout(keepProbability=$rate)"
-    }
 }

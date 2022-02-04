@@ -43,6 +43,7 @@ public class GlobalMaxPool1D(
         return tf.max(input, tf.constant(1))
     }
 
-    override fun toString(): String =
-        "GlobalMaxPool1D(name=$name)"
+    override fun toString(): String {
+        return "GlobalMaxPool1D(name = $name, isTrainable=$isTrainable, hasActivation=$hasActivation)"
+    }
 }

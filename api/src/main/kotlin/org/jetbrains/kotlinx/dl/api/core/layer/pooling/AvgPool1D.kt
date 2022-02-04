@@ -83,6 +83,7 @@ public class AvgPool1D(
         return tf.squeeze(avgPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 
-    override fun toString(): String =
-        "AvgPool1D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+    override fun toString(): String {
+        return "AvgPool1D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
 }

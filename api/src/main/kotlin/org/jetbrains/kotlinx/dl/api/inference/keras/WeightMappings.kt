@@ -54,7 +54,7 @@ internal object WeightMappings {
 
     private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray))
+            Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray!!))
         )
         if (layer.useBias) {
             variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!)
@@ -76,7 +76,7 @@ internal object WeightMappings {
 
     private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray))
+            Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray!!))
         )
         if (layer.useBias) {
             variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
@@ -141,7 +141,7 @@ internal object WeightMappings {
 
     private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray))
+            Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray!!))
         )
         if (layer.useBias) {
             variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!)

@@ -63,6 +63,10 @@ public class AvgPool2D(
         )
     }
 
+    override fun toString(): String {
+        return "AvgPool2D(name = $name, isTrainable=$isTrainable, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = emptyMap()
         set(value) = assignWeights(value)

@@ -188,6 +188,10 @@ public class SeparableConv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
+    override fun toString(): String {
+        return "SeparableConv2D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, depthwiseInitializer=$depthwiseInitializer, pointwiseInitializer=$pointwiseInitializer, biasInitializer=$biasInitializer, depthwiseRegularizer=$depthwiseRegularizer, pointwiseRegularizer=$pointwiseRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, depthwiseShapeArray=${depthwiseShapeArray.contentToString()}, pointwiseShapeArray=${pointwiseShapeArray.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()}, hasActivation=$hasActivation)"
+    }
+
     override var weights: Map<String, Array<*>>
         get() = extractWeights(depthwiseKernel, pointwiseKernel, bias)
         set(value) = assignWeights(value)
@@ -206,8 +210,5 @@ public class SeparableConv2D(
     override val paramCount: Int
         get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias).sumOf { it.shape.numElements() }.toInt()
 
-    override fun toString(): String =
-        "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, depthwiseInitializer=$depthwiseInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=${depthwiseKernel.shape}, padding=$padding)"
+
 }
