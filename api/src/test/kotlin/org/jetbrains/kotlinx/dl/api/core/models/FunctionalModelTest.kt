@@ -32,7 +32,6 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
 
 internal class FunctionalModelTest {
-
     private val correctTestModel = Functional.of(
         input,
         conv2D_1(input),
@@ -97,7 +96,6 @@ internal class FunctionalModelTest {
         assertEquals(org.jetbrains.kotlinx.dl.api.core.models.graphLines, graphLines)
     }
 }
-
 
 private val input = Input(
     IMAGE_SIZE,
@@ -198,7 +196,6 @@ internal val dense_2 = Dense(
     biasInitializer = Constant(0.1f),
     name = "dense_2"
 )
-
 
 private val graphLines = setOf(
     "Name: default_data_placeholder; Type: Placeholder; Out #tensors:  1",

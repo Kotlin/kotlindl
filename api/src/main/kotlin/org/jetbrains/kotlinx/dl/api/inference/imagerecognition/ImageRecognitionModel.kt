@@ -71,7 +71,6 @@ public class ImageRecognitionModel(
         else
             Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
 
-
         val preprocessing: Preprocessing = preprocess {
             load {
                 pathToData = imageFile
