@@ -197,10 +197,10 @@ public class SeparableConv2D(
         set(value) = assignWeights(value)
 
     /** Returns the shape of kernel weights. */
-    public val depthwiseShapeArray: LongArray get() = TensorShape(depthwiseKernel.shape).dims()
+    public val depthwiseShapeArray: LongArray? get() = if (this::depthwiseKernel.isInitialized) TensorShape(depthwiseKernel.shape).dims() else null
 
     /** Returns the shape of kernel weights. */
-    public val pointwiseShapeArray: LongArray get() = TensorShape(pointwiseKernel.shape).dims()
+    public val pointwiseShapeArray: LongArray? get() = if (this::pointwiseKernel.isInitialized) TensorShape(pointwiseKernel.shape).dims() else null
 
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }

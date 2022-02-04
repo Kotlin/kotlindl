@@ -106,11 +106,11 @@ internal object WeightMappings {
         val variables = mutableMapOf(
             Pair(
                 "depthwise_kernel:0",
-                Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray)
+                Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray!!)
             ),
             Pair(
                 "pointwise_kernel:0",
-                Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray)
+                Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray!!)
             )
         )
         if (layer.useBias) {
@@ -163,8 +163,8 @@ internal object WeightMappings {
 
     private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray)),
-            Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray))
+            Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray!!)),
+            Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray!!))
         )
         if (layer.scale) {
             variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)

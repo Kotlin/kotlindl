@@ -205,12 +205,12 @@ public class BatchNorm(
         get() = beta?.let { TensorShape(it.shape).dims() }
 
     /** Returns the shape of movingMean variable weights. */
-    public val movingMeanShapeArray: LongArray
-        get() = TensorShape(movingMean.shape).dims()
+    public val movingMeanShapeArray: LongArray?
+        get() = if (this::movingMean.isInitialized) TensorShape(movingMean.shape).dims() else null
 
     /** Returns the shape of movingVariance variable weights. */
-    public val movingVarianceShapeArray: LongArray
-        get() = TensorShape(movingVariance.shape).dims()
+    public val movingVarianceShapeArray: LongArray?
+        get() = if (this::movingVariance.isInitialized) TensorShape(movingVariance.shape).dims() else null
 
 
 }
