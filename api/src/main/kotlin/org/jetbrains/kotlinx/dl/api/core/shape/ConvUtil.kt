@@ -48,16 +48,40 @@ internal fun convTransposeOutputLength(
     dilation: Int
 ): Long {
     val dilatedFilterSize = dilatedFilterSize(filterSize, dilation)
-    val totalPadding = (outputPaddingStart ?: 0) + (outputPaddingEnd ?: 0) - padding.value(dilatedFilterSize)
+    if (outputPaddingEnd == null || outputPaddingStart == null) {
+        // https://github.com/keras-team/keras/blob/cff8cc93305d1c4a54385fb623fe895dafa0845c/keras/utils/conv_utils.py#L185
+        return when (padding) {
+            ConvPadding.VALID -> inputLength * stride + max(dilatedFilterSize - stride, 0)
+            ConvPadding.SAME -> inputLength * stride
+            ConvPadding.FULL -> inputLength * stride - (stride + dilatedFilterSize - 2)
+        }
+    }
+    val totalPadding = convTransposePadding(padding, outputPaddingStart, outputPaddingEnd, filterSize, dilation).sum()
     return (inputLength - 1) * stride + dilatedFilterSize + totalPadding
 }
 
-internal fun convTransposeSingleSidePadding(padding: ConvPadding,
-                                            outputPadding: Int,
-                                            filterSize: Int,
-                                            dilation: Int
-): Int {
+private fun convTransposePadding(
+    padding: ConvPadding,
+    outputPaddingStart: Int,
+    outputPaddingEnd: Int,
+    dilatedKernelSize: Int
+): List<Int> {
+    // https://github.com/keras-team/keras/blob/cff8cc93305d1c4a54385fb623fe895dafa0845c/keras/utils/conv_utils.py#L194
+    val automaticPadding = when (padding) {
+        ConvPadding.VALID -> 0
+        ConvPadding.SAME -> dilatedKernelSize / 2
+        ConvPadding.FULL -> dilatedKernelSize - 1
+    }
+    return listOf(outputPaddingStart - automaticPadding, outputPaddingEnd - automaticPadding)
+}
+
+internal fun convTransposePadding(
+    padding: ConvPadding,
+    outputPaddingStart: Int,
+    outputPaddingEnd: Int,
+    filterSize: Int,
+    dilation: Int
+): List<Int> {
     val dilatedKernelSize = dilatedFilterSize(filterSize, dilation)
-    val automaticPadding = padding.value(dilatedKernelSize) / 2
-    return max(0, outputPadding - automaticPadding)
+    return convTransposePadding(padding, outputPaddingStart, outputPaddingEnd, dilatedKernelSize).map { max(0, it) }
 }

@@ -138,9 +138,16 @@ class Conv3DTransposeTest : ConvLayerTest() {
         val expected = create3DTensor(
             batchSize = 1, channels = 3,
             arrayOf(
-                floatArrayOf(32f, 64f, 32f, 64f, 32f),
-                floatArrayOf(64f, 128f, 64f, 128f, 64f),
-                floatArrayOf(32f, 64f, 32f, 64f, 32f)
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+                floatArrayOf(64f, 64f, 128f, 64f, 128f, 64f),
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+            ),
+            arrayOf(
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+                floatArrayOf(64f, 64f, 128f, 64f, 128f, 64f),
+                floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
             )
         )
 

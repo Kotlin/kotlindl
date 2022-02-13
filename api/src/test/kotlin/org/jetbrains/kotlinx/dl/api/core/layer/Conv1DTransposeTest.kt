@@ -106,7 +106,7 @@ class Conv1DTransposeTest : ConvLayerTest() {
     @Test
     fun samePaddingStrides() {
         val input = create1DTensor(batchSize = 1, size = 3, channels = 32, initValue = 1f)
-        val expected = create1DTensor(batchSize = 1, channels = 3, floatArrayOf(32f, 64f, 32f, 64f, 32f))
+        val expected = create1DTensor(batchSize = 1, channels = 3, floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f))
 
         assertTensorsEquals(
             Conv1DTranspose(

@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeOutputLength
-import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeSingleSidePadding
+import org.jetbrains.kotlinx.dl.api.core.shape.convTransposePadding
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeKernelVarName
@@ -94,9 +94,12 @@ public abstract class ConvTranspose(
             dilations: IntArray
         ): IntArray {
             val withStandardPadding = kernelSize.indices.flatMap { dim ->
-                listOf(
-                    convTransposeSingleSidePadding(padding, this[2 * dim], kernelSize[dim], dilations[dim + 1]),
-                    convTransposeSingleSidePadding(padding, this[2 * dim + 1], kernelSize[dim], dilations[dim + 1])
+                convTransposePadding(
+                    padding,
+                    this[2 * dim],
+                    this[2 * dim + 1],
+                    kernelSize[dim],
+                    dilations[dim + 1]
                 )
             }
             return intArrayOf(0, 0, *(withStandardPadding.toIntArray()), 0, 0)

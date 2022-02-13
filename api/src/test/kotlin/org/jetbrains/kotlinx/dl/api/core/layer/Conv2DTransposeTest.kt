@@ -130,9 +130,10 @@ class Conv2DTransposeTest : ConvLayerTest() {
         val input = create2DTensor(batchSize = 1, height = 2, width = 3, channels = 32, initValue = 1f)
         val expected = create2DTensor(
             batchSize = 1, channels = 3,
-            floatArrayOf(32f, 64f, 32f, 64f, 32f),
-            floatArrayOf(64f, 128f, 64f, 128f, 64f),
-            floatArrayOf(32f, 64f, 32f, 64f, 32f)
+            floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+            floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f),
+            floatArrayOf(64f, 64f, 128f, 64f, 128f, 64f),
+            floatArrayOf(32f, 32f, 64f, 32f, 64f, 32f)
         )
 
         assertTensorsEquals(
