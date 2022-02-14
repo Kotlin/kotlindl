@@ -122,6 +122,16 @@ fun modernLenet() {
         println(it.kGraph)
 
         println("Accuracy after: $accuracy")
+
+        // Reset the model
+        it.init(forceInitialization = true)
+
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy after reset: $accuracy")
+
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy after reset and fit: $accuracy")
     }
 }
 

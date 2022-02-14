@@ -637,7 +637,6 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
 
             testEvaluationGreaterThan(it, test, 0.05)
-            testEvaluationLessThan(it, test, 0.3)
         }
     }
 
@@ -715,7 +714,6 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
             testEvaluationGreaterThan(it, test, 0.05)
-            testEvaluationLessThan(it, test, 0.3)
         }
     }
 }
