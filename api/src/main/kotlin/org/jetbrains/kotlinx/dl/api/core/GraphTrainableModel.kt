@@ -272,12 +272,15 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /**
      * Initializes kGraph variables.
      *
+     * @param [forceInitialization] If true it forces initialization and ignores that model is initialized already.
      * NOTE: Model becomes initialized after this method call. (Flags [isModelInitialized] and [isOptimizerVariableInitialized] are set up to true)
      */
-    public fun init() {
+    public fun init(forceInitialization: Boolean = false) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(!isModelInitialized) { "Model is initialized already!" }
-        check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
+        if (!forceInitialization) {
+            check(!isModelInitialized) { "Model is initialized already!" }
+            check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
+        }
 
         logger.debug { "Initialization of TensorFlow Graph variables." }
         kGraph.initializeGraphVariables(session)

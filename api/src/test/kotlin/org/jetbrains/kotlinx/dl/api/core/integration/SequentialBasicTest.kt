@@ -27,13 +27,11 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-
-private const val INCORRECT_AMOUNT_OF_CLASSES_1 = 11
 
 internal class SequentialBasicTest : IntegrationTest() {
     private val testModel = Sequential.of(
@@ -102,7 +100,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun initLeNetModel() {
-        val (train, test) = mnist()
+        val (_, test) = mnist()
 
         testModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
@@ -133,54 +131,110 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.7)
-            }
+            testEvaluationGreaterThan(it, test, 0.7)
 
             it.logSummary()
 
-            // Prediction testing
-            val label = it.predict(test.getX(0))
-            assertEquals(test.getY(0), label.toFloat())
+            testModelOutput(it, test)
+        }
+    }
 
-            val softPrediction = it.predictSoftly(test.getX(0))
+    @Test
+    fun resetModelWeights() {
+        val (train, test) = mnist()
 
+        val block: (Sequential) -> Unit = {
+            it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
+            it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+
+            testEvaluationGreaterThan(it, test, 0.7)
+
+            it.logSummary()
+
+            testModelOutput(it, test)
+
+            val exception =
+                assertThrows(IllegalStateException::class.java) {
+                    it.init()
+                }
             assertEquals(
-                test.getY(0),
-                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
+                "Model is initialized already!",
+                exception.message
             )
 
-            // Test predict method with specified tensor name
-            val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
-            assertEquals(test.getY(0), label2.toFloat())
+            it.init(forceInitialization = true)
 
-            // Test predictAndGetActivations method
-            val (label3, activations) = it.predictAndGetActivations(test.getX(0))
-            assertEquals(test.getY(0), label3.toFloat())
-            assertEquals(3, activations.size)
+            testEvaluationLessThan(it, test, 0.2)
 
-            // TODO: flaky test due to TF non-determinism
-            /*val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.43086472153663635, conv2d1Activations[0][0][0][0].toDouble(), EPS)
-            val conv2d2Activations = activations[1] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.0, conv2d2Activations[0][0][0][0].toDouble(), EPS)
-            val denseActivations = activations[2] as Array<FloatArray>
-            assertEquals(2.8752777576446533, denseActivations[0][0].toDouble(), EPS)*/
+            it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 
-            val predictions = it.predict(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), predictions.size)
+            testEvaluationGreaterThan(it, test, 0.7)
 
-            val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), softPredictions.size)
-            assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
-
-            var manualAccuracy = 0
-            predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
-            assertTrue(manualAccuracy > 0.7)
+            testModelOutput(it, test)
         }
+        testModel.use(block)
+    }
+
+    private fun testEvaluationGreaterThan(
+        it: Sequential,
+        test: OnHeapDataset,
+        targetAccuracy: Double
+    ) {
+        // Evaluation testing
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+        if (accuracy != null) {
+            assertTrue(accuracy > targetAccuracy)
+        }
+    }
+
+    private fun testEvaluationLessThan(
+        it: Sequential,
+        test: OnHeapDataset,
+        targetAccuracy: Double
+    ) {
+        // Evaluation testing
+        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+
+        if (accuracy != null) {
+            assertTrue(accuracy < targetAccuracy)
+        }
+    }
+
+    private fun testModelOutput(
+        it: Sequential,
+        test: OnHeapDataset
+    ) {
+        // Prediction testing
+        val label = it.predict(test.getX(0))
+        assertEquals(test.getY(0), label.toFloat())
+
+        val softPrediction = it.predictSoftly(test.getX(0))
+
+        assertEquals(
+            test.getY(0),
+            softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
+        )
+
+        // Test predict method with specified tensor name
+        val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
+        assertEquals(test.getY(0), label2.toFloat())
+
+        // Test predictAndGetActivations method
+        val (label3, activations) = it.predictAndGetActivations(test.getX(0))
+        assertEquals(test.getY(0), label3.toFloat())
+        assertEquals(3, activations.size)
+
+        val predictions = it.predict(test, TEST_BATCH_SIZE)
+        assertEquals(test.xSize(), predictions.size)
+
+        val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
+        assertEquals(test.xSize(), softPredictions.size)
+        assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
+
+        var manualAccuracy = 0
+        predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
+        assertTrue(manualAccuracy > 0.7)
     }
 
     @Test
@@ -218,44 +272,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
             it.logSummary()
 
-            // Prediction testing
-            val label = it.predict(test.getX(0))
-            assertEquals(test.getY(0), label.toFloat())
-
-            val softPrediction = it.predictSoftly(test.getX(0))
-
-            assertEquals(
-                test.getY(0),
-                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
-            )
-
-            // Test predict method with specified tensor name
-            val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
-            assertEquals(test.getY(0), label2.toFloat())
-
-            // Test predictAndGetActivations method
-            val (label3, activations) = it.predictAndGetActivations(test.getX(0))
-            assertEquals(test.getY(0), label3.toFloat())
-            assertEquals(3, activations.size)
-
-            // TODO: flaky test due to TF non-determinism
-            /*val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.43086472153663635, conv2d1Activations[0][0][0][0].toDouble(), EPS)
-            val conv2d2Activations = activations[1] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.0, conv2d2Activations[0][0][0][0].toDouble(), EPS)
-            val denseActivations = activations[2] as Array<FloatArray>
-            assertEquals(2.8752777576446533, denseActivations[0][0].toDouble(), EPS)*/
-
-            val predictions = it.predict(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), predictions.size)
-
-            val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), softPredictions.size)
-            assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
-
-            var manualAccuracy = 0
-            predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
-            assertTrue(manualAccuracy > 0.7)
+            testModelOutput(it, test)
         }
     }
 
@@ -277,53 +294,11 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.7)
-            }
+            testEvaluationGreaterThan(it, test, 0.7)
 
             it.logSummary()
 
-            // Prediction testing
-            val label = it.predict(test.getX(0))
-            assertEquals(test.getY(0), label.toFloat())
-
-            val softPrediction = it.predictSoftly(test.getX(0))
-
-            assertEquals(
-                test.getY(0),
-                softPrediction.indexOfFirst { value -> value == softPrediction.maxOrNull()!! }.toFloat()
-            )
-
-            // Test predict method with specified tensor name
-            val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
-            assertEquals(test.getY(0), label2.toFloat())
-
-            // Test predictAndGetActivations method
-            val (label3, activations) = it.predictAndGetActivations(test.getX(0))
-            assertEquals(test.getY(0), label3.toFloat())
-            assertEquals(3, activations.size)
-
-            // TODO: flaky asserts due-to non-determinism
-            /*val conv2d1Activations = activations[0] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.43086472153663635, conv2d1Activations[0][0][0][0].toDouble(), EPS)
-            val conv2d2Activations = activations[1] as Array<Array<Array<FloatArray>>>
-            assertEquals(0.0, conv2d2Activations[0][0][0][0].toDouble(), EPS)
-            val denseActivations = activations[2] as Array<FloatArray>
-            assertEquals(2.8752777576446533, denseActivations[0][0].toDouble(), EPS)*/
-
-            val predictions = it.predict(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), predictions.size)
-
-            val softPredictions = it.predictSoftly(test, TEST_BATCH_SIZE)
-            assertEquals(test.xSize(), softPredictions.size)
-            assertEquals(AMOUNT_OF_CLASSES, softPredictions[0].size)
-
-            var manualAccuracy = 0
-            predictions.forEachIndexed { index, lb -> if (lb == test.getY(index).toInt()) manualAccuracy++ }
-            assertTrue(manualAccuracy > 0.7)
+            testModelOutput(it, test)
 
             copiedModel = it.copy(copyWeights = true)
 
@@ -338,12 +313,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         }
 
         copiedModel.use {
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.7)
-            }
+            testEvaluationGreaterThan(it, test, 0.7)
         }
     }
 
@@ -370,17 +340,13 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.7)
-            }
+            testEvaluationGreaterThan(it, test, 0.7)
         }
     }
 
     @Test
     fun trainingFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         testModel.use {
             val exception =
@@ -400,7 +366,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun evaluatingFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (_, test) = mnist()
 
         testModel.use {
             val exception =
@@ -416,7 +382,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictionFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         testModel.use {
             val exception =
@@ -432,7 +398,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun softPredictionFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         testModel.use {
             val exception =
@@ -448,7 +414,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictAllFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (_, test) = mnist()
 
         testModel.use {
             val exception =
@@ -475,7 +441,7 @@ internal class SequentialBasicTest : IntegrationTest() {
 
     @Test
     fun predictAndGetActivationsFailedWithoutCompilation() {
-        val (train, test) = mnist()
+        val (_, test) = mnist()
 
         testModel.use {
             val exception =
@@ -595,12 +561,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 100.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.05)
-            }
+            testEvaluationGreaterThan(it, test, 0.05)
+            testEvaluationLessThan(it, test, 0.3)
         }
 
     }
@@ -674,12 +636,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertEquals(1, trainingHistory.batchHistory[0].epochIndex)
             assertEquals(0, trainingHistory.batchHistory[0].batchIndex)
 
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.05)
-            }
+            testEvaluationGreaterThan(it, test, 0.05)
+            testEvaluationLessThan(it, test, 0.3)
         }
     }
 
@@ -756,12 +714,8 @@ internal class SequentialBasicTest : IntegrationTest() {
             assertTrue(trainingHistory.batchHistory[0].lossValue > 2.0f)
             assertTrue(trainingHistory.batchHistory[0].metricValues[0] < 0.2f)
 
-            // Evaluation testing
-            val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-            if (accuracy != null) {
-                assertTrue(accuracy > 0.05)
-            }
+            testEvaluationGreaterThan(it, test, 0.05)
+            testEvaluationLessThan(it, test, 0.3)
         }
     }
 }
