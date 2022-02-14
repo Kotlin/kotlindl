@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -74,65 +75,69 @@ private fun convertToLayer(
 ): Layer {
     return when (kerasLayer.class_name) {
         // Core layers
-        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DENSE -> createDenseLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_PERMUTE -> createPermuteLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ACTIVATION -> createActivationLayer(kerasLayer.config!!)
+        LAYER_DENSE -> createDenseLayer(kerasLayer.config!!)
+        LAYER_PERMUTE -> createPermuteLayer(kerasLayer.config!!)
         // Convolution layers
-        LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CONV3D -> createConv3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_SEPARABLE_CONV2D -> createSeparableConv2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_CONV1D -> createConv1DLayer(kerasLayer.config!!)
+        LAYER_CONV2D -> createConv2DLayer(kerasLayer.config!!)
+        LAYER_CONV3D -> createConv3DLayer(kerasLayer.config!!)
+        LAYER_DEPTHWISE_CONV2D -> createDepthwiseConv2DLayer(kerasLayer.config!!)
+        LAYER_SEPARABLE_CONV2D -> createSeparableConv2DLayer(kerasLayer.config!!)
         // Pooling layers
-        LAYER_MAX_POOL_1D -> createMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOL_2D -> createMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_MAX_POOL_3D -> createMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_AVG_POOL_1D -> createAvgPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_AVG_POOL_2D -> createAvgPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_MAX_POOL_1D -> createGlobalMaxPool1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_MAX_POOL_2D -> createGlobalMaxPool2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_MAX_POOL_3D -> createGlobalMaxPool3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_GLOBAL_AVG_POOL_1D -> createGlobalAvgPool1DLayer(kerasLayer.config!!.name!!)
-        LAYER_GLOBAL_AVG_POOL_2D -> createGlobalAvgPool2DLayer(kerasLayer.config!!.name!!)
-        LAYER_GLOBAL_AVG_POOL_3D -> createGlobalAvgPool3DLayer(kerasLayer.config!!.name!!)
+        LAYER_MAX_POOL_1D -> createMaxPool1DLayer(kerasLayer.config!!)
+        LAYER_MAX_POOL_2D -> createMaxPool2DLayer(kerasLayer.config!!)
+        LAYER_MAX_POOL_3D -> createMaxPool3DLayer(kerasLayer.config!!)
+        LAYER_AVG_POOL_1D -> createAvgPool1DLayer(kerasLayer.config!!)
+        LAYER_AVG_POOL_2D -> createAvgPool2DLayer(kerasLayer.config!!)
+        LAYER_AVG_POOL_3D -> createAvgPool3DLayer(kerasLayer.config!!)
+        LAYER_GLOBAL_MAX_POOL_1D -> GlobalMaxPool1D()
+        LAYER_GLOBAL_MAX_POOL_2D -> GlobalMaxPool2D()
+        LAYER_GLOBAL_MAX_POOL_3D -> GlobalMaxPool3D()
+        LAYER_GLOBAL_AVG_POOL_1D -> GlobalAvgPool1D()
+        LAYER_GLOBAL_AVG_POOL_2D -> GlobalAvgPool2D()
+        LAYER_GLOBAL_AVG_POOL_3D -> GlobalAvgPool3D()
         // Recurrent layers
         // Normalization layers
-        LAYER_BATCH_NORM -> createBatchNormLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_BATCH_NORM -> createBatchNormLayer(kerasLayer.config!!)
         // Regularization layers
-        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_DROPOUT -> createDropoutLayer(kerasLayer.config!!)
         // Attention layers
         // Reshaping layers
-        LAYER_FLATTEN -> createFlattenLayer(kerasLayer.config!!.name!!)
-        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_1D -> createCropping1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_CROPPING_3D -> createCropping3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_1D -> createZeroPadding1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ZERO_PADDING_3D -> createZeroPadding3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_UP_SAMPLING_1D -> createUpSampling1DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_UP_SAMPLING_2D -> createUpSampling2DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_UP_SAMPLING_3D -> createUpSampling3DLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_FLATTEN -> Flatten()
+        LAYER_REPEAT_VECTOR -> createRepeatVectorLayer(kerasLayer.config!!)
+        LAYER_RESHAPE -> createReshapeLayer(kerasLayer.config!!)
+        LAYER_CROPPING_1D -> createCropping1DLayer(kerasLayer.config!!)
+        LAYER_CROPPING_2D -> createCropping2DLayer(kerasLayer.config!!)
+        LAYER_CROPPING_3D -> createCropping3DLayer(kerasLayer.config!!)
+        LAYER_ZERO_PADDING_1D -> createZeroPadding1DLayer(kerasLayer.config!!)
+        LAYER_ZERO_PADDING_2D -> createZeroPadding2DLayer(kerasLayer.config!!)
+        LAYER_ZERO_PADDING_3D -> createZeroPadding3DLayer(kerasLayer.config!!)
+        LAYER_UP_SAMPLING_1D -> createUpSampling1DLayer(kerasLayer.config!!)
+        LAYER_UP_SAMPLING_2D -> createUpSampling2DLayer(kerasLayer.config!!)
+        LAYER_UP_SAMPLING_3D -> createUpSampling3DLayer(kerasLayer.config!!)
         // Merging layers
-        LAYER_ADD -> createAddLayer(kerasLayer.config!!.name!!)
-        LAYER_AVERAGE -> createAverageLayer(kerasLayer.config!!.name!!)
-        LAYER_SUBTRACT -> createSubtractLayer(kerasLayer.config!!.name!!)
-        LAYER_MAXIMUM -> createMaximumLayer(kerasLayer.config!!.name!!)
-        LAYER_MINIMUM -> createMinimumLayer(kerasLayer.config!!.name!!)
-        LAYER_MULTIPLY -> createMultiplyLayer(kerasLayer.config!!.name!!)
-        LAYER_CONCATENATE -> createConcatenateLayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_DOT -> createDotLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_ADD -> Add()
+        LAYER_AVERAGE -> Average()
+        LAYER_SUBTRACT -> Subtract()
+        LAYER_MAXIMUM -> Maximum()
+        LAYER_MINIMUM -> Minimum()
+        LAYER_MULTIPLY -> Multiply()
+        LAYER_CONCATENATE -> createConcatenateLayer(kerasLayer.config!!)
+        LAYER_DOT -> createDotLayer(kerasLayer.config!!)
         // Locally-connected layers
         // Activation layers
-        LAYER_RELU -> createReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_ELU -> createELULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!, kerasLayer.config.name!!)
-        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!, kerasLayer.config.name!!)
+        LAYER_RELU -> createReLULayer(kerasLayer.config!!)
+        LAYER_ELU -> createELULayer(kerasLayer.config!!)
+        LAYER_PRELU -> createPReLULayer(kerasLayer.config!!)
+        LAYER_LEAKY_RELU -> createLeakyReLULayer(kerasLayer.config!!)
+        LAYER_THRESHOLDED_RELU -> createThresholdedReLULayer(kerasLayer.config!!)
+        LAYER_SOFTMAX -> createSoftmaxLayer(kerasLayer.config!!)
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
+    }.apply {
+        isTrainable = if (this !is NoGradients) kerasLayer.config?.trainable?:isTrainable
+        else false
+        name = kerasLayer.config?.name?:name
     }
 }
 
@@ -395,158 +400,76 @@ private fun createInputLayer(layer: KerasLayer, inputShape: IntArray? = null): I
     return Input(*inputLayerDims, name = inputLayerName)
 }
 
-private fun createGlobalAvgPool2DLayer(name: String): Layer {
-    return GlobalAvgPool2D(
-        name = name
-    )
-}
-
-private fun createGlobalAvgPool1DLayer(name: String): Layer {
-    return GlobalAvgPool1D(
-        name = name
-    )
-}
-
-private fun createGlobalAvgPool3DLayer(name: String): Layer {
-    return GlobalAvgPool3D(
-        name = name
-    )
-}
-
-private fun createGlobalMaxPool1DLayer(config: LayerConfig, name: String): Layer {
-    return GlobalMaxPool1D(
-        name = name
-    )
-}
-
-private fun createGlobalMaxPool2DLayer(config: LayerConfig, name: String): Layer {
-    return GlobalMaxPool2D(
-        name = name,
-    )
-}
-
-private fun createGlobalMaxPool3DLayer(config: LayerConfig, name: String): Layer {
-    return GlobalMaxPool3D(
-        name = name,
-    )
-}
-
-private fun createAddLayer(name: String): Layer {
-    return Add(
-        name = name
-    )
-}
-
-private fun createSubtractLayer(name: String): Layer {
-    return Subtract(
-        name = name
-    )
-}
-
-private fun createAverageLayer(name: String): Layer {
-    return Average(
-        name = name
-    )
-}
-
-private fun createMaximumLayer(name: String): Layer {
-    return Maximum(
-        name = name
-    )
-}
-
-private fun createMinimumLayer(name: String): Layer {
-    return Minimum(
-        name = name
-    )
-}
-
-private fun createMultiplyLayer(name: String): Layer {
-    return Multiply(
-        name = name
-    )
-}
-
-private fun createConcatenateLayer(config: LayerConfig, name: String): Layer {
+private fun createConcatenateLayer(config: LayerConfig): Layer {
     return Concatenate(
-        axis = config.axis!! as Int,
-        name = name
+        axis = config.axis!! as Int
     )
 }
 
-private fun createDotLayer(config: LayerConfig, name: String): Layer {
+private fun createDotLayer(config: LayerConfig): Layer {
     return Dot(
-        axis = config.axis!! as IntArray,
-        name = name
+        axis = config.axis!! as IntArray
     )
 }
 
-private fun createDropoutLayer(config: LayerConfig, name: String): Layer {
+private fun createDropoutLayer(config: LayerConfig): Layer {
     return Dropout(
-        rate = config.rate!!.toFloat(),
-        name = name
+        rate = config.rate!!.toFloat()
     )
 }
 
-private fun createActivationLayer(config: LayerConfig, name: String): Layer {
+private fun createActivationLayer(config: LayerConfig): Layer {
     return ActivationLayer(
-        activation = convertToActivation(config.activation!!),
-        name = name
+        activation = convertToActivation(config.activation!!)
     )
 }
 
-private fun createReLULayer(config: LayerConfig, name: String): Layer {
+private fun createReLULayer(config: LayerConfig): Layer {
     return ReLU(
         maxValue = config.max_value!!.toFloat(),
         negativeSlope = config.negative_slope!!.toFloat(),
-        threshold = config.threshold!!.toFloat(),
-        name = name
+        threshold = config.threshold!!.toFloat()
     )
 }
 
-private fun createELULayer(config: LayerConfig, name: String): Layer {
+private fun createELULayer(config: LayerConfig): Layer {
     return ELU(
-        alpha = config.alpha!!.toFloat(),
-        name = name
+        alpha = config.alpha!!.toFloat()
     )
 }
 
-private fun createPReLULayer(config: LayerConfig, name: String): Layer {
+private fun createPReLULayer(config: LayerConfig): Layer {
     return PReLU(
         alphaInitializer = convertToInitializer(config.alpha_initializer!!),
         alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
-        sharedAxes = config.shared_axes!!.toIntArray(),
-        name = name
+        sharedAxes = config.shared_axes!!.toIntArray()
     )
 }
 
-private fun createLeakyReLULayer(config: LayerConfig, name: String): Layer {
+private fun createLeakyReLULayer(config: LayerConfig): Layer {
     return LeakyReLU(
-        alpha = config.alpha!!.toFloat(),
-        name = name
+        alpha = config.alpha!!.toFloat()
     )
 }
 
-private fun createThresholdedReLULayer(config: LayerConfig, name: String): Layer {
+private fun createThresholdedReLULayer(config: LayerConfig): Layer {
     return ThresholdedReLU(
-        theta = config.theta!!.toFloat(),
-        name = name
+        theta = config.theta!!.toFloat()
     )
 }
 
-private fun createSoftmaxLayer(config: LayerConfig, name: String): Layer {
+private fun createSoftmaxLayer(config: LayerConfig): Layer {
     val axis = when (config.axis) {
         is Int -> listOf(config.axis)
         is List<*> -> config.axis as List<Int>
         else -> throw IllegalArgumentException("Axis must be an integer or a list of integers")
     }
     return Softmax(
-        name = name,
         axis = axis
     )
 }
 
-private fun createBatchNormLayer(config: LayerConfig, name: String): Layer {
+private fun createBatchNormLayer(config: LayerConfig): Layer {
     return BatchNorm(
         axis = config.axis!! as List<Int>,
         momentum = config.momentum!!,
@@ -558,12 +481,11 @@ private fun createBatchNormLayer(config: LayerConfig, name: String): Layer {
         gammaRegularizer = convertToRegularizer(config.gamma_regularizer),
         betaRegularizer = convertToRegularizer(config.beta_regularizer),
         movingMeanInitializer = convertToInitializer(config.moving_mean_initializer!!),
-        movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!),
-        name = name
+        movingVarianceInitializer = convertToInitializer(config.moving_variance_initializer!!)
     )
 }
 
-private fun createDenseLayer(config: LayerConfig, name: String): Layer {
+private fun createDenseLayer(config: LayerConfig): Layer {
     return Dense(
         outputSize = config.units!!,
         activation = convertToActivation(config.activation!!),
@@ -572,19 +494,17 @@ private fun createDenseLayer(config: LayerConfig, name: String): Layer {
         kernelRegularizer = convertToRegularizer(config.kernel_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
-        name = name,
         useBias = config.use_bias ?: true
     )
 }
 
-private fun createPermuteLayer(config: LayerConfig, name: String): Layer {
+private fun createPermuteLayer(config: LayerConfig): Layer {
     return Permute(
-        dims = config.dims!!,
-        name = name
+        dims = config.dims!!
     )
 }
 
-private fun createMaxPool1DLayer(config: LayerConfig, name: String): Layer {
+private fun createMaxPool1DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
     val strides = config.strides!!
@@ -592,12 +512,11 @@ private fun createMaxPool1DLayer(config: LayerConfig, name: String): Layer {
     return MaxPool1D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
-private fun createMaxPool2DLayer(config: LayerConfig, name: String): Layer {
+private fun createMaxPool2DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -615,12 +534,11 @@ private fun createMaxPool2DLayer(config: LayerConfig, name: String): Layer {
     return MaxPool2D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
-private fun createAvgPool1DLayer(config: LayerConfig, name: String): Layer {
+private fun createAvgPool1DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = intArrayOf(1, poolSize[0], 1)
     val strides = config.strides!!
@@ -628,12 +546,11 @@ private fun createAvgPool1DLayer(config: LayerConfig, name: String): Layer {
     return AvgPool1D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
-private fun createAvgPool2DLayer(config: LayerConfig, name: String): Layer {
+private fun createAvgPool2DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(4)
     addedOnesPoolSize[0] = 1
@@ -651,12 +568,11 @@ private fun createAvgPool2DLayer(config: LayerConfig, name: String): Layer {
     return AvgPool2D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
-private fun createAvgPool3DLayer(config: LayerConfig, name: String): Layer {
+private fun createAvgPool3DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!
     val addedOnesPoolSize = intArrayOf(1, poolSize[0], poolSize[1], poolSize[2], 1)
     val strides = config.strides!!
@@ -664,12 +580,11 @@ private fun createAvgPool3DLayer(config: LayerConfig, name: String): Layer {
     return AvgPool3D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
-private fun createMaxPool3DLayer(config: LayerConfig, name: String): Layer {
+private fun createMaxPool3DLayer(config: LayerConfig): Layer {
     val poolSize = config.pool_size!!.toIntArray()
     val addedOnesPoolSize = IntArray(5)
     addedOnesPoolSize[0] = 1
@@ -689,8 +604,7 @@ private fun createMaxPool3DLayer(config: LayerConfig, name: String): Layer {
     return MaxPool3D(
         poolSize = addedOnesPoolSize,
         strides = addedOnesStrides,
-        padding = convertPadding(config.padding!!),
-        name = name
+        padding = convertPadding(config.padding!!)
     )
 }
 
@@ -703,19 +617,15 @@ private fun convertPadding(padding: KerasPadding): ConvPadding {
     }
 }
 
-private fun createFlattenLayer(name: String): Layer {
-    return Flatten(name = name)
+private fun createRepeatVectorLayer(config: LayerConfig): Layer {
+    return RepeatVector(n = config.n!!)
 }
 
-private fun createRepeatVectorLayer(config: LayerConfig, name: String): Layer {
-    return RepeatVector(name = name, n = config.n!!)
+private fun createReshapeLayer(config: LayerConfig): Layer {
+    return Reshape(targetShape = config.target_shape!!)
 }
 
-private fun createReshapeLayer(config: LayerConfig, name: String): Layer {
-    return Reshape(name = name, targetShape = config.target_shape!!)
-}
-
-private fun createConv1DLayer(config: LayerConfig, name: String): Layer {
+private fun createConv1DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!![0]
     val strides = config.strides!!
 
@@ -742,12 +652,11 @@ private fun createConv1DLayer(config: LayerConfig, name: String): Layer {
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
-        useBias = config.use_bias!!,
-        name = name
+        useBias = config.use_bias!!
     )
 }
 
-private fun createConv2DLayer(config: LayerConfig, name: String): Layer {
+private fun createConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
     val strides = config.strides!!
 
@@ -776,12 +685,11 @@ private fun createConv2DLayer(config: LayerConfig, name: String): Layer {
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
-        useBias = config.use_bias!!,
-        name = name
+        useBias = config.use_bias!!
     )
 }
 
-private fun createConv3DLayer(config: LayerConfig, name: String): Layer {
+private fun createConv3DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
     val strides = config.strides!!
 
@@ -812,12 +720,11 @@ private fun createConv3DLayer(config: LayerConfig, name: String): Layer {
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
-        useBias = config.use_bias!!,
-        name = name
+        useBias = config.use_bias!!
     )
 }
 
-private fun createDepthwiseConv2DLayer(config: LayerConfig, name: String): Layer {
+private fun createDepthwiseConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
     val strides = config.strides!!
 
@@ -846,12 +753,11 @@ private fun createDepthwiseConv2DLayer(config: LayerConfig, name: String): Layer
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         padding = convertPadding(config.padding!!),
-        useBias = config.use_bias!!,
-        name = name
+        useBias = config.use_bias!!
     )
 }
 
-private fun createSeparableConv2DLayer(config: LayerConfig, name: String): Layer {
+private fun createSeparableConv2DLayer(config: LayerConfig): Layer {
     val kernelSize = config.kernel_size!!.toIntArray()
     val strides = config.strides!!
 
@@ -883,78 +789,68 @@ private fun createSeparableConv2DLayer(config: LayerConfig, name: String): Layer
         activityRegularizer = convertToRegularizer(config.activity_regularizer),
         biasRegularizer = convertToRegularizer(config.bias_regularizer),
         padding = convertPadding(config.padding!!),
-        useBias = config.use_bias!!,
-        name = name
+        useBias = config.use_bias!!
     )
 }
 
-private fun createZeroPadding1DLayer(config: LayerConfig, name: String): Layer {
+private fun createZeroPadding1DLayer(config: LayerConfig): Layer {
     assert(config.padding is KerasPadding.ZeroPadding1D)
     return ZeroPadding1D(
-        padding = (config.padding as KerasPadding.ZeroPadding1D).padding,
-        name = name
+        padding = (config.padding as KerasPadding.ZeroPadding1D).padding
     )
 }
 
-private fun createZeroPadding2DLayer(config: LayerConfig, name: String): Layer {
+private fun createZeroPadding2DLayer(config: LayerConfig): Layer {
     assert(config.padding is KerasPadding.ZeroPadding2D)
     return ZeroPadding2D(
         padding = (config.padding as KerasPadding.ZeroPadding2D).padding,
-        dataFormat = config.data_format,
-        name = name
+        dataFormat = config.data_format
     )
 }
 
-private fun createZeroPadding3DLayer(config: LayerConfig, name: String): Layer {
+private fun createZeroPadding3DLayer(config: LayerConfig): Layer {
     assert(config.padding is KerasPadding.ZeroPadding3D)
     return ZeroPadding3D(
-        padding = (config.padding as KerasPadding.ZeroPadding3D).padding,
-        name = name
+        padding = (config.padding as KerasPadding.ZeroPadding3D).padding
     )
 }
 
-private fun createCropping1DLayer(config: LayerConfig, name: String): Layer {
+private fun createCropping1DLayer(config: LayerConfig): Layer {
     val cropping = config.cropping!!.map { it as Int }.toTypedArray().toIntArray()
     return Cropping1D(
-        cropping = cropping,
-        name = name,
+        cropping = cropping
     )
 }
 
-private fun createCropping2DLayer(config: LayerConfig, name: String): Layer {
+private fun createCropping2DLayer(config: LayerConfig): Layer {
     val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping2D(
-        cropping = cropping,
-        name = name,
+        cropping = cropping
     )
 }
 
-private fun createCropping3DLayer(config: LayerConfig, name: String): Layer {
+private fun createCropping3DLayer(config: LayerConfig): Layer {
     val cropping = config.cropping!!.map { (it as List<Int>).toIntArray() }.toTypedArray()
     return Cropping3D(
-        cropping = cropping,
-        name = name,
+        cropping = cropping
     )
 }
 
-private fun createUpSampling1DLayer(config: LayerConfig, name: String): Layer {
+private fun createUpSampling1DLayer(config: LayerConfig): Layer {
     return UpSampling1D(
-        size = config.size!! as Int,
-        name = name,
+        size = config.size!! as Int
     )
 }
 
-private fun createUpSampling2DLayer(config: LayerConfig, name: String): Layer {
+private fun createUpSampling2DLayer(config: LayerConfig): Layer {
     return UpSampling2D(
         size = (config.size!! as List<Int>).toIntArray(),
-        interpolation = convertToInterpolationMethod(config.interpolation!!),
-        name = name,
+        interpolation = convertToInterpolationMethod(config.interpolation!!)
     )
 }
 
-private fun createUpSampling3DLayer(config: LayerConfig, name: String): Layer {
+private fun createUpSampling3DLayer(config: LayerConfig): Layer {
     return UpSampling3D(
-        size = (config.size!! as List<Int>).toIntArray(),
-        name = name,
+        size = (config.size!! as List<Int>).toIntArray()
     )
 }

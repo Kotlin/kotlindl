@@ -22,7 +22,7 @@ import org.tensorflow.op.Ops
  */
 public class Permute(
     public val dims: IntArray,
-    name: String
+    name: String = ""
 ) : Layer(name) {
 
     init {

@@ -24,6 +24,11 @@ public abstract class Layer(public var name: String) {
      * If false, layer's weights are frozen and could be changed during the training.
      */
     public var isTrainable: Boolean = true
+        set(value) {
+            if (value && this is NoGradients)
+                throw IllegalStateException("${this.javaClass.simpleName} layer can not set `isTrainable` to `true`.")
+            field = value
+        }
 
     /** Output data tensor shape. */
     public lateinit var outputShape: TensorShape
