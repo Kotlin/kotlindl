@@ -272,19 +272,32 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /**
      * Initializes kGraph variables.
      *
-     * @param [forceInitialization] If true it forces initialization and ignores that model is initialized already.
-     * NOTE: Model becomes initialized after this method call. (Flags [isModelInitialized] and [isOptimizerVariableInitialized] are set up to true)
+     * NOTE: The model becomes initialized after this method call. The flag [isModelInitialized] is set to True.
      */
-    public fun init(forceInitialization: Boolean = false) {
+    public fun init() {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        if (!forceInitialization) {
-            check(!isModelInitialized) { "Model is initialized already!" }
-            check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
-        }
+        check(!isModelInitialized) { "Model is initialized already!" }
+        check(!isOptimizerVariableInitialized) { "Optimizer variables are initialized already!" }
 
         logger.debug { "Initialization of TensorFlow Graph variables." }
         kGraph.initializeGraphVariables(session)
         isModelInitialized = true
+    }
+
+    /**
+     * It ignores that model is initialized already and call initializers under the hood to re-initialize [kGraph] variables.
+     *
+     * NOTE: The model becomes initialized after this method call.
+     * The flag [isModelInitialized] is set to True and the flag [isOptimizerVariableInitialized] is set to False.
+     * As a result, when the method ```fit()``` will be called, optimizer variables are re-initialized.
+     */
+    public fun reset() {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+
+        logger.debug { "Initialization of TensorFlow Graph variables." }
+        kGraph.initializeGraphVariables(session)
+        isModelInitialized = true
+        isOptimizerVariableInitialized = false
     }
 
     private fun internalFit(

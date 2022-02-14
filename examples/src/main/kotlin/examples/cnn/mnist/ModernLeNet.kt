@@ -124,7 +124,7 @@ fun modernLenet() {
         println("Accuracy after: $accuracy")
 
         // Reset the model
-        it.init(forceInitialization = true)
+        it.reset()
 
         accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy after reset: $accuracy")

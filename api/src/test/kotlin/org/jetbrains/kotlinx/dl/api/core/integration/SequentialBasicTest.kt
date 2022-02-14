@@ -162,7 +162,7 @@ internal class SequentialBasicTest : IntegrationTest() {
                 exception.message
             )
 
-            it.init(forceInitialization = true)
+            it.reset()
 
             testEvaluationLessThan(it, test, 0.2)
 
