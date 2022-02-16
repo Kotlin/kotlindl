@@ -80,22 +80,35 @@ public class Conv1DTranspose(
     override val kernelSize: IntArray = intArrayOf(kernelLength)
 
     override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
+        // implementation of a 1D convolution with a 2D convolution
         return tf.withExpandedDimensions(input) { expandedInput ->
+            // expand 1D convolution parameters to use them with a 2D convolution operation
+            val expandedOutputShape = expand(outputShape)
+            val expandedKernel = tf.expandKernel(kernel.variable)
+            val expandedStrides = expand(strides)
+            val expandedDilations = expand(dilations)
             val expandedOutputPadding = outputPadding?.withAdded(EXTRA_DIM * 2, listOf(0, 0))
-            return@withExpandedDimensions tf.nn.conv2dBackpropInput(
-                tf.shapeWithDynamicBatchSize(expand(outputShape), input),
-                tf.expandKernel(kernel.variable),
-                expandedInput,
-                expand(strides).toLongList(),
-                if (outputPadding != null) EXPLICIT else padding.paddingName,
-                *buildOptions(
-                    expand(dilations),
-                    expandedOutputPadding?.withStandardPadding(
-                        padding,
-                        expandKernel(kernelSize),
-                        expand(dilations)
-                    )
+
+            // replace "-1" batch size in the output shape with the batch size of the input
+            // see more in shapeWithDynamicBatchSize documentation
+            val outputShapeWithBatchSize = tf.shapeWithDynamicBatchSize(expandedOutputShape, input)
+
+            val options = buildOptions(
+                expandedDilations,
+                expandedOutputPadding?.withStandardPadding(
+                    padding,
+                    expandKernel(kernelSize),
+                    expandedDilations
                 )
+            )
+
+            return@withExpandedDimensions tf.nn.conv2dBackpropInput(
+                outputShapeWithBatchSize,
+                expandedKernel,
+                expandedInput,
+                expandedStrides.toLongList(),
+                if (outputPadding != null) EXPLICIT else padding.paddingName,
+                *options
             )
         }
     }
