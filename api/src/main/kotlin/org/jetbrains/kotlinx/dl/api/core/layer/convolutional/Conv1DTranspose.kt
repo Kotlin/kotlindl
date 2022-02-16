@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.ex
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.expandKernel
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.withAdded
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.withExpandedDimensions
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2DTranspose.Companion.withStandardPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -88,8 +87,8 @@ public class Conv1DTranspose(
                 tf.expandKernel(kernel.variable),
                 expandedInput,
                 expand(strides).toLongList(),
-                if (outputPadding != null) Conv2DTranspose.EXPLICIT else padding.paddingName,
-                *Conv2DTranspose.buildOptions(
+                if (outputPadding != null) EXPLICIT else padding.paddingName,
+                *buildOptions(
                     expand(dilations),
                     expandedOutputPadding?.withStandardPadding(
                         padding,

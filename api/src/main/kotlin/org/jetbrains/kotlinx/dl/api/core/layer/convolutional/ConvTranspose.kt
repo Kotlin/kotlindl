@@ -6,14 +6,17 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
+import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeOutputLength
+import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeSingleSidePadding
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.op.nn.Conv2dBackpropInput
 
 /**
  * A base class for defining transposed convolution layers (sometimes called deconvolution) of different dimensions.
@@ -74,6 +77,42 @@ public abstract class ConvTranspose(
     }
 
     internal companion object {
+        /**
+         * Padding constant to indicate that specific padding values are going to be provided.
+         */
+        internal const val EXPLICIT = "EXPLICIT"
+
+
+        /**
+         * Combines explicitly provided padding value with the standard padding from the provided padding method.
+         * This is needed since [org.tensorflow.op.NnOps.conv2dBackpropInput] function does not support specifying
+         * both padding method and explicit output padding at the same time.
+         */
+        internal fun IntArray.withStandardPadding(
+            padding: ConvPadding,
+            kernelSize: IntArray,
+            dilations: IntArray
+        ): IntArray {
+            val withStandardPadding = kernelSize.indices.flatMap { dim ->
+                listOf(
+                    convTransposeSingleSidePadding(padding, this[2 * dim], kernelSize[dim], dilations[dim + 1]),
+                    convTransposeSingleSidePadding(padding, this[2 * dim + 1], kernelSize[dim], dilations[dim + 1])
+                )
+            }
+            return intArrayOf(0, 0, *(withStandardPadding.toIntArray()), 0, 0)
+        }
+
+        /**
+         * Builds options to pass dilations and output padding to the [org.tensorflow.op.NnOps.conv2dBackpropInput].
+         */
+        internal fun buildOptions(dilations: IntArray, outputPadding: IntArray?): Array<Conv2dBackpropInput.Options> {
+            val options = mutableListOf(Conv2dBackpropInput.dilations(dilations.toLongList()))
+            if (outputPadding != null) {
+                options.add(Conv2dBackpropInput.explicitPaddings(outputPadding.toLongList()))
+            }
+            return options.map { it.dataFormat("NHWC") }.toTypedArray()
+        }
+
         /**
          * Creates an integer vector with the contents of [tensorShape], except for the first dimension (batch size):
          * batch size from the [input] is used instead.

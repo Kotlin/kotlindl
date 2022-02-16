@@ -13,10 +13,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeSingleSidePadding
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.nn.Conv2dBackpropInput
 
 /**
  * 2D convolution transpose layer.
@@ -92,35 +90,5 @@ public class Conv2DTranspose(
                 )
             )
         )
-    }
-
-    internal companion object {
-        internal const val EXPLICIT = "EXPLICIT"
-
-        /**
-         * Combines explicitly provided padding value with the standard padding from the provided padding method.
-         * This is needed since [org.tensorflow.op.NnOps.conv2dBackpropInput] function does not support specifying
-         * both padding method and explicit output padding at the same time.
-         */
-        internal fun IntArray.withStandardPadding(padding: ConvPadding,
-                                                  kernelSize: IntArray,
-                                                  dilations: IntArray
-        ): IntArray {
-            val withStandardPadding = kernelSize.indices.flatMap { dim ->
-                listOf(
-                    convTransposeSingleSidePadding(padding, this[2 * dim], kernelSize[dim], dilations[dim + 1]),
-                    convTransposeSingleSidePadding(padding, this[2 * dim + 1], kernelSize[dim], dilations[dim + 1])
-                )
-            }
-            return intArrayOf(0, 0, *(withStandardPadding.toIntArray()), 0, 0)
-        }
-
-        internal fun buildOptions(dilations: IntArray, outputPadding: IntArray?): Array<Conv2dBackpropInput.Options> {
-            val options = mutableListOf(Conv2dBackpropInput.dilations(dilations.toLongList()))
-            if (outputPadding != null) {
-                options.add(Conv2dBackpropInput.explicitPaddings(outputPadding.toLongList()))
-            }
-            return options.map { it.dataFormat("NHWC") }.toTypedArray()
-        }
     }
 }
