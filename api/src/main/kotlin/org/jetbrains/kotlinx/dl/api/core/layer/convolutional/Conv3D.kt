@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -68,7 +69,7 @@ public class Conv3D(
     public override val padding: ConvPadding = ConvPadding.SAME,
     public override val useBias: Boolean = true,
     name: String = ""
-) : AbstractConv(name = name) {
+) : AbstractConv(name = name), NoGradients {
 
     init {
         requireArraySize(kernelSize, 3, "kernelSize")
