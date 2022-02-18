@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -29,6 +29,12 @@ internal fun convBiasVarName(name: String, dim: Int): String = layerVarName(name
 
 /** Default Conv kernel variable name in TensorFlow graph, based on layer's name. */
 internal fun convKernelVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_kernel")
+
+/** Default Conv transpose bias variable name in TensorFlow graph, based on layer's name. */
+internal fun convTransposeBiasVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_transpose_bias")
+
+/** Default Conv transpose kernel variable name in TensorFlow graph, based on layer's name. */
+internal fun convTransposeKernelVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_transpose_kernel")
 
 /** Default DepthwiseConv2d bias variable name in TensorFlow graph, based on layer's name. */
 internal fun depthwiseConv2dBiasVarName(name: String): String = layerVarName(name, "depthwise_conv2d_bias")

@@ -8,7 +8,7 @@ dependencies {
     api 'io.github.microutils:kotlin-logging:2.0.4' // for logging
     api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
     api 'com.beust:klaxon:5.5'
-    testImplementation 'ch.qos.logback:logback-classic:1.2.7'
+    testImplementation 'ch.qos.logback:logback-classic:1.2.10'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -12,17 +12,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv1DTest : ConvLayerTest() {
-    private fun createFloatConv1DTensor(
-        batchSize: Int,
-        size: Int,
-        channels: Int,
-        initValue: Float
-    ) = Array(batchSize) { Array(size) { FloatArray(channels) { initValue } } }
-
     @Test
     fun zeroedInputTensorWithDefaultValues() {
-        val input = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 0.0f)
-        val expected = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 32, initValue = 0.0f)
+        val input = create1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 0.0f)
+        val expected = create1DTensor(batchSize = 1, size = 3, channels = 32, initValue = 0.0f)
 
         assertTensorsEquals(
             Conv1D(
@@ -36,8 +29,8 @@ internal class Conv1DTest : ConvLayerTest() {
 
     @Test
     fun constantInputTensorWithValidPadding() {
-        val input = createFloatConv1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 1.0f)
-        val expected = createFloatConv1DTensor(batchSize = 1, size = 2, channels = 16, initValue = 2.0f)
+        val input = create1DTensor(batchSize = 1, size = 3, channels = 1, initValue = 1.0f)
+        val expected = create1DTensor(batchSize = 1, size = 2, channels = 16, initValue = 2.0f)
 
         assertTensorsEquals(
             Conv1D(
@@ -45,7 +38,7 @@ internal class Conv1DTest : ConvLayerTest() {
                 filters = 16,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = 2,
+                kernelLength = 2,
                 padding = ConvPadding.VALID
             ),
             input,
@@ -70,11 +63,26 @@ internal class Conv1DTest : ConvLayerTest() {
                 filters = 1,
                 kernelInitializer = Constant(1.0f),
                 biasInitializer = Zeros(),
-                kernelSize = 3,
+                kernelLength = 3,
                 padding = ConvPadding.VALID
             ),
             input,
             expected
         )
+    }
+
+    companion object {
+        internal fun create1DTensor(
+            batchSize: Int,
+            size: Int,
+            channels: Int,
+            initValue: Float
+        ) = Array(batchSize) { Array(size) { FloatArray(channels) { initValue } } }
+
+        internal fun create1DTensor(
+            batchSize: Int,
+            channels: Int,
+            sequence: FloatArray,
+        ) = Array(batchSize) { Array(sequence.size) { idx -> FloatArray(channels) { sequence[idx] } } }
     }
 }

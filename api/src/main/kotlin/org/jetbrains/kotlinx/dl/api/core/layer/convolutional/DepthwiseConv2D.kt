@@ -50,37 +50,20 @@ import org.tensorflow.op.nn.DepthwiseConv2dNative
  * @since 0.2
  */
 public class DepthwiseConv2D(
-    public val kernelSize: IntArray = intArrayOf(3, 3),
-    public val strides: IntArray = intArrayOf(1, 1, 1, 1),
-    public val dilations: IntArray = intArrayOf(1, 1, 1, 1),
-    public val activation: Activations = Activations.Relu,
+    public override val kernelSize: IntArray = intArrayOf(3, 3),
+    public override val strides: IntArray = intArrayOf(1, 1, 1, 1),
+    public override val dilations: IntArray = intArrayOf(1, 1, 1, 1),
+    public override val activation: Activations = Activations.Relu,
     public val depthMultiplier: Int = 1,
     public val depthwiseInitializer: Initializer = HeNormal(),
-    public val biasInitializer: Initializer = HeUniform(),
+    public override val biasInitializer: Initializer = HeUniform(),
     public val depthwiseRegularizer: Regularizer? = null,
-    public val biasRegularizer: Regularizer? = null,
-    public val activityRegularizer: Regularizer? = null,
-    public val padding: ConvPadding = ConvPadding.SAME,
-    public val useBias: Boolean = true,
+    public override val biasRegularizer: Regularizer? = null,
+    public override val activityRegularizer: Regularizer? = null,
+    public override val padding: ConvPadding = ConvPadding.SAME,
+    public override val useBias: Boolean = true,
     name: String = ""
-) : AbstractConv(
-    // filtersInternal is not used in any place of this implementation of AbstractConv because
-    // all its usages are overridden with custom functions that use the depthMultiplier and the
-    // shape of the input data representing number of channels in it
-    filtersInternal = -1,
-    kernelSizeInternal = kernelSize,
-    stridesInternal = strides,
-    dilationsInternal = dilations,
-    activationInternal = activation,
-    kernelInitializerInternal = depthwiseInitializer,
-    biasInitializerInternal = biasInitializer,
-    kernelRegularizerInternal = depthwiseRegularizer,
-    biasRegularizerInternal = biasRegularizer,
-    activityRegularizerInternal = activityRegularizer,
-    paddingInternal = padding,
-    useBiasInternal = useBias,
-    name = name
-), NoGradients {
+) : AbstractConv(name = name), NoGradients {
 
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
@@ -88,6 +71,13 @@ public class DepthwiseConv2D(
         requireArraySize(dilations, 4, "dilations")
         isTrainable = false
     }
+
+    // filters is not used in any place of this implementation of AbstractConv because
+    // all its usages are overridden with custom functions that use the depthMultiplier and the
+    // shape of the input data representing number of channels in it
+    override val filters: Int get() = -1
+    override val kernelInitializer: Initializer get() = depthwiseInitializer
+    override val kernelRegularizer: Regularizer? get() = depthwiseRegularizer
 
     protected override fun computeKernelShape(numberOfChannels: Long): Shape =
         shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, depthMultiplier.toLong())
@@ -117,17 +107,17 @@ public class DepthwiseConv2D(
 
         val rows = convOutputLength(
             rowsCount,
-            kernelSizeInternal[0],
-            paddingInternal,
-            stridesInternal[1],
-            dilationsInternal[1]
+            kernelSize[0],
+            padding,
+            strides[1],
+            dilations[1]
         )
         val cols = convOutputLength(
             colsCount,
-            kernelSizeInternal[1],
-            paddingInternal,
-            stridesInternal[2],
-            dilationsInternal[2]
+            kernelSize[1],
+            padding,
+            strides[2],
+            dilations[2]
         )
         val filters = channelsCount * depthMultiplier
 
