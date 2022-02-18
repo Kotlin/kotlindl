@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -51,6 +51,10 @@ public open class L2L1(
             }
         }
         return regularization
+    }
+
+    override fun toString(): String {
+        return "L2L1(l1=$l1, l2=$l2)"
     }
 }
 

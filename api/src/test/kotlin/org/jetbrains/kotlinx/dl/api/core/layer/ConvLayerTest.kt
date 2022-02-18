@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -32,6 +32,7 @@ open class ConvLayerTest {
                     val numberOfLosses = tf.constant(1.0f)
 
                     layer.build(tf, kGraph, input.shape)
+                    layer.computeOutputShape(input.shape)
                     val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
                     kGraph.initializeGraphVariables(session)
                     session.runner().fetch(output).run().first().use { outputTensor ->

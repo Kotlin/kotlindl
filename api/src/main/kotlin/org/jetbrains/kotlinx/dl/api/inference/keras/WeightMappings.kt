@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvTranspose
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -30,6 +31,7 @@ internal object WeightMappings {
         return when (layer) {
             is Dense -> getDenseVariables(layer)
             is Conv2D -> getConv2DVariables(layer)
+            is ConvTranspose -> getConvTransposeVariables(layer)
             is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
             is SeparableConv2D -> getSeparableConv2DVariables(layer)
             is BatchNorm -> getBatchNormVariables(layer)
@@ -45,6 +47,7 @@ internal object WeightMappings {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)
             is Conv2D -> getConv2DVariablePathTemplates(layer, layerPaths)
+            is ConvTranspose -> getConvTransposeVariablePathTemplates(layer, layerPaths)
             is DepthwiseConv2D -> getDepthwiseConv2DVariablePathTemplates(layer, layerPaths)
             is SeparableConv2D -> getSeparableConv2DVariablePathTemplates(layer, layerPaths)
             is BatchNorm -> getBatchNormVariablePathTemplates(layer, layerPaths)
@@ -70,6 +73,28 @@ internal object WeightMappings {
         )
         if (layer.useBias) {
             variables[convBiasVarName(layer.name, dim = 2)] = layerConvOrDensePaths.biasPath
+        }
+        return variables
+    }
+
+    private fun getConvTransposeVariables(layer: ConvTranspose): Map<String, Pair<String, LongArray>> {
+        val variables = mutableMapOf(
+            Pair("kernel:0", Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layer.kernelShapeArray!!))
+        )
+        if (layer.useBias) {
+            variables["bias:0"] = Pair(convTransposeBiasVarName(layer.name, layer.dimensions), layer.biasShapeArray!!)
+        }
+        return variables
+    }
+
+    private fun getConvTransposeVariablePathTemplates(layer: ConvTranspose, layerPaths: LayerPaths?): Map<String, String> {
+        val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
+            ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
+        val variables = mutableMapOf(
+            Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layerConvOrDensePaths.kernelPath)
+        )
+        if (layer.useBias) {
+            variables[convTransposeBiasVarName(layer.name, layer.dimensions)] = layerConvOrDensePaths.biasPath
         }
         return variables
     }
@@ -119,8 +144,9 @@ internal object WeightMappings {
         return variables
     }
 
-    private fun getSeparableConv2DVariablePathTemplates(layer: SeparableConv2D,
-                                                        layerPaths: LayerPaths?
+    private fun getSeparableConv2DVariablePathTemplates(
+        layer: SeparableConv2D,
+        layerPaths: LayerPaths?
     ): Map<String, String> {
         val layerSeparableConv2DPaths = layerPaths as? LayerSeparableConv2DPaths
             ?: LayerSeparableConv2DPaths(
