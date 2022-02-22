@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -16,8 +16,10 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetL
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -53,16 +55,12 @@ fun main() {
 
         it.loadWeights(getVGG16WeightsFile())
 
+        val preprocessing: Preprocessing = preprocess {
+            transformImage { convert { colorMode = ColorMode.BGR } }
+        }
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                }
-                transformImage { convert { colorMode = ColorMode.BGR } }
-            }
-
-            val inputData = preprocessInput(preprocessing().first, model.inputDimensions, inputType = InputType.CAFFE)
+            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = preprocessInput(image, model.inputDimensions, inputType = InputType.CAFFE)
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 

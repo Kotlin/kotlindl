@@ -1,11 +1,12 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -15,23 +16,15 @@ import kotlin.random.Random
 /**
  * This dataset keeps all data on disk and generates batches on-fly according [preprocessing] pipeline.
  *
- * @param [preprocessing] The preprocessing pipeline.
- * @param [labels] Also it could keep labels, if it could be preprocessed separately and passed to this parameter. If it's missed, it will try to generate labels on-fly according
- * [org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator].
+ * @param [xFiles] files to load images from
+ * @param [y] labels to use for the loaded images
+ * @param [preprocessing] preprocessing to apply to the loaded images
  */
 public class OnFlyImageDataset internal constructor(
-    private var preprocessing: Preprocessing,
-    labels: FloatArray?
+    private val xFiles: Array<File>,
+    private val y: FloatArray,
+    private val preprocessing: Preprocessing,
 ) : Dataset() {
-    private var xFiles: Array<File>
-
-    private var y: FloatArray
-
-    init {
-        val loading = preprocessing.load
-        xFiles = loading.prepareFileNames()
-        y = labels ?: OnHeapDataset.prepareY(xFiles, preprocessing)
-    }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyImagesToBatch(src: Array<File>, start: Int, length: Int): Array<FloatArray> {
@@ -53,19 +46,18 @@ public class OnFlyImageDataset internal constructor(
 
         val trainDatasetLastIndex = truncate(xFiles.size * splitRatio).toInt()
 
-        val train = OnFlyImageDataset(preprocessing, y.copyOfRange(0, trainDatasetLastIndex))
-        train.xFiles = xFiles.copyOfRange(0, trainDatasetLastIndex)
-
+        val train = OnFlyImageDataset(
+            xFiles.copyOfRange(0, trainDatasetLastIndex),
+            y.copyOfRange(0, trainDatasetLastIndex),
+            preprocessing
+        )
         val test = OnFlyImageDataset(
-            preprocessing,
-            y.copyOfRange(trainDatasetLastIndex, y.size)
+            xFiles.copyOfRange(trainDatasetLastIndex, xFiles.size),
+            y.copyOfRange(trainDatasetLastIndex, y.size),
+            preprocessing
         )
-        test.xFiles = xFiles.copyOfRange(trainDatasetLastIndex, xFiles.size)
 
-        return Pair(
-            train,
-            test
-        )
+        return Pair(train, test)
     }
 
     public companion object {
@@ -90,31 +82,34 @@ public class OnFlyImageDataset internal constructor(
         }
 
         /**
-         * Use [preprocessors] and [labels] to prepare data
-         * to create dataset [OnFlyImageDataset].
+         * Create dataset [OnFlyImageDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
-            preprocessors: Preprocessing,
-            labels: FloatArray
+            pathToData: File,
+            labels: FloatArray,
+            preprocessing: Preprocessing = Preprocessing()
         ): OnFlyImageDataset {
             return try {
-                OnFlyImageDataset(preprocessors, labels)
+                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
 
         /**
-         * Use [preprocessors] to prepare data
-         * to create dataset [OnFlyImageDataset].
+         * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator] using [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
-            preprocessors: Preprocessing
+            pathToData: File,
+            labelGenerator: LabelGenerator,
+            preprocessors: Preprocessing = Preprocessing()
         ): OnFlyImageDataset {
             return try {
-                OnFlyImageDataset(preprocessors, null)
+                val xFiles = OnHeapDataset.prepareFileNames(pathToData)
+                val y = OnHeapDataset.prepareY(xFiles, labelGenerator)
+                OnFlyImageDataset(xFiles, y, preprocessors)
             } catch (e: IOException) {
                 throw AssertionError(e)
             }

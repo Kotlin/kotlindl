@@ -31,10 +31,6 @@ fun poseDetectionMoveNet() {
 
         val imageFile = getFileFromResource("datasets/poses/single/3.jpg")
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(null, null, 3)
-            }
             transformImage {
                 resize {
                     outputHeight = 192
@@ -44,7 +40,7 @@ fun poseDetectionMoveNet() {
             }
         }
 
-        val inputData = modelType.preprocessInput(preprocessing)
+        val inputData = modelType.preprocessInput(imageFile, preprocessing)
 
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
@@ -85,10 +81,6 @@ private fun visualisePoseLandmarks(
     poseLandmarks: Array<FloatArray>
 ) {
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(null, null, 3)
-        }
         transformImage {
             resize {
                 outputHeight = 256
@@ -103,8 +95,8 @@ private fun visualisePoseLandmarks(
         }
     }
 
-    val rawImage = preprocessing().first
-    drawRawPoseLandMarks(rawImage, ImageShape(256, 256, 3), poseLandmarks)
+    val (rawImage, shape) = preprocessing(imageFile)
+    drawRawPoseLandMarks(rawImage, shape, poseLandmarks)
 }
 
 /** */

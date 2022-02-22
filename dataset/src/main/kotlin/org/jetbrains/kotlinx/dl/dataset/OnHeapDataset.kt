@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,12 +8,15 @@ package org.jetbrains.kotlinx.dl.dataset
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import java.io.File
 import java.io.IOException
-import java.lang.UnsupportedOperationException
 import java.nio.FloatBuffer
+import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.math.truncate
 import kotlin.random.Random
+import kotlin.streams.toList
 
 /**
  * Basic class to handle features [x] and labels [y].
@@ -172,19 +175,17 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Use [preprocessors] and [labels] to prepare data
-         * to create dataset [OnHeapDataset].
+         * Create dataset [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
-            preprocessors: Preprocessing,
-            labels: FloatArray
+            pathToData: File,
+            labels: FloatArray,
+            preprocessing: Preprocessing = Preprocessing()
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.load
-                val xFiles = loading.prepareFileNames()
-
-                val x = prepareX(xFiles, preprocessors)
+                val xFiles = prepareFileNames(pathToData)
+                val x = prepareX(xFiles, preprocessing)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -201,18 +202,18 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
 
 
         /**
-         * Use [preprocessors] to prepare data
-         * to create dataset [OnHeapDataset].
+         * Create dataset [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
-            preprocessors: Preprocessing
+            pathToData: File,
+            labelGenerator: LabelGenerator,
+            preprocessing: Preprocessing = Preprocessing()
         ): OnHeapDataset {
             return try {
-                val loading = preprocessors.load
-                val xFiles = loading.prepareFileNames()
-                val x = prepareX(xFiles, preprocessors)
-                val y = prepareY(xFiles, preprocessors)
+                val xFiles = prepareFileNames(pathToData)
+                val x = prepareX(xFiles, preprocessing)
+                val y = prepareY(xFiles, labelGenerator)
 
                 OnHeapDataset(x, y)
             } catch (e: IOException) {
@@ -222,31 +223,35 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
 
         internal fun prepareY(
             xFiles: Array<File>,
-            preprocessors: Preprocessing,
+            labelGenerator: LabelGenerator,
         ): FloatArray {
-            val y: FloatArray
-            if (preprocessors.load.labelGenerator != null) {
-                when (val labelGenerator = preprocessors.load.labelGenerator) {
-                    is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
-                        val mapping = labelGenerator.mapping
+            when (labelGenerator) {
+                is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
+                    val mapping = labelGenerator.mapping
 
-                        y = FloatArray(xFiles.size) { 0.0f }
-                        for (i in xFiles.indices) {
-                            y[i] = (mapping[xFiles[i].parentFile.name]
-                                ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
-                        }
+                    val y = FloatArray(xFiles.size) { 0.0f }
+                    for (i in xFiles.indices) {
+                        y[i] = (mapping[xFiles[i].parentFile.name]
+                            ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
                     }
-                    is EmptyLabels -> {
-                        y = FloatArray(xFiles.size) { Float.NaN }
-                    }
-                    else -> {
-                        throw UnsupportedOperationException("Unknown label generator: ${labelGenerator.toString()}") // TODO: labelGenerator.apply(...) will be better solution here.
-                    }
+                    return y
                 }
-            } else {
-                throw IllegalStateException("Label generator should be defined for Loading stage of image preprocessing.")
+                is EmptyLabels -> {
+                    return FloatArray(xFiles.size) { Float.NaN }
+                }
+                else -> {
+                    throw UnsupportedOperationException("Unknown label generator: ${labelGenerator.toString()}") // TODO: labelGenerator.apply(...) will be better solution here.
+                }
             }
-            return y
+        }
+
+        internal fun prepareFileNames(pathToData: File): Array<File> {
+            return Files.walk(pathToData.toPath())
+                .filter { path: Path -> Files.isRegularFile(path) }
+                .filter { path: Path -> path.toString().endsWith(".jpg") || path.toString().endsWith(".png") }
+                .map { obj: Path -> obj.toFile() }
+                .toList()
+                .toTypedArray()
         }
     }
 

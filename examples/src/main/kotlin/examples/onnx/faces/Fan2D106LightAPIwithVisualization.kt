@@ -1,12 +1,11 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
@@ -28,39 +27,28 @@ fun main() {
     val model = ONNXModels.FaceAlignment.Fan2d106.pretrainedModel(modelHub)
 
     model.use {
+        val preprocessing = preprocessing()
         for (i in 0..8) {
             val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
             val landmarks = it.detectLandmarks(imageFile = imageFile)
 
-            visualiseLandMarks(imageFile, landmarks)
+            val (rawImage, shape) = preprocessing(imageFile)
+            drawLandMarks(rawImage, shape, landmarks)
         }
     }
 }
 
-fun visualiseLandMarks(
-    imageFile: File,
-    landmarks: List<Landmark>
-) {
-    val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(224, 224, 3)
+private fun preprocessing() = preprocess {
+    transformImage {
+        resize {
+            outputWidth = 192
+            outputHeight = 192
         }
-        transformImage {
-            resize {
-                outputWidth = 192
-                outputHeight = 192
-            }
-            convert { colorMode = ColorMode.BGR }
-        }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        convert { colorMode = ColorMode.BGR }
+    }
+    transformTensor {
+        rescale {
+            scalingCoefficient = 255f
         }
     }
-
-    val rawImage = preprocessing().first
-
-    drawLandMarks(rawImage, ImageShape(192, 192, 3), landmarks)
 }

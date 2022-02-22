@@ -47,10 +47,6 @@ private fun visualise(
     detectedObjects: List<DetectedObject>
 ) {
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(null, null, 3)
-        }
         transformImage {
             resize {
                 outputWidth = 1000
@@ -65,7 +61,7 @@ private fun visualise(
         }
     }
 
-    val rawImage = preprocessing().first
+    val rawImage = preprocessing(imageFile).first
 
     drawDetectedObjects(rawImage, ImageShape(1000, 1000, 3), detectedObjects)
 }

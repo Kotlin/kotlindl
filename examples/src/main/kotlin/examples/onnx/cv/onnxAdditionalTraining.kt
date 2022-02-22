@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -33,7 +33,6 @@ private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
-private const val NUM_CHANNELS = 3L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 /**
@@ -60,9 +59,13 @@ fun runONNXAdditionalTraining(
     model.use {
         println(it)
 
-        val preprocessing: Preprocessing = preprocessing(resizeTo, dogsVsCatsDatasetPath, it)
+        val preprocessing: Preprocessing = preprocessing(resizeTo, it)
 
-        val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+        val dataset = OnFlyImageDataset.create(
+            File(dogsVsCatsDatasetPath),
+            FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+            preprocessing
+        ).shuffle()
         val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
         /**
@@ -92,16 +95,10 @@ fun runONNXAdditionalTraining(
 
 private fun preprocessing(
     resizeTo: Pair<Int, Int>,
-    dogsVsCatsDatasetPath: String,
     model: OnnxInferenceModel
 ): Preprocessing {
     val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         preprocess {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                imageShape = ImageShape(channels = NUM_CHANNELS)
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             transformImage { convert { colorMode = ColorMode.BGR } }
             transformTensor {
                 onnx {
@@ -111,11 +108,6 @@ private fun preprocessing(
         }
     } else {
         preprocess {
-            load {
-                pathToData = File(dogsVsCatsDatasetPath)
-                imageShape = ImageShape(channels = NUM_CHANNELS)
-                labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-            }
             transformImage {
                 resize {
                     outputHeight = resizeTo.first

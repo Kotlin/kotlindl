@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import java.io.File
 
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
@@ -242,8 +243,8 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
      *
      * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
      */
-    public fun preprocessInput(preprocessing: Preprocessing): FloatArray {
-        val (data, shape) = preprocessing()
+    public fun preprocessInput(imageFile: File, preprocessing: Preprocessing): FloatArray {
+        val (data, shape) = preprocessing(imageFile)
         return preprocessInput(
             data,
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!)

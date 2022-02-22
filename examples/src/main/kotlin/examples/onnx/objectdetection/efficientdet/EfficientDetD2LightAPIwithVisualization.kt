@@ -42,10 +42,6 @@ internal fun visualise(
     inputShape: LongArray
 ) {
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = imageFile
-            imageShape = ImageShape(null, null, 3)
-        }
         transformImage {
             resize {
                 outputWidth = inputShape[1].toInt()
@@ -60,9 +56,8 @@ internal fun visualise(
         }
     }
 
-    val rawImage = preprocessing().first
-
-    drawDetectedObjects(rawImage, ImageShape(inputShape[1], inputShape[2], 3), detectedObjects)
+    val (rawImage, shape) = preprocessing(imageFile)
+    drawDetectedObjects(rawImage, shape, detectedObjects)
 }
 
 

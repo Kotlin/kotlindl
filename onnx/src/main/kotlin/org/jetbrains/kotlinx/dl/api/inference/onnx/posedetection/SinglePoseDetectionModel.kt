@@ -50,10 +50,6 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
         val width = inputShape[2]
 
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(null, null, 3)
-            }
             transformImage {
                 resize {
                     outputHeight = height.toInt()
@@ -63,7 +59,7 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
             }
         }
 
-        val (data, shape) = preprocessing()
+        val (data, shape) = preprocessing(imageFile)
 
         val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
             data,

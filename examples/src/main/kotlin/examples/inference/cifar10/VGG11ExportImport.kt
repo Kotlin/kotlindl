@@ -170,10 +170,6 @@ fun vgg11OnCifar10ExportImport() {
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
 
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(cifarImagesArchive)
-            imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
-        }
         transformImage { convert { colorMode = ColorMode.BGR } }
         transformTensor {
             rescale {
@@ -183,7 +179,7 @@ fun vgg11OnCifar10ExportImport() {
     }
 
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnFlyImageDataset.create(preprocessing, y)
+    val dataset = OnFlyImageDataset.create(File(cifarImagesArchive), y, preprocessing)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
