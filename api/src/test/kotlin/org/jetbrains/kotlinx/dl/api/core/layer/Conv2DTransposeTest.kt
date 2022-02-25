@@ -20,6 +20,7 @@ class Conv2DTransposeTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv2DTranspose(
+                3, 3,
                 name = "TestConv2DTranspose_zeroInput",
                 biasInitializer = Zeros()
             ),
@@ -41,6 +42,7 @@ class Conv2DTransposeTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv2DTranspose(
+                kernelSize = 3,
                 name = "TestConv2DTranspose_noPadding",
                 filters = 3,
                 kernelInitializer = Constant(1.0f),
@@ -63,6 +65,7 @@ class Conv2DTransposeTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv2DTranspose(
+                kernelSize = 3,
                 name = "TestConv2DTranspose_samePadding",
                 filters = 3,
                 kernelInitializer = Constant(1.0f),
@@ -87,6 +90,7 @@ class Conv2DTransposeTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv2DTranspose(
+                kernelSize = 3,
                 name = "TestConv2DTranspose_outputPadding",
                 filters = 3,
                 kernelInitializer = Constant(1.0f),

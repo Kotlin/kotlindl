@@ -43,7 +43,7 @@ internal class MaxPool1DTest {
                 floatArrayOf(7.0f, 2.0f, 5.0f)
             )
         )
-        val layer = MaxPool1D()
+        val layer = MaxPool1D(2, 2)
 
         EagerSession.create().use {
             val tf = Ops.create()

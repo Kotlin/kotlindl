@@ -128,7 +128,7 @@ internal class MaxPool3DTest {
             }
         }
 
-        val layer = MaxPool3D()
+        val layer = MaxPool3D(2, 2)
         assertMaxPool3D(layer, expected)
     }
 
@@ -178,7 +178,7 @@ internal class MaxPool3DTest {
                 ),
             ),
         )
-        val layer = MaxPool3D()
+        val layer = MaxPool3D(2, 2)
         assertMaxPool3D(layer, expected, inputNumeric)
     }
 

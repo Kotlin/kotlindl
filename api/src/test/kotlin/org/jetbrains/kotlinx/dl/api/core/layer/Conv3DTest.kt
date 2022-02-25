@@ -19,6 +19,7 @@ internal class Conv3DTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv3D(
+                3, 3,
                 name = "TestConv3D_1",
                 biasInitializer = Zeros()
             ),

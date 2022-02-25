@@ -20,7 +20,7 @@ internal class GraphTrainableModelBuilderTest {
 
                 layers {
                     +Input(128, 128)
-                    +Conv1D()
+                    +Conv1D(32, 3, 1, 1)
                 }
             }.let {
                 it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
@@ -34,7 +34,7 @@ internal class GraphTrainableModelBuilderTest {
                 }
 
                 layers {
-                    +Conv1D()(+Input(128, 128))
+                    +Conv1D(32, 3, 1, 1)(+Input(128, 128))
                 }
             }.let {
                 it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
@@ -70,8 +70,8 @@ internal class GraphTrainableModelBuilderTest {
 
                 layers {
                     +Input(128, 128)
-                    +Conv1D(name = "Second Layer")
-                    +Conv1D(name = "Third Layer")
+                    +Conv1D(32, 3, 1, 1, name = "Second Layer")
+                    +Conv1D(32, 3, 1, 1, name = "Third Layer")
                 }
             }
         }
@@ -87,7 +87,7 @@ internal class GraphTrainableModelBuilderTest {
             ::Functional {
                 layers {
                     +Input(128, 128, name = "First Layer")
-                    +Conv1D(name = "Second Layer")
+                    +Conv1D(32, 3, 1, 1, name = "Second Layer")
                 }
             }.let {
                 it.layers.size == 2 && it.layers[0] is Input && it.layers[1] is Conv1D
