@@ -93,7 +93,7 @@ fun runONNXAdditionalTraining(
     }
 }
 
-private fun preprocessing(
+fun preprocessing(
     resizeTo: Pair<Int, Int>,
     model: OnnxInferenceModel
 ): Preprocessing {

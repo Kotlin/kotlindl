@@ -11,12 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 fun runONNXImageRecognitionPrediction(
@@ -31,7 +26,7 @@ fun runONNXImageRecognitionPrediction(
     model.use {
         println(it)
 
-        val preprocessing: Preprocessing = preprocessing(resizeTo)
+        val preprocessing: Preprocessing = examples.transferlearning.preprocessing(resizeTo)
         for (i in 1..8) {
             val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
@@ -46,22 +41,3 @@ fun runONNXImageRecognitionPrediction(
     }
 }
 
-// TODO: copy-paste from predictionRunner (refactor it)
-private fun preprocessing(resizeTo: Pair<Int, Int>): Preprocessing {
-    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
-    } else {
-        preprocess {
-            transformImage {
-                resize {
-                    outputWidth = resizeTo.first
-                    outputHeight = resizeTo.second
-                }
-                convert { colorMode = ColorMode.BGR }
-            }
-        }
-    }
-    return preprocessing
-}

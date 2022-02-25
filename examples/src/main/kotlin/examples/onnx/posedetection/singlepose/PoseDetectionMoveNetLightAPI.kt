@@ -35,7 +35,6 @@ fun poseDetectionMoveNetLightAPI() {
                 println("Found ${it.poseLandmarkLabel} with probability ${it.probability}")
             }
 
-            // TODO: add edges visualisation
             val (rawImage, shape) = preprocessing(imageFile)
             drawDetectedPose(rawImage, shape, detectedPose)
         }

@@ -73,7 +73,7 @@ fun runImageRecognitionPrediction(
     }
 }
 
-private fun preprocessing(resizeTo: Pair<Int, Int>): Preprocessing {
+internal fun preprocessing(resizeTo: Pair<Int, Int>): Preprocessing {
     val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         preprocess {
             transformImage { convert { colorMode = ColorMode.BGR } }

@@ -39,11 +39,10 @@ fun efficientNet4LitePrediction() {
             transformImage { convert { colorMode = ColorMode.BGR } }
         }
         for (i in 1..8) {
-            // TODO: currently, the whole model is loaded but not used for prediction, the preprocessing is used only
             val inputData = modelType.preprocessInput(
                 getFileFromResource("datasets/vgg/image$i.jpg"),
                 preprocessing
-            ) // TODO: to preprocessInput(preprocessing)
+            )
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
