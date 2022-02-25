@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
-import org.jetbrains.kotlinx.dl.api.core.layer.unfreeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -80,8 +79,6 @@ fun mobilenetWithAdditionalTraining() {
     val hdfFile = modelHub.loadWeights(modelType)
 
     model.use {
-        it.layers.last().unfreeze()
-
         it.compile(
             optimizer = Adam(),
             loss = Losses.MAE,
