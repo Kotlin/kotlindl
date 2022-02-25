@@ -129,17 +129,6 @@ public class TrainingHistory {
     public fun eventsByEpoch(epochIndex: Int): TreeMap<Int, BatchTrainingEvent>? {
         return historyByEpochAndBatch[epochIndex]
     }
-
-    /**
-     * Returns all values of one filed in [EpochTrainingEvent] for all epochs. All [EpochTrainingEvent.metricValues] for example.
-     */
-    public operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
-        val result = DoubleArray(_epochHistory.size)
-        for (i in 0 until _epochHistory.size) {
-            result[i] = desiredField.invoke(_epochHistory[i])
-        }
-        return result
-    }
 }
 
 /**

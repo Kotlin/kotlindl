@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
-private const val EPOCHS = 1
+private const val EPOCHS = 2
 private const val TRAINING_BATCH_SIZE = 1000
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -70,8 +70,8 @@ fun lenetWithAlternativeLossFunction() {
 
         println("Accuracy: $accuracy")
 
-        /*val accuracyByEpoch = history[EpochTrainingEvent::metricValues] // TODO: fix a bug with an access
-        println(accuracyByEpoch.contentToString())*/
+        val accuracyByEpoch = history.epochHistory.map { it.metricValues[0] }.toDoubleArray()
+        println(accuracyByEpoch.contentToString())
     }
 }
 
