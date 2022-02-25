@@ -64,6 +64,35 @@ public class DepthwiseConv2D(
     public override val useBias: Boolean = true,
     name: String = ""
 ) : AbstractConv(name = name), NoGradients {
+    public constructor(
+        kernelSize: Int = 3,
+        strides: Int = 1,
+        dilations: Int = 1,
+        activation: Activations = Activations.Relu,
+        depthMultiplier: Int = 1,
+        depthwiseInitializer: Initializer = HeNormal(),
+        biasInitializer: Initializer = HeUniform(),
+        depthwiseRegularizer: Regularizer? = null,
+        biasRegularizer: Regularizer? = null,
+        activityRegularizer: Regularizer? = null,
+        padding: ConvPadding = ConvPadding.SAME,
+        useBias: Boolean = true,
+        name: String = ""
+    ) : this(
+        kernelSize = intArrayOf(kernelSize, kernelSize),
+        strides = intArrayOf(1, strides, strides, 1),
+        dilations = intArrayOf(1, dilations, dilations, 1),
+        activation = activation,
+        depthMultiplier = depthMultiplier,
+        depthwiseInitializer = depthwiseInitializer,
+        biasInitializer = biasInitializer,
+        depthwiseRegularizer = depthwiseRegularizer,
+        biasRegularizer = biasRegularizer,
+        activityRegularizer = activityRegularizer,
+        padding = padding,
+        useBias = useBias,
+        name = name
+    )
 
     init {
         requireArraySize(kernelSize, 2, "kernelSize")

@@ -77,6 +77,42 @@ public class SeparableConv2D(
     public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name), NoGradients {
+    public constructor(
+        filters: Int = 32,
+        kernelSize: Int = 3,
+        strides: Int = 1,
+        dilations: Int = 1,
+        activation: Activations = Activations.Relu,
+        depthMultiplier: Int = 1,
+        depthwiseInitializer: Initializer = HeNormal(),
+        pointwiseInitializer: Initializer = HeNormal(),
+        biasInitializer: Initializer = HeUniform(),
+        depthwiseRegularizer: Regularizer? = null,
+        pointwiseRegularizer: Regularizer? = null,
+        biasRegularizer: Regularizer? = null,
+        activityRegularizer: Regularizer? = null,
+        padding: ConvPadding = ConvPadding.SAME,
+        useBias: Boolean = true,
+        name: String = ""
+    ) : this(
+        filters = filters,
+        kernelSize = intArrayOf(kernelSize, kernelSize),
+        strides = intArrayOf(1, strides, strides, 1),
+        dilations = intArrayOf(1, dilations, dilations, 1),
+        activation = activation,
+        depthMultiplier = depthMultiplier,
+        depthwiseInitializer = depthwiseInitializer,
+        pointwiseInitializer = pointwiseInitializer,
+        biasInitializer = biasInitializer,
+        depthwiseRegularizer = depthwiseRegularizer,
+        pointwiseRegularizer = pointwiseRegularizer,
+        biasRegularizer = biasRegularizer,
+        activityRegularizer = activityRegularizer,
+        padding = padding,
+        useBias = useBias,
+        name = name
+    )
+
     // weight tensors
     private lateinit var depthwiseKernel: KVariable
     private lateinit var pointwiseKernel: KVariable

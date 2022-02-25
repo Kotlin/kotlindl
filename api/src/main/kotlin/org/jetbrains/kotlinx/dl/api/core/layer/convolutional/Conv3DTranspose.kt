@@ -65,6 +65,36 @@ public class Conv3DTranspose(
     public override val useBias: Boolean = true,
     name: String = ""
 ) : ConvTranspose(dimensions = 3, name), NoGradients {
+    public constructor(
+        filters: Int = 3,
+        kernelSize: Int = 3,
+        strides: Int = 1,
+        dilations: Int = 1,
+        activation: Activations = Activations.Relu,
+        kernelInitializer: Initializer = HeNormal(),
+        biasInitializer: Initializer = HeUniform(),
+        kernelRegularizer: Regularizer? = null,
+        biasRegularizer: Regularizer? = null,
+        activityRegularizer: Regularizer? = null,
+        padding: ConvPadding = ConvPadding.SAME,
+        useBias: Boolean = true,
+        name: String = ""
+    ) : this(
+        filters = filters,
+        kernelSize = intArrayOf(kernelSize),
+        strides = intArrayOf(1, strides, strides, strides, 1),
+        dilations = intArrayOf(1, dilations, dilations, dilations, 1),
+        activation = activation,
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
+        kernelRegularizer = kernelRegularizer,
+        biasRegularizer = biasRegularizer,
+        activityRegularizer = activityRegularizer,
+        padding = padding,
+        useBias = useBias,
+        name = name
+    )
+
     init {
         requireArraySize(kernelSize, dimensions, "kernelSize")
         requireArraySize(strides, dimensions + 2, "strides")

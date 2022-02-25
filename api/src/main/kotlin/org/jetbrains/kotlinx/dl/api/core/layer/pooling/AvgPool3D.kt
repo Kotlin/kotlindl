@@ -32,6 +32,17 @@ public class AvgPool3D(
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
+    public constructor(
+        poolSize: Int = 2,
+        strides: Int = 2,
+        padding: ConvPadding = ConvPadding.VALID,
+        name: String = ""
+    ) : this(
+        poolSize = intArrayOf(1, poolSize, poolSize, poolSize, 1),
+        strides = intArrayOf(1, strides, strides, strides, 1),
+        padding = padding,
+        name = name
+    )
 
     override val hasActivation: Boolean
         get() = false

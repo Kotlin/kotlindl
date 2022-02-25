@@ -31,6 +31,18 @@ public class MaxPool2D(
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
+    public constructor(
+        poolSize: Int = 2,
+        strides: Int = 2,
+        padding: ConvPadding = ConvPadding.VALID,
+        name: String = ""
+    ) : this(
+        poolSize = intArrayOf(1, poolSize, poolSize, 1),
+        strides = intArrayOf(1, strides, strides, 1),
+        padding = padding,
+        name = name
+    )
+
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {

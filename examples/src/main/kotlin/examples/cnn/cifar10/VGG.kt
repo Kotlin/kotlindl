@@ -54,34 +54,34 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -89,21 +89,21 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Conv2D(
         filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
@@ -111,38 +111,38 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
-        padding = ConvPadding.SAME
-    ),
-    MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
-    ),
-    Conv2D(
-        filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
-        activation = Activations.Relu,
-        kernelInitializer = HeNormal(),
-        biasInitializer = HeNormal(),
-        padding = ConvPadding.SAME
-    ),
-    Conv2D(
-        filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(),
         biasInitializer = HeNormal(),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
+    ),
+    Conv2D(
+        filters = 256,
+        kernelSize = 3,
+        strides = 1,
+        activation = Activations.Relu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
+        padding = ConvPadding.SAME
+    ),
+    Conv2D(
+        filters = 256,
+        kernelSize = 3,
+        strides = 1,
+        activation = Activations.Relu,
+        kernelInitializer = HeNormal(),
+        biasInitializer = HeNormal(),
+        padding = ConvPadding.SAME
+    ),
+    MaxPool2D(
+        poolSize = 2,
+        strides = 2,
     ),
     Flatten(),
     Dense(

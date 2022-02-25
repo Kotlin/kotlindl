@@ -15,7 +15,7 @@ import java.io.File
 
 fun main() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.ObjectDetection.EfficientDetD2 // TODO: input/output https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb
+    val modelType = ONNXModels.ObjectDetection.EfficientDetD2
     val model = modelHub.loadModel(modelType)
 
     model.use {
