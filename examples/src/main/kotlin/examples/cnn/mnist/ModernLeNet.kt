@@ -42,29 +42,29 @@ private val modernLeNet = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = intArrayOf(5, 5),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 5,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(5, 5),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 5,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Flatten(), // 3136
     Dense(

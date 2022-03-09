@@ -53,8 +53,8 @@ private val input = Input(
 )
 private val conv2D_1 = Conv2D(
     filters = 32,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -63,8 +63,8 @@ private val conv2D_1 = Conv2D(
 )
 private val conv2D_2 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -72,15 +72,15 @@ private val conv2D_2 = Conv2D(
     name = "conv2D_2"
 )
 private val maxPool2D = MaxPool2D(
-    poolSize = intArrayOf(1, 3, 3, 1),
-    strides = intArrayOf(1, 3, 3, 1),
+    poolSize = 3,
+    strides = 3,
     padding = ConvPadding.VALID,
     name = "maxPool2D"
 )
 private val conv2D_4 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -89,8 +89,8 @@ private val conv2D_4 = Conv2D(
 )
 private val conv2D_5 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -100,8 +100,8 @@ private val conv2D_5 = Conv2D(
 private val add = Add(name = "add")
 private val conv2D_6 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -110,8 +110,8 @@ private val conv2D_6 = Conv2D(
 )
 private val conv2D_7 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),
@@ -121,8 +121,8 @@ private val conv2D_7 = Conv2D(
 private val add_1 = Add(name = "add_1")
 private val conv2D_8 = Conv2D(
     filters = 64,
-    kernelSize = intArrayOf(3, 3),
-    strides = intArrayOf(1, 1, 1, 1),
+    kernelSize = 3,
+    strides = 1,
     activation = Activations.Relu,
     kernelInitializer = HeNormal(SEED),
     biasInitializer = HeNormal(SEED),

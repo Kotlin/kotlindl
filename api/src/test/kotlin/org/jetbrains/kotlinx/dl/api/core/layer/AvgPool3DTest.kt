@@ -58,7 +58,7 @@ internal class AvgPool3DTest {
 
     @Test
     fun default() {
-        val layer = AvgPool3D()
+        val layer = AvgPool3D(2, 2)
         val expected = arrayOf(
             arrayOf(
                 arrayOf(

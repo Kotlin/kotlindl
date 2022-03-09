@@ -19,6 +19,8 @@ internal class Conv2DTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv2D(
+                32,
+                3,
                 name = "TestConv2D_1",
                 biasInitializer = Zeros()
             ),

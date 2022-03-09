@@ -50,8 +50,8 @@ fun main() {
     )
     x = Conv2D(
         filters = 32,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -61,8 +61,8 @@ fun main() {
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -71,16 +71,16 @@ fun main() {
     )(x)
 
     val maxPool = MaxPool2D(
-        poolSize = intArrayOf(1, 3, 3, 1),
-        strides = intArrayOf(1, 3, 3, 1),
+        poolSize = 3,
+        strides = 3,
         padding = ConvPadding.VALID,
         name = "maxPool2D"
     )(x)
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -90,8 +90,8 @@ fun main() {
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -103,8 +103,8 @@ fun main() {
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -114,8 +114,8 @@ fun main() {
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
@@ -127,8 +127,8 @@ fun main() {
 
     x = Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),

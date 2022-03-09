@@ -577,6 +577,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 32,
+                kernelSize = 3,
                 kernelInitializer = HeNormal(13L),
                 biasInitializer = HeNormal(13L),
                 padding = ConvPadding.VALID,
@@ -589,6 +590,7 @@ internal class SequentialBasicTest : IntegrationTest() {
             ),
             Conv2D(
                 filters = 64,
+                kernelSize = 3,
                 kernelInitializer = GlorotNormal(13L),
                 biasInitializer = GlorotUniform(13L),
                 padding = ConvPadding.SAME,

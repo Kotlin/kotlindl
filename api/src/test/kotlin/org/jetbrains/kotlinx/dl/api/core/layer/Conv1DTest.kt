@@ -19,6 +19,10 @@ internal class Conv1DTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv1D(
+                32,
+                3,
+                1,
+                1,
                 name = "TestConv1D_1",
                 biasInitializer = Zeros()
             ),
@@ -34,6 +38,7 @@ internal class Conv1DTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv1D(
+                strides = 1,
                 name = "TestConv1D_2",
                 filters = 16,
                 kernelInitializer = Constant(1.0f),
@@ -59,6 +64,7 @@ internal class Conv1DTest : ConvLayerTest() {
 
         assertTensorsEquals(
             Conv1D(
+                strides = 1,
                 name = "TestConv1D_3",
                 filters = 1,
                 kernelInitializer = Constant(1.0f),

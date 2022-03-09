@@ -45,7 +45,7 @@ internal class AvgPool1DTest {
                 floatArrayOf(4.0f, 1.0f, 4.5f)
             )
         )
-        val layer = AvgPool1D()
+        val layer = AvgPool1D(2, 2)
 
         EagerSession.create().use {
             val tf = Ops.create()
