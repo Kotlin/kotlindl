@@ -82,7 +82,7 @@ public class Conv2DTranspose(
         name: String = ""
     ) : this(
         filters = filters,
-        kernelSize = intArrayOf(kernelSize),
+        kernelSize = intArrayOf(kernelSize, kernelSize),
         strides = intArrayOf(1, strides, strides, 1),
         dilations = intArrayOf(1, dilations, dilations, 1),
         activation = activation,

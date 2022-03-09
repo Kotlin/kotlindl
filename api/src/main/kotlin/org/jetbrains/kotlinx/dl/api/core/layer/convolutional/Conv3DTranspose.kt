@@ -81,7 +81,7 @@ public class Conv3DTranspose(
         name: String = ""
     ) : this(
         filters = filters,
-        kernelSize = intArrayOf(kernelSize),
+        kernelSize = intArrayOf(kernelSize, kernelSize, kernelSize),
         strides = intArrayOf(1, strides, strides, strides, 1),
         dilations = intArrayOf(1, dilations, dilations, dilations, 1),
         activation = activation,
