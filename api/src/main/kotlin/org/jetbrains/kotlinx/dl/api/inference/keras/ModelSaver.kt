@@ -161,12 +161,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
     val config: KerasInitializerConfig
     if (isKerasFullyCompatible) {
         val (_className, _config) = when (initializer) {
-            is GlorotUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is GlorotNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is HeNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is HeUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is LeCunNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is LeCunUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
+            is VarianceScaling -> convertToVarianceScalingInitializer(initializer)
             is RandomUniform -> convertToRandomUniformInitializer(initializer)
             is RandomNormal -> convertToRandomNormalInitializer(initializer)
             is Identity -> convertToIdentityInitializer(initializer)
