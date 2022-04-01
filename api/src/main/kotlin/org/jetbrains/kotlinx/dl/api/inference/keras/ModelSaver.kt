@@ -157,34 +157,27 @@ private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegulariz
 }
 
 private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer {
-    val className: String
-    val config: KerasInitializerConfig
-    if (isKerasFullyCompatible) {
-        val (_className, _config) = when (initializer) {
-            is VarianceScaling -> convertToVarianceScalingInitializer(initializer)
-            is RandomUniform -> convertToRandomUniformInitializer(initializer)
-            is RandomNormal -> convertToRandomNormalInitializer(initializer)
-            is Identity -> convertToIdentityInitializer(initializer)
-            else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
-            // TODO: support Constant initializer
+    val (className, config) = when (initializer) {
+        is VarianceScaling -> {
+            if (isKerasFullyCompatible) {
+                convertToVarianceScalingInitializer(initializer)
+            } else {
+                when (initializer) {
+                    is GlorotUniform -> INITIALIZER_GLOROT_UNIFORM
+                    is GlorotNormal -> INITIALIZER_GLOROT_NORMAL
+                    is HeNormal -> INITIALIZER_HE_NORMAL
+                    is HeUniform -> INITIALIZER_HE_UNIFORM
+                    is LeCunNormal -> INITIALIZER_LECUN_NORMAL
+                    is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
+                    else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
+                } to KerasInitializerConfig(seed = 12)
+            }
         }
-
-        className = _className
-        config = _config
-    } else {
-        className = when (initializer) {
-            is GlorotUniform -> INITIALIZER_GLOROT_UNIFORM
-            is GlorotNormal -> INITIALIZER_GLOROT_NORMAL
-            is HeNormal -> INITIALIZER_HE_NORMAL
-            is HeUniform -> INITIALIZER_HE_UNIFORM
-            is LeCunNormal -> INITIALIZER_LECUN_NORMAL
-            is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
-            is Identity -> INITIALIZER_IDENTITY
-            else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
-        }
-        config = KerasInitializerConfig(seed = 12)
+        is RandomUniform -> convertToRandomUniformInitializer(initializer)
+        is RandomNormal -> convertToRandomNormalInitializer(initializer)
+        is Identity -> convertToIdentityInitializer(initializer)
+        else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
     }
-
     return KerasInitializer(class_name = className, config = config)
 }
 
