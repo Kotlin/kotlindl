@@ -170,7 +170,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
                     is LeCunNormal -> INITIALIZER_LECUN_NORMAL
                     is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
                     else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
-                } to KerasInitializerConfig(seed = 12)
+                } to KerasInitializerConfig(seed = initializer.seed.toInt())
             }
         }
         is RandomUniform -> convertToRandomUniformInitializer(initializer)
