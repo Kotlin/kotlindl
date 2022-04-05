@@ -10,7 +10,9 @@ import io.jhdf.api.Group
 import io.jhdf.api.Node
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
+import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.BIAS_DATA_PATH_TEMPLATE
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.KERNEL_DATA_PATH_TEMPLATE
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.getLayerVariableNames
@@ -226,7 +228,7 @@ private fun fillLayerWeights(layer: Layer, group: Group, model: GraphTrainableMo
 }
 
 private fun fillLayerVariablesFromKeras(layerName: String,
-                                        variables: Map<String, Pair<String, LongArray>>,
+                                        variables: Map<String, KVariable>,
                                         model: GraphTrainableModel,
                                         group: Group
 ) {
@@ -243,15 +245,15 @@ private fun fillLayerVariablesFromKeras(layerName: String,
     val dataNodes = (layerWeightsNode.children[nameOfWeightSubGroup] as Group).children
 
     dataNodes.values.map { it as DatasetBase }.forEach {
-        val (name, shape) = variables[it.name]
+        val variable = variables[it.name]
             ?: throw IllegalArgumentException(
                 "Parsing of h5 file for variable with name ${it.name} in layer $layerName is not supported!"
             )
         val dims = it.dimensions
-        require(shape.map(Long::toInt).toIntArray().contentEquals(dims)) {
-            "$name variable shape in loaded data is ${dims.contentToString()}. Should be ${shape.contentToString()}"
+        require(variable.shape.toIntArray().contentEquals(dims)) {
+            "${variable.name} variable shape in loaded data is ${dims.contentToString()}. Should be ${variable.shape.toIntArray().contentToString()}"
         }
-        model.fillVariable(name, it.data)
+        model.fillVariable(variable.name, it.data)
     }
 }
 
@@ -261,9 +263,9 @@ private fun fillLayerWeights(layer: Layer, hdfFile: HdfFile, layerPaths: LayerPa
         model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
         return
     }
-    variables.forEach { (variableName, variableDataPathTemplate) ->
+    variables.forEach { (variable, variableDataPathTemplate) ->
         val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
-        model.fillVariable(variableName, data)
+        model.fillVariable(variable.name, data)
     }
     model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
