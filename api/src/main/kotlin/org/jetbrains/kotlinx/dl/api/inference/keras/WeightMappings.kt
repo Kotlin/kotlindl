@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.util.*
 
 internal object WeightMappings {
@@ -57,10 +58,10 @@ internal object WeightMappings {
 
     private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray!!))
+            Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernel.shape.toLongArray()))
         )
         if (layer.useBias) {
-            variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!)
+            variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.bias!!.shape.toLongArray())
         }
         return variables
     }
@@ -79,10 +80,10 @@ internal object WeightMappings {
 
     private fun getConvTransposeVariables(layer: ConvTranspose): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("kernel:0", Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layer.kernelShapeArray!!))
+            Pair("kernel:0", Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layer.kernel.shape.toLongArray()))
         )
         if (layer.useBias) {
-            variables["bias:0"] = Pair(convTransposeBiasVarName(layer.name, layer.dimensions), layer.biasShapeArray!!)
+            variables["bias:0"] = Pair(convTransposeBiasVarName(layer.name, layer.dimensions), layer.bias!!.shape.toLongArray())
         }
         return variables
     }
@@ -101,10 +102,10 @@ internal object WeightMappings {
 
     private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray!!))
+            Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernel.shape.toLongArray()))
         )
         if (layer.useBias) {
-            variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
+            variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.bias!!.shape.toLongArray())
         }
         return variables
     }
@@ -131,15 +132,15 @@ internal object WeightMappings {
         val variables = mutableMapOf(
             Pair(
                 "depthwise_kernel:0",
-                Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray!!)
+                Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseKernel.shape.toLongArray())
             ),
             Pair(
                 "pointwise_kernel:0",
-                Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray!!)
+                Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseKernel.shape.toLongArray())
             )
         )
         if (layer.useBias) {
-            variables["bias:0"] = Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
+            variables["bias:0"] = Pair(separableConv2dBiasVarName(layer.name), layer.bias!!.shape.toLongArray())
         }
         return variables
     }
@@ -167,10 +168,10 @@ internal object WeightMappings {
 
     private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray!!))
+            Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernel.shape.toLongArray()))
         )
         if (layer.useBias) {
-            variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!)
+            variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.bias!!.shape.toLongArray())
         }
         return variables
     }
@@ -189,14 +190,14 @@ internal object WeightMappings {
 
     private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
         val variables = mutableMapOf(
-            Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray!!)),
-            Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray!!))
+            Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMean.shape.toLongArray())),
+            Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVariance.shape.toLongArray()))
         )
         if (layer.scale) {
-            variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)
+            variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gamma!!.shape.toLongArray())
         }
         if (layer.center) {
-            variables["beta:0"] = Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)
+            variables["beta:0"] = Pair(batchNormBetaVarName(layer.name), layer.beta!!.shape.toLongArray())
         }
         return variables
     }
