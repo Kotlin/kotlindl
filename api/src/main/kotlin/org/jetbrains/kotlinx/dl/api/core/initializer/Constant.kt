@@ -16,7 +16,7 @@ import org.tensorflow.op.Ops
  * @property constantValue Constant value to fill the tensor.
  * @constructor Creates a [Constant] initializer with a given [constantValue].
  */
-public class Constant(private val constantValue: Float) : Initializer() {
+public class Constant(public val constantValue: Float) : Initializer() {
     override fun initialize(
         fanIn: Int,
         fanOut: Int,

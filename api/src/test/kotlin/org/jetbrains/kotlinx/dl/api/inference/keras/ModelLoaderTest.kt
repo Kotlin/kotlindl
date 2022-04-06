@@ -49,31 +49,22 @@ class ModelLoaderTest {
             }
 
             with((this[7] as Dense).kernelInitializer) {
-                // This should be 'Zeros' initializer
-                assertTrue(this is RandomUniform)
-                assertEquals(0.0f, (this as RandomUniform).maxVal)
-                assertEquals(0.0f, (this).minVal)
+                assertTrue(this is Zeros)
             }
 
             with((this[8] as Dense).kernelInitializer) {
-                // This should be 'Constant' initializer
-                assertTrue(this is RandomUniform)
-                assertEquals(0.0f, (this as RandomUniform).maxVal)
-                assertEquals(0.0f, (this).minVal)
+                assertTrue(this is Constant)
+                assertEquals(2f, (this as Constant).constantValue)
             }
 
             with((this[9] as Dense).kernelInitializer) {
-                // This should be 'Ones' initializer
-                assertTrue(this is RandomUniform)
-                assertEquals(1.0f, (this as RandomUniform).maxVal)
-                assertEquals(1.0f, this.minVal)
+                assertTrue(this is Ones)
             }
 
             with((this[10] as Dense).kernelInitializer) {
                 assertTrue(this is RandomNormal)
-                // Mean and stdev are not public. Should they be?
-                // assertEquals(0.0f, (this as RandomNormal).mean)
-                // assertEquals(1.0f, (this as RandomNormal).stdev)
+                assertEquals(0.0f, (this as RandomNormal).mean)
+                assertEquals(1.0f, this.stdev)
             }
 
             with((this[11] as Dense).kernelInitializer) {

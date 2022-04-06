@@ -175,6 +175,11 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
         }
         is RandomUniform -> convertToRandomUniformInitializer(initializer)
         is RandomNormal -> convertToRandomNormalInitializer(initializer)
+        is TruncatedNormal -> INITIALIZER_TRUNCATED_NORMAL to KerasInitializerConfig(seed = initializer.seed.toInt())
+        is Orthogonal -> convertToOrthogonalInitializer(initializer)
+        is Zeros -> INITIALIZER_ZEROS to KerasInitializerConfig()
+        is Ones -> INITIALIZER_ONES to KerasInitializerConfig()
+        is Constant -> INITIALIZER_CONSTANT to KerasInitializerConfig(value = initializer.constantValue.toDouble())
         is Identity -> convertToIdentityInitializer(initializer)
         else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
     }
@@ -235,6 +240,15 @@ private fun convertMode(mode: Mode): String {
         Mode.FAN_OUT -> "fan_out"
         Mode.FAN_AVG -> "fan_avg"
     }
+}
+
+private fun convertToOrthogonalInitializer(initializer: Orthogonal): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_ORTHOGONAL, KerasInitializerConfig(
+            gain = initializer.gain.toDouble(),
+            seed = initializer.seed.toInt()
+        )
+    )
 }
 
 private fun convertToKerasPadding(padding: ConvPadding): KerasPadding {

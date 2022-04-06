@@ -22,8 +22,8 @@ import kotlin.math.min
  */
 
 public class Orthogonal(
-    private val gain: Float = 1.0f,
-    private val seed: Long = 12L
+    public val gain: Float = 1.0f,
+    public val seed: Long = 12L
 ) : Initializer() {
     override fun initialize(
         fanIn: Int,

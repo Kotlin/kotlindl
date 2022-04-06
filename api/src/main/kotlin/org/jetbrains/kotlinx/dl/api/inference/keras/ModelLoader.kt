@@ -247,9 +247,8 @@ private fun convertToRegularizer(regularizer: KerasRegularizer?): Regularizer? {
 }
 
 private fun convertToInitializer(initializer: KerasInitializer): Initializer {
-    val seed = if (initializer.config!!.seed != null) {
-        initializer.config.seed!!.toLong()
-    } else 12L
+    val config = initializer.config
+    val seed = config!!.seed?.toLong() ?: 12L
 
     return when (initializer.class_name!!) {
         INITIALIZER_GLOROT_UNIFORM -> GlorotUniform(seed = seed)
@@ -258,36 +257,23 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         INITIALIZER_HE_UNIFORM -> HeUniform(seed = seed)
         INITIALIZER_LECUN_NORMAL -> LeCunNormal(seed = seed)
         INITIALIZER_LECUN_UNIFORM -> LeCunUniform(seed = seed)
-        INITIALIZER_ZEROS -> RandomUniform(
-            seed = seed,
-            minVal = 0.0f,
-            maxVal = 0.0f
-        ) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_CONSTANT -> RandomUniform(
-            seed = seed,
-            minVal = 0.0f,
-            maxVal = 0.0f
-        ) // instead of real initializers, because it doesn't influence on nothing
-        INITIALIZER_ONES -> RandomUniform(
-            seed = seed,
-            minVal = 1.0f,
-            maxVal = 1.0f
-        ) // instead of real initializers, because it doesn't influence on nothing*/
         INITIALIZER_RANDOM_NORMAL -> RandomNormal(
             seed = seed,
-            mean = initializer.config.mean!!.toFloat(),
-            stdev = initializer.config.stddev!!.toFloat()
+            mean = config.mean!!.toFloat(),
+            stdev = config.stddev!!.toFloat()
         )
         INITIALIZER_RANDOM_UNIFORM -> RandomUniform(
             seed = seed,
-            minVal = initializer.config.minval!!.toFloat(),
-            maxVal = initializer.config.maxval!!.toFloat()
+            minVal = config.minval!!.toFloat(),
+            maxVal = config.maxval!!.toFloat()
         )
-        INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScalingInitializer(initializer)
-        INITIALIZER_ORTHOGONAL -> Orthogonal(seed = seed, gain = initializer.config.gain!!.toFloat())
-        /*INITIALIZER_CONSTANT -> Constant(initializer.config.value!!.toFloat())*/
-        INITIALIZER_IDENTITY -> Identity(initializer.config.gain?.toFloat() ?: 1f)
+        INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
+        INITIALIZER_ORTHOGONAL -> Orthogonal(seed = seed, gain = config.gain!!.toFloat())
+        INITIALIZER_ZEROS -> Zeros()
+        INITIALIZER_ONES -> Ones()
+        INITIALIZER_CONSTANT -> Constant(config.value!!.toFloat())
+        INITIALIZER_IDENTITY -> Identity(config.gain?.toFloat() ?: 1f)
         else -> throw IllegalStateException("${initializer.class_name} is not supported yet!")
     }
 }
