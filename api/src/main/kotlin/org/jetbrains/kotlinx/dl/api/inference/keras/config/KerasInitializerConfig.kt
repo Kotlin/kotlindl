@@ -25,7 +25,7 @@ internal data class KerasInitializerConfig(
     @Json(serializeNull = false)
     val stddev: Double? = null,
     @Json(serializeNull = false)
-    val value: Int? = null,
+    val value: Double? = null,
     @Json(serializeNull = false)
     val gain: Double? = null
 )
