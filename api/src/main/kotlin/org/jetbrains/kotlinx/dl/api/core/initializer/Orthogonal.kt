@@ -60,8 +60,7 @@ public class Orthogonal(
         //Make Q uniform
         val d: Operand<Float> = tf.linalg.tensorDiagPart(ro)
         var qop: Operand<Float> = tf.withName(name).math.mul(qo, tf.math.sign(d))
-        val n: Operand<Float>? = null
-        if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, n)
+        if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, tf.constant(intArrayOf(1, 0)))
 
         return tf.math.mul(tf.reshape(qop, shape), tf.dtypes.cast(tf.constant(this.gain), getDType()))
     }
