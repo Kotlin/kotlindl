@@ -202,22 +202,16 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             .any { variableName.contains(it) }
     }
 
-    /** Returns two lists : variables and tensors (containing the variables' data) with the same order and size. */
-    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
-        val modelWeightsExtractorRunner = session.runner()
-
+    /** Returns a list of variables paired with their data. */
+    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
         var variables = kGraph.layerVariables()
-
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
         }
 
-        variables.forEach {
-            modelWeightsExtractorRunner.fetch(it)
-        }
-
-        val modelWeights = modelWeightsExtractorRunner.run()
-        return Pair(variables, modelWeights)
+        val modelWeightsExtractorRunner = session.runner()
+        variables.forEach(modelWeightsExtractorRunner::fetch)
+        return variables.zip(modelWeightsExtractorRunner.run())
     }
 
     /**
