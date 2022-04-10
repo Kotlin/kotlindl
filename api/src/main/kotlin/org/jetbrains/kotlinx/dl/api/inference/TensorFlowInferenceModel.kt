@@ -224,37 +224,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     }
 
     /**
-     * Executes pre-defined Assign TensorFlow operand.
-     *
-     * @param [variableName] Name of variable to be assigned.
-     */
-    internal fun runAssignOpByVarName(
-        variableName: String
-    ) {
-        val assignOpName = defaultAssignOpName(variableName)
-
-        session.runner()
-            .addTarget(assignOpName)
-            .run()
-    }
-
-    /**
-     * Fills variable with the given data in appropriate form (shape).
-     *
-     * @param variableName Name of variable to be filled.
-     * @param kernelData Data for variable filling, should have correct shape and type.
-     */
-    internal fun fillVariable(
-        variableName: String,
-        kernelData: Any
-    ) {
-        val initializerName = defaultInitializerOpName(variableName)
-        val assignOpName = defaultAssignOpName(variableName)
-
-        populateVariable(initializerName, kernelData, assignOpName)
-    }
-
-    /**
      * Loads variable data from .txt files.
      *
      * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
@@ -328,7 +297,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [data] Variable data.
      */
     // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
-    internal fun assignVariable(
+    private fun assignVariable(
         variableName: String,
         data: Array<*>,
         kGraph: KGraph = this.kGraph,

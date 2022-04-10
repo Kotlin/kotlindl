@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.initializer
 
+import org.jetbrains.kotlinx.dl.api.core.layer.InitializerOperation
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
@@ -28,7 +29,8 @@ public abstract class Initializer {
      * @param [fanOut] The maximum number of inputs that the output of an initializer can feed to other steps.
      * @param [tf] Tensorflow Ops Accessor
      * @param [input] Variable to initialize
-     * @return Assign operand created.
+     * @return initializer operation.
+     * @see InitializerOperation
      */
     public fun apply(
         fanIn: Int,
@@ -36,13 +38,12 @@ public abstract class Initializer {
         tf: Ops,
         input: Operand<Float>,
         name: String
-    ): Assign<Float> {
-        return tf.withName(defaultAssignOpName(name)).assign(
-            input, initialize(
-                fanIn, fanOut, tf,
-                shapeOperand(tf, input.asOutput().shape()), defaultInitializerOpName(name)
-            )
+    ): InitializerOperation {
+        val initialize = initialize(
+            fanIn, fanOut, tf,
+            shapeOperand(tf, input.asOutput().shape()), defaultInitializerOpName(name)
         )
+        return InitializerOperation(tf.withName(defaultAssignOpName(name)).assign(input, initialize), initialize)
     }
 
 
