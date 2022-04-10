@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.tensorflow.Session
+import org.tensorflow.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 import java.io.File
@@ -166,15 +167,29 @@ public open class TensorFlowInferenceModel : InferenceModel() {
                 saveOptimizerState || !isOptimizerVariable(variableName)
             }
             variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
-            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run())
+            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run()).toMap()
 
-            for ((variableName, tensorForCopying) in modelWeights) {
-                model.assignVariable(variableName, tensorForCopying.convertTensorToMultiDimArray())
-                tensorForCopying.close()
+            model.loadVariables(modelWeights.keys) { variableName, _ ->
+                modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
             }
         }
         model.isModelInitialized = true
         return model
+    }
+
+    /**
+     * Loads variable data for variable names in the provided collection using a provided function.
+     * @param [variableNames] Variable names to load.
+     * @param [getData] Function that returns variable data by variable name and shape.
+     */
+    protected fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
+        for (variableName in variableNames) {
+            val variableOperation = kGraph.tfGraph.operation(variableName)
+            check(variableOperation != null) { "Operation $variableName is not found in static graph." }
+            val variableShape = variableOperation.output<Float>(0).shape()
+            val data = getData(variableName, variableShape)
+            assignVariable(variableName, variableShape, data)
+        }
     }
 
     /** Check that the variable with the name [variableName] is an optimizer variable**/
@@ -199,76 +214,28 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [predicate] Predicate for matching variable names for loading.
      */
     protected fun loadVariablesFromTxt(pathToModelDirectory: String, predicate: (String) -> Boolean) {
-        val file = File("$pathToModelDirectory/variableNames.txt")
+        val variableNamesFile = File("$pathToModelDirectory/variableNames.txt")
 
-        if (!file.exists()) throw FileNotFoundException(
+        if (!variableNamesFile.exists()) throw FileNotFoundException(
             "File 'variableNames.txt' is not found. This file must be in the model directory. " +
                     "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
-        val variableNamesToLoad = file.readLines().filter(predicate)
-        variableNamesToLoad.forEach { variableName -> loadVariable(variableName, pathToModelDirectory) }
-    }
-
-    /**
-     * Loads variable data from .txt file.
-     *
-     * @param [variableName] Name of variable to load state.
-     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
-     */
-    protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
-        val operation = kGraph.tfGraph.operation(variableName)
-        check(operation != null) { "Operation $variableName is not found in static graph." }
-
-        val file = File("$pathToModelDirectory/$variableName.txt")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File '$variableName.txt' is not found. This file must be in the model directory." +
-                    "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
-        Scanner(file.inputStream()).use { scanner ->
-            scanner.useLocale(Locale.US)
-            val initializerName = defaultInitializerOpName(variableName)
-            val assignOpName = defaultAssignOpName(variableName)
-
-            val initOp = kGraph.tfGraph.operation(initializerName)
-            check(initOp != null) {
-                "Operation $initializerName is not found in static graph.\n" +
-                        "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+        val variableNamesToLoad = variableNamesFile.readLines().filter(predicate)
+        loadVariables(variableNamesToLoad) { variableName, variableShape ->
+            val file = File("$pathToModelDirectory/$variableName.txt")
+            if (!file.exists()) throw FileNotFoundException(
+                "File '$variableName.txt' is not found. This file must be in the model directory." +
+                        "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+            )
+            Scanner(file.inputStream()).use { scanner ->
+                scanner.useLocale(Locale.US)
+                scanner.createFloatArray(variableShape)
             }
-
-            val assignOp = kGraph.tfGraph.operation(assignOpName)
-            check(assignOp != null) { "Operation $assignOp is not found in static graph." }
-
-            val shape = operation.output<Float>(0).shape()
-            val tensorShape = TensorShape(shape)
-
-            val source = scanner.createFloatArray(shape)
-            populateVariable(initializerName, source, assignOpName)
-
-            logger.debug { "Loading the variable $variableName data" }
-            logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-            logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
         }
     }
 
-    /**
-     * Assigns variable data from multidimensional array.
-     *
-     * @param [variableName] Name of variable to load state.
-     * @param [data] Variable data.
-     */
-    // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
-    private fun assignVariable(
-        variableName: String,
-        data: Array<*>,
-        kGraph: KGraph = this.kGraph,
-        session: Session = this.session
-    ) {
-        val operation = kGraph.tfGraph.operation(variableName)
-        check(operation != null) { "Operation $variableName is not found in static graph." }
-
+    private fun assignVariable(variableName: String, variableShape: Shape, data: Any) {
         val initializerName = defaultInitializerOpName(variableName)
         val assignOpName = defaultAssignOpName(variableName)
 
@@ -281,22 +248,15 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         val assignOp = kGraph.tfGraph.operation(assignOpName)
         check(assignOp != null) { "Operation $assignOp is not found in static graph." }
 
-        val shape = operation.output<Float>(0).shape()
-        val tensorShape = TensorShape(shape)
+        populateVariable(assignOpName, initializerName, data)
 
-        populateVariable(initializerName, data, assignOpName, session)
-
+        val tensorShape = TensorShape(variableShape)
         logger.debug { "Loading the variable $variableName data" }
         logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+        logger.debug { "Number of elements: ${tensorShape.numElements()}" }
     }
 
-    private fun populateVariable(
-        initializerName: String,
-        data: Any,
-        assignOpName: String,
-        session: Session = this.session
-    ) {
+    private fun populateVariable(assignOpName: String, initializerName: String, data: Any) {
         var tensorData = data
         if (data is Array<*> && data.isArrayOf<Float>()) {
             tensorData = (data as Array<Float>).toFloatArray()
@@ -307,7 +267,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
                 .feed(initializerName, tensor)
                 .addTarget(assignOpName)
                 .run()
-
         }
     }
 
