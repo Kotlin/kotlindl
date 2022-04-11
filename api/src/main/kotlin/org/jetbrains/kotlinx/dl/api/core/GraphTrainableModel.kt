@@ -117,13 +117,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
-            var cnt = 1
-            for (layer in layers) {
+            for ((index, layer) in layers.withIndex()) {
                 if (layer.name.isEmpty()) {
-                    val generatedLayerName =
-                        (layer::class.simpleName ?: return).lowercase(Locale.getDefault()) + "_" + cnt
-                    layer.name = generatedLayerName
-                    cnt++
+                    val simpleName = layer::class.simpleName ?: "layer"
+                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
                 }
             }
         }
