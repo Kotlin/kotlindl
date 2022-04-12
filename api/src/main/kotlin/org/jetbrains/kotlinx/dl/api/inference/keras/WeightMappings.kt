@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
+import org.jetbrains.kotlinx.dl.api.core.util.mapOfNotNull
 
 internal object WeightMappings {
 
@@ -165,16 +166,6 @@ internal object WeightMappings {
             layer.gamma to layerBatchNormPaths.gammaPath,
             layer.beta to layerBatchNormPaths.betaPath
         )
-    }
-
-    private fun <K, V> mapOfNotNull(vararg mapping: Pair<K?, V?>): Map<K, V> {
-        return buildMap {
-            mapping.forEach { (k, v) ->
-                if (k != null && v != null) {
-                    put(k, v)
-                }
-            }
-        }
     }
 }
 
