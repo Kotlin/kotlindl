@@ -1,58 +1,68 @@
 package org.jetbrains.kotlinx.dl.api.core.initializer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
+import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
-private const val EPS = 1e-7f
-private const val FAN_IN = 10
-private const val FAN_OUT = 20
-private const val GAIN: Float = 1.0f
-private const val SEED: Long = 12L
+private const val EPS = 1e-6f
 
 internal class OrthogonalTest {
     @Test
-    fun initialize() {
-        val actual = Array(2) { FloatArray(2) { 0f } }
-        val expected = Array(2) { FloatArray(2) { 0f } }
-        expected[0][0] = 0.96555376f
-        expected[0][1] = 0.26020378f
-        expected[1][0] = 0.26020378f
-        expected[1][1] = -0.9655537f
+    fun `2 by 2 matrix`() {
+        doTest(2, 12L, floatArrayOf(0.96555376f, 0.26020378f, 0.26020378f, -0.9655537f))
+    }
 
-        val shape = Shape.make(2, 2)
+    @Test
+    fun `3 by 3 matrix`() {
+        doTest(3)
+    }
 
+    @Test
+    fun `5 by 5 matrix`() {
+        doTest(5)
+    }
+
+    @Test
+    fun `10 by 10 matrix`() {
+        doTest(10)
+    }
+
+    private fun doTest(size: Int, seed: Long = 12L, expectedMatrix: FloatArray? = null) {
+        val shape = Shape.make(size.toLong(), size.toLong())
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val instance = Orthogonal(gain = 1.0f, seed = 12L)
-            val operand = instance.initialize(
-                fanIn = FAN_IN,
-                fanOut = FAN_OUT,
+            val instance = Orthogonal(gain = 1.0f, seed = seed)
+            val matrix = instance.initialize(
+                fanIn = 10,
+                fanOut = 20,
                 tf = tf,
                 shape = shapeOperand(tf, shape),
                 name = "default_name"
             )
-            operand.asOutput().tensor().copyTo(actual)
+            val matrixTransposed = tf.linalg.transpose(matrix, tf.constant(intArrayOf(1, 0)))
+            val multiplicationResult = tf.linalg.matMul(matrixTransposed, matrix)
 
             Assertions.assertArrayEquals(
-                expected[0],
-                actual[0],
+                identityMatrix(size),
+                multiplicationResult.asOutput().tensor().convertTensorToFlattenFloatArray(),
                 EPS
             )
 
-            Assertions.assertArrayEquals(
-                expected[1],
-                actual[1],
-                EPS
-            )
-
-            Assertions.assertEquals(
-                "Orthogonal(gain=$GAIN, seed=$SEED)",
-                instance.toString()
-            )
+            if (expectedMatrix != null) {
+                Assertions.assertArrayEquals(
+                    expectedMatrix,
+                    matrix.asOutput().tensor().convertTensorToFlattenFloatArray(),
+                    EPS
+                )
+            }
         }
+    }
+
+    private fun identityMatrix(size: Int): FloatArray {
+        return FloatArray(size * size) { index -> if (index % size == index / size) 1f else 0f }
     }
 }

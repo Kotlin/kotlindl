@@ -35,22 +35,21 @@ public class Orthogonal(
         val dimsShape = shape.asOutput().shape().size(0)
         require(dimsShape >= 2) { "The tensor to initialize must be at least two-dimensional" }
 
-        // Flatten the input shape with the last dimension remaining
+        // Generate a random matrix
+        val distOpND: Operand<Float> = tf.random.statelessRandomNormal(shape, tf.constant(longArrayOf(seed, 0L)), getDType())
+
+        // Flatten the generated random matrix with the last dimension remaining
         // its original shape, so it works for conv2d
         var numRows: Long = 1
         var i = 0
         while (i < dimsShape - 1) {
-            numRows *= shape.asOutput().shape().size(i)
+            numRows *= distOpND.asOutput().shape().size(i)
             i++
         }
 
-        val numCols = shape.asOutput().shape().size(i - 1)
-        val flatShape: Shape = Shape.make(max(numRows, numCols), min(numRows, numCols))
-        val seeds = longArrayOf(seed, 0L)
-
-        // Generate a random matrix
-        val distOp: Operand<Float> =
-            tf.random.statelessRandomNormal(shapeOperand(tf, flatShape), tf.constant(seeds), getDType())
+        val numCols = distOpND.asOutput().shape().size(i - 1)
+        val flatShape = Shape.make(max(numRows, numCols), min(numRows, numCols))
+        val distOp: Operand<Float> = tf.reshape(distOpND, shapeOperand(tf, flatShape))
 
         // Compute the qr factorization
         val qrOptions = Qr.fullMatrices(false)
@@ -61,8 +60,7 @@ public class Orthogonal(
         //Make Q uniform
         val d: Operand<Float> = tf.linalg.tensorDiagPart(ro)
         var qop: Operand<Float> = tf.withName(name).math.mul(qo, tf.math.sign(d))
-        val n: Operand<Float>? = null
-        if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, n)
+        if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, tf.constant(intArrayOf(1, 0)))
 
         return tf.math.mul(tf.reshape(qop, shape), tf.dtypes.cast(tf.constant(this.gain), getDType()))
     }
