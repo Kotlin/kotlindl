@@ -23,11 +23,6 @@ import org.tensorflow.op.core.Variable
  */
 public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     /**
-     * Top level map key is the variable name, lower level map key is the slot name.
-     */
-    private lateinit var slots: MutableMap<String, MutableMap<String, Variable<Float>>>
-
-    /**
      * Prepares targets for optimization process.
      *
      * NOTE: Developer API.
@@ -43,8 +38,6 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         tf: Ops,
         loss: Operand<Float>
     ): List<Operand<Float>> {
-        slots = mutableMapOf()
-
         val gradients: Gradients = computeGradients(tf, loss, weights)
         return applyGradients(graph, tf, weights, gradients)
     }
@@ -79,7 +72,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
 
     /**
      * Creates a slot in the graph for the specified variable with the specified name. Adds the slot's
-     * initializer to the graph's initializers, and the slot to the optimiser's slot map.
+     * initializer to the graph's initializers.
      *
      * @param [graph] KGraph to be updated.
      * @param [tf] TensorFlow graph API for building operations.
@@ -103,26 +96,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         graph.addOptimizerVariableInitializer(slotInit)
         graph.addOptimizerVariable(slot)
 
-        val varName = variable.op().name()
-
-        val variables: MutableMap<String, Variable<Float>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
-        variables[varName] = slot
         return slot
-    }
-
-    /**
-     * Gets the slot associated with the specified variable and slot name.
-     *
-     * @param [varName]  The variable to lookup.
-     * @param [slotName] The slot name.
-     * @return The slot.
-     */
-    protected fun getSlot(
-        varName: String,
-        slotName: String
-    ): Variable<Float> {
-        val variables: MutableMap<String, Variable<Float>> = slots[slotName]!!
-        return variables[varName]!!
     }
 
     /**
