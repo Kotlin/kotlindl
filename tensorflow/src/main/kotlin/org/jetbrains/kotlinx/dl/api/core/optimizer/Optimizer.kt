@@ -47,20 +47,9 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
 
         val gradients: Gradients = computeGradients(tf, loss, weights)
 
-        val variableOutputs = variablesToOutputs(weights)
-
-        createSlots(graph, tf, variableOutputs) // empty action if not overridden
+        createSlots(graph, tf, weights.map { it.asOutput() }) // empty action if not overridden
 
         return applyGradients(graph, tf, weights, gradients)
-    }
-
-    private fun variablesToOutputs(variables: List<Variable<Float>>): List<Output<Float>> {
-        val variableOutputs: MutableList<Output<Float>> = mutableListOf()
-        for (i in variables.indices) {
-            variableOutputs.add(i, variables[i].asOutput())
-        }
-
-        return variableOutputs
     }
 
     /**
