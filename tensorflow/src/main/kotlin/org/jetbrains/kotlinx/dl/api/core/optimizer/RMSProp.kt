@@ -6,10 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
@@ -65,12 +63,12 @@ public class RMSProp(
         epsilonConstant = tf.constant(epsilon, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val slots = createRMSPropSlot(graph, tf, variable.asOutput())
-            val rmsSlot: Variable<Float> = slots[0]
-            val momentumSlot: Variable<Float> = slots[1]
+            val output = variable.asOutput()
+            val rmsSlot = createSlot(RMS, output, tf, graph)
+            val momentumSlot = createSlot(MOMENTUM, output, tf, graph)
 
             if (centered) {
-                val mgSlot: Variable<Float> = slots[2]
+                val mgSlot = createSlot(MG, output, tf, graph)
                 targets.add(
                     tf.train.applyCenteredRmsProp(
                         variable,
@@ -102,31 +100,6 @@ public class RMSProp(
             }
         }
         return targets
-    }
-
-    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>): List<Variable<Float>> {
-        val rmsInitializerName = defaultInitializerOpName(createName(v, RMS))
-
-        val rmsInitializer: Operand<Float> = tf.withName(rmsInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
-        val rms = createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
-
-        val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
-        val momentumInitializer: Operand<Float> = tf.withName(momentumInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        val momentum = createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
-
-        if (centered) {
-            val mgInitializerName = defaultInitializerOpName(createName(v, MG))
-            val mgInitializer: Operand<Float> = tf.withName(mgInitializerName)
-                .fill(
-                    tf.shape(v),
-                    tf.constant(0.0f)
-                )
-            val mg = createSlot(graph, tf, v.asOutput(), MG, mgInitializer)
-            return listOf(rms, momentum, mg)
-        }
-        return listOf(rms, momentum)
     }
 
     override val optimizerName: String get() = "RMSProp"

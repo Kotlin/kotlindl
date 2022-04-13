@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultOptimizerVariableName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
@@ -99,7 +98,9 @@ public class Adam(
         graph.addOptimizerVariableInitializer(betaTwoPowerInit)
 
         for ((i, variable) in weights.withIndex()) {
-            val (firstMomentSlot, secondMomentSlot) = createAdamSlot(graph, tf, variable.asOutput())
+            val output = variable.asOutput()
+            val firstMomentSlot = createSlot(FIRST_MOMENT, output, tf, graph)
+            val secondMomentSlot = createSlot(SECOND_MOMENT, output, tf, graph)
             targets.add(
                 tf.train.applyAdam(
                     variable,
@@ -131,19 +132,6 @@ public class Adam(
         graph.addOptimizerVariable(betaTwoPower)
 
         return targets
-    }
-
-    private fun createAdamSlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
-        val firstMomentInitializerName = defaultInitializerOpName(createName(v, FIRST_MOMENT))
-        val firstMomentInitializer =
-            tf.withName(firstMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
-        val firstMoment = createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
-
-        val secondMomentInitializerName = defaultInitializerOpName(createName(v, SECOND_MOMENT))
-        val secondMomentInitializer =
-            tf.withName(secondMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
-        val secondMoment = createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
-        return firstMoment to secondMoment
     }
 
     override val optimizerName: String get() = "Adam"

@@ -7,12 +7,12 @@ package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
+import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultOptimizerVariableName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 
@@ -74,36 +74,32 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      * Creates a slot in the graph for the specified variable with the specified name. Adds the slot's
      * initializer to the graph's initializers.
      *
-     * @param [graph] KGraph to be updated.
-     * @param [tf] TensorFlow graph API for building operations.
-     * @param [variable]    The variable to create the slot for.
      * @param [slotName]    The name of the slot.
-     * @param [initializer] The initializer for the slot.
+     * @param [variable]    The variable to create the slot for.
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [graph] KGraph to be updated.
+     * @param [initialValue] The initial value to use.
      */
-    protected open fun createSlot(
-        graph: KGraph,
-        tf: Ops,
-        variable: Output<Float>,
-        slotName: String,
-        initializer: Operand<Float>
+    protected fun createSlot(slotName: String,
+                             variable: Output<Float>,
+                             tf: Ops,
+                             graph: KGraph,
+                             initialValue: Float = 0.0f
     ): Variable<Float> {
-        val createName: String = createName(variable, slotName)
-        val slot: Variable<Float> = tf.withName(createName).variable(variable.shape(), getDType())
+        val slotVariableName = defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
+        val slot = tf.withName(slotVariableName).variable(variable.shape(), getDType())
 
-        val assignName = defaultAssignOpName(createName(variable, slotName))
-        val slotInit: Assign<Float> = tf.withName(assignName).assign(slot, initializer)
+        val initializerOpName = defaultInitializerOpName(slotVariableName)
+        val initializerOp = tf.withName(initializerOpName)
+            .fill(tf.shape(variable), tf.dtypes.cast(tf.constant(initialValue), getDType()))
 
-        graph.addOptimizerVariableInitializer(slotInit)
+        val assignOpName = defaultAssignOpName(slotVariableName)
+        val assignOp = tf.withName(assignOpName).assign(slot, initializerOp)
+
+        graph.addOptimizerVariableInitializer(assignOp)
         graph.addOptimizerVariable(slot)
 
         return slot
-    }
-
-    /**
-     * Creates name for [variable] used in slot with name [slotName].
-     */
-    internal open fun createName(variable: Output<Float>, slotName: String): String {
-        return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
 
     /** True, if optimizer is implemented for GPU. */

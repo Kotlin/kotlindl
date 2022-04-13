@@ -6,10 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
@@ -91,7 +89,9 @@ public class Ftrl(
         learningRatePowerConst = tf.constant(learningRatePower, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val (accumSlot, linearSlot) = createFtrlSlot(graph, tf, variable.asOutput())
+            val output = variable.asOutput()
+            val accumSlot = createSlot(ACCUMULATOR, output, tf, graph)
+            val linearSlot = createSlot(LINEAR_ACCUMULATOR, output, tf, graph)
 
             val options = ApplyFtrl.useLocking(true)
 
@@ -112,20 +112,6 @@ public class Ftrl(
         }
 
         return targets
-    }
-
-    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
-        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-        val accumInitializer = tf.withName(accumInitializerName)
-            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-        val accumulator = createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
-
-        val linearAccumInitializerName = defaultInitializerOpName(createName(v, LINEAR_ACCUMULATOR))
-        val linearAccumInitializer = tf.withName(linearAccumInitializerName)
-            .fill(tf.shape(v), tf.constant(0.0f))
-        val linearAccumulator = createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
-
-        return accumulator to linearAccumulator
     }
 
     override val optimizerName: String get() = "Ftrl"

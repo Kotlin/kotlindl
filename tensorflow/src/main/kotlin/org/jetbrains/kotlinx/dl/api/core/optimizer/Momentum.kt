@@ -6,9 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
@@ -50,7 +48,7 @@ public class Momentum(
         momentumConst = tf.constant(momentum)
 
         for ((i, variable) in weights.withIndex()) {
-            val slot = createMomentumSlot(graph, tf, variable.asOutput())
+            val slot = createSlot(MOMENTUM, variable.asOutput(), tf, graph)
 
             targets.add(
                 tf.train.applyMomentum(
@@ -65,13 +63,6 @@ public class Momentum(
             )
         }
         return targets
-    }
-
-    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>): Variable<Float> {
-        val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
-        val initializer: Operand<Float> = tf.withName(momentumInitializerName)
-            .fill(tf.shape(v), tf.constant(0.0f))
-        return createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
     }
 
     override val optimizerName: String get() = "Momentum"

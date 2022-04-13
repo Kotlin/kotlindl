@@ -6,10 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
@@ -64,7 +62,7 @@ public class AdaGrad(
         learningRateConst = tf.constant(learningRate, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val slot = createAdaGradSlot(graph, tf, variable.asOutput())
+            val slot = createSlot(ACCUMULATOR, variable.asOutput(), tf, graph, initialValue = initialAccumulatorValue)
 
             targets.add(
                 tf.train.applyAdagrad(
@@ -78,14 +76,6 @@ public class AdaGrad(
             )
         }
         return targets
-    }
-
-    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>): Variable<Float> {
-        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-
-        val initializer: Operand<Float> = tf.withName(accumInitializerName)
-            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-        return createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 
     override val optimizerName: String get() = "Adagrad"

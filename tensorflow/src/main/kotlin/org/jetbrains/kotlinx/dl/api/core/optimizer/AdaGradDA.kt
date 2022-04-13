@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultOptimizerVariableName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
@@ -83,7 +82,9 @@ public class AdaGradDA(
         graph.addOptimizerVariableInitializer(globalStepInit)
 
         for ((i, variable) in weights.withIndex()) {
-            val (gradSlot, gradSquaredSlot) = createAdaGradDASlot(graph, tf, variable.asOutput())
+            val output = variable.asOutput()
+            val gradSlot = createSlot(ACCUMULATOR, output, tf, graph)
+            val gradSquaredSlot = createSlot(SQUARED_ACCUMULATOR, output, tf, graph)
             targets.add(
                 tf.train.applyAdagradDa(
                     variable,
@@ -103,20 +104,6 @@ public class AdaGradDA(
         graph.addOptimizerVariableAssignAddInitializer(globalStepInitFinish)
         graph.addOptimizerVariable(globalStep)
         return targets
-    }
-
-    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
-        val accumulatorInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-        val accumInitializer: Operand<Float> = tf.withName(accumulatorInitializerName)
-            .fill(tf.shape(v), tf.constant(0.0f))
-        val accumulator = createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
-
-        val squareAccumInitializerName = defaultInitializerOpName(createName(v, SQUARED_ACCUMULATOR))
-        val sqInitializer: Operand<Float> = tf.withName(squareAccumInitializerName)
-            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-
-        val squaredAccumulator = createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
-        return accumulator to squaredAccumulator
     }
 
     override val optimizerName: String get() = "AdaGradDA"
