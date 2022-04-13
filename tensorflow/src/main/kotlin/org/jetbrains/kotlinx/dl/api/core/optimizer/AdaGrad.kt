@@ -58,14 +58,12 @@ public class AdaGrad(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
         initialAccumulatorValueConstant = tf.constant(initialAccumulatorValue, getDType())
         learningRateConst = tf.constant(learningRate, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val slot: Variable<Float> = getSlot(varName, ACCUMULATOR)

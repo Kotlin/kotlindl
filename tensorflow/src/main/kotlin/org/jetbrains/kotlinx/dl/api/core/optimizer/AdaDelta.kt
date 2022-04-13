@@ -67,14 +67,13 @@ public class AdaDelta(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
+
         rhoConst = tf.constant(rho, getDType())
         learningRateConst = tf.constant(learningRate, getDType())
         epsilonConstant = tf.constant(epsilon, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)

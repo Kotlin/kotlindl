@@ -72,8 +72,7 @@ public class Adamax(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
         betaOneConst = tf.constant(beta1, getDType())
         betaTwoConst = tf.constant(beta2, getDType())
@@ -82,8 +81,7 @@ public class Adamax(
 
         val scope = Scope(graph.tfGraph)
 
-        for (i in weights.indices) {
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val firstMomentSlot: Variable<Float> = getSlot(varName, FIRST_MOMENT)

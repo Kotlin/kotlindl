@@ -57,16 +57,14 @@ public class RMSProp(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
         decayConst = tf.constant(decay, getDType())
         momentumConst = tf.constant(momentum, getDType())
         learningRateConst = tf.constant(learningRate, getDType())
         epsilonConstant = tf.constant(epsilon, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val rmsSlot: Variable<Float> = getSlot(varName, RMS)

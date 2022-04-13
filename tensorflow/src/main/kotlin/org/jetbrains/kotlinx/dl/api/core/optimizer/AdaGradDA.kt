@@ -70,14 +70,13 @@ public class AdaGradDA(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
+
         learningRateConst = tf.constant(learningRate, getDType())
         l1StrengthConst = tf.constant(l1Strength, getDType())
         l2StrengthConst = tf.constant(l2Strength, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val gradSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)

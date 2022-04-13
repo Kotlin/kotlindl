@@ -82,8 +82,7 @@ public class Ftrl(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
         l1RegularizationStrengthConst = tf.constant(l1RegularizationStrength, getDType())
         l2RegularizationStrengthConst = tf.constant(l2RegularizationStrength, getDType())
@@ -91,9 +90,7 @@ public class Ftrl(
         l2ShrinkageRegularizationStrengthConst = tf.constant(l2ShrinkageRegularizationStrength, getDType())
         learningRatePowerConst = tf.constant(learningRatePower, getDType())
 
-        for (i in weights.indices) {
-
-            val variable = weights[i]
+        for ((i, variable) in weights.withIndex()) {
             val varName = variable.ref().op().name()
 
             val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)

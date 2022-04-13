@@ -44,15 +44,12 @@ public class Momentum(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
         learningRateConst = tf.constant(learningRate)
         momentumConst = tf.constant(momentum)
 
-        for (i in weights.indices) {
-            val variable = weights[i]
-
+        for ((i, variable) in weights.withIndex()) {
             val slot = getSlot(variable.ref().op().name(), MOMENTUM)
 
             targets.add(
