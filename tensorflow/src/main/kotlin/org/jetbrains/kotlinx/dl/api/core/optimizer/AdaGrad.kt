@@ -64,9 +64,7 @@ public class AdaGrad(
         learningRateConst = tf.constant(learningRate, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val slot: Variable<Float> = getSlot(varName, ACCUMULATOR)
+            val slot = createAdaGradSlot(graph, tf, variable.asOutput())
 
             targets.add(
                 tf.train.applyAdagrad(
@@ -88,10 +86,6 @@ public class AdaGrad(
         val initializer: Operand<Float> = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
         return createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        return variables.map { createAdaGradSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "Adagrad"

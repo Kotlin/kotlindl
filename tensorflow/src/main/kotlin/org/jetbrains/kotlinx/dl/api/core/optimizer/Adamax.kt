@@ -79,14 +79,19 @@ public class Adamax(
         learningRateConst = tf.constant(learningRate, getDType())
         epsilonConstant = tf.constant(epsilon, getDType())
 
+        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
+        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
+        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
+            .assign(
+                betaOnePower,
+                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
+            )
+        graph.addOptimizerVariableInitializer(betaOnePowerInit)
+
         val scope = Scope(graph.tfGraph)
 
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val firstMomentSlot: Variable<Float> = getSlot(varName, FIRST_MOMENT)
-            val secondMomentSlot: Variable<Float> = getSlot(varName, SECOND_MOMENT)
-
+            val (firstMomentSlot, secondMomentSlot) = createAdamaxSlot(graph, tf, variable.asOutput())
             targets.add(
                 ApplyAdaMax.create(
                     scope,
@@ -104,10 +109,9 @@ public class Adamax(
             )
         }
 
-        val betaOnePowerInit = tf
-            .assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
+        val betaOnePowerInit2 = tf.assign(betaOnePower, tf.math.mul(betaOnePower, betaOneConst))
 
-        graph.addOptimizerVariableInitializer(betaOnePowerInit)
+        graph.addOptimizerVariableInitializer(betaOnePowerInit2)
         graph.addOptimizerVariable(betaOnePower)
 
         return targets
@@ -125,20 +129,6 @@ public class Adamax(
         val secondMoment = createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
 
         return firstMoment to secondMoment
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
-        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
-
-        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
-            .assign(
-                betaOnePower,
-                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
-            )
-        graph.addOptimizerVariableInitializer(betaOnePowerInit)
-
-        return variables.flatMap { createAdamaxSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Adamax"

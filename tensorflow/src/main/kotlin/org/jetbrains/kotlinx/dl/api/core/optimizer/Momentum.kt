@@ -50,7 +50,7 @@ public class Momentum(
         momentumConst = tf.constant(momentum)
 
         for ((i, variable) in weights.withIndex()) {
-            val slot = getSlot(variable.ref().op().name(), MOMENTUM)
+            val slot = createMomentumSlot(graph, tf, variable.asOutput())
 
             targets.add(
                 tf.train.applyMomentum(
@@ -72,10 +72,6 @@ public class Momentum(
         val initializer: Operand<Float> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f))
         return createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        return variables.map { createMomentumSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "Momentum"

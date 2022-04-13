@@ -46,9 +46,6 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         slots = mutableMapOf()
 
         val gradients: Gradients = computeGradients(tf, loss, weights)
-
-        createSlots(graph, tf, weights.map { it.asOutput() }) // empty action if not overridden
-
         return applyGradients(graph, tf, weights, gradients)
     }
 
@@ -76,13 +73,6 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     ): Gradients {
         return tf.gradients(loss, weights)
     }
-
-    /**
-     * No-op slot creation method.
-     *
-     * @param variables The variables to create slots for.
-     */
-    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> = emptyList()
 
     /** Returns optimizer name. */
     public abstract val optimizerName: String

@@ -65,13 +65,12 @@ public class RMSProp(
         epsilonConstant = tf.constant(epsilon, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val rmsSlot: Variable<Float> = getSlot(varName, RMS)
-            val momentumSlot: Variable<Float> = getSlot(varName, MOMENTUM)
+            val slots = createRMSPropSlot(graph, tf, variable.asOutput())
+            val rmsSlot: Variable<Float> = slots[0]
+            val momentumSlot: Variable<Float> = slots[1]
 
             if (centered) {
-                val mgSlot: Variable<Float> = getSlot(varName, MG)
+                val mgSlot: Variable<Float> = slots[2]
                 targets.add(
                     tf.train.applyCenteredRmsProp(
                         variable,
@@ -128,10 +127,6 @@ public class RMSProp(
             return listOf(rms, momentum, mg)
         }
         return listOf(rms, momentum)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        return variables.flatMap { createRMSPropSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "RMSProp"

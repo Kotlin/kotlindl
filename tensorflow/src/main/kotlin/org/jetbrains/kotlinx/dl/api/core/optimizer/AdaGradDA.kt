@@ -76,12 +76,14 @@ public class AdaGradDA(
         l1StrengthConst = tf.constant(l1Strength, getDType())
         l2StrengthConst = tf.constant(l2Strength, getDType())
 
+        globalStep = tf.withName(GLOBAL_STEP).variable(Shape.scalar(), getDType())
+        val globalStepAssignName = defaultAssignOpName(GLOBAL_STEP)
+        val globalStepInit: Assign<*> = tf.withName(globalStepAssignName)
+            .assign(globalStep, tf.withName(defaultInitializerOpName(GLOBAL_STEP)).constant(0.0f))
+        graph.addOptimizerVariableInitializer(globalStepInit)
+
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val gradSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val gradSquaredSlot: Variable<Float> = getSlot(varName, SQUARED_ACCUMULATOR)
-
+            val (gradSlot, gradSquaredSlot) = createAdaGradDASlot(graph, tf, variable.asOutput())
             targets.add(
                 tf.train.applyAdagradDa(
                     variable,
@@ -115,15 +117,6 @@ public class AdaGradDA(
 
         val squaredAccumulator = createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
         return accumulator to squaredAccumulator
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        globalStep = tf.withName(GLOBAL_STEP).variable(Shape.scalar(), getDType())
-        val globalStepAssignName = defaultAssignOpName(GLOBAL_STEP)
-        val globalStepInit: Assign<*> = tf.withName(globalStepAssignName)
-            .assign(globalStep, tf.withName(defaultInitializerOpName(GLOBAL_STEP)).constant(0.0f))
-        graph.addOptimizerVariableInitializer(globalStepInit)
-        return variables.flatMap { createAdaGradDASlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "AdaGradDA"

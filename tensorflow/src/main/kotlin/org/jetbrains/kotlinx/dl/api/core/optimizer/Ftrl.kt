@@ -91,10 +91,8 @@ public class Ftrl(
         learningRatePowerConst = tf.constant(learningRatePower, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
+            val (accumSlot, linearSlot) = createFtrlSlot(graph, tf, variable.asOutput())
 
-            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val linearSlot: Variable<Float> = getSlot(varName, LINEAR_ACCUMULATOR)
             val options = ApplyFtrl.useLocking(true)
 
             targets.add(
@@ -128,10 +126,6 @@ public class Ftrl(
         val linearAccumulator = createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
 
         return accumulator to linearAccumulator
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        return variables.flatMap { createFtrlSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Ftrl"

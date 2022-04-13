@@ -74,10 +74,7 @@ public class AdaDelta(
         epsilonConstant = tf.constant(epsilon, getDType())
 
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val accumUpdateSlot: Variable<Float> = getSlot(varName, ACCUMULATOR_UPDATE)
+            val (accumSlot, accumUpdateSlot) = createAdaDeltaSlot(graph, tf, variable.asOutput())
 
             targets.add(
                 tf.train.applyAdadelta(
@@ -105,10 +102,6 @@ public class AdaDelta(
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         val accumulatorUpdate = createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
         return accumulator to accumulatorUpdate
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        return variables.flatMap { createAdaDeltaSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Adadelta"

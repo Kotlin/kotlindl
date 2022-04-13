@@ -80,12 +80,26 @@ public class Adam(
         learningRateConst = tf.constant(learningRate, getDType())
         epsilonConstant = tf.constant(epsilon, getDType())
 
+        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
+        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
+        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
+            .assign(
+                betaOnePower,
+                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
+            )
+        graph.addOptimizerVariableInitializer(betaOnePowerInit)
+
+        betaTwoPower = tf.withName(SECOND_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
+        val betaTwoPowerAssignName = defaultAssignOpName(SECOND_BETA_POWER_NAME)
+        val betaTwoPowerInit: Assign<*> = tf.withName(betaTwoPowerAssignName)
+            .assign(
+                betaTwoPower,
+                tf.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME)).constant(beta2, getDType())
+            )
+        graph.addOptimizerVariableInitializer(betaTwoPowerInit)
+
         for ((i, variable) in weights.withIndex()) {
-            val varName = variable.ref().op().name()
-
-            val firstMomentSlot: Variable<Float> = getSlot(varName, FIRST_MOMENT)
-            val secondMomentSlot: Variable<Float> = getSlot(varName, SECOND_MOMENT)
-
+            val (firstMomentSlot, secondMomentSlot) = createAdamSlot(graph, tf, variable.asOutput())
             targets.add(
                 tf.train.applyAdam(
                     variable,
@@ -130,31 +144,6 @@ public class Adam(
             tf.withName(secondMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
         val secondMoment = createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
         return firstMoment to secondMoment
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
-        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
-
-        val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
-        val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
-            .assign(
-                betaOnePower,
-                tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
-            )
-        graph.addOptimizerVariableInitializer(betaOnePowerInit)
-
-
-        betaTwoPower = tf.withName(SECOND_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
-
-        val betaTwoPowerAssignName = defaultAssignOpName(SECOND_BETA_POWER_NAME)
-        val betaTwoPowerInit: Assign<*> = tf.withName(betaTwoPowerAssignName)
-            .assign(
-                betaTwoPower,
-                tf.withName(defaultInitializerOpName(SECOND_BETA_POWER_NAME)).constant(beta2, getDType())
-            )
-        graph.addOptimizerVariableInitializer(betaTwoPowerInit)
-
-        return variables.flatMap { createAdamSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Adam"
