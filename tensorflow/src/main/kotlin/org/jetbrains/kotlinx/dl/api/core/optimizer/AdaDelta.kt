@@ -95,22 +95,21 @@ public class AdaDelta(
         return targets
     }
 
-    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
         val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
         val accumulatorInitializer = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
+        val accumulator = createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
 
         val accumUpdateInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR_UPDATE))
         val updateInitializer: Operand<Float> = tf.withName(accumUpdateInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
+        val accumulatorUpdate = createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
+        return accumulator to accumulatorUpdate
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaDeltaSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
+        return variables.flatMap { createAdaDeltaSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Adadelta"

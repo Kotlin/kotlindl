@@ -84,18 +84,16 @@ public class AdaGrad(
         return targets
     }
 
-    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>): Variable<Float> {
         val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
 
         val initializer: Operand<Float> = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
+        return createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaGradSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
+        return variables.map { createAdaGradSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "Adagrad"

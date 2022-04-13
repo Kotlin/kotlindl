@@ -107,17 +107,17 @@ public class RMSProp(
         return targets
     }
 
-    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>): List<Variable<Float>> {
         val rmsInitializerName = defaultInitializerOpName(createName(v, RMS))
 
         val rmsInitializer: Operand<Float> = tf.withName(rmsInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
+        val rms = createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
 
         val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
         val momentumInitializer: Operand<Float> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
+        val momentum = createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
 
         if (centered) {
             val mgInitializerName = defaultInitializerOpName(createName(v, MG))
@@ -126,14 +126,14 @@ public class RMSProp(
                     tf.shape(v),
                     tf.constant(0.0f)
                 )
-            createSlot(graph, tf, v.asOutput(), MG, mgInitializer)
+            val mg = createSlot(graph, tf, v.asOutput(), MG, mgInitializer)
+            return listOf(rms, momentum, mg)
         }
+        return listOf(rms, momentum)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createRMSPropSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
+        return variables.flatMap { createRMSPropSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "RMSProp"

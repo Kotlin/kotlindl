@@ -93,9 +93,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      *
      * @param variables The variables to create slots for.
      */
-    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-
-    }
+    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> = emptyList()
 
     /** Returns optimizer name. */
     public abstract val optimizerName: String
@@ -116,7 +114,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         variable: Output<Float>,
         slotName: String,
         initializer: Operand<Float>
-    ) {
+    ): Variable<Float> {
         val createName: String = createName(variable, slotName)
         val slot: Variable<Float> = tf.withName(createName).variable(variable.shape(), getDType())
 
@@ -130,6 +128,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
 
         val variables: MutableMap<String, Variable<Float>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
         variables[varName] = slot
+        return slot
     }
 
     /**

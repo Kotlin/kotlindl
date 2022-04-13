@@ -104,28 +104,27 @@ public class AdaGradDA(
         return targets
     }
 
-    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
         val accumulatorInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
         val accumInitializer: Operand<Float> = tf.withName(accumulatorInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
+        val accumulator = createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
 
         val squareAccumInitializerName = defaultInitializerOpName(createName(v, SQUARED_ACCUMULATOR))
         val sqInitializer: Operand<Float> = tf.withName(squareAccumInitializerName)
             .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
 
-        createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
+        val squaredAccumulator = createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
+        return accumulator to squaredAccumulator
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaGradDASlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
         globalStep = tf.withName(GLOBAL_STEP).variable(Shape.scalar(), getDType())
         val globalStepAssignName = defaultAssignOpName(GLOBAL_STEP)
         val globalStepInit: Assign<*> = tf.withName(globalStepAssignName)
             .assign(globalStep, tf.withName(defaultInitializerOpName(GLOBAL_STEP)).constant(0.0f))
         graph.addOptimizerVariableInitializer(globalStepInit)
+        return variables.flatMap { createAdaGradDASlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "AdaGradDA"

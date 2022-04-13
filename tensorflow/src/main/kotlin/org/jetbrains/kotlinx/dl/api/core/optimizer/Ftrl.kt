@@ -119,22 +119,22 @@ public class Ftrl(
         return targets
     }
 
-    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
         val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
         val accumInitializer = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
+        val accumulator = createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
 
         val linearAccumInitializerName = defaultInitializerOpName(createName(v, LINEAR_ACCUMULATOR))
         val linearAccumInitializer = tf.withName(linearAccumInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f))
-        createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
+        val linearAccumulator = createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
+
+        return accumulator to linearAccumulator
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createFtrlSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
+        return variables.flatMap { createFtrlSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Ftrl"

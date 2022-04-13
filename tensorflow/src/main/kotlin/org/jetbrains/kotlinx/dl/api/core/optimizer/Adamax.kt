@@ -115,22 +115,21 @@ public class Adamax(
         return targets
     }
 
-    private fun createAdamaxSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createAdamaxSlot(graph: KGraph, tf: Ops, v: Output<Float>): Pair<Variable<Float>, Variable<Float>> {
         val firstMomentInitializerName = defaultInitializerOpName(createName(v, FIRST_MOMENT))
         val firstMomentInitializer =
             tf.withName(firstMomentInitializerName).fill(tf.shape(v), tf.constant(0.0f, getDType()))
-        createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
+        val firstMoment = createSlot(graph, tf, v.asOutput(), FIRST_MOMENT, firstMomentInitializer)
 
         val secondMomentInitializerName = defaultInitializerOpName(createName(v, SECOND_MOMENT))
         val secondMomentInitializer = tf.withName(secondMomentInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f, getDType()))
-        createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
+        val secondMoment = createSlot(graph, tf, v.asOutput(), SECOND_MOMENT, secondMomentInitializer)
+
+        return firstMoment to secondMoment
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdamaxSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
         betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
         val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
 
@@ -140,6 +139,8 @@ public class Adamax(
                 tf.withName(defaultInitializerOpName(FIRST_BETA_POWER_NAME)).constant(beta1, getDType())
             )
         graph.addOptimizerVariableInitializer(betaOnePowerInit)
+
+        return variables.flatMap { createAdamaxSlot(graph, tf, it.asOutput()).toList() }
     }
 
     override val optimizerName: String get() = "Adamax"

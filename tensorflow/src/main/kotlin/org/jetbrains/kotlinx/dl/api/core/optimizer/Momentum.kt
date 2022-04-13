@@ -70,17 +70,15 @@ public class Momentum(
         return targets
     }
 
-    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>): Variable<Float> {
         val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
         val initializer: Operand<Float> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f))
-        createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
+        return createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createMomentumSlot(graph, tf, v.asOutput())
-        }
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>): List<Variable<Float>> {
+        return variables.map { createMomentumSlot(graph, tf, it.asOutput()) }
     }
 
     override val optimizerName: String get() = "Momentum"
