@@ -114,9 +114,9 @@ public class SeparableConv2D(
     )
 
     // weight tensors
-    private lateinit var depthwiseKernel: KVariable
-    private lateinit var pointwiseKernel: KVariable
-    private var bias: KVariable? = null
+    internal lateinit var depthwiseKernel: KVariable
+    internal lateinit var pointwiseKernel: KVariable
+    internal var bias: KVariable? = null
 
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
@@ -225,21 +225,19 @@ public class SeparableConv2D(
     }
 
     override fun toString(): String {
-        return "SeparableConv2D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, depthMultiplier=$depthMultiplier, depthwiseInitializer=$depthwiseInitializer, pointwiseInitializer=$pointwiseInitializer, biasInitializer=$biasInitializer, depthwiseRegularizer=$depthwiseRegularizer, pointwiseRegularizer=$pointwiseRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, depthwiseShapeArray=${depthwiseShapeArray.contentToString()}, pointwiseShapeArray=${pointwiseShapeArray.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()}, hasActivation=$hasActivation)"
+        return "SeparableConv2D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, " +
+                "strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, " +
+                "depthMultiplier=$depthMultiplier, " +
+                "depthwiseInitializer=$depthwiseInitializer, pointwiseInitializer=$pointwiseInitializer, biasInitializer=$biasInitializer, " +
+                "depthwiseRegularizer=$depthwiseRegularizer, pointwiseRegularizer=$pointwiseRegularizer, biasRegularizer=$biasRegularizer, " +
+                "activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, " +
+                "depthwiseShapeArray=${depthwiseKernel.shape}, pointwiseShapeArray=${pointwiseKernel.shape}, biasShapeArray=${bias?.shape}, " +
+                "hasActivation=$hasActivation)"
     }
 
     override var weights: Map<String, Array<*>>
         get() = extractWeights(depthwiseKernel, pointwiseKernel, bias)
         set(value) = assignWeights(value)
-
-    /** Returns the shape of kernel weights. */
-    public val depthwiseShapeArray: LongArray? get() = if (this::depthwiseKernel.isInitialized) TensorShape(depthwiseKernel.shape).dims() else null
-
-    /** Returns the shape of kernel weights. */
-    public val pointwiseShapeArray: LongArray? get() = if (this::pointwiseKernel.isInitialized) TensorShape(pointwiseKernel.shape).dims() else null
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override val hasActivation: Boolean get() = true
 

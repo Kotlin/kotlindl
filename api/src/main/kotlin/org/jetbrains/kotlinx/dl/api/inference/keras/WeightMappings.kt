@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
+import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvTranspose
@@ -12,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.util.*
+import org.jetbrains.kotlinx.dl.api.core.util.mapOfNotNull
 
 internal object WeightMappings {
 
@@ -27,7 +28,7 @@ internal object WeightMappings {
     private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
 
     // TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
-    internal fun getLayerVariables(layer: Layer): Map<String, Pair<String, LongArray>>? {
+    internal fun getLayerVariables(layer: Layer): Map<String, KVariable>? {
         return when (layer) {
             is Dense -> getDenseVariables(layer)
             is Conv2D -> getConv2DVariables(layer)
@@ -40,10 +41,10 @@ internal object WeightMappings {
     }
 
     internal fun getLayerVariableNames(layer: Layer): List<String>? {
-        return getLayerVariables(layer)?.map { (_, variable) -> variable.first }
+        return getLayerVariables(layer)?.values?.map(KVariable::name)
     }
 
-    internal fun getLayerVariablePathTemplates(layer: Layer, layerPaths: LayerPaths?): Map<String, String>? {
+    internal fun getLayerVariablePathTemplates(layer: Layer, layerPaths: LayerPaths?): Map<KVariable, String>? {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)
             is Conv2D -> getConv2DVariablePathTemplates(layer, layerPaths)
@@ -55,99 +56,64 @@ internal object WeightMappings {
         }
     }
 
-    private fun getConv2DVariables(layer: Conv2D): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair("kernel:0", Pair(convKernelVarName(layer.name, dim = 2), layer.kernelShapeArray!!))
-        )
-        if (layer.useBias) {
-            variables["bias:0"] = Pair(convBiasVarName(layer.name, dim = 2), layer.biasShapeArray!!)
-        }
-        return variables
+    private fun getConv2DVariables(layer: Conv2D): Map<String, KVariable> {
+        return mapOfNotNull("kernel:0" to layer.kernel, "bias:0" to layer.bias)
     }
 
-    private fun getConv2DVariablePathTemplates(layer: Conv2D, layerPaths: LayerPaths?): Map<String, String> {
+    private fun getConv2DVariablePathTemplates(layer: Conv2D, layerPaths: LayerPaths?): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
-        val variables = mutableMapOf(
-            Pair(convKernelVarName(layer.name, dim = 2), layerConvOrDensePaths.kernelPath)
+        return mapOfNotNull(
+            layer.kernel to layerConvOrDensePaths.kernelPath,
+            layer.bias to layerConvOrDensePaths.biasPath
         )
-        if (layer.useBias) {
-            variables[convBiasVarName(layer.name, dim = 2)] = layerConvOrDensePaths.biasPath
-        }
-        return variables
     }
 
-    private fun getConvTransposeVariables(layer: ConvTranspose): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair("kernel:0", Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layer.kernelShapeArray!!))
-        )
-        if (layer.useBias) {
-            variables["bias:0"] = Pair(convTransposeBiasVarName(layer.name, layer.dimensions), layer.biasShapeArray!!)
-        }
-        return variables
+    private fun getConvTransposeVariables(layer: ConvTranspose): Map<String, KVariable> {
+        return mapOfNotNull("kernel:0" to layer.kernel, "bias:0" to layer.bias)
     }
 
-    private fun getConvTransposeVariablePathTemplates(layer: ConvTranspose, layerPaths: LayerPaths?): Map<String, String> {
+    private fun getConvTransposeVariablePathTemplates(layer: ConvTranspose,
+                                                      layerPaths: LayerPaths?
+    ): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
-        val variables = mutableMapOf(
-            Pair(convTransposeKernelVarName(layer.name, layer.dimensions), layerConvOrDensePaths.kernelPath)
+        return mapOfNotNull(
+            layer.kernel to layerConvOrDensePaths.kernelPath,
+            layer.bias to layerConvOrDensePaths.biasPath
         )
-        if (layer.useBias) {
-            variables[convTransposeBiasVarName(layer.name, layer.dimensions)] = layerConvOrDensePaths.biasPath
-        }
-        return variables
     }
 
-    private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair("depthwise_kernel:0", Pair(depthwiseConv2dKernelVarName(layer.name), layer.kernelShapeArray!!))
-        )
-        if (layer.useBias) {
-            variables["depthwise_bias:0"] = Pair(depthwiseConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
-        }
-        return variables
+    private fun getDepthwiseConv2DVariables(layer: DepthwiseConv2D): Map<String, KVariable> {
+        return mapOfNotNull("depthwise_kernel:0" to layer.kernel, "depthwise_bias:0" to layer.bias)
     }
 
     private fun getDepthwiseConv2DVariablePathTemplates(layer: DepthwiseConv2D,
                                                         layerPaths: LayerPaths?
-    ): Map<String, String> {
+    ): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(
                 layer.name,
                 DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE,
                 DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
             )
-        val variables = mutableMapOf(
-            Pair(depthwiseConv2dKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
+        return mapOfNotNull(
+            layer.kernel to layerConvOrDensePaths.kernelPath,
+            layer.bias to layerConvOrDensePaths.biasPath
         )
-        if (layer.useBias) {
-            variables[depthwiseConv2dBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
-        }
-        return variables
     }
 
-    private fun getSeparableConv2DVariables(layer: SeparableConv2D): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair(
-                "depthwise_kernel:0",
-                Pair(separableConv2dDepthwiseKernelVarName(layer.name), layer.depthwiseShapeArray!!)
-            ),
-            Pair(
-                "pointwise_kernel:0",
-                Pair(separableConv2dPointwiseKernelVarName(layer.name), layer.pointwiseShapeArray!!)
-            )
+    private fun getSeparableConv2DVariables(layer: SeparableConv2D): Map<String, KVariable> {
+        return mapOfNotNull(
+            "depthwise_kernel:0" to layer.depthwiseKernel,
+            "pointwise_kernel:0" to layer.pointwiseKernel,
+            "bias:0" to layer.bias
         )
-        if (layer.useBias) {
-            variables["bias:0"] = Pair(separableConv2dBiasVarName(layer.name), layer.biasShapeArray!!)
-        }
-        return variables
     }
 
-    private fun getSeparableConv2DVariablePathTemplates(
-        layer: SeparableConv2D,
-        layerPaths: LayerPaths?
-    ): Map<String, String> {
+    private fun getSeparableConv2DVariablePathTemplates(layer: SeparableConv2D,
+                                                        layerPaths: LayerPaths?
+    ): Map<KVariable, String> {
         val layerSeparableConv2DPaths = layerPaths as? LayerSeparableConv2DPaths
             ?: LayerSeparableConv2DPaths(
                 layer.name,
@@ -155,54 +121,37 @@ internal object WeightMappings {
                 POINTWISE_KERNEL_DATA_PATH_TEMPLATE,
                 DEPTHWISE_BIAS_DATA_PATH_TEMPLATE
             )
-        val variables = mutableMapOf(
-            Pair(separableConv2dDepthwiseKernelVarName(layer.name), layerSeparableConv2DPaths.depthwiseKernelPath),
-            Pair(separableConv2dPointwiseKernelVarName(layer.name), layerSeparableConv2DPaths.pointwiseKernelPath)
+        return mapOfNotNull(
+            layer.depthwiseKernel to layerSeparableConv2DPaths.depthwiseKernelPath,
+            layer.pointwiseKernel to layerSeparableConv2DPaths.pointwiseKernelPath,
+            layer.bias to layerSeparableConv2DPaths.biasPath
         )
-        if (layer.useBias) {
-            variables[separableConv2dBiasVarName(layer.name)] = layerSeparableConv2DPaths.biasPath
-        }
-        return variables
     }
 
-    private fun getDenseVariables(layer: Dense): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair("kernel:0", Pair(denseKernelVarName(layer.name), layer.kernelShapeArray!!))
-        )
-        if (layer.useBias) {
-            variables["bias:0"] = Pair(denseBiasVarName(layer.name), layer.biasShapeArray!!)
-        }
-        return variables
+    private fun getDenseVariables(layer: Dense): Map<String, KVariable> {
+        return mapOfNotNull("kernel:0" to layer.kernel, "bias:0" to layer.bias)
     }
 
-    private fun getDenseVariablesPathTemplates(layer: Dense, layerPaths: LayerPaths?): Map<String, String> {
+    private fun getDenseVariablesPathTemplates(layer: Dense, layerPaths: LayerPaths?): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
-        val variables = mutableMapOf(
-            Pair(denseKernelVarName(layer.name), layerConvOrDensePaths.kernelPath)
+        return mapOfNotNull(
+            layer.kernel to layerConvOrDensePaths.kernelPath,
+            layer.bias to layerConvOrDensePaths.biasPath
         )
-        if (layer.useBias) {
-            variables[denseBiasVarName(layer.name)] = layerConvOrDensePaths.biasPath
-        }
-        return variables
     }
 
-    private fun getBatchNormVariables(layer: BatchNorm): Map<String, Pair<String, LongArray>> {
-        val variables = mutableMapOf(
-            Pair("moving_mean:0", Pair(batchNormMovingMeanVarName(layer.name), layer.movingMeanShapeArray!!)),
-            Pair("moving_variance:0", Pair(batchNormMovingVarianceVarName(layer.name), layer.movingVarianceShapeArray!!))
+    private fun getBatchNormVariables(layer: BatchNorm): Map<String, KVariable> {
+        return mapOfNotNull(
+            "moving_mean:0" to layer.movingMean,
+            "moving_variance:0" to layer.movingVariance,
+            "gamma:0" to layer.gamma,
+            "beta:0" to layer.beta
         )
-        if (layer.scale) {
-            variables["gamma:0"] = Pair(batchNormGammaVarName(layer.name), layer.gammaShapeArray!!)
-        }
-        if (layer.center) {
-            variables["beta:0"] = Pair(batchNormBetaVarName(layer.name), layer.betaShapeArray!!)
-        }
-        return variables
     }
 
 
-    private fun getBatchNormVariablePathTemplates(layer: BatchNorm, layerPaths: LayerPaths?): Map<String, String> {
+    private fun getBatchNormVariablePathTemplates(layer: BatchNorm, layerPaths: LayerPaths?): Map<KVariable, String> {
         val layerBatchNormPaths = layerPaths as? LayerBatchNormPaths
             ?: LayerBatchNormPaths(
                 layer.name,
@@ -211,17 +160,12 @@ internal object WeightMappings {
                 MOVING_MEAN_DATA_PATH_TEMPLATE,
                 MOVING_VARIANCE_DATA_PATH_TEMPLATE
             )
-        val variables = mutableMapOf(
-            Pair(batchNormMovingMeanVarName(layer.name), layerBatchNormPaths.movingMeanPath),
-            Pair(batchNormMovingVarianceVarName(layer.name), layerBatchNormPaths.movingVariancePath)
+        return mapOfNotNull(
+            layer.movingMean to layerBatchNormPaths.movingMeanPath,
+            layer.movingVariance to layerBatchNormPaths.movingVariancePath,
+            layer.gamma to layerBatchNormPaths.gammaPath,
+            layer.beta to layerBatchNormPaths.betaPath
         )
-        if (layer.scale) {
-            variables[batchNormGammaVarName(layer.name)] = layerBatchNormPaths.gammaPath
-        }
-        if (layer.center) {
-            variables[batchNormBetaVarName(layer.name)] = layerBatchNormPaths.betaPath
-        }
-        return variables
     }
 }
 

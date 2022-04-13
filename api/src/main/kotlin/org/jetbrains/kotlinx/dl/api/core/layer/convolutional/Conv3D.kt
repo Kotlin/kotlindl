@@ -157,6 +157,13 @@ public class Conv3D(
     }
 
     override fun toString(): String {
-        return "Conv3D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, padding=$padding, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
+        return "Conv3D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, " +
+                "strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, " +
+                "activation=$activation, " +
+                "kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, " +
+                "kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, " +
+                "activityRegularizer=$activityRegularizer, padding=$padding, " +
+                "useBias=$useBias, hasActivation=$hasActivation, " +
+                "kernelShapeArray=${kernel.shape}, biasShapeArray=${bias?.shape})"
     }
 }

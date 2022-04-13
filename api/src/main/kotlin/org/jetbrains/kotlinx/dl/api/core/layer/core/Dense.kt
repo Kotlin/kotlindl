@@ -55,8 +55,8 @@ public class Dense(
     public val useBias: Boolean = true,
     name: String = ""
 ) : Layer(name) {
-    private lateinit var kernel: KVariable
-    private var bias: KVariable? = null
+    internal lateinit var kernel: KVariable
+    internal var bias: KVariable? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
@@ -107,7 +107,10 @@ public class Dense(
     }
 
     override fun toString(): String {
-        return "Dense(name = $name, isTrainable=$isTrainable, outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernelShapeArray?.contentToString()}, biasShapeArray=${biasShapeArray?.contentToString()})"
+        return "Dense(name = $name, isTrainable=$isTrainable, outputSize=$outputSize, activation=$activation, " +
+                "kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, " +
+                "kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, " +
+                "useBias=$useBias, hasActivation=$hasActivation, kernelShapeArray=${kernel.shape}, biasShapeArray=${bias?.shape})"
     }
 
     override var weights: Map<String, Array<*>>
@@ -118,10 +121,4 @@ public class Dense(
 
     override val paramCount: Int
         get() = listOfNotNull(kernel, bias).sumOf { it.shape.numElements() }.toInt()
-
-    /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray? get() = if (this::kernel.isInitialized) TensorShape(kernel.shape).dims() else null
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 }

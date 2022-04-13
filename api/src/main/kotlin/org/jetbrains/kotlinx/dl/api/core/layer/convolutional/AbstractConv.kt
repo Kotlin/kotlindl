@@ -62,10 +62,10 @@ public abstract class AbstractConv(
     internal abstract val useBias: Boolean
 
     /** Tensor with kernel weights */
-    protected lateinit var kernel: KVariable
+    internal lateinit var kernel: KVariable
 
     /** Tensor with bias weights */
-    protected var bias: KVariable? = null
+    internal var bias: KVariable? = null
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
@@ -122,12 +122,6 @@ public abstract class AbstractConv(
 
         return Activations.convert(activation).apply(tf, withBias, name)
     }
-
-    /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray? get() = if (this::kernel.isInitialized)  TensorShape(kernel.shape).dims() else null
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override var weights: Map<String, Array<*>>
         get() = extractWeights(kernel, bias)

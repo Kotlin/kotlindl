@@ -168,7 +168,7 @@ public class DepthwiseConv2D(
                 "padding=$padding, " +
                 "useBias=$useBias, " +
                 "hasActivation=$hasActivation, " +
-                "depthwiseKernelShapeArray=${kernelShapeArray?.contentToString()}, " +
-                "biasShapeArray=${biasShapeArray?.contentToString()})"
+                "depthwiseKernelShapeArray=${kernel.shape}, " +
+                "biasShapeArray=${bias?.shape})"
     }
 }

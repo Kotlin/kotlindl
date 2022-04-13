@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
@@ -58,10 +57,10 @@ public class BatchNorm(
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
 ) : Layer(name), NoGradients {
-    private var gamma: KVariable? = null
-    private var beta: KVariable? = null
-    private lateinit var movingMean: KVariable
-    private lateinit var movingVariance: KVariable
+    internal var gamma: KVariable? = null
+    internal var beta: KVariable? = null
+    internal lateinit var movingMean: KVariable
+    internal lateinit var movingVariance: KVariable
 
     init {
         isTrainable = false
@@ -183,7 +182,13 @@ public class BatchNorm(
     }
 
     override fun toString(): String {
-        return "BatchNorm(name = $name, isTrainable=$isTrainable, axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, betaInitializer=$betaInitializer, gammaRegularizer=$gammaRegularizer, betaRegularizer=$betaRegularizer, movingMeanInitializer=$movingMeanInitializer, movingVarianceInitializer=$movingVarianceInitializer, hasActivation=$hasActivation, gammaShapeArray=${gammaShapeArray?.contentToString()}, betaShapeArray=${betaShapeArray?.contentToString()}, movingMeanShapeArray=${movingMeanShapeArray.contentToString()}, movingVarianceShapeArray=${movingVarianceShapeArray.contentToString()})"
+        return "BatchNorm(name = $name, isTrainable=$isTrainable, axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, " +
+                "gammaInitializer=$gammaInitializer, betaInitializer=$betaInitializer, " +
+                "gammaRegularizer=$gammaRegularizer, betaRegularizer=$betaRegularizer, " +
+                "movingMeanInitializer=$movingMeanInitializer, movingVarianceInitializer=$movingVarianceInitializer, " +
+                "hasActivation=$hasActivation, " +
+                "gammaShapeArray=${gamma?.shape}, betaShapeArray=${beta?.shape}, " +
+                "movingMeanShapeArray=${movingMean.shape}, movingVarianceShapeArray=${movingVariance.shape})"
     }
 
     override var weights: Map<String, Array<*>>
@@ -194,24 +199,5 @@ public class BatchNorm(
 
     override val paramCount: Int
         get() = listOfNotNull(gamma, beta, movingMean, movingVariance).sumOf { it.shape.numElements() }.toInt()
-
-
-    /** Returns the shape of gamma variable weights. */
-    public val gammaShapeArray: LongArray?
-        get() = gamma?.let { TensorShape(it.shape).dims() }
-
-    /** Returns the shape of beta variable weights. */
-    public val betaShapeArray: LongArray?
-        get() = beta?.let { TensorShape(it.shape).dims() }
-
-    /** Returns the shape of movingMean variable weights. */
-    public val movingMeanShapeArray: LongArray?
-        get() = if (this::movingMean.isInitialized) TensorShape(movingMean.shape).dims() else null
-
-    /** Returns the shape of movingVariance variable weights. */
-    public val movingVarianceShapeArray: LongArray?
-        get() = if (this::movingVariance.isInitialized) TensorShape(movingVariance.shape).dims() else null
-
-
 }
 
