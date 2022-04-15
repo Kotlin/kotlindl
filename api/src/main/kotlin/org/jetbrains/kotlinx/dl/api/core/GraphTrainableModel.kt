@@ -116,11 +116,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /**
      * Returns a list of layer variables in this model.
      */
-    private fun layerVariables(): List<Variable<Float>> = layers.variables().map { it.variable }
+    private fun layerVariables(): List<KVariable> = layers.variables()
     /**
      * Returns a list of non-trainable, 'frozen' layer variables in this model.
      */
-    private fun frozenLayerVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
+    private fun frozenLayerVariables(): List<KVariable> = layers.frozenVariables()
 
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
@@ -901,7 +901,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Returns a list of variables paired with their data. */
     private fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
-        var variables = layerVariables()
+        var variables = layerVariables().map { it.variable }
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
         }
@@ -928,9 +928,31 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Check that the variable with the name [variableName] belongs to the frozen layer. */
     private fun isVariableRelatedToFrozenLayer(variableName: String): Boolean {
-        return frozenLayerVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
+        return frozenLayerVariables().map { it.name }.any { variableName.contains(it) }
+    }
+
+    /**
+     * Loads variable data for variable names in the provided collection using a provided function.
+     * @param [variableNames] Variable names to load.
+     * @param [getData] Function that returns variable data by variable name and shape.
+     */
+    protected override fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
+        val layerVariablesByName = layerVariables().associateBy { it.name }
+
+        for (variableName in variableNames) {
+            val variableOperation = kGraph.tfGraph.operation(variableName)
+            check(variableOperation != null) { "Operation $variableName is not found in static graph." }
+            val variableShape = variableOperation.output<Float>(0).shape()
+
+            val data = getData(variableName, variableShape)
+
+            val variable = layerVariablesByName[variableName]
+            if (variable != null) {
+                variable.fill(data, session)
+            } else {
+                assignVariable(variableName, variableShape, data)
+            }
+        }
     }
 
     /**

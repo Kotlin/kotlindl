@@ -182,7 +182,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [variableNames] Variable names to load.
      * @param [getData] Function that returns variable data by variable name and shape.
      */
-    protected fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
+    protected open fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
         for (variableName in variableNames) {
             val variableOperation = kGraph.tfGraph.operation(variableName)
             check(variableOperation != null) { "Operation $variableName is not found in static graph." }
@@ -235,7 +235,14 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         }
     }
 
-    private fun assignVariable(variableName: String, variableShape: Shape, data: Any) {
+    /**
+     * Assigns variable data from multidimensional array.
+     *
+     * @param [variableName] Name of variable to load state for.
+     * @param [variableShape] Shape of the variable.
+     * @param [data] Variable data.
+     */
+    protected fun assignVariable(variableName: String, variableShape: Shape, data: Any) {
         val initializerName = defaultInitializerOpName(variableName)
         val assignOpName = defaultAssignOpName(variableName)
 
