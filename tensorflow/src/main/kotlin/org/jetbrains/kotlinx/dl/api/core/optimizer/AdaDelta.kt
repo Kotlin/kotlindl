@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdadelta
@@ -49,9 +48,6 @@ public class AdaDelta(
     private val epsilon: Float = 1e-8f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var rhoConst: Constant<Float>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -67,9 +63,9 @@ public class AdaDelta(
     ): List<Operand<Float>> {
         val targets = mutableListOf<Operand<Float>>()
 
-        rhoConst = tf.constant(rho, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        val rhoConst = tf.constant(rho, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val epsilonConstant = tf.constant(epsilon, getDType())
 
         for ((i, variable) in weights.withIndex()) {
             val output = variable.asOutput()

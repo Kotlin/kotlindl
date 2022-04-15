@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyCenteredRmsProp
@@ -37,11 +36,6 @@ public class RMSProp(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var decayConst: Constant<Float>
-    private lateinit var momentumConst: Constant<Float>
-
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
         require(momentum >= 0.0f) { "Momentum $momentum should be >= 0.0." }
@@ -57,10 +51,10 @@ public class RMSProp(
     ): List<Operand<Float>> {
         val targets = mutableListOf<Operand<Float>>()
 
-        decayConst = tf.constant(decay, getDType())
-        momentumConst = tf.constant(momentum, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        val decayConst = tf.constant(decay, getDType())
+        val momentumConst = tf.constant(momentum, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val epsilonConstant = tf.constant(epsilon, getDType())
 
         for ((i, variable) in weights.withIndex()) {
             val output = variable.asOutput()

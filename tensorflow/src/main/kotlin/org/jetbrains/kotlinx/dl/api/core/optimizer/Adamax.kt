@@ -15,7 +15,6 @@ import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.Scope
 import org.tensorflow.op.core.Assign
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdaMax
@@ -52,12 +51,6 @@ public class Adamax(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var betaOneConst: Constant<Float>
-    private lateinit var betaTwoConst: Constant<Float>
-    private lateinit var betaOnePower: Variable<Float>
-
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
         require(beta1 > 0.0f && beta1 < 1.0f) { "Beta1 $beta1 should be in range (0.0; 1.0)." }
@@ -73,12 +66,12 @@ public class Adamax(
     ): List<Operand<Float>> {
         val targets = mutableListOf<Operand<Float>>()
 
-        betaOneConst = tf.constant(beta1, getDType())
-        betaTwoConst = tf.constant(beta2, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        val betaOneConst = tf.constant(beta1, getDType())
+        val betaTwoConst = tf.constant(beta2, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val epsilonConstant = tf.constant(epsilon, getDType())
 
-        betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
+        val betaOnePower = tf.withName(FIRST_BETA_POWER_NAME).variable(Shape.scalar(), getDType())
         val betaOnePowerAssignName = defaultAssignOpName(FIRST_BETA_POWER_NAME)
         val betaOnePowerInit: Assign<*> = tf.withName(betaOnePowerAssignName)
             .assign(

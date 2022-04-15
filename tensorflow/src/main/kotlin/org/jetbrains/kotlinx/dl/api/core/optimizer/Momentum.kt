@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.core.optimizer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyMomentum
@@ -28,8 +27,6 @@ public class Momentum(
     private val useNesterov: Boolean = true,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var momentumConst: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -44,8 +41,8 @@ public class Momentum(
     ): List<Operand<Float>> {
         val targets = mutableListOf<Operand<Float>>()
 
-        learningRateConst = tf.constant(learningRate)
-        momentumConst = tf.constant(momentum)
+        val learningRateConst = tf.constant(learningRate)
+        val momentumConst = tf.constant(momentum)
 
         for ((i, variable) in weights.withIndex()) {
             val slot = createSlot(MOMENTUM, variable.asOutput(), tf, graph)
