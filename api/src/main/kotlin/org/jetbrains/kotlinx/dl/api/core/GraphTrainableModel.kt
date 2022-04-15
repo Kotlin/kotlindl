@@ -117,13 +117,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
-            var cnt = 1
-            for (layer in layers) {
+            for ((index, layer) in layers.withIndex()) {
                 if (layer.name.isEmpty()) {
-                    val generatedLayerName =
-                        (layer::class.simpleName ?: return).lowercase(Locale.getDefault()) + "_" + cnt
-                    layer.name = generatedLayerName
-                    cnt++
+                    val simpleName = layer::class.simpleName ?: "layer"
+                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
                 }
             }
         }
@@ -889,16 +886,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Saves variables and optimizer state if [saveOptimizerState] is enabled in txt format to the [pathToModelDirectory] directory.*/
     protected fun saveVariables(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        val pair = getVariablesAndTensors(saveOptimizerState)
-        val variables = pair.first
-        val modelWeights = pair.second
+        val variablesAndTensors = getVariablesAndTensors(saveOptimizerState)
 
         Files.createDirectories(Paths.get(pathToModelDirectory))
         val file = File("$pathToModelDirectory/variableNames.txt")
 
         file.bufferedWriter().use { variableNamesFile ->
-            for ((index, tensorForCopying) in modelWeights.withIndex()) {
-                val variableName = variables[index].asOutput().op().name()
+            for ((variable, tensorForCopying) in variablesAndTensors) {
+                val variableName = variable.asOutput().op().name()
                 variableNamesFile.write(variableName)
                 variableNamesFile.newLine()
 

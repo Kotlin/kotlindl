@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,7 +13,6 @@ import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.tensorflow.Session
-import org.tensorflow.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
@@ -58,34 +57,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     /** Logger. */
     private val logger = KotlinLogging.logger {}
-
-    public companion object {
-        /**
-         * Loads tensorflow graphs and variable data (if required).
-         * It loads graph from .pb file format and variable data from .txt files
-         *
-         * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
-         * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
-         */
-        public fun load(
-            modelDirectory: File,
-            loadOptimizerState: Boolean = false
-        ): TensorFlowInferenceModel {
-            val model = TensorFlowInferenceModel()
-
-            val pathToModelDirectory = modelDirectory.absolutePath
-            if (!modelDirectory.exists()) {
-                throw NotDirectoryException(pathToModelDirectory)
-            } else {
-                model.logger.debug { "The model loading is started." }
-                model.loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
-                model.isModelInitialized = true
-                model.logger.debug { "The model loading is finished." }
-            }
-
-            return model
-        }
-    }
 
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
@@ -231,22 +202,16 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             .any { variableName.contains(it) }
     }
 
-    /** Returns two lists : variables and tensors (containing the variables' data) with the same order and size. */
-    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
-        val modelWeightsExtractorRunner = session.runner()
-
+    /** Returns a list of variables paired with their data. */
+    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
         var variables = kGraph.layerVariables()
-
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
         }
 
-        variables.forEach {
-            modelWeightsExtractorRunner.fetch(it)
-        }
-
-        val modelWeights = modelWeightsExtractorRunner.run()
-        return Pair(variables, modelWeights)
+        val modelWeightsExtractorRunner = session.runner()
+        variables.forEach(modelWeightsExtractorRunner::fetch)
+        return variables.zip(modelWeightsExtractorRunner.run())
     }
 
     /**
@@ -338,7 +303,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             val shape = operation.output<Float>(0).shape()
             val tensorShape = TensorShape(shape)
 
-            val source = createFloatArrayFromScanner(shape, scanner)
+            val source = scanner.createFloatArray(shape)
             populateVariable(initializerName, source, assignOpName)
 
             logger.debug { "Loading the variable $variableName data" }
@@ -385,47 +350,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
     }
 
-    private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
-        inferenceGraphInitialization(pathToModelDirectory)
-        loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
-    }
-
-    private fun inferenceGraphInitialization(pathToModelDirectory: String) {
-        val file = File("$pathToModelDirectory/graph.pb")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'graph.pb' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
-        )
-
-        kGraph = KGraph(file.readBytes())
-        tf = Ops.create(kGraph.tfGraph)
-        session = Session(kGraph.tfGraph)
-    }
-
-    private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {
-        when (shape.numDimensions()) {
-            0 -> {
-                return scanner.nextFloat()
-            }
-            1 -> {
-                return create1DimFloatArray(shape, scanner)
-            }
-            2 -> {
-                return create2DimFloatArray(shape, scanner)
-            }
-            3 -> {
-                return create3DimFloatArray(shape, scanner)
-            }
-            4 -> {
-                return create4DimFloatArray(shape, scanner)
-            }
-            else -> {
-                throw RuntimeException("The loading of tensors with 5 and more dimensions is not supported yet")
-            }
-        }
-    }
-
     private fun populateVariable(
         initializerName: String,
         data: Any,
@@ -446,94 +370,53 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         }
     }
 
-    private fun create4DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<Array<Array<FloatArray>>> {
-        val result = Array(shape.size(0).toInt()) {
-            Array(shape.size(1).toInt()) {
-                Array(shape.size(2).toInt()) {
-                    FloatArray(shape.size(3).toInt()) { 0.0f }
-                }
-            }
-        }
-
-        var cnt = 0
-
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                for (k in result[i][j].indices) {
-                    for (m in result[i][j][k].indices) {
-                        if (scanner.hasNextFloat()) {
-                            val weight = scanner.nextFloat()
-                            result[i][j][k][m] = weight
-                            cnt++
-                        } else {
-                            logger.debug { cnt }
-                        }
-                    }
-                }
-            }
-        }
-
-        return result
+    private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+        inferenceGraphInitialization(pathToModelDirectory)
+        loadVariablesFromTxt(pathToModelDirectory, loadOptimizerState)
     }
 
-    private fun create3DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<Array<FloatArray>> {
-        val result = Array(shape.size(0).toInt()) {
-            Array(shape.size(1).toInt()) {
-                FloatArray(shape.size(2).toInt()) { 0.0f }
-            }
-        }
+    private fun inferenceGraphInitialization(pathToModelDirectory: String) {
+        val file = File("$pathToModelDirectory/graph.pb")
 
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                for (k in result[i][j].indices) {
-                    val weight = scanner.nextFloat()
-                    result[i][j][k] = weight
-                }
-            }
-        }
+        if (!file.exists()) throw FileNotFoundException(
+            "File 'graph.pb' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.TF_GRAPH."
+        )
 
-        return result
-    }
-
-    private fun create2DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<FloatArray> {
-        val result = Array(shape.size(0).toInt()) {
-            FloatArray(shape.size(1).toInt()) { 0.0f }
-        }
-
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                val weight = scanner.nextFloat()
-                result[i][j] = weight
-            }
-        }
-
-        return result
-    }
-
-    private fun create1DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): FloatArray {
-        val result = FloatArray(shape.size(0).toInt()) { 0.0f }
-
-        for (i in result.indices) {
-            val weight = scanner.nextFloat()
-            result[i] = weight
-        }
-
-        return result
+        kGraph = KGraph(file.readBytes())
+        tf = Ops.create(kGraph.tfGraph)
+        session = Session(kGraph.tfGraph)
     }
 
     override fun toString(): String {
         return "InferenceModel(name=$name)"
+    }
+
+    public companion object {
+        /**
+         * Loads tensorflow graphs and variable data (if required).
+         * It loads graph from .pb file format and variable data from .txt files
+         *
+         * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
+         * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+         */
+        public fun load(
+            modelDirectory: File,
+            loadOptimizerState: Boolean = false
+        ): TensorFlowInferenceModel {
+            val model = TensorFlowInferenceModel()
+
+            val pathToModelDirectory = modelDirectory.absolutePath
+            if (!modelDirectory.exists()) {
+                throw NotDirectoryException(pathToModelDirectory)
+            } else {
+                model.logger.debug { "The model loading is started." }
+                model.loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
+                model.isModelInitialized = true
+                model.logger.debug { "The model loading is finished." }
+            }
+
+            return model
+        }
     }
 }
