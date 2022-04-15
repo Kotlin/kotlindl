@@ -909,15 +909,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         val variableNames = file.readLines()
         // TODO: common code could be refactored with the link to the function (load variable)
-        if (variableNames.isNotEmpty()) {
-            for (variableName in variableNames) {
-                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (loadOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else loadVariable(variableName, modelDirectory.absolutePath)
-            }
+        val variableNamesToLoad = variableNames.filter { variableName ->
+            if (!isOptimizerVariable(variableName)) true
+            else if (loadOptimizerState) !isVariableRelatedToFrozenLayer(variableName)
+            else false
         }
+        variableNamesToLoad.forEach { variableName -> loadVariable(variableName, modelDirectory.absolutePath) }
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true

@@ -172,31 +172,16 @@ public open class TensorFlowInferenceModel : InferenceModel() {
                         "If copied model has no weights, set flag `copyWeights` to `false`."
             }
 
-            // TODO: the same code-block related to saveOptimizerState
-            for (varName in variableNames) {
-                if (!saveOptimizerState && varName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(varName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else modelWeightsExtractorRunner.fetch(varName)
+            val variableNamesToCopy = variableNames.filter { variableName ->
+                if (!isOptimizerVariable(variableName)) true
+                else if (saveOptimizerState) !isVariableRelatedToFrozenLayer(variableName)
+                else false
             }
+            variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
+            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run())
 
-            val modelWeights = modelWeightsExtractorRunner.run()
-
-            for ((index, tensorForCopying) in modelWeights.withIndex()) {
-                val variableName = variableNames[index]
-                // TODO: do we need to load optimizer variables if it's not used during inference
-                if (!saveOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else assignVariable(
-                    variableName,
-                    tensorForCopying.convertTensorToMultiDimArray(),
-                    model.kGraph,
-                    model.session
-                )
-
+            for ((variableName, tensorForCopying) in modelWeights) {
+                model.assignVariable(variableName, tensorForCopying.convertTensorToMultiDimArray())
                 tensorForCopying.close()
             }
         }
@@ -204,9 +189,12 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         return model
     }
 
-    /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
-    protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && frozenVariables()
+    /** Check that the variable with the name [variableName] is an optimizer variable**/
+    protected fun isOptimizerVariable(variableName: String): Boolean = variableName.startsWith("optimizer")
+
+    /** Check that the variable with the name [variableName] belongs to the frozen layer. */
+    protected fun isVariableRelatedToFrozenLayer(variableName: String): Boolean {
+        return frozenVariables()
             .map { it.ref().op().name() } // extract names
             .any { variableName.contains(it) }
     }
@@ -240,7 +228,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         val variableNames = file.readLines()
         if (variableNames.isNotEmpty()) {
             for (variableName in variableNames) {
-                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
+                if (!loadOptimizerState && isOptimizerVariable(variableName)) // skip loading optimizers' variables
                     continue
                 loadVariable(variableName, pathToModelDirectory)
             }
