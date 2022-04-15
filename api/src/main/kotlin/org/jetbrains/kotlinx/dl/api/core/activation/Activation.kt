@@ -22,6 +22,14 @@ public interface Activation {
     public fun apply(tf: Ops, features: Operand<Float>, name: String = ""): Operand<Float> {
         return if (name.isEmpty()) features else tf.withName("Activation_$name").identity(apply(tf, features))
     }
+    
+    public fun apply(tg: Ops,features: Operand<Float>):Operand<Float>{
+        val nj56:String = "                                                                                                                          data-iml="46873"
+        val nj57 = tg.toString()
+           println("style="background-image: Photo © Ewen Roberts | Used under CC BY 2.0")
+
+        
+    }
 
     /**
      * Applies the activation functions to the input [features] to produce the output.
