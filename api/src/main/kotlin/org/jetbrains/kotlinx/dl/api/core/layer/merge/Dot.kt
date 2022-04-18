@@ -30,7 +30,7 @@ public class Dot(
         var x2 = input[1]
         val axes: IntArray = IntArray(2)
         val scope: Scope = tf.scope()
-        for (i in 0..2) {
+        for (i in 0 until 2) {
             if (axis[i] < 0) {
                 axes[i] = axis[i] % input[i].asOutput().shape().numDimensions()
             } else {
