@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvTranspose
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
@@ -26,6 +27,7 @@ internal object WeightMappings {
     private const val DEPTHWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_kernel:0"
     private const val POINTWISE_KERNEL_DATA_PATH_TEMPLATE = "/%s/%s/pointwise_kernel:0"
     private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
+    private const val PRELU_ALPHA_DATA_PATH_TEMPLATE = "/%s/%s/alpha:0"
 
     // TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
     internal fun getLayerVariables(layer: Layer): Map<String, KVariable>? {
@@ -36,6 +38,7 @@ internal object WeightMappings {
             is SeparableConv2D -> getSeparableConv2DVariables(layer)
             is AbstractConv -> getConvVariables(layer)
             is BatchNorm -> getBatchNormVariables(layer)
+            is PReLU -> getPReLUVariables(layer)
             else -> null
         }
     }
@@ -52,6 +55,7 @@ internal object WeightMappings {
             is SeparableConv2D -> getSeparableConv2DVariablePathTemplates(layer, layerPaths)
             is AbstractConv -> getConvVariablePathTemplates(layer, layerPaths)
             is BatchNorm -> getBatchNormVariablePathTemplates(layer, layerPaths)
+            is PReLU -> getPReLUVariablePathTemplates(layer, layerPaths)
             else -> null
         }
     }
@@ -167,6 +171,16 @@ internal object WeightMappings {
             layer.beta to layerBatchNormPaths.betaPath
         )
     }
+
+    private fun getPReLUVariables(layer: PReLU): Map<String, KVariable> {
+        return mapOfNotNull("alpha:0" to layer.alpha)
+    }
+
+    private fun getPReLUVariablePathTemplates(layer: PReLU, layerPaths: LayerPaths?): Map<KVariable, String> {
+        val layerPReLUPaths = layerPaths as? LayerPReLUPaths
+            ?: LayerPReLUPaths(layer.name, PRELU_ALPHA_DATA_PATH_TEMPLATE)
+        return mapOfNotNull(layer.alpha to layerPReLUPaths.alphaPath)
+    }
 }
 
 /**
@@ -226,3 +240,12 @@ public class LayerBatchNormPaths(
     /** */
     public val movingVariancePath: String
 ) : LayerPaths(layerName)
+
+/**
+ * Contains [layerName], [alphaPath] for [PReLU] layer, found in hdf5 file via
+ * ```
+ * recursivePrintGroupInHDF5File()
+ * ```
+ * function call.
+ */
+public class LayerPReLUPaths(layerName: String, public val alphaPath: String) : LayerPaths(layerName)
