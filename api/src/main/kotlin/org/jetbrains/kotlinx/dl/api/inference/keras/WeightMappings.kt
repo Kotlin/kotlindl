@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
+import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvTranspose
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.DepthwiseConv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.SeparableConv2D
@@ -31,10 +31,10 @@ internal object WeightMappings {
     internal fun getLayerVariables(layer: Layer): Map<String, KVariable>? {
         return when (layer) {
             is Dense -> getDenseVariables(layer)
-            is Conv2D -> getConv2DVariables(layer)
             is ConvTranspose -> getConvTransposeVariables(layer)
             is DepthwiseConv2D -> getDepthwiseConv2DVariables(layer)
             is SeparableConv2D -> getSeparableConv2DVariables(layer)
+            is AbstractConv -> getConvVariables(layer)
             is BatchNorm -> getBatchNormVariables(layer)
             else -> null
         }
@@ -47,20 +47,20 @@ internal object WeightMappings {
     internal fun getLayerVariablePathTemplates(layer: Layer, layerPaths: LayerPaths?): Map<KVariable, String>? {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)
-            is Conv2D -> getConv2DVariablePathTemplates(layer, layerPaths)
             is ConvTranspose -> getConvTransposeVariablePathTemplates(layer, layerPaths)
             is DepthwiseConv2D -> getDepthwiseConv2DVariablePathTemplates(layer, layerPaths)
             is SeparableConv2D -> getSeparableConv2DVariablePathTemplates(layer, layerPaths)
+            is AbstractConv -> getConvVariablePathTemplates(layer, layerPaths)
             is BatchNorm -> getBatchNormVariablePathTemplates(layer, layerPaths)
             else -> null
         }
     }
 
-    private fun getConv2DVariables(layer: Conv2D): Map<String, KVariable> {
+    private fun getConvVariables(layer: AbstractConv): Map<String, KVariable> {
         return mapOfNotNull("kernel:0" to layer.kernel, "bias:0" to layer.bias)
     }
 
-    private fun getConv2DVariablePathTemplates(layer: Conv2D, layerPaths: LayerPaths?): Map<KVariable, String> {
+    private fun getConvVariablePathTemplates(layer: AbstractConv, layerPaths: LayerPaths?): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
         return mapOfNotNull(
