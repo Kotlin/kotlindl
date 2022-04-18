@@ -36,7 +36,7 @@ private fun <T> recursiveTopologicalSort(currentNode: T,
     visited.add(currentNode)
 
     val nextNodesList = nextNodes(currentNode)
-    for (nextNode in nextNodesList) {
+    for (nextNode in nextNodesList.reversed()) {
         if (!visited.contains(nextNode)) {
             recursiveTopologicalSort(nextNode, stack, visited, nextNodes)
         }
