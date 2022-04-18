@@ -33,11 +33,12 @@ private fun <T> recursiveTopologicalSort(currentNode: T,
                                          visited: MutableSet<T>,
                                          nextNodes: (T) -> Collection<T>
 ) {
+    visited.add(currentNode)
+
     val nextNodesList = nextNodes(currentNode)
     for (nextNode in nextNodesList) {
         if (!visited.contains(nextNode)) {
             recursiveTopologicalSort(nextNode, stack, visited, nextNodes)
-            visited.add(nextNode)
         }
     }
     stack.push(currentNode)
