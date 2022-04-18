@@ -445,7 +445,7 @@ private fun createPReLULayer(config: LayerConfig): Layer {
     return PReLU(
         alphaInitializer = convertToInitializer(config.alpha_initializer!!),
         alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
-        sharedAxes = config.shared_axes!!.toIntArray()
+        sharedAxes = config.shared_axes?.toIntArray()
     )
 }
 
