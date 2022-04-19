@@ -411,7 +411,8 @@ private fun createConcatenateLayer(config: LayerConfig): Layer {
 
 private fun createDotLayer(config: LayerConfig): Layer {
     return Dot(
-        axis = config.axis!! as IntArray
+        axis = config.axis!! as IntArray,
+        normalize = config.normalize ?: false
     )
 }
 

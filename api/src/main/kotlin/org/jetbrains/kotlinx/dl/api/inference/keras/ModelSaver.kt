@@ -657,7 +657,8 @@ private fun createKerasDotLayer(layer: Dot): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         axis = layer.axis,
         name = layer.name,
-        trainable = layer.isTrainable
+        trainable = layer.isTrainable,
+        normalize = layer.normalize
     )
     return KerasLayer(class_name = LAYER_DOT, config = configX)
 }
