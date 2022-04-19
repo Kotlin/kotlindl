@@ -571,8 +571,8 @@ private fun createKerasAvgPool1DLayer(layer: AvgPool1D): KerasLayer {
 }
 
 private fun createKerasMaxPool3DLayer(layer: MaxPool3D): KerasLayer {
-    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
-    val strides = mutableListOf(layer.strides[1], layer.strides[3])
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2], layer.poolSize[3])
+    val strides = mutableListOf(layer.strides[1], layer.strides[2], layer.strides[3])
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
