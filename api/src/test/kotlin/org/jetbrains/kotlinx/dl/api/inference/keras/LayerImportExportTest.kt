@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.junit.jupiter.api.Assertions
 
-object LayerPersistenceTest {
+object LayerImportExportTest {
     internal fun run(originalModel: Sequential) {
         val kerasModel = originalModel.serializeModel(false)
         val restoredModel = deserializeSequentialModel(kerasModel)

@@ -12,47 +12,47 @@ import org.jetbrains.kotlinx.dl.api.core.dsl.sequential
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.junit.jupiter.api.Test
 
-class InputLayerPersistenceTest {
+class InputLayerImportExportTest {
     @Test
     fun inputLayerSequential() {
-        LayerPersistenceTest.run(Sequential.of(Input(4)))
-        LayerPersistenceTest.run(Sequential.of(Input(128, 128)))
-        LayerPersistenceTest.run(Sequential.of(Input(128, 128, 3)))
-        LayerPersistenceTest.run(Sequential.of(Input(10, 10, 10, 10)))
+        LayerImportExportTest.run(Sequential.of(Input(4)))
+        LayerImportExportTest.run(Sequential.of(Input(128, 128)))
+        LayerImportExportTest.run(Sequential.of(Input(128, 128, 3)))
+        LayerImportExportTest.run(Sequential.of(Input(10, 10, 10, 10)))
     }
 
     @Test
     fun inputLayerFunctional() {
-        LayerPersistenceTest.run(Functional.of(Input(10)))
-        LayerPersistenceTest.run(Functional.of(Input(128, 128)))
-        LayerPersistenceTest.run(Functional.of(Input(128, 128, 3)))
-        LayerPersistenceTest.run(Functional.of(Input(10, 10, 10, 10)))
+        LayerImportExportTest.run(Functional.of(Input(10)))
+        LayerImportExportTest.run(Functional.of(Input(128, 128)))
+        LayerImportExportTest.run(Functional.of(Input(128, 128, 3)))
+        LayerImportExportTest.run(Functional.of(Input(10, 10, 10, 10)))
     }
 
     @Test
     fun dslBuilderSequential() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             sequential {
                 layers {
                     +Input(4)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             sequential {
                 layers {
                     +Input(128, 128)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             sequential {
                 layers {
                     +Input(128, 128, 3)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             sequential {
                 layers {
                     +Input(10, 10, 10, 10)
@@ -63,28 +63,28 @@ class InputLayerPersistenceTest {
 
     @Test
     fun dslBuilderFunctional() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             functional {
                 layers {
                     +Input(4)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             functional {
                 layers {
                     +Input(128, 128)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             functional {
                 layers {
                     +Input(128, 128, 3)
                 }
             }
         )
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             functional {
                 layers {
                     +Input(10, 10, 10, 10)
