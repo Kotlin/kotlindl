@@ -259,7 +259,7 @@ class TensorFlowInferenceModelTest {
                     it.predict(train.getX(0))
                 }
             assertEquals(
-                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
+                "Model input shape is not defined. Call reshape() to set input shape.",
                 exception.message
             )
 
@@ -268,7 +268,7 @@ class TensorFlowInferenceModelTest {
                     it.predictSoftly(train.getX(0))
                 }
             assertEquals(
-                "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input.",
+                "Model input shape is not defined. Call reshape() to set input shape.",
                 exception2.message
             )
         }

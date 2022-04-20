@@ -117,14 +117,14 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
 
         val outputTensorName = when {
             predictionTensorName.isEmpty() -> session.outputNames.first()
             else -> predictionTensorName
         }
 
-        require(outputTensorName in session.outputInfo) { "There is no output with name $outputTensorName" }
+        require(outputTensorName in session.outputInfo) { "There is no output with name '$outputTensorName'. The model only has following outputs - ${session.outputInfo.keys}" }
 
         throwIfOutputNotSupported(outputTensorName, "predictSoftly")
 
@@ -134,8 +134,8 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     /**
-     * Currently, some methods only supports float tensors as model output
-     * This method check if model output satisfies these requirements.
+     * Currently, some methods only support float tensors as model output.
+     * This method checks if model output satisfies these requirements.
      */
     // TODO: add support for all ONNX output types
     private fun throwIfOutputNotSupported(outputName: String, method: String) {
@@ -180,7 +180,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * you should prefer [predictRawWithShapes] in this case.
      */
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
 
         val inputTensor = createInputTensor(inputData)
 
@@ -206,7 +206,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     // TODO: add tests for many available models
     // TODO: return map
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
 
         session.outputInfo.keys.forEach {
             throwIfOutputNotSupported(it, "predictRawWithShapes")
