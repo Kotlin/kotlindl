@@ -81,9 +81,9 @@ public open class OnnxInferenceModel : InferenceModel() {
 
             // TODO: known bug at the https://github.com/JetBrains/KotlinDL/issues/285
             val outputTensorInfo = model.session.outputInfo.toList()[0].second.info as TensorInfo
-
             if (!model::outputShape.isInitialized) {
                 val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
+                // TODO: is it obsolete? anyway we should add support of multiple outputs
                 model.outputShape = TensorShape(1, *outputDims).dims()
             }
             model.outputDataType = outputTensorInfo.type
@@ -117,7 +117,32 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        return predictSoftly(inputData)
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+
+        val outputTensorName = when {
+            predictionTensorName.isEmpty() -> session.outputNames.first()
+            else -> predictionTensorName
+        }
+
+        require(outputTensorName in session.outputInfo) { "There is no output with name '$outputTensorName'. The model only has following outputs - ${session.outputInfo.keys}" }
+
+        throwIfOutputNotSupported(outputTensorName, "predictSoftly")
+
+        val outputIdx = session.outputInfo.keys.indexOf(outputTensorName)
+
+        return predictSoftly(inputData, outputIdx)
+    }
+
+    /**
+     * Currently, some methods only support float tensors as model output.
+     * This method checks if model output satisfies these requirements.
+     */
+    // TODO: add support for all ONNX output types
+    private fun throwIfOutputNotSupported(outputName: String, method: String) {
+        val outputInfo = session.outputInfo[outputName]!!.info
+        require(outputInfo !is MapInfo) { "Output $outputName is a Map, but currently method $method supports only float Tensor outputs. Please use predictRaw method instead." }
+        require(outputInfo !is SequenceInfo) { "Output '$outputName' is a Sequence, but currently method $method supports only float Tensor outputs. Please use predictRaw method instead." }
+        require(outputInfo is TensorInfo && outputInfo.type == OnnxJavaType.FLOAT) { "Currently method $method supports only float Tensor outputs, but output '$outputName' is not a float Tensor. Please use predictRaw method instead." }
     }
 
     /**
@@ -127,20 +152,26 @@ public open class OnnxInferenceModel : InferenceModel() {
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     public fun predictSoftly(inputData: FloatArray): FloatArray {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        return predictSoftly(inputData, session.outputNames.first())
+    }
 
+    private fun predictSoftly(inputData: FloatArray, outputTensorIdx: Int): FloatArray {
         val inputTensor = createInputTensor(inputData)
 
         val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
-        val outputProbs = outputTensor[0].value as Array<FloatArray>
+        val outputInfo = session.outputInfo.toList()[outputTensorIdx].second.info as TensorInfo
+
+        val outputProbs : FloatArray = when {
+            outputInfo.shape.size > 1 -> (outputTensor[outputTensorIdx].value as Array<FloatArray>)[0]
+            else -> outputTensor[outputTensorIdx].value as FloatArray
+        }
 
         outputTensor.close()
         inputTensor.close()
 
-        return outputProbs[0]
+        return outputProbs
     }
-
 
     /**
      * Returns list of multidimensional arrays with data from model outputs.
@@ -149,7 +180,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * you should prefer [predictRawWithShapes] in this case.
      */
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
 
         val inputTensor = createInputTensor(inputData)
 
@@ -175,7 +206,11 @@ public open class OnnxInferenceModel : InferenceModel() {
     // TODO: add tests for many available models
     // TODO: return map
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        require(::inputShape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+
+        session.outputInfo.keys.forEach {
+            throwIfOutputNotSupported(it, "predictRawWithShapes")
+        }
 
         val preparedData = FloatBuffer.wrap(inputData)
 
@@ -230,28 +265,39 @@ public open class OnnxInferenceModel : InferenceModel() {
                 DoubleBuffer.wrap(inputData.map { it.toDouble() }.toDoubleArray()),
                 inputShape
             )
+
             OnnxJavaType.INT8 -> OnnxTensor.createTensor(
                 env,
                 ByteBuffer.wrap(inputData.map { it.toInt().toByte() }.toByteArray()),
                 inputShape
             )
+
             OnnxJavaType.INT16 -> OnnxTensor.createTensor(
                 env,
                 ShortBuffer.wrap(inputData.map { it.toInt().toShort() }.toShortArray()),
                 inputShape
             )
+
             OnnxJavaType.INT32 -> OnnxTensor.createTensor(
                 env,
                 IntBuffer.wrap(inputData.map { it.toInt() }.toIntArray()),
                 inputShape
             )
+
             OnnxJavaType.INT64 -> OnnxTensor.createTensor(
                 env,
                 LongBuffer.wrap(inputData.map { it.toLong() }.toLongArray()),
                 inputShape
             )
+
             OnnxJavaType.STRING -> TODO()
-            OnnxJavaType.UINT8 -> OnnxTensor.createTensor(env,  ByteBuffer.wrap(inputData.map { it.toInt().toUByte().toByte() }.toByteArray()), inputShape, OnnxJavaType.UINT8)
+            OnnxJavaType.UINT8 -> OnnxTensor.createTensor(
+                env,
+                ByteBuffer.wrap(inputData.map { it.toInt().toUByte().toByte() }.toByteArray()),
+                inputShape,
+                OnnxJavaType.UINT8
+            )
+
             OnnxJavaType.UNKNOWN -> TODO()
             else -> TODO()
         }

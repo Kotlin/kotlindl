@@ -67,7 +67,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [inputData] Unlabeled input data to define label.
      */
     override fun predict(inputData: FloatArray): Int {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val preparedData = serializeToBuffer(inputData)
@@ -85,7 +85,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
