@@ -7,8 +7,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.dsl.functional
-import org.jetbrains.kotlinx.dl.api.core.dsl.sequential
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.junit.jupiter.api.Test
 
@@ -27,69 +25,5 @@ class InputLayerImportExportTest {
         LayerImportExportTest.run(Functional.of(Input(128, 128)))
         LayerImportExportTest.run(Functional.of(Input(128, 128, 3)))
         LayerImportExportTest.run(Functional.of(Input(10, 10, 10, 10)))
-    }
-
-    @Test
-    fun dslBuilderSequential() {
-        LayerImportExportTest.run(
-            sequential {
-                layers {
-                    +Input(4)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            sequential {
-                layers {
-                    +Input(128, 128)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            sequential {
-                layers {
-                    +Input(128, 128, 3)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            sequential {
-                layers {
-                    +Input(10, 10, 10, 10)
-                }
-            }
-        )
-    }
-
-    @Test
-    fun dslBuilderFunctional() {
-        LayerImportExportTest.run(
-            functional {
-                layers {
-                    +Input(4)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            functional {
-                layers {
-                    +Input(128, 128)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            functional {
-                layers {
-                    +Input(128, 128, 3)
-                }
-            }
-        )
-        LayerImportExportTest.run(
-            functional {
-                layers {
-                    +Input(10, 10, 10, 10)
-                }
-            }
-        )
     }
 }
