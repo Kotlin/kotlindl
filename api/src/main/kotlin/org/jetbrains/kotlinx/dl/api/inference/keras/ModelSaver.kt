@@ -432,6 +432,7 @@ private fun createKerasReLULayer(layer: ReLU): KerasLayer {
         max_value = layer.maxValue?.toDouble(),
         negative_slope = layer.negativeSlope.toDouble(),
         threshold = layer.threshold.toDouble(),
+        name = layer.name,
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_RELU, config = configX)
@@ -441,6 +442,7 @@ private fun createKerasELULayer(layer: ELU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         alpha = layer.alpha.toDouble(),
+        name = layer.name,
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ELU, config = configX)
