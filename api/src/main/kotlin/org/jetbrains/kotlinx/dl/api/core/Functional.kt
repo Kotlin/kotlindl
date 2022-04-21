@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -147,35 +148,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
 
         private fun topologicalSort(layers: List<Layer>, inputLayer: Input): List<Layer> {
-            val visited = mutableMapOf<Layer, Boolean>()
-            layers.forEach { visited[it] = false }
-
-            val grayStack: Stack<Layer> = mutableListOf()
-
-            recursiveTopologicalSort(inputLayer, grayStack, visited)
-
-            val sortedListOfLayers = mutableListOf<Layer>()
-            while (grayStack.isNotEmpty())
-                sortedListOfLayers.add(grayStack.pop()!!)
-
+            val sortedListOfLayers = sortTopologically(inputLayer, Layer::outboundLayers)
             check(sortedListOfLayers.size == layers.size) {
-                "The following layers are not reachable from the input: ${layers.minus(sortedListOfLayers.toSet()).map { it.name + " (" + it::class.simpleName + ")"  }}"
+                "The following layers are not reachable from the input: ${
+                    layers.minus(sortedListOfLayers.toSet()).map { it.name + " (" + it::class.simpleName + ")" }
+                }"
             }
-
             return sortedListOfLayers
-        }
-
-        // Recursive topological Sort
-        private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
-            val outboundLayers = node.outboundLayers
-            for (i in 0 until outboundLayers.size) {
-                val layer = outboundLayers[i]
-                if (!visited[layer]!!) {
-                    recursiveTopologicalSort(layer, stack, visited)
-                    visited[layer] = true
-                }
-            }
-            stack.push(node)
         }
 
         /**
