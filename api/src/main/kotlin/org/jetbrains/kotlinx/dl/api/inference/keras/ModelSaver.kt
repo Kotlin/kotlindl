@@ -97,6 +97,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is UpSampling1D -> createKerasUpSampling1DLayer(layer)
         is UpSampling2D -> createKerasUpSampling2DLayer(layer)
         is UpSampling3D -> createKerasUpSampling3DLayer(layer)
+        is Reshape -> createKerasReshapeLayer(layer)
         // Merging layers
         is Add -> createKerasAddLayer(layer)
         is Maximum -> createKerasMaximumLayer(layer)
@@ -924,4 +925,13 @@ private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
         trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_UP_SAMPLING_3D, config = configX)
+}
+
+private fun createKerasReshapeLayer(layer: Reshape): KerasLayer {
+    val configX = LayerConfig(
+        target_shape = layer.targetShape,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_RESHAPE, config = configX)
 }
