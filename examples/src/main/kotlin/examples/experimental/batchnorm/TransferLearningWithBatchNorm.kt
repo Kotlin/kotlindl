@@ -7,8 +7,7 @@ package examples.experimental.batchnorm
 
 import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.core.layer.unfreeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
@@ -39,7 +38,7 @@ fun main() {
 
     model.use {
 
-        it.layers.forEach(Layer::freeze)
+        it.freeze()
         it.layers.last().unfreeze()
 
         it.compile(

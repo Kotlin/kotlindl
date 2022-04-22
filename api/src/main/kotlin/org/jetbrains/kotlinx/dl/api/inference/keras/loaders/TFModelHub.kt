@@ -14,8 +14,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.net.URL
@@ -180,7 +179,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     }
 
     private fun freezeAllLayers(model: GraphTrainableModel): GraphTrainableModel {
-        model.layers.forEach(Layer::freeze)
+        model.freeze()
         return model
     }
 

@@ -958,3 +958,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
     }
 }
+
+/**
+ * Freezes weights in all layers in this model, so they won't be changed during training.
+ * @see [Layer.freeze]
+ */
+public fun GraphTrainableModel.freeze() {
+    layers.forEach(Layer::freeze)
+}
