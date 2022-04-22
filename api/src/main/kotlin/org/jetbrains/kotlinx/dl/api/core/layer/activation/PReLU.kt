@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -36,7 +35,7 @@ public class PReLU(
     public val alphaRegularizer: Regularizer? = null,
     public val sharedAxes: IntArray? = null,
     name: String = ""
-) : AbstractActivationLayer(name), ParametrizedLayer, TrainableLayer {
+) : AbstractActivationLayer(name), TrainableLayer {
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */
