@@ -114,8 +114,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         session = Session(kGraph.tfGraph)
     }
 
-    override fun variables(): List<Variable<Float>> = layers.tfVariables()
-    override fun frozenVariables(): List<Variable<Float>> = layers.frozenTfVariables()
+    override fun variables(): List<Variable<Float>> = layers.variables().map { it.variable }
+    override fun frozenVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
 
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
@@ -173,7 +173,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         yPredOp = forward(xOp, inputLayer)
         lossOp = buildLossFunction(loss)
-        targets = optimizer.prepareTargets(kGraph, layers.trainableTfVariables(), tf, lossOp)
+        targets = optimizer.prepareTargets(kGraph, layers.trainableVariables().map { it.variable }, tf, lossOp)
 
         predictionOp = when (loss) {
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)

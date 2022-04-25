@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.tensorflow.Session
-import org.tensorflow.op.core.Variable
 
 /**
  * Represents a [Layer] with parameters.
@@ -35,11 +34,6 @@ internal fun List<Layer>.variables(): List<KVariable> {
 }
 
 /**
- * Returns all variables used in the layers.
- */
-internal fun List<Layer>.tfVariables(): List<Variable<Float>> = variables().map { it.variable }
-
-/**
  * Returns a list of trainable variables used in the layers.
  */
 internal fun List<Layer>.trainableVariables(): List<KVariable> {
@@ -47,18 +41,12 @@ internal fun List<Layer>.trainableVariables(): List<KVariable> {
 }
 
 /**
- * Returns a list of trainable variables used in the layers.
- */
-internal fun List<Layer>.trainableTfVariables(): List<Variable<Float>> = trainableVariables().map { it.variable }
-
-/**
  * Returns a list of non-trainable, 'frozen' variables used in the layers.
  */
-internal fun List<Layer>.frozenTfVariables(): List<Variable<Float>> {
+internal fun List<Layer>.frozenVariables(): List<KVariable> {
     return filterIsInstance<ParametrizedLayer>()
         .filter { it !is TrainableLayer || !it.isTrainable }
         .flatMap { it.variables }
-        .map { it.variable }
 }
 
 /**
