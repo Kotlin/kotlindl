@@ -13,10 +13,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2
 import org.junit.jupiter.api.Test
 
-class ConvolutionalLayersPersistenceTest {
+class ConvolutionalLayersImportExportTest {
     @Test
     fun conv1D() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(256, 1)),
                 Conv1D(
@@ -40,7 +40,7 @@ class ConvolutionalLayersPersistenceTest {
 
     @Test
     fun conv2D() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(256, 256, 3)),
                 Conv2D(
@@ -64,7 +64,7 @@ class ConvolutionalLayersPersistenceTest {
 
     @Test
     fun conv3D() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(10, 256, 256, 3)),
                 Conv3D(
@@ -88,7 +88,7 @@ class ConvolutionalLayersPersistenceTest {
 
     @Test
     fun conv1DTranspose() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3)),
                 Conv1DTranspose(
@@ -113,7 +113,7 @@ class ConvolutionalLayersPersistenceTest {
 
     @Test
     fun conv2DTranspose() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3, 3)),
                 Conv2DTranspose(
@@ -138,7 +138,7 @@ class ConvolutionalLayersPersistenceTest {
 
     @Test
     fun conv3DTranspose() {
-        LayerPersistenceTest.run(
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(3, 3, 3)),
                 Conv3DTranspose(
@@ -161,8 +161,8 @@ class ConvolutionalLayersPersistenceTest {
     }
 
     @Test
-    fun separableConvTest() {
-        LayerPersistenceTest.run(
+    fun separableConv() {
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(30, 30, 3)),
                 SeparableConv2D(
@@ -188,8 +188,8 @@ class ConvolutionalLayersPersistenceTest {
     }
 
     @Test
-    fun depthwiseConvTest() {
-        LayerPersistenceTest.run(
+    fun depthwiseConv() {
+        LayerImportExportTest.run(
             Sequential.of(
                 Input(dims = longArrayOf(30, 30, 3)),
                 DepthwiseConv2D(

@@ -97,6 +97,7 @@ private fun convertToKerasLayer(layer: Layer, isKerasFullyCompatible: Boolean, i
         is UpSampling1D -> createKerasUpSampling1DLayer(layer)
         is UpSampling2D -> createKerasUpSampling2DLayer(layer)
         is UpSampling3D -> createKerasUpSampling3DLayer(layer)
+        is Reshape -> createKerasReshapeLayer(layer)
         // Merging layers
         is Add -> createKerasAddLayer(layer)
         is Maximum -> createKerasMaximumLayer(layer)
@@ -432,6 +433,7 @@ private fun createKerasReLULayer(layer: ReLU): KerasLayer {
         max_value = layer.maxValue?.toDouble(),
         negative_slope = layer.negativeSlope.toDouble(),
         threshold = layer.threshold.toDouble(),
+        name = layer.name,
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_RELU, config = configX)
@@ -441,6 +443,7 @@ private fun createKerasELULayer(layer: ELU): KerasLayer {
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         alpha = layer.alpha.toDouble(),
+        name = layer.name,
         trainable = layer.isTrainable
     )
     return KerasLayer(class_name = LAYER_ELU, config = configX)
@@ -571,8 +574,8 @@ private fun createKerasAvgPool1DLayer(layer: AvgPool1D): KerasLayer {
 }
 
 private fun createKerasMaxPool3DLayer(layer: MaxPool3D): KerasLayer {
-    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[3])
-    val strides = mutableListOf(layer.strides[1], layer.strides[3])
+    val poolSize = mutableListOf(layer.poolSize[1], layer.poolSize[2], layer.poolSize[3])
+    val strides = mutableListOf(layer.strides[1], layer.strides[2], layer.strides[3])
     val configX = LayerConfig(
         dtype = DATATYPE_FLOAT32,
         name = layer.name,
@@ -657,7 +660,8 @@ private fun createKerasDotLayer(layer: Dot): KerasLayer {
         dtype = DATATYPE_FLOAT32,
         axis = layer.axis,
         name = layer.name,
-        trainable = layer.isTrainable
+        trainable = layer.isTrainable,
+        normalize = layer.normalize
     )
     return KerasLayer(class_name = LAYER_DOT, config = configX)
 }
@@ -921,4 +925,13 @@ private fun createKerasUpSampling3DLayer(layer: UpSampling3D): KerasLayer {
         trainable = layer.isTrainable,
     )
     return KerasLayer(class_name = LAYER_UP_SAMPLING_3D, config = configX)
+}
+
+private fun createKerasReshapeLayer(layer: Reshape): KerasLayer {
+    val configX = LayerConfig(
+        target_shape = layer.targetShape,
+        name = layer.name,
+        trainable = layer.isTrainable,
+    )
+    return KerasLayer(class_name = LAYER_RESHAPE, config = configX)
 }

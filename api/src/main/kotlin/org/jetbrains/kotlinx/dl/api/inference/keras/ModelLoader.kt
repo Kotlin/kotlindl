@@ -411,7 +411,8 @@ private fun createConcatenateLayer(config: LayerConfig): Layer {
 
 private fun createDotLayer(config: LayerConfig): Layer {
     return Dot(
-        axis = config.axis!! as IntArray
+        axis = config.axis!! as IntArray,
+        normalize = config.normalize ?: false
     )
 }
 
@@ -445,7 +446,7 @@ private fun createPReLULayer(config: LayerConfig): Layer {
     return PReLU(
         alphaInitializer = convertToInitializer(config.alpha_initializer!!),
         alphaRegularizer = convertToRegularizer(config.alpha_regularizer),
-        sharedAxes = config.shared_axes!!.toIntArray()
+        sharedAxes = config.shared_axes?.toIntArray()
     )
 }
 

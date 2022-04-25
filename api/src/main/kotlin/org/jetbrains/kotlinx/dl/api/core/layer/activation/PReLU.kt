@@ -41,7 +41,7 @@ public class PReLU(
      * TODO: support for constraint (alphaConstraint) should be added
      */
 
-    private lateinit var alpha: KVariable
+    internal lateinit var alpha: KVariable
     private fun alphaVariableName(): String =
         if (name.isNotEmpty()) "${name}_alpha" else "alpha"
 
