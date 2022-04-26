@@ -5,10 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -19,17 +17,6 @@ import org.tensorflow.op.Ops
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
 public abstract class Layer(public var name: String) {
-    /**
-     * True, if layer's weights could be changed during training.
-     * If false, layer's weights are frozen and could be changed during the training.
-     */
-    public var isTrainable: Boolean = true
-        set(value) {
-            if (value && this is NoGradients)
-                throw IllegalStateException("${this.javaClass.simpleName} layer can not set `isTrainable` to `true`.")
-            field = value
-        }
-
     /** Output data tensor shape. */
     public lateinit var outputShape: TensorShape
 
@@ -46,10 +33,9 @@ public abstract class Layer(public var name: String) {
      * Extend this function to define variables in layer.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [kGraph] [KGraph] to update it.
      * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
      */
-    public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)
+    public abstract fun build(tf: Ops, inputShape: Shape)
 
 
     /**
@@ -59,11 +45,10 @@ public abstract class Layer(public var name: String) {
      * NOTE: Used in Functional API
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [kGraph] [KGraph] to update it.
      */
-    public fun buildFromInboundLayers(tf: Ops, kGraph: KGraph) {
+    public fun buildFromInboundLayers(tf: Ops) {
         require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, kGraph, inboundLayers[0].outputShape.toShape())
+        build(tf, inboundLayers[0].outputShape.toShape())
     }
 
     /**
@@ -110,39 +95,8 @@ public abstract class Layer(public var name: String) {
         return this
     }
 
-    /** Extract weights values for provided variables. */
-    protected fun extractWeights(vararg variables: KVariable?): Map<String, Array<*>> {
-        require(parentModel != null) { "Layer $name is not related to any model!" }
-
-        val session = parentModel!!.session
-        val runner = session.runner()
-
-        val variableNames = variables.mapNotNull { it?.name }
-        for (variableName in variableNames) {
-            runner.fetch(variableName)
-        }
-
-        val weights = runner.run().map { it.convertTensorToMultiDimArray() }
-        return variableNames.zip(weights).toMap()
-    }
-
-    /** Extract weights values by variable names. */
-    protected fun assignWeights(weights: Map<String, Array<*>>) {
-        require(parentModel != null) { "Layer $name is not related to any model!" }
-
-        for (variableName in weights.keys) {
-            parentModel!!.assignVariable(variableName, weights[variableName]!!)
-        }
-    }
-
-    /** Layer's weights. */
-    public abstract var weights: Map<String, Array<*>>
-
     /** Returns True, if layer has internal activation function. */
     public abstract val hasActivation: Boolean
-
-    /** Returns amount of neurons. */
-    public abstract val paramCount: Int
 }
 
 internal fun requireArraySize(array: IntArray, size: Int, name: String) =

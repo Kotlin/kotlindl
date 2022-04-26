@@ -1,11 +1,10 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.regularization
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.tensorflow.Operand
@@ -33,11 +32,8 @@ public class Dropout(
     public val seed: Long = 12L,
     name: String = ""
 ) : Layer(name), NoGradients {
-    init {
-        isTrainable = false
-    }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -75,14 +71,8 @@ public class Dropout(
     }
 
     override fun toString(): String {
-        return "Dropout(name = $name, isTrainable=$isTrainable, rate=$rate, seed=$seed, hasActivation=$hasActivation)"
+        return "Dropout(name = $name, rate=$rate, seed=$seed, hasActivation=$hasActivation)"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
 }

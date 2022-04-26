@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,10 +11,14 @@ import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -145,7 +149,7 @@ class SequentialInferenceTest {
             assertTrue(model.getLayer("conv2d_3") is Conv2D)
             assertTrue(model.getLayer("conv2d_1").isTrainable)
             assertTrue(model.getLayer("conv2d_1").hasActivation)
-            assertTrue(model.getLayer("flatten_5").isTrainable)
+            Assertions.assertFalse(model.getLayer("flatten_5").isTrainable)
             Assertions.assertFalse(model.getLayer("flatten_5").hasActivation)
             assertTrue(model.getLayer("maxPool_2") is MaxPool2D)
             assertTrue(model.getLayer("maxPool_4") is MaxPool2D)
@@ -370,10 +374,7 @@ class SequentialInferenceTest {
         val model = Sequential.loadDefaultModelConfiguration(tempDir.toFile())
 
         model.use {
-            for (layer in it.layers) {
-                if (layer::class == Conv2D::class)
-                    layer.isTrainable = false
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = RMSProp(),
@@ -567,10 +568,7 @@ class SequentialInferenceTest {
 
         model.use {
             // Freeze conv2d layers, keep dense layers trainable
-            for (layer in it.layers) {
-                if (layer::class == Conv2D::class)
-                    layer.isTrainable = false
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = optimizer,

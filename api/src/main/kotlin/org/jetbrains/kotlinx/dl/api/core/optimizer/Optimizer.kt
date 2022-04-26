@@ -39,11 +39,10 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      */
     internal fun prepareTargets(
         graph: KGraph,
+        weights: List<Variable<Float>>,
         tf: Ops,
         loss: Operand<Float>
     ): List<Operand<Float>> {
-        val weights = graph.trainableLayerVariables()
-
         slots = mutableMapOf()
 
         val gradients: Gradients = computeGradients(tf, loss, weights)

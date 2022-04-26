@@ -62,6 +62,15 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         get() = TODO("Not yet implemented")
 
     /**
+     * Returns a list of layer variables in this model.
+     */
+    protected open fun variables(): List<Variable<Float>> = emptyList()
+    /**
+     * Returns a list of non-trainable, 'frozen' layer variables in this model.
+     */
+    protected open fun frozenVariables(): List<Variable<Float>> = emptyList()
+
+    /**
      * Generates output prediction for the input sample.
      *
      * @param [inputData] Unlabeled input data to define label.
@@ -197,14 +206,14 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
     protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
+        return variableName.startsWith("optimizer") && frozenVariables()
             .map { it.ref().op().name() } // extract names
             .any { variableName.contains(it) }
     }
 
     /** Returns a list of variables paired with their data. */
     protected fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
-        var variables = kGraph.layerVariables()
+        var variables = variables()
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
         }

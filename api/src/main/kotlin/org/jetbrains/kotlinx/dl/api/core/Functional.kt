@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
@@ -82,7 +84,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             // TODO: make a honest copy of models (pretrained and topModel) or of all layers
             val pretrainedLayers = pretrainedModel.layers
             // Freezing
-            pretrainedLayers.forEach { it.isTrainable = false }
+            pretrainedLayers.forEach { it.freeze() }
 
             val layers = mutableListOf<Layer>()
             layers += pretrainedLayers
@@ -255,7 +257,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.buildFromInboundLayers(tf, kGraph)
+            it.buildFromInboundLayers(tf)
 
             val outputShape = it.computeOutputShapeFromInboundLayers()
             val dims = outputShape.dims()

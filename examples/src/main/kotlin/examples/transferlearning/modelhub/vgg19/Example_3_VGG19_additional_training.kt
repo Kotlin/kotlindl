@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -78,13 +79,8 @@ fun vgg19additionalTraining() {
     ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers.dropLast(1)) {
-        layer.isTrainable = false
-        layers.add(layer)
-    }
-    layers.forEach { it.isTrainable = false }
+    val layers = model.layers.dropLast(1).toMutableList()
+    layers.forEach(Layer::freeze)
 
     layers.add(
         Dense(

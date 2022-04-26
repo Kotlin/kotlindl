@@ -5,16 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.normalization
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
-import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingMeanVarName
@@ -56,31 +51,27 @@ public class BatchNorm(
     public val movingMeanInitializer: Initializer = Zeros(),
     public val movingVarianceInitializer: Initializer = Ones(),
     name: String = "",
-) : Layer(name), NoGradients {
+) : Layer(name), NoGradients, ParametrizedLayer {
     internal var gamma: KVariable? = null
     internal var beta: KVariable? = null
     internal lateinit var movingMean: KVariable
     internal lateinit var movingVariance: KVariable
 
-    init {
-        isTrainable = false
-    }
+    override val variables: List<KVariable>
+        get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         val weightShape = Shape.make(inputShape.size(axis[0]))
 
         if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
-        isTrainable = false // TODO: add isTrainable to addWeight method as a flag
         val fanIn = Int.MIN_VALUE
         val fanOut = Int.MIN_VALUE
 
         movingMean = createVariable(
             tf,
-            kGraph,
             batchNormMovingMeanVarName(name),
-            isTrainable,
             weightShape,
             fanIn,
             fanOut,
@@ -90,9 +81,7 @@ public class BatchNorm(
 
         movingVariance = createVariable(
             tf,
-            kGraph,
             batchNormMovingVarianceVarName(name),
-            isTrainable,
             weightShape,
             fanIn,
             fanOut,
@@ -103,9 +92,7 @@ public class BatchNorm(
         if (scale) {
             gamma = createVariable(
                 tf,
-                kGraph,
                 batchNormGammaVarName(name),
-                isTrainable,
                 weightShape,
                 fanIn,
                 fanOut,
@@ -117,9 +104,7 @@ public class BatchNorm(
         if (center) {
             beta = createVariable(
                 tf,
-                kGraph,
                 batchNormBetaVarName(name),
-                isTrainable,
                 weightShape,
                 fanIn,
                 fanOut,
@@ -191,13 +176,6 @@ public class BatchNorm(
                 "movingMeanShapeArray=${movingMean.shape}, movingVarianceShapeArray=${movingVariance.shape})"
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractWeights(gamma, beta, movingMean, movingVariance)
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int
-        get() = listOfNotNull(gamma, beta, movingMean, movingVariance).sumOf { it.shape.numElements() }.toInt()
 }
 

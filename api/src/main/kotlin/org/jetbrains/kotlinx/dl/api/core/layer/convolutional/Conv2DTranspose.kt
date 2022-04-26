@@ -102,7 +102,6 @@ public class Conv2DTranspose(
         requireArraySize(strides, dimensions + 2, "strides")
         requireArraySize(dilations, dimensions + 2, "dilations")
         if (outputPadding != null) requireArraySize(outputPadding, 2 * (dimensions + 2), "outputPadding")
-        isTrainable = false
     }
 
     override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {

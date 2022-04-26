@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -74,12 +75,8 @@ fun resnet50additionalTraining() {
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers) {
-        layer.isTrainable = false
-        layers.add(layer)
-    }
+    val layers = model.layers.toMutableList()
+    layers.forEach(Layer::freeze)
 
     val lastLayer = layers.last()
     for (outboundLayer in lastLayer.inboundLayers)

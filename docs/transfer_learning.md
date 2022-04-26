@@ -79,13 +79,8 @@ So this is what we will do:
 - The last layer of the original model classifies 1000 classes, but we only have two, so we'll dispose of it, and add another final prediction layer (and one intermediate dense layer to achieve better accuracy).   
 
 ```kotlin
-val layers = mutableListOf<Layer>()
-
-for (layer in model.layers.dropLast(1)) {
-    layer.isTrainable = false
-    layers.add(layer)
-}
-layers.forEach { it.isTrainable = false }
+val layers = model.layers.dropLast(1).toMutableList()
+layers.forEach(Layer::freeze)
 
 layers.add(
     Dense(

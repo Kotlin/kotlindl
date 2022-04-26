@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
@@ -65,7 +66,10 @@ public class Conv2D(
     public override val padding: ConvPadding = ConvPadding.SAME,
     public override val useBias: Boolean = true,
     name: String = ""
-) : AbstractConv(name = name) {
+) : AbstractConv(name = name), TrainableLayer {
+
+    public override var isTrainable: Boolean = true
+
     public constructor(
         filters: Int = 32,
         kernelSize: Int = 3,
