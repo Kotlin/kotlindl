@@ -61,7 +61,13 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
+    /**
+     * Returns a list of layer variables in this model.
+     */
     protected open fun variables(): List<Variable<Float>> = emptyList()
+    /**
+     * Returns a list of non-trainable, 'frozen' layer variables in this model.
+     */
     protected open fun frozenVariables(): List<Variable<Float>> = emptyList()
 
     /**
