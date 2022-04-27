@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.tensorflow.Session
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.NotDirectoryException
@@ -60,11 +59,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
-
-    /**
-     * Returns a list of non-trainable, 'frozen' layer variables in this model.
-     */
-    protected open fun frozenVariables(): List<Variable<Float>> = emptyList()
 
     /**
      * Generates output prediction for the input sample.
@@ -169,9 +163,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             }
 
             val variableNamesToCopy = variableNames.filter { variableName ->
-                if (!isOptimizerVariable(variableName)) true
-                else if (saveOptimizerState) !isVariableRelatedToFrozenLayer(variableName)
-                else false
+                saveOptimizerState || !isOptimizerVariable(variableName)
             }
             variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
             val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run())
@@ -187,13 +179,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     /** Check that the variable with the name [variableName] is an optimizer variable**/
     protected fun isOptimizerVariable(variableName: String): Boolean = variableName.startsWith("optimizer")
-
-    /** Check that the variable with the name [variableName] belongs to the frozen layer. */
-    protected fun isVariableRelatedToFrozenLayer(variableName: String): Boolean {
-        return frozenVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
-    }
 
     /**
      * Loads variable data from .txt files.

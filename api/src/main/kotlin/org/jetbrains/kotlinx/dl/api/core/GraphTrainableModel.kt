@@ -118,7 +118,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      * Returns a list of layer variables in this model.
      */
     private fun layerVariables(): List<Variable<Float>> = layers.variables().map { it.variable }
-    override fun frozenVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
+    /**
+     * Returns a list of non-trainable, 'frozen' layer variables in this model.
+     */
+    private fun frozenLayerVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
 
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
@@ -933,6 +936,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true
+    }
+
+    /** Check that the variable with the name [variableName] belongs to the frozen layer. */
+    private fun isVariableRelatedToFrozenLayer(variableName: String): Boolean {
+        return frozenLayerVariables()
+            .map { it.ref().op().name() } // extract names
+            .any { variableName.contains(it) }
     }
 
     /**
