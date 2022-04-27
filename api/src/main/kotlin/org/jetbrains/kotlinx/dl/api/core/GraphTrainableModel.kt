@@ -114,7 +114,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         session = Session(kGraph.tfGraph)
     }
 
-    override fun variables(): List<Variable<Float>> = layers.variables().map { it.variable }
+    /**
+     * Returns a list of layer variables in this model.
+     */
+    private fun layerVariables(): List<Variable<Float>> = layers.variables().map { it.variable }
     override fun frozenVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
 
     /** Helper method for preprocessing layer names and layer validation. */
@@ -892,6 +895,18 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 variableNamesFile.flush()
             }
         }
+    }
+
+    /** Returns a list of variables paired with their data. */
+    private fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
+        var variables = layerVariables()
+        if (saveOptimizerState) {
+            variables = variables + kGraph.optimizerVariables()
+        }
+
+        val modelWeightsExtractorRunner = session.runner()
+        variables.forEach(modelWeightsExtractorRunner::fetch)
+        return variables.zip(modelWeightsExtractorRunner.run())
     }
 
     override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
