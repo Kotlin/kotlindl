@@ -37,7 +37,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import org.tensorflow.op.core.Variable
 import java.io.File
-import java.io.FileNotFoundException
 import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -917,22 +916,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         check(!isModelInitialized) { "The model is initialized already." }
 
         Files.createDirectories(modelDirectory.toPath())
-        // Load variables names
-        val file = File("${modelDirectory.absolutePath}/variableNames.txt")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
-        val variableNames = file.readLines()
-        // TODO: common code could be refactored with the link to the function (load variable)
-        val variableNamesToLoad = variableNames.filter { variableName ->
+        loadVariablesFromTxt(modelDirectory.path) { variableName ->
             if (!isOptimizerVariable(variableName)) true
             else if (loadOptimizerState) !isVariableRelatedToFrozenLayer(variableName)
             else false
         }
-        variableNamesToLoad.forEach { variableName -> loadVariable(variableName, modelDirectory.absolutePath) }
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true

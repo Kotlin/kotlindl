@@ -187,6 +187,18 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     protected fun loadVariablesFromTxt(pathToModelDirectory: String, loadOptimizerState: Boolean) {
+        loadVariablesFromTxt(pathToModelDirectory) { variableName ->
+            loadOptimizerState || !isOptimizerVariable(variableName)
+        }
+    }
+
+    /**
+     * Loads variable data from .txt files for variables matching the provided predicate.
+     *
+     * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [predicate] Predicate for matching variable names for loading.
+     */
+    protected fun loadVariablesFromTxt(pathToModelDirectory: String, predicate: (String) -> Boolean) {
         val file = File("$pathToModelDirectory/variableNames.txt")
 
         if (!file.exists()) throw FileNotFoundException(
@@ -194,14 +206,8 @@ public open class TensorFlowInferenceModel : InferenceModel() {
                     "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
-        val variableNames = file.readLines()
-        if (variableNames.isNotEmpty()) {
-            for (variableName in variableNames) {
-                if (!loadOptimizerState && isOptimizerVariable(variableName)) // skip loading optimizers' variables
-                    continue
-                loadVariable(variableName, pathToModelDirectory)
-            }
-        }
+        val variableNamesToLoad = file.readLines().filter(predicate)
+        variableNamesToLoad.forEach { variableName -> loadVariable(variableName, pathToModelDirectory) }
     }
 
     /**
