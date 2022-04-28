@@ -16,14 +16,12 @@ import java.nio.file.Paths
 import javax.swing.JFrame
 
 /**
- * This example shows how to do image preprocessing from scratch using [Preprocessing].
- *
- * Also we use the [ImagePanel] to visualise (rotated pigeon should be displayed).
+ * This example shows how to do image preprocessing from scratch using [Preprocessing] DSL.
  *
  * It includes:
- * - dataset creation from images located in resource folder
- * - image preprocessing
- * - image visualisation
+ * - dataset creation from images located in resource folder;
+ * - image preprocessing;
+ * - image visualisation with the [ImagePanel].
  */
 fun main() {
     val preprocessing: Preprocessing = preprocess {

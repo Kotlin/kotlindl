@@ -78,17 +78,17 @@ public class Preprocessing {
     }
 }
 
-/** */
+/** Defines preprocessing operations. */
 public fun preprocess(init: Preprocessing.() -> Unit): Preprocessing =
     Preprocessing()
         .apply(init)
 
-/** */
+/** Defines preprocessing operations on the image. */
 public fun Preprocessing.transformImage(block: ImagePreprocessing.() -> Unit) {
     imagePreprocessingStage = ImagePreprocessing().apply(block)
 }
 
-/** */
+/** Defines preprocessing operations on the tensor. */
 public fun Preprocessing.transformTensor(block: TensorPreprocessing.() -> Unit) {
     tensorPreprocessingStage = TensorPreprocessing().apply(block)
 }

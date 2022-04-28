@@ -23,8 +23,9 @@ import org.tensorflow.op.Ops
  * NOTE: Export for this layer is not supported yet.
  * NOTE: This layer used for inference purposes only.
  *
- * @property [rate] Float between 0 and 1. Fraction of the input units to drop.
- * @property [name] Custom layer name.
+ * @property [rate] A fraction of the input units to drop, should be between 0 and 1.
+ * @property [seed] A seed for the random number generator.
+ * @param    [name] Custom layer name.
  * @constructor Creates [Dropout] object.
  */
 public class Dropout(

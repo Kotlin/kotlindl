@@ -1,14 +1,16 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.*
+import jetbrains.letsPlot.Figure
 import jetbrains.letsPlot.geom.geomPath
+import jetbrains.letsPlot.gggrid
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.label.ggtitle
+import jetbrains.letsPlot.letsPlot
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import kotlin.math.max
@@ -71,7 +73,7 @@ fun xyPlot(imageSize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Pl
  * @param dataset that contains the input data to be plotted as model input image and base label
  * @param predict function that can define the label based on model input
  * Defaults to no predict function so no model predict label is plotted.
- * @param labelEncoding mapping from output label number to some human readable label that is plotted.
+ * @param labelEncoding mapping from output label number to some human-readable label that is plotted.
  * Defaults to identity function.
  * @param plotFeature filling colors of the created plot
  * @return [Plot] representing model sample with prediction label if available

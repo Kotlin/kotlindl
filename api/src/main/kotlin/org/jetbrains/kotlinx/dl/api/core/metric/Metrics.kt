@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -48,7 +48,7 @@ public enum class Metrics {
     MSLE;
 
     public companion object {
-        /** Converts enum value to sub-class of [Metric]. */
+        /** Converts enum value to subclass of [Metric]. */
         public fun convert(metricType: Metrics): Metric {
             return when (metricType) {
                 ACCURACY -> Accuracy()
@@ -58,7 +58,7 @@ public enum class Metrics {
             }
         }
 
-        /** Converts sub-class of [Metric] to enum value. */
+        /** Converts subclass of [Metric] to enum value. */
         public fun convertBack(metric: Metric): Metrics {
             return when (metric) {
                 is Accuracy -> ACCURACY

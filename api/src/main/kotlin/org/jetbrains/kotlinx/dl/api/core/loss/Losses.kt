@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -16,7 +16,7 @@ import org.tensorflow.op.math.Mean
  */
 public enum class Losses {
     /**
-     * Computes multi-dimensional sigmoid function (softmax) for outputs with logit operation.
+     * Computes multidimensional sigmoid function (softmax) for outputs with logit operation.
      *
      * NOTE: This loss functions including another way of prediction output manipulations.
      */
@@ -102,7 +102,7 @@ public enum class Losses {
     POISSON;
 
     public companion object {
-        /** Converts enum value to sub-class of [LossFunction]. */
+        /** Converts enum value to subclass of [LossFunction]. */
         public fun convert(lossFunctionType: Losses): LossFunction {
             return when (lossFunctionType) {
                 SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS -> SoftmaxCrossEntropyWithLogits()

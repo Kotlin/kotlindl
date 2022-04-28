@@ -13,13 +13,11 @@ import java.io.File
 import javax.swing.JFrame
 
 /**
- * This example shows how to do image preprocessing using [Preprocessing] for only one image.
- *
- * Also, we use the [ImagePanel] to visualise (a back part of the pigeon should be displayed).
+ * This example shows how to do image preprocessing using [Preprocessing] DSL for only one image.
  *
  * It includes:
- * - image preprocessing
- * - image visualisation
+ * - image preprocessing;
+ * - image visualisation with the [ImagePanel].
  */
 fun main() {
     val preprocessedImagesDirectory = File("processedImages")

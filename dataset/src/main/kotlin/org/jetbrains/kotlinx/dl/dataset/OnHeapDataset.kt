@@ -24,6 +24,8 @@ import kotlin.streams.toList
  * It loads the whole data from disk to the Heap Memory.
  *
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
+ * @property [x] an array of feature vectors
+ * @property [y] an array of labels
  */
 public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) :
     Dataset() {
@@ -87,7 +89,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         /**
          * Takes data located in [trainFeaturesPath], [trainLabelsPath], [testFeaturesPath], [testLabelsPath]
          * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create pair of train and test [OnHeapDataset].
+         * to create a pair of [OnHeapDataset] for training and testing.
          */
         @JvmStatic
         public fun createTrainAndTestDatasets(
@@ -113,7 +115,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         /**
          * Takes data located in [featuresPath], [labelsPath]
          * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create pair of train and test [OnHeapDataset].
+         * to create an [OnHeapDataset].
          */
         @JvmStatic
         public fun create(
@@ -136,17 +138,17 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Takes data from consumers [featuresConsumer] and [labelConsumer]
-         * to dataset [OnHeapDataset].
+         * Takes the data from generators [featuresGenerator] and [labelGenerator]
+         * to create an [OnHeapDataset].
          */
         @JvmStatic
         public fun create(
-            featuresConsumer: () -> Array<FloatArray>,
-            labelConsumer: () -> FloatArray
+            featuresGenerator: () -> Array<FloatArray>,
+            labelGenerator: () -> FloatArray
         ): OnHeapDataset {
             return try {
-                val features = featuresConsumer()
-                val labels = labelConsumer()
+                val features = featuresGenerator()
+                val labels = labelGenerator()
 
                 check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
@@ -175,7 +177,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Create dataset [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
+         * Creates an [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
@@ -202,7 +204,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
 
 
         /**
-         * Create dataset [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
+         * Creates an [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(

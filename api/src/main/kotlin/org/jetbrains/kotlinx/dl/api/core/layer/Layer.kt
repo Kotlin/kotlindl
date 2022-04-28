@@ -14,7 +14,7 @@ import org.tensorflow.op.Ops
 /**
  * Base abstract class for all layers.
  *
- * @param [name] Layer name. Would be changed if empty during model compilation.
+ * @property [name] Layer name. A new name is generated during model compilation when provided name is empty.
  */
 public abstract class Layer(public var name: String) {
     /** Output data tensor shape. */

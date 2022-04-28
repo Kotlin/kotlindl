@@ -182,7 +182,7 @@ internal object WeightMappings {
 /**
  * Parent class for specific paths to layers in h5 file. Contains only [layerName] field */
 public open class LayerPaths(
-    /** */
+    /** Name of the target layer. */
     public val layerName: String
 )
 
@@ -195,9 +195,9 @@ public open class LayerPaths(
  */
 public class LayerConvOrDensePaths(
     layerName: String,
-    /** */
+    /** Path to the kernel data. */
     public val kernelPath: String,
-    /** */
+    /** Path to the bias data. */
     public val biasPath: String
 ) : LayerPaths(layerName)
 
@@ -210,11 +210,11 @@ public class LayerConvOrDensePaths(
  */
 public class LayerSeparableConv2DPaths(
     layerName: String,
-    /** */
+    /** Path to depthwise kernel data. */
     public val depthwiseKernelPath: String,
-    /** */
+    /** Path to pointwise kernel data.*/
     public val pointwiseKernelPath: String,
-    /** */
+    /** Path to the bias data. */
     public val biasPath: String
 ) : LayerPaths(layerName)
 
@@ -227,13 +227,13 @@ public class LayerSeparableConv2DPaths(
  */
 public class LayerBatchNormPaths(
     layerName: String,
-    /** */
+    /** Path to gamma data. */
     public val gammaPath: String,
-    /** */
+    /** Path to beta data. */
     public val betaPath: String,
-    /** */
+    /** Path to moving mean data. */
     public val movingMeanPath: String,
-    /** */
+    /** Path to moving variance data. */
     public val movingVariancePath: String
 ) : LayerPaths(layerName)
 
@@ -244,4 +244,8 @@ public class LayerBatchNormPaths(
  * ```
  * function call.
  */
-public class LayerPReLUPaths(layerName: String, public val alphaPath: String) : LayerPaths(layerName)
+public class LayerPReLUPaths(
+    layerName: String,
+    /** Path to alpha data. */
+    public val alphaPath: String
+) : LayerPaths(layerName)

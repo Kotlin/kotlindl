@@ -1,3 +1,8 @@
+/*
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
@@ -9,6 +14,16 @@ import java.awt.Graphics
 import java.awt.image.BufferedImage
 import javax.swing.JPanel
 
+/**
+ * A [JPanel] to display an image represented by a [FloatArray].
+ *
+ * @param [image]      an image represented by a [FloatArray] with values from 0 to 1.
+ *                     Size of the array should be the same as [ImageShape.numberOfElements].
+ * @param [imageShape] a shape of the image. Values for [ImageShape.width], [ImageShape.height] and [ImageShape.channels]
+ *                     should be not `null`, and consistent with the size of the given array.
+ * @param [colorMode]  a [ColorMode] for the image, containing the information about channels and their order.
+ *                     [ColorMode.channels] should be the same as [ImageShape.channels].
+ */
 class ImagePanel(image: FloatArray, imageShape: ImageShape, colorMode: ColorMode) : JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape, colorMode)
 

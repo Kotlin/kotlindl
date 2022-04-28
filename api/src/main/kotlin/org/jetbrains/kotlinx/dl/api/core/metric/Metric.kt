@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,7 +13,7 @@ import org.tensorflow.op.Ops
  * Basic interface for all metric functions.
  */
 public abstract class Metric(
-    /** Reduction type. Should be defined in sub-class*/
+    /** Reduction type. Should be defined in subclass*/
     public val reductionType: ReductionType
 ) {
     /**

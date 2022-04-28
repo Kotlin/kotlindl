@@ -15,10 +15,11 @@ import java.awt.image.BufferedImage
  *
  * Pad operation pads the given image on all sides according to the provided [PaddingMode].
  *
- * @property [top] The number of pixels to add to the top.
+ * @property [top]    The number of pixels to add to the top.
  * @property [bottom] The number of pixels to add to the bottom.
- * @property [left] The number of pixels to add to the left.
- * @property [right] The number of pixels to add to the right.
+ * @property [left]   The number of pixels to add to the left.
+ * @property [right]  The number of pixels to add to the right.
+ * @property [mode]   The kind of padding to use.
  */
 public class Padding(
     public var top: Int = 0,
