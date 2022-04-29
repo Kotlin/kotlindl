@@ -169,7 +169,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
                     is HeUniform -> INITIALIZER_HE_UNIFORM
                     is LeCunNormal -> INITIALIZER_LECUN_NORMAL
                     is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
-                    else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
+                    else -> throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported yet.")
                 } to KerasInitializerConfig(seed = initializer.seed.toInt())
             }
         }
@@ -181,7 +181,7 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
         is Ones -> INITIALIZER_ONES to KerasInitializerConfig()
         is Constant -> INITIALIZER_CONSTANT to KerasInitializerConfig(value = initializer.constantValue.toDouble())
         is Identity -> convertToIdentityInitializer(initializer)
-        else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
+        else -> throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported yet.")
     }
     return KerasInitializer(class_name = className, config = config)
 }
