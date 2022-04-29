@@ -176,6 +176,11 @@ private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyComp
         is RandomUniform -> convertToRandomUniformInitializer(initializer)
         is RandomNormal -> convertToRandomNormalInitializer(initializer)
         is TruncatedNormal -> INITIALIZER_TRUNCATED_NORMAL to KerasInitializerConfig(seed = initializer.seed.toInt())
+        is ParametrizedTruncatedNormal -> {
+            if (isKerasFullyCompatible) {
+                throw throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported in the fully compatible mode.")
+            } else convertToParametrizedTruncatedNormalInitializer(initializer)
+        }
         is Orthogonal -> convertToOrthogonalInitializer(initializer)
         is Zeros -> INITIALIZER_ZEROS to KerasInitializerConfig()
         is Ones -> INITIALIZER_ONES to KerasInitializerConfig()
@@ -222,6 +227,18 @@ private fun convertToIdentityInitializer(initializer: Identity): Pair<String, Ke
         INITIALIZER_IDENTITY,
         KerasInitializerConfig(
             gain = initializer.gain.toDouble()
+        )
+    )
+}
+
+private fun convertToParametrizedTruncatedNormalInitializer(initializer: ParametrizedTruncatedNormal): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_PARAMETRIZED_TRUNCATED_NORMAL, KerasInitializerConfig(
+            mean = initializer.mean.toDouble(),
+            stddev = initializer.stdev.toDouble(),
+            p1 = initializer.p1.toDouble(),
+            p2 = initializer.p2.toDouble(),
+            seed = initializer.seed.toInt()
         )
     )
 }

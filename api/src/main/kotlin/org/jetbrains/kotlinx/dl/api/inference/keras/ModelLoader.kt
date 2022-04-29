@@ -269,6 +269,13 @@ private fun convertToInitializer(initializer: KerasInitializer): Initializer {
         )
         INITIALIZER_VARIANCE_SCALING -> convertVarianceScalingInitializer(initializer)
         INITIALIZER_TRUNCATED_NORMAL -> TruncatedNormal(seed = seed)
+        INITIALIZER_PARAMETRIZED_TRUNCATED_NORMAL -> ParametrizedTruncatedNormal(
+            mean = config.mean!!.toFloat(),
+            stdev = config.stddev!!.toFloat(),
+            p1 = config.p1!!.toFloat(),
+            p2 = config.p2!!.toFloat(),
+            seed = seed
+        )
         INITIALIZER_ORTHOGONAL -> Orthogonal(seed = seed, gain = config.gain!!.toFloat())
         INITIALIZER_ZEROS -> Zeros()
         INITIALIZER_ONES -> Ones()

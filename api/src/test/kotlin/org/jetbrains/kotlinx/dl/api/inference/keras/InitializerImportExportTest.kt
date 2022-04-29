@@ -63,6 +63,24 @@ class InitializerImportExportTest {
     }
 
     @Test
+    fun parametrizedTruncatedNormal() {
+        LayerImportExportTest.run(
+            Sequential.of(
+                Input(10),
+                Dense(
+                    10, kernelInitializer = ParametrizedTruncatedNormal(
+                        mean = 0.1f,
+                        stdev = 2f,
+                        p1 = -5f,
+                        p2 = 5.1f,
+                        seed = 10
+                    )
+                )
+            )
+        )
+    }
+
+    @Test
     fun glorotNormal() {
         LayerImportExportTest.run(
             Sequential.of(
