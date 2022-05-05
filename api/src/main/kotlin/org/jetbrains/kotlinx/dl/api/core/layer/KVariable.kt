@@ -87,11 +87,9 @@ internal fun createVariable(
     )
 }
 
-internal fun KVariable.fill(data: Any, session: Session) = initializerOperation.fill(data, session)
-internal fun KVariable.init(session: Session) = initializerOperation.run(session)
-internal fun List<KVariable>.init(session: Session) {
+internal fun List<InitializerOperation>.init(session: Session) {
     if (isEmpty()) return
     val runner = session.runner()
-    map { it.initializerOperation.assign }.forEach(runner::addTarget)
+    map { it.assign }.forEach(runner::addTarget)
     runner.run()
 }

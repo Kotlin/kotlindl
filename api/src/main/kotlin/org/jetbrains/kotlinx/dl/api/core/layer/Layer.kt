@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.TrainableModel
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -21,7 +21,7 @@ public abstract class Layer(public var name: String) {
     public lateinit var outputShape: TensorShape
 
     /** Model where this layer is used. */
-    public var parentModel: TrainableModel? = null
+    public var parentModel: GraphTrainableModel? = null
 
     /** Returns inbound layers. */
     public var inboundLayers: MutableList<Layer> = mutableListOf()

@@ -948,11 +948,19 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
             val variable = layerVariablesByName[variableName]
             if (variable != null) {
-                variable.fill(data, session)
+                fill(variable, data)
             } else {
                 assignVariable(variableName, variableShape, data)
             }
         }
+    }
+
+    internal fun fill(variable: KVariable, data: Any) {
+        variable.initializerOperation.fill(data, session)
+    }
+
+    internal fun init(variable: KVariable) {
+        variable.initializerOperation.run(session)
     }
 
     /**

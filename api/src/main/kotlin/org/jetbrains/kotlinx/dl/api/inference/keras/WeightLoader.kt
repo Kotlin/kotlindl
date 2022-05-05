@@ -10,8 +10,10 @@ import io.jhdf.api.Group
 import io.jhdf.api.Node
 import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.layer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.fill
+import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.BIAS_DATA_PATH_TEMPLATE
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.KERNEL_DATA_PATH_TEMPLATE
@@ -252,7 +254,7 @@ private fun fillLayerVariablesFromKeras(layerName: String,
         require(variable.shape.toIntArray().contentEquals(dims)) {
             "${variable.name} variable shape in loaded data is ${dims.contentToString()}. Should be ${variable.shape.toIntArray().contentToString()}"
         }
-        variable.fill(it.data, model.session)
+        model.fill(variable, it.data)
     }
 }
 
@@ -264,7 +266,7 @@ private fun fillLayerWeights(layer: Layer, hdfFile: HdfFile, layerPaths: LayerPa
     }
     variables.forEach { (variable, variableDataPathTemplate) ->
         val data = hdfFile.getDatasetByPath(variableDataPathTemplate.format(layer.name, layer.name)).data
-        variable.fill(data, model.session)
+        model.fill(variable, data)
     }
     model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
@@ -275,6 +277,6 @@ private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
         model.logger.warn { "Initializing weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
         return
     }
-    variables.forEach { it.init(model.session) }
+    variables.forEach(model::init)
     model.logger.debug { "${layer.paramCount} parameters initialized for the layer ${layer.name}." }
 }

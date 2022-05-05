@@ -32,7 +32,7 @@ public var Layer.weights: Map<String, Array<*>>
         for (variable in variables) {
             val value = weights[variable.name]
             if (value != null) {
-                variable.fill(value, model.session)
+                model.fill(variable, value)
             }
         }
     }
