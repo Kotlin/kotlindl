@@ -37,7 +37,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import org.tensorflow.op.core.Variable
 import java.io.File
-import java.io.FileNotFoundException
 import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -114,8 +113,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         session = Session(kGraph.tfGraph)
     }
 
-    override fun variables(): List<Variable<Float>> = layers.variables().map { it.variable }
-    override fun frozenVariables(): List<Variable<Float>> = layers.frozenVariables().map { it.variable }
+    /**
+     * Returns a list of layer variables in this model.
+     */
+    private fun layerVariables(): List<KVariable> = layers.variables()
+    /**
+     * Returns a list of non-trainable, 'frozen' layer variables in this model.
+     */
+    private fun frozenLayerVariables(): List<KVariable> = layers.frozenVariables()
 
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
@@ -894,33 +899,68 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
     }
 
+    /** Returns a list of variables paired with their data. */
+    private fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
+        var variables = layerVariables().map { it.variable }
+        if (saveOptimizerState) {
+            variables = variables + kGraph.optimizerVariables()
+        }
+
+        val modelWeightsExtractorRunner = session.runner()
+        variables.forEach(modelWeightsExtractorRunner::fetch)
+        return variables.zip(modelWeightsExtractorRunner.run())
+    }
+
     override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
         check(!isModelInitialized) { "The model is initialized already." }
 
         Files.createDirectories(modelDirectory.toPath())
-        // Load variables names
-        val file = File("${modelDirectory.absolutePath}/variableNames.txt")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
-        val variableNames = file.readLines()
-        // TODO: common code could be refactored with the link to the function (load variable)
-        if (variableNames.isNotEmpty()) {
-            for (variableName in variableNames) {
-                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (loadOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else loadVariable(variableName, modelDirectory.absolutePath)
-            }
+        loadVariablesFromTxt(modelDirectory.path) { variableName ->
+            if (!isOptimizerVariable(variableName)) true
+            else if (loadOptimizerState) !isVariableRelatedToFrozenLayer(variableName)
+            else false
         }
 
         isModelInitialized = true
         if (loadOptimizerState) isOptimizerVariableInitialized = true
+    }
+
+    /** Check that the variable with the name [variableName] belongs to the frozen layer. */
+    private fun isVariableRelatedToFrozenLayer(variableName: String): Boolean {
+        return frozenLayerVariables().map { it.name }.any { variableName.contains(it) }
+    }
+
+    /**
+     * Loads variable data for variable names in the provided collection using a provided function.
+     * @param [variableNames] Variable names to load.
+     * @param [getData] Function that returns variable data by variable name and shape.
+     */
+    protected override fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
+        val layerVariablesByName = layerVariables().associateBy { it.name }
+
+        for (variableName in variableNames) {
+            val variableOperation = kGraph.tfGraph.operation(variableName)
+            check(variableOperation != null) { "Operation $variableName is not found in static graph." }
+            val variableShape = variableOperation.output<Float>(0).shape()
+
+            val data = getData(variableName, variableShape)
+
+            val variable = layerVariablesByName[variableName]
+            if (variable != null) {
+                fill(variable, data)
+            } else {
+                assignVariable(variableName, variableShape, data)
+            }
+        }
+    }
+
+    internal fun fill(variable: KVariable, data: Any) {
+        variable.initializerOperation.fill(data, session)
+    }
+
+    internal fun init(variable: KVariable) {
+        variable.initializerOperation.run(session)
     }
 
     /**

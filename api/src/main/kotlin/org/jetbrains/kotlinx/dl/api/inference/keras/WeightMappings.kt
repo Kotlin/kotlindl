@@ -43,10 +43,6 @@ internal object WeightMappings {
         }
     }
 
-    internal fun getLayerVariableNames(layer: Layer): List<String>? {
-        return getLayerVariables(layer)?.values?.map(KVariable::name)
-    }
-
     internal fun getLayerVariablePathTemplates(layer: Layer, layerPaths: LayerPaths?): Map<KVariable, String>? {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)

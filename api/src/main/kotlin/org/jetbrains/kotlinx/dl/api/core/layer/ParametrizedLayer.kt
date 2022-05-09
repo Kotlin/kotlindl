@@ -52,14 +52,7 @@ internal fun List<Layer>.frozenVariables(): List<KVariable> {
 /**
  * Initializes this layers variables using provided initializer operands.
  */
-public fun ParametrizedLayer.initialize(session: Session) {
-    // Only run the session if there is initializer ops.
-    if (variables.isNotEmpty()) {
-        val runner = session.runner()
-        variables.map { it.initializerOperand }.forEach(runner::addTarget)
-        runner.run()
-    }
-}
+public fun ParametrizedLayer.initialize(session: Session): Unit = variables.map { it.initializerOperation }.init(session)
 
 /**
  * Initializes variables for [ParametrizedLayer] instances using provided initializer operands.

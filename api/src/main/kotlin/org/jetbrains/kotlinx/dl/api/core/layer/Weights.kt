@@ -29,7 +29,10 @@ public var Layer.weights: Map<String, Array<*>>
         val model = parentModel
         requireNotNull(model) { "Layer '$name' is not related to any model" }
 
-        for ((name, value) in weights) {
-            model.assignVariable(name, value)
+        for (variable in variables) {
+            val value = weights[variable.name]
+            if (value != null) {
+                model.fill(variable, value)
+            }
         }
     }
