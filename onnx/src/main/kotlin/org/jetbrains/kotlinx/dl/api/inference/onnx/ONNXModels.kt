@@ -583,11 +583,24 @@ public object ONNXModels {
         public object YOLOv4 :
             ObjectDetection<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/objectdetection/yolov4") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
+                val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+                    data,
+                    ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
+                )
+
+                // TODO: should be returned from the Transpose from apply method
+                val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
+
+                return preprocessInput(
+                    transposedData,
+                    transposedShape,
+                    inputType = InputType.CV,
+                    channelsLast = false
+                )
             }
 
             override fun pretrainedModel(modelHub: ModelHub): OnnxInferenceModel {
-                TODO("Not yet implemented")
+                return modelHub.loadModel(this)
             }
 
             override fun preInit(): OnnxInferenceModel {

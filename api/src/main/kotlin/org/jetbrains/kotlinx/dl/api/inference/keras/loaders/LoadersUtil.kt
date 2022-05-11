@@ -27,6 +27,7 @@ public fun preprocessInput(
         InputType.TF -> floatArray.map { it / 127.5f - 1 }.toFloatArray()
         InputType.CAFFE -> caffeStylePreprocessing(floatArray, tensorShape!!, channelsLast)
         InputType.TORCH -> torchStylePreprocessing(floatArray, tensorShape!!, channelsLast)
+        InputType.CV -> floatArray.map { it / 255.0f }.toFloatArray()
     }
 }
 

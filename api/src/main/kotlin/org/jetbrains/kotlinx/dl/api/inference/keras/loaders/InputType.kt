@@ -25,5 +25,10 @@ public enum class InputType {
      * This preprocessing will scale pixels between 0 and 1,
      * then will normalize each channel with respect to the ImageNet dataset.
      */
-    TORCH
+    TORCH,
+
+    /**
+     * Just scale between 0 and 1
+     */
+    CV
 }
