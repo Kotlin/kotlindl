@@ -165,7 +165,7 @@ For more details on installing Jupyter Notebook and adding the Kotlin kernel, ch
   * [Deep Learning with KotlinDL](https://www.youtube.com/watch?v=jCFZc97_XQU) (Zinoviev Alexey at Huawei Developer Group HDG UK 2021, [slides](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa1RPX3h0a2FrZ2pUby1kSURzYWVpM0tHNFRrUXxBQ3Jtc0tucjZMRE1JbWNuN1BrbGFMc0FOeERPVEtMR0FDLUo4bi1lcC1BcmFkMkd0WFJOS3ZVMFQ3YlctUXFHU1lVdjVZMHUzYmlETjRCZ3lLclBpZGNWcXJXcmdVLTQ5Ujd2N0hNUHlMZXRTZE1wYktHSUZuSQ&q=https%3A%2F%2Fspeakerdeck.com%2Fzaleslaw%2Fdeep-learning-with-kotlindl))
   * [Introduction to Deep Learning with KotlinDL](https://www.youtube.com/watch?v=ruUz8uMZUVw) (Zinoviev Alexey at Kotlin Budapest User Group 2021, [slides](https://speakerdeck.com/zaleslaw/deep-learning-introduction-with-kotlindl))
 * [Change log for KotlinDL](CHANGELOG.md)
-* [Full KotlinDL API reference](https://jetbrains.github.io/KotlinDL/)
+* [Full KotlinDL API reference](https://kotlin.github.io/kotlindl/)
 
 ## Examples and tutorials
 You do not need to have any prior deep learning experience to start using KotlinDL. 
@@ -348,11 +348,11 @@ KotlinDL supports model inference in JVM backend applications. Android support i
 
 ## Contributing
 
-Read the [Contributing Guidelines](https://github.com/JetBrains/KotlinDL/blob/master/CONTRIBUTING.md).
+Read the [Contributing Guidelines](https://github.com/Kotlin/kotlindl/blob/master/CONTRIBUTING.md).
 
 ## Reporting issues/Support
 
-Please use [GitHub issues](https://github.com/JetBrains/KotlinDL/issues) for filing feature requests and bug reports. 
+Please use [GitHub issues](https://github.com/Kotlin/kotlindl/issues) for filing feature requests and bug reports. 
 You are also welcome to join the [#kotlindl channel](https://kotlinlang.slack.com/messages/kotlindl/) in the Kotlin Slack.
 
 ## Code of Conduct
