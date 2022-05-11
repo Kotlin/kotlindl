@@ -9,10 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.serializeModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import java.io.File
@@ -78,7 +75,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelConfiguration(configuration: File, inputShape: IntArray? = null): Sequential {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(configuration, inputShape)
+            return loadSequentialModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -88,7 +85,9 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File, inputShape: IntArray? = null): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromConfiguration(configuration: File,
+                                                    inputShape: IntArray? = null
+        ): Pair<Input, MutableList<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
             val config = loadSerializedModel(configuration)

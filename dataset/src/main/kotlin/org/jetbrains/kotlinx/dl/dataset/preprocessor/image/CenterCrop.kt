@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage
  *
  * @property [size] target image size.
  */
-public class CenterCrop(public var size: Int = -1): ImagePreprocessorBase() {
+public class CenterCrop(public var size: Int = -1) : ImagePreprocessorBase() {
 
     override fun getOutputShape(inputShape: ImageShape): ImageShape {
         if (size <= 0) return inputShape
@@ -27,9 +27,11 @@ public class CenterCrop(public var size: Int = -1): ImagePreprocessorBase() {
         if (size <= 0 || (image.width == size && image.height == size)) return image
 
         val paddedImage = padIfNecessary(image)
-        return paddedImage.getSubimage((paddedImage.width - size) / 2,
-                                       (paddedImage.height - size) / 2,
-                                       size, size).copy()
+        return paddedImage.getSubimage(
+            (paddedImage.width - size) / 2,
+            (paddedImage.height - size) / 2,
+            size, size
+        ).copy()
     }
 
     private fun padIfNecessary(image: BufferedImage): BufferedImage {
@@ -38,9 +40,11 @@ public class CenterCrop(public var size: Int = -1): ImagePreprocessorBase() {
             val horizontalSpace = (size - image.width).coerceAtLeast(0)
             val top = verticalSpace / 2
             val left = horizontalSpace / 2
-            return Padding(top = top, bottom = verticalSpace - top,
-                           left = left, right = horizontalSpace - left,
-                           mode = PaddingMode.Black).apply(image)
+            return Padding(
+                top = top, bottom = verticalSpace - top,
+                left = left, right = horizontalSpace - left,
+                mode = PaddingMode.Black
+            ).apply(image)
         }
         return image
     }

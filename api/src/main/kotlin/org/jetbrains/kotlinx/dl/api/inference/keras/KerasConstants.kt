@@ -11,6 +11,7 @@ internal const val LAYER_DENSE: String = "Dense"
 internal const val LAYER_INPUT: String = "InputLayer"
 internal const val LAYER_ACTIVATION: String = "Activation"
 internal const val LAYER_PERMUTE: String = "Permute"
+
 // Convolution layers
 internal const val LAYER_CONV1D: String = "Conv1D"
 internal const val LAYER_CONV2D: String = "Conv2D"
@@ -20,6 +21,7 @@ internal const val LAYER_CONV2D_TRANSPOSE: String = "Conv2DTranspose"
 internal const val LAYER_CONV3D_TRANSPOSE: String = "Conv3DTranspose"
 internal const val LAYER_DEPTHWISE_CONV2D: String = "DepthwiseConv2D"
 internal const val LAYER_SEPARABLE_CONV2D: String = "SeparableConv2D"
+
 // Pooling layers
 internal const val LAYER_MAX_POOL_1D: String = "MaxPooling1D"
 internal const val LAYER_MAX_POOL_2D: String = "MaxPooling2D"
@@ -33,13 +35,17 @@ internal const val LAYER_GLOBAL_MAX_POOL_3D: String = "GlobalMaxPooling3D"
 internal const val LAYER_GLOBAL_AVG_POOL_1D: String = "GlobalAveragePooling1D"
 internal const val LAYER_GLOBAL_AVG_POOL_2D: String = "GlobalAveragePooling2D"
 internal const val LAYER_GLOBAL_AVG_POOL_3D: String = "GlobalAveragePooling3D"
+
 // Recurrent layers
 internal const val LAYER_LSTM: String = "LSTM"
+
 // Normalization layers
 internal const val LAYER_NORMALIZATION: String = "Normalization"
 internal const val LAYER_BATCH_NORM: String = "BatchNormalization"
+
 // Regularization layers
 internal const val LAYER_DROPOUT: String = "Dropout"
+
 // Attention layers
 // Reshaping layers
 internal const val LAYER_FLATTEN: String = "Flatten"
@@ -54,6 +60,7 @@ internal const val LAYER_CROPPING_3D = "Cropping3D"
 internal const val LAYER_UP_SAMPLING_1D: String = "UpSampling1D"
 internal const val LAYER_UP_SAMPLING_2D: String = "UpSampling2D"
 internal const val LAYER_UP_SAMPLING_3D: String = "UpSampling3D"
+
 // Merging layers
 internal const val LAYER_ADD: String = "Add"
 internal const val LAYER_MULTIPLY: String = "Multiply"
@@ -62,7 +69,8 @@ internal const val LAYER_AVERAGE: String = "Average"
 internal const val LAYER_MAXIMUM: String = "Maximum"
 internal const val LAYER_MINIMUM: String = "Minimum"
 internal const val LAYER_CONCATENATE: String = "Concatenate"
-internal const val LAYER_DOT:String = "Dot"
+internal const val LAYER_DOT: String = "Dot"
+
 // Locally-connected layers
 // Activation layers
 internal const val LAYER_RELU: String = "ReLU"

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.dataset.image
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.PreprocessingImageTest.Companion.setRGB
@@ -60,5 +65,5 @@ class ImageConverterTest {
         Assertions.assertArrayEquals(expectedImage, targetImage)
     }
 
-    private fun gray(value : Float) = byteArrayOf((value * 255).toInt().toByte())
+    private fun gray(value: Float) = byteArrayOf((value * 255).toInt().toByte())
 }

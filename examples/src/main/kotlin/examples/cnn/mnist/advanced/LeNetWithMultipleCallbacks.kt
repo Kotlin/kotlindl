@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,8 +7,13 @@ package examples.cnn.mnist.advanced
 
 import examples.cnn.models.buildLetNet5Classic
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
-import org.jetbrains.kotlinx.dl.api.core.callback.*
-import org.jetbrains.kotlinx.dl.api.core.history.*
+import org.jetbrains.kotlinx.dl.api.core.callback.Callback
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStopping
+import org.jetbrains.kotlinx.dl.api.core.callback.EarlyStoppingMode
+import org.jetbrains.kotlinx.dl.api.core.callback.TerminateOnNaN
+import org.jetbrains.kotlinx.dl.api.core.history.BatchEvent
+import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
+import org.jetbrains.kotlinx.dl.api.core.history.History
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam

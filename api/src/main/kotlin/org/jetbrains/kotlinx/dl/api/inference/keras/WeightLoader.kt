@@ -252,7 +252,8 @@ private fun fillLayerVariablesFromKeras(layerName: String,
             )
         val dims = it.dimensions
         require(variable.shape.toIntArray().contentEquals(dims)) {
-            "${variable.name} variable shape in loaded data is ${dims.contentToString()}. Should be ${variable.shape.toIntArray().contentToString()}"
+            "${variable.name} variable shape in loaded data is ${dims.contentToString()}. " +
+                    "Should be ${variable.shape.toIntArray().contentToString()}"
         }
         model.fill(variable, it.data)
     }

@@ -43,7 +43,7 @@ internal fun loadSequentialModelConfiguration(
     return deserializeSequentialModel(sequentialConfig, inputShape)
 }
 
-internal fun deserializeSequentialModel(sequentialConfig: KerasModel?,  inputShape: IntArray? = null): Sequential {
+internal fun deserializeSequentialModel(sequentialConfig: KerasModel?, inputShape: IntArray? = null): Sequential {
     val pair = loadSequentialModelLayers(sequentialConfig, inputShape)
     val input: Input = pair.first
     val layers = pair.second
@@ -59,7 +59,9 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?,  inputSha
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadSequentialModelLayers(config: KerasModel?, inputShape: IntArray? = null): Pair<Input, MutableList<Layer>> {
+internal fun loadSequentialModelLayers(config: KerasModel?,
+                                       inputShape: IntArray? = null
+): Pair<Input, MutableList<Layer>> {
     val kerasLayers = config!!.config!!.layers!!
 
     val input = createInputLayer(kerasLayers.first(), inputShape)
@@ -139,9 +141,9 @@ private fun convertToLayer(
         else -> throw IllegalStateException("${kerasLayer.class_name} is not supported yet!")
     }.apply {
         if (this is TrainableLayer) {
-            isTrainable = kerasLayer.config?.trainable?:isTrainable
+            isTrainable = kerasLayer.config?.trainable ?: isTrainable
         }
-        name = kerasLayer.config?.name?:name
+        name = kerasLayer.config?.name ?: name
     }
 }
 
@@ -393,8 +395,8 @@ private fun convertToInterpolationMethod(interpolation: String): InterpolationMe
  */
 
 private fun createInputLayer(layer: KerasLayer, inputShape: IntArray? = null): Input {
-    val inputLayerDims = if (inputShape!= null) {
-       inputShape.map { it.toLong() }.toLongArray()
+    val inputLayerDims = if (inputShape != null) {
+        inputShape.map { it.toLong() }.toLongArray()
     } else {
         val batchInputShape = layer.config!!.batch_input_shape!!
         batchInputShape.subList(1, batchInputShape.size).map { it!!.toLong() }.toLongArray()

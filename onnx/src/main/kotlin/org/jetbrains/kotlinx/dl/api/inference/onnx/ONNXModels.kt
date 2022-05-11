@@ -1,14 +1,17 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.*
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
@@ -151,7 +154,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB0(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b0", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b0",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -159,7 +166,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB1(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b1", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b1",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -167,7 +178,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB2(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b2", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b2",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -175,7 +190,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB3(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b3", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b3",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -183,7 +202,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB4(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b4", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b4",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -191,7 +214,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB5(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b5", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b5",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -199,7 +226,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB6(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b6", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b6",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -207,7 +238,11 @@ public object ONNXModels {
 
         /** */
         public class EfficientNetB7(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-b7", channelsFirst = false, noTop = noTop) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/efficientnet/efficientnet-b7",
+                channelsFirst = false,
+                noTop = noTop
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -307,7 +342,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): SSDMobileNetV1ObjectDetectionModel {
-                val model =  SSDMobileNetV1ObjectDetectionModel()
+                val model = SSDMobileNetV1ObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 1000L, 1000L, 3L)
                 return model
             }
@@ -350,7 +385,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 512L, 512L, 3L)
                 return model
             }
@@ -387,7 +422,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 640L, 640L, 3L)
                 return model
             }
@@ -424,7 +459,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 768L, 768L, 3L)
                 return model
             }
@@ -461,7 +496,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 896L, 896L, 3L)
                 return model
             }
@@ -498,7 +533,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 1024L, 1024L, 3L)
                 return model
             }
@@ -535,7 +570,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
                 return model
             }
@@ -572,7 +607,7 @@ public object ONNXModels {
             }
 
             override fun preInit(): EfficientDetObjectDetectionModel {
-                val model =  EfficientDetObjectDetectionModel()
+                val model = EfficientDetObjectDetectionModel()
                 model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
                 return model
             }

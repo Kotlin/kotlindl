@@ -216,7 +216,12 @@ fun runImageRecognitionTransferLearningOnTopModel(
             )
         )
 
-        it.loadWeightsByPaths(hdfFile, weightPaths, missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH, forFrozenLayersOnly = true)
+        it.loadWeightsByPaths(
+            hdfFile,
+            weightPaths,
+            missedWeights = MissedWeightsStrategy.LOAD_CUSTOM_PATH,
+            forFrozenLayersOnly = true
+        )
 
         val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy before training $accuracyBeforeTraining")

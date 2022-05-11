@@ -30,7 +30,9 @@ object LayerImportExportTest {
         listOf(expectedModel, actualModel).forEach {
             it.compile(Adam(), Losses.MSE, Metrics.ACCURACY)
         }
-        Assertions.assertEquals(expectedModel.layers.joinToString("\n"),
-                                actualModel.layers.joinToString("\n"))
+        Assertions.assertEquals(
+            expectedModel.layers.joinToString("\n"),
+            actualModel.layers.joinToString("\n")
+        )
     }
 }

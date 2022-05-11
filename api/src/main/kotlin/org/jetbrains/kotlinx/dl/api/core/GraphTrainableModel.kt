@@ -117,6 +117,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      * Returns a list of layer variables in this model.
      */
     private fun layerVariables(): List<KVariable> = layers.variables()
+
     /**
      * Returns a list of non-trainable, 'frozen' layer variables in this model.
      */
@@ -327,7 +328,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 val averageTrainingMetricAccum = FloatArray(metrics.size) { 0.0f }
 
                 while (batchIter.hasNext() && !stopTraining) {
-                    fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory)}
+                    fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory) }
                     val batch: DataBatch = batchIter.next()
 
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
@@ -370,12 +371,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                             // TODO: create map (metric name and metric value)
                                             logger.debug { "Batch stat: { lossValue: $lossValue metricValues: $metricValues }" }
 
-                                            fitCallbacks.forEach { it.onTrainBatchEnd(
-                                                batchCounter,
-                                                trainBatchSize,
-                                                batchTrainingEvent,
-                                                trainingHistory
-                                            ) }
+                                            fitCallbacks.forEach {
+                                                it.onTrainBatchEnd(
+                                                    batchCounter,
+                                                    trainBatchSize,
+                                                    batchTrainingEvent,
+                                                    trainingHistory
+                                                )
+                                            }
                                         }
                                     }
                             }
@@ -384,23 +387,29 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 }
 
                 val avgTrainingMetricValue = FloatArray(metrics.size) { 0.0f }
-                averageTrainingMetricAccum.forEachIndexed { index, metricValue ->  avgTrainingMetricValue[index] = metricValue / batchCounter}
+                averageTrainingMetricAccum.forEachIndexed { index, metricValue ->
+                    avgTrainingMetricValue[index] = metricValue / batchCounter
+                }
 
                 val avgLossValue = (averageTrainingLossAccum / batchCounter)
 
                 val nanList = mutableListOf<Double>()
-                for(j in 1 .. metrics.size) {
+                for (j in 1..metrics.size) {
                     nanList.add(Double.NaN)
                 }
 
                 val epochTrainingEvent = EpochTrainingEvent(
                     i,
-                    avgLossValue.toDouble(), avgTrainingMetricValue.map { it.toDouble() }.toMutableList(), Double.NaN, nanList
+                    avgLossValue.toDouble(),
+                    avgTrainingMetricValue.map { it.toDouble() }.toMutableList(),
+                    Double.NaN,
+                    nanList
                 )
 
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
-                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metrics.convertBack(it)] }.toList()// TODO: probably I should it by name, not by type
+                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metrics.convertBack(it)] }.toList()
+                    // TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
                     epochTrainingEvent.valMetricValues = validationMetricValues!!
@@ -453,7 +462,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             val metricValues = mutableListOf<Float>()
 
             check(tensorList.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensorList.size - 1} metrics are returned!" }
-            for (i in 1 .. metricOps.size) {
+            for (i in 1..metricOps.size) {
                 metricValues.add(tensorList[i].floatValue())
             }
 
@@ -514,7 +523,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                             val metricValues = mutableListOf<Float>()
 
                             check(lossAndMetricsTensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${lossAndMetricsTensors.size - 1} metrics are returned!" }
-                            for (i in 1 .. metricOps.size) {
+                            for (i in 1..metricOps.size) {
                                 metricValues.add(lossAndMetricsTensors[i].floatValue())
                             }
 
@@ -523,10 +532,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                 averageMetricAccum[i] += metricValues[i]
                             }
 
-                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), averageMetricAccum.map { it.toDouble() })
+                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(),
+                                                        averageMetricAccum.map { it.toDouble() })
                             evaluationHistory.appendBatch(batchEvent)
 
-                            callbacks.forEach { it.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory) }
+                            callbacks.forEach {
+                                it.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
+                            }
                         }
                     }
 
@@ -537,7 +549,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
 
         val avgMetricValue = FloatArray(metrics.size) { 0.0f }
-        averageMetricAccum.forEachIndexed { index, metricValue ->  avgMetricValue[index] = metricValue / batchCounter}
+        averageMetricAccum.forEachIndexed { index, metricValue -> avgMetricValue[index] = metricValue / batchCounter }
 
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 

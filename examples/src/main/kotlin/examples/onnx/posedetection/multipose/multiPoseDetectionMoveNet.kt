@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -43,7 +43,7 @@ fun multiPoseDetectionMoveNet() {
         val inputData = modelType.preprocessInput(imageFile, preprocessing)
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
-        visualisePoseLandmarks(imageFile, (yhat["output_0"]  as Array<Array<FloatArray>>)[0])
+        visualisePoseLandmarks(imageFile, (yhat["output_0"] as Array<Array<FloatArray>>)[0])
     }
 }
 

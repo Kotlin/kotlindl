@@ -40,7 +40,10 @@ fun ssd() {
             }
         }
         for (i in 1..6) {
-            val inputData = modelType.preprocessInput(getFileFromResource("datasets/detection/image$i.jpg"), preprocessing)
+            val inputData = modelType.preprocessInput(
+                getFileFromResource("datasets/detection/image$i.jpg"),
+                preprocessing
+            )
 
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())

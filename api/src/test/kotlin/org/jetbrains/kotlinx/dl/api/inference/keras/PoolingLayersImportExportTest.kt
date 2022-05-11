@@ -27,7 +27,12 @@ class PoolingLayersImportExportTest {
         LayerImportExportTest.run(
             Sequential.of(
                 Input(100, 100, 3),
-                AvgPool2D(name = "test_avg_pool", poolSize = intArrayOf(1, 5, 3, 1), strides = intArrayOf(1, 5, 3, 1), padding = ConvPadding.SAME)
+                AvgPool2D(
+                    name = "test_avg_pool",
+                    poolSize = intArrayOf(1, 5, 3, 1),
+                    strides = intArrayOf(1, 5, 3, 1),
+                    padding = ConvPadding.SAME
+                )
             )
         )
     }
@@ -37,7 +42,12 @@ class PoolingLayersImportExportTest {
         LayerImportExportTest.run(
             Sequential.of(
                 Input(100, 100, 100, 3),
-                AvgPool3D(name = "test_avg_pool", poolSize = intArrayOf(1, 7, 5, 3, 1), strides = intArrayOf(1, 7, 5, 3, 1), padding = ConvPadding.SAME)
+                AvgPool3D(
+                    name = "test_avg_pool",
+                    poolSize = intArrayOf(1, 7, 5, 3, 1),
+                    strides = intArrayOf(1, 7, 5, 3, 1),
+                    padding = ConvPadding.SAME
+                )
             )
         )
     }
@@ -57,7 +67,12 @@ class PoolingLayersImportExportTest {
         LayerImportExportTest.run(
             Sequential.of(
                 Input(100, 100, 3),
-                MaxPool2D(name = "test_max_pool", poolSize = intArrayOf(1, 5, 3, 1), strides = intArrayOf(1, 5, 3, 1), padding = ConvPadding.SAME)
+                MaxPool2D(
+                    name = "test_max_pool",
+                    poolSize = intArrayOf(1, 5, 3, 1),
+                    strides = intArrayOf(1, 5, 3, 1),
+                    padding = ConvPadding.SAME
+                )
             )
         )
     }
@@ -67,7 +82,12 @@ class PoolingLayersImportExportTest {
         LayerImportExportTest.run(
             Sequential.of(
                 Input(100, 100, 100, 10),
-                MaxPool3D(name = "test_max_pool", poolSize = intArrayOf(1, 7, 5, 3, 1), strides = intArrayOf(1, 7, 5, 3, 1), padding = ConvPadding.SAME)
+                MaxPool3D(
+                    name = "test_max_pool",
+                    poolSize = intArrayOf(1, 7, 5, 3, 1),
+                    strides = intArrayOf(1, 7, 5, 3, 1),
+                    padding = ConvPadding.SAME
+                )
             )
         )
     }

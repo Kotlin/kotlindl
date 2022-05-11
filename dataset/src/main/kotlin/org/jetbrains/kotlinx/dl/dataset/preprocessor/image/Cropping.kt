@@ -40,8 +40,10 @@ public class Cropping(
     override fun apply(image: BufferedImage): BufferedImage {
         val croppedImageShape = getOutputShape(image.getShape())
 
-        return image.getSubimage(left, top,
-                                 croppedImageShape.width!!.toInt(),
-                                 croppedImageShape.height!!.toInt()).copy()
+        return image.getSubimage(
+            left, top,
+            croppedImageShape.width!!.toInt(),
+            croppedImageShape.height!!.toInt()
+        ).copy()
     }
 }

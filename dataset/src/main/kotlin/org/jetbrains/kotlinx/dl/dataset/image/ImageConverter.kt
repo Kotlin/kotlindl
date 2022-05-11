@@ -118,7 +118,7 @@ public object ImageConverter {
         check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
         check(supportedImageTypes.contains(image.type)) {
             "Images with type ${image.type} are not supported yet. " +
-                "Supported types are: $supportedImageTypes. See also `java.awt.image.BufferedImage.getType`."
+                    "Supported types are: $supportedImageTypes. See also `java.awt.image.BufferedImage.getType`."
         }
 
         val raster = image.raster

@@ -52,7 +52,9 @@ internal fun List<Layer>.frozenVariables(): List<KVariable> {
 /**
  * Initializes this layers variables using provided initializer operands.
  */
-public fun ParametrizedLayer.initialize(session: Session): Unit = variables.map { it.initializerOperation }.init(session)
+public fun ParametrizedLayer.initialize(session: Session) {
+    variables.map { it.initializerOperation }.init(session)
+}
 
 /**
  * Initializes variables for [ParametrizedLayer] instances using provided initializer operands.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -107,7 +107,11 @@ fun lenetMnistWithCustomCallback() {
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, callback = FitCallback())
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE, callback = EvaluationCallback()).metrics[Metrics.ACCURACY]
+        val accuracy = it.evaluate(
+            dataset = test,
+            batchSize = TEST_BATCH_SIZE,
+            callback = EvaluationCallback()
+        ).metrics[Metrics.ACCURACY]
         println("Accuracy: $accuracy")
 
         val predictions = it.predictSoftly(dataset = test, batchSize = TEST_BATCH_SIZE, callback = PredictCallback())

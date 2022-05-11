@@ -474,7 +474,11 @@ internal class SequentialModelTest {
         assertFalse(correctTestModel.isModelCompiled)
 
         correctTestModel.use {
-            it.compile(optimizer = Adam(), loss = SoftmaxCrossEntropyWithLogits(), metrics = listOf(Accuracy(), Accuracy()))
+            it.compile(
+                optimizer = Adam(),
+                loss = SoftmaxCrossEntropyWithLogits(),
+                metrics = listOf(Accuracy(), Accuracy())
+            )
             assertTrue(correctTestModel.isModelCompiled)
 
             assertEquals(it.layers[0].paramCount, 0)

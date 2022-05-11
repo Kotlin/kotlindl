@@ -1,14 +1,15 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package examples.onnx.cv
 
+import examples.onnx.cv.efficicentnet.efficientNet4LitePrediction
 import examples.onnx.cv.resnet.notop.resnet50CustomPrediction
 import examples.onnx.cv.resnet.notop.resnet50additionalTraining
-import examples.onnx.cv.efficicentnet.efficientNet4LitePrediction
-import examples.onnx.cv.resnet.*
+import examples.onnx.cv.resnet.resnet18LightAPIPrediction
+import examples.onnx.cv.resnet.resnet18prediction
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.junit.jupiter.api.Test
 
@@ -79,7 +80,7 @@ class OnnxResNetTestSuite {
     }
 
     @Test
-    fun efficientNet4LitePredictionTest(){
+    fun efficientNet4LitePredictionTest() {
         efficientNet4LitePrediction()
     }
 }

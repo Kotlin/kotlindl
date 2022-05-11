@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,14 +11,11 @@ import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.KerasPadding
 import org.jetbrains.kotlinx.dl.api.inference.keras.config.LayerConfig
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class PaddingConverterTest {
-    private val klaxon = Klaxon()
-        .converter(PaddingConverter())
+    private val klaxon = Klaxon().converter(PaddingConverter())
     private val parser = Parser.default()
 
     @Test

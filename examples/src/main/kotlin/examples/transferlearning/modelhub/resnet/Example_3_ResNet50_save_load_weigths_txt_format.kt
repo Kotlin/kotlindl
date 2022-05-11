@@ -100,8 +100,7 @@ fun main() {
             it.reshape(224, 224, 3)
 
             val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions
-            )
+            val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -222,7 +222,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
     private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): File {
         var modelDirectory = "/" + modelType.modelRelativePath
-        if(noTop) modelDirectory += "/notop"
+        if (noTop) modelDirectory += "/notop"
 
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
         val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
@@ -246,7 +246,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     /** Returns .h5 file with model weights, saved from Keras 2.x. */
     private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): HdfFile {
         var modelDirectory = "/" + modelType.modelRelativePath
-        if(noTop) modelDirectory += "/notop"
+        if (noTop) modelDirectory += "/notop"
 
         val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
         val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME

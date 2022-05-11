@@ -243,7 +243,11 @@ internal class SequentialBasicTest : IntegrationTest() {
         val (train, test) = mnist()
 
         testModel.use {
-            it.compile(optimizer = Adam(), loss = SoftmaxCrossEntropyWithLogits(), metrics = listOf(Accuracy(), MSE(), MAE()))
+            it.compile(
+                optimizer = Adam(),
+                loss = SoftmaxCrossEntropyWithLogits(),
+                metrics = listOf(Accuracy(), MSE(), MAE())
+            )
 
             val trainingHistory =
                 it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)

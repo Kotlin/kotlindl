@@ -34,7 +34,9 @@ internal fun convKernelVarName(name: String, dim: Int): String = layerVarName(na
 internal fun convTransposeBiasVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_transpose_bias")
 
 /** Default Conv transpose kernel variable name in TensorFlow graph, based on layer's name. */
-internal fun convTransposeKernelVarName(name: String, dim: Int): String = layerVarName(name, "conv${dim}d_transpose_kernel")
+internal fun convTransposeKernelVarName(name: String, dim: Int): String {
+    return layerVarName(name, "conv${dim}d_transpose_kernel")
+}
 
 /** Default DepthwiseConv2d bias variable name in TensorFlow graph, based on layer's name. */
 internal fun depthwiseConv2dBiasVarName(name: String): String = layerVarName(name, "depthwise_conv2d_bias")

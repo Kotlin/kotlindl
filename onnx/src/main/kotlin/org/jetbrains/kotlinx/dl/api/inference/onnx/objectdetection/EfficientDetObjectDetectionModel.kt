@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,9 +10,11 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
@@ -42,10 +44,10 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
                     classLabel = cocoCategoriesForEfficientDet[items[i][6].toInt()]!!,
                     probability = probability,
                     // left, bot, right, top
-                    xMin = minOf (items[i][2]/inputShape[2], 1.0f),
-                    yMax = minOf (items[i][3]/inputShape[1], 1.0f),
-                    xMax = minOf (items[i][4]/inputShape[2], 1.0f),
-                    yMin = minOf (items[i][1]/inputShape[1], 1.0f)
+                    xMin = minOf(items[i][2] / inputShape[2], 1.0f),
+                    yMax = minOf(items[i][3] / inputShape[1], 1.0f),
+                    xMax = minOf(items[i][4] / inputShape[2], 1.0f),
+                    yMin = minOf(items[i][1] / inputShape[1], 1.0f)
                 )
                 foundObjects.add(detectedObject)
             }

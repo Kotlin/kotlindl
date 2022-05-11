@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -260,7 +260,10 @@ fun drawRawPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Ar
     frame.isResizable = false
 }
 
-fun drawMultiPoseLandMarks(dst: FloatArray, imageShape: ImageShape, multiPoseDetectionResult: MultiPoseDetectionResult) {
+fun drawMultiPoseLandMarks(dst: FloatArray,
+                           imageShape: ImageShape,
+                           multiPoseDetectionResult: MultiPoseDetectionResult
+) {
     val frame = JFrame("Landmarks")
     @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(MultiPosePointsJPanel(dst, imageShape, multiPoseDetectionResult))
@@ -305,12 +308,12 @@ class RawMultiPosePointsJPanel(
         val posePoints = mutableListOf<MutableList<Triple<Float, Float, Float>>>()
         rawPosePoints.forEachIndexed { index, floats ->
             val poseLandmarks = mutableListOf<Triple<Float, Float, Float>>()
-            for (i in 0 .. 50 step 3) {
-                poseLandmarks.add(i%3, Triple(floats[i + 1], floats[i], floats[i + 2]))
+            for (i in 0..50 step 3) {
+                poseLandmarks.add(i % 3, Triple(floats[i + 1], floats[i], floats[i + 2]))
             }
 
             //if(floats[55] > 0.1) { // threshold
-                posePoints.add(index, poseLandmarks)
+            posePoints.add(index, poseLandmarks)
             //}
         }
 
@@ -531,7 +534,8 @@ class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, priv
     }
 }
 
-class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Landmark>) : JPanel() {
+class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Landmark>) :
+    JPanel() {
     private val bufferedImage = image.toBufferedImage(imageShape)
 
     override fun paint(graphics: Graphics) {

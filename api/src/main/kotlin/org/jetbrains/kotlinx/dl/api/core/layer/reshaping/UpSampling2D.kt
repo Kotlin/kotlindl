@@ -66,8 +66,10 @@ public class UpSampling2D(
         )
         return when (interpolation) {
             InterpolationMethod.NEAREST -> tf.image.resizeNearestNeighbor(input, newSize)
-            InterpolationMethod.BILINEAR ->
-                tf.image.resizeBilinear(input, newSize, ResizeBilinear.halfPixelCenters(true))
+            InterpolationMethod.BILINEAR -> tf.image.resizeBilinear(
+                input, newSize,
+                ResizeBilinear.halfPixelCenters(true)
+            )
             else -> throw IllegalArgumentException("The interpolation type interpolation is not supported.")
         }
     }

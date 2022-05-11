@@ -14,7 +14,7 @@
             <AppenderRef ref="STDOUT" level="DEBUG"/>
         </Root>
         <Logger name="io.jhdf" level="off" additivity="true">
-            <appender-ref ref="STDOUT" />
+            <appender-ref ref="STDOUT"/>
         </Logger>
     </Loggers>
 </Configuration>

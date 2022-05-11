@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -36,7 +36,10 @@ public class Orthogonal(
         require(dimsShape >= 2) { "The tensor to initialize must be at least two-dimensional" }
 
         // Generate a random matrix
-        val distOpND: Operand<Float> = tf.random.statelessRandomNormal(shape, tf.constant(longArrayOf(seed, 0L)), getDType())
+        val distOpND: Operand<Float> = tf.random.statelessRandomNormal(
+            shape,
+            tf.constant(longArrayOf(seed, 0L)), getDType()
+        )
 
         // Flatten the generated random matrix with the last dimension remaining
         // its original shape, so it works for conv2d

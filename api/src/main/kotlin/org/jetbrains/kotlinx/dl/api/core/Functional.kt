@@ -7,8 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
@@ -90,13 +90,14 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             layers += pretrainedLayers
 
             val topLayers = topModel.layers
-            layers+= topLayers
+            layers += topLayers
             topLayers[0].inboundLayers.add(pretrainedLayers.last())
 
             if (topModel is Sequential && layers.size > 1) {
                 // establish edges in DAG
                 topLayers.subList(1, topLayers.size).forEachIndexed { index, layer ->
-                    val topLayersIndex = index - 1 + 1 // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
+                    val topLayersIndex = index - 1 + 1 
+                    // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
                     layer.inboundLayers.add(topLayers[topLayersIndex])
                 }
             }
