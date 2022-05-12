@@ -48,16 +48,16 @@ fun lenetWithAlternativeLossFunction() {
 
     val (newTrain, validation) = train.split(0.95)
 
-    lenet5Classic.use {
-        it.compile(
+    lenet5Classic.use { model ->
+        model.compile(
             optimizer = Adam(),
             loss = Losses.HUBER,
             metric = Metrics.ACCURACY
         )
 
-        it.logSummary()
+        model.logSummary()
 
-        val history = it.fit(
+        val history = model.fit(
             trainingDataset = newTrain,
             validationDataset = validation,
             epochs = EPOCHS,
@@ -65,7 +65,7 @@ fun lenetWithAlternativeLossFunction() {
             validationBatchSize = TEST_BATCH_SIZE
         )
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        val accuracy = model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 
         println("Accuracy: $accuracy")
 

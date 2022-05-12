@@ -112,9 +112,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(
-                configuration, inputShape
-            )
+            return loadSequentialModelConfiguration(configuration, inputShape)
         }
 
         /**

@@ -49,7 +49,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun mobilenetWithAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    var modelType = TFModels.CV.MobileNet()
+    val modelType = TFModels.CV.MobileNet()
     val model = modelHub.loadModel(modelType)
 
     val preprocessing: Preprocessing = preprocess {

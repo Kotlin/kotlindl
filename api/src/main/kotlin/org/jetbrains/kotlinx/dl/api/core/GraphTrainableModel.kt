@@ -412,7 +412,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     // TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
-                    epochTrainingEvent.valMetricValues = validationMetricValues!!
+                    epochTrainingEvent.valMetricValues = validationMetricValues
                     logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()} val loss: $validationLossValue val metrics: $validationMetricValues" } // TODO: check printing for validation
                 } else {
                     logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()}" }

@@ -242,7 +242,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
                     return FloatArray(xFiles.size) { Float.NaN }
                 }
                 else -> {
-                    throw UnsupportedOperationException("Unknown label generator: ${labelGenerator.toString()}") // TODO: labelGenerator.apply(...) will be better solution here.
+                    throw UnsupportedOperationException("Unknown label generator: ${labelGenerator}") // TODO: labelGenerator.apply(...) will be better solution here.
                 }
             }
         }

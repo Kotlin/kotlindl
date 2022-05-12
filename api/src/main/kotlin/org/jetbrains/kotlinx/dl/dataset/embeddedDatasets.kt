@@ -189,7 +189,7 @@ public fun freeSpokenDigits(
     val dataset = File(path)
         .listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
-    val maxDataSize = dataset.map { it.first.size }.maxOrNull()
+    val maxDataSize = dataset.maxOfOrNull { it.first.size }
         ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
     check(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
         "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"

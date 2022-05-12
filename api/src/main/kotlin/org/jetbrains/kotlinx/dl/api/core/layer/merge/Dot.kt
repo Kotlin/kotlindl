@@ -33,8 +33,8 @@ public class Dot(
         require(input.size == 2) { "A `Dot` layer should be called on exactly 2 input. 'Received: input=${input}" }
         var x1 = input[0]
         var x2 = input[1]
-        val axes: IntArray = IntArray(2)
-        val scope: Scope = tf.scope()
+        val axes = IntArray(2)
+        val scope = tf.scope()
         for (i in 0 until 2) {
             if (axis[i] < 0) {
                 axes[i] = axis[i] % input[i].asOutput().shape().numDimensions()
@@ -89,7 +89,7 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
     val xDim = x.asOutput().shape().numDimensions()
     val yDim = y.asOutput().shape().numDimensions()
     val diff: Int
-    var x2: Operand<Float> = x;
+    var x2: Operand<Float> = x
     var y2: Operand<Float> = y
     if (xDim > yDim) {
         diff = xDim - yDim
@@ -120,10 +120,10 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
     val x2Dim = x2.asOutput().shape().numDimensions()
     val y2Dim = y2.asOutput().shape().numDimensions()
     if (x2Dim == 2 && y2Dim == 2) {
-        if (axis[0] == axis[1]) {
-            out = ReduceSum.create(scope, Mul.create(scope, x2, y2), Constant.create(scope, axis[0]))
+        out = if (axis[0] == axis[1]) {
+            ReduceSum.create(scope, Mul.create(scope, x2, y2), Constant.create(scope, axis[0]))
         } else {
-            out = ReduceSum.create(
+            ReduceSum.create(
                 scope,
                 Mul.create(scope, Transpose.create(scope, x2, Constant.create(scope, intArrayOf(1, 0))), y2),
                 Constant.create(scope, axis[1])
@@ -142,10 +142,10 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
     }
     val idx: Float
     if (diff != 0) {
-        if (xDim > yDim) {
-            idx = (xDim + yDim - 3).toFloat()
+        idx = if (xDim > yDim) {
+            (xDim + yDim - 3).toFloat()
         } else {
-            idx = (xDim - 1).toFloat()
+            (xDim - 1).toFloat()
         }
         out = Squeeze.create(scope, Constant.create(scope, FloatArray(diff) { it + idx }))
     }
