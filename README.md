@@ -145,7 +145,7 @@ Or add just one dependency if you don’t need datasets, ONNX and visualization:
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
 ```
-The latest KotlinDL version is 0.4.0-alpha-2. 
+The latest KotlinDL version is 0.4.0-alpha-4. 
 The latest stable KotlinDL version is 0.3.0. 
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
