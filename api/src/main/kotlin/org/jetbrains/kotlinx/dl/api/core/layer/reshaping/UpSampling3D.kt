@@ -20,6 +20,8 @@ import org.tensorflow.op.Ops
  * Output shape: 5D tensor with shape `(batch_size, dim1 * size[0], dim2 * size[1], dim3 * size[2], depth)`.
  *
  * @property [size] Upsampling factor array of size 3 (i.e. number of repeats per each dimension).
+ *
+ * @since 0.3
  */
 public class UpSampling3D(
     public val size: IntArray = intArrayOf(2, 2, 2),

@@ -12,6 +12,8 @@ import org.tensorflow.op.Ops
  * Zero-padding layer for 3D input (e.g. video).
  * This layer can add zeros in the rows, cols and depth of a video tensor.
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
+ *
+ * @since 0.3
  */
 public class ZeroPadding3D : AbstractZeroPadding {
     public val padding: IntArray

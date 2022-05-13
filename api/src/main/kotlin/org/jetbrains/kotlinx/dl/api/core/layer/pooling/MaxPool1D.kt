@@ -24,6 +24,8 @@ import org.tensorflow.op.core.Squeeze
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no padding, or
  * [ConvPadding.SAME] which means padding the input equally such that the output has the same dimension
  * as the input.
+ *
+ * @since 0.3
  */
 public class MaxPool1D(
     public val poolSize: IntArray = intArrayOf(1, 2, 1),

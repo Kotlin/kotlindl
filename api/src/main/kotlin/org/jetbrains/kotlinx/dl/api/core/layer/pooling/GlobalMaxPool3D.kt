@@ -14,6 +14,8 @@ import org.tensorflow.op.Ops
  * Global max pooling operation for 3D data (e.g. videos, spatio-temporal).
  *
  * Downsamples the input by taking the maximum value over spatio-temporal dimensions.
+ *
+ * @since 0.3
  */
 public class GlobalMaxPool3D(
     name: String = "",

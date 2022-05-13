@@ -29,6 +29,8 @@ import org.tensorflow.op.Ops
  * @property [alphaInitializer] Initializer instance for the weights.
  * @property [alphaRegularizer] Regularizer instance for the weights.
  * @property [sharedAxes] The axes along which to share learnable parameters.
+ *
+ * @since 0.3
  */
 public class PReLU(
     public val alphaInitializer: Initializer = Zeros(),

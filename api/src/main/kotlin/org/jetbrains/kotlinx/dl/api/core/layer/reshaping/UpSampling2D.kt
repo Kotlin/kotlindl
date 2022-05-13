@@ -23,6 +23,8 @@ import org.tensorflow.op.image.ResizeBilinear
  * @property [size] Upsampling factor array of size 2 (i.e. number of repeats per rows and columns).
  * @property [interpolation] Interpolation method; could be either of [InterpolationMethod.NEAREST] or
  * [InterpolationMethod.BILINEAR].
+ *
+ * @since 0.3
  */
 public class UpSampling2D(
     public val size: IntArray = intArrayOf(2, 2),

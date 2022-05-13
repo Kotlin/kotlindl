@@ -20,6 +20,8 @@ import org.tensorflow.op.Ops
  *
  * @property [cropping] An integer array of size two (`[begin_crop, end_crop]`) indicating
  * the number of elements to remove from the beginning and end of the cropping axis.
+ *
+ * @since 0.3
  */
 public class Cropping1D(
     public val cropping: IntArray,

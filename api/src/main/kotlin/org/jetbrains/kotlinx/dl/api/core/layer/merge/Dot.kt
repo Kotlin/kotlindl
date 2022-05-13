@@ -20,6 +20,8 @@ import org.tensorflow.op.math.Square
  *
  * @param axis: Axis along which to take the dot product.
  * @param normalize: Whether to L2-normalize samples along the dot product axis before taking the dot product.
+ *
+ * @since 0.4
  */
 public class Dot(
     public val axis: IntArray,

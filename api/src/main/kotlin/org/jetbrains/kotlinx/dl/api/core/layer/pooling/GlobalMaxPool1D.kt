@@ -14,6 +14,8 @@ import org.tensorflow.op.Ops
  * Global max pooling operation for 1D temporal data (e.g. audio, timeseries, etc.).
  *
  * Downsamples the input by taking the maximum value over time dimension.
+ *
+ * @since 0.3
  */
 public class GlobalMaxPool1D(
     name: String = ""

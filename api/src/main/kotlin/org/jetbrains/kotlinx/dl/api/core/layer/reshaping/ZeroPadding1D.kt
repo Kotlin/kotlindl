@@ -12,6 +12,8 @@ import org.tensorflow.op.Ops
  * Zero-padding layer for 1D input (e.g. audio).
  * This layer can add zeros in the rows of the audio tensor
  * @property [padding] 2 numbers  interpreted as `(left_pad, right_pad)`.
+ *
+ * @since 0.3
  */
 public class ZeroPadding1D : AbstractZeroPadding {
     public val padding: IntArray

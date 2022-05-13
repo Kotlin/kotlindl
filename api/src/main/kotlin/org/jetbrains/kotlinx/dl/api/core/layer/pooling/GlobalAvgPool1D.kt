@@ -18,6 +18,8 @@ import org.tensorflow.op.Ops
  * Output shape: 2D tensor with shape `(batch_size, features)`.
  * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool1D] object.
+ *
+ * @since 0.3
  */
 public class GlobalAvgPool1D(
     name: String = ""

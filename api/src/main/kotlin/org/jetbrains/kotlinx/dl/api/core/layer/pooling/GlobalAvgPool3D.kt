@@ -21,6 +21,8 @@ import org.tensorflow.op.Ops
  *
  * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool3D] object.
+ *
+ * @since 0.3
  */
 public class GlobalAvgPool3D(
     name: String = ""

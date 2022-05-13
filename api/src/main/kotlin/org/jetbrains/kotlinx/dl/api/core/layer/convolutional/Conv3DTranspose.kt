@@ -49,6 +49,8 @@ import org.tensorflow.op.nn.Conv3dBackpropInput
  * @param [padding] type of padding to use
  * @param [useBias] a flag that specifies if the bias should be used
  * @param [name] custom layer name
+ *
+ * @since 0.4
  */
 public class Conv3DTranspose(
     public override val filters: Int = 3,

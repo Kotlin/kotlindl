@@ -18,6 +18,8 @@ import org.tensorflow.op.Ops
  * @property [dims] array of integers.
  * @property [name] Custom layer name.
  * @constructor Creates [Permute] object.
+ *
+ * @since 0.3
  */
 public class Permute(
     public val dims: IntArray,

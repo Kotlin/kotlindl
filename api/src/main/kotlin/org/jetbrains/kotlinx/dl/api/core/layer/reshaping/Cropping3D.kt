@@ -20,6 +20,8 @@ import org.tensorflow.op.Ops
  *
  * @property [cropping] An array consisting of three integer arrays of size two which are interpreted as
  * `[[left_dim1_crop, right_dim1_crop], [left_dim2_crop, right_dim2_crop], [left_dim3_crop, right_dim3_crop]]`.
+ *
+ * @since 0.3
  */
 public class Cropping3D(
     public val cropping: Array<IntArray>,

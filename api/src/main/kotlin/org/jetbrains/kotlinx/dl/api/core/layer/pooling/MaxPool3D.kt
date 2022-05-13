@@ -22,6 +22,8 @@ import java.util.*
  * @property [padding] The padding method, either 'valid' or 'same'.
  * @property [name] Custom layer name.
  * @constructor Creates [MaxPool2D] object.
+ *
+ * @since 0.3
  */
 public class MaxPool3D(
     public var poolSize: IntArray = intArrayOf(1, 2, 2, 2, 1),

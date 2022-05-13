@@ -19,6 +19,8 @@ import org.tensorflow.op.Ops
  * Output shape: 3D tensor with shape `(batch_size, steps * size, features)`.
  *
  * @property [size] Upsampling factor (i.e. number of repeats).
+ *
+ * @since 0.3
  */
 public class UpSampling1D(
     public val size: Int = 2,

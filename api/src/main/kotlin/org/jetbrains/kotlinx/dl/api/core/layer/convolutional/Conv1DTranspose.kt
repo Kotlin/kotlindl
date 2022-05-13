@@ -52,6 +52,8 @@ import org.tensorflow.op.Ops
  * @property [outputPadding] the amount of explicit padding to use (six numbers: two for each dimension).
  * @property [useBias] a flag that specifies if the bias should be used
  * @param [name] custom layer name
+ *
+ * @since 0.4
  */
 public class Conv1DTranspose(
     public override val filters: Int = 3,
