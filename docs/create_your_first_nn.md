@@ -77,7 +77,7 @@ val model = Sequential.of(
 Quite simple, right? Let's take a closer look at what we have defined here. 
 First, we specify the kind of input we will pass to this neural network. 
 We have images that are 28 x 28 pixels and only have one color channel. 
-Thus the input will be an array of size 28 x 28 x 1.
+Thus, the input will be an array of size 28 x 28 x 1.
 
 The first layer is `Flatten()`. It simply reformats the data, 
 transforming the three-dimensional input array into a one-dimensional array 

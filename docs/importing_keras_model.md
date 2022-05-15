@@ -67,7 +67,7 @@ Non-trainable params: 0
 
 You can find a Jupyter notebook with the Python code used to train this model [here](CIFAR-10.ipynb). 
 
-Once this model has been trained, it's important to save it properly so we can load it from KotlinDL:
+Once this model has been trained, it's important to save it properly, so we can load it from KotlinDL:
 ```python
 model.save('keras-cifar-10/weights', save_format='h5')
 
@@ -124,7 +124,7 @@ fun main() {
 ```
 
 As you can see, loading and using a model trained with Keras is quite simple. 
-If the architecture is supported, all you need to do is save the weights and JSON configuration after training, 
+If the architecture is supported, all you need to do is to save the weights and JSON configuration after training, 
 load it from KotlinDL, and make sure to preprocess your data again before running the inference task.
 
 
