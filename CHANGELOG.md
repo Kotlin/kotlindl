@@ -1,3 +1,60 @@
+# 0.4.0 TBA
+Features:
+* Added new `Dot` layer and `Conv1DTranspose`, `Conv2DTranspose`, `Conv3DTranspose` layers. 
+  [#144](https://github.com/Kotlin/kotlindl/issues/144) [#124](https://github.com/Kotlin/kotlindl/issues/124)
+* Added new activation functions: `SparsemaxActivation` and `SoftShrinkActivation`. 
+  [#171](https://github.com/Kotlin/kotlindl/issues/171) [#170](https://github.com/Kotlin/kotlindl/issues/170)
+* Added new `Padding`, `CenterCrop`, `Convert`, `Grayscale` image preprocessors and `Normalizing` tensor preprocessor.
+  [#203](https://github.com/Kotlin/kotlindl/issues/203) [#201](https://github.com/Kotlin/kotlindl/issues/201)
+  [#202](https://github.com/Kotlin/kotlindl/issues/202) [#204](https://github.com/Kotlin/kotlindl/issues/204)
+* Introduced new DSL for creating `Sequential` and `Functional` models. [#133](https://github.com/Kotlin/kotlindl/issues/133)
+
+New models:
+* Added NoTop models to the TensorFlow Model Hub. [#281](https://github.com/Kotlin/kotlindl/issues/281)
+* Added EfficientNet model family to the ONNX Model Hub. [#264](https://github.com/Kotlin/kotlindl/issues/264)
+* Added PoseNet and EfficientDet model families to the ONNX Model Hub. 
+  [#269](https://github.com/Kotlin/kotlindl/issues/269) [#304](https://github.com/Kotlin/kotlindl/issues/304)
+* Added SSD-Mobilenet-v1 model to the ONNX Model Hub [#296](https://github.com/Kotlin/kotlindl/issues/296)
+
+Examples and tutorials:
+* Added a tutorial for ResNet'50 fine-tuning.
+* Added an example of Image preprocessing DSL usage with TensorFlow model. [#292](https://github.com/Kotlin/kotlindl/issues/292)
+
+API changes:
+* Introduced new abstraction for layer parameters -- `KVariable`. [#324](https://github.com/Kotlin/kotlindl/pull/324)
+* Moved some of the `Layer` functionality to the new interfaces `ParametrizedLayer` and `TrainableLayer`.
+  [#217](https://github.com/Kotlin/kotlindl/issues/217)
+* Added support for multiple `Callbacks` in `fit()`, `evaluate()`, `predict()` instead of `compile()`.
+  [#270](https://github.com/Kotlin/kotlindl/issues/270)
+* Added support for multiple metrics. [#298](https://github.com/Kotlin/kotlindl/issues/298)
+* Added support for the model reset. [#271](https://github.com/Kotlin/kotlindl/issues/271)
+* Replaced `Long` parameters with `Integer` ones in convolutional, average pool and max pool layers. 
+  [#273](https://github.com/Kotlin/kotlindl/issues/273)
+* Moved loading section out of image preprocessing. [#322](https://github.com/Kotlin/kotlindl/issues/322)
+* Remove obsolete `CustomPreprocessor` interface. [#257](https://github.com/Kotlin/kotlindl/pull/257)
+* Supported exporting tensor data to `BufferedImage` [#293](https://github.com/Kotlin/kotlindl/issues/293)
+
+Bug fixes:
+* Added support for correct loading of `isTrainable` status from Keras. [#153](https://github.com/Kotlin/kotlindl/issues/153)
+* Generalized `Reshape` layer to higher dimensions. [#249](https://github.com/Kotlin/kotlindl/pull/249)
+* Fixed incorrect bounding box coordinates in ObjectDetection and FaceDetection examples. [#279](https://github.com/Kotlin/kotlindl/issues/279)
+* Fixed `toString` methods for layer classes. [#301](https://github.com/Kotlin/kotlindl/issues/301)
+* Set all the optimizers to have `useLocking = True` [#305](https://github.com/Kotlin/kotlindl/issues/305)
+* Fixed a bug with silently skipped layers in topological sort. [#314](https://github.com/Kotlin/kotlindl/issues/314)
+* Fixed `loadModelLayersFromConfiguration` recursively calling itself. [#319](https://github.com/Kotlin/kotlindl/pull/319)
+* Fixed `GraphTrainableModel#internalPredict` for multi-dimensional predictions. [#327](https://github.com/Kotlin/kotlindl/issues/327)
+* Fixed `Orthogonal` initializer. [#348](https://github.com/Kotlin/kotlindl/pull/348)
+* Fixed initialization of the variables in `GraphTrainableModel`. [#355](https://github.com/Kotlin/kotlindl/pull/355)
+* Add model output type checks for `OnnxInferenceModel`. [#356](https://github.com/Kotlin/kotlindl/pull/356)
+* Fixed `IndexOutOfBoundsException` in the `Dot` layer. [#357](https://github.com/Kotlin/kotlindl/pull/357)
+* Fixed import and export issues:
+  - Fixed layers import and export and added tests. [#329](https://github.com/Kotlin/kotlindl/issues/329) 
+    [#341](https://github.com/Kotlin/kotlindl/issues/341) [#360](https://github.com/Kotlin/kotlindl/pull/360)
+  - Fixed exporting `Ones`, `Zeros`, `Orthogonal` and `ParametrizedTruncatedNormal` initializers.
+    [#331](https://github.com/Kotlin/kotlindl/issues/331)
+* Updated log4j version.
+* Fixed the group of examples with ToyResNet.
+
 # 0.3.0 (28/09/2021) ONNX for inference and transfer learning and ONNX Model Hub
 Features:
 * Implemented the [copying for the Functional and Sequential models](https://github.com/JetBrains/KotlinDL/issues/40)
