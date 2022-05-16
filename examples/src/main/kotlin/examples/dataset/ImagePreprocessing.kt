@@ -7,7 +7,9 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ArrayType
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
@@ -57,7 +59,14 @@ fun main() {
     val rawImage = batchIter.next().x[2]
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.getFinalShape(), colorMode = ColorMode.GRAYSCALE))
+
+    val image = ImageConverter.floatArrayToBufferedImage(
+        rawImage,
+        preprocessing.getFinalShape(),
+        ArrayType.NORMALIZED_GRAY to ColorMode.GRAYSCALE
+    )
+
+    frame.contentPane.add(ImagePanel(image))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

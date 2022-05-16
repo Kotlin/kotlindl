@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.image
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.supportedImageTypes
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Convert
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -214,6 +215,62 @@ public object ImageConverter {
             }
         }
         return result
+    }
+
+    /**
+     * Converts [FloatArray] to [BufferedImage] of [outputShape] shape
+     * using [conversion] pair which describes conversion,
+     * e.g. RGB array to BGR image etc.
+     * There is a set of predefined conversion pairs.
+     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversions
+     * If a custom conversion is needed, one can use another method variation
+     * that accepts custom lambda or Conversion interface implementation.
+     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversion
+     *
+     * @param [tensor]      float array to convert
+     * @param [outputShape] shape of the output image
+     * @param [conversion] pair <ArrayType -> Image ColorMode> which describes conversion
+     * @return [BufferedImage] result image.
+     * */
+    public fun floatArrayToBufferedImage(
+        tensor: FloatArray,
+        outputShape: ImageShape,
+        conversion: Pair<ArrayType, ColorMode>,
+    ) : BufferedImage {
+        val (arrayType, imageColorMode) = conversion
+
+        require(conversion in Conversions) { "There is no predefined conversion for array of $arrayType type to image in $imageColorMode mode" }
+
+        val output = BufferedImage(
+            outputShape.width!!.toInt(),
+            outputShape.height!!.toInt(),
+            imageColorMode.imageType()
+        )
+
+        return floatArrayToBufferedImage(tensor, output, Conversions[conversion])
+    }
+
+    /**
+     * Converts [FloatArray] to [BufferedImage] using lambda
+     * or Conversion interface implementation. One can use predefined conversions implementation or supply own.
+     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversion
+     * The output image is passed as an argument and modified in place.
+     *
+     * @param [tensor]      float array to convert
+     * @param [bufferedImage] pre-constructed output image
+     * @param [conversion] processing logic. Can be [Conversion] implementation or [(FloatArray) -> FloatArray] lambda
+     * @return [BufferedImage] result image. Note that it is a [bufferedImage] modified inside a function
+     * */
+    public fun floatArrayToBufferedImage(
+        tensor: FloatArray,
+        bufferedImage: BufferedImage,
+        conversion: Conversion? = null
+    ): BufferedImage {
+        val dataCopy = conversion?.invoke(tensor.copyOf()) ?: tensor.copyOf()
+        // Note: conversion should output array in RGB format
+        bufferedImage.raster.setPixels(0, 0, bufferedImage.width, bufferedImage.height, dataCopy)
+
+        return bufferedImage
     }
 }
 
