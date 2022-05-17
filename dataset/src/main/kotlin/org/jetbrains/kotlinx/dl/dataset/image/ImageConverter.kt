@@ -218,36 +218,53 @@ public object ImageConverter {
     }
 
     /**
-     * Converts [FloatArray] to [BufferedImage] of [outputShape] shape
-     * using [conversion] pair which describes conversion,
-     * e.g. RGB array to BGR image etc.
-     * There is a set of predefined conversion pairs.
-     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversions
+     * Converts [tensor] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
+     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of input tensor.
+     * If [isNormalized] is true, than [tensor] values considered to be in [0..1) interval
+     * and will be rescaled to [0..255) interval.
+     *
      * If a custom conversion is needed, one can use another method variation
      * that accepts custom lambda or Conversion interface implementation.
      * @see org.jetbrains.kotlinx.dl.dataset.image.Conversion
      *
      * @param [tensor]      float array to convert
      * @param [outputShape] shape of the output image
-     * @param [conversion] pair <ArrayType -> Image ColorMode> which describes conversion
      * @return [BufferedImage] result image.
      * */
     public fun floatArrayToBufferedImage(
         tensor: FloatArray,
         outputShape: ImageShape,
-        conversion: Pair<ArrayType, ColorMode>,
+        arrayColorMode: ColorMode,
+        isNormalized: Boolean
     ) : BufferedImage {
-        val (arrayType, imageColorMode) = conversion
+        val numberOfElements = when (arrayColorMode) {
+            ColorMode.GRAYSCALE -> outputShape.width!! * outputShape.height!!
+            else -> outputShape.width!! * outputShape.height!! * 3
+        }
 
-        require(conversion in Conversions) { "There is no predefined conversion for array of $arrayType type to image in $imageColorMode mode" }
+        require(
+              numberOfElements == tensor.size.toLong()
+        ) { "Requested output shape [$outputShape] does not match with input array size [${tensor.size}]" }
+
+        val dataCopy = tensor.copyOf()
+
+        if (isNormalized) {
+            denormalizeInplace(dataCopy, scale = 255f)
+        }
+
+        if (arrayColorMode == ColorMode.BGR) {
+            swapRandB(dataCopy)
+        }
 
         val output = BufferedImage(
-            outputShape.width!!.toInt(),
-            outputShape.height!!.toInt(),
-            imageColorMode.imageType()
+            outputShape.width.toInt(),
+            outputShape.height.toInt(),
+            arrayColorMode.imageType()
         )
 
-        return floatArrayToBufferedImage(tensor, output, Conversions[conversion])
+        output.raster.setPixels(0, 0, output.width, output.height, dataCopy)
+
+        return output
     }
 
     /**

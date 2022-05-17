@@ -5,7 +5,6 @@
 
 package examples.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.image.ArrayType
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -66,7 +65,8 @@ fun main() {
     val bufferedImage = ImageConverter.floatArrayToBufferedImage(
         rawImage,
         preprocessing.getFinalShape(),
-        ArrayType.NORMALIZED_BGR to ColorMode.BGR
+        ColorMode.BGR,
+        isNormalized = true
     )
 
     val frame = JFrame("Filters")

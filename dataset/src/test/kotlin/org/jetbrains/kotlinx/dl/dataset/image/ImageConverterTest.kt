@@ -68,29 +68,6 @@ class ImageConverterTest {
     }
 
     @Test
-    fun grayscaleTensorToBufferedImageTest() {
-        val sourceTensor = floatArrayOf(0.2f, 0.4f, 0.6f, 0.8f)
-
-        val expectedImage = BufferedImage(2, 2, BufferedImage.TYPE_BYTE_GRAY)
-        expectedImage.raster.setDataElements(0, 0, gray(sourceTensor[0]))
-        expectedImage.raster.setDataElements(1, 0, gray(sourceTensor[1]))
-        expectedImage.raster.setDataElements(0, 1, gray(sourceTensor[2]))
-        expectedImage.raster.setDataElements(1, 1, gray(sourceTensor[3]))
-
-        val targetImage = ImageConverter.floatArrayToBufferedImage(
-            sourceTensor,
-            ImageShape(2, 2),
-            ArrayType.NORMALIZED_GRAY to ColorMode.GRAYSCALE
-        )
-
-        Assertions.assertArrayEquals(
-            ImageConverter.toNormalizedFloatArray(expectedImage),
-            ImageConverter.toNormalizedFloatArray(targetImage),
-            "Conversion of array of GRAY type to image in GRAYSCALE mode failed"
-        )
-    }
-
-    @Test
     fun floatArrayToBufferedImageCustomConversionTest() {
         val sourceImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         val color1 = Color(50, 150, 200)
@@ -122,44 +99,65 @@ class ImageConverterTest {
     }
 
     private val imageTypes =
-        listOf(BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB)
+        listOf(BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB)
+
+    @Test
+    fun normalizedFloatArrayToBufferedImageTest() {
+        for (sourceImageType in imageTypes) {
+            val sourceImage = BufferedImage(2, 2, sourceImageType)
+            val color1 = Color(50, 150, 200)
+            val color2 = Color(10, 190, 70)
+            val color3 = Color(210, 40, 40)
+            val color4 = Color(210, 160, 60)
+            sourceImage.setRGB(0, 0, color1.rgb)
+            sourceImage.setRGB(0, 1, color2.rgb)
+            sourceImage.setRGB(1, 0, color3.rgb)
+            sourceImage.setRGB(1, 1, color4.rgb)
+
+            val sourceArray = ImageConverter.toNormalizedFloatArray(sourceImage)
+
+            val targetImage = ImageConverter.floatArrayToBufferedImage(
+                sourceArray,
+                ImageShape(2, 2),
+                sourceImage.colorMode(),
+                isNormalized = true
+            )
+
+            Assertions.assertArrayEquals(
+                sourceArray,
+                ImageConverter.toNormalizedFloatArray(targetImage),
+                "Conversion of array normalized array to image in ${sourceImage.colorMode()} mode failed"
+            )
+        }
+    }
 
     @Test
     fun floatArrayToBufferedImageTest() {
         for (sourceImageType in imageTypes) {
-            for (arrayType in ArrayType.values()) {
-                if (arrayType in listOf(ArrayType.NORMALIZED_GRAY, ArrayType.GRAY)) continue
+            val sourceImage = BufferedImage(2, 2, sourceImageType)
+            val color1 = Color(50, 150, 200)
+            val color2 = Color(10, 190, 70)
+            val color3 = Color(210, 40, 40)
+            val color4 = Color(210, 160, 60)
+            sourceImage.setRGB(0, 0, color1.rgb)
+            sourceImage.setRGB(0, 1, color2.rgb)
+            sourceImage.setRGB(1, 0, color3.rgb)
+            sourceImage.setRGB(1, 1, color4.rgb)
 
-                val sourceImage = BufferedImage(2, 2, sourceImageType)
-                val color1 = Color(50, 150, 200)
-                val color2 = Color(10, 190, 70)
-                val color3 = Color(210, 40, 40)
-                val color4 = Color(210, 160, 60)
-                sourceImage.setRGB(0, 0, color1.rgb)
-                sourceImage.setRGB(0, 1, color2.rgb)
-                sourceImage.setRGB(1, 0, color3.rgb)
-                sourceImage.setRGB(1, 1, color4.rgb)
+            val sourceArray = ImageConverter.toRawFloatArray(sourceImage)
 
-                val sourceArray = when {
-                    arrayType.isNormalized() -> ImageConverter.toNormalizedFloatArray(sourceImage, arrayType.colorMode())
-                    else -> ImageConverter.toRawFloatArray(sourceImage, arrayType.colorMode())
-                }
+            val targetImage = ImageConverter.floatArrayToBufferedImage(
+                sourceArray,
+                ImageShape(2, 2),
+                sourceImage.colorMode(),
+                isNormalized = false
+            )
 
-                val targetImage = ImageConverter.floatArrayToBufferedImage(
-                    sourceArray,
-                    ImageShape(2, 2),
-                    arrayType to sourceImage.colorMode()
-                )
-
-                Assertions.assertArrayEquals(
-                    sourceArray,
-                    when {
-                        arrayType.isNormalized() -> ImageConverter.toNormalizedFloatArray(targetImage, arrayType.colorMode())
-                        else -> ImageConverter.toRawFloatArray(targetImage, arrayType.colorMode())
-                    },
-                    "Conversion of array $arrayType type to image in ${sourceImage.colorMode()} mode failed"
-                )
-            }
+            Assertions.assertArrayEquals(
+                sourceArray,
+                ImageConverter.toRawFloatArray(targetImage),
+                "Conversion of array normalized array to image in ${sourceImage.colorMode()} mode failed"
+            )
         }
     }
 

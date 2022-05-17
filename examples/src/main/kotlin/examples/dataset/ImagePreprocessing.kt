@@ -7,7 +7,6 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.image.ArrayType
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -63,7 +62,8 @@ fun main() {
     val image = ImageConverter.floatArrayToBufferedImage(
         rawImage,
         preprocessing.getFinalShape(),
-        ArrayType.NORMALIZED_GRAY to ColorMode.GRAYSCALE
+        ColorMode.GRAYSCALE,
+        isNormalized = true
     )
 
     frame.contentPane.add(ImagePanel(image))
