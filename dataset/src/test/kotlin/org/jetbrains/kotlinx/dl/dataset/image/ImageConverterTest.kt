@@ -84,10 +84,10 @@ class ImageConverterTest {
 
         val targetImage = ImageConverter.floatArrayToBufferedImage(
             tfNormalized,
-            BufferedImage(2, 2, sourceImage.type)
+            ImageShape(2, 2),
+            arrayColorMode = ColorMode.BGR
         ) {
             it.forEachIndexed { idx, v -> it[idx] = round((v + 1) * 127.5f) }
-            ImageConverter.swapRandB(it)
             it
         }
 

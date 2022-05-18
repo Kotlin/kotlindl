@@ -218,43 +218,64 @@ public object ImageConverter {
     }
 
     /**
-     * Converts [tensor] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
-     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of input tensor.
-     * If [isNormalized] is true, than [tensor] values considered to be in [0..1) interval
+     * Converts [inputArray] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
+     *
+     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
+     *
+     * If [isNormalized] is true, then [inputArray] values considered to be in [0..1) interval
      * and will be rescaled to [0..255) interval.
      *
-     * If a custom conversion is needed, one can use another method variation
-     * that accepts custom lambda or Conversion interface implementation.
-     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversion
+     * If an array requires custom processing, one can use method variation that accepts [ArrayTransform].
      *
-     * @param [tensor]      float array to convert
-     * @param [outputShape] shape of the output image
-     * @return [BufferedImage] result image.
+     * @param [inputArray]      float array to convert.
+     * @param [outputShape]     shape of the output image.
+     * @param [arrayColorMode]  [ColorMode] of an [inputArray].
+     * @param [isNormalized]    [Boolean] that indicates [inputArray] should be rescaled to [0..255) interval.
+     * @return [BufferedImage]  result image.
      * */
     public fun floatArrayToBufferedImage(
-        tensor: FloatArray,
+        inputArray: FloatArray,
         outputShape: ImageShape,
         arrayColorMode: ColorMode,
         isNormalized: Boolean
     ) : BufferedImage {
-        val numberOfElements = when (arrayColorMode) {
-            ColorMode.GRAYSCALE -> outputShape.width!! * outputShape.height!!
-            else -> outputShape.width!! * outputShape.height!! * 3
+        return floatArrayToBufferedImage(inputArray, outputShape, arrayColorMode) {
+            if (isNormalized) denormalizeInplace(it, scale = 255f) else it
         }
+    }
+
+    /**
+     * Converts [inputArray] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
+     * If a custom [arrayTransform] is needed, lambda or ArrayTransform can be provided.
+     *
+     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
+     *
+     * If an [arrayTransform] is given, then [arrayColorMode] is interpreted as a color mode of an array after transform.
+     *
+     * [inputArray] is explicitly copied before applying [arrayTransform].
+     *
+     * @see ArrayTransform
+     *
+     * @param [inputArray]      float array to convert.
+     * @param [outputShape]     shape of the output image.
+     * @param [arrayColorMode]  [ColorMode] of an [inputArray].
+     * @param [arrayTransform]  [ArrayTransform] implementation.
+     *                          Thanks to Kotlin SAM convention it can be supplied as [(FloatArray) -> FloatArray] lambda.
+     * @return [BufferedImage]  result image.
+     * */
+    public fun floatArrayToBufferedImage(
+        inputArray: FloatArray,
+        outputShape: ImageShape,
+        arrayColorMode: ColorMode,
+        arrayTransform: ArrayTransform? = null
+    ): BufferedImage {
+        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
+
+        val dataCopy = arrayTransform?.invoke(inputArray.copyOf()) ?: inputArray.copyOf()
 
         require(
-              numberOfElements == tensor.size.toLong()
-        ) { "Requested output shape [$outputShape] does not match with input array size [${tensor.size}]" }
-
-        val dataCopy = tensor.copyOf()
-
-        if (isNormalized) {
-            denormalizeInplace(dataCopy, scale = 255f)
-        }
-
-        if (arrayColorMode == ColorMode.BGR) {
-            swapRandB(dataCopy)
-        }
+            numberOfElements == dataCopy.size.toLong()
+        ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
 
         val output = BufferedImage(
             outputShape.width.toInt(),
@@ -262,32 +283,14 @@ public object ImageConverter {
             arrayColorMode.imageType()
         )
 
+        /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
+        if (arrayColorMode == ColorMode.BGR) {
+            swapRandB(dataCopy)
+        }
+
         output.raster.setPixels(0, 0, output.width, output.height, dataCopy)
 
         return output
-    }
-
-    /**
-     * Converts [FloatArray] to [BufferedImage] using lambda
-     * or Conversion interface implementation. One can use predefined conversions implementation or supply own.
-     * @see org.jetbrains.kotlinx.dl.dataset.image.Conversion
-     * The output image is passed as an argument and modified in place.
-     *
-     * @param [tensor]      float array to convert
-     * @param [bufferedImage] pre-constructed output image
-     * @param [conversion] processing logic. Can be [Conversion] implementation or [(FloatArray) -> FloatArray] lambda
-     * @return [BufferedImage] result image. Note that it is a [bufferedImage] modified inside a function
-     * */
-    public fun floatArrayToBufferedImage(
-        tensor: FloatArray,
-        bufferedImage: BufferedImage,
-        conversion: Conversion? = null
-    ): BufferedImage {
-        val dataCopy = conversion?.invoke(tensor.copyOf()) ?: tensor.copyOf()
-        // Note: conversion should output array in RGB format
-        bufferedImage.raster.setPixels(0, 0, bufferedImage.width, bufferedImage.height, dataCopy)
-
-        return bufferedImage
     }
 }
 
