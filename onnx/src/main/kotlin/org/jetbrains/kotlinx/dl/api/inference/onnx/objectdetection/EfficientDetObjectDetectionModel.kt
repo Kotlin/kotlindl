@@ -10,12 +10,13 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
+
+private const val OUTPUT_NAME = "detections:0"
 
 /**
  * Special model class for detection objects on images
@@ -35,7 +36,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
     public fun detectObjects(inputData: FloatArray): List<DetectedObject> {
         val rawPrediction = this.predictRaw(inputData)
         val foundObjects = mutableListOf<DetectedObject>()
-        val items = (rawPrediction["detections:0"] as Array<Array<FloatArray>>)[0]
+        val items = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
 
         for (i in items.indices) {
             val probability = items[i][5]
@@ -66,7 +67,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File): List<DetectedObject> {
-        val preprocessing: Preprocessing = preprocess {
+        val preprocessing = preprocess {
             transformImage {
                 resize {
                     outputHeight = inputShape[1].toInt()

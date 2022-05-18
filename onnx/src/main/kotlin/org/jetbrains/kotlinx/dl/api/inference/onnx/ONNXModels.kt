@@ -286,7 +286,6 @@ public object ONNXModels {
                     ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
                 )
 
-                // TODO: should be returned from the Transpose from apply method
                 val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
                 return preprocessInput(
@@ -612,23 +611,6 @@ public object ONNXModels {
                 return model
             }
         }
-
-        /** */
-        // TODO: remove or implement
-        public object YOLOv4 :
-            ObjectDetection<OnnxInferenceModel, OnnxInferenceModel>("models/onnx/objectdetection/yolov4") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
-            }
-
-            override fun pretrainedModel(modelHub: ModelHub): OnnxInferenceModel {
-                TODO("Not yet implemented")
-            }
-
-            override fun preInit(): OnnxInferenceModel {
-                TODO("Not yet implemented")
-            }
-        }
     }
 
     /** Face alignment models and preprocessing. */
@@ -641,15 +623,10 @@ public object ONNXModels {
         public object Fan2d106 :
             FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
+                return Transpose(axes = intArrayOf(2, 0, 1)).apply(
                     data,
                     ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
                 )
-
-                // TODO: should be returned from the Transpose from apply method
-                val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
-
-                return transposedData
             }
 
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
@@ -787,7 +764,6 @@ internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): 
         ImageShape(width = tensorShape[0], height = tensorShape[1], channels = tensorShape[2])
     )
 
-    // TODO: should be returned from the Transpose from apply method
     val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
     return preprocessInput(

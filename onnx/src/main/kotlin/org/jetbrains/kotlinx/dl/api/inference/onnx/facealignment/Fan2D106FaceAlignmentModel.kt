@@ -18,6 +18,9 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
+private const val OUTPUT_NAME = "fc1"
+private const val INPUT_SIZE = 192
+
 /**
  * The light-weight API for solving Face Alignment task via Fan2D106 model.
  */
@@ -45,7 +48,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         TODO("Not yet implemented")
     }
 
-    /** */
+    /** Releases the model resources. */
     override fun close() {
         internalModel.close()
     }
@@ -57,8 +60,8 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         val preprocessing: Preprocessing = preprocess {
             transformImage {
                 resize {
-                    outputHeight = 192
-                    outputWidth = 192
+                    outputHeight = INPUT_SIZE
+                    outputWidth = INPUT_SIZE
                 }
                 convert { colorMode = ColorMode.BGR }
             }
@@ -68,7 +71,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         val yhat = internalModel.predictRaw(inputData)
 
         val landMarks = mutableListOf<Landmark>()
-        val floats = (yhat["fc1"] as Array<*>)[0] as FloatArray
+        val floats = (yhat[OUTPUT_NAME] as Array<*>)[0] as FloatArray
         for (i in floats.indices step 2) {
             landMarks.add(Landmark(floats[i], floats[i + 1]))
         }

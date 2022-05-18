@@ -19,6 +19,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 import java.lang.Float.min
 
+private const val OUTPUT_NAME = "output_0"
+
 /**
  * SinglePoseDetectionModel is an ultra-fast and accurate model that detects 17 keypoints and 18 basic edges of a body.
  *
@@ -28,7 +30,7 @@ import java.lang.Float.min
 public class SinglePoseDetectionModel : OnnxInferenceModel() {
     public fun detectPose(inputData: FloatArray): DetectedPose {
         val rawPrediction = this.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+        val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<Array<FloatArray>>>)[0][0]
 
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()
         for (i in rawPoseLandMarks.indices) {
@@ -47,11 +49,10 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
     }
 
     public fun detectPose(imageFile: File): DetectedPose {
-        // TODO: could be differnt for channelLast/First
         val height = inputShape[1]
         val width = inputShape[2]
 
-        val preprocessing: Preprocessing = preprocess {
+        val preprocessing = preprocess {
             transformImage {
                 resize {
                     outputHeight = height.toInt()
@@ -65,7 +66,7 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectPose(preprocessedData)
