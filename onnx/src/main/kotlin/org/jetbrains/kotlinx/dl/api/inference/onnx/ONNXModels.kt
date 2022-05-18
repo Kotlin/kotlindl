@@ -37,21 +37,69 @@ public object ONNXModels {
             return OnnxInferenceModel()
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 18 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 34 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet34 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return resNetOnnxPreprocessing(data, tensorShape)
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 50 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet50 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -59,7 +107,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 101 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet101 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -67,7 +131,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 152 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet152 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -75,7 +155,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 18 layers with ResNetv2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet18v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -83,7 +179,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 34 layers with ResNetv2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet34v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -91,7 +203,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 50 layers with ResNetv2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet50v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -99,7 +227,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 101 layers with ResNetv2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet101v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -107,7 +251,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 152 layers with ResNetv2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x3x224x224)
+         * - an output with the shape (1x1000).
+         *
+         * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
+         *    Official ResNet model from ONNX Github.</a>
+         */
         public class ResNet152v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {

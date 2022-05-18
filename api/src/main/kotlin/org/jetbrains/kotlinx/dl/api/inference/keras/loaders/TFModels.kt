@@ -227,6 +227,10 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
 
+    /**
+     * If true it means that the second dimension is related to number of channels in image has short notation as `NCWH`,
+     * otherwise, channels are at the last position and has a short notation as `NHWC`.
+     */
     public val channelsFirst: Boolean
 
     /**
@@ -248,7 +252,7 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
         return preprocessInput(
             data,
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-        ) // TODO: need to be 4 or 3 in all cases
+        )
     }
 
     /** Returns the specially prepared pre-trained model of the type U. */
