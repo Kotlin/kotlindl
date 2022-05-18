@@ -6,6 +6,7 @@
 package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.awt.Color
@@ -61,8 +62,15 @@ fun main() {
     val image = File(imageResource!!.toURI())
     val rawImage = preprocessing(image).first
 
+    val bufferedImage = ImageConverter.floatArrayToBufferedImage(
+        rawImage,
+        preprocessing.getFinalShape(),
+        ColorMode.BGR,
+        isNormalized = true
+    )
+
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.getFinalShape(), colorMode = ColorMode.BGR))
+    frame.contentPane.add(ImagePanel(bufferedImage))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
