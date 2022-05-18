@@ -21,7 +21,7 @@ import org.tensorflow.op.random.TruncatedNormal
  * @property seed Seed.
  * @constructor Creates [TruncatedNormal] initializer.
  */
-public class TruncatedNormal(private val seed: Long = 12L) :
+public class TruncatedNormal(public val seed: Long = 12L) :
     Initializer() {
     override fun initialize(
         fanIn: Int,

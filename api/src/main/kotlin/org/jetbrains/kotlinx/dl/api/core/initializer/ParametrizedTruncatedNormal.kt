@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -20,11 +20,11 @@ import org.tensorflow.op.random.ParameterizedTruncatedNormal
  * @constructor Creates a [ParametrizedTruncatedNormal] initializer.
  */
 public class ParametrizedTruncatedNormal(
-    private val mean: Float = 0.0f,
-    private val stdev: Float = 1.0f,
-    private val p1: Float = -10.0f, // low level edge
-    private val p2: Float = 10.0f, // high level edge
-    private val seed: Long
+    internal val mean: Float = 0.0f,
+    internal val stdev: Float = 1.0f,
+    internal val p1: Float = -10.0f, // low level edge
+    internal val p2: Float = 10.0f, // high level edge
+    internal val seed: Long
 ) :
     Initializer() {
     override fun initialize(

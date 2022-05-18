@@ -157,39 +157,37 @@ private fun convertToKerasRegularizer(regularizer: Regularizer?): KerasRegulariz
 }
 
 private fun convertToKerasInitializer(initializer: Initializer, isKerasFullyCompatible: Boolean): KerasInitializer {
-    val className: String
-    val config: KerasInitializerConfig
-    if (isKerasFullyCompatible) {
-        val (_className, _config) = when (initializer) {
-            is GlorotUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is GlorotNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is HeNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is HeUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is LeCunNormal -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is LeCunUniform -> convertToVarianceScalingInitializer(initializer as VarianceScaling)
-            is RandomUniform -> convertToRandomUniformInitializer(initializer)
-            is RandomNormal -> convertToRandomNormalInitializer(initializer)
-            is Identity -> convertToIdentityInitializer(initializer)
-            else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
-            // TODO: support Constant initializer
+    val (className, config) = when (initializer) {
+        is VarianceScaling -> {
+            if (isKerasFullyCompatible) {
+                convertToVarianceScalingInitializer(initializer)
+            } else {
+                when (initializer) {
+                    is GlorotUniform -> INITIALIZER_GLOROT_UNIFORM
+                    is GlorotNormal -> INITIALIZER_GLOROT_NORMAL
+                    is HeNormal -> INITIALIZER_HE_NORMAL
+                    is HeUniform -> INITIALIZER_HE_UNIFORM
+                    is LeCunNormal -> INITIALIZER_LECUN_NORMAL
+                    is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
+                    else -> throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported yet.")
+                } to KerasInitializerConfig(seed = initializer.seed.toInt())
+            }
         }
-
-        className = _className
-        config = _config
-    } else {
-        className = when (initializer) {
-            is GlorotUniform -> INITIALIZER_GLOROT_UNIFORM
-            is GlorotNormal -> INITIALIZER_GLOROT_NORMAL
-            is HeNormal -> INITIALIZER_HE_NORMAL
-            is HeUniform -> INITIALIZER_HE_UNIFORM
-            is LeCunNormal -> INITIALIZER_LECUN_NORMAL
-            is LeCunUniform -> INITIALIZER_LECUN_UNIFORM
-            is Identity -> INITIALIZER_IDENTITY
-            else -> throw IllegalStateException("${initializer::class.simpleName} is not supported yet!")
+        is RandomUniform -> convertToRandomUniformInitializer(initializer)
+        is RandomNormal -> convertToRandomNormalInitializer(initializer)
+        is TruncatedNormal -> INITIALIZER_TRUNCATED_NORMAL to KerasInitializerConfig(seed = initializer.seed.toInt())
+        is ParametrizedTruncatedNormal -> {
+            if (isKerasFullyCompatible) {
+                throw throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported in the fully compatible mode.")
+            } else convertToParametrizedTruncatedNormalInitializer(initializer)
         }
-        config = KerasInitializerConfig(seed = 12)
+        is Orthogonal -> convertToOrthogonalInitializer(initializer)
+        is Zeros -> INITIALIZER_ZEROS to KerasInitializerConfig()
+        is Ones -> INITIALIZER_ONES to KerasInitializerConfig()
+        is Constant -> INITIALIZER_CONSTANT to KerasInitializerConfig(value = initializer.constantValue.toDouble())
+        is Identity -> convertToIdentityInitializer(initializer)
+        else -> throw IllegalStateException("Exporting ${initializer::class.simpleName} is not supported yet.")
     }
-
     return KerasInitializer(class_name = className, config = config)
 }
 
@@ -233,6 +231,18 @@ private fun convertToIdentityInitializer(initializer: Identity): Pair<String, Ke
     )
 }
 
+private fun convertToParametrizedTruncatedNormalInitializer(initializer: ParametrizedTruncatedNormal): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_PARAMETRIZED_TRUNCATED_NORMAL, KerasInitializerConfig(
+            mean = initializer.mean.toDouble(),
+            stddev = initializer.stdev.toDouble(),
+            p1 = initializer.p1.toDouble(),
+            p2 = initializer.p2.toDouble(),
+            seed = initializer.seed.toInt()
+        )
+    )
+}
+
 private fun convertDistribution(distribution: Distribution): String {
     return when (distribution) {
         Distribution.TRUNCATED_NORMAL -> "truncated_normal"
@@ -247,6 +257,15 @@ private fun convertMode(mode: Mode): String {
         Mode.FAN_OUT -> "fan_out"
         Mode.FAN_AVG -> "fan_avg"
     }
+}
+
+private fun convertToOrthogonalInitializer(initializer: Orthogonal): Pair<String, KerasInitializerConfig> {
+    return Pair(
+        INITIALIZER_ORTHOGONAL, KerasInitializerConfig(
+            gain = initializer.gain.toDouble(),
+            seed = initializer.seed.toInt()
+        )
+    )
 }
 
 private fun convertToKerasPadding(padding: ConvPadding): KerasPadding {
