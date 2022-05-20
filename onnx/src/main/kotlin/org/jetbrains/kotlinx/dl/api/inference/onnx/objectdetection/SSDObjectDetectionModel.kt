@@ -10,12 +10,16 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
+
+private const val OUTPUT_BOXES = "bboxes"
+private const val OUTPUT_LABELS = "labels"
+private const val OUTPUT_SCORES = "scores"
+private const val INPUT_SIZE = 1200
 
 /**
  * Special model class for detection objects on images
@@ -39,9 +43,9 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
         val rawPrediction = this.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = (rawPrediction["bboxes"] as Array<Array<FloatArray>>)[0]
-        val classIndices = (rawPrediction["labels"] as Array<LongArray>)[0]
-        val probabilities = (rawPrediction["scores"] as Array<FloatArray>)[0]
+        val boxes = (rawPrediction[OUTPUT_BOXES] as Array<Array<FloatArray>>)[0]
+        val classIndices = (rawPrediction[OUTPUT_LABELS] as Array<LongArray>)[0]
+        val probabilities = (rawPrediction[OUTPUT_SCORES] as Array<FloatArray>)[0]
         val numberOfFoundObjects = boxes.size
 
         for (i in 0 until numberOfFoundObjects) {
@@ -76,11 +80,11 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
-        val preprocessing: Preprocessing = preprocess {
+        val preprocessing = preprocess {
             transformImage {
                 resize {
-                    outputHeight = 1200
-                    outputWidth = 1200
+                    outputHeight = INPUT_SIZE
+                    outputWidth = INPUT_SIZE
                 }
                 convert { colorMode = ColorMode.BGR }
             }
@@ -90,7 +94,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectObjects(preprocessedData, topK)

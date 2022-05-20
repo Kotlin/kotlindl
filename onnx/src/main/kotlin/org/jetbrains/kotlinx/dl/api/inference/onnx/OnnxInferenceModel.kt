@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import java.nio.*
 import java.util.*
 
+private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Call reshape() to set input shape."
 
 /**
  * Inference model built on ONNX format.
@@ -65,8 +66,6 @@ public open class OnnxInferenceModel : InferenceModel() {
         ): OnnxInferenceModel {
             require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
-            // require(!model::inputShape.isInitialized) { "The model $model is initialized!" }
-            // require(!model::outputShape.isInitialized) { "The model $model is initialized!" }
 
             model.env = OrtEnvironment.getEnvironment()
             model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
@@ -110,14 +109,14 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override val inputDimensions: LongArray
-        get() = TensorShape(inputShape).tail() // TODO: it keeps only 3 numbers
+        get() = TensorShape(inputShape).tail()
 
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
 
         val outputTensorName = when {
             predictionTensorName.isEmpty() -> session.outputNames.first()
@@ -137,7 +136,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * Currently, some methods only support float tensors as model output.
      * This method checks if model output satisfies these requirements.
      */
-    // TODO: add support for all ONNX output types
+    // TODO: add support for all ONNX output types (see https://github.com/Kotlin/kotlindl/issues/367)
     private fun throwIfOutputNotSupported(outputName: String, method: String) {
         val outputInfo = session.outputInfo[outputName]!!.info
         require(outputInfo !is MapInfo) { "Output $outputName is a Map, but currently method $method supports only float Tensor outputs. Please use predictRaw method instead." }
@@ -180,19 +179,19 @@ public open class OnnxInferenceModel : InferenceModel() {
      * you should prefer [predictRawWithShapes] in this case.
      */
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
-        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
 
         val inputTensor = createInputTensor(inputData)
 
-        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
+        val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
         val result = mutableMapOf<String, Any>()
 
-        output.forEach {
+        outputTensor.forEach {
             result[it.key] = it.value.value
         }
 
-        output.close()
+        outputTensor.close()
         inputTensor.close()
 
         return result.toMap()
@@ -206,7 +205,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     // TODO: add tests for many available models
     // TODO: return map
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
 
         session.outputInfo.keys.forEach {
             throwIfOutputNotSupported(it, "predictRawWithShapes")
@@ -242,13 +241,13 @@ public open class OnnxInferenceModel : InferenceModel() {
         TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
     }
 
-    /** */
+    /** Releases the ONNXRuntime - related resources. */
     override fun close() {
         session.close()
         env.close()
     }
 
-    // TODO: make ONNX model description
+    // TODO: make ONNX model description (see https://github.com/Kotlin/kotlindl/issues/368)
     override fun toString(): String {
         println(session.inputNames)
         println(session.inputInfo)

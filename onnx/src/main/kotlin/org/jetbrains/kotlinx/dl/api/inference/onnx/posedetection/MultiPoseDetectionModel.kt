@@ -19,6 +19,10 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
+private const val CLASS_LABEL = "person"
+private const val OUTPUT_NAME = "output_0"
+private const val INPUT_SIZE = 256
+
 /**
  * MultiPoseDetectionModel is an ultra-fast and accurate model that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
  *
@@ -27,7 +31,7 @@ import java.io.File
 public class MultiPoseDetectionModel : OnnxInferenceModel() {
     public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
         val rawPrediction = this.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction["output_0"] as Array<Array<FloatArray>>)[0]
+        val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
 
         val result = MultiPoseDetectionResult(mutableListOf())
 
@@ -45,10 +49,9 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
                 foundPoseLandmarks.add(poseLandmark)
             }
 
-            // TODO: change order in visualisation
             // [ymin, xmin, ymax, xmax, score]
             val detectedObject = DetectedObject(
-                classLabel = "person",
+                classLabel = CLASS_LABEL,
                 probability = floats[55],
                 yMin = floats[53],
                 xMin = floats[52],
@@ -72,8 +75,8 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
         val preprocessing: Preprocessing = preprocess {
             transformImage {
                 resize {
-                    outputHeight = 256
-                    outputWidth = 256
+                    outputHeight = INPUT_SIZE
+                    outputWidth = INPUT_SIZE
                 }
                 convert { colorMode = ColorMode.BGR }
             }
@@ -83,7 +86,7 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectPoses(preprocessedData, confidence)

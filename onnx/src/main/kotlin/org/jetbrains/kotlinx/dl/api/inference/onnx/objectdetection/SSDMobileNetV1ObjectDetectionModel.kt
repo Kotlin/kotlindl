@@ -10,12 +10,16 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
+
+private const val OUTPUT_BOXES = "detection_boxes:0"
+private const val OUTPUT_CLASSES = "detection_classes:0"
+private const val OUTPUT_SCORES = "detection_scores:0"
+private const val OUTPUT_NUMBER_OF_DETECTIONS = "num_detections:0"
 
 /**
  * Special model class for detection objects on images
@@ -39,10 +43,10 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
         val rawPrediction = this.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = (rawPrediction["detection_boxes:0"] as Array<Array<FloatArray>>)[0]
-        val classIndices = (rawPrediction["detection_classes:0"] as Array<FloatArray>)[0]
-        val probabilities = (rawPrediction["detection_scores:0"] as Array<FloatArray>)[0]
-        val numberOfFoundObjects = (rawPrediction["num_detections:0"] as FloatArray)[0].toInt()
+        val boxes = (rawPrediction[OUTPUT_BOXES] as Array<Array<FloatArray>>)[0]
+        val classIndices = (rawPrediction[OUTPUT_CLASSES] as Array<FloatArray>)[0]
+        val probabilities = (rawPrediction[OUTPUT_SCORES] as Array<FloatArray>)[0]
+        val numberOfFoundObjects = (rawPrediction[OUTPUT_NUMBER_OF_DETECTIONS] as FloatArray)[0].toInt()
 
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
@@ -76,7 +80,7 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
-        val preprocessing: Preprocessing = preprocess {
+        val preprocessing = preprocess {
             transformImage {
                 resize {
                     outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
@@ -90,7 +94,7 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
 
         val preprocessedData = ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!) // TODO: refactor to the imageShape
+            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectObjects(preprocessedData, topK)
