@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.inference.posedetection
 
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 
+/** This data class represents a few detected poses on the given image. */
 public data class MultiPoseDetectionResult(
+    /** THe list of the detected poses. */
     val multiplePoses: MutableList<Pair<DetectedObject, DetectedPose>>
 )

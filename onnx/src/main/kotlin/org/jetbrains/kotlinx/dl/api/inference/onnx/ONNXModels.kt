@@ -39,7 +39,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 18 layers with ResNetv1 architecture.
@@ -62,7 +62,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 34 layers with ResNetv1 architecture.
@@ -85,7 +85,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
@@ -109,7 +109,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 101 layers with ResNetv1 architecture.
@@ -133,7 +133,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 152 layers with ResNetv1 architecture.
@@ -157,7 +157,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 18 layers with ResNetv2 architecture.
@@ -181,7 +181,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 34 layers with ResNetv2 architecture.
@@ -205,7 +205,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv2 architecture.
@@ -229,7 +229,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 101 layers with ResNetv2 architecture.
@@ -253,7 +253,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 152 layers with ResNetv2 architecture.
@@ -277,7 +277,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * EfficientNet-Lite 4 is the largest variant and most accurate of the set of EfficientNet-Lite model.
@@ -306,7 +306,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
@@ -334,7 +334,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
@@ -343,7 +343,7 @@ public object ONNXModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (N,M3,M4,2048)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the model have been removed so that the user can fine-tune the model for his specific task..
+         * NOTE: This model is converted from Keras.applications, the last two layers in the model have been removed so that the user can fine-tune the model for his specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -362,7 +362,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB0 architecture.
@@ -391,7 +391,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB1 architecture.
@@ -420,7 +420,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB2 architecture.
@@ -449,7 +449,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB3 architecture.
@@ -478,7 +478,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB4 architecture.
@@ -507,7 +507,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB5 architecture.
@@ -536,7 +536,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB6 architecture.
@@ -565,7 +565,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
          *
          * Instantiates the EfficientNetB7 architecture.

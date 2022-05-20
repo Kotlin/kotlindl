@@ -52,7 +52,7 @@ public class ImageRecognitionModel(
         TODO("Not yet implemented")
     }
 
-    /** */
+    /** Releases internal resources. */
     override fun close() {
         internalModel.close()
     }

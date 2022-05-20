@@ -6,8 +6,12 @@
 package org.jetbrains.kotlinx.dl.api.inference.posedetection
 
 /**
+ * This data class represents one point of the detected human's pose.
+ *
  * @property [poseLandmarkLabel] The predicted pose landmark label.
  * @property [probability] The probability of the predicted class.
+ * @property [x] The value of `x` coordinate.
+ * @property [y] The value of `y` coordinate.
  */
 public data class PoseLandmark(
     val poseLandmarkLabel: String,
