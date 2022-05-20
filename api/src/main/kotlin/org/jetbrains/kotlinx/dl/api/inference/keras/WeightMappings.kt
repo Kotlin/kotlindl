@@ -29,7 +29,6 @@ internal object WeightMappings {
     private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
     private const val PRELU_ALPHA_DATA_PATH_TEMPLATE = "/%s/%s/alpha:0"
 
-    // TODO: add loading for all layers with weights from Keras like Conv1D and Conv3D
     internal fun getLayerVariables(layer: Layer): Map<String, KVariable>? {
         return when (layer) {
             is Dense -> getDenseVariables(layer)
