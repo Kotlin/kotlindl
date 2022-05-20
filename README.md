@@ -305,46 +305,36 @@ tasks{
 
 Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
 
-- Input
-- Flatten
-- Dense
-- Dropout
-- Conv2D
-- MaxPool2D
-- AvgPool2D
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- GlobalMaxPool2D
-- Cropping2D
-- UpSampling2D
-- ZeroPadding2D
-- Reshape
-- Permute
-- RepeatVector
-- Softmax
-- LeakyReLU
-- PReLU
-- ELU
-- ThresholdedReLU
-- Conv1D
-- MaxPooling1D
-- AveragePooling1D
-- GlobalMaxPooling1D
-- GlobalAveragePooling1D
-- UpSampling1D
-- Cropping1D
-- Conv3D
-- MaxPooling3D
-- AveragePooling3D
-- GlobalAveragePooling3D
-- GlobalMaxPool3D
-- Cropping3D
+* Core layers:
+  - `Input`, `Dense`, `Flatten`, `Reshape`, `Dropout`, `BatchNorm`.
+* Convolutional layers:
+  - `Conv1D`, `Conv2D`, `Conv3D`;
+  - `Conv1DTranspose`, `Conv2DTranspose`, `Conv3DTranspose`;
+  - `DepthwiseConv2D`;
+  - `SeparableConv2D`.
+* Pooling layers:
+  - `MaxPool1D`, `MaxPool2D`, `MaxPooling3D`;
+  - `AvgPool1D`, `AvgPool2D`, `AvgPool3D`;
+  - `GlobalMaxPool1D`, `GlobalMaxPool2D`, `GlobalMaxPool3D`;
+  - `GlobalAvgPool1D`, `GlobalAvgPool2D`, `GlobalAvgPool3D`.
+* Merge layers:
+  - `Add`, `Subtract`, `Multiply`;
+  - `Average`, `Maximum`, `Minimum`;
+  - `Dot`;
+  - `Concatenate`.
+* Activation layers:
+  - `ELU`, `LeakyReLU`, `PReLU`, `ReLU`, `Softmax`, `ThresholdedReLU`;
+  - `ActivationLayer`.
+* Cropping layers:
+  - `Cropping1D`, `Cropping2D`, `Cropping3D`.
+* Upsampling layers:
+  - `UpSampling1D`, `UpSampling2D`, `UpSampling3D`.
+* Zero padding layers:
+  - `ZeroPadding1D`, `ZeroPadding2D`, `ZeroPadding3D`.
+* Other layers:
+  - `Permute`, `RepeatVector`.
 
-KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.
+KotlinDL supports model inference in JVM backend applications only.
 
 ## Contributing
 
