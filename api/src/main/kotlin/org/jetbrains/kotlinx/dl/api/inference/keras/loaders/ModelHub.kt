@@ -11,8 +11,6 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.nio.file.Files
 
-private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
-private const val WEIGHTS_FILE_NAME = "/weights.h5"
 internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**
