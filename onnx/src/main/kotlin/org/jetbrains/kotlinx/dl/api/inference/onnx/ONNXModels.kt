@@ -26,6 +26,7 @@ public object ONNXModels {
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
         override val channelsFirst: Boolean,
+        /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
         internal var noTop: Boolean = false
     ) :
         ModelType<T, ImageRecognitionModel> {
@@ -45,7 +46,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -68,7 +69,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -91,7 +92,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -115,7 +116,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -139,7 +140,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -163,7 +164,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -187,7 +188,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -211,7 +212,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -235,7 +236,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -259,7 +260,7 @@ public object ONNXModels {
          *
          * The model have
          * - an input with the shape (1x3x224x224)
-         * - an output with the shape (1x1000).
+         * - an output with the shape (1x1000)
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
@@ -275,20 +276,52 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * EfficientNet-Lite 4 is the largest variant and most accurate of the set of EfficientNet-Lite model.
+         * It is an integer-only quantized model that produces the highest accuracy of all of the EfficientNet models.
+         * It achieves 80.4% ImageNet top-1 accuracy, while still running in real-time (e.g. 30ms/image) on a Pixel 4 CPU.
+         *
+         * The model have
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (1x1000)
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
+         *    Official EfficientNet4Lite model from ONNX Github.</a>
+         */
         public class EfficientNet4Lite :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = true) {
+            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(
                     data,
                     tensorShape,
                     inputType = InputType.TF,
-                    channelsLast = false
+                    channelsLast = !channelsFirst
                 )
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 50 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (1x1000)
+         *
+         * NOTE: This model is converted from Keras.applications and could be used to be compared with the [ResNet50noTopCustom] model.
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://keras.io/api/applications/resnet/#resnet50-function">
+         *    Official ResNet model from Keras.applications.</a>
+         */
         public object ResNet50custom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -300,7 +333,23 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * This model has 50 layers with ResNetv1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (N,M3,M4,2048)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the model have been removed so that the user can fine-tune the model for his specific task..
+         *
+         * @see <a href="https://arxiv.org/abs/1512.03385">
+         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
+         * @see <a href="https://keras.io/api/applications/resnet/#resnet50-function">
+         *    Official ResNet model from Keras.applications.</a>
+         */
         public object ResNet50noTopCustom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
@@ -312,7 +361,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB0 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x7x7x1280)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb0-function">
+         *    Official EfficientNetB0 model from Keras.applications.</a>
+         */
         public class EfficientNetB0(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b0",
@@ -324,7 +390,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB1 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x240x240x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x7x7x1280)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb1-function">
+         *    Official EfficientNetB1 model from Keras.applications.</a>
+         */
         public class EfficientNetB1(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b1",
@@ -336,7 +419,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB2 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x260x260x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x8x8x1408)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb2-function">
+         *    Official EfficientNetB2 model from Keras.applications.</a>
+         */
         public class EfficientNetB2(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b2",
@@ -348,7 +448,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB3 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x300x300x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x9x9x1536)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb3-function">
+         *    Official EfficientNetB3 model from Keras.applications.</a>
+         */
         public class EfficientNetB3(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b3",
@@ -360,7 +477,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB4 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x380x380x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x11x11x1792)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb4-function">
+         *    Official EfficientNetB4 model from Keras.applications.</a>
+         */
         public class EfficientNetB4(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b4",
@@ -372,7 +506,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB5 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x456x456x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x14x14x2048)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb5-function">
+         *    Official EfficientNetB5 model from Keras.applications.</a>
+         */
         public class EfficientNetB5(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b5",
@@ -384,7 +535,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB6 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x528x528x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x16x16x2304)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb6-function">
+         *    Official EfficientNetB6 model from Keras.applications.</a>
+         */
         public class EfficientNetB6(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b6",
@@ -396,7 +564,24 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes.
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         *
+         * Instantiates the EfficientNetB7 architecture.
+         *
+         * The model have
+         * - an input with the shape (1x600x600x3)
+         * - an output with the shape (1x1000)
+         * - an output for noTop model with the shape (1x18x18x2560)
+         *
+         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         *
+         * @see <a href="https://arxiv.org/abs/1905.11946">
+         *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
+         * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb7-function">
+         *    Official EfficientNetB7 model from Keras.applications.</a>
+         */
         public class EfficientNetB7(noTop: Boolean = false) :
             CV<OnnxInferenceModel>(
                 "models/onnx/cv/efficientnet/efficientnet-b7",
@@ -408,7 +593,15 @@ public object ONNXModels {
             }
         }
 
-        /** */
+        /**
+         * This model is a neural network for digit classification that take grey-scale images of digits as input and classify the major object in the image into a set of 10 different classes.
+         *
+         * This model is just an implementation of the famous LeNet-5 model.
+         *
+         * The model have
+         * - an input with the shape (1x1x28x28)
+         * - an output with the shape (1x10)
+         */
         public class Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 TODO("Not yet implemented")
@@ -506,11 +699,6 @@ public object ONNXModels {
                 return model
             }
         }
-
-        // TODO: download from here https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md#tensorflow-2-detection-model-zoo
-        // TODO: interesting visualisation https://github.com/tensorflow/models/blob/master/research/object_detection/utils/visualization_utils.py
-        // TODO: good tutorial https://www.tensorflow.org/hub/tutorials/tf2_object_detection
-        // TODO: looks like the right models were exported https://github.com/google/automl/tree/master/efficientdet
 
 
         /**
@@ -779,7 +967,13 @@ public object ONNXModels {
         override val channelsFirst: Boolean = true
     ) :
         ModelType<T, U> {
-        /** */
+        /**
+         * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
+         *
+         * The model have
+         * - an input with the shape (1x3x192x192)
+         * - an output with the shape (1x212)
+         */
         public object Fan2d106 :
             FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
