@@ -99,7 +99,12 @@ class ImageConverterTest {
     }
 
     private val imageTypes =
-        listOf(BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_RGB)
+        listOf(
+            BufferedImage.TYPE_BYTE_GRAY,
+            BufferedImage.TYPE_3BYTE_BGR,
+            BufferedImage.TYPE_INT_BGR,
+            BufferedImage.TYPE_INT_RGB
+        )
 
     @Test
     fun normalizedFloatArrayToBufferedImageTest() {
@@ -161,5 +166,27 @@ class ImageConverterTest {
         }
     }
 
-    private fun gray(value : Float) = byteArrayOf((value * 255).toInt().toByte())
+    @Test
+    fun floatArrayToBufferedImageClampTest() {
+        val colorMode = ColorMode.RGB
+        val expectedImage = BufferedImage(2, 2, colorMode.imageType())
+        expectedImage.setRGB(0, 0, Color.black.rgb)
+        expectedImage.setRGB(0, 1, Color.white.rgb)
+        expectedImage.setRGB(1, 0, Color.black.rgb)
+        expectedImage.setRGB(1, 1, Color.white.rgb)
+
+        val inputArray = FloatArray(expectedImage.width * expectedImage.height * colorMode.channels)
+        inputArray.fill(-5f, 0, inputArray.size / 2)
+        inputArray.fill(300f, inputArray.size / 2, inputArray.size)
+
+        val outputImage = ImageConverter.floatArrayToBufferedImage(
+            inputArray, expectedImage.getShape(), colorMode, false
+        )
+        Assertions.assertArrayEquals(
+            ImageConverter.toRawFloatArray(expectedImage),
+            ImageConverter.toRawFloatArray(outputImage),
+        )
+    }
+
+    private fun gray(value: Float) = byteArrayOf((value * 255).toInt().toByte())
 }

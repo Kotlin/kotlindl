@@ -238,7 +238,7 @@ public object ImageConverter {
         outputShape: ImageShape,
         arrayColorMode: ColorMode,
         isNormalized: Boolean
-    ) : BufferedImage {
+    ): BufferedImage {
         return floatArrayToBufferedImage(inputArray, outputShape, arrayColorMode) {
             if (isNormalized) denormalizeInplace(it, scale = 255f) else it
         }
@@ -275,6 +275,11 @@ public object ImageConverter {
         require(
             numberOfElements == dataCopy.size.toLong()
         ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
+
+        for ((i, value) in dataCopy.withIndex()) {
+            if (value < 0) dataCopy[i] = 0f
+            if (value > 255) dataCopy[i] = 255f
+        }
 
         /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
         if (arrayColorMode == ColorMode.BGR) {
