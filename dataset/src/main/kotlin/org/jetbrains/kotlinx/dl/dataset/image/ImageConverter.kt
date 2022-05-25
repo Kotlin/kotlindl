@@ -269,25 +269,23 @@ public object ImageConverter {
         arrayColorMode: ColorMode,
         arrayTransform: ArrayTransform? = null
     ): BufferedImage {
-        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
-
         val dataCopy = arrayTransform?.invoke(inputArray.copyOf()) ?: inputArray.copyOf()
 
+        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
         require(
             numberOfElements == dataCopy.size.toLong()
         ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
-
-        val output = BufferedImage(
-            outputShape.width.toInt(),
-            outputShape.height.toInt(),
-            arrayColorMode.imageType()
-        )
 
         /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
         if (arrayColorMode == ColorMode.BGR) {
             swapRandB(dataCopy)
         }
 
+        val output = BufferedImage(
+            outputShape.width.toInt(),
+            outputShape.height.toInt(),
+            arrayColorMode.imageType()
+        )
         output.raster.setPixels(0, 0, output.width, output.height, dataCopy)
 
         return output
