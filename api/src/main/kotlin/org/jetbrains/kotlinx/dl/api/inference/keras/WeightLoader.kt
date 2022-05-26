@@ -12,8 +12,8 @@ import io.jhdf.dataset.DatasetBase
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
-import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.BIAS_DATA_PATH_TEMPLATE
 import org.jetbrains.kotlinx.dl.api.inference.keras.WeightMappings.KERNEL_DATA_PATH_TEMPLATE
@@ -219,6 +219,8 @@ private fun GraphTrainableModel.loadWeights(layersToLoad: Collection<Layer>, loa
 }
 
 private fun fillLayerWeights(layer: Layer, group: Group, model: GraphTrainableModel) {
+    if (layer !is ParametrizedLayer) return
+
     val variables = getLayerVariables(layer)
     if (variables == null) {
         model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
@@ -260,6 +262,8 @@ private fun fillLayerVariablesFromKeras(layerName: String,
 }
 
 private fun fillLayerWeights(layer: Layer, hdfFile: HdfFile, layerPaths: LayerPaths?, model: GraphTrainableModel) {
+    if (layer !is ParametrizedLayer) return
+
     val variables = getLayerVariablePathTemplates(layer, layerPaths)
     if (variables == null) {
         model.logger.warn { "Loading weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }
@@ -273,6 +277,8 @@ private fun fillLayerWeights(layer: Layer, hdfFile: HdfFile, layerPaths: LayerPa
 }
 
 private fun initLayerWeights(layer: Layer, model: GraphTrainableModel) {
+    if (layer !is ParametrizedLayer) return
+
     val variables = getLayerVariables(layer)?.values
     if (variables == null) {
         model.logger.warn { "Initializing weights for the layer ${layer.name} is skipped as ${layer::class.qualifiedName} layers are not supported." }

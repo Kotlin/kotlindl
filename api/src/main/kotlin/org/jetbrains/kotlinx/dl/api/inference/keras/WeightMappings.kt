@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import org.jetbrains.kotlinx.dl.api.core.layer.KVariable
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.PReLU
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvTranspose
@@ -29,7 +29,7 @@ internal object WeightMappings {
     private const val DEPTHWISE_BIAS_DATA_PATH_TEMPLATE = "/%s/%s/depthwise_bias:0"
     private const val PRELU_ALPHA_DATA_PATH_TEMPLATE = "/%s/%s/alpha:0"
 
-    internal fun getLayerVariables(layer: Layer): Map<String, KVariable>? {
+    internal fun getLayerVariables(layer: ParametrizedLayer): Map<String, KVariable>? {
         return when (layer) {
             is Dense -> getDenseVariables(layer)
             is ConvTranspose -> getConvTransposeVariables(layer)
@@ -42,7 +42,7 @@ internal object WeightMappings {
         }
     }
 
-    internal fun getLayerVariablePathTemplates(layer: Layer, layerPaths: LayerPaths?): Map<KVariable, String>? {
+    internal fun getLayerVariablePathTemplates(layer: ParametrizedLayer, layerPaths: LayerPaths?): Map<KVariable, String>? {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)
             is ConvTranspose -> getConvTransposeVariablePathTemplates(layer, layerPaths)
