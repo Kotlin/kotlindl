@@ -46,9 +46,13 @@ public class Preprocessing {
     }
 
     /** Applies the preprocessing pipeline to the specific image file. */
-    public operator fun invoke(imagePath: File): Pair<FloatArray, ImageShape> {
-        require(imagePath.isFile) { "Invoke call is available for one file preprocessing only." }
-        return handleFile(imagePath)
+    public operator fun invoke(imageFile: File): Pair<FloatArray, ImageShape> {
+        require(imageFile.exists()) { "File '$imageFile' does not exist." }
+        require(imageFile.isFile) {
+            if (imageFile.isDirectory) "File '$imageFile' is a directory."
+            else "File '$imageFile' is not a normal file."
+        }
+        return handleFile(imageFile)
     }
 
     internal fun handleFile(file: File): Pair<FloatArray, ImageShape> {
