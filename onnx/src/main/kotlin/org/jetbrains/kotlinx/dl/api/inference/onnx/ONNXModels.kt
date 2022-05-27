@@ -702,7 +702,7 @@ public object ONNXModels {
 
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -715,7 +715,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -739,7 +739,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -752,7 +752,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -776,7 +776,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -789,7 +789,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -813,7 +813,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -826,7 +826,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -850,7 +850,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -863,7 +863,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -887,7 +887,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -900,7 +900,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detectionr.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
@@ -924,7 +924,7 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a real-time neural network for object detection that detects 80 different classes
+         * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
          *
          * Internally it uses the EfficientNets as backbone networks.
@@ -937,7 +937,7 @@ public object ONNXModels {
          * NOTE: The detections are limited to 100.
          *
          * @see <a href="https://arxiv.org/abs/1911.09070">
-         *     SSD: Single Shot MultiBox Detector.</a>
+         *     EfficientDet: Scalable and Efficient Object Detection.</a>
          * @see <a href="https://github.com/google/automl/tree/master/efficientdet">
          *    Detailed description of EfficientDet model in google/automl repository.</a>
          * @see <a href="https://github.com/onnx/tensorflow-onnx/blob/master/tutorials/efficientdet.ipynb">
