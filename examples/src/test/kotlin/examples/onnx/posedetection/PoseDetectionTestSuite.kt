@@ -22,7 +22,7 @@ class PoseDetectionTestSuite {
     @Test
     fun easyPoseDetectionMoveNetSinglePoseLightingTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
+        val model = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
@@ -35,7 +35,7 @@ class PoseDetectionTestSuite {
     @Test
     fun easyPoseDetectionMoveNetSinglePoseThunderTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
+        val model = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
@@ -48,7 +48,7 @@ class PoseDetectionTestSuite {
     @Test
     fun easyPoseDetectionMoveNetMultiPoseLightingTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+        val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
@@ -65,7 +65,7 @@ class PoseDetectionTestSuite {
     @Test
     fun poseDetectionMoveNetSinglePoseLightingTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val modelType = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting
+        val modelType = ONNXModels.PoseDetection.MoveNetSinglePoseLighting
         val model = modelHub.loadModel(modelType)
 
         model.use {
@@ -93,7 +93,7 @@ class PoseDetectionTestSuite {
     @Test
     fun poseDetectionMoveNetSinglePoseThunderTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val modelType = ONNXModels.PoseEstimation.MoveNetSinglePoseThunder
+        val modelType = ONNXModels.PoseDetection.MoveNetSinglePoseThunder
         val model = modelHub.loadModel(modelType)
 
         model.use {
@@ -121,7 +121,7 @@ class PoseDetectionTestSuite {
     @Test
     fun poseDetectionMoveNetMultiPoseLightingTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val modelType = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting
+        val modelType = ONNXModels.PoseDetection.MoveNetMultiPoseLighting
         val model = modelHub.loadModel(modelType)
 
         model.use { inferenceModel ->

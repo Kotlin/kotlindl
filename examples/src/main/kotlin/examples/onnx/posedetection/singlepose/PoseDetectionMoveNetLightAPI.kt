@@ -23,7 +23,7 @@ import java.io.File
  */
 fun poseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val model = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
+    val model = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
     model.use { poseDetectionModel ->
         val preprocessing = preprocessing()

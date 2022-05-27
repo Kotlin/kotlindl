@@ -23,7 +23,7 @@ import java.io.File
  */
 fun multiPoseDetectionMoveNet() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting
+    val modelType = ONNXModels.PoseDetection.MoveNetMultiPoseLighting
     val model = modelHub.loadModel(modelType)
 
     model.use {

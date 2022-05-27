@@ -993,8 +993,8 @@ public object ONNXModels {
         }
     }
 
-    /** Pose estimation models. */
-    public sealed class PoseEstimation<T : InferenceModel, U : InferenceModel>(
+    /** Pose detection models. */
+    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(
         override val modelRelativePath: String,
         override val channelsFirst: Boolean = true
     ) :
@@ -1020,7 +1020,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseLighting :
-            PoseEstimation<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
+            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -1059,7 +1059,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetMultiPoseLighting :
-            PoseEstimation<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
+            PoseDetection<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }
@@ -1096,7 +1096,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseThunder :
-            PoseEstimation<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
+            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return data
             }

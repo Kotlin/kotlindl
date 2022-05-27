@@ -1,4 +1,4 @@
-# 0.4.0 (01/06/2022) Pose Estimation, EfficientDet for Object Detection and EfficientNet for Image Recognition
+# 0.4.0 (01/06/2022) Pose Detection, EfficientDet for Object Detection and EfficientNet for Image Recognition
 Features:
 * Added the PoseNet model family to the ONNX Model Hub. [#269](https://github.com/Kotlin/kotlindl/issues/269)
   * MoveNetSinglePoseLighting
@@ -53,7 +53,7 @@ Examples and tutorials:
 * Added an example of Image preprocessing DSL usage with TensorFlow model. [#292](https://github.com/Kotlin/kotlindl/issues/292).
 * Added examples for Object Detection with [EfficientDet2](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx/objectdetection/efficientdet).
 * Added examples for Object Detection with [SSD-Mobilenet-v1](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx/objectdetection/ssdmobile).
-* Added examples for Pose Estimation with [different models](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx/posedetection).
+* Added examples for Pose Detection with [different models](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx/posedetection).
 * Added examples for Image Recognition with different models from [EfficientNet model family](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx/cv/efficicentnet).
 * Added examples for fine-tuning of [noTop ResNet model](https://github.com/Kotlin/kotlindl/blob/master/examples/src/main/kotlin/examples/transferlearning/modelhub/resnet/Example_5_ResNet50_prediction_additional_training_noTop.kt).
 * Added an example for new Image Preprocessing DSL operator [Normalize](https://github.com/Kotlin/kotlindl/blob/master/examples/src/main/kotlin/examples/dataset/NormalizeExample.kt).

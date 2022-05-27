@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
@@ -24,8 +23,8 @@ private const val OUTPUT_NAME = "output_0"
 /**
  * SinglePoseDetectionModel is an ultra-fast and accurate model that detects 17 keypoints and 18 basic edges of a body.
  *
- * It internally uses [ONNXModels.PoseEstimation.MoveNetSinglePoseLighting]
- * or [ONNXModels.PoseEstimation.MoveNetSinglePoseThunder] under the hood to make predictions.
+ * It internally uses [ONNXModels.PoseDetection.MoveNetSinglePoseLighting]
+ * or [ONNXModels.PoseDetection.MoveNetSinglePoseThunder] under the hood to make predictions.
  */
 public class SinglePoseDetectionModel : OnnxInferenceModel() {
     public fun detectPose(inputData: FloatArray): DetectedPose {
@@ -64,7 +63,7 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
 
         val (data, shape) = preprocessing(imageFile)
 
-        val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
+        val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
             data,
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )

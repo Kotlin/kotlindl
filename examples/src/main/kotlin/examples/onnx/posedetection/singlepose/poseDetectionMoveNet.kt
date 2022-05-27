@@ -23,7 +23,7 @@ import java.io.File
  */
 fun poseDetectionMoveNet() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting
+    val modelType = ONNXModels.PoseDetection.MoveNetSinglePoseLighting
     val model = modelHub.loadModel(modelType)
 
     model.use {
