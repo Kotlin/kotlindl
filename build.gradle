@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
     id 'maven-publish'
     id 'io.codearte.nexus-staging' version '0.22.0'
     id 'org.jetbrains.dokka' version '1.5.30'
