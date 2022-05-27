@@ -38,14 +38,13 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
         rawPoseLandMarks.forEachIndexed { poseIndex, floats ->
             val foundPoseLandmarks = mutableListOf<PoseLandmark>()
 
-            for (i in 0..50 step 3) {
+            for (keyPointIdx in 0..16) {
                 val poseLandmark = PoseLandmark(
-                    poseLandmarkLabel = keyPoints[poseIndex]!!,
-                    x = floats[i + 1],
-                    y = floats[i],
-                    probability = floats[i + 2]
+                    poseLandmarkLabel = keyPoints[keyPointIdx]!!,
+                    x = floats[3 * keyPointIdx + 1],
+                    y = floats[3 * keyPointIdx],
+                    probability = floats[3 * keyPointIdx + 2]
                 )
-
                 foundPoseLandmarks.add(poseLandmark)
             }
 

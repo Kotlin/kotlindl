@@ -35,6 +35,10 @@ fun poseDetectionMoveNetLightAPI() {
                 println("Found ${it.poseLandmarkLabel} with probability ${it.probability}")
             }
 
+            detectedPose.edges.forEach {
+                println("The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
+            }
+
             val (rawImage, shape) = preprocessing(imageFile)
             drawDetectedPose(rawImage, shape, detectedPose)
         }
