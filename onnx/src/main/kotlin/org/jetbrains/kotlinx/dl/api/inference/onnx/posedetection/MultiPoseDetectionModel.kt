@@ -26,7 +26,7 @@ private const val INPUT_SIZE = 256
 /**
  * MultiPoseDetectionModel is an ultra-fast and accurate model that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
  *
- * It internally uses [ONNXModels.PoseEstimation.MoveNetMultiPoseLighting] under the hood to make predictions.
+ * It internally uses [ONNXModels.PoseDetection.MoveNetMultiPoseLighting] under the hood to make predictions.
  */
 public class MultiPoseDetectionModel : OnnxInferenceModel() {
     public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
@@ -38,14 +38,13 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
         rawPoseLandMarks.forEachIndexed { poseIndex, floats ->
             val foundPoseLandmarks = mutableListOf<PoseLandmark>()
 
-            for (i in 0..50 step 3) {
+            for (keyPointIdx in 0..16) {
                 val poseLandmark = PoseLandmark(
-                    poseLandmarkLabel = keyPoints[poseIndex]!!,
-                    x = floats[i + 1],
-                    y = floats[i],
-                    probability = floats[i + 2]
+                    poseLandmarkLabel = keyPoints[keyPointIdx]!!,
+                    x = floats[3 * keyPointIdx + 1],
+                    y = floats[3 * keyPointIdx],
+                    probability = floats[3 * keyPointIdx + 2]
                 )
-
                 foundPoseLandmarks.add(poseLandmark)
             }
 
@@ -84,7 +83,7 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
 
         val (data, shape) = preprocessing(imageFile)
 
-        val preprocessedData = ONNXModels.PoseEstimation.MoveNetSinglePoseLighting.preprocessInput(
+        val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
             data,
             longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )

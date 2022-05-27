@@ -23,7 +23,7 @@ import java.io.File
  */
 fun multiPoseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val model = ONNXModels.PoseEstimation.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+    val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
     model.use { poseDetectionModel ->
         val preprocessing = preprocessing()
@@ -36,6 +36,10 @@ fun multiPoseDetectionMoveNetLightAPI() {
                 println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")
                 detectedPose.second.poseLandmarks.forEach {
                     println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
+                }
+
+                detectedPose.second.edges.forEach {
+                    println("   The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
                 }
             }
 
