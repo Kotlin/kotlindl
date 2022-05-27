@@ -53,7 +53,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD0LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD0, 51)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD0, 72)
     }
 
     @Test
@@ -63,7 +63,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD1LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD1, 50)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD1, 65)
     }
 
     @Test
@@ -73,7 +73,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD2LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD2, 38)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD2, 51)
     }
 
     @Test
@@ -83,7 +83,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD3LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD3, 33)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD3, 38)
     }
 
     @Test
@@ -93,7 +93,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD4LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD4, 27)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD4, 26)
     }
 
     @Test
@@ -103,7 +103,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD5LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD5, 24)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD5, 26)
     }
 
     @Test
@@ -113,7 +113,7 @@ class ObjectDetectionTestSuite {
 
     @Test
     fun efficientDetD6LightAPITest() {
-        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD6, 19)
+        efficientDetLightAPIInference(ONNXModels.ObjectDetection.EfficientDetD6, 22)
     }
 }
 
