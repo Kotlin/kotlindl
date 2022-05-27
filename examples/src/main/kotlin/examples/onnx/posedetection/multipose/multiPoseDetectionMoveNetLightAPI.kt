@@ -37,6 +37,10 @@ fun multiPoseDetectionMoveNetLightAPI() {
                 detectedPose.second.poseLandmarks.forEach {
                     println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
                 }
+
+                detectedPose.second.edges.forEach {
+                    println("   The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
+                }
             }
 
             val (rawImage, shape) = preprocessing(imageFile)
