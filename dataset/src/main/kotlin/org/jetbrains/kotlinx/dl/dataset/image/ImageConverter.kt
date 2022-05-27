@@ -223,7 +223,8 @@ public object ImageConverter {
      * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
      *
      * If [isNormalized] is true, then [inputArray] values considered to be in [0..1) interval
-     * and will be rescaled to [0..255) interval.
+     * and will be rescaled to [0..255) interval. Values that are outside this range are clamped
+     * to avoid artifacts on the image.
      *
      * If an array requires custom processing, one can use method variation that accepts [ArrayTransform].
      *
@@ -240,7 +241,12 @@ public object ImageConverter {
         isNormalized: Boolean
     ): BufferedImage {
         return floatArrayToBufferedImage(inputArray, outputShape, arrayColorMode) {
-            if (isNormalized) denormalizeInplace(it, scale = 255f) else it
+            if (isNormalized) denormalizeInplace(it, scale = 255f)
+            for ((i, value) in it.withIndex()) {
+                if (value < 0) it[i] = 0f
+                if (value > 255) it[i] = 255f
+            }
+            it
         }
     }
 
@@ -275,11 +281,6 @@ public object ImageConverter {
         require(
             numberOfElements == dataCopy.size.toLong()
         ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
-
-        for ((i, value) in dataCopy.withIndex()) {
-            if (value < 0) dataCopy[i] = 0f
-            if (value > 255) dataCopy[i] = 255f
-        }
 
         /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
         if (arrayColorMode == ColorMode.BGR) {
