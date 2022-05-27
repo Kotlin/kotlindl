@@ -61,7 +61,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
     /**
      * Returns the detected object for the given image file sorted by the score.
      *
-     * NOTE: this method includes the SSD - related preprocessing.
+     * NOTE: this method includes the EfficientDet - related preprocessing.
      *
      * @param [imageFile] File, should be an image.
      * @return List of [DetectedObject] sorted by score.
@@ -73,7 +73,9 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
                     outputHeight = inputShape[1].toInt()
                     outputWidth = inputShape[2].toInt()
                 }
-                convert { colorMode = ColorMode.BGR }
+                // the channels of input of EfficientDet models should be in RGB order
+                // model is quite sensitive for this
+                convert { colorMode = ColorMode.RGB }
             }
         }
 
