@@ -95,6 +95,7 @@ fun lenetWithMultipleCallbacks() {
             callback = PredictCallback()
         )
 
+        println(predictions.size)
     }
 }
 
@@ -115,22 +116,6 @@ class EvaluateCallback : Callback() {
     override fun onTestEnd(logs: History) {
         println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
-
-    override fun onPredictBatchBegin(batch: Int, batchSize: Int) {
-        println("Prediction batch $batch begins.")
-    }
-
-    override fun onPredictBatchEnd(batch: Int, batchSize: Int) {
-        println("Prediction batch $batch ends.")
-    }
-
-    override fun onPredictBegin() {
-        println("Train begins")
-    }
-
-    override fun onPredictEnd() {
-        println("Test begins")
-    }
 }
 
 /** Simple custom Callback object. */
@@ -144,11 +129,11 @@ class PredictCallback : Callback() {
     }
 
     override fun onPredictBegin() {
-        println("Train begins")
+        println("Predict begins")
     }
 
     override fun onPredictEnd() {
-        println("Test begins")
+        println("Predict ends")
     }
 }
 

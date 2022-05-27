@@ -51,9 +51,7 @@ fun resnet50additionalTrainingNoTopWithHelper() {
     val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     val noTopModel = modelHub.loadModel(modelType)
 
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-
-    val preprocessing: Preprocessing = preprocess {
+    val preprocessing = preprocess {
         transformImage {
             resize {
                 outputHeight = IMAGE_SIZE
@@ -70,7 +68,7 @@ fun resnet50additionalTrainingNoTopWithHelper() {
     }
 
     val dataset = OnFlyImageDataset.create(
-        File(dogsCatsImages),
+        File(dogsCatsSmallDatasetPath()),
         FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
         preprocessing
     ).shuffle()
