@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import java.io.File
 
 /**
- * This examples demonstrates the light-weight inference API with [ImageRecognitionModel] on ResNet'18 model:
+ * This examples demonstrates the light-weight inference API with [ImageRecognitionModel] on EfficientNetB7 model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
  */
