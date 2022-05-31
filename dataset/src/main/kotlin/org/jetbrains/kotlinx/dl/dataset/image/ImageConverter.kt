@@ -223,7 +223,8 @@ public object ImageConverter {
      * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
      *
      * If [isNormalized] is true, then [inputArray] values considered to be in [0..1) interval
-     * and will be rescaled to [0..255) interval.
+     * and will be rescaled to [0..255) interval. Values that are outside this range are clamped
+     * to avoid artifacts on the image.
      *
      * If an array requires custom processing, one can use method variation that accepts [ArrayTransform].
      *
@@ -238,9 +239,14 @@ public object ImageConverter {
         outputShape: ImageShape,
         arrayColorMode: ColorMode,
         isNormalized: Boolean
-    ) : BufferedImage {
+    ): BufferedImage {
         return floatArrayToBufferedImage(inputArray, outputShape, arrayColorMode) {
-            if (isNormalized) denormalizeInplace(it, scale = 255f) else it
+            if (isNormalized) denormalizeInplace(it, scale = 255f)
+            for ((i, value) in it.withIndex()) {
+                if (value < 0) it[i] = 0f
+                if (value > 255) it[i] = 255f
+            }
+            it
         }
     }
 
@@ -269,25 +275,23 @@ public object ImageConverter {
         arrayColorMode: ColorMode,
         arrayTransform: ArrayTransform? = null
     ): BufferedImage {
-        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
-
         val dataCopy = arrayTransform?.invoke(inputArray.copyOf()) ?: inputArray.copyOf()
 
+        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
         require(
             numberOfElements == dataCopy.size.toLong()
         ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
-
-        val output = BufferedImage(
-            outputShape.width.toInt(),
-            outputShape.height.toInt(),
-            arrayColorMode.imageType()
-        )
 
         /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
         if (arrayColorMode == ColorMode.BGR) {
             swapRandB(dataCopy)
         }
 
+        val output = BufferedImage(
+            outputShape.width.toInt(),
+            outputShape.height.toInt(),
+            arrayColorMode.imageType()
+        )
         output.raster.setPixels(0, 0, output.width, output.height, dataCopy)
 
         return output
