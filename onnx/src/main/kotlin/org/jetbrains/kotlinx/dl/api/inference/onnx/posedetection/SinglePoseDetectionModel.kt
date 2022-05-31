@@ -57,7 +57,7 @@ public class SinglePoseDetectionModel : OnnxInferenceModel() {
                     outputHeight = height.toInt()
                     outputWidth = width.toInt()
                 }
-                convert { colorMode = ColorMode.BGR }
+                convert { colorMode = ColorMode.RGB }
             }
         }
 

@@ -62,7 +62,6 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
             val detectedPose = DetectedPose(foundPoseLandmarks, foundPoseEdges)
 
             if (detectedObject.probability > confidence) result.multiplePoses.add(
-                poseIndex,
                 Pair(detectedObject, detectedPose)
             )
         }
@@ -77,7 +76,7 @@ public class MultiPoseDetectionModel : OnnxInferenceModel() {
                     outputHeight = INPUT_SIZE
                     outputWidth = INPUT_SIZE
                 }
-                convert { colorMode = ColorMode.BGR }
+                convert { colorMode = ColorMode.RGB }
             }
         }
 
