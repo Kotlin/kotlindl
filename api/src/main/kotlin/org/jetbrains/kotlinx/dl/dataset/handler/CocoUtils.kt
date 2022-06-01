@@ -8,10 +8,13 @@ package org.jetbrains.kotlinx.dl.dataset.handler
 /**
  * 80 object categories in COCO dataset.
  *
+ * Note that output class labels of SSD model do not correspond to ids in COCO annotations.
+ * If you want to evaluate this model on the COCO validation/test set, you need to convert class predictions using appropriate mapping.
+ *
  * @see <a href="https://cocodataset.org/#home">
  *     COCO dataset</a>
  */
-public val cocoCategories: Map<Int, String> = mapOf(
+public val cocoCategoriesForSSD: Map<Int, String> = mapOf(
     1 to "person",
     2 to "bicycle",
     3 to "car",
@@ -101,7 +104,7 @@ public val cocoCategories: Map<Int, String> = mapOf(
  * @see <a href="https://cocodataset.org/#home">
  *     COCO dataset</a>
  */
-public val cocoCategoriesForEfficientDet: Map<Int, String> = mapOf(
+public val cocoCategories: Map<Int, String> = mapOf(
     1 to "person",
     2 to "bicycle",
     3 to "car",

@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet
+import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
@@ -42,7 +42,7 @@ public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
             val probability = items[i][5]
             if (probability != 0.0f) {
                 val detectedObject = DetectedObject(
-                    classLabel = cocoCategoriesForEfficientDet[items[i][6].toInt()]!!,
+                    classLabel = cocoCategories[items[i][6].toInt()]!!,
                     probability = probability,
                     // left, bot, right, top
                     xMin = minOf(items[i][2] / inputShape[2], 1.0f),
