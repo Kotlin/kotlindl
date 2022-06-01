@@ -617,7 +617,7 @@ public object ONNXModels {
         ModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD]).
          *
          * The model have an input with the shape is (1x3x1200x1200).
          *
@@ -660,7 +660,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD]).
          *
          * SSD-MobilenetV1 is an object detection model that uses a Single Shot MultiBox Detector (SSD) approach
          * to predict object classes for boundary boxes.
@@ -703,7 +703,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -740,7 +740,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -777,7 +777,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -814,7 +814,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -851,7 +851,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -888,7 +888,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
@@ -925,7 +925,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForEfficientDet]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories]).
          *
          * Internally it uses the EfficientNets as backbone networks.
          *
