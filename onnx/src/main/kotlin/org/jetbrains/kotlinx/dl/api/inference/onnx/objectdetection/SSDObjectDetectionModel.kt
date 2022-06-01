@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
+import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
@@ -27,6 +27,13 @@ private const val INPUT_SIZE = 1200
  *
  * It internally uses [ONNXModels.ObjectDetection.SSD] trained on the COCO dataset.
  *
+ * Note that output class labels do not correspond to ids in COCO annotations.
+ * If you want to evaluate this model on the COCO validation/test set, you need to convert class predictions using appropriate mapping.
+ *
+ *
+ *  @see <a href="https://github.com/lji72/inference/blob/tf_ssd_resent34_align_onnx/others/cloud/single_stage_detector/tensorflow/dataset_config/coco_labelmap.txt">
+ *     Example mapping</a>
+ *
  * @since 0.3
  */
 public class SSDObjectDetectionModel : OnnxInferenceModel() {
@@ -39,7 +46,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
      * @param [topK] The number of the detected objects with the highest score to be returned.
      * @return List of [DetectedObject] sorted by score.
      */
-    public fun detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
+    public fun  detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
         val rawPrediction = this.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
@@ -50,7 +57,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
 
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
-                classLabel = cocoCategories[classIndices[i].toInt()]!!,
+                classLabel = cocoCategoriesForSSD[classIndices[i].toInt()]!!,
                 probability = probabilities[i],
                 // left, bot, right, top
                 xMin = boxes[i][0],
@@ -86,7 +93,7 @@ public class SSDObjectDetectionModel : OnnxInferenceModel() {
                     outputHeight = INPUT_SIZE
                     outputWidth = INPUT_SIZE
                 }
-                convert { colorMode = ColorMode.BGR }
+                convert { colorMode = ColorMode.RGB }
             }
         }
 

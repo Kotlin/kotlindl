@@ -86,7 +86,7 @@ public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
                     outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
                     outputWidth = this@SSDMobileNetV1ObjectDetectionModel.inputShape[2].toInt()
                 }
-                convert { colorMode = ColorMode.BGR }
+                convert { colorMode = ColorMode.RGB }
             }
         }
 
