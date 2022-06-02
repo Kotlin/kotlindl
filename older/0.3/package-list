@@ -1,0 +1,97 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:////PointingToDeclaration/examples/[root]/index.html
+$dokka.location:/LeNetClassic///PointingToDeclaration/examples/[root]/-le-net-classic/index.html
+$dokka.location:/LeNetClassic/EPOCHS/#/PointingToDeclaration/examples/[root]/-le-net-classic/-e-p-o-c-h-s.html
+$dokka.location:/LeNetClassic/IMAGE_SIZE/#/PointingToDeclaration/examples/[root]/-le-net-classic/-i-m-a-g-e_-s-i-z-e.html
+$dokka.location:/LeNetClassic/NUM_CHANNELS/#/PointingToDeclaration/examples/[root]/-le-net-classic/-n-u-m_-c-h-a-n-n-e-l-s.html
+$dokka.location:/LeNetClassic/SEED/#/PointingToDeclaration/examples/[root]/-le-net-classic/-s-e-e-d.html
+$dokka.location:/LeNetClassic/TEST_BATCH_SIZE/#/PointingToDeclaration/examples/[root]/-le-net-classic/-t-e-s-t_-b-a-t-c-h_-s-i-z-e.html
+$dokka.location:/LeNetClassic/TRAINING_BATCH_SIZE/#/PointingToDeclaration/examples/[root]/-le-net-classic/-t-r-a-i-n-i-n-g_-b-a-t-c-h_-s-i-z-e.html
+$dokka.location:/LeNetClassic/main/#java.lang.String[]/PointingToDeclaration/examples/[root]/-le-net-classic/main.html
+module:api
+org.jetbrains.kotlinx.dl.api.core
+org.jetbrains.kotlinx.dl.api.core.activation
+org.jetbrains.kotlinx.dl.api.core.callback
+org.jetbrains.kotlinx.dl.api.core.exception
+org.jetbrains.kotlinx.dl.api.core.history
+org.jetbrains.kotlinx.dl.api.core.initializer
+org.jetbrains.kotlinx.dl.api.core.layer
+org.jetbrains.kotlinx.dl.api.core.layer.activation
+org.jetbrains.kotlinx.dl.api.core.layer.convolutional
+org.jetbrains.kotlinx.dl.api.core.layer.core
+org.jetbrains.kotlinx.dl.api.core.layer.merge
+org.jetbrains.kotlinx.dl.api.core.layer.normalization
+org.jetbrains.kotlinx.dl.api.core.layer.pooling
+org.jetbrains.kotlinx.dl.api.core.layer.regularization
+org.jetbrains.kotlinx.dl.api.core.layer.reshaping
+org.jetbrains.kotlinx.dl.api.core.loss
+org.jetbrains.kotlinx.dl.api.core.metric
+org.jetbrains.kotlinx.dl.api.core.model
+org.jetbrains.kotlinx.dl.api.core.optimizer
+org.jetbrains.kotlinx.dl.api.core.regularizer
+org.jetbrains.kotlinx.dl.api.core.shape
+org.jetbrains.kotlinx.dl.api.core.summary
+org.jetbrains.kotlinx.dl.api.core.util
+org.jetbrains.kotlinx.dl.api.extension
+org.jetbrains.kotlinx.dl.api.inference
+org.jetbrains.kotlinx.dl.api.inference.facealignment
+org.jetbrains.kotlinx.dl.api.inference.imagerecognition
+org.jetbrains.kotlinx.dl.api.inference.keras
+org.jetbrains.kotlinx.dl.api.inference.keras.loaders
+org.jetbrains.kotlinx.dl.api.inference.objectdetection
+org.jetbrains.kotlinx.dl.api.inference.savedmodel
+org.jetbrains.kotlinx.dl.dataset
+org.jetbrains.kotlinx.dl.dataset.handler
+org.jetbrains.kotlinx.dl.dataset.preprocessor
+module:dataset
+org.jetbrains.kotlinx.dl.dataset
+org.jetbrains.kotlinx.dl.dataset.audio.wav
+org.jetbrains.kotlinx.dl.dataset.image
+org.jetbrains.kotlinx.dl.dataset.preprocessor
+org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
+org.jetbrains.kotlinx.dl.dataset.preprocessor.image
+module:examples
+examples.cnn.cifar10
+examples.cnn.dogscats
+examples.cnn.fashionmnist
+examples.cnn.fsdd
+examples.cnn.mnist
+examples.cnn.mnist.advanced
+examples.custom
+examples.dataset
+examples.experimental.batchnorm
+examples.inference
+examples.inference.fashionmnist
+examples.inference.mnist
+examples.inference.optimizers
+examples.inference.savedmodel
+examples.inference.saveload
+examples.ml
+examples.onnx.cv
+examples.onnx.cv.custom
+examples.onnx.cv.efficicentnet
+examples.onnx.cv.resnet
+examples.onnx.faces
+examples.onnx.mnist
+examples.onnx.objectdetection.ssd
+examples.transferlearning
+examples.transferlearning.lenet
+examples.transferlearning.modelhub.densenet
+examples.transferlearning.modelhub.inception
+examples.transferlearning.modelhub.mobilenet
+examples.transferlearning.modelhub.nasnet
+examples.transferlearning.modelhub.resnet
+examples.transferlearning.modelhub.vgg16
+examples.transferlearning.modelhub.vgg19
+examples.transferlearning.toyresnet
+examples.visualization
+module:onnx
+org.jetbrains.kotlinx.dl.api.inference.loaders
+org.jetbrains.kotlinx.dl.api.inference.onnx
+org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
+org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
+org.jetbrains.kotlinx.dl.dataset.preprocessor
+module:visualization
+org.jetbrains.kotlinx.dl.visualization.letsplot
+org.jetbrains.kotlinx.dl.visualization.swing

@@ -1,0 +1,346 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PReLU</title>
+</head><body><link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../scripts/main.js" async></script>
+  
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+            <div id="logo"></div>
+          </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <script type="text/javascript" src="../../../scripts/main.js"></script><div id="leftToggler"><span class="icon-toggler"></span></div>
+
+        <div class="main-content" id="content" pageids="api::org.jetbrains.kotlinx.dl.api.core.layer.activation/PReLU///PointingToDeclaration//-1197683648">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../index.html">api</a>/<a href="../index.html">org.jetbrains.kotlinx.dl.api.core.layer.activation</a>/<a href="index.html">PReLU</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>PRe</span><wbr><span><span>LU</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">class <a href="index.html">PReLU</a>(alphaInitializer: <a href="../../org.jetbrains.kotlinx.dl.api.core.initializer/-initializer/index.html">Initializer</a>, alphaRegularizer: <a href="../../org.jetbrains.kotlinx.dl.api.core.regularizer/-regularizer/index.html">Regularizer</a>?, sharedAxes: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int-array/index.html">IntArray</a>?, name: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>) : <a href="../-abstract-activation-layer/index.html">AbstractActivationLayer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Parametric Rectified Linear Unit.</p><p class="paragraph">It follows:</p><div class="sample-container"><code class="" theme="idea"><pre>f(x) = alpha * x     if x &lt; 0<br>f(x) = x             if x &gt;= 0</pre></code></div><p class="paragraph">where <code>alpha</code> is a learnable weight and has the same shape as <code>x</code> (i.e. input).</p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="tabbedcontent">Constructors</h2>
+              <div class="table" data-togglable="Constructors"><a data-name="-1908606212%2FConstructors%2F-1197683648" anchor-label="PReLU" id="-1908606212%2FConstructors%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue TabbedContent">
+                    <div class=""><span class="inline-flex"><a href="-p-re-l-u.html">PReLU</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1908606212%2FConstructors%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">fun <a href="-p-re-l-u.html">PReLU</a>(alphaInitializer: <a href="../../org.jetbrains.kotlinx.dl.api.core.initializer/-initializer/index.html">Initializer</a> = Zeros(), alphaRegularizer: <a href="../../org.jetbrains.kotlinx.dl.api.core.regularizer/-regularizer/index.html">Regularizer</a>? = null, sharedAxes: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int-array/index.html">IntArray</a>? = null, name: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a> = "")<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="-365748211%2FFunctions%2F-1197683648" anchor-label="build" id="-365748211%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="build.html"><span><span>build</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-365748211%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open override fun <a href="build.html">build</a>(tf: <span data-unresolved-link="org.tensorflow.op/Ops///PointingToDeclaration/">Ops</span>, kGraph: <a href="../../org.jetbrains.kotlinx.dl.api.core/-k-graph/index.html">KGraph</a>, inputShape: <span data-unresolved-link="org.tensorflow/Shape///PointingToDeclaration/">Shape</span>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Extend this function to define variables in layer.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1367217662%2FFunctions%2F-1197683648" anchor-label="buildFromInboundLayers" id="1367217662%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/build-from-inbound-layers.html"><span>build</span><wbr><span>From</span><wbr><span>Inbound</span><wbr><span><span>Layers</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1367217662%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">fun <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/build-from-inbound-layers.html">buildFromInboundLayers</a>(tf: <span data-unresolved-link="org.tensorflow.op/Ops///PointingToDeclaration/">Ops</span>, kGraph: <a href="../../org.jetbrains.kotlinx.dl.api.core/-k-graph/index.html">KGraph</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Extend this function to define variables in layer.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="432957068%2FFunctions%2F-1197683648" anchor-label="computeOutputShape" id="432957068%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-abstract-activation-layer/compute-output-shape.html"><span>compute</span><wbr><span>Output</span><wbr><span><span>Shape</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="432957068%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open override fun <a href="../-abstract-activation-layer/compute-output-shape.html">computeOutputShape</a>(inputShape: <span data-unresolved-link="org.tensorflow/Shape///PointingToDeclaration/">Shape</span>): <span data-unresolved-link="org.tensorflow/Shape///PointingToDeclaration/">Shape</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Computes output shape, based on <a href="../-abstract-activation-layer/compute-output-shape.html">inputShape</a> and <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a> type.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1482535679%2FFunctions%2F-1197683648" anchor-label="computeOutputShapeFromInboundLayers" id="1482535679%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/compute-output-shape-from-inbound-layers.html"><span>compute</span><wbr><span>Output</span><wbr><span>Shape</span><wbr><span>From</span><wbr><span>Inbound</span><wbr><span><span>Layers</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1482535679%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open fun <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/compute-output-shape-from-inbound-layers.html">computeOutputShapeFromInboundLayers</a>(): <a href="../../org.jetbrains.kotlinx.dl.api.core.shape/-tensor-shape/index.html">TensorShape</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Computes output shape, based on input shapes of inbound layers.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1195807115%2FFunctions%2F-1197683648" anchor-label="forward" id="1195807115%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="forward.html"><span><span>forward</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1195807115%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open override fun <a href="forward.html">forward</a>(tf: <span data-unresolved-link="org.tensorflow.op/Ops///PointingToDeclaration/">Ops</span>, input: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;): <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Applies the activation functions to the <a href="forward.html">input</a> to produce the output.</p></div></div>
+<div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open override fun <a href="../-abstract-activation-layer/forward.html">forward</a>(tf: <span data-unresolved-link="org.tensorflow.op/Ops///PointingToDeclaration/">Ops</span>, input: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;, isTraining: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>&gt;, numberOfLosses: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;?): <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Builds main layer input transformation with <a href="../-abstract-activation-layer/forward.html">tf</a>. Depends on <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a> type.</p></div></div>
+<div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open fun <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/forward.html">forward</a>(tf: <span data-unresolved-link="org.tensorflow.op/Ops///PointingToDeclaration/">Ops</span>, input: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;&gt;, isTraining: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>&gt;, numberOfLosses: <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;?): <span data-unresolved-link="org.tensorflow/Operand///PointingToDeclaration/">Operand</span>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Builds main layer input transformation with <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/forward.html">tf</a>. Depends on <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a> type.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="87028897%2FFunctions%2F-1197683648" anchor-label="invoke" id="87028897%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/invoke.html"><span><span>invoke</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="87028897%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">operator fun <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/invoke.html">invoke</a>(vararg layers: <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a>): <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Important part of functional API. It takes <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/invoke.html">layers</a> as input and saves them to the <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/inbound-layers.html">inboundLayers</a> of the given layer.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-57030528%2FFunctions%2F-1197683648" anchor-label="toString" id="-57030528%2FFunctions%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-57030528%2FFunctions%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">open override fun <a href="to-string.html">toString</a>(): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="1246098504%2FProperties%2F-1197683648" anchor-label="alphaInitializer" id="1246098504%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="alpha-initializer.html">alphaInitializer</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1246098504%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1246098504%2FProperties%2F-1197683648" anchor-label="alphaInitializer" id="1246098504%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">val <a href="alpha-initializer.html">alphaInitializer</a>: <a href="../../org.jetbrains.kotlinx.dl.api.core.initializer/-initializer/index.html">Initializer</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1246098504%2FProperties%2F-1197683648" anchor-label="alphaInitializer" id="1246098504%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Initializer instance for the weights.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1662331632%2FProperties%2F-1197683648" anchor-label="alphaRegularizer" id="1662331632%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="alpha-regularizer.html">alphaRegularizer</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1662331632%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1662331632%2FProperties%2F-1197683648" anchor-label="alphaRegularizer" id="1662331632%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">val <a href="alpha-regularizer.html">alphaRegularizer</a>: <a href="../../org.jetbrains.kotlinx.dl.api.core.regularizer/-regularizer/index.html">Regularizer</a>? = null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1662331632%2FProperties%2F-1197683648" anchor-label="alphaRegularizer" id="1662331632%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Regularizer instance for the weights.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="555676721%2FProperties%2F-1197683648" anchor-label="hasActivation" id="555676721%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-abstract-activation-layer/has-activation.html">hasActivation</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="555676721%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="555676721%2FProperties%2F-1197683648" anchor-label="hasActivation" id="555676721%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">open override val <a href="../-abstract-activation-layer/has-activation.html">hasActivation</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="555676721%2FProperties%2F-1197683648" anchor-label="hasActivation" id="555676721%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Returns True, if layer has internal activation function.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-421627156%2FProperties%2F-1197683648" anchor-label="inboundLayers" id="-421627156%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/inbound-layers.html">inboundLayers</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-421627156%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="-421627156%2FProperties%2F-1197683648" anchor-label="inboundLayers" id="-421627156%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/inbound-layers.html">inboundLayers</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a>&lt;<a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-421627156%2FProperties%2F-1197683648" anchor-label="inboundLayers" id="-421627156%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Returns inbound layers.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1396176079%2FProperties%2F-1197683648" anchor-label="isTrainable" id="1396176079%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/is-trainable.html">isTrainable</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1396176079%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1396176079%2FProperties%2F-1197683648" anchor-label="isTrainable" id="1396176079%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/is-trainable.html">isTrainable</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a> = true<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1396176079%2FProperties%2F-1197683648" anchor-label="isTrainable" id="1396176079%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">True, if layer's weights could be changed during training. If false, layer's weights are frozen and could be changed during the training.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="743017320%2FProperties%2F-1197683648" anchor-label="name" id="743017320%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/name.html">name</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="743017320%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="743017320%2FProperties%2F-1197683648" anchor-label="name" id="743017320%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/name.html">name</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="485439489%2FProperties%2F-1197683648" anchor-label="outboundLayers" id="485439489%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/outbound-layers.html">outboundLayers</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="485439489%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="485439489%2FProperties%2F-1197683648" anchor-label="outboundLayers" id="485439489%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/outbound-layers.html">outboundLayers</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a>&lt;<a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/index.html">Layer</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="485439489%2FProperties%2F-1197683648" anchor-label="outboundLayers" id="485439489%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Returns outbound layers.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="266324999%2FProperties%2F-1197683648" anchor-label="outputShape" id="266324999%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/output-shape.html">outputShape</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="266324999%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="266324999%2FProperties%2F-1197683648" anchor-label="outputShape" id="266324999%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">lateinit var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/output-shape.html">outputShape</a>: <a href="../../org.jetbrains.kotlinx.dl.api.core.shape/-tensor-shape/index.html">TensorShape</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="266324999%2FProperties%2F-1197683648" anchor-label="outputShape" id="266324999%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Output data tensor shape.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-856770710%2FProperties%2F-1197683648" anchor-label="paramCount" id="-856770710%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="param-count.html">paramCount</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-856770710%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="-856770710%2FProperties%2F-1197683648" anchor-label="paramCount" id="-856770710%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">open override val <a href="param-count.html">paramCount</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-856770710%2FProperties%2F-1197683648" anchor-label="paramCount" id="-856770710%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Returns amount of neurons.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1701153640%2FProperties%2F-1197683648" anchor-label="parentModel" id="1701153640%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/parent-model.html">parentModel</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1701153640%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1701153640%2FProperties%2F-1197683648" anchor-label="parentModel" id="1701153640%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">var <a href="../../org.jetbrains.kotlinx.dl.api.core.layer/-layer/parent-model.html">parentModel</a>: <a href="../../org.jetbrains.kotlinx.dl.api.core/-trainable-model/index.html">TrainableModel</a>? = null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1701153640%2FProperties%2F-1197683648" anchor-label="parentModel" id="1701153640%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Model where this layer is used.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="748228546%2FProperties%2F-1197683648" anchor-label="sharedAxes" id="748228546%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="shared-axes.html">sharedAxes</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="748228546%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="748228546%2FProperties%2F-1197683648" anchor-label="sharedAxes" id="748228546%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">val <a href="shared-axes.html">sharedAxes</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int-array/index.html">IntArray</a>? = null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="748228546%2FProperties%2F-1197683648" anchor-label="sharedAxes" id="748228546%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">The axes along which to share learnable parameters.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1729003411%2FProperties%2F-1197683648" anchor-label="weights" id="1729003411%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a>
+                <div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="weights.html">weights</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1729003411%2FProperties%2F-1197683648"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><a data-name="1729003411%2FProperties%2F-1197683648" anchor-label="weights" id="1729003411%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><div class="symbol monospace">open override var <a href="weights.html">weights</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html">Array</a>&lt;*&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1729003411%2FProperties%2F-1197683648" anchor-label="weights" id="1729003411%2FProperties%2F-1197683648" data-filterable-set=":api:dokkaHtmlPartial/main"></a><p class="paragraph">Layer's weights.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+
