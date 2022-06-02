@@ -13,6 +13,7 @@ module:api
 org.jetbrains.kotlinx.dl.api.core
 org.jetbrains.kotlinx.dl.api.core.activation
 org.jetbrains.kotlinx.dl.api.core.callback
+org.jetbrains.kotlinx.dl.api.core.dsl
 org.jetbrains.kotlinx.dl.api.core.exception
 org.jetbrains.kotlinx.dl.api.core.history
 org.jetbrains.kotlinx.dl.api.core.initializer
@@ -40,6 +41,7 @@ org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 org.jetbrains.kotlinx.dl.api.inference.keras
 org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 org.jetbrains.kotlinx.dl.api.inference.objectdetection
+org.jetbrains.kotlinx.dl.api.inference.posedetection
 org.jetbrains.kotlinx.dl.api.inference.savedmodel
 org.jetbrains.kotlinx.dl.dataset
 org.jetbrains.kotlinx.dl.dataset.handler
@@ -62,6 +64,7 @@ examples.custom
 examples.dataset
 examples.experimental.batchnorm
 examples.inference
+examples.inference.cifar10
 examples.inference.fashionmnist
 examples.inference.mnist
 examples.inference.optimizers
@@ -69,12 +72,18 @@ examples.inference.savedmodel
 examples.inference.saveload
 examples.ml
 examples.onnx.cv
-examples.onnx.cv.custom
 examples.onnx.cv.efficicentnet
+examples.onnx.cv.efficicentnet.lightAPI
+examples.onnx.cv.efficicentnet.notop
+examples.onnx.cv.lenet
 examples.onnx.cv.resnet
+examples.onnx.cv.resnet.notop
 examples.onnx.faces
-examples.onnx.mnist
+examples.onnx.objectdetection.efficientdet
 examples.onnx.objectdetection.ssd
+examples.onnx.objectdetection.ssdmobile
+examples.onnx.posedetection.multipose
+examples.onnx.posedetection.singlepose
 examples.transferlearning
 examples.transferlearning.lenet
 examples.transferlearning.modelhub.densenet
@@ -91,6 +100,7 @@ org.jetbrains.kotlinx.dl.api.inference.loaders
 org.jetbrains.kotlinx.dl.api.inference.onnx
 org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
+org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 org.jetbrains.kotlinx.dl.dataset.preprocessor
 module:visualization
 org.jetbrains.kotlinx.dl.visualization.letsplot

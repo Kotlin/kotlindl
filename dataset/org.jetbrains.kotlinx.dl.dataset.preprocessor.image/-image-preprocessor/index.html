@@ -23,7 +23,7 @@
           </div>
           <div class="cover ">
             <h1 class="cover"><span>Image</span><wbr><span><span>Preprocessor</span></span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dataset:dokkaHtmlPartial/main"><div class="symbol monospace">interface <a href="index.html">ImagePreprocessor</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Basic interface for image preprocessors. It operates on <a href="https://docs.oracle.com/javase/8/docs/api/java/awt/image/BufferedImage.html">BufferedImage</a>.</p><p class="paragraph">When implementing a new <a href="index.html">ImagePreprocessor</a> it is recommended to use <a href="../-image-preprocessor-base/index.html">ImagePreprocessorBase</a> as a base class to automatically add additional features such as saving preprocessor output.</p></div></div>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dataset:dokkaHtmlPartial/main"><div class="symbol monospace">interface <a href="index.html">ImagePreprocessor</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Basic interface for image preprocessors. It operates on <a href="https://docs.oracle.com/javase/8/docs/api/java/awt/image/BufferedImage.html">BufferedImage</a>.</p><p class="paragraph">When implementing a new <a href="index.html">ImagePreprocessor</a> it is recommended to use <a href="../-image-preprocessor-base/index.html">ImagePreprocessorBase</a> as a base class to automatically add additional features such as saving preprocessor output with <a href="../-image-saver/index.html">ImageSaver</a>.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
@@ -46,19 +46,19 @@
                     </div>
                   </div>
                 </div>
-<a data-name="-2036997177%2FFunctions%2F1376148770" anchor-label="getOutputShape" id="-2036997177%2FFunctions%2F1376148770" data-filterable-set=":dataset:dokkaHtmlPartial/main"></a>
+<a data-name="1702102684%2FFunctions%2F1376148770" anchor-label="getOutputShape" id="1702102684%2FFunctions%2F1376148770" data-filterable-set=":dataset:dokkaHtmlPartial/main"></a>
                 <div class="table-row" data-filterable-current=":dataset:dokkaHtmlPartial/main" data-filterable-set=":dataset:dokkaHtmlPartial/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="get-output-shape.html"><span>get</span><wbr><span>Output</span><wbr><span><span>Shape</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2036997177%2FFunctions%2F1376148770"></span>
+                    <div class=""><span class="inline-flex"><a href="get-output-shape.html"><span>get</span><wbr><span>Output</span><wbr><span><span>Shape</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1702102684%2FFunctions%2F1376148770"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title"><div class="divergent-group" data-filterable-current=":dataset:dokkaHtmlPartial/main" data-filterable-set=":dataset:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dataset:dokkaHtmlPartial/main"><div class="symbol monospace">open fun <a href="get-output-shape.html">getOutputShape</a>(inputShape: <a href="../../org.jetbrains.kotlinx.dl.dataset.preprocessor/-image-shape/index.html">ImageShape</a>?): <a href="../../org.jetbrains.kotlinx.dl.dataset.preprocessor/-image-shape/index.html">ImageShape</a>?<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dataset:dokkaHtmlPartial/main"><div class="symbol monospace">open fun <a href="get-output-shape.html">getOutputShape</a>(inputShape: <a href="../../org.jetbrains.kotlinx.dl.dataset.preprocessor/-image-shape/index.html">ImageShape</a>): <a href="../../org.jetbrains.kotlinx.dl.dataset.preprocessor/-image-shape/index.html">ImageShape</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<div class="brief "><p class="paragraph">Computes output image shape for the provided <a href="get-output-shape.html">inputShape</a>.</p></div></div>
+<div class="brief "><p class="paragraph">Computes output image shape for the provided <a href="get-output-shape.html">inputShape</a>. Note that some input dimensions could equal to <code>null</code>, which means that they are undefined. This is useful for the operations with fixed output size not dependent on the input size.</p></div></div>
 </div>
                     </div>
                   </div>
@@ -78,7 +78,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   

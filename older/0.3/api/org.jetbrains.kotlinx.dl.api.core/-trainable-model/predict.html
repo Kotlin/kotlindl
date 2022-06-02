@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>predict</title>
+</head><body><link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../scripts/main.js" async></script>
+  
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+            <div id="logo"></div>
+          </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <script type="text/javascript" src="../../../scripts/main.js"></script><div id="leftToggler"><span class="icon-toggler"></span></div>
+
+        <div class="main-content" id="content" pageids="api::org.jetbrains.kotlinx.dl.api.core/TrainableModel/predict/#org.jetbrains.kotlinx.dl.dataset.Dataset#kotlin.Int/PointingToDeclaration//-1197683648">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../index.html">api</a>/<a href="../index.html">org.jetbrains.kotlinx.dl.api.core</a>/<a href="index.html">TrainableModel</a>/<a href="predict.html">predict</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span><span>predict</span></span></h1>
+          </div>
+<div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">abstract fun <a href="predict.html">predict</a>(dataset: <a href="../../../api/org.jetbrains.kotlinx.dl.dataset/-dataset/index.html">Dataset</a>, batchSize: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int-array/index.html">IntArray</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Generates output predictions for the input samples.</p><h4 class="">Return</h4><p class="paragraph">Array of labels. The length is equal to the Number of samples on the <a href="predict.html">dataset</a>.</p><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span><span>dataset</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">Data to predict on.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>batch</span><wbr><span><span>Size</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">Number of samples per batch of computation.</p></div></div></div></div></div></div></div></div></div></div></div>
+<div class="divergent-group" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div class="symbol monospace">abstract fun <a href="predict.html">predict</a>(inputData: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float-array/index.html">FloatArray</a>, predictionTensorName: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Generates output prediction for the input sample using output of the <a href="predict.html">predictionTensorName</a> tensor.</p><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="Parameters"><div class="content sourceset-depenent-content" data-active="" data-togglable=":api:dokkaHtmlPartial/main"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>input</span><wbr><span><span>Data</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">Unlabeled input data to define label.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":api:dokkaHtmlPartial/main" data-filterable-set=":api:dokkaHtmlPartial/main"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><span>prediction</span><wbr><span>Tensor</span><wbr><span><span>Name</span></span></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">Name of output tensor to make prediction.</p></div></div></div></div></div></div></div></div></div></div></div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+
