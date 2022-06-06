@@ -8,9 +8,11 @@ plugins {
 apply plugin: "io.codearte.nexus-staging"
 apply from: project.rootProject.file('gradle/dokka.gradle')
 
+def kotlinDLVersion = "$majorVersion.$minorVersion"
+
 allprojects {
     group = 'org.jetbrains.kotlinx'
-    version = "$majorVersion.$minorVersion"
+    version = kotlinDLVersion
 
     apply plugin: "maven-publish"
     apply plugin: "kotlin"
@@ -38,4 +40,10 @@ def unpublishedSubprojects = ["examples"]
 subprojects {
     if (name in unpublishedSubprojects) return
     apply from: project.rootProject.file('gradle/publish.gradle')
+}
+
+task setTeamcityVersion {
+    doLast {
+        println("##teamcity[buildNumber '$version']")
+    }
 }
