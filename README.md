@@ -128,13 +128,12 @@ To use the full power of KotlinDL (including the `onnx` and `visualization` modu
    
    dependencies {
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-dataset:[KOTLIN-DL-VERSION]'
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
    }
 ```
 
-Or add just one dependency if you don’t need datasets, ONNX and visualization:
+Or add just one dependency if you don’t need ONNX and visualization:
 
 ```groovy
    repositories {
