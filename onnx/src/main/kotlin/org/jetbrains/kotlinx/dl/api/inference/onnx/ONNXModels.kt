@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Transpose
 
@@ -26,10 +27,10 @@ public object ONNXModels {
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
         override val channelsFirst: Boolean,
+        override val inputColorMode: ColorMode = ColorMode.RGB,
         /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
         internal var noTop: Boolean = false
-    ) :
-        ModelType<T, ImageRecognitionModel> {
+    ) : ModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(modelHub.loadModel(this), this)
         }
@@ -323,7 +324,11 @@ public object ONNXModels {
          *    Official ResNet model from Keras.applications.</a>
          */
         public object ResNet50custom :
-            CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50", channelsFirst = false) {
+            CV<OnnxInferenceModel>(
+                "models/onnx/cv/custom/resnet50",
+                channelsFirst = false,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(
                     data,
@@ -612,7 +617,8 @@ public object ONNXModels {
     /** Object detection models and preprocessing. */
     public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true
+        override val channelsFirst: Boolean = true,
+        override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
         ModelType<T, U> {
         /**
@@ -964,7 +970,8 @@ public object ONNXModels {
     /** Face alignment models and preprocessing. */
     public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true
+        override val channelsFirst: Boolean = true,
+        override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
         ModelType<T, U> {
         /**
@@ -996,7 +1003,8 @@ public object ONNXModels {
     /** Pose detection models. */
     public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true
+        override val channelsFirst: Boolean = true,
+        override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
         ModelType<T, U> {
         /**
