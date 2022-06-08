@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
-private const val EPOCHS = 5
+private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 200
 private const val TEST_BATCH_SIZE = 1000
 private const val NUM_LABELS = 10
@@ -41,36 +41,36 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = 2,
+        strides = 2,
         padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = 2,
+        strides = 2,
         padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -78,22 +78,22 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = 2,
+        strides = 2,
         padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -101,22 +101,22 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 256,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = 2,
+        strides = 2,
         padding = ConvPadding.SAME
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
@@ -124,16 +124,16 @@ private val vgg11 = Sequential.of(
     ),
     Conv2D(
         filters = 128,
-        kernelSize = intArrayOf(3, 3),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 3,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = heNormal,
         biasInitializer = heNormal,
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = 2,
+        strides = 2,
         padding = ConvPadding.SAME
     ),
     Flatten(),

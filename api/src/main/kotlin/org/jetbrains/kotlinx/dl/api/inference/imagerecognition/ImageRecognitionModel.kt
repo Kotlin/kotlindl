@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,10 +11,12 @@ import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
@@ -50,7 +52,7 @@ public class ImageRecognitionModel(
         TODO("Not yet implemented")
     }
 
-    /** */
+    /** Releases internal resources. */
     override fun close() {
         internalModel.close()
     }
@@ -71,12 +73,7 @@ public class ImageRecognitionModel(
         else
             Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
 
-
         val preprocessing: Preprocessing = preprocess {
-            load {
-                pathToData = imageFile
-                imageShape = ImageShape(null, null, 3)
-            }
             transformImage {
                 resize {
                     outputHeight = height.toInt()
@@ -87,7 +84,7 @@ public class ImageRecognitionModel(
             }
         }
 
-        return modelType.preprocessInput(preprocessing)
+        return modelType.preprocessInput(imageFile, preprocessing)
     }
 
     /**

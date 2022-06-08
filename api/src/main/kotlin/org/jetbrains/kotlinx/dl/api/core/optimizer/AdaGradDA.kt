@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -18,7 +18,7 @@ import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
-import java.util.*
+import org.tensorflow.op.train.ApplyAdagradDa
 
 private val GLOBAL_STEP = defaultOptimizerVariableName("adagrad-da-global-step")
 private const val ACCUMULATOR = "gradient_accumulator"
@@ -92,7 +92,8 @@ public class AdaGradDA(
                     learningRateConst,
                     l1StrengthConst,
                     l2StrengthConst,
-                    tf.dtypes.cast(globalStep, Long::class.javaObjectType)
+                    tf.dtypes.cast(globalStep, Long::class.javaObjectType),
+                    ApplyAdagradDa.useLocking(true)
                 )
             )
         }

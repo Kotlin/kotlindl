@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,9 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
+import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -24,39 +27,84 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          *
+         * @property [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be input layer.
+         * NOTE: First layer should be an input layer, if you want to compile model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Functional {
-            layerValidation(layers.toList())
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Functional {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             return preprocessAndCreate(layers.toList())
         }
 
-
         /**
          * Creates the [Functional] model.
          *
+         * @property [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be input layer.
+         * NOTE: First layer should be an input layer, if you want to compile model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>): Functional {
-            layerValidation(layers)
+        public fun of(layers: List<Layer>, noInput: Boolean = false): Functional {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             return preprocessAndCreate(layers)
         }
+
+        /**
+         * Creates the [Functional] model from two models: [pretrainedModel] and [topModel].
+         * All layers of pretrainedModel will be frozen automatically.
+         * The input of the [topModel] will be connected to the output of the [pretrainedModel].
+         *
+         * NOTE: First layer of [pretrainedModel] should be an input layer.
+         * NOTE: Both models should be non-compiled yet.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(pretrainedModel: GraphTrainableModel, topModel: GraphTrainableModel): Functional {
+            require(!pretrainedModel.isModelCompiled) { "Pretrained model should not be compiled!" }
+            require(!topModel.isModelCompiled) { "Top model should not be compiled!" }
+
+            // TODO: make a honest copy of models (pretrained and topModel) or of all layers
+            val pretrainedLayers = pretrainedModel.layers
+            // Freezing
+            pretrainedLayers.forEach { it.freeze() }
+
+            val layers = mutableListOf<Layer>()
+            layers += pretrainedLayers
+
+            val topLayers = topModel.layers
+            layers += topLayers
+            topLayers[0].inboundLayers.add(pretrainedLayers.last())
+
+            if (topModel is Sequential && layers.size > 1) {
+                // establish edges in DAG
+                topLayers.subList(1, topLayers.size).forEachIndexed { index, layer ->
+                    val topLayersIndex = index - 1 + 1 
+                    // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
+                    layer.inboundLayers.add(topLayers[topLayersIndex])
+                }
+            }
+
+            return of(layers)
+        }
+
 
         /**
          * Creates the [Functional] model.
@@ -103,31 +151,13 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
 
         private fun topologicalSort(layers: List<Layer>, inputLayer: Input): List<Layer> {
-            val visited = mutableMapOf<Layer, Boolean>()
-            layers.forEach { visited[it] = false }
-
-            val grayStack: Stack<Layer> = mutableListOf()
-
-            recursiveTopologicalSort(inputLayer, grayStack, visited)
-
-            val sortedListOfLayers = mutableListOf<Layer>()
-            while (grayStack.isNotEmpty())
-                sortedListOfLayers.add(grayStack.pop()!!)
-
-            return sortedListOfLayers
-        }
-
-        // Recursive topological Sort
-        private fun recursiveTopologicalSort(node: Layer, stack: Stack<Layer>, visited: MutableMap<Layer, Boolean>) {
-            val outboundLayers = node.outboundLayers
-            for (i in 0 until outboundLayers.size) {
-                val layer = outboundLayers[i]
-                if (!visited[layer]!!) {
-                    recursiveTopologicalSort(layer, stack, visited)
-                    visited[layer] = true
-                }
+            val sortedListOfLayers = sortTopologically(inputLayer, Layer::outboundLayers)
+            check(sortedListOfLayers.size == layers.size) {
+                "The following layers are not reachable from the input: ${
+                    layers.minus(sortedListOfLayers.toSet()).map { it.name + " (" + it::class.simpleName + ")" }
+                }"
             }
-            stack.push(node)
+            return sortedListOfLayers
         }
 
         /**
@@ -137,11 +167,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return the [Functional] model.
          */
         private fun preprocessAndCreate(layers: List<Layer>): Functional {
-            var layerList = layers
-            val inputLayer = findInputLayer(layerList)
+            val inputLayer = findInputLayer(layers)
 
-            fillOutputLayers(layerList)
-            layerList = topologicalSort(layerList, inputLayer)
+            fillOutputLayers(layers)
+            val layerList = topologicalSort(layers, inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
             return Functional(*layerList.toTypedArray())
@@ -154,10 +183,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
-        public fun loadModelConfiguration(configuration: File): Functional {
+        public fun loadModelConfiguration(configuration: File, inputShape: IntArray? = null): Functional {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -167,10 +196,14 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File): MutableList<Layer> {
+        public fun loadModelLayersFromConfiguration(
+            configuration: File,
+            inputShape: IntArray? = null
+        ): MutableList<Layer> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return loadModelLayersFromConfiguration(configuration)
+            val functionalConfig = loadSerializedModel(configuration)
+            return loadFunctionalModelLayers(functionalConfig, inputShape)
         }
 
         /**
@@ -181,7 +214,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Functional model.
          */
         @JvmStatic
-        public fun loadDefaultModelConfiguration(modelDirectory: File): Functional {
+        public fun loadDefaultModelConfiguration(modelDirectory: File, inputShape: IntArray? = null): Functional {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -191,7 +224,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return loadFunctionalModelConfiguration(configuration)
+            return loadFunctionalModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -202,7 +235,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return List of layers. All connections between the layers are established and form an acyclic directed graph.
          */
         @JvmStatic
-        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): MutableList<Layer> {
+        public fun loadModelLayersFromDefaultConfiguration(
+            modelDirectory: File,
+            inputShape: IntArray? = null
+        ): MutableList<Layer> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -213,7 +249,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             )
 
             val functionalConfig = loadSerializedModel(configuration)
-            return loadFunctionalModelLayers(functionalConfig)
+            return loadFunctionalModelLayers(functionalConfig, inputShape)
         }
     }
 
@@ -222,7 +258,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.buildFromInboundLayers(tf, kGraph)
+            it.buildFromInboundLayers(tf)
 
             val outputShape = it.computeOutputShapeFromInboundLayers()
             val dims = outputShape.dims()
@@ -333,7 +369,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             deserializedModel.compile(
                 optimizer = this.optimizer,
                 loss = this.loss,
-                metric = this.metric
+                metrics = this.metrics
             )
 
             deserializedModel.layers.forEach {
@@ -344,5 +380,24 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             return deserializedModel
         }
+    }
+
+    /** Removes the last layer from the [Functional] model, if it's not compiled yet! . */
+    public fun removeLastLayer(): Functional {
+        require(!this.isModelCompiled) { "It works for non-compiled models only!" }
+
+        val layers = mutableListOf<Layer>()
+
+        for (layer in this.layers) {
+            layers.add(layer)
+        }
+
+        val lastLayer = layers.last()
+        for (outboundLayer in lastLayer.inboundLayers)
+            outboundLayer.outboundLayers.remove(lastLayer)
+
+        layers.removeLast()
+
+        return of(layers)
     }
 }

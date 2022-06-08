@@ -1,11 +1,10 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -13,6 +12,8 @@ import org.tensorflow.op.Ops
  * Zero-padding layer for 1D input (e.g. audio).
  * This layer can add zeros in the rows of the audio tensor
  * @property [padding] 2 numbers  interpreted as `(left_pad, right_pad)`.
+ *
+ * @since 0.3
  */
 public class ZeroPadding1D : AbstractZeroPadding {
     public val padding: IntArray
@@ -33,8 +34,8 @@ public class ZeroPadding1D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding1D layer
-     * @param [padding] triple of padding values - [padding.first] represents padding on left side
-     * and [padding.second] is padding on right side
+     * @param [padding] triple of padding values - [Pair.first] represents padding on left side
+     * and [Pair.second] is padding on right side
      * @param [name] layer name
      */
     public constructor(
@@ -58,7 +59,7 @@ public class ZeroPadding1D : AbstractZeroPadding {
         this.padding = padding
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         this.inputShape = inputShape
     }
 
@@ -72,6 +73,6 @@ public class ZeroPadding1D : AbstractZeroPadding {
     }
 
     override fun toString(): String {
-        return "ZeroPadding1D(padding=$padding)"
+        return "ZeroPadding1D(name = $name, padding=${padding.contentToString()}, hasActivation=$hasActivation)"
     }
 }

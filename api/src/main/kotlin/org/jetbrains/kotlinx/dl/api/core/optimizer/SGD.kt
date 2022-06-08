@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,7 +11,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
-import java.util.*
+import org.tensorflow.op.train.ApplyGradientDescent
 
 /**
  * Stochastic gradient descent optimizer.
@@ -45,7 +45,8 @@ public class SGD(
                 tf.train.applyGradientDescent(
                     weights[i],
                     tf.constant(learningRate, getDType()),
-                    clipGradient.clipGradient(tf, gradients.dy(i))
+                    clipGradient.clipGradient(tf, gradients.dy(i)),
+                    ApplyGradientDescent.useLocking(true)
                 )
             )
         }

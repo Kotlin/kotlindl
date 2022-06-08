@@ -1,18 +1,16 @@
 /*
-* Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
-* Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
-*/
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool1D
 import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Graph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -43,12 +41,12 @@ internal class MaxPool1DTest {
                 floatArrayOf(7.0f, 2.0f, 5.0f)
             )
         )
-        val layer = MaxPool1D()
+        val layer = MaxPool1D(2, 2)
 
         EagerSession.create().use {
             val tf = Ops.create()
             val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
@@ -111,7 +109,7 @@ internal class MaxPool1DTest {
         EagerSession.create().use {
             val tf = Ops.create()
             val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
@@ -170,7 +168,7 @@ internal class MaxPool1DTest {
         EagerSession.create().use {
             val tf = Ops.create()
             val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)

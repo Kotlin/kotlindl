@@ -119,7 +119,22 @@ This, however, does not affect the high-level API.
 
 
 ## How to configure KotlinDL in your project
-To use KotlinDL in your project, add the following dependency to your `build.gradle` file:
+To use the full power of KotlinDL (including the `onnx` and `visualization` modules) in your project, add the following dependencies to your build.gradle file:
+
+```groovy
+   repositories {
+      mavenCentral()
+   }
+   
+   dependencies {
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
+   }
+```
+
+Or add just one dependency if you don’t need ONNX and visualization:
+
 ```groovy
    repositories {
       mavenCentral()
@@ -128,9 +143,8 @@ To use KotlinDL in your project, add the following dependency to your `build.gra
    dependencies {
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
-```
-The latest KotlinDL version is 0.3.0. 
-The latest stable KotlinDL version is 0.3.0. 
+``` 
+The latest KotlinDL version is 0.4.0.
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
@@ -149,7 +163,7 @@ For more details on installing Jupyter Notebook and adding the Kotlin kernel, ch
   * [Deep Learning with KotlinDL](https://www.youtube.com/watch?v=jCFZc97_XQU) (Zinoviev Alexey at Huawei Developer Group HDG UK 2021, [slides](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa1RPX3h0a2FrZ2pUby1kSURzYWVpM0tHNFRrUXxBQ3Jtc0tucjZMRE1JbWNuN1BrbGFMc0FOeERPVEtMR0FDLUo4bi1lcC1BcmFkMkd0WFJOS3ZVMFQ3YlctUXFHU1lVdjVZMHUzYmlETjRCZ3lLclBpZGNWcXJXcmdVLTQ5Ujd2N0hNUHlMZXRTZE1wYktHSUZuSQ&q=https%3A%2F%2Fspeakerdeck.com%2Fzaleslaw%2Fdeep-learning-with-kotlindl))
   * [Introduction to Deep Learning with KotlinDL](https://www.youtube.com/watch?v=ruUz8uMZUVw) (Zinoviev Alexey at Kotlin Budapest User Group 2021, [slides](https://speakerdeck.com/zaleslaw/deep-learning-introduction-with-kotlindl))
 * [Change log for KotlinDL](CHANGELOG.md)
-* [Full KotlinDL API reference](https://jetbrains.github.io/KotlinDL/)
+* [Full KotlinDL API reference](https://kotlin.github.io/kotlindl/)
 
 ## Examples and tutorials
 You do not need to have any prior deep learning experience to start using KotlinDL. 
@@ -193,9 +207,9 @@ You could use any widely known JVM logging library with a [Simple Logging Facade
 You will also need to add the following dependencies and configuration file ``log4j2.xml`` to the ``src/resource`` folder in your project if you wish to use log4j2:
 
 ```groovy
-  implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
-  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.1'
+  implementation 'org.apache.logging.log4j:log4j-api:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.16.0'
+  implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.16.0'
 ```
 
 ```xml
@@ -289,54 +303,44 @@ tasks{
 
 Currently, only a limited set of deep learning architectures are supported. Here's the list of available layers:
 
-- Input
-- Flatten
-- Dense
-- Dropout
-- Conv2D
-- MaxPool2D
-- AvgPool2D
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- GlobalMaxPool2D
-- Cropping2D
-- UpSampling2D
-- ZeroPadding2D
-- Reshape
-- Permute
-- RepeatVector
-- Softmax
-- LeakyReLU
-- PReLU
-- ELU
-- ThresholdedReLU
-- Conv1D
-- MaxPooling1D
-- AveragePooling1D
-- GlobalMaxPooling1D
-- GlobalAveragePooling1D
-- UpSampling1D
-- Cropping1D
-- Conv3D
-- MaxPooling3D
-- AveragePooling3D
-- GlobalAveragePooling3D
-- GlobalMaxPool3D
-- Cropping3D
+* Core layers:
+  - `Input`, `Dense`, `Flatten`, `Reshape`, `Dropout`, `BatchNorm`.
+* Convolutional layers:
+  - `Conv1D`, `Conv2D`, `Conv3D`;
+  - `Conv1DTranspose`, `Conv2DTranspose`, `Conv3DTranspose`;
+  - `DepthwiseConv2D`;
+  - `SeparableConv2D`.
+* Pooling layers:
+  - `MaxPool1D`, `MaxPool2D`, `MaxPooling3D`;
+  - `AvgPool1D`, `AvgPool2D`, `AvgPool3D`;
+  - `GlobalMaxPool1D`, `GlobalMaxPool2D`, `GlobalMaxPool3D`;
+  - `GlobalAvgPool1D`, `GlobalAvgPool2D`, `GlobalAvgPool3D`.
+* Merge layers:
+  - `Add`, `Subtract`, `Multiply`;
+  - `Average`, `Maximum`, `Minimum`;
+  - `Dot`;
+  - `Concatenate`.
+* Activation layers:
+  - `ELU`, `LeakyReLU`, `PReLU`, `ReLU`, `Softmax`, `ThresholdedReLU`;
+  - `ActivationLayer`.
+* Cropping layers:
+  - `Cropping1D`, `Cropping2D`, `Cropping3D`.
+* Upsampling layers:
+  - `UpSampling1D`, `UpSampling2D`, `UpSampling3D`.
+* Zero padding layers:
+  - `ZeroPadding1D`, `ZeroPadding2D`, `ZeroPadding3D`.
+* Other layers:
+  - `Permute`, `RepeatVector`.
 
-KotlinDL supports model inference in JVM backend applications. Android support is coming in later releases.
+KotlinDL supports model inference in JVM backend applications only.
 
 ## Contributing
 
-Read the [Contributing Guidelines](https://github.com/JetBrains/KotlinDL/blob/master/CONTRIBUTING.md).
+Read the [Contributing Guidelines](https://github.com/Kotlin/kotlindl/blob/master/CONTRIBUTING.md).
 
 ## Reporting issues/Support
 
-Please use [GitHub issues](https://github.com/JetBrains/KotlinDL/issues) for filing feature requests and bug reports. 
+Please use [GitHub issues](https://github.com/Kotlin/kotlindl/issues) for filing feature requests and bug reports. 
 You are also welcome to join the [#kotlindl channel](https://kotlinlang.slack.com/messages/kotlindl/) in the Kotlin Slack.
 
 ## Code of Conduct

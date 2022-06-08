@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -22,8 +22,8 @@ import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 
-private const val EPOCHS = 10
-private const val TRAINING_BATCH_SIZE = 500
+private const val EPOCHS = 20 // 20, at least, is recommended
+private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 500
 private const val NUM_CHANNELS = 1L
 private const val SEED = 12L
@@ -41,7 +41,7 @@ internal fun soundBlock(filters: Int, kernelSize: Int, poolStride: Int): Array<L
     arrayOf(
         Conv1D(
             filters = filters,
-            kernelSize = kernelSize,
+            kernelLength = kernelSize,
             strides = intArrayOf(1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
@@ -50,7 +50,7 @@ internal fun soundBlock(filters: Int, kernelSize: Int, poolStride: Int): Array<L
         ),
         Conv1D(
             filters = filters,
-            kernelSize = kernelSize,
+            kernelLength = kernelSize,
             strides = intArrayOf(1, 1, 1),
             activation = Activations.Relu,
             kernelInitializer = HeNormal(SEED),
@@ -122,6 +122,7 @@ private val soundNet = Sequential.of(
  */
 fun soundNet() {
     val (train, test) = freeSpokenDigits()
+    train.shuffle()
 
     soundNet.use {
         it.compile(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -12,21 +12,15 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv2DTest : ConvLayerTest() {
-    private fun createFloatConv2DTensor(
-        batchSize: Int,
-        height: Int,
-        width: Int,
-        channels: Int,
-        initValue: Float
-    ) = Array(batchSize) { Array(height) { Array(width) { FloatArray(channels) { initValue } } } }
-
     @Test
     fun zeroedInputTensorWithDefaultValues() {
-        val input = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 0.0f)
-        val expected = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 32, initValue = 0.0f)
+        val input = create2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 0.0f)
+        val expected = create2DTensor(batchSize = 1, height = 3, width = 3, channels = 32, initValue = 0.0f)
 
         assertTensorsEquals(
             Conv2D(
+                32,
+                3,
                 name = "TestConv2D_1",
                 biasInitializer = Zeros()
             ),
@@ -37,8 +31,8 @@ internal class Conv2DTest : ConvLayerTest() {
 
     @Test
     fun constantInputTensorWithValidPadding() {
-        val input = createFloatConv2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 1.0f)
-        val expected = createFloatConv2DTensor(batchSize = 1, height = 2, width = 2, channels = 16, initValue = 4.0f)
+        val input = create2DTensor(batchSize = 1, height = 3, width = 3, channels = 1, initValue = 1.0f)
+        val expected = create2DTensor(batchSize = 1, height = 2, width = 2, channels = 16, initValue = 4.0f)
 
         assertTensorsEquals(
             Conv2D(
@@ -83,5 +77,25 @@ internal class Conv2DTest : ConvLayerTest() {
             input,
             expected
         )
+    }
+
+    internal companion object {
+        internal fun create2DTensor(
+            batchSize: Int,
+            height: Int,
+            width: Int,
+            channels: Int,
+            initValue: Float
+        ) = Array(batchSize) { Array(height) { Array(width) { FloatArray(channels) { initValue } } } }
+
+        internal fun create2DTensor(
+            batchSize: Int,
+            channels: Int,
+            vararg rows: FloatArray
+        ) = Array(batchSize) {
+            Array(rows.size) { rowIdx ->
+                Array(rows[rowIdx].size) { columnIdx -> FloatArray(channels) { rows[rowIdx][columnIdx] } }
+            }
+        }
     }
 }

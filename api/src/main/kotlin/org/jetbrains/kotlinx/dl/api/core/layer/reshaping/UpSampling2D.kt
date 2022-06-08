@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -23,6 +23,8 @@ import org.tensorflow.op.image.ResizeBilinear
  * @property [size] Upsampling factor array of size 2 (i.e. number of repeats per rows and columns).
  * @property [interpolation] Interpolation method; could be either of [InterpolationMethod.NEAREST] or
  * [InterpolationMethod.BILINEAR].
+ *
+ * @since 0.3
  */
 public class UpSampling2D(
     public val size: IntArray = intArrayOf(2, 2),
@@ -66,12 +68,15 @@ public class UpSampling2D(
         )
         return when (interpolation) {
             InterpolationMethod.NEAREST -> tf.image.resizeNearestNeighbor(input, newSize)
-            InterpolationMethod.BILINEAR ->
-                tf.image.resizeBilinear(input, newSize, ResizeBilinear.halfPixelCenters(true))
+            InterpolationMethod.BILINEAR -> tf.image.resizeBilinear(
+                input, newSize,
+                ResizeBilinear.halfPixelCenters(true)
+            )
             else -> throw IllegalArgumentException("The interpolation type interpolation is not supported.")
         }
     }
 
-    override fun toString(): String =
-        "UpSampling2D(size=$size, interpolation=$interpolation)"
+    override fun toString(): String {
+        return "UpSampling2D(name = $name, size=${size.contentToString()}, interpolation=$interpolation, hasActivation=$hasActivation)"
+    }
 }

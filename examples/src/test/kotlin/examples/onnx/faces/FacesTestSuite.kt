@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -9,9 +9,11 @@ import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -38,26 +40,21 @@ class FacesTestSuite {
         val model = modelHub.loadModel(modelType)
 
         model.use {
+            val preprocessing: Preprocessing = preprocess {
+                transformImage {
+                    resize {
+                        outputHeight = 192
+                        outputWidth = 192
+                    }
+                    convert { colorMode = ColorMode.BGR }
+                }
+            }
             for (i in 0..8) {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-                val preprocessing: Preprocessing = preprocess {
-                    load {
-                        pathToData = imageFile
-                        imageShape = ImageShape(224, 224, 3)
-                    }
-                    transformImage {
-                        resize {
-                            outputHeight = 192
-                            outputWidth = 192
-                        }
-                        convert { colorMode = ColorMode.BGR }
-                    }
-                }
-
-                val inputData = modelType.preprocessInput(preprocessing)
+                val inputData = modelType.preprocessInput(imageFile, preprocessing)
 
                 val yhat = it.predictRaw(inputData)
-                assertEquals(212, (yhat[0][0] as FloatArray).size)
+                assertEquals(212, (yhat.values.toTypedArray()[0] as Array<FloatArray>)[0].size)
             }
         }
     }

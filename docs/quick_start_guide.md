@@ -7,7 +7,7 @@ first you'll need to set up the appropriate dependencies.
 1. Open a Kotlin project where you want to use Kotlin DL, or create a new Kotlin project in IntelliJ IDEA as described in the [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.html).
 2. Add the Kotlin DL dependency to your project's build file. 
     * If you're using Gradle as the build system, add the following to the `build.gradle` file:
-    ```kotlin
+    ```groovy
    repositories {
        mavenCentral()
    }

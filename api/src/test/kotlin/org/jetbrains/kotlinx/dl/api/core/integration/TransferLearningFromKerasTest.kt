@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,6 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -49,6 +52,13 @@ private const val pathToWeightsRegularizers = "inference/lenet/regularizers/mnis
 private val realPathToWeightsRegularizers =
     TransferLearningTest::class.java.classLoader.getResource(pathToWeightsRegularizers).path.toString()
 
+private const val pathToConfigWithDropout = "inference/lenet/dropout/modelConfig.json"
+private val realPathToConfigDropout =
+    TransferLearningTest::class.java.classLoader.getResource(pathToConfigWithDropout).path.toString()
+
+private const val pathToWeightsDropout = "inference/lenet/dropout/weights.h5"
+private val realPathToWeightsDropout =
+    TransferLearningTest::class.java.classLoader.getResource(pathToWeightsDropout).path.toString()
 
 class TransferLearningTest : IntegrationTest() {
     /** Loads configuration with default initializers for the last Dense layer from Keras. But Zeros initializer (default initializers for bias) is not supported yet. */
@@ -107,7 +117,7 @@ class TransferLearningTest : IntegrationTest() {
                 model.loadWeights(modelDirectory)
             }
         assertEquals(
-            "Weights for the loaded Conv2D layer conv2d_12 are not found in .h5 file! \n" +
+            "Weights for the loaded layer conv2d_12 are not found in .h5 file! \n" +
                     "h5 weight file contains weights for the following list of layers: [conv2d, conv2d_1, dense, dense_1, dense_2, flatten, max_pooling2d, max_pooling2d_1]\n" +
                     "Double-check your loaded configuration which contains layers with the following names: [input, conv2d_12, max_pooling2d_96, conv2d_1, max_pooling2d_1, flatten, dense, dense_1, dense_2].",
             exception.message
@@ -126,7 +136,7 @@ class TransferLearningTest : IntegrationTest() {
         val dense1LayerName = "dense_1"
 
         assertEquals(testModel.layers.size, 9)
-        assertTrue(testModel.getLayer(flattenLayerName).isTrainable)
+        assertTrue(!testModel.getLayer(flattenLayerName).isTrainable)
         assertFalse(testModel.getLayer(flattenLayerName).hasActivation)
         assertTrue(testModel.getLayer(conv2dLayerName) is Conv2D)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).kernelInitializer is GlorotNormal)
@@ -280,6 +290,37 @@ class TransferLearningTest : IntegrationTest() {
     }
 
     @Test
+    fun loadModelConfigAndWeightsFromKerasWithDropout() {
+        val jsonConfigFile = File(realPathToConfigDropout)
+        val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
+
+        val file = File(realPathToWeightsDropout)
+        val hdfFile = HdfFile(file)
+
+        testModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
+
+            it.loadWeights(hdfFile)
+
+            val copy = it.copy()
+            assertTrue(copy.layers.size == 11)
+            copy.close()
+
+            val conv2DKernelWeights =
+                it.getLayer("conv2d_12").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.041764896f, conv2DKernelWeights[0][0][0][0])
+
+            val conv2DKernelWeights1 =
+                it.getLayer("conv2d_13").weights.values.toTypedArray()[0] as Array<Array<Array<FloatArray>>>
+            assertEquals(0.021932468f, conv2DKernelWeights1[0][0][0][0])
+        }
+    }
+
+    @Test
     fun loadModelConfigAndWeightsFromKerasByTemplates() {
         val jsonConfigFile = File(realPathToConfig)
         val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
@@ -386,7 +427,7 @@ class TransferLearningTest : IntegrationTest() {
                     it.loadWeights(hdfFile)
                 }
             assertEquals(
-                "Model is initialized already!",
+                "Model is already initialized.",
                 exception.message
             )
         }
@@ -447,10 +488,7 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            for (layer in it.layers) {
-                if (layer is Conv2D)
-                    layer.isTrainable = false
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),
@@ -514,14 +552,8 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            val layerList = mutableListOf<Layer>()
-
-            for (layer in it.layers) {
-                if (layer is Conv2D) {
-                    layer.isTrainable = false
-                    layerList.add(layer)
-                }
-            }
+            val layerList = it.layers.filterIsInstance<Conv2D>()
+            layerList.forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),
@@ -585,14 +617,7 @@ class TransferLearningTest : IntegrationTest() {
         val (train, test) = fashionMnist()
 
         testModel.use {
-            val layerList = mutableListOf<Layer>()
-
-            for (layer in it.layers) {
-                if (layer is Conv2D) {
-                    layer.isTrainable = false
-                    layerList.add(layer)
-                }
-            }
+            it.layers.filterIsInstance<Conv2D>().forEach(Layer::freeze)
 
             it.compile(
                 optimizer = Adam(),

@@ -27,30 +27,29 @@ You can do so via the Image Preprocessing Pipeline description, and building a d
 Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the ResNet'50 specific preprocessing.
 
 ```kotlin
-val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
-
 val preprocessing: Preprocessing = preprocess {
-    load {
-        pathToData = File(dogsVsCatsDatasetPath)
-        imageShape = ImageShape(channels = 3)
-        colorMode = ColorOrder.BGR
-        labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-    }
     transformImage {
         resize {
             outputHeight = 224
             outputWidth = 224
             interpolation = InterpolationType.BILINEAR
         }
+        convert { colorMode = ColorMode.BGR }
     }
     transformTensor {
         sharpen {
-            modelType = TFModels.CV.ResNet50
+            modelTypePreprocessing = TFModels.CV.ResNet50()
         }
     }
 }
 
-val dataset = OnFlyImageDataset.create(preprocessing).shuffle()
+val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
+val dataset = OnFlyImageDataset.create(
+    File(dogsVsCatsDatasetPath),
+    FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+    preprocessing
+).shuffle()
+
 val (train, test) = dataset.split(0.7)
 ```  
 In the final lines, after creating a dataset, we shuffle the data, so that when we split it into training and testing portions, we do not get a test set containing only images of one class.    
@@ -63,7 +62,7 @@ In this tutorial, we will load ResNet'50 model and weights that are made availab
 
 ```kotlin
 val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-val modelType = TFModels.CV.ResNet50
+val modelType = TFModels.CV.ResNet50()
 val model = modelHub.loadModel(modelType)
 ```
 

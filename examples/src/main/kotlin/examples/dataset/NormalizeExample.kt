@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -15,12 +20,7 @@ import java.nio.file.Paths
 fun main() {
     val resource = ImagePreprocessing::class.java.getResource("/datasets/vgg")!!
     val imageDirectory = Paths.get(resource.toURI()).toFile()
-    val images = OnHeapDataset.create(preprocess {
-        load {
-            pathToData = imageDirectory
-            labelGenerator = EmptyLabels()
-        }
-    }).x
+    val images = OnHeapDataset.create(imageDirectory, EmptyLabels()).x
     val datasetMean = mean(*images, channels = 3)
     val datasetStd = std(*images, channels = 3)
     println("Dataset mean is ${datasetMean.contentToString()}\nDataset std is ${datasetStd.contentToString()}")
@@ -34,7 +34,6 @@ fun main() {
     )
 
     val preprocessing: Preprocessing = preprocess {
-        load { pathToData = image }
         transformTensor {
             normalize {
                 mean = datasetMean
@@ -42,7 +41,7 @@ fun main() {
             }
         }
     }
-    val (processedImageFloats, _) = preprocessing()
+    val (processedImageFloats, _) = preprocessing(image)
 
     println(
         "Processed image mean is ${processedImageFloats.mean(3).contentToString()}\n" +

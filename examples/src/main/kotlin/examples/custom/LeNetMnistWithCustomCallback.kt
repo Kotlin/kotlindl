@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -87,11 +87,11 @@ private val model = Sequential.of(
  *
  * It includes:
  * - dataset loading from S3
- * - callback definition [CustomCallback]
- * - model compilation with [CustomCallback]
+ * - callback definitions
  * - TensorFlow graph printing
- * - model training
- * - model evaluation
+ * - model training with custom callback
+ * - model evaluation with custom callback
+ * - model prediction with custom callback
  */
 fun lenetMnistWithCustomCallback() {
     val (train, test) = mnist()
@@ -100,22 +100,27 @@ fun lenetMnistWithCustomCallback() {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Metrics.ACCURACY,
-            callback = CustomCallback()
+            metric = Metrics.ACCURACY
         )
 
         println(it.kGraph)
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, callback = FitCallback())
 
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
+        val accuracy = it.evaluate(
+            dataset = test,
+            batchSize = TEST_BATCH_SIZE,
+            callback = EvaluationCallback()
+        ).metrics[Metrics.ACCURACY]
         println("Accuracy: $accuracy")
+
+        val predictions = it.predictSoftly(dataset = test, batchSize = TEST_BATCH_SIZE, callback = PredictCallback())
+        println("Predictions for the first element is ${predictions[0].contentToString()}")
     }
 }
 
 /** Simple custom Callback object. */
-class CustomCallback : Callback() {
+class FitCallback : Callback() {
     override fun onEpochBegin(epoch: Int, logs: TrainingHistory) {
         println("Epoch $epoch begins.")
     }
@@ -139,7 +144,10 @@ class CustomCallback : Callback() {
     override fun onTrainEnd(logs: TrainingHistory) {
         println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
+}
 
+/** Simple custom Callback object. */
+class EvaluationCallback : Callback() {
     override fun onTestBatchBegin(batch: Int, batchSize: Int, logs: History) {
         println("Test batch $batch begins.")
     }
@@ -153,9 +161,12 @@ class CustomCallback : Callback() {
     }
 
     override fun onTestEnd(logs: History) {
-        println("Train ends with last loss ${logs.lastBatchEvent().lossValue}")
+        println("Test ends with last loss ${logs.lastBatchEvent().lossValue}")
     }
+}
 
+/** Simple custom Callback object. */
+class PredictCallback : Callback() {
     override fun onPredictBatchBegin(batch: Int, batchSize: Int) {
         println("Prediction batch $batch begins.")
     }

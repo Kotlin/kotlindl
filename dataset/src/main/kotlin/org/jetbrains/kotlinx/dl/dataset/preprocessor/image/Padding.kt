@@ -1,9 +1,13 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.dataset.image.draw
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Color
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 /**
@@ -11,10 +15,11 @@ import java.awt.image.BufferedImage
  *
  * Pad operation pads the given image on all sides according to the provided [PaddingMode].
  *
- * @property [top] The number of pixels to add to the top.
+ * @property [top]    The number of pixels to add to the top.
  * @property [bottom] The number of pixels to add to the bottom.
- * @property [left] The number of pixels to add to the left.
- * @property [right] The number of pixels to add to the right.
+ * @property [left]   The number of pixels to add to the left.
+ * @property [right]  The number of pixels to add to the right.
+ * @property [mode]   The kind of padding to use.
  */
 public class Padding(
     public var top: Int = 0,
@@ -23,8 +28,7 @@ public class Padding(
     public var right: Int = 0,
     public var mode: PaddingMode = PaddingMode.Black
 ) : ImagePreprocessorBase() {
-    override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
-        if (inputShape == null) return null
+    override fun getOutputShape(inputShape: ImageShape): ImageShape {
         return ImageShape(
             inputShape.width?.plus(left + right.toLong()),
             inputShape.height?.plus(top + bottom.toLong()),

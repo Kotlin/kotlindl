@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,12 +13,15 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+
+private const val S3_FOLDER_SEPARATOR = "/"
+private const val MODEL_FILE_EXTENSION = ".onnx"
+private const val NO_TOP_PREFIX = "-notop"
 
 /**
  * This class provides methods for loading ONNX model to the local [cacheDirectory].
@@ -50,15 +53,16 @@ public class ONNXModelHub(cacheDirectory: File) :
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val modelFile = "/" + modelType.modelRelativePath + ".onnx"
-
-        val inferenceModel = if (modelType == ONNXModels.ObjectDetection.SSD) {
-            SSDObjectDetectionModel()
+        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
+            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + NO_TOP_PREFIX + MODEL_FILE_EXTENSION
         } else {
-            OnnxInferenceModel()
+            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
         }
+
+        val inferenceModel = modelType.preInit()
+
         return OnnxInferenceModel.initializeONNXModel(
-            inferenceModel,
+            inferenceModel as OnnxInferenceModel,
             getONNXModelFile(modelFile, loadingMode).absolutePath
         ) as T
     }

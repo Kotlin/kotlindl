@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,11 +7,9 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.serializeModel
+import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import java.io.File
@@ -30,13 +28,18 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Sequential] model.
          *
-         * @property [input] The input layer with initial shapes.
+         * @property [noInput] If true it disables input layer check.
          * @property [layers] The layers to describe the model design.
+         *
+         * NOTE: First layer should be an input layer, if you want to compile model.
+         *
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Sequential {
-            layerValidation(layers.toList())
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Sequential {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             preProcessLayerNames(layers)
             return Sequential(*layers)
@@ -44,13 +47,19 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
         /**
          * Creates the [Functional] model.
+         *
+         * @property [noInput] If true it disables input layer check.
          * @property [layers] The layers to describe the model design.
-         * NOTE: First layer should be input layer.
-         * @return the [Functional] model.
+         *
+         * NOTE: First layer should be an input layer, if you want to compile model.
+         *
+         * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>): Sequential {
-            layerValidation(layers.toList())
+        public fun of(layers: List<Layer>, noInput: Boolean = false): Sequential {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
 
             preProcessLayerNames(layers.toTypedArray())
             return Sequential(*layers.toTypedArray())
@@ -63,10 +72,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Sequential model.
          */
         @JvmStatic
-        public fun loadModelConfiguration(configuration: File): Sequential {
+        public fun loadModelConfiguration(configuration: File, inputShape: IntArray? = null): Sequential {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(configuration)
+            return loadSequentialModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -76,11 +85,13 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromConfiguration(configuration: File,
+                                                    inputShape: IntArray? = null
+        ): Pair<Input, MutableList<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
             val config = loadSerializedModel(configuration)
-            return loadSequentialModelLayers(config)
+            return loadSequentialModelLayers(config, inputShape)
         }
 
         /**
@@ -91,7 +102,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Non-compiled and non-trained Sequential model.
          */
         @JvmStatic
-        public fun loadDefaultModelConfiguration(modelDirectory: File): Sequential {
+        public fun loadDefaultModelConfiguration(modelDirectory: File, inputShape: IntArray? = null): Sequential {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -101,7 +112,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
-            return org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelConfiguration(configuration)
+            return loadSequentialModelConfiguration(configuration, inputShape)
         }
 
         /**
@@ -112,7 +123,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromDefaultConfiguration(modelDirectory: File): Pair<Input, MutableList<Layer>> {
+        public fun loadModelLayersFromDefaultConfiguration(
+            modelDirectory: File,
+            inputShape: IntArray? = null
+        ): Pair<Input, MutableList<Layer>> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
@@ -123,7 +137,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             )
 
             val config = loadSerializedModel(configuration)
-            return loadSequentialModelLayers(config)
+            return loadSequentialModelLayers(config, inputShape)
         }
     }
 
@@ -132,7 +146,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         var inputShape: Shape = inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.build(tf, kGraph, inputShape)
+            it.build(tf, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
             val tensorShape = TensorShape(inputShape)
@@ -159,6 +173,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     /** Returns a copy of this model. */
+    // TODO: implement the saving of optimizer state
     public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
         val serializedModel = serializeModel(true)
         val deserializedModel = deserializeSequentialModel(serializedModel)
@@ -168,7 +183,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             deserializedModel.compile(
                 optimizer = this.optimizer,
                 loss = this.loss,
-                metric = this.metric
+                metrics = this.metrics
             )
 
             deserializedModel.layers.forEach {

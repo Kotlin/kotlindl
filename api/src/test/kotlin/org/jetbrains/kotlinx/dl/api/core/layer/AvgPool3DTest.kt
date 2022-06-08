@@ -1,11 +1,10 @@
 /*
-* Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
-* Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
-*/
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool3D
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
@@ -13,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Graph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -58,7 +56,7 @@ internal class AvgPool3DTest {
 
     @Test
     fun default() {
-        val layer = AvgPool3D()
+        val layer = AvgPool3D(2, 2)
         val expected = arrayOf(
             arrayOf(
                 arrayOf(
@@ -72,7 +70,7 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
@@ -145,7 +143,7 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
@@ -202,7 +200,7 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)

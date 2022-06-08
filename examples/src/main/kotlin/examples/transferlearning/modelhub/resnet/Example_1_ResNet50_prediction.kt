@@ -9,7 +9,7 @@ import examples.transferlearning.runImageRecognitionPrediction
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 
 fun resnet50Prediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.ResNet50)
+    runImageRecognitionPrediction(modelType = TFModels.CV.ResNet50())
 }
 
 /** */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.layer.merge.Add
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
@@ -24,7 +25,6 @@ import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private const val NUM_CHANNELS = 1L
@@ -32,7 +32,6 @@ private const val IMAGE_SIZE = 28L
 private const val SEED = 13L
 
 internal class FunctionalModelTest {
-
     private val correctTestModel = Functional.of(
         input,
         conv2D_1(input),
@@ -52,20 +51,41 @@ internal class FunctionalModelTest {
         name = "functional_model"
     }
 
-    @BeforeEach
-    fun compile() {
-        correctTestModel.compile(
-            optimizer = Adam(),
-            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Accuracy()
-        )
+    private val correctTestModelWithUnsortedLayers = Functional.of(
+        input,
+        conv2D_2(conv2D_1),
+        maxPool2D(conv2D_2),
+        globalAvgPool2D(conv2D_8),
+        dense_1(globalAvgPool2D),
+        conv2D_1(input),
+        conv2D_4(maxPool2D),
+        conv2D_5(conv2D_4),
+        add(conv2D_5, maxPool2D),
+        conv2D_6(add),
+        conv2D_7(conv2D_6),
+        add_1(conv2D_7, add),
+        conv2D_8(add_1),
+        dense_2(dense_1)
+    ).apply {
+        name = "functional_model"
     }
 
     @Test
     fun summary() {
-        assertEquals("functional_model", correctTestModel.name)
+        dense_2.freeze()
 
-        dense_2.isTrainable = false
+        checkFunctionalModelAfterCompilation(correctTestModel)
+        checkFunctionalModelAfterCompilation(correctTestModelWithUnsortedLayers)
+    }
+
+    private fun checkFunctionalModelAfterCompilation(model: Functional) {
+        model.compile(
+            optimizer = Adam(),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Accuracy()
+        )
+
+        assertEquals("functional_model", model.name)
 
         assertEquals(
             ModelSummary(
@@ -90,14 +110,10 @@ internal class FunctionalModelTest {
                 trainableParamsCount = 220096,
                 frozenParamsCount = 2570
             ),
-            correctTestModel.summary()
+            model.summary()
         )
-
-        val graphLines = correctTestModel.kGraph().toString().split('\n').toSet()
-        assertEquals(org.jetbrains.kotlinx.dl.api.core.models.graphLines, graphLines)
     }
 }
-
 
 private val input = Input(
     IMAGE_SIZE,
@@ -198,7 +214,6 @@ internal val dense_2 = Dense(
     biasInitializer = Constant(0.1f),
     name = "dense_2"
 )
-
 
 private val graphLines = setOf(
     "Name: default_data_placeholder; Type: Placeholder; Out #tensors:  1",

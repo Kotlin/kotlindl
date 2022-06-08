@@ -8,9 +8,15 @@ With the built-in functionality, we can convert the [Fashion MNIST image archive
 val (train, test) = fashionMnist()
 ```
 
-You may also notice that we are splitting the data into three sets. 
+You may also notice that we are splitting the data into two sets.
 We have the test set, which we won't be touching until we are satisfied with the model and want to confirm its performance on unseen data. 
-And we have the train set which we will split into `newTrain` and `validation` sets. We'll use these during the training and validation process.  
+And we have the train set which we'll use during the training process.
+
+Note that it's a slightly simplified approach.
+In practice, there is also a third subset of data.
+It's called a validation set, and it's needed to monitor the model target metrics during training and tuning the model hyperparameters.
+Another common technique for robust model evaluation is [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)).
+Splitting a dataset for model evaluation is essential in deep learning and machine learning, but it's enough for our tutorial to use a simplified approach.
 
 Now everything is ready to train the model. Use the `fit()` method for this: 
 
@@ -42,7 +48,7 @@ Here are some important parameters that we need to pass to the `fit()` method:
 * `epochs` - Number of iterations over the data you want the training process to perform. Epoch = iteration. 
 * `batchSize` - How many examples will be used for updating the model's parameters (aka weights and biases) at a time.
 
-After the model has been trained, it's important to evaluate its performance on the validation dataset, so that we can check how it generalizes to the new data. 
+After the model has been trained, it's important to evaluate its performance on the test set, so that we can check how it generalizes to the new data.
 
 ```kotlin
 val accuracy = it.evaluate(dataset = test,

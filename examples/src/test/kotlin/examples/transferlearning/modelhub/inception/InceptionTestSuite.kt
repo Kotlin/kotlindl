@@ -5,6 +5,8 @@
 
 package examples.transferlearning.modelhub.inception
 
+import examples.transferlearning.runImageRecognitionTransferLearning
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class InceptionTestSuite {
@@ -14,7 +16,27 @@ class InceptionTestSuite {
     }
 
     @Test
+    fun inceptionV3dditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.Inception(
+                noTop = true,
+                inputShape = intArrayOf(99, 99, 3)
+            )
+        )
+    }
+
+    @Test
     fun xceptionPredictionTest() {
         xceptionPrediction()
+    }
+
+    @Test
+    fun xceptionAdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.Xception(
+                noTop = true,
+                inputShape = intArrayOf(90, 90, 3)
+            )
+        )
     }
 }

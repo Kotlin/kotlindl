@@ -1,11 +1,12 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.awt.Color
@@ -13,24 +14,16 @@ import java.io.File
 import javax.swing.JFrame
 
 /**
- * This example shows how to do image preprocessing using [Preprocessing] for only one image.
- *
- * Also, we use the [ImagePanel] to visualise (a back part of the pigeon should be displayed).
+ * This example shows how to do image preprocessing using [Preprocessing] DSL for only one image.
  *
  * It includes:
- * - image preprocessing
- * - image visualisation
+ * - image preprocessing;
+ * - image visualisation with the [ImagePanel].
  */
 fun main() {
-    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
-    val image = File(imageResource!!.toURI())
     val preprocessedImagesDirectory = File("processedImages")
 
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = image
-            imageShape = ImageShape(224, 224, 3)
-        }
         transformImage {
             crop {
                 left = 100
@@ -65,10 +58,19 @@ fun main() {
         }
     }
 
-    val rawImage = preprocessing().first
+    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
+    val image = File(imageResource!!.toURI())
+    val rawImage = preprocessing(image).first
+
+    val bufferedImage = ImageConverter.floatArrayToBufferedImage(
+        rawImage,
+        preprocessing.getFinalShape(),
+        ColorMode.BGR,
+        isNormalized = true
+    )
 
     val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(rawImage, preprocessing.finalShape, colorMode = ColorMode.BGR))
+    frame.contentPane.add(ImagePanel(bufferedImage))
     frame.pack()
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

@@ -1,13 +1,13 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.dataset.image.copy
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.image.getShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.image.BufferedImage
 
 /**
@@ -29,8 +29,7 @@ public class Cropping(
     public var right: Int = 1
 ) : ImagePreprocessorBase() {
 
-    override fun getOutputShape(inputShape: ImageShape?): ImageShape? {
-        if (inputShape == null) return null
+    override fun getOutputShape(inputShape: ImageShape): ImageShape {
         return ImageShape(
             width = inputShape.width?.minus(left)?.minus(right),
             height = inputShape.height?.minus(top)?.minus(bottom),
@@ -39,10 +38,12 @@ public class Cropping(
     }
 
     override fun apply(image: BufferedImage): BufferedImage {
-        val croppedImageShape = getOutputShape(image.getShape())!!
+        val croppedImageShape = getOutputShape(image.getShape())
 
-        return image.getSubimage(left, top,
-                                 croppedImageShape.width!!.toInt(),
-                                 croppedImageShape.height!!.toInt()).copy()
+        return image.getSubimage(
+            left, top,
+            croppedImageShape.width!!.toInt(),
+            croppedImageShape.height!!.toInt()
+        ).copy()
     }
 }

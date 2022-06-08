@@ -4,47 +4,9 @@ In this tutorial, we’ll explain how to save your Keras model so that it's comp
 specify which architectures are currently supported, and demonstrate how to load and run an inference with such a model from your JVM project. 
   
 ### Supported architectures
-KotlinDL 0.2 supports a limited number of deep learning architectures. As the project evolves, we will expand the list of supported architectures.
+KotlinDL supports a limited number of deep learning architectures. As the project evolves, we will expand the list of supported architectures.
 
-Currently, the following layers are supported: 
-- Input
-- Flatten
-- Dense
-- Dropout
-- Conv2D
-- MaxPool2D
-- AvgPool2D  
-- BatchNorm
-- ActivationLayer
-- DepthwiseConv2D
-- SeparableConv2D
-- Merge layers (Add, Subtract, Multiply, Average, Concatenate, Maximum, Minimum)
-- GlobalAvgPool2D
-- GlobalMaxPool2D
-- Cropping2D 
-- UpSampling2D
-- ZeroPadding2D
-- Reshape
-- Permute
-- RepeatVector
-- Softmax   
-- LeakyReLU   
-- PReLU   
-- ELU 
-- ThresholdedReLU 
-- Conv1D  
-- MaxPooling1D  
-- AveragePooling1D  
-- GlobalMaxPooling1D  
-- GlobalAveragePooling1D
-- UpSampling1D
-- Cropping1D
-- Conv3D  
-- MaxPooling3D  
-- AveragePooling3D  
-- GlobalAveragePooling3D
-- GlobalMaxPool3D
-- Cropping3D
+Please check an up-to-date [list of supported layers](../README.md#Limitations).
 
 ### Saving a trained Keras model 
 For this tutorial, we'll train a simple convolutional neural network that can classify images 
@@ -60,7 +22,7 @@ Here are some examples:
 
 --- 
  
-Here's how we define the convolutional neural network that we will train: 
+Here's how we define the convolutional neural network in Keras that we will train:
 ```python
 model = models.Sequential(
 [
@@ -105,7 +67,7 @@ Non-trainable params: 0
 
 You can find a Jupyter notebook with the Python code used to train this model [here](CIFAR-10.ipynb). 
 
-Once this model has been trained, it's important to save it properly so we can load it from KotlinDL:
+Once this model has been trained, it's important to save it properly, so we can load it from KotlinDL:
 ```python
 model.save('keras-cifar-10/weights', save_format='h5')
 
@@ -162,7 +124,7 @@ fun main() {
 ```
 
 As you can see, loading and using a model trained with Keras is quite simple. 
-If the architecture is supported, all you need to do is save the weights and JSON configuration after training, 
+If the architecture is supported, all you need to do is to save the weights and JSON configuration after training, 
 load it from KotlinDL, and make sure to preprocess your data again before running the inference task.
 
 

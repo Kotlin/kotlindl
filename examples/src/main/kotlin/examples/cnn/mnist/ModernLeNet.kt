@@ -42,29 +42,29 @@ private val modernLeNet = Sequential.of(
     ),
     Conv2D(
         filters = 32,
-        kernelSize = intArrayOf(5, 5),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 5,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Conv2D(
         filters = 64,
-        kernelSize = intArrayOf(5, 5),
-        strides = intArrayOf(1, 1, 1, 1),
+        kernelSize = 5,
+        strides = 1,
         activation = Activations.Relu,
         kernelInitializer = HeNormal(SEED),
         biasInitializer = HeNormal(SEED),
         padding = ConvPadding.SAME
     ),
     MaxPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1)
+        poolSize = 2,
+        strides = 2,
     ),
     Flatten(), // 3136
     Dense(
@@ -122,6 +122,16 @@ fun modernLenet() {
         println(it.kGraph)
 
         println("Accuracy after: $accuracy")
+
+        // Reset the model
+        it.reset()
+
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy after reset: $accuracy")
+
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        println("Accuracy after reset and fit: $accuracy")
     }
 }
 

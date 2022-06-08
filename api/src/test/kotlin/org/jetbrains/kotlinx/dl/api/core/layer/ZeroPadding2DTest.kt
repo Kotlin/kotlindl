@@ -1,11 +1,10 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
@@ -13,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Graph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -35,7 +33,7 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(padding, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
             val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
@@ -92,7 +90,7 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(paddingArray, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
             val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
@@ -151,7 +149,7 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(paddingArray, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
             val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()

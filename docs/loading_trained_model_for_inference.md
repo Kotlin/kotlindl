@@ -7,7 +7,7 @@ we'll use the test data subset to generate a prediction example that the model h
 The example images in the test data have the same size and format as the ones the model has been trained on, 
 so we do not need to do any additional preprocessing. 
 However, if you are going to train the model on your own data, 
-make sure to use the same image preprocessing before using an image for inference as you did training your model. 
+make sure to use the same image preprocessing before using an image for inference as you did while training your model. 
 Every model expects to get exactly the same input as it was trained on. 
 
 To load the model simply use the path to it, tell it how incoming images should be reshaped (if needed), and call the

@@ -1,6 +1,10 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
@@ -24,10 +28,9 @@ open class LayerTest {
         tf: Ops,
         layer: Layer,
         input: Array<*>,
-        kGraph: KGraph,
     ): Output<*> {
         val inputShape = input.shape
-        layer.build(tf, kGraph, inputShape)
+        layer.build(tf, inputShape)
         val inputOp = getInputOp(tf, input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
@@ -41,8 +44,7 @@ open class LayerTest {
     ): Tensor<*> {
         EagerSession.create().use {
             val tf = Ops.create()
-            val kGraph = KGraph(Graph().toGraphDef())
-            val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
+            val outputOp = getLayerOutputOp(tf, layer, input)
             return outputOp.tensor()
         }
     }
@@ -54,12 +56,9 @@ open class LayerTest {
         Graph().use { graph ->
             Session(graph).use { session ->
                 val tf = Ops.create(graph)
-                KGraph(graph.toGraphDef()).use { kGraph ->
-                    val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
-                    kGraph.initializeGraphVariables(session)
-                    val outputTensor = session.runner().fetch(outputOp).run().first()
-                    return outputTensor
-                }
+                val outputOp = getLayerOutputOp(tf, layer, input)
+                (layer as? ParametrizedLayer)?.initialize(session)
+                return session.runner().fetch(outputOp).run().first()
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -9,20 +9,17 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
-import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
-import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
+import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
+import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2d.dilations
-
-private const val KERNEL_VARIABLE_NAME = "conv2d_kernel"
-
-private const val BIAS_VARIABLE_NAME = "conv2d_bias"
 
 /**
  * 2D convolution layer (e.g. spatial convolution over images).
@@ -56,36 +53,53 @@ private const val BIAS_VARIABLE_NAME = "conv2d_bias"
  * @constructor Creates [Conv2D] object.
  */
 public class Conv2D(
-    public val filters: Int = 32,
-    public val kernelSize: IntArray = intArrayOf(3, 3),
-    public val strides: IntArray = intArrayOf(1, 1, 1, 1),
-    public val dilations: IntArray = intArrayOf(1, 1, 1, 1),
-    public val activation: Activations = Activations.Relu,
-    public val kernelInitializer: Initializer = HeNormal(),
-    public val biasInitializer: Initializer = HeUniform(),
-    public val kernelRegularizer: Regularizer? = null,
-    public val biasRegularizer: Regularizer? = null,
-    public val activityRegularizer: Regularizer? = null,
-    public val padding: ConvPadding = ConvPadding.SAME,
-    public val useBias: Boolean = true,
+    public override val filters: Int = 32,
+    public override val kernelSize: IntArray = intArrayOf(3, 3),
+    public override val strides: IntArray = intArrayOf(1, 1, 1, 1),
+    public override val dilations: IntArray = intArrayOf(1, 1, 1, 1),
+    public override val activation: Activations = Activations.Relu,
+    public override val kernelInitializer: Initializer = HeNormal(),
+    public override val biasInitializer: Initializer = HeUniform(),
+    public override val kernelRegularizer: Regularizer? = null,
+    public override val biasRegularizer: Regularizer? = null,
+    public override val activityRegularizer: Regularizer? = null,
+    public override val padding: ConvPadding = ConvPadding.SAME,
+    public override val useBias: Boolean = true,
     name: String = ""
-) : AbstractConv(
-    filtersInternal = filters,
-    kernelSizeInternal = kernelSize,
-    stridesInternal = strides,
-    dilationsInternal = dilations,
-    activationInternal = activation,
-    kernelInitializerInternal = kernelInitializer,
-    biasInitializerInternal = biasInitializer,
-    kernelRegularizerInternal = kernelRegularizer,
-    biasRegularizerInternal = biasRegularizer,
-    activityRegularizerInternal = activityRegularizer,
-    paddingInternal = padding,
-    useBiasInternal = useBias,
-    kernelVariableName = KERNEL_VARIABLE_NAME,
-    biasVariableName = BIAS_VARIABLE_NAME,
-    name = name
-) {
+) : AbstractConv(name = name), TrainableLayer {
+
+    public override var isTrainable: Boolean = true
+
+    public constructor(
+        filters: Int = 32,
+        kernelSize: Int = 3,
+        strides: Int = 1,
+        dilations: Int = 1,
+        activation: Activations = Activations.Relu,
+        kernelInitializer: Initializer = HeNormal(),
+        biasInitializer: Initializer = HeUniform(),
+        kernelRegularizer: Regularizer? = null,
+        biasRegularizer: Regularizer? = null,
+        activityRegularizer: Regularizer? = null,
+        padding: ConvPadding = ConvPadding.SAME,
+        useBias: Boolean = true,
+        name: String = ""
+    ) : this(
+        filters = filters,
+        kernelSize = intArrayOf(kernelSize, kernelSize),
+        strides = intArrayOf(1, strides, strides, 1),
+        dilations = intArrayOf(1, dilations, dilations, 1),
+        activation = activation,
+        kernelInitializer = kernelInitializer,
+        biasInitializer = biasInitializer,
+        kernelRegularizer = kernelRegularizer,
+        biasRegularizer = biasRegularizer,
+        activityRegularizer = activityRegularizer,
+        padding = padding,
+        useBias = useBias,
+        name = name
+    )
+
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
         requireArraySize(strides, 4, "strides")
@@ -96,8 +110,14 @@ public class Conv2D(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float> {
-        val options = dilations(dilationsInternal.toLongList()).dataFormat("NHWC")
-        return tf.nn.conv2d(input, kernel, stridesInternal.toLongList(), paddingInternal.paddingName, options)
+        val options = dilations(dilations.toLongList()).dataFormat("NHWC")
+        return tf.nn.conv2d(
+            input,
+            kernel.variable,
+            strides.toLongList(),
+            padding.paddingName,
+            options
+        )
     }
 
     protected override fun defineOutputShape(inputShape: Shape): Shape {
@@ -107,29 +127,33 @@ public class Conv2D(
 
         val rows = convOutputLength(
             rowsCount,
-            kernelSizeInternal[0],
-            paddingInternal,
-            stridesInternal[1],
-            dilationsInternal[1]
+            kernelSize[0],
+            padding,
+            strides[1],
+            dilations[1]
         )
         val cols = convOutputLength(
             colsCount,
-            kernelSizeInternal[1],
-            paddingInternal,
-            stridesInternal[2],
-            dilationsInternal[2]
+            kernelSize[1],
+            padding,
+            strides[2],
+            dilations[2]
         )
 
-        return Shape.make(batchSize, rows, cols, filtersInternal.toLong())
+        return Shape.make(batchSize, rows, cols, filters.toLong())
     }
-
-    override fun toString(): String =
-        "Conv2D(filters=$filters, kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +
-                "dilations=${dilations.contentToString()}, activation=$activation, kernelInitializer=$kernelInitializer, " +
-                "biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape, padding=$padding, " +
-                "biasRegularizer=$biasRegularizer, kernelRegularizer=$kernelRegularizer, activityRegularizer=$activityRegularizer)"
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)
 
     override fun biasVarName(name: String): String = convBiasVarName(name, dim = 2)
+
+    override fun toString(): String {
+        return "Conv2D(name = $name, isTrainable=$isTrainable, filters=$filters, kernelSize=${kernelSize.contentToString()}, " +
+                "strides=${strides.contentToString()}, dilations=${dilations.contentToString()}, " +
+                "activation=$activation, " +
+                "kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, " +
+                "kernelRegularizer=$kernelRegularizer, biasRegularizer=$biasRegularizer, activityRegularizer=$activityRegularizer, " +
+                "padding=$padding, useBias=$useBias, hasActivation=$hasActivation, " +
+                "kernelShapeArray=${kernel.shape}, biasShapeArray=${bias?.shape})"
+    }
 }

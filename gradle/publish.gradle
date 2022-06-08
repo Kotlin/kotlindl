@@ -34,6 +34,7 @@ nexusStaging {
     password sonatypePassword
     packageGroup project.group.toString()
     repositoryDescription "kotlinx.kotlindl staging repository, version: $version"
+    delayBetweenRetriesInMillis 5000
 }
 
 publishing {

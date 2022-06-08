@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -14,7 +14,8 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
-import java.util.*
+import org.tensorflow.op.train.ApplyCenteredRmsProp
+import org.tensorflow.op.train.ApplyRmsProp
 
 private const val RMS = "rms"
 private const val MG = "mg"
@@ -83,7 +84,8 @@ public class RMSProp(
                         decayConst,
                         momentumConst,
                         epsilonConstant,
-                        clipGradient.clipGradient(tf, gradients.dy(i))
+                        clipGradient.clipGradient(tf, gradients.dy(i)),
+                        ApplyCenteredRmsProp.useLocking(true)
                     )
                 )
             } else {
@@ -96,7 +98,8 @@ public class RMSProp(
                         decayConst,
                         momentumConst,
                         epsilonConstant,
-                        gradients.dy(i)
+                        gradients.dy(i),
+                        ApplyRmsProp.useLocking(true)
                     )
                 )
             }

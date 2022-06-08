@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -189,7 +189,7 @@ public fun freeSpokenDigits(
     val dataset = File(path)
         .listFiles()?.flatMap(::extractWavFileSamples)
         ?: throw IllegalStateException("Cannot find Free Spoken Digits Dataset files in $path")
-    val maxDataSize = dataset.map { it.first.size }.maxOrNull()
+    val maxDataSize = dataset.maxOfOrNull { it.first.size }
         ?: throw IllegalStateException("Empty Free Spoken Digits Dataset")
     check(maxDataSize <= FSDD_SOUND_DATA_SIZE) {
         "Sound data should be limited to $FSDD_SOUND_DATA_SIZE values but has $maxDataSize"
@@ -364,7 +364,7 @@ private fun loadFile(
     return file
 }
 
-/** Creates file structure archived in zip file with all directories and sub-directories. */
+/** Creates file structure archived in zip file with all directories and subdirectories. */
 @Throws(IOException::class)
 internal fun extractFromZipArchiveToFolder(zipArchivePath: Path, toFolder: Path, bufferSize: Int = 4096) {
     val zipFile = ZipFile(zipArchivePath.toFile())

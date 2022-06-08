@@ -12,4 +12,9 @@ class VGG16TestSuite {
     fun vgg16predictionTest() {
         vgg16prediction()
     }
+
+    @Test
+    fun vgg16noTopAdditionalTrainingTest() {
+        vgg16noTopAdditionalTraining()
+    }
 }

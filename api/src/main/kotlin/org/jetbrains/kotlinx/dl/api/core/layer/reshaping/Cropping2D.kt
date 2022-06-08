@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -66,6 +66,7 @@ public class Cropping2D(
         )
     }
 
-    override fun toString(): String =
-        "Cropping2D(cropping=${cropping.contentToString()})"
+    override fun toString(): String {
+        return "Cropping2D(name = $name, cropping=${cropping.contentDeepToString()}, hasActivation = $hasActivation)"
+    }
 }

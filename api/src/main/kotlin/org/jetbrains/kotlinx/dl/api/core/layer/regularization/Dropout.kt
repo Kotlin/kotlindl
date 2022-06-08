@@ -1,11 +1,10 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.regularization
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.tensorflow.Operand
@@ -15,28 +14,27 @@ import org.tensorflow.op.Ops
 /**
  * Applies Dropout to the input.
  *
- * Dropout consists in randomly setting a fraction `rate` of input units to 0
- * at each update during training time, which helps prevent overfitting.
- * The units that are kept are scaled by `1 / (1 - rate)`, so that their
- * sum is unchanged at training time and inference time.
+ * The Dropout layer randomly sets input units to 0 with a frequency of `rate`
+ * at each step during training time, which helps prevent overfitting.
  *
- * NOTE: Import and export for this layer is not supported yet.
+ * Inputs not set to 0 are scaled up by 1/(1 - rate) such that the sum over
+ * all inputs is unchanged.
+ *
+ * NOTE: Export for this layer is not supported yet.
  * NOTE: This layer used for inference purposes only.
  *
- * @property keepProbability The dropout rate, between 0 and 1. E.g. `rate=0.1` would drop out 10% of input units.
- * @property [name] Custom layer name.
+ * @property [rate] A fraction of the input units to drop, should be between 0 and 1.
+ * @property [seed] A seed for the random number generator.
+ * @param    [name] Custom layer name.
  * @constructor Creates [Dropout] object.
  */
 public class Dropout(
-    private val keepProbability: Float = 0.1f,
-    private val seed: Long = 12L,
+    public val rate: Float = 0.1f,
+    public val seed: Long = 12L,
     name: String = ""
 ) : Layer(name), NoGradients {
-    init {
-        isTrainable = false
-    }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
@@ -73,15 +71,9 @@ public class Dropout(
         /* }*/
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
+    override fun toString(): String {
+        return "Dropout(name = $name, rate=$rate, seed=$seed, hasActivation=$hasActivation)"
+    }
 
     override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
-
-    override fun toString(): String {
-        return "Dropout(keepProbability=$keepProbability)"
-    }
 }

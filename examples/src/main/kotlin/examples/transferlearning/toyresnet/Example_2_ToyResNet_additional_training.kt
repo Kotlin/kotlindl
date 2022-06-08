@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,8 @@ package examples.transferlearning.toyresnet
 
 
 import org.jetbrains.kotlinx.dl.api.core.Functional
+import org.jetbrains.kotlinx.dl.api.core.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.unfreeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -24,8 +26,7 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 fun main() {
     val (train, test) = fashionMnist()
 
-
-    val jsonConfigFile = getToyResNetJSONConfigFile()
+    val jsonConfigFile = getJSONConfigFileToyResNet()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     model.use {
@@ -37,7 +38,7 @@ fun main() {
 
         it.logSummary()
 
-        val hdfFile = getToyResNetWeightsFile()
+        val hdfFile = getWeightsFileToyResNet()
 
         it.loadWeights(hdfFile)
 
@@ -45,10 +46,8 @@ fun main() {
 
         println("Accuracy before: $accuracy")
 
-        for (layer in it.layers) {
-            layer.isTrainable = false
-        }
-        it.layers.last().isTrainable = true
+        it.freeze()
+        it.layers.last().unfreeze()
 
         it.fit(dataset = train, epochs = 1, batchSize = 1000)
 

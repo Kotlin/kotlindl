@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -20,6 +20,8 @@ import org.tensorflow.op.Ops
  *
  * @property [cropping] An integer array of size two (`[begin_crop, end_crop]`) indicating
  * the number of elements to remove from the beginning and end of the cropping axis.
+ *
+ * @since 0.3
  */
 public class Cropping1D(
     public val cropping: IntArray,
@@ -58,6 +60,7 @@ public class Cropping1D(
         )
     }
 
-    override fun toString(): String =
-        "Cropping1D(cropping=${cropping.contentToString()})"
+    override fun toString(): String {
+        return "Cropping1D(name = $name, cropping=${cropping.contentToString()}, hasActivation=$hasActivation)"
+    }
 }

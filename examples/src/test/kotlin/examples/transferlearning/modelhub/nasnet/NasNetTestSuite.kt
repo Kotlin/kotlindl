@@ -5,6 +5,8 @@
 
 package examples.transferlearning.modelhub.nasnet
 
+import examples.transferlearning.runImageRecognitionTransferLearning
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class NasNetTestSuite {
@@ -14,7 +16,22 @@ class NasNetTestSuite {
     }
 
     @Test
+    fun nasNetMobileAdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(modelType = TFModels.CV.NASNetMobile(noTop = true))
+    }
+
+    @Test
     fun nasNetLargePredictionTest() {
         nasNetLargePrediction()
+    }
+
+    @Test
+    fun nasNetLargeAdditionalTrainingNoTopTest() {
+        runImageRecognitionTransferLearning(
+            modelType = TFModels.CV.NASNetLarge(
+                noTop = true,
+                inputShape = intArrayOf(370, 370, 3)
+            )
+        )
     }
 }

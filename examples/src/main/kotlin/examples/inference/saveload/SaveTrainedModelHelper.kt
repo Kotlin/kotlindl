@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package examples.inference.saveload
 
 import org.jetbrains.kotlinx.dl.api.core.SavingFormat
@@ -28,25 +33,28 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
             it.compile(
                 optimizer = SGD(learningRate = 0.3f),
                 loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                metric = Metrics.ACCURACY,
-                callback = object : Callback() {
-                    override fun onTrainBatchEnd(
-                        batch: Int,
-                        batchSize: Int,
-                        event: BatchTrainingEvent,
-                        logs: TrainingHistory
-                    ) {
-                        if (event.metricValue > accuracyThreshold) {
-                            println("Stopping training at ${event.metricValue} accuracy")
-                            model.stopTraining = true
-                        }
-                    }
-                }
+                metric = Metrics.ACCURACY
             )
             it.init()
             var accuracy = 0.0
             while (accuracy < accuracyThreshold) {
-                it.fit(dataset = train, epochs = 1, batchSize = trainBatchSize)
+                it.fit(
+                    dataset = train,
+                    epochs = 1,
+                    batchSize = trainBatchSize,
+                    callback = object : Callback() {
+                        override fun onTrainBatchEnd(
+                            batch: Int,
+                            batchSize: Int,
+                            event: BatchTrainingEvent,
+                            logs: TrainingHistory
+                        ) {
+                            if (event.metricValues[0] > accuracyThreshold) {
+                                println("Stopping training at ${event.metricValues[0]} accuracy")
+                                model.stopTraining = true
+                            }
+                        }
+                    })
                 accuracy = it.evaluate(dataset = test, batchSize = testBatchSize).metrics[Metrics.ACCURACY] ?: 0.0
                 println("Accuracy: $accuracy")
             }

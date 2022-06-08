@@ -1,6 +1,10 @@
+/*
+ * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -18,6 +22,8 @@ import java.util.*
  * @property [padding] The padding method, either 'valid' or 'same'.
  * @property [name] Custom layer name.
  * @constructor Creates [MaxPool2D] object.
+ *
+ * @since 0.3
  */
 public class MaxPool3D(
     public var poolSize: IntArray = intArrayOf(1, 2, 2, 2, 1),
@@ -25,8 +31,19 @@ public class MaxPool3D(
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
+    public constructor(
+        poolSize: Int = 2,
+        strides: Int = 2,
+        padding: ConvPadding = ConvPadding.VALID,
+        name: String = ""
+    ) : this(
+        poolSize = intArrayOf(1, poolSize, poolSize, poolSize, 1),
+        strides = intArrayOf(1, strides, strides, strides, 1),
+        padding = padding,
+        name = name
+    )
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         var lenDim1: Long = inputShape.size(1)
@@ -54,16 +71,9 @@ public class MaxPool3D(
         return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
-    override val hasActivation: Boolean get() = false
-
-    override val paramCount: Int get() = 0
-
     override fun toString(): String {
-        return "MaxPool3D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+        return "MaxPool3D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
     }
 
+    override val hasActivation: Boolean get() = false
 }

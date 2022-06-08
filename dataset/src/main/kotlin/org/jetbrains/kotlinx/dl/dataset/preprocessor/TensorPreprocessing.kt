@@ -1,16 +1,20 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 /**
- * The whole tensor preprocessing pipeline DSL.
+ * Represents the tensor preprocessing stage of the [Preprocessing].
+ * Consists of the operations implementing [Preprocessor] which are applied to the tensor one by one.
  *
- * It supports operations that implement [Preprocessor], for example: [Rescaling] preprocessor or [CustomPreprocessor] preprocessor.
+ * Supported operations include:
+ * - [normalize],
+ * - [rescale].
  *
- * It's a part of the [org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing] pipeline DSL.
+ * @see Normalizing
+ * @see Rescaling
  */
 public class TensorPreprocessing {
     /** Internal state of the [TensorPreprocessing]. The list of [Preprocessor].*/
@@ -22,11 +26,12 @@ public class TensorPreprocessing {
     }
 }
 
-/** */
+/** Applies [Rescaling] preprocessor to the tensor to scale each value by a given coefficient. */
 public fun TensorPreprocessing.rescale(block: Rescaling.() -> Unit) {
     addOperation(Rescaling().apply(block))
 }
 
+/** Applies [Normalizing] preprocessor to the tensor to normalize it with given mean and std values. */
 public fun TensorPreprocessing.normalize(block: Normalizing.() -> Unit) {
     addOperation(Normalizing().apply(block))
 }

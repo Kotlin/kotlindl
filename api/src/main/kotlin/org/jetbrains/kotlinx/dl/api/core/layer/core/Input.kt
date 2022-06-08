@@ -1,11 +1,10 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
@@ -30,7 +29,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
     public var packedDims: LongArray = dims
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     /**
      * Extend this function to define placeholder in layer.
@@ -69,15 +68,9 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         return inputShape
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 
-    override val paramCount: Int get() = 0
-
     override fun toString(): String {
-        return "Input(shape=${packedDims.contentToString()})"
+        return "Input(name = $name, shape=${packedDims.contentToString()})"
     }
 }

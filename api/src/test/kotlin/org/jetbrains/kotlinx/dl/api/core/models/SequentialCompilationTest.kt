@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -15,15 +15,15 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.isTrainable
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.loss.SoftmaxCrossEntropyWithLogits
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -34,7 +34,7 @@ private const val AMOUNT_OF_CLASSES = 10
 
 
 internal class SequentialModelTest {
-    private val correctTestModel = Sequential.of(
+    private val correctTestModelLayers = listOf(
         Input(
             IMAGE_SIZE,
             IMAGE_SIZE,
@@ -85,18 +85,20 @@ internal class SequentialModelTest {
             biasInitializer = Constant(0.1f),
             name = "dense_2"
         )
-    ).apply {
-        name = "sequential_model"
-    }
+    )
 
     @Test
     fun buildModel() {
+        val correctTestModel = Sequential.of(correctTestModelLayers).apply {
+            name = "sequential_model"
+        }
+
         assertEquals(correctTestModel.layers.size, 8)
         assertTrue(correctTestModel.getLayer("conv2d_1") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_2") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_1").isTrainable)
         assertTrue(correctTestModel.getLayer("conv2d_1").hasActivation)
-        assertTrue(correctTestModel.getLayer("flatten_1").isTrainable)
+        assertFalse(correctTestModel.getLayer("flatten_1").isTrainable)
         assertFalse(correctTestModel.getLayer("flatten_1").hasActivation)
         assertArrayEquals(correctTestModel.inputLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
@@ -419,10 +421,14 @@ internal class SequentialModelTest {
 
     @Test
     fun compilation() {
+        val correctTestModel = Sequential.of(correctTestModelLayers).apply {
+            name = "sequential_model"
+        }
+
         val exception =
             assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
         assertEquals(
-            "lateinit property kernelShape has not been initialized",
+            "lateinit property kernel has not been initialized",
             exception.message
         )
 
@@ -430,6 +436,49 @@ internal class SequentialModelTest {
 
         correctTestModel.use {
             it.compile(optimizer = Adam(), loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, metric = Accuracy())
+            assertTrue(correctTestModel.isModelCompiled)
+
+            assertEquals(it.layers[0].paramCount, 0)
+            assertEquals(it.layers[1].paramCount, 832)
+            assertEquals(it.layers[2].paramCount, 0)
+            assertEquals(it.layers[3].paramCount, 51264)
+            assertEquals(it.layers[4].paramCount, 0)
+            assertEquals(it.layers[5].paramCount, 0)
+            assertEquals(it.layers[6].paramCount, 1606144)
+            assertEquals(it.layers[7].paramCount, 5130)
+
+            assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 1))
+            assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
+            assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
+            assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
+            assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
+            assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 3136))
+            assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 512))
+            assertArrayEquals(it.layers[7].outputShape.dims(), longArrayOf(-1, 10))
+        }
+    }
+
+    @Test
+    fun compilationWithTwoMetrics() {
+        val correctTestModel = Sequential.of(correctTestModelLayers).apply {
+            name = "sequential_model"
+        }
+
+        val exception =
+            assertThrows(UninitializedPropertyAccessException::class.java) { correctTestModel.layers[1].paramCount }
+        assertEquals(
+            "lateinit property kernel has not been initialized",
+            exception.message
+        )
+
+        assertFalse(correctTestModel.isModelCompiled)
+
+        correctTestModel.use {
+            it.compile(
+                optimizer = Adam(),
+                loss = SoftmaxCrossEntropyWithLogits(),
+                metrics = listOf(Accuracy(), Accuracy())
+            )
             assertTrue(correctTestModel.isModelCompiled)
 
             assertEquals(it.layers[0].paramCount, 0)

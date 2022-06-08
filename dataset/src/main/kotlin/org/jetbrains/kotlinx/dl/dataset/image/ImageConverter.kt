@@ -1,11 +1,13 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset.image
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter.supportedImageTypes
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Convert
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -15,51 +17,96 @@ import java.io.InputStream
 import javax.imageio.ImageIO
 
 
-/** Helper object to convert images to [FloatArray]. */
+/**
+ * Helper object with methods to convert [BufferedImage] to [FloatArray].
+ *
+ * @see [supportedImageTypes] for a list of supported image types.
+ * */
 public object ImageConverter {
-    /** All pixels has values in range [0; 255]. */
+
+    private val supportedImageTypes = setOf(
+        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR,
+        BufferedImage.TYPE_INT_RGB, BufferedImage.TYPE_BYTE_GRAY
+    )
+
+    /**
+     * Converts [image] to [FloatArray] without normalization.
+     *
+     * @param [image]       image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in the `[0, 255]` range
+     * */
     public fun toRawFloatArray(image: BufferedImage, colorMode: ColorMode? = null): FloatArray {
         return imageToFloatArray(image, colorMode)
     }
 
-    /** All pixels has values in range [0; 255]. */
+    /**
+     * Reads the image from [inputStream] and converts it to [FloatArray] without normalization.
+     *
+     * @param [inputStream] source of the image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in `[0, 255]` range
+     * */
     public fun toRawFloatArray(inputStream: InputStream, colorMode: ColorMode? = null): FloatArray {
         return toRawFloatArray(toBufferedImage(inputStream), colorMode)
     }
 
-    /** All pixels has values in range [0; 255]. */
+    /**
+     * Reads the image from [imageFile] and converts it to [FloatArray] without normalization.
+     *
+     * @param [imageFile]   source of the image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in the `[0, 255]` range
+     * */
     public fun toRawFloatArray(imageFile: File, colorMode: ColorMode? = null): FloatArray {
         return imageFile.inputStream().use { toRawFloatArray(it, colorMode) }
     }
 
-    /** All pixels in range [0;1) */
+    /**
+     * Converts [image] to [FloatArray] and scales the values, so they would fit into the `[0, 1)` range.
+     *
+     * @param [image]       image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in the `[0, 1)` range
+     * */
     public fun toNormalizedFloatArray(image: BufferedImage, colorMode: ColorMode? = null): FloatArray {
         return toRawFloatArray(image, colorMode).also { normalize(it) }
     }
 
-    /** All pixels in range [0;1) */
+    /**
+     * Reads the image from [inputStream], converts it to [FloatArray] and scales the values,
+     * so they would fit into the `[0, 1)` range.
+     *
+     * @param [inputStream] source of the image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in the `[0, 1)` range
+     * */
     public fun toNormalizedFloatArray(inputStream: InputStream, colorMode: ColorMode? = null): FloatArray {
         return toNormalizedFloatArray(toBufferedImage(inputStream), colorMode)
     }
 
-    /** All pixels in range [0;1) */
+    /**
+     * Reads the image from [imageFile], converts it to [FloatArray] and scales the values,
+     * so they would fit into the `[0, 1)` range.
+     *
+     * @param [imageFile]   source of the image to convert
+     * @param [colorMode]   color mode to convert the image to. `null` value keeps the original color mode.
+     * @return [FloatArray] with pixel values in the `[0, 1)` range
+     * */
     public fun toNormalizedFloatArray(imageFile: File, colorMode: ColorMode? = null): FloatArray {
         return imageFile.inputStream().use { toNormalizedFloatArray(it, colorMode) }
     }
 
     /**
      * Returns [BufferedImage] extracted from [inputStream].
+     *
+     * @param [inputStream] source of the image
      */
     @Throws(IOException::class)
     public fun toBufferedImage(inputStream: InputStream): BufferedImage {
         ImageIO.setUseCache(false)
         return ImageIO.read(inputStream)
     }
-
-    private val supportedImageTypes = setOf(
-        BufferedImage.TYPE_3BYTE_BGR, BufferedImage.TYPE_INT_BGR,
-        BufferedImage.TYPE_INT_RGB, BufferedImage.TYPE_BYTE_GRAY
-    )
 
     private fun imageToFloatArray(image: BufferedImage, colorMode: ColorMode?): FloatArray {
         if (colorMode != null && image.colorMode() != colorMode) {
@@ -72,7 +119,7 @@ public object ImageConverter {
         check(image.alphaRaster == null) { "Images with alpha channels are not supported yet!" }
         check(supportedImageTypes.contains(image.type)) {
             "Images with type ${image.type} are not supported yet. " +
-                "Supported types are: $supportedImageTypes. See also `java.awt.image.BufferedImage.getType`."
+                    "Supported types are: $supportedImageTypes. See also `java.awt.image.BufferedImage.getType`."
         }
 
         val raster = image.raster
@@ -87,11 +134,16 @@ public object ImageConverter {
         return result
     }
 
-    public fun swapRandB(res: FloatArray) {
-        for (i in res.indices step 3) {
-            val tmp = res[i]
-            res[i] = res[i + 2]
-            res[i + 2] = tmp
+    /**
+     * Given a float array representing an image, swaps red and green channels in it.
+     *
+     * @param [image] image to swap channels in
+     */
+    public fun swapRandB(image: FloatArray) {
+        for (i in image.indices step 3) {
+            val tmp = image[i]
+            image[i] = image[i + 2]
+            image[i + 2] = tmp
         }
     }
 
@@ -99,7 +151,13 @@ public object ImageConverter {
         for (i in data.indices) data[i] /= scale
     }
 
-    /** Converts [image] with [colorMode] to the 3D array. */
+    /**
+     * Converts [image] with [colorMode] to the 3D array.
+     *
+     * @param [image]     image to convert
+     * @param [colorMode] color mode used in the target array
+     * @return a 3D array with the image in a format `height x width x channels`
+     * */
     public fun imageTo3DFloatArray(
         image: BufferedImage,
         colorMode: ColorMode = ColorMode.BGR
@@ -158,9 +216,93 @@ public object ImageConverter {
         }
         return result
     }
+
+    /**
+     * Converts [inputArray] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
+     *
+     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
+     *
+     * If [isNormalized] is true, then [inputArray] values considered to be in [0..1) interval
+     * and will be rescaled to [0..255) interval. Values that are outside this range are clamped
+     * to avoid artifacts on the image.
+     *
+     * If an array requires custom processing, one can use method variation that accepts [ArrayTransform].
+     *
+     * @param [inputArray]      float array to convert.
+     * @param [outputShape]     shape of the output image.
+     * @param [arrayColorMode]  [ColorMode] of an [inputArray].
+     * @param [isNormalized]    [Boolean] that indicates [inputArray] should be rescaled to [0..255) interval.
+     * @return [BufferedImage]  result image.
+     * */
+    public fun floatArrayToBufferedImage(
+        inputArray: FloatArray,
+        outputShape: ImageShape,
+        arrayColorMode: ColorMode,
+        isNormalized: Boolean
+    ): BufferedImage {
+        return floatArrayToBufferedImage(inputArray, outputShape, arrayColorMode) {
+            if (isNormalized) denormalizeInplace(it, scale = 255f)
+            for ((i, value) in it.withIndex()) {
+                if (value < 0) it[i] = 0f
+                if (value > 255) it[i] = 255f
+            }
+            it
+        }
+    }
+
+    /**
+     * Converts [inputArray] of type [FloatArray] to [BufferedImage] with [outputShape] provided.
+     * If a custom [arrayTransform] is needed, lambda or ArrayTransform can be provided.
+     *
+     * The output [BufferedImage] will have the same ColorMode as [arrayColorMode] of an input tensor.
+     *
+     * If an [arrayTransform] is given, then [arrayColorMode] is interpreted as a color mode of an array after transform.
+     *
+     * [inputArray] is explicitly copied before applying [arrayTransform].
+     *
+     * @see ArrayTransform
+     *
+     * @param [inputArray]      float array to convert.
+     * @param [outputShape]     shape of the output image.
+     * @param [arrayColorMode]  [ColorMode] of an [inputArray].
+     * @param [arrayTransform]  [ArrayTransform] implementation.
+     *                          Thanks to Kotlin SAM convention it can be supplied as [(FloatArray) -> FloatArray] lambda.
+     * @return [BufferedImage]  result image.
+     * */
+    public fun floatArrayToBufferedImage(
+        inputArray: FloatArray,
+        outputShape: ImageShape,
+        arrayColorMode: ColorMode,
+        arrayTransform: ArrayTransform? = null
+    ): BufferedImage {
+        val dataCopy = arrayTransform?.invoke(inputArray.copyOf()) ?: inputArray.copyOf()
+
+        val numberOfElements = outputShape.width!! * outputShape.height!! * arrayColorMode.channels
+        require(
+            numberOfElements == dataCopy.size.toLong()
+        ) { "Requested output shape [$outputShape] does not match with input array size [${inputArray.size}]" }
+
+        /* This swap is needed because BufferedImage.raster.setPixels accepts data in RGB format */
+        if (arrayColorMode == ColorMode.BGR) {
+            swapRandB(dataCopy)
+        }
+
+        val output = BufferedImage(
+            outputShape.width.toInt(),
+            outputShape.height.toInt(),
+            arrayColorMode.imageType()
+        )
+        output.raster.setPixels(0, 0, output.width, output.height, dataCopy)
+
+        return output
+    }
 }
 
-/** Represents the number and order of color channels in the image */
+/**
+ * Represents the number and order of color channels in the image.
+ *
+ * @property [channels] number of image channels
+ * */
 public enum class ColorMode(public val channels: Int) {
     /** Red, green, blue. */
     RGB(3),
@@ -181,6 +323,9 @@ internal fun BufferedImage.colorMode(): ColorMode {
     }
 }
 
+/**
+ * Returns an integer representing a type of [BufferedImage] corresponding to this color mode.
+ */
 public fun ColorMode.imageType(): Int {
     return when (this) {
         ColorMode.RGB -> BufferedImage.TYPE_INT_RGB

@@ -1,12 +1,11 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.history
 
 import java.util.*
-import kotlin.reflect.KProperty1
 
 /**
  * Contains all recorded batch events as a list of [BatchTrainingEvent] objects and epoch events as a list of [EpochTrainingEvent] objects.
@@ -48,10 +47,10 @@ public class TrainingHistory {
      * @param epochIndex Epoch index.
      * @param batchIndex Epoch index.
      * @param lossValue Value of loss function on training dataset.
-     * @param metricValue Value of metric function on training dataset.
+     * @param metricValues Value of metric function on training dataset.
      */
-    public fun appendBatch(epochIndex: Int, batchIndex: Int, lossValue: Double, metricValue: Double) {
-        val newEvent = BatchTrainingEvent(epochIndex, batchIndex, lossValue, metricValue)
+    public fun appendBatch(epochIndex: Int, batchIndex: Int, lossValue: Double, metricValues: List<Double>) {
+        val newEvent = BatchTrainingEvent(epochIndex, batchIndex, lossValue, metricValues)
         addNewBatchEvent(newEvent, epochIndex, batchIndex)
     }
 
@@ -67,18 +66,18 @@ public class TrainingHistory {
      *
      * @param epochIndex Epoch index.
      * @param lossValue Value of loss function on training dataset.
-     * @param metricValue Value of metric function on training dataset.
+     * @param metricValues Value of metric function on training dataset.
      * @param valLossValue Value of loss function on validation dataset. Could be null, if validation phase is missed.
-     * @param valMetricValue Value of metric function on validation dataset. Could be null, if validation phase is missed.
+     * @param valMetricValues Value of metric function on validation dataset. Could be null, if validation phase is missed.
      */
     public fun appendEpoch(
         epochIndex: Int,
         lossValue: Double,
-        metricValue: Double,
+        metricValues: List<Double>,
         valLossValue: Double?,
-        valMetricValue: Double?
+        valMetricValues: List<Double>?
     ) {
-        val newEvent = EpochTrainingEvent(epochIndex, lossValue, metricValue, valLossValue, valMetricValue)
+        val newEvent = EpochTrainingEvent(epochIndex, lossValue, metricValues, valLossValue, valMetricValues)
         addNewEpochEvent(newEvent, epochIndex)
     }
 
@@ -129,58 +128,47 @@ public class TrainingHistory {
     public fun eventsByEpoch(epochIndex: Int): TreeMap<Int, BatchTrainingEvent>? {
         return historyByEpochAndBatch[epochIndex]
     }
-
-    /**
-     * Returns all values of one filed in [EpochTrainingEvent] for all epochs. All [EpochTrainingEvent.metricValue] for example.
-     */
-    public operator fun get(desiredField: KProperty1<EpochTrainingEvent, Double>): DoubleArray {
-        val result = DoubleArray(_epochHistory.size)
-        for (i in 0 until _epochHistory.size) {
-            result[i] = desiredField.invoke(_epochHistory[i])
-        }
-        return result
-    }
 }
 
 /**
  * One record in [TrainingHistory] objects containing tracked data from one batch in the specific epoch.
  *
- * @constructor Creates [BatchTrainingEvent] from [epochIndex], [batchIndex], [lossValue], [metricValue].
+ * @constructor Creates [BatchTrainingEvent] from [epochIndex], [batchIndex], [lossValue], [metricValues].
  * @param epochIndex Batch index.
  * @param batchIndex Batch index.
  * @param lossValue Final value of loss function.
- * @param metricValue Final value of chosen metric.
+ * @param metricValues Final value of chosen metric.
  */
 public class BatchTrainingEvent(
     public val epochIndex: Int,
     public val batchIndex: Int,
     public val lossValue: Double,
-    public val metricValue: Double
+    public val metricValues: List<Double>
 ) {
     override fun toString(): String {
-        return "BatchTrainingEvent(epoch=$epochIndex, batch=$batchIndex, lossValue=$lossValue, metricValue=$metricValue)"
+        return "BatchTrainingEvent(epochIndex=$epochIndex, batchIndex=$batchIndex, lossValue=$lossValue, metricValues=$metricValues)"
     }
 }
 
 /**
  * One record in [TrainingHistory] objects containing tracked data from one epoch.
  *
- * @constructor Creates [EpochTrainingEvent] from [epochIndex], [lossValue], [metricValue], [valLossValue], [valMetricValue].
+ * @constructor Creates [EpochTrainingEvent] from [epochIndex], [lossValue], [metricValues], [valLossValue], [valMetricValues].
  * @param epochIndex Batch index.
  * @param lossValue Value of loss function on training dataset.
- * @param metricValue Value of metric function on training dataset.
+ * @param metricValues Values of metric function on training dataset.
  * @param valLossValue Value of loss function on validation dataset. Could be null, if validation phase is missed.
- * @param valMetricValue Value of metric function on validation dataset. Could be null, if validation phase is missed.
+ * @param valMetricValues Values of metric function on validation dataset. Could be null, if validation phase is missed.
  */
 public class EpochTrainingEvent(
     public val epochIndex: Int,
     public val lossValue: Double,
-    public val metricValue: Double,
+    public val metricValues: List<Double>,
     public var valLossValue: Double?,
-    public var valMetricValue: Double?
+    public var valMetricValues: List<Double?>?
 
 ) {
     override fun toString(): String {
-        return "EpochTrainingEvent(epoch=$epochIndex, lossValue=$lossValue, metricValue=$metricValue, valLossValue=$valLossValue, valMetricValue=$valMetricValue)"
+        return "EpochTrainingEvent(epochIndex=$epochIndex, lossValue=$lossValue, metricValues=$metricValues, valLossValue=$valLossValue, valMetricValues=$valMetricValues)"
     }
 }

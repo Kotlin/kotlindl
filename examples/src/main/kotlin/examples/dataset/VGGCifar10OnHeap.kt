@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -182,13 +182,7 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun main() {
-    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(cifarImagesArchive)
-            imageShape = ImageShape(IMAGE_SIZE, IMAGE_SIZE, 3)
-        }
         transformImage { convert { colorMode = ColorMode.BGR } }
         transformTensor {
             rescale {
@@ -197,8 +191,9 @@ fun main() {
         }
     }
 
+    val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
-    val dataset = OnHeapDataset.create(preprocessing, y)
+    val dataset = OnHeapDataset.create(File(cifarImagesArchive), y, preprocessing)
 
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -16,7 +16,6 @@ import org.tensorflow.Session
 import org.tensorflow.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Variable
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.NotDirectoryException
@@ -59,34 +58,6 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     /** Logger. */
     private val logger = KotlinLogging.logger {}
 
-    public companion object {
-        /**
-         * Loads tensorflow graphs and variable data (if required).
-         * It loads graph from .pb file format and variable data from .txt files
-         *
-         * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
-         * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
-         */
-        public fun load(
-            modelDirectory: File,
-            loadOptimizerState: Boolean = false
-        ): TensorFlowInferenceModel {
-            val model = TensorFlowInferenceModel()
-
-            val pathToModelDirectory = modelDirectory.absolutePath
-            if (!modelDirectory.exists()) {
-                throw NotDirectoryException(pathToModelDirectory)
-            } else {
-                model.logger.debug { "The model loading is started." }
-                model.loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
-                model.isModelInitialized = true
-                model.logger.debug { "The model loading is finished." }
-            }
-
-            return model
-        }
-    }
-
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
@@ -96,7 +67,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [inputData] Unlabeled input data to define label.
      */
     override fun predict(inputData: FloatArray): Int {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val preparedData = serializeToBuffer(inputData)
@@ -114,7 +85,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::shape.isInitialized) { "Reshape functions is missed! Define and set up the reshape function to transform initial data to the model input." }
+        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
         check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
 
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
@@ -192,93 +163,37 @@ public open class TensorFlowInferenceModel : InferenceModel() {
                         "If copied model has no weights, set flag `copyWeights` to `false`."
             }
 
-            // TODO: the same code-block related to saveOptimizerState
-            for (varName in variableNames) {
-                if (!saveOptimizerState && varName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(varName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else modelWeightsExtractorRunner.fetch(varName)
+            val variableNamesToCopy = variableNames.filter { variableName ->
+                saveOptimizerState || !isOptimizerVariable(variableName)
             }
+            variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
+            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run()).toMap()
 
-            val modelWeights = modelWeightsExtractorRunner.run()
-
-            for ((index, tensorForCopying) in modelWeights.withIndex()) {
-                val variableName = variableNames[index]
-                // TODO: do we need to load optimizer variables if it's not used during inference
-                if (!saveOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                else if (saveOptimizerState && isOptimizerNameAndRelatedToFrozenLayer(variableName)) // skip loading optimizers' variables for frozen layers
-                    continue
-                else assignVariable(
-                    variableName,
-                    tensorForCopying.convertTensorToMultiDimArray(),
-                    model.kGraph,
-                    model.session
-                )
-
-                tensorForCopying.close()
+            model.loadVariables(modelWeights.keys) { variableName, _ ->
+                modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
             }
         }
         model.isModelInitialized = true
         return model
     }
 
-    /** Checks that the variable with the name [variableName] is an optimizer variable and belongs to the frozen layer. */
-    protected fun isOptimizerNameAndRelatedToFrozenLayer(variableName: String): Boolean {
-        return variableName.startsWith("optimizer") && kGraph.frozenLayerVariables()
-            .map { it.ref().op().name() } // extract names
-            .any { variableName.contains(it) }
-    }
-
-    /** Returns two lists : variables and tensors (containing the variables' data) with the same order and size. */
-    protected fun getVariablesAndTensors(saveOptimizerState: Boolean): Pair<List<Variable<Float>>, MutableList<Tensor<*>>> {
-        val modelWeightsExtractorRunner = session.runner()
-
-        var variables = kGraph.layerVariables()
-
-        if (saveOptimizerState) {
-            variables = variables + kGraph.optimizerVariables()
-        }
-
-        variables.forEach {
-            modelWeightsExtractorRunner.fetch(it)
-        }
-
-        val modelWeights = modelWeightsExtractorRunner.run()
-        return Pair(variables, modelWeights)
-    }
-
     /**
-     * Executes pre-defined Assign TensorFlow operand.
-     *
-     * @param [variableName] Name of variable to be assigned.
+     * Loads variable data for variable names in the provided collection using a provided function.
+     * @param [variableNames] Variable names to load.
+     * @param [getData] Function that returns variable data by variable name and shape.
      */
-    internal fun runAssignOpByVarName(
-        variableName: String
-    ) {
-        val assignOpName = defaultAssignOpName(variableName)
-
-        session.runner()
-            .addTarget(assignOpName)
-            .run()
+    protected open fun loadVariables(variableNames: Collection<String>, getData: (String, Shape) -> Any) {
+        for (variableName in variableNames) {
+            val variableOperation = kGraph.tfGraph.operation(variableName)
+            check(variableOperation != null) { "Operation $variableName is not found in static graph." }
+            val variableShape = variableOperation.output<Float>(0).shape()
+            val data = getData(variableName, variableShape)
+            assignVariable(variableName, variableShape, data)
+        }
     }
 
-    /**
-     * Fills variable with the given data in appropriate form (shape).
-     *
-     * @param variableName Name of variable to be filled.
-     * @param kernelData Data for variable filling, should have correct shape and type.
-     */
-    internal fun fillVariable(
-        variableName: String,
-        kernelData: Any
-    ) {
-        val initializerName = defaultInitializerOpName(variableName)
-        val assignOpName = defaultAssignOpName(variableName)
-
-        populateVariable(initializerName, kernelData, assignOpName)
-    }
+    /** Check that the variable with the name [variableName] is an optimizer variable**/
+    protected fun isOptimizerVariable(variableName: String): Boolean = variableName.startsWith("optimizer")
 
     /**
      * Loads variable data from .txt files.
@@ -287,82 +202,47 @@ public open class TensorFlowInferenceModel : InferenceModel() {
      * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
      */
     protected fun loadVariablesFromTxt(pathToModelDirectory: String, loadOptimizerState: Boolean) {
-        val file = File("$pathToModelDirectory/variableNames.txt")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
-                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
-        )
-
-        val variableNames = file.readLines()
-        if (variableNames.isNotEmpty()) {
-            for (variableName in variableNames) {
-                if (!loadOptimizerState && variableName.startsWith("optimizer")) // skip loading optimizers' variables
-                    continue
-                loadVariable(variableName, pathToModelDirectory)
-            }
+        loadVariablesFromTxt(pathToModelDirectory) { variableName ->
+            loadOptimizerState || !isOptimizerVariable(variableName)
         }
     }
 
     /**
-     * Loads variable data from .txt file.
+     * Loads variable data from .txt files for variables matching the provided predicate.
      *
-     * @param [variableName] Name of variable to load state.
      * @param [pathToModelDirectory] Path to directory with TensorFlow graph and variable data.
+     * @param [predicate] Predicate for matching variable names for loading.
      */
-    protected fun loadVariable(variableName: String, pathToModelDirectory: String) {
-        val operation = kGraph.tfGraph.operation(variableName)
-        check(operation != null) { "Operation $variableName is not found in static graph." }
+    protected fun loadVariablesFromTxt(pathToModelDirectory: String, predicate: (String) -> Boolean) {
+        val variableNamesFile = File("$pathToModelDirectory/variableNames.txt")
 
-        val file = File("$pathToModelDirectory/$variableName.txt")
-
-        if (!file.exists()) throw FileNotFoundException(
-            "File '$variableName.txt' is not found. This file must be in the model directory." +
-                    "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+        if (!variableNamesFile.exists()) throw FileNotFoundException(
+            "File 'variableNames.txt' is not found. This file must be in the model directory. " +
+                    "It is generated during Sequential model saving with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
         )
 
-        Scanner(file.inputStream()).use { scanner ->
-            scanner.useLocale(Locale.US)
-            val initializerName = defaultInitializerOpName(variableName)
-            val assignOpName = defaultAssignOpName(variableName)
-
-            val initOp = kGraph.tfGraph.operation(initializerName)
-            check(initOp != null) {
-                "Operation $initializerName is not found in static graph.\n" +
-                        "NOTE: Loading of Zeros, Ones, Constant initializers is not supported."
+        val variableNamesToLoad = variableNamesFile.readLines().filter(predicate)
+        loadVariables(variableNamesToLoad) { variableName, variableShape ->
+            val file = File("$pathToModelDirectory/$variableName.txt")
+            if (!file.exists()) throw FileNotFoundException(
+                "File '$variableName.txt' is not found. This file must be in the model directory." +
+                        "It is generated when saving the model with SavingFormat.TF_GRAPH_CUSTOM_VARIABLES or SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
+            )
+            Scanner(file.inputStream()).use { scanner ->
+                scanner.useLocale(Locale.US)
+                scanner.createFloatArray(variableShape)
             }
-
-            val assignOp = kGraph.tfGraph.operation(assignOpName)
-            check(assignOp != null) { "Operation $assignOp is not found in static graph." }
-
-            val shape = operation.output<Float>(0).shape()
-            val tensorShape = TensorShape(shape)
-
-            val source = createFloatArrayFromScanner(shape, scanner)
-            populateVariable(initializerName, source, assignOpName)
-
-            logger.debug { "Loading the variable $variableName data" }
-            logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-            logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
         }
     }
 
     /**
      * Assigns variable data from multidimensional array.
      *
-     * @param [variableName] Name of variable to load state.
+     * @param [variableName] Name of variable to load state for.
+     * @param [variableShape] Shape of the variable.
      * @param [data] Variable data.
      */
-    // TODO: refactor this and previous function to join together common parts maybe via lambda of data creation
-    internal fun assignVariable(
-        variableName: String,
-        data: Array<*>,
-        kGraph: KGraph = this.kGraph,
-        session: Session = this.session
-    ) {
-        val operation = kGraph.tfGraph.operation(variableName)
-        check(operation != null) { "Operation $variableName is not found in static graph." }
-
+    protected fun assignVariable(variableName: String, variableShape: Shape, data: Any) {
         val initializerName = defaultInitializerOpName(variableName)
         val assignOpName = defaultAssignOpName(variableName)
 
@@ -375,14 +255,26 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         val assignOp = kGraph.tfGraph.operation(assignOpName)
         check(assignOp != null) { "Operation $assignOp is not found in static graph." }
 
-        val shape = operation.output<Float>(0).shape()
-        val tensorShape = TensorShape(shape)
+        populateVariable(assignOpName, initializerName, data)
 
-        populateVariable(initializerName, data, assignOpName, session)
-
+        val tensorShape = TensorShape(variableShape)
         logger.debug { "Loading the variable $variableName data" }
         logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+        logger.debug { "Number of elements: ${tensorShape.numElements()}" }
+    }
+
+    private fun populateVariable(assignOpName: String, initializerName: String, data: Any) {
+        var tensorData = data
+        if (data is Array<*> && data.isArrayOf<Float>()) {
+            tensorData = (data as Array<Float>).toFloatArray()
+        }
+
+        Tensor.create(tensorData).use { tensor ->
+            session.runner()
+                .feed(initializerName, tensor)
+                .addTarget(assignOpName)
+                .run()
+        }
     }
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {
@@ -403,137 +295,35 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         session = Session(kGraph.tfGraph)
     }
 
-    private fun createFloatArrayFromScanner(shape: Shape, scanner: Scanner): Any {
-        when (shape.numDimensions()) {
-            0 -> {
-                return scanner.nextFloat()
-            }
-            1 -> {
-                return create1DimFloatArray(shape, scanner)
-            }
-            2 -> {
-                return create2DimFloatArray(shape, scanner)
-            }
-            3 -> {
-                return create3DimFloatArray(shape, scanner)
-            }
-            4 -> {
-                return create4DimFloatArray(shape, scanner)
-            }
-            else -> {
-                throw RuntimeException("The loading of tensors with 5 and more dimensions is not supported yet")
-            }
-        }
-    }
-
-    private fun populateVariable(
-        initializerName: String,
-        data: Any,
-        assignOpName: String,
-        session: Session = this.session
-    ) {
-        var tensorData = data
-        if (data is Array<*> && data.isArrayOf<Float>()) {
-            tensorData = (data as Array<Float>).toFloatArray()
-        }
-
-        Tensor.create(tensorData).use { tensor ->
-            session.runner()
-                .feed(initializerName, tensor)
-                .addTarget(assignOpName)
-                .run()
-
-        }
-    }
-
-    private fun create4DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<Array<Array<FloatArray>>> {
-        val result = Array(shape.size(0).toInt()) {
-            Array(shape.size(1).toInt()) {
-                Array(shape.size(2).toInt()) {
-                    FloatArray(shape.size(3).toInt()) { 0.0f }
-                }
-            }
-        }
-
-        var cnt = 0
-
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                for (k in result[i][j].indices) {
-                    for (m in result[i][j][k].indices) {
-                        if (scanner.hasNextFloat()) {
-                            val weight = scanner.nextFloat()
-                            result[i][j][k][m] = weight
-                            cnt++
-                        } else {
-                            logger.debug { cnt }
-                        }
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
-    private fun create3DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<Array<FloatArray>> {
-        val result = Array(shape.size(0).toInt()) {
-            Array(shape.size(1).toInt()) {
-                FloatArray(shape.size(2).toInt()) { 0.0f }
-            }
-        }
-
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                for (k in result[i][j].indices) {
-                    val weight = scanner.nextFloat()
-                    result[i][j][k] = weight
-                }
-            }
-        }
-
-        return result
-    }
-
-    private fun create2DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): Array<FloatArray> {
-        val result = Array(shape.size(0).toInt()) {
-            FloatArray(shape.size(1).toInt()) { 0.0f }
-        }
-
-        for (i in result.indices) {
-            for (j in result[i].indices) {
-                val weight = scanner.nextFloat()
-                result[i][j] = weight
-            }
-        }
-
-        return result
-    }
-
-    private fun create1DimFloatArray(
-        shape: Shape,
-        scanner: Scanner
-    ): FloatArray {
-        val result = FloatArray(shape.size(0).toInt()) { 0.0f }
-
-        for (i in result.indices) {
-            val weight = scanner.nextFloat()
-            result[i] = weight
-        }
-
-        return result
-    }
-
     override fun toString(): String {
         return "InferenceModel(name=$name)"
+    }
+
+    public companion object {
+        /**
+         * Loads tensorflow graphs and variable data (if required).
+         * It loads graph from .pb file format and variable data from .txt files
+         *
+         * @param [modelDirectory] Path to directory with TensorFlow graph and variable data.
+         * @param [loadOptimizerState] Loads optimizer internal variables data, if true.
+         */
+        public fun load(
+            modelDirectory: File,
+            loadOptimizerState: Boolean = false
+        ): TensorFlowInferenceModel {
+            val model = TensorFlowInferenceModel()
+
+            val pathToModelDirectory = modelDirectory.absolutePath
+            if (!modelDirectory.exists()) {
+                throw NotDirectoryException(pathToModelDirectory)
+            } else {
+                model.logger.debug { "The model loading is started." }
+                model.loadModelFromSimpleFormat(pathToModelDirectory, loadOptimizerState)
+                model.isModelInitialized = true
+                model.logger.debug { "The model loading is finished." }
+            }
+
+            return model
+        }
     }
 }

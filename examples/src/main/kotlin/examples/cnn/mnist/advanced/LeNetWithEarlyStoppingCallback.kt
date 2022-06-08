@@ -63,13 +63,12 @@ fun lenetWithEarlyStoppingCallback() {
         it.compile(
             optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-            metric = Metrics.ACCURACY,
-            callback = earlyStopping
+            metric = Metrics.ACCURACY
         )
 
         it.logSummary()
 
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE, earlyStopping)
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
 

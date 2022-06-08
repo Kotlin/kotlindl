@@ -1,11 +1,10 @@
 /*
-* Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
-* Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
-*/
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
@@ -25,6 +24,8 @@ import org.tensorflow.op.core.Squeeze
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no padding, or
  * [ConvPadding.SAME] which means padding the input equally such that the output has the same dimension
  * as the input.
+ *
+ * @since 0.3
  */
 public class MaxPool1D(
     public val poolSize: IntArray = intArrayOf(1, 2, 1),
@@ -32,14 +33,20 @@ public class MaxPool1D(
     public val padding: ConvPadding = ConvPadding.VALID,
     name: String = ""
 ) : Layer(name) {
+    public constructor(
+        poolSize: Int = 2,
+        strides: Int = 2,
+        padding: ConvPadding = ConvPadding.VALID,
+        name: String = ""
+    ) : this(
+        poolSize = intArrayOf(1, poolSize, 1),
+        strides = intArrayOf(1, strides, 1),
+        padding = padding,
+        name = name
+    )
 
     override val hasActivation: Boolean
         get() = false
-    override val paramCount: Int
-        get() = 0
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
 
     init {
         requireArraySize(poolSize, 3, "poolSize")
@@ -49,7 +56,7 @@ public class MaxPool1D(
         }
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         val steps = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
@@ -94,6 +101,7 @@ public class MaxPool1D(
         return tf.squeeze(maxPool, Squeeze.axis(listOf(expandAxis.toLong())))
     }
 
-    override fun toString(): String =
-        "MaxPool1D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
+    override fun toString(): String {
+        return "MaxPool1D(name = $name, poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding, hasActivation=$hasActivation)"
+    }
 }

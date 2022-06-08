@@ -12,5 +12,4 @@ class FashionMnistExportImportTestSuite {
     fun lenetOnFashionMnistExportImportToTxtTest() {
         lenetOnFashionMnistExportImportToTxt()
     }
-
 }

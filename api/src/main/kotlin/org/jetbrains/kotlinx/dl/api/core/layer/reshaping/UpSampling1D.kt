@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -19,6 +19,8 @@ import org.tensorflow.op.Ops
  * Output shape: 3D tensor with shape `(batch_size, steps * size, features)`.
  *
  * @property [size] Upsampling factor (i.e. number of repeats).
+ *
+ * @since 0.3
  */
 public class UpSampling1D(
     public val size: Int = 2,
@@ -46,6 +48,7 @@ public class UpSampling1D(
         return repeat(tf, input, repeats = size, axis = 1)
     }
 
-    override fun toString(): String =
-        "UpSampling1D(size=$size)"
+    override fun toString(): String {
+        return "UpSampling1D(name = $name, size=$size, hasActivation=$hasActivation)"
+    }
 }

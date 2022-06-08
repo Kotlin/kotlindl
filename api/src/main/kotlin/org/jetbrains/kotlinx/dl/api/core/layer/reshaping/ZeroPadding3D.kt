@@ -1,11 +1,10 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -13,6 +12,8 @@ import org.tensorflow.op.Ops
  * Zero-padding layer for 3D input (e.g. video).
  * This layer can add zeros in the rows, cols and depth of a video tensor.
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
+ *
+ * @since 0.3
  */
 public class ZeroPadding3D : AbstractZeroPadding {
     public val padding: IntArray
@@ -33,8 +34,8 @@ public class ZeroPadding3D : AbstractZeroPadding {
 
     /**
      * Constructs an instance of ZeroPadding3D layer
-     * @param [padding] triple of padding values - [padding.first] represents vertical padding (applied to top and
-     * bottom of image, and [padding.second] is horizontal padding (left and right sides), [padding.third] is depth padding
+     * @param [padding] triple of padding values - [Triple.first] represents vertical padding (applied to top and
+     * bottom of image, and [Triple.second] is horizontal padding (left and right sides), [Triple.third] is depth padding
      * @param [name] layer name
      */
     public constructor(
@@ -80,7 +81,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
         this.padding = padding
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         this.inputShape = inputShape
     }
 
@@ -131,6 +132,8 @@ public class ZeroPadding3D : AbstractZeroPadding {
     }
 
     override fun toString(): String {
-        return "ZeroPadding3D(padding=$padding)"
+        return "ZeroPadding3D(name = $name, padding=${padding.contentToString()}, hasActivation=$hasActivation)"
     }
+
+
 }

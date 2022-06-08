@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
+import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -31,7 +32,6 @@ private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
-private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
@@ -49,17 +49,10 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun mobilenetWithAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    var modelType = TFModels.CV.MobileNet
+    val modelType = TFModels.CV.MobileNet()
     val model = modelHub.loadModel(modelType)
 
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-
     val preprocessing: Preprocessing = preprocess {
-        load {
-            pathToData = File(dogsCatsImages)
-            imageShape = ImageShape(channels = NUM_CHANNELS)
-            labelGenerator = FromFolders(mapping = mapOf("cat" to 0, "dog" to 1))
-        }
         transformImage {
             resize {
                 outputHeight = IMAGE_SIZE.toInt()
@@ -70,19 +63,22 @@ fun mobilenetWithAdditionalTraining() {
         }
         transformTensor {
             sharpen {
-                modelType = TFModels.CV.MobileNet
+                modelTypePreprocessing = TFModels.CV.MobileNet()
             }
         }
     }
 
-    val dataset = OnHeapDataset.create(preprocessing).shuffle()
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
+    val dataset = OnHeapDataset.create(
+        File(dogsCatsImages),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        preprocessing
+    ).shuffle()
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
 
     model.use {
-        it.layers.last().isTrainable = true
-
         it.compile(
             optimizer = Adam(),
             loss = Losses.MAE,
@@ -92,12 +88,8 @@ fun mobilenetWithAdditionalTraining() {
         it.logSummary()
     }
 
-    val layers = mutableListOf<Layer>()
-
-    for (layer in model.layers) {
-        layer.isTrainable = false
-        layers.add(layer)
-    }
+    val layers = model.layers.toMutableList()
+    layers.forEach(Layer::freeze)
 
     val lastLayer = layers.last()
     for (outboundLayer in lastLayer.inboundLayers)

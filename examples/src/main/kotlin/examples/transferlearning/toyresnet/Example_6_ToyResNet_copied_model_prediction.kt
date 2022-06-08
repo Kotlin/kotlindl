@@ -16,9 +16,9 @@ import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 
 /** Just loading ToyResNet trained in Keras, making a copy and using for prediction. */
 fun main() {
-    val (train, test) = fashionMnist()
+    val (_, test) = fashionMnist()
 
-    val jsonConfigFile = getToyResNetJSONConfigFile()
+    val jsonConfigFile = getJSONConfigFileToyResNet()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
     var copiedModel: Functional
     model.use {
@@ -30,7 +30,7 @@ fun main() {
 
         it.logSummary()
 
-        val hdfFile = getToyResNetWeightsFile()
+        val hdfFile = getWeightsFileToyResNet()
 
         it.loadWeights(hdfFile)
         copiedModel = it.copy(copyWeights = true)

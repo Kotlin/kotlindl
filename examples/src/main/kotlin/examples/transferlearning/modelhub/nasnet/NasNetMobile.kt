@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,8 +7,8 @@ package examples.transferlearning.modelhub.nasnet
 
 
 import examples.transferlearning.runImageRecognitionPrediction
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 
 /**
  * This examples demonstrates the inference concept on NasNetMobile model:
@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
  * NOTE: Input resolution is 224*224
  */
 fun nasNetMobilePrediction() {
-    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetMobile)
+    runImageRecognitionPrediction(modelType = TFModels.CV.NASNetMobile())
 }
 
 /** */

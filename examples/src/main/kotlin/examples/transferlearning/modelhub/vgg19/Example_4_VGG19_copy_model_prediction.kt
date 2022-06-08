@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,12 +13,14 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 /**
@@ -38,7 +40,7 @@ import java.io.File
  */
 fun vgg19copyModelPrediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG19
+    val modelType = TFModels.CV.VGG19()
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = modelHub.loadClassLabels()
@@ -60,16 +62,12 @@ fun vgg19copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
+        val preprocessing: Preprocessing = preprocess {
+            transformImage { convert { colorMode = ColorMode.BGR } }
+        }
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                }
-                transformImage { convert { colorMode = ColorMode.BGR } }
-            }
-
-            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
+            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -81,16 +79,12 @@ fun vgg19copyModelPrediction() {
     }
 
     copiedModel.use {
+        val preprocessing: Preprocessing = preprocess {
+            transformImage { convert { colorMode = ColorMode.BGR } }
+        }
         for (i in 1..8) {
-            val preprocessing: Preprocessing = preprocess {
-                load {
-                    pathToData = getFileFromResource("datasets/vgg/image$i.jpg")
-                    imageShape = ImageShape(224, 224, 3)
-                }
-                transformImage { convert { colorMode = ColorMode.BGR } }
-            }
-
-            val inputData = modelType.preprocessInput(preprocessing().first, model.inputDimensions)
+            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

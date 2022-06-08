@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -20,6 +20,8 @@ import org.tensorflow.op.Ops
  *
  * @property [cropping] An array consisting of three integer arrays of size two which are interpreted as
  * `[[left_dim1_crop, right_dim1_crop], [left_dim2_crop, right_dim2_crop], [left_dim3_crop, right_dim3_crop]]`.
+ *
+ * @since 0.3
  */
 public class Cropping3D(
     public val cropping: Array<IntArray>,
@@ -69,6 +71,7 @@ public class Cropping3D(
         )
     }
 
-    override fun toString(): String =
-        "Cropping3D(cropping=${cropping.contentToString()})"
+    override fun toString(): String {
+        return "Cropping3D(name = $name, cropping=${cropping.contentDeepToString()}, hasActivation=$hasActivation)"
+    }
 }

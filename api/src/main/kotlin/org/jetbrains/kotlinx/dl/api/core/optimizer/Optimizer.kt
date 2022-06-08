@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -19,7 +19,7 @@ import org.tensorflow.op.core.Variable
 /**
  * Base class for all optimizers.
  *
- * @property [clipGradient] Strategy of gradient clipping as sub-class of [ClipGradientAction].
+ * @property [clipGradient] Strategy of gradient clipping as subclass of [ClipGradientAction].
  */
 public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     /**
@@ -39,11 +39,10 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      */
     internal fun prepareTargets(
         graph: KGraph,
+        weights: List<Variable<Float>>,
         tf: Ops,
         loss: Operand<Float>
     ): List<Operand<Float>> {
-        val weights = graph.trainableLayerVariables()
-
         slots = mutableMapOf()
 
         val gradients: Gradients = computeGradients(tf, loss, weights)

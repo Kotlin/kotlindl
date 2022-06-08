@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -138,7 +138,7 @@ public class WavFile(
     }
 
     /**
-     * Read some number of frames from a specific offset in the buffer into a multi-dimensional
+     * Read some number of frames from a specific offset in the buffer into a multidimensional
      * float array.
      *
      * @param returnBuffer the buffer to read samples into

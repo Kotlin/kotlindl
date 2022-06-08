@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -99,7 +99,7 @@ public class EarlyStopping(
                 best = Double.MIN_VALUE
             }
             // If metric
-            else -> if (this.monitor == EpochTrainingEvent::metricValue || this.monitor == EpochTrainingEvent::valMetricValue) {
+            else -> if (this.monitor == EpochTrainingEvent::metricValues || this.monitor == EpochTrainingEvent::valMetricValues) { // TODO: correctly handle the case with monitoring of multiple metrics
                 monitorOp = BiFunction { a: Number, b: Number -> a.toDouble() > b.toDouble() }
                 monitorGreater = true
                 best = Double.MAX_VALUE
@@ -125,9 +125,7 @@ public class EarlyStopping(
         if ((monitorOp ?: return).apply(current.toDouble() - minDelta, best)) {
             best = current.toDouble()
             wait = 0
-            if (restoreBestWeights) {
-                // TODO this.bestWeights = this.model.getWeights();
-            }
+            // TODO if (restoreBestWeights) this.bestWeights = this.model.getWeights();
         } else {
             wait++
             if (wait > patience) {

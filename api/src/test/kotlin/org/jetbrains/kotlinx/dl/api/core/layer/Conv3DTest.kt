@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -12,24 +12,14 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Test
 
 internal class Conv3DTest : ConvLayerTest() {
-    private fun createFloatConv3DTensor(
-        batchSize: Int,
-        depth: Int,
-        height: Int,
-        width: Int,
-        channels: Int,
-        initValue: Float
-    ) = Array(batchSize) { Array(depth) { Array(height) { Array(width) { FloatArray(channels) { initValue } } } } }
-
     @Test
     fun zeroedInputTensorWithDefaultValues() {
-        val input =
-            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 0.0f)
-        val expected =
-            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 32, initValue = 0.0f)
+        val input = create3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 0.0f)
+        val expected = create3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 32, initValue = 0.0f)
 
         assertTensorsEquals(
             Conv3D(
+                32, 3,
                 name = "TestConv3D_1",
                 biasInitializer = Zeros()
             ),
@@ -40,10 +30,8 @@ internal class Conv3DTest : ConvLayerTest() {
 
     @Test
     fun constantInputTensorWithValidPadding() {
-        val input =
-            createFloatConv3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 1.0f)
-        val expected =
-            createFloatConv3DTensor(batchSize = 1, depth = 2, height = 2, width = 2, channels = 16, initValue = 8.0f)
+        val input = create3DTensor(batchSize = 1, depth = 3, height = 3, width = 3, channels = 1, initValue = 1.0f)
+        val expected = create3DTensor(batchSize = 1, depth = 2, height = 2, width = 2, channels = 16, initValue = 8.0f)
 
         assertTensorsEquals(
             Conv3D(
@@ -99,5 +87,29 @@ internal class Conv3DTest : ConvLayerTest() {
             input,
             expected
         )
+    }
+
+    internal companion object {
+        internal fun create3DTensor(
+            batchSize: Int,
+            depth: Int,
+            height: Int,
+            width: Int,
+            channels: Int,
+            initValue: Float
+        ) = Array(batchSize) { Array(depth) { Array(height) { Array(width) { FloatArray(channels) { initValue } } } } }
+
+        internal fun create3DTensor(
+            batchSize: Int,
+            channels: Int,
+            vararg frames: Array<FloatArray>
+        ) = Array(batchSize) {
+            Array(frames.size) { frameIdx ->
+                val rows = frames[frameIdx]
+                Array(rows.size) { rowIdx ->
+                    Array(rows[rowIdx].size) { columnIdx -> FloatArray(channels) { rows[rowIdx][columnIdx] } }
+                }
+            }
+        }
     }
 }

@@ -1,12 +1,12 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 package examples.transferlearning.modelhub.resnet
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import java.io.File
 
 /**
@@ -22,7 +22,7 @@ fun resnet50easyPrediction() {
     val modelHub =
         TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = TFModels.CV.ResNet50.pretrainedModel(modelHub)
+    val model = TFModels.CV.ResNet50().pretrainedModel(modelHub)
 
     model.use {
         for (i in 1..8) {
@@ -30,7 +30,7 @@ fun resnet50easyPrediction() {
 
             val recognizedObject = it.predictObject(imageFile = imageFile)
             println(recognizedObject)
-            
+
             val top5 = it.predictTopKObjects(imageFile = imageFile, topK = 5)
             println(top5.toString())
         }

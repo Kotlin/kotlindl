@@ -6,15 +6,15 @@
 package examples.transferlearning.toyresnet
 
 
+import io.jhdf.HdfFile
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.fashionMnist
 import java.io.File
-import java.io.FileReader
-import java.util.*
 
 /**
  * We described ToyResNet in Keras and saved model configuration.
@@ -26,7 +26,7 @@ import java.util.*
 fun main() {
     val (train, test) = fashionMnist()
 
-    val jsonConfigFile = getResNetJSONConfigFile()
+    val jsonConfigFile = getJSONConfigFileToyResNet()
     val model = Functional.loadModelConfiguration(jsonConfigFile)
 
     model.use {
@@ -52,14 +52,17 @@ fun main() {
 }
 
 /** Returns JSON file with model configuration, saved from Keras 2.x. */
-private fun getResNetJSONConfigFile(): File {
-    val properties = Properties()
-    val reader = FileReader("data.properties")
-    properties.load(reader)
+internal fun getJSONConfigFileToyResNet(): File {
+    val pathToConfig = "models/toyresnet/modelConfig.json"
+    val realPathToConfig = OnHeapDataset::class.java.classLoader.getResource(pathToConfig).path.toString()
 
-    val resnetJSONModelPath = properties["resnetJSONModelPath"] as String
-
-    return File(resnetJSONModelPath)
+    return File(realPathToConfig)
 }
 
+/** Returns .h5 file with model weights, saved from Keras 2.x. */
+internal fun getWeightsFileToyResNet(): HdfFile {
+    val pathToWeights = "models/toyresnet/weights.h5"
+    val realPathToWeights = OnHeapDataset::class.java.classLoader.getResource(pathToWeights).path.toString()
+    return HdfFile(File(realPathToWeights))
+}
 

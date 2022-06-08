@@ -6,6 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.inference.objectdetection
 
 /**
+ * This data class represents the detected object on the given image.
+ *
  * @property [classLabel] The predicted class's name
  * @property [probability] The probability of the predicted class.
  * @property [xMax] The maximum X coordinate for the bounding box containing the predicted object.
