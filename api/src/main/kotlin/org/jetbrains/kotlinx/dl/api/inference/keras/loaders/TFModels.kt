@@ -574,6 +574,10 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
      */
     public val channelsFirst: Boolean
 
+    /**
+      * An expected channels order for the input image.
+      * Note: the wrong choice of this parameter can significantly impact the model's performance.
+     */
     public val inputColorMode: ColorMode
 
     /**
