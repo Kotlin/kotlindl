@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import java.io.File
 
@@ -27,10 +28,10 @@ public object TFModels {
     public sealed class CV<T : GraphTrainableModel>(
         override val modelRelativePath: String,
         override val channelsFirst: Boolean = false,
+        override val inputColorMode: ColorMode = ColorMode.RGB,
         public var inputShape: IntArray? = null,
         internal var noTop: Boolean = false
-    ) :
-        ModelType<T, ImageRecognitionModel> {
+    ) : ModelType<T, ImageRecognitionModel> {
 
         init {
             if (inputShape != null) {
@@ -61,7 +62,12 @@ public object TFModels {
          *    Official VGG16 model from Keras.applications.</a>
          */
         public class VGG16(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Sequential>("models/tensorflow/cv/vgg16", inputShape = inputShape, noTop = noTop) {
+            CV<Sequential>(
+                "models/tensorflow/cv/vgg16",
+                inputShape = inputShape,
+                noTop = noTop,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -85,7 +91,12 @@ public object TFModels {
          *    Official VGG19 model from Keras.applications.</a>
          */
         public class VGG19(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Sequential>("models/tensorflow/cv/vgg19", inputShape = inputShape, noTop = noTop) {
+            CV<Sequential>(
+                "models/tensorflow/cv/vgg19",
+                inputShape = inputShape,
+                noTop = noTop,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -155,7 +166,12 @@ public object TFModels {
          *    Official ResNet50 model from Keras.applications.</a>
          */
         public class ResNet50(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet50", inputShape = inputShape, noTop = noTop) {
+            CV<Functional>(
+                "models/tensorflow/cv/resnet50",
+                inputShape = inputShape,
+                noTop = noTop,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -181,7 +197,12 @@ public object TFModels {
          *    Official ResNet101 model from Keras.applications.</a>
          */
         public class ResNet101(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet101", inputShape = inputShape, noTop = noTop) {
+            CV<Functional>(
+                "models/tensorflow/cv/resnet101",
+                inputShape = inputShape,
+                noTop = noTop,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -207,7 +228,12 @@ public object TFModels {
          *    Official ResNet152 model from Keras.applications.</a>
          */
         public class ResNet152(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet152", inputShape = inputShape, noTop = noTop) {
+            CV<Functional>(
+                "models/tensorflow/cv/resnet152",
+                inputShape = inputShape,
+                noTop = noTop,
+                inputColorMode = ColorMode.BGR
+            ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
                 return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
             }
@@ -547,6 +573,12 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
      * otherwise, channels are at the last position and has a short notation as `NHWC`.
      */
     public val channelsFirst: Boolean
+
+    /**
+      * An expected channels order for the input image.
+      * Note: the wrong choice of this parameter can significantly impact the model's performance.
+     */
+    public val inputColorMode: ColorMode
 
     /**
      * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
