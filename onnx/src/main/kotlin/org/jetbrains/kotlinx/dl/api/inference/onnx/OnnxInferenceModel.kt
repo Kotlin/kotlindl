@@ -6,14 +6,19 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import ai.onnxruntime.*
+import ai.onnxruntime.OrtSession.SessionOptions
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider.CPU
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider.CUDA
 import java.nio.*
 import java.util.*
+
 
 private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Call reshape() to set input shape."
 
@@ -50,6 +55,11 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var outputDataType: OnnxJavaType
         private set
 
+    private lateinit var pathToModel: String
+
+    /** Execution providers currently set for the model. */
+    private lateinit var executionProvidersInUse: List<ExecutionProvider>
+
     public companion object {
         /**
          * Loads model from SavedModelBundle format.
@@ -68,7 +78,7 @@ public open class OnnxInferenceModel : InferenceModel() {
             require(!model::session.isInitialized) { "The model $model is initialized!" }
 
             model.env = OrtEnvironment.getEnvironment()
-            model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
+            model.session = model.env.createSession(pathToModel, SessionOptions())
 
             val inputTensorInfo = model.session.inputInfo.toList()[0].second.info as TensorInfo
             if (!model::inputShape.isInitialized) {
@@ -87,8 +97,69 @@ public open class OnnxInferenceModel : InferenceModel() {
             }
             model.outputDataType = outputTensorInfo.type
 
+            model.pathToModel = pathToModel
+
             return model
         }
+
+    }
+
+    /**
+     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
+     * This method allows to set the execution provider to use.
+     * If the model is already initialized, internal session will be closed and new one will be created.
+     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
+     * If execution provider is not supported, an exception will be thrown.
+     * @param executionProviders list of execution providers to use.
+     */
+    public fun reinitializeWith(vararg executionProviders: ExecutionProvider) {
+        require(::env.isInitialized) { "The model $this is not initialized!" }
+        require(executionProviders.isNotEmpty()) { "Please pass at least one execution provider!" }
+        for (executionProvider in executionProviders) {
+            require(executionProvider.internalProviderId in OrtEnvironment.getAvailableProviders()) {
+                "The optimized execution provider $executionProvider is not available in the current environment!"
+            }
+        }
+
+        val uniqueProviders = executionProviders.distinctBy { it.internalProviderId }
+
+        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
+            return
+        }
+
+        if (::session.isInitialized) {
+            session.close()
+        }
+
+        val sessionOptions = SessionOptions()
+        for (provider in uniqueProviders) {
+            when (provider) {
+                is CUDA -> {
+                    sessionOptions.addCUDA(provider.deviceId)
+                }
+                is CPU -> {
+                     /*
+                         Doing nothing here because the CPU provider is always added to the sessionOptions
+                         after all other providers are added.
+                      */
+                }
+            }
+        }
+
+        /*
+            Users can explicitly add CPU provider with BFCArenaAllocator disabled,
+            but if not present, it will be added automatically with BFCArenaAllocator enabled.
+         */
+        uniqueProviders.find { it is CPU }?.let {
+            it as CPU
+            sessionOptions.addCPU(it.useBFCArenaAllocator)
+        } ?: run {
+            sessionOptions.addCPU(true)
+        }
+
+        session = env.createSession(pathToModel, sessionOptions)
+
+        executionProvidersInUse = uniqueProviders
     }
 
     /**

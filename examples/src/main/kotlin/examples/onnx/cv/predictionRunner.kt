@@ -11,6 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.inferAndCloseUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -19,20 +21,23 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
 
 fun runImageRecognitionPrediction(
-    modelType: ONNXModels.CV<OnnxInferenceModel>
-) {
+    modelType: ONNXModels.CV<OnnxInferenceModel>,
+    executionProviders: List<ExecutionProvider> = emptyList()
+): List<Pair<String, Float>> {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels =
         loadImageNetClassLabels()
 
-    model.use {
+    val inference: (OnnxInferenceModel) -> List<Pair<String, Float>> = {
         println(it)
 
         val preprocessing: Preprocessing = preprocess {
             transformImage { convert { colorMode = ColorMode.BGR } }
         }
+
+        val results = mutableListOf<Pair<String, Float>>()
         for (i in 1..8) {
             val inputData = modelType.preprocessInput(getFileFromResource("datasets/vgg/image$i.jpg"), preprocessing)
 
@@ -41,7 +46,16 @@ fun runImageRecognitionPrediction(
 
             val top5 = predictTopNLabels(it, inputData, imageNetClassLabels)
 
-            println(top5.toString())
+            top5.forEach { entry -> results.add(entry.value) }
         }
+
+        results
     }
+
+    return if (executionProviders.isNotEmpty()) {
+        model.inferAndCloseUsing(executionProviders) { inference(it) }
+    } else {
+        model.use { inference(it) }
+    }
+
 }
