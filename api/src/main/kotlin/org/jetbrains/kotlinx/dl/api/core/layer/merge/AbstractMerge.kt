@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.copy
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -27,9 +28,9 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         throw UnsupportedOperationException("$layerTypeName layer is not supported in Sequential models.")
     }
 
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        checkInputShapes(inboundLayers.map { it.outputShape.toShape() }) //TODO: crash efficientNet models
-        return inboundLayers[0].outputShape.clone()
+    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+        checkInputShapes(inputShapes) //TODO: crash efficientNet models
+        return inputShapes.first().copy()
     }
 
     override fun forward(

@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -23,21 +25,15 @@ public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        val inputShapes = mutableListOf<TensorShape>()
-        inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
-        val newShape = inputShapes[0].clone()
+    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+        val newShapeArray = inputShapes.first().toLongArray()
 
-        var axe = axis
-        if (axis == -1) { // it influences on nasmobilemodel
-            val rank: Int = inputShapes[0].rank()
-            axe = (rank + axis) // to make axe positive
-        }
+        var axe = axis.takeIf { it != -1 /*it influences on nasmobilemodel*/ }
+            ?: newShapeArray.size + axis // to make axe positive
 
+        newShapeArray[axe] = inputShapes.sumOf { it.size(axe) } // concatenated dimension
 
-        newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
-
-        return newShape.clone()
+        return shapeFromDims(*newShapeArray)
     }
 
     override fun checkInputShapes(inputShapes: List<Shape>) {

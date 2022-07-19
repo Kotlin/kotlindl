@@ -259,8 +259,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.setOutputShape(inputLayer.computeOutputShape())
 
         layers.filter { it !is Input }.forEach { layer ->
-            layer.buildFromInboundLayers(tf)
-            val outputShape = layer.computeOutputShapeFromInboundLayers()
+            val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
+            layer.build(tf, inputShapes)
+            val outputShape = layer.computeOutputShape(inputShapes)
             layer.setOutputShape(outputShape)
             logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
         }

@@ -140,3 +140,7 @@ private fun getShapeOfArray(data: Array<*>): Shape {
  * If the most inner array does not have any elements its size is missed in result
  */
 internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
+
+internal fun Shape.copy(): Shape {
+    return Shape.make(size(0), *tail(this))
+}

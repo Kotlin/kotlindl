@@ -9,10 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.setOutputShape
 import org.jetbrains.kotlinx.dl.api.core.layer.weights
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import java.io.File
 import java.io.FileNotFoundException
 

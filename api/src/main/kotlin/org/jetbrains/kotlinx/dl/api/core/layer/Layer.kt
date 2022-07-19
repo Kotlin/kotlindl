@@ -37,7 +37,6 @@ public abstract class Layer(public var name: String) {
      */
     public abstract fun build(tf: Ops, inputShape: Shape)
 
-
     /**
      * Extend this function to define variables in layer.
      *
@@ -45,10 +44,10 @@ public abstract class Layer(public var name: String) {
      * NOTE: Used in Functional API
      *
      * @param [tf] TensorFlow graph API for building operations.
+     * @param [inputShapes] Shapes of the inputs, result of [computeOutputShape] call from inbound layers.
      */
-    public fun buildFromInboundLayers(tf: Ops) {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, inboundLayers[0].outputShape.toShape())
+    public open fun build(tf: Ops, inputShapes: List<Shape>) {
+        build(tf, inputShapes.first())
     }
 
     /**
@@ -57,14 +56,13 @@ public abstract class Layer(public var name: String) {
     public abstract fun computeOutputShape(inputShape: Shape): Shape
 
     /**
-     * Computes output shape, based on input shapes of inbound layers.
+     * Computes output shape, based on [inputShapes] and [Layer] type.
      *
      * NOTE: This function should be overridden for layers with multiple inputs.
      * NOTE: Used in Functional API
      */
-    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
+    public open fun computeOutputShape(inputShapes: List<Shape>): Shape {
+        return computeOutputShape(inputShapes.first())
     }
 
     /**
@@ -129,10 +127,7 @@ internal fun LongArray.toIntArray(): IntArray {
 }
 
 internal fun Layer.setOutputShape(shape: Shape) {
-    setOutputShape(TensorShape(shape))
-}
-
-internal fun Layer.setOutputShape(tensorShape: TensorShape) {
+    val tensorShape = TensorShape(shape)
     check(tensorShape.tail().all { elem -> elem > 0 })
     {
         "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${tensorShape}.\n" +
