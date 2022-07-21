@@ -276,20 +276,11 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        var output: Operand<Float> = input
-        val outputByLayerName = mutableMapOf<String, Operand<Float>>()
-        val outputs = mutableListOf<Operand<Float>>()
-        outputs.add(input)
-        outputByLayerName[inputLayer.name] = input
-        for (layer in layers) {
-            for (inboundLayer in layer.inboundLayers) {
-                outputs.add(outputByLayerName[inboundLayer.name]!!)
-            }
-            output = layer.forward(tf, outputs, training, numberOfLossesOp)
-            outputByLayerName[layer.name] = output
-            outputs.clear()
+        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to inputLayer.forward(tf, input, training, numberOfLossesOp))
+        for (layer in layers.filter { it !is Input }) {
+            output[layer] = layer.forward(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLossesOp)
         }
-        return output
+        return output[layers.last()]!!
     }
 
     override fun save(
