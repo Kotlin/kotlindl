@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -254,23 +255,24 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers() {
+    override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
         inputLayer.setOutputShape(inputLayer.build(tf))
+
+        val input = inputLayer.input
+        val output = mutableMapOf<Layer, Operand<Float>>(
+            inputLayer to inputLayer.forward(tf, input, training, numberOfLosses)
+        )
 
         layers.filter { it !is Input }.forEach { layer ->
             val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
             val outputShape = layer.build(tf, inputShapes)
             layer.setOutputShape(outputShape)
             logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
-        }
-    }
 
-    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to inputLayer.forward(tf, input, training, numberOfLossesOp))
-        for (layer in layers.filter { it !is Input }) {
-            output[layer] = layer.forward(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLossesOp)
+            output[layer] = layer.forward(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
         }
-        return output[layers.last()]!!
+
+        return input to output[layers.last()]!!
     }
 
     override fun save(
