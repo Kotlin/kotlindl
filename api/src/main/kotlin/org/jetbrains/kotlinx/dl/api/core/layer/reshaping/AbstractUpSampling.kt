@@ -27,8 +27,6 @@ public abstract class AbstractUpSampling(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
     override fun forward(
         tf: Ops,
         input: Operand<Float>,

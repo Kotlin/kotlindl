@@ -81,11 +81,8 @@ public class ZeroPadding3D : AbstractZeroPadding {
         this.padding = padding
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         this.inputShape = inputShape
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
         val dim1 = inputShape.size(1) + padding[0] + padding[1]
         val dim2 = inputShape.size(2) + padding[2] + padding[3]
         val dim3 = inputShape.size(3) + padding[4] + padding[5]

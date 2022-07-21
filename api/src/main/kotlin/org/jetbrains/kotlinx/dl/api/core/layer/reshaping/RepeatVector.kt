@@ -32,9 +32,7 @@ public class RepeatVector(
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         require(inputShape.numDimensions() == 2) {
             "Input tensor must have 2 dimensions but got ${inputShape.numDimensions()}"
         }

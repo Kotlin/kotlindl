@@ -125,7 +125,7 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         // Amount of channels should be the last value in the inputShape (make warning here)
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -168,9 +168,7 @@ public class SeparableConv2D(
                 biasRegularizer
             )
         }
-    }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(

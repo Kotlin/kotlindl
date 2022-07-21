@@ -76,12 +76,10 @@ public class ZeroPadding2D : AbstractZeroPadding {
         this.dataFormat = dataFormat ?: CHANNELS_LAST
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
-        this.inputShape = inputShape
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         require(inputShape.numDimensions() == 4) { "input tensor must have 4 dimensions" }
+
+        this.inputShape = inputShape
 
         return if (dataFormat == CHANNELS_FIRST) {
             Shape.make(

@@ -141,14 +141,12 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun buildLayers() {
-        inputLayer.build(tf)
-        var inputShape = inputLayer.computeOutputShape()
+        var inputShape = inputLayer.build(tf)
         inputLayer.setOutputShape(inputShape)
 
         layers.filter { it !is Input }.forEach { layer ->
-            layer.build(tf, inputShape)
+            inputShape = layer.build(tf, inputShape)
 
-            inputShape = layer.computeOutputShape(inputShape)
             layer.setOutputShape(inputShape)
             logger.debug { "${layer.name}; $layer; outputShape: $inputShape" }
         }

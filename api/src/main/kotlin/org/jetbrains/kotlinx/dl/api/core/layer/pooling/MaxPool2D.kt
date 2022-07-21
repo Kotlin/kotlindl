@@ -42,9 +42,7 @@ public class MaxPool2D(
         name = name
     )
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(

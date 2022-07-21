@@ -56,9 +56,7 @@ public class AvgPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         var steps = inputShape.size(1)
         steps = convOutputLength(steps, poolSize[1], padding, strides[1])
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))

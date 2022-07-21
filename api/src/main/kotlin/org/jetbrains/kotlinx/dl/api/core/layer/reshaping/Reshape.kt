@@ -30,15 +30,13 @@ public class Reshape(
 ) : Layer(name) {
     private lateinit var units: Constant<Int>
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         units = tf.constant(IntArray(targetShape.size + 1) {
             if (it == 0) -1 else targetShape[it - 1]
         })
+        // leaves unknown dimensions unknown
+        return Shape.make(inputShape.size(0), *targetShape.map { it.toLong() }.toLongArray())
     }
-
-    // leaves unknown dimensions unknown
-    override fun computeOutputShape(inputShape: Shape): Shape =
-        Shape.make(inputShape.size(0), *targetShape.map { it.toLong() }.toLongArray())
 
     override fun forward(
         tf: Ops,

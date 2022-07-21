@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
@@ -29,7 +28,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
     public var packedDims: LongArray = dims
 
-    override fun build(tf: Ops, inputShape: Shape) {}
+    override fun build(tf: Ops, inputShape: Shape): Shape = build(tf)
 
     /**
      * Extend this function to define placeholder in layer.
@@ -38,19 +37,13 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun build(tf: Ops) {
+    public fun build(tf: Ops): Shape {
         input = tf.withName(DATA_PLACEHOLDER).placeholder(
             getDType(),
             Placeholder.shape(Shape.make(-1L, *packedDims))
         )
+        return input.asOutput().shape()
     }
-
-    /**
-     * Computes output shape, based on [input] and [Layer] type.
-     *
-     * NOTE: Called instead of [Layer.computeOutputShape].
-     */
-    public fun computeOutputShape(): Shape = input.asOutput().shape()
 
     override fun forward(
         tf: Ops,
@@ -59,10 +52,6 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
         numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return input
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return inputShape
     }
 
     override val hasActivation: Boolean get() = false

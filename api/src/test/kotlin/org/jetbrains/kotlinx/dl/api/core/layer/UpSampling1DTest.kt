@@ -36,7 +36,7 @@ internal class UpSampling1DTest : LayerTest() {
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[1] * 2, inputShape[2])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 
     @Test
@@ -57,6 +57,6 @@ internal class UpSampling1DTest : LayerTest() {
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[1] * 3, inputShape[2])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

@@ -109,7 +109,7 @@ internal class UpSampling3DTest : LayerTest() {
         val expectedShape = longArrayOf(
             inputShape[0], inputShape[1] * 2, inputShape[2] * 2, inputShape[3] * 2, inputShape[4]
         )
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 
     @Test
@@ -145,6 +145,6 @@ internal class UpSampling3DTest : LayerTest() {
         val expectedShape = longArrayOf(
             inputShape[0], inputShape[1], inputShape[2] * 2, inputShape[3], inputShape[4]
         )
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

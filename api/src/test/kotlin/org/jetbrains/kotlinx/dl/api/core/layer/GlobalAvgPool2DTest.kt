@@ -49,6 +49,6 @@ internal class GlobalAvgPool2DTest : LayerTest() {
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[3])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

@@ -56,9 +56,7 @@ public class MaxPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         val steps = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }

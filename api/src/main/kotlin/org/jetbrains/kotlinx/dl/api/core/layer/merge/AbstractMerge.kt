@@ -20,15 +20,11 @@ import org.tensorflow.op.Ops
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
 public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
-    override fun build(tf: Ops, inputShape: Shape) {
-
+    override fun build(tf: Ops, inputShape: Shape): Shape {
+        throw UnsupportedOperationException("$layerTypeName is not supported in Sequential models.")
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        throw UnsupportedOperationException("$layerTypeName layer is not supported in Sequential models.")
-    }
-
-    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+    override fun build(tf: Ops, inputShapes: List<Shape>): Shape {
         checkInputShapes(inputShapes) //TODO: crash efficientNet models
         return inputShapes.first().copy()
     }

@@ -60,7 +60,7 @@ public class BatchNorm(
     override val variables: List<KVariable>
         get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         // Compute shapes of kernel and bias matrices
         val weightShape = Shape.make(inputShape.size(axis[0]))
 
@@ -112,9 +112,6 @@ public class BatchNorm(
                 betaRegularizer
             )
         }
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
         return inputShape
     }
 

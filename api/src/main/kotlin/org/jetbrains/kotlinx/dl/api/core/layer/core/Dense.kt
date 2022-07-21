@@ -62,7 +62,7 @@ public class Dense(
 
     override var isTrainable: Boolean = true
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         val fanOut = outputSize
 
@@ -89,9 +89,6 @@ public class Dense(
                 biasRegularizer
             )
         }
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
         return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
     }
 

@@ -24,9 +24,7 @@ public class GlobalMaxPool2D(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         return Shape.make(inputShape.size(0), inputShape.size(3))
     }
 

@@ -37,7 +37,7 @@ public class Cropping2D(
         }
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         return Shape.make(
             inputShape.size(0),
             inputShape.size(1) - cropping[0][0] - cropping[0][1],

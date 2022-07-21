@@ -54,6 +54,6 @@ class GlobalMaxPool3DTest : LayerTest() {
         )
         assertLayerOutputIsCorrect(layer, input, expected)
         val expectedShape = longArrayOf(inputShape[0], inputShape[4])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

@@ -44,6 +44,6 @@ internal class Cropping2DTest : LayerTest() {
         val expectedShape = longArrayOf(
             inputShape[0], inputShape[1] - 1, inputShape[2] - 1 - 2, inputShape[3]
         )
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

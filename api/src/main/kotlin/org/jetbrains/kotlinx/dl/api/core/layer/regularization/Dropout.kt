@@ -34,10 +34,7 @@ public class Dropout(
     name: String = ""
 ) : Layer(name), NoGradients {
 
-    override fun build(tf: Ops, inputShape: Shape) {
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         return inputShape
     }
 

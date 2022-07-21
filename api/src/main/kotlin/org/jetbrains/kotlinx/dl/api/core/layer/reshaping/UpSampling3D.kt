@@ -41,7 +41,7 @@ public class UpSampling3D(
         }
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         return Shape.make(
             inputShape.size(0),
             inputShape.size(1) * size[0],

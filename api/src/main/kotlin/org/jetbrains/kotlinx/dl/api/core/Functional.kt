@@ -97,7 +97,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             if (topModel is Sequential && layers.size > 1) {
                 // establish edges in DAG
                 topLayers.subList(1, topLayers.size).forEachIndexed { index, layer ->
-                    val topLayersIndex = index - 1 + 1 
+                    val topLayersIndex = index - 1 + 1
                     // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
                     layer.inboundLayers.add(topLayers[topLayersIndex])
                 }
@@ -255,13 +255,11 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun buildLayers() {
-        inputLayer.build(tf)
-        inputLayer.setOutputShape(inputLayer.computeOutputShape())
+        inputLayer.setOutputShape(inputLayer.build(tf))
 
         layers.filter { it !is Input }.forEach { layer ->
             val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
-            layer.build(tf, inputShapes)
-            val outputShape = layer.computeOutputShape(inputShapes)
+            val outputShape = layer.build(tf, inputShapes)
             layer.setOutputShape(outputShape)
             logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
         }

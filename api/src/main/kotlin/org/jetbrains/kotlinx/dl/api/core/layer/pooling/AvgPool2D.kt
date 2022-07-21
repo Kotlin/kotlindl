@@ -43,9 +43,7 @@ public class AvgPool2D(
         name = name
     )
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(

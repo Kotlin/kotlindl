@@ -35,7 +35,7 @@ class PReLUTest : LayerTest() {
 
         assertLayerOutputIsCorrect(layer, input, expected, RunMode.GRAPH)
         val expectedShape = inputShape
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 
     @Test
@@ -90,6 +90,6 @@ class PReLUTest : LayerTest() {
 
         assertLayerOutputIsCorrect(layer, input, expected, RunMode.GRAPH)
         val expectedShape = inputShape
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

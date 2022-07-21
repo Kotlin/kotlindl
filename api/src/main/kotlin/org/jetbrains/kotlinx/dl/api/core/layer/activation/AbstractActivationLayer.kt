@@ -41,9 +41,7 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         numberOfLosses: Operand<Float>?
     ): Operand<Float> = forward(tf, input)
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape = inputShape
+    override fun build(tf: Ops, inputShape: Shape): Shape = inputShape
 
     override val hasActivation: Boolean get() = true
 }

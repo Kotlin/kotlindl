@@ -56,9 +56,7 @@ public class AvgPool3D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         val dim1 = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
         val dim2 = convOutputLength(inputShape.size(2), poolSize[2], padding, strides[2])
         val dim3 = convOutputLength(inputShape.size(3), poolSize[3], padding, strides[3])

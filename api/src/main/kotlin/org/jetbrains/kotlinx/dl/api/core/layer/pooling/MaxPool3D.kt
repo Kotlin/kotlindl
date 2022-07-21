@@ -43,9 +43,7 @@ public class MaxPool3D(
         name = name
     )
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    override fun build(tf: Ops, inputShape: Shape): Shape {
         var lenDim1: Long = inputShape.size(1)
         var lenDim2: Long = inputShape.size(2)
         var lenDim3: Long = inputShape.size(3)

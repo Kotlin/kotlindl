@@ -25,7 +25,7 @@ public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
-    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+    override fun build(tf: Ops, inputShapes: List<Shape>): Shape {
         val newShapeArray = inputShapes.first().toLongArray()
 
         var axe = axis.takeIf { it != -1 /*it influences on nasmobilemodel*/ }

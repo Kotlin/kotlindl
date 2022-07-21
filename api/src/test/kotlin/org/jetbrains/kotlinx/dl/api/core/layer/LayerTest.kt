@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -30,7 +29,7 @@ open class LayerTest {
         input: Array<*>,
     ): Output<*> {
         val inputShape = input.shape
-        layer.build(tf, inputShape)
+        layer.setOutputShape(layer.build(tf, inputShape))
         val inputOp = getInputOp(tf, input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
@@ -95,21 +94,10 @@ open class LayerTest {
 
     /**
      * Checks the computed output shape of layer is equal to the expected output shape.
-     *
-     * Essentially, this method invokes the `computeOutputShape` of a layer instance ([layer])
-     * given an input shape array ([inputShapeArray]) and verifies its output is equal to the
-     * expected output shape ([expectedOutputShape]).
      */
-    protected fun assertLayerComputedOutputShape(
-        layer: Layer,
-        inputShapeArray: LongArray,
-        expectedOutputShape: LongArray,
-    ) {
-        val inputShape = shapeFromDims(*inputShapeArray)
-        val outputShape = layer.computeOutputShape(inputShape).toLongArray()
+    protected fun assertLayerComputedOutputShape(layer: Layer, expectedOutputShape: LongArray) {
         assertArrayEquals(
-            expectedOutputShape,
-            outputShape,
+            expectedOutputShape, layer.outputShape.dims(),
             "Computed output shape differs from expected output shape!",
         )
     }

@@ -30,39 +30,26 @@ public abstract class Layer(public var name: String) {
     public var outboundLayers: MutableList<Layer> = mutableListOf()
 
     /**
-     * Extend this function to define variables in layer.
+     * Extend this function to define variables in layer and compute output shape.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
+     * @param [inputShape] Shape of the input from previous layer.
+     * @returns output shape, based on [inputShape] and [Layer] type.
      */
-    public abstract fun build(tf: Ops, inputShape: Shape)
+    public abstract fun build(tf: Ops, inputShape: Shape): Shape
 
     /**
-     * Extend this function to define variables in layer.
+     * Extend this function to define variables in layer and compute output shape.
      *
      * NOTE: This function should be overridden for layers with multiple inputs.
      * NOTE: Used in Functional API
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShapes] Shapes of the inputs, result of [computeOutputShape] call from inbound layers.
+     * @param [inputShapes] Shapes of the inputs, result of [build] calls from inbound layers.
+     * @returns output shape, based on [inputShapes] and [Layer] type.
      */
-    public open fun build(tf: Ops, inputShapes: List<Shape>) {
-        build(tf, inputShapes.first())
-    }
-
-    /**
-     * Computes output shape, based on [inputShape] and [Layer] type.
-     */
-    public abstract fun computeOutputShape(inputShape: Shape): Shape
-
-    /**
-     * Computes output shape, based on [inputShapes] and [Layer] type.
-     *
-     * NOTE: This function should be overridden for layers with multiple inputs.
-     * NOTE: Used in Functional API
-     */
-    public open fun computeOutputShape(inputShapes: List<Shape>): Shape {
-        return computeOutputShape(inputShapes.first())
+    public open fun build(tf: Ops, inputShapes: List<Shape>): Shape {
+        return build(tf, inputShapes.first())
     }
 
     /**

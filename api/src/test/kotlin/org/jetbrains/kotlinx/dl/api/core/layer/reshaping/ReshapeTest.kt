@@ -59,37 +59,4 @@ internal class ReshapeTest : LayerTest() {
         assertLayerOutputIsCorrect(layer, input, expected)
         assertLayerOutputIsCorrect(layer, input, expected, RunMode.GRAPH)
     }
-
-    @Test
-    fun computeOutputShape() {
-        assertLayerComputedOutputShape(
-            layer = Reshape(targetShape = listOf(1, 2, 3)),
-            inputShapeArray = longArrayOf(100, 3, 2, 1),
-            expectedOutputShape = longArrayOf(100, 1, 2, 3)
-        )
-
-        assertLayerComputedOutputShape(
-            layer = Reshape(targetShape = listOf(1, 2, 3)),
-            inputShapeArray = longArrayOf(-1, 3, 2, 1),
-            expectedOutputShape = longArrayOf(-1, 1, 2, 3)
-        )
-
-        assertLayerComputedOutputShape(
-            layer = Reshape(targetShape = listOf(6)),
-            inputShapeArray = longArrayOf(100, 3, 2, 1),
-            expectedOutputShape = longArrayOf(100, 6)
-        )
-
-        assertLayerComputedOutputShape(
-            layer = Reshape(targetShape = listOf(4, 5)),
-            inputShapeArray = longArrayOf(100, 20),
-            expectedOutputShape = longArrayOf(100, 4, 5)
-        )
-
-        assertLayerComputedOutputShape(
-            layer = Reshape(targetShape = listOf(4, 5, 6, 7, 8, 9, 10)),
-            inputShapeArray = longArrayOf(100, 4 * 5 * 6, 7 * 10, 8 * 9),
-            expectedOutputShape = longArrayOf(100, 4, 5, 6, 7, 8, 9, 10)
-        )
-    }
 }
