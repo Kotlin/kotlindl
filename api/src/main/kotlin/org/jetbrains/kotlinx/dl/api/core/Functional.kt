@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
+import org.jetbrains.kotlinx.dl.api.core.layer.setOutputShape
 import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
@@ -257,21 +258,11 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.build(tf)
         inputLayer.computeOutputShape()
 
-        layers.filter { it !is Input }.forEach {
-            it.buildFromInboundLayers(tf)
-
-            val outputShape = it.computeOutputShapeFromInboundLayers()
-            val dims = outputShape.dims()
-
-            check(outputShape.tail().all { elem -> elem > 0 })
-            {
-                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
-                        "Analyze your model architecture and layer output shapes carefully to discover a problem."
-            }
-
-            it.outputShape = outputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
-
-            logger.debug { "${it.name}; outputShape: $outputShape $it" }
+        layers.filter { it !is Input }.forEach { layer ->
+            layer.buildFromInboundLayers(tf)
+            val outputShape = layer.computeOutputShapeFromInboundLayers()
+            layer.setOutputShape(outputShape)
+            logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
         }
     }
 

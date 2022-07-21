@@ -127,3 +127,16 @@ internal fun LongArray.toIntArray(): IntArray {
         else -> IntArray(size) { this[it].toInt() }
     }
 }
+
+internal fun Layer.setOutputShape(shape: Shape) {
+    setOutputShape(TensorShape(shape))
+}
+
+internal fun Layer.setOutputShape(tensorShape: TensorShape) {
+    check(tensorShape.tail().all { elem -> elem > 0 })
+    {
+        "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${tensorShape}.\n" +
+                "Analyze your model architecture and layer output shapes carefully to discover a problem."
+    }
+    outputShape = tensorShape
+}

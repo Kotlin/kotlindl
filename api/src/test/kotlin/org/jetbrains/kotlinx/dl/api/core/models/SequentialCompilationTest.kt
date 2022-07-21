@@ -670,7 +670,7 @@ internal class SequentialModelTest {
                 )
             }
             assertEquals(
-                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [-1, 0, 0, 128].\n" +
+                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [None, 0, 0, 128].\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem.",
                 exception.message
             )
