@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
@@ -125,7 +124,12 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Shape {
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape (make warning here)
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -169,26 +173,6 @@ public class SeparableConv2D(
             )
         }
 
-        var rows = inputShape.size(1)
-        var cols = inputShape.size(2)
-        rows = convOutputLength(
-            rows, kernelSize[0], padding,
-            strides[1], dilations[1]
-        )
-        cols = convOutputLength(
-            cols, kernelSize[1], padding,
-            strides[2], dilations[2]
-        )
-
-        return Shape.make(inputShape.size(0), rows, cols, filters.toLong())
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
         val paddingName = padding.paddingName
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toLongList()).dataFormat("NHWC")
 

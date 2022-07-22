@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Shape
-import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 1D input (e.g. audio).
@@ -17,7 +16,6 @@ import org.tensorflow.op.Ops
  */
 public class ZeroPadding1D : AbstractZeroPadding {
     public val padding: IntArray
-    private lateinit var inputShape: Shape
 
     /**
      * Constructs an instance of ZeroPadding1D layer
@@ -59,13 +57,7 @@ public class ZeroPadding1D : AbstractZeroPadding {
         this.padding = padding
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Shape {
-        this.inputShape = inputShape
-        val length = inputShape.size(1) + padding[0] + padding[1]
-        return Shape.make(inputShape.size(1), length, inputShape.size(2))
-    }
-
-    override fun paddingArrayToTfFormat(): Array<IntArray> {
+    override fun paddingArrayToTfFormat(inputShape: Shape): Array<IntArray> {
         return arrayOf(intArrayOf(0, 0), intArrayOf(padding[0], padding[1]), intArrayOf(0, 0))
     }
 

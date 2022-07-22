@@ -142,18 +142,13 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
-        var inputShape = inputLayer.build(tf)
-        inputLayer.setOutputShape(inputShape)
-        val input = inputLayer.input
-        var output = inputLayer.forward(tf, input, training, numberOfLossesOp)
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        var output: Operand<Float> = input
 
         layers.filter { it !is Input }.forEach { layer ->
-            inputShape = layer.build(tf, inputShape)
-
-            layer.setOutputShape(inputShape)
-            logger.debug { "${layer.name}; $layer; outputShape: $inputShape" }
-
-            output = layer.forward(tf, output, training, numberOfLossesOp)
+            output = layer.build(tf, output, training, numberOfLossesOp)
+            layer.setOutputShape(output.asOutput().shape())
         }
 
         return input to output

@@ -36,7 +36,7 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 4, inputShape[2])
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 4, inputShape[2])
         assertLayerComputedOutputShape(layer, expectedShape)
     }
 
@@ -57,7 +57,7 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 6, inputShape[2])
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 6, inputShape[2])
         assertLayerComputedOutputShape(layer, expectedShape)
     }
 
@@ -77,7 +77,7 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 5, inputShape[2])
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 5, inputShape[2])
         assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

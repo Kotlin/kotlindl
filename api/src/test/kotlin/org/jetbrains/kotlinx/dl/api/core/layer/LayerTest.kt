@@ -28,12 +28,11 @@ open class LayerTest {
         layer: Layer,
         input: Array<*>,
     ): Output<*> {
-        val inputShape = input.shape
-        layer.setOutputShape(layer.build(tf, inputShape))
         val inputOp = getInputOp(tf, input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
-        val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+        val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput()
+        layer.setOutputShape(output.shape())
         return output
     }
 

@@ -64,7 +64,12 @@ public abstract class AbstractConv(
     public override val variables: List<KVariable>
         get() = listOfNotNull(kernel, bias)
 
-    override fun build(tf: Ops, inputShape: Shape): Shape {
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -95,19 +100,9 @@ public abstract class AbstractConv(
                 biasRegularizer
             )
         }
-        return computeOutputShape(inputShape)
-    }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
         val convolution = convImplementation(tf, input)
-
         val withBias = bias?.let { tf.nn.biasAdd(convolution, it.variable) } ?: convolution
-
         return Activations.convert(activation).apply(tf, withBias, name)
     }
 
@@ -143,9 +138,6 @@ public abstract class AbstractConv(
 
     /** The actual layer operation implementation without adding the bias which is added by the abstract class. */
     protected abstract fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float>
-
-    /** Given [inputShape] return output shape.*/
-    protected abstract fun computeOutputShape(inputShape: Shape): Shape
 }
 
 private fun multiply(values: LongArray) = values.fold(1L, Long::times)

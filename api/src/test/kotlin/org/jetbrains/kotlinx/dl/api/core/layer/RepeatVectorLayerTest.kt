@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.Output
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 internal class RepeatVectorLayerTest {
@@ -46,10 +45,9 @@ internal class RepeatVectorLayerTest {
 
     // TODO: generalise this for Layer, see https://github.com/JetBrains/KotlinDL/issues/145
     private operator fun RepeatVector.invoke(input: Array<FloatArray>): Output<Float> = Ops.create().let { tf ->
-        build(tf, Shape.make(10, 10))
         val inputOp = tf.constant(input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
-        forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+        build(tf, inputOp, isTraining, numberOfLosses).asOutput()
     }
 }

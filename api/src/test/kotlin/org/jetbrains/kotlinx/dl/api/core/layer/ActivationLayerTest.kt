@@ -28,12 +28,10 @@ open class ActivationLayerTest {
         EagerSession.create().use {
             val tf = Ops.create(it)
             val inputOp = tf.constant(input)
-            val inputShape = inputOp.asOutput().shape()
-            layer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
 
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses)
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses)
             val actualShape = shapeFromDims(*output.asOutput().tensor().shape())
             assertEquals(expectedShape, actualShape)
 
@@ -59,15 +57,13 @@ open class ActivationLayerTest {
         expected: FloatArray
     ) {
         val inputSize = input.size
-        val inputShape = Shape.make(inputSize.toLong())
 
         EagerSession.create().use {
             val tf = Ops.create(it)
             val inputOp = tf.constant(input)
-            layer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
 
             val expectedShape = Shape.make(
                 inputSize.toLong()

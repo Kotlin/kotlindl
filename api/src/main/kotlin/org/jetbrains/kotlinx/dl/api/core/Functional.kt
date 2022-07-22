@@ -256,20 +256,14 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
-        inputLayer.setOutputShape(inputLayer.build(tf))
-
-        val input = inputLayer.input
-        val output = mutableMapOf<Layer, Operand<Float>>(
-            inputLayer to inputLayer.forward(tf, input, training, numberOfLosses)
-        )
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to input)
 
         layers.filter { it !is Input }.forEach { layer ->
-            val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
-            val outputShape = layer.build(tf, inputShapes)
-            layer.setOutputShape(outputShape)
-            logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
-
-            output[layer] = layer.forward(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
+            val out = layer.build(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
+            output[layer] = out
+            layer.setOutputShape(out.asOutput().shape())
         }
 
         return input to output[layers.last()]!!

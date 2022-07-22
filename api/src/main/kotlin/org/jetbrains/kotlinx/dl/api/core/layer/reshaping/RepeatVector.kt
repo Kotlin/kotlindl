@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -32,18 +31,10 @@ public class RepeatVector(
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Shape {
-        require(inputShape.numDimensions() == 2) {
-            "Input tensor must have 2 dimensions but got ${inputShape.numDimensions()}"
-        }
-        return Shape.make(inputShape.size(0), n.toLong(), inputShape.size(1))
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val x = tf.expandDims(input, tf.constant(1))
         val pattern = tf.stack(listOf(tf.constant(1), tf.constant(n), tf.constant(1)))

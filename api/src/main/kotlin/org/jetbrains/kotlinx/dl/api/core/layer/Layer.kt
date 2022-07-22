@@ -30,48 +30,33 @@ public abstract class Layer(public var name: String) {
     public var outboundLayers: MutableList<Layer> = mutableListOf()
 
     /**
-     * Extend this function to define variables in layer and compute output shape.
+     * Extend this function to define variables in the layer and compute layer output.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShape] Shape of the input from previous layer.
-     * @returns output shape, based on [inputShape] and [Layer] type.
+     * @param [input] Layer input.
+     * @param [isTraining] TensorFlow operand for switching between training and inference modes.
+     * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public abstract fun build(tf: Ops, inputShape: Shape): Shape
+    public abstract fun build(tf: Ops,
+                              input: Operand<Float>,
+                              isTraining: Operand<Boolean>,
+                              numberOfLosses: Operand<Float>?): Operand<Float>
 
     /**
-     * Extend this function to define variables in layer and compute output shape.
+     * Extend this function to define variables in the layer and compute layer output.
      *
      * NOTE: This function should be overridden for layers with multiple inputs.
      * NOTE: Used in Functional API
      *
-     * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShapes] Shapes of the inputs, result of [build] calls from inbound layers.
-     * @returns output shape, based on [inputShapes] and [Layer] type.
+     * @param [input] Layer input list.
+     * @param [isTraining] TensorFlow operand for switching between training and inference modes.
+     * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public open fun build(tf: Ops, inputShapes: List<Shape>): Shape {
-        return build(tf, inputShapes.first())
-    }
-
-    /**
-     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
-     */
-    public abstract fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float>
-
-    /**
-     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
-     */
-    public open fun forward(
-        tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return forward(tf, input[0], isTraining, numberOfLosses)
+    public open fun build(tf: Ops,
+                          input: List<Operand<Float>>,
+                          isTraining: Operand<Boolean>,
+                          numberOfLosses: Operand<Float>?): Operand<Float> {
+        return build(tf, input.first(), isTraining, numberOfLosses)
     }
 
     /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */

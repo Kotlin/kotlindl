@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -27,18 +26,17 @@ public abstract class AbstractUpSampling(
     override val hasActivation: Boolean
         get() = false
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return upSample(tf, input)
     }
 
     /**
      * The actual implementation of upsampling operation which each subclassed layer needs to
-     * implement. This method will then be called from [forward] method to upsample the input tensor.
+     * implement. This method will then be called from [build] method to upsample the input tensor.
      */
     protected abstract fun upSample(tf: Ops, input: Operand<Float>): Operand<Float>
 }

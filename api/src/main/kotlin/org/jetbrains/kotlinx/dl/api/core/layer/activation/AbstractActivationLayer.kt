@@ -6,9 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -34,14 +32,12 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         input: Operand<Float>
     ): Operand<Float>
 
-    override fun forward(
+    override fun build(
         tf: Ops,
         input: Operand<Float>,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float> = forward(tf, input)
-
-    override fun build(tf: Ops, inputShape: Shape): Shape = inputShape
 
     override val hasActivation: Boolean get() = true
 }

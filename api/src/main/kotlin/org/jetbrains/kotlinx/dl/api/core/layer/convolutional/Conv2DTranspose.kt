@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -107,6 +108,7 @@ public class Conv2DTranspose(
     }
 
     override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
+        val outputShape = TensorShape(computeOutputShape(input.asOutput().shape()))
         return tf.nn.conv2dBackpropInput(
             tf.shapeWithDynamicBatchSize(outputShape, input),
             kernel.variable,

@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -35,15 +34,6 @@ public class Cropping2D(
         require(cropping[0].size == 2 && cropping[1].size == 2) {
             "All elements of cropping should be arrays of size 2."
         }
-    }
-
-    override fun build(tf: Ops, inputShape: Shape): Shape {
-        return Shape.make(
-            inputShape.size(0),
-            inputShape.size(1) - cropping[0][0] - cropping[0][1],
-            inputShape.size(2) - cropping[1][0] - cropping[1][1],
-            inputShape.size(3)
-        )
     }
 
     override fun crop(tf: Ops, input: Operand<Float>): Operand<Float> {

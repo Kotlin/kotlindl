@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 private const val EPS: Float = 1e-6f
@@ -47,13 +46,10 @@ internal class AvgPool1DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, inputShape)
-
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, 2, input[0][0].size)
@@ -111,13 +107,10 @@ internal class AvgPool1DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, inputShape)
-
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, input[0].size, input[0][0].size)
@@ -171,13 +164,10 @@ internal class AvgPool1DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, inputShape)
-
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, 2, input[0][0].size)

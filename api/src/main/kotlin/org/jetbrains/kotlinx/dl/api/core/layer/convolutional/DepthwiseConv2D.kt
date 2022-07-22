@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
@@ -125,31 +124,6 @@ public class DepthwiseConv2D(
     ): Operand<Float> {
         val options = DepthwiseConv2dNative.dilations(dilations.toLongList()).dataFormat("NHWC")
         return tf.nn.depthwiseConv2dNative(input, kernel.variable, strides.toLongList(), padding.paddingName, options)
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val batchSize = inputShape.size(0)
-        val rowsCount = inputShape.size(1)
-        val colsCount = inputShape.size(2)
-        val channelsCount = inputShape.size(3)
-
-        val rows = convOutputLength(
-            rowsCount,
-            kernelSize[0],
-            padding,
-            strides[1],
-            dilations[1]
-        )
-        val cols = convOutputLength(
-            colsCount,
-            kernelSize[1],
-            padding,
-            strides[2],
-            dilations[2]
-        )
-        val filters = channelsCount * depthMultiplier
-
-        return Shape.make(batchSize, rows, cols, filters)
     }
 
     override fun toString(): String {

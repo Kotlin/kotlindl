@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.copy
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -20,29 +19,18 @@ import org.tensorflow.op.Ops
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
 public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
-    override fun build(tf: Ops, inputShape: Shape): Shape {
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         throw UnsupportedOperationException("$layerTypeName is not supported in Sequential models.")
     }
 
-    override fun build(tf: Ops, inputShapes: List<Shape>): Shape {
-        checkInputShapes(inputShapes) //TODO: crash efficientNet models
-        return inputShapes.first().copy()
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return input
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: List<Operand<Float>>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         checkInputShapes(input.map { it.asOutput().shape() }) //TODO: crash efficientNet models
         return tf.withName(layerTypeName).identity(mergeFunction(input, tf))

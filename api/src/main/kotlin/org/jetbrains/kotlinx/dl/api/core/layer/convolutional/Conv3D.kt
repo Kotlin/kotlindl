@@ -13,11 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv3d.dilations
 
@@ -122,37 +120,6 @@ public class Conv3D(
             padding.paddingName,
             options
         )
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val batchSize = inputShape.size(0)
-        val depthsCount = inputShape.size(1)
-        val rowsCount = inputShape.size(2)
-        val colsCount = inputShape.size(3)
-
-        val depths = convOutputLength(
-            depthsCount,
-            kernelSize[0],
-            padding,
-            strides[1],
-            dilations[1]
-        )
-        val rows = convOutputLength(
-            rowsCount,
-            kernelSize[1],
-            padding,
-            strides[2],
-            dilations[2]
-        )
-        val cols = convOutputLength(
-            colsCount,
-            kernelSize[2],
-            padding,
-            strides[3],
-            dilations[3]
-        )
-
-        return Shape.make(batchSize, depths, rows, cols, filters.toLong())
     }
 
     override fun toString(): String {

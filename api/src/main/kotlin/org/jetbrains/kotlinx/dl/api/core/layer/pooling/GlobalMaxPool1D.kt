@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -24,15 +23,10 @@ public class GlobalMaxPool1D(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops, inputShape: Shape): Shape {
-        return Shape.make(inputShape.size(0), inputShape.size(2))
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return tf.max(input, tf.constant(1))
     }

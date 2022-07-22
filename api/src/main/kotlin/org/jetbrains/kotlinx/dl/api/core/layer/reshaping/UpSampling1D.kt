@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -34,14 +33,6 @@ public class UpSampling1D(
         require(size > 0) {
             "The upsampling size should be a positive integer."
         }
-    }
-
-    override fun build(tf: Ops, inputShape: Shape): Shape {
-        return Shape.make(
-            inputShape.size(0),
-            inputShape.size(1) * size,
-            inputShape.size(2)
-        )
     }
 
     protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {

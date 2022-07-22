@@ -7,8 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
-import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -25,17 +23,6 @@ public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
-    override fun build(tf: Ops, inputShapes: List<Shape>): Shape {
-        val newShapeArray = inputShapes.first().toLongArray()
-
-        var axe = axis.takeIf { it != -1 /*it influences on nasmobilemodel*/ }
-            ?: newShapeArray.size + axis // to make axe positive
-
-        newShapeArray[axe] = inputShapes.sumOf { it.size(axe) } // concatenated dimension
-
-        return shapeFromDims(*newShapeArray)
-    }
-
     override fun checkInputShapes(inputShapes: List<Shape>) {
         require(inputShapes.size > 1) { "The number of input layers should be more than 1." }
         val firstInputShape = TensorShape(inputShapes.first())
