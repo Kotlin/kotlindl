@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
@@ -183,9 +182,7 @@ public class SeparableConv2D(
             strides[2], dilations[2]
         )
 
-        val shape = Shape.make(inputShape.size(0), rows, cols, filters.toLong())
-        outputShape = TensorShape(shape)
-        return shape
+        return Shape.make(inputShape.size(0), rows, cols, filters.toLong())
     }
 
     override fun forward(

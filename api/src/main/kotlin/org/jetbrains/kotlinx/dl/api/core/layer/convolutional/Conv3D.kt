@@ -124,7 +124,7 @@ public class Conv3D(
         )
     }
 
-    protected override fun defineOutputShape(inputShape: Shape): Shape {
+    override fun computeOutputShape(inputShape: Shape): Shape {
         val batchSize = inputShape.size(0)
         val depthsCount = inputShape.size(1)
         val rowsCount = inputShape.size(2)

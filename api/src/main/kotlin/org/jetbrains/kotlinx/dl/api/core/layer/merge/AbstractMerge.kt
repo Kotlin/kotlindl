@@ -29,8 +29,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
 
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
         checkInputShapesOfInboundLayers() //TODO: crash efficientNet models
-        outputShape = inboundLayers[0].outputShape.clone()
-        return outputShape
+        return inboundLayers[0].outputShape.clone()
     }
 
     override fun forward(

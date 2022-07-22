@@ -127,7 +127,7 @@ public class Conv1D(
         }
     }
 
-    protected override fun defineOutputShape(inputShape: Shape): Shape {
+    override fun computeOutputShape(inputShape: Shape): Shape {
         val batchSize = inputShape.size(0)
         val colsCount = inputShape.size(1)
 

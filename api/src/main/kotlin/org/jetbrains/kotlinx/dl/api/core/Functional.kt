@@ -256,7 +256,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
     override fun buildLayers() {
         inputLayer.build(tf)
-        inputLayer.computeOutputShape()
+        inputLayer.setOutputShape(inputLayer.computeOutputShape())
 
         layers.filter { it !is Input }.forEach { layer ->
             layer.buildFromInboundLayers(tf)

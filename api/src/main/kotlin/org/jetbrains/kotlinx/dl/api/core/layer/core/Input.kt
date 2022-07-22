@@ -50,10 +50,7 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
      *
      * NOTE: Called instead of [Layer.computeOutputShape].
      */
-    public fun computeOutputShape(): Shape {
-        outputShape = TensorShape(input.asOutput().shape())
-        return outputShape.toShape()
-    }
+    public fun computeOutputShape(): Shape = input.asOutput().shape()
 
     override fun forward(
         tf: Ops,

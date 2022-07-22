@@ -43,10 +43,7 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
 
     override fun build(tf: Ops, inputShape: Shape): Unit = Unit
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        this.outputShape = TensorShape(inputShape)
-        return inputShape
-    }
+    override fun computeOutputShape(inputShape: Shape): Shape = inputShape
 
     override val hasActivation: Boolean get() = true
 }

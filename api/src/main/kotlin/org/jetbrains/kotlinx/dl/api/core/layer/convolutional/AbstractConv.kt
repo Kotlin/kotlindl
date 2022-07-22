@@ -98,12 +98,6 @@ public abstract class AbstractConv(
         }
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val shape = defineOutputShape(inputShape)
-        outputShape = TensorShape(shape)
-        return shape
-    }
-
     override fun forward(
         tf: Ops,
         input: Operand<Float>,
@@ -149,15 +143,6 @@ public abstract class AbstractConv(
 
     /** The actual layer operation implementation without adding the bias which is added by the abstract class. */
     protected abstract fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float>
-
-    /**
-     * Actual implementation of [computeOutputShape] which only defines the value
-     * of output shape without the need of saving it to some variable.
-     *
-     * @param inputShape which can be used to define the output shape
-     * @return the defined output shape that is saved in class variable and returned by [computeOutputShape]]
-     */
-    protected abstract fun defineOutputShape(inputShape: Shape): Shape
 }
 
 private fun multiply(values: LongArray) = values.fold(1L, Long::times)
