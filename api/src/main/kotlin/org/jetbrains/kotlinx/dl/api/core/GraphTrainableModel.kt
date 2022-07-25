@@ -78,7 +78,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     private lateinit var predictionOp: Operand<Float>
 
     /** TensorFlow prediction operand. */
-    private lateinit var metricOps: MutableList<Operand<Float>>
+    private lateinit var metricOps: List<Operand<Float>>
 
     /** A list of targets to be optimized. */
     protected lateinit var targets: List<Operand<Float>>
@@ -185,10 +185,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             is SoftmaxCrossEntropyWithLogits -> tf.withName(OUTPUT_NAME).nn.softmax(yPredOp)
             else -> tf.withName(OUTPUT_NAME).identity(yPredOp)
         }
-        metricOps = mutableListOf()
-        metrics.forEach {
-            metricOps.add(it.apply(tf, predictionOp, yTrueOp, numberOfLossesOp))
-        }
+
+        metricOps = metrics.map { it.apply(tf, predictionOp, yTrueOp, numberOfLossesOp) }
 
         isModelCompiled = true
     }
@@ -435,7 +433,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         batchLabels: Tensor<Float>,
         numberOfLosses: Tensor<Float>,
         isTraining: Tensor<Float>,
-        metricOps: MutableList<Operand<Float>>
+        metricOps: List<Operand<Float>>
     ): Pair<Float, List<Float>> {
         val runner = session.runner()
 
