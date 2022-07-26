@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import kotlin.math.abs
@@ -24,8 +24,7 @@ public class Flatten(name: String = "") : Layer(name) {
                        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
-        val tensorShape = TensorShape(inputShape)
-        val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
+        val amountOfNeuronsInFlattenLayer = (inputShape.numElements() / abs(inputShape.size(0))).toInt()
         val units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))
         return tf.reshape(input, units)
     }

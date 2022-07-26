@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -25,9 +25,9 @@ public class Concatenate(
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
     override fun checkInputShapes(inputShapes: List<Shape>) {
         require(inputShapes.size > 1) { "The number of input layers should be more than 1." }
-        val firstInputShape = TensorShape(inputShapes.first())
+        val firstInputShape = inputShapes.first().toTensorShape()
         for ((index, inputShape)  in inputShapes.withIndex()) {
-            val currentInputShape = TensorShape(inputShape)
+            val currentInputShape = inputShape.toTensorShape()
             require(firstInputShape.almostEqual(currentInputShape, except = axis)) {
                 "A Concatenate layer requires inputs with matching shapes except for the concat axis $axis. " +
                         "But shapes are the following: shape of first input is $firstInputShape and shape at index $index is $currentInputShape."

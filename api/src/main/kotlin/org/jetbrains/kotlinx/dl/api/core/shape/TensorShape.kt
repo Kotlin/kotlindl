@@ -1,16 +1,14 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.shape
 
-import org.tensorflow.Shape
 import kotlin.math.abs
 
 /**
- * Helper wrapper of [Shape] class with helper methods.
- *
+ * Representation of the tensor shape class with helper methods.
  */
 public class TensorShape() {
     private lateinit var dims: LongArray
@@ -25,10 +23,6 @@ public class TensorShape() {
         public fun tail(vararg dims: Long): LongArray {
             return dims.copyOfRange(1, dims.size)
         }
-    }
-
-    public constructor(shape: Shape) : this() {
-        dims = dimsFromShape(shape)
     }
 
     /**
@@ -167,14 +161,6 @@ public class TensorShape() {
         return this
     }
 
-    private fun dimsFromShape(shape: Shape): LongArray {
-        val dims = LongArray(shape.numDimensions())
-        for (i in 0 until shape.numDimensions()) {
-            dims[i] = shape.size(i)
-        }
-        return dims
-    }
-
     private fun concatenate(first: LongArray, vararg last: Long): LongArray {
         val dims = LongArray(first.size + last.size)
         System.arraycopy(first, 0, dims, 0, first.size)
@@ -190,11 +176,6 @@ public class TensorShape() {
     /** Returns the tail dimension. */
     public fun tail(): LongArray {
         return dims.copyOfRange(1, dims.size)
-    }
-
-    /** Converts to [Shape] object. */
-    public fun toShape(): Shape {
-        return Shape.make(head(*dims), *tail(*dims))
     }
 
     override fun toString(): String {
@@ -232,3 +213,34 @@ public class TensorShape() {
         return almostEqual
     }
 }
+
+internal fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
+    fun appendPrimitiveArraySize(size: Int, acc: MutableList<Long>): LongArray {
+        acc += size.toLong()
+        return acc.toLongArray()
+    }
+
+    tailrec fun collectDims(data: Array<*>, acc: MutableList<Long>): LongArray {
+        val firstElem = data[0] ?: return acc.toLongArray()
+        acc += data.size.toLong()
+        return when (firstElem) {
+            is Array<*> -> collectDims(firstElem, acc)
+            is BooleanArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is ByteArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is CharArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is ShortArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is IntArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is LongArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is FloatArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            is DoubleArray -> appendPrimitiveArraySize(firstElem.size, acc)
+            else -> acc.toLongArray()
+        }
+    }
+    return collectDims(data, mutableListOf())
+}
+
+/**
+ * Get shape of array of arrays (of arrays...) of Array of elements of any type.
+ * If the most inner array does not have any elements its size is missed in result
+ */
+internal val Array<*>.tensorShape: TensorShape get() = TensorShape(getDimsOfArray(this))

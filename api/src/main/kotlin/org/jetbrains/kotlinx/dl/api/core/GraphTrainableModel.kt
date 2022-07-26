@@ -142,7 +142,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics) {
-        compile(optimizer, Losses.convert(loss), Metrics.convert(metric))
+        compile(optimizer, Losses.convert(loss), Metric.convert(metric))
     }
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metric) {
@@ -208,7 +208,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     override fun compile(optimizer: Optimizer, loss: LossFunction, metric: Metrics) {
-        compile(optimizer, loss, Metrics.convert(metric))
+        compile(optimizer, loss, Metric.convert(metric))
     }
 
     /** Common method for building model static graph layer by layer via calling build() method on each layer in correct order. */
@@ -405,7 +405,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
-                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metrics.convertBack(it)] }.toList()
+                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metric.convertBack(it)] }.toList()
                     // TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
@@ -553,7 +553,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         callbacks.forEach { it.onTestEnd(evaluationHistory) }
         val metricValues = mutableMapOf<Metrics, Double>() // TODO: Metrics -> Metric class
         metrics.forEachIndexed { index, metric ->
-            metricValues[Metrics.convertBack(metric)] = avgMetricValue[index].toDouble()
+            metricValues[Metric.convertBack(metric)] = avgMetricValue[index].toDouble()
         }
 
         return EvaluationResult(avgLossValue, metricValues)
@@ -796,7 +796,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         return longArrayOf(
             batchSize.toLong(),
-            *tail(xTensorShape)
+            *xTensorShape.tail()
         )
     }
 

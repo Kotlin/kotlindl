@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -44,7 +43,7 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         copiedModelName: String?,
         saveOptimizerState: Boolean,
         copyWeights: Boolean
-    ): TensorFlowInferenceModel {
+    ): InferenceModel {
         TODO("Not yet implemented")
     }
 

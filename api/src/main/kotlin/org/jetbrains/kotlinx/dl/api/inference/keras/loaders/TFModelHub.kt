@@ -225,7 +225,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         if (noTop) modelDirectory += "/notop"
 
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
-        val configURL = AWS_S3_URL + modelDirectory + MODEL_CONFIG_FILE_NAME
+        val configURL = awsS3Url + modelDirectory + MODEL_CONFIG_FILE_NAME
 
         val dir = File(cacheDirectory.absolutePath + modelDirectory)
         if (!dir.exists()) Files.createDirectories(dir.toPath())
@@ -249,7 +249,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
         if (noTop) modelDirectory += "/notop"
 
         val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
-        val weightsURL = AWS_S3_URL + modelDirectory + WEIGHTS_FILE_NAME
+        val weightsURL = awsS3Url + modelDirectory + WEIGHTS_FILE_NAME
 
         val fileName = cacheDirectory.absolutePath + relativeWeightsPath
         val file = File(fileName)
