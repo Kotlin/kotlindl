@@ -1,6 +1,7 @@
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api project(":api")
+    api project(":tensorflow")
     api project(":dataset")
     api project(":visualization")
     api project(":onnx")
@@ -27,6 +28,7 @@ if (publishedArtifactsVersion != null && !publishedArtifactsVersion.isBlank()) {
     configurations.all {
         resolutionStrategy.dependencySubstitution {
             substitute project(":api") using module("org.jetbrains.kotlinx:kotlin-deeplearning-api:$publishedArtifactsVersion") because "testing published artifacts"
+            substitute project(":tensorflow") using module("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:$publishedArtifactsVersion") because "testing published artifacts"
             substitute project(":dataset") using module("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:$publishedArtifactsVersion") because "testing published artifacts"
             substitute project(":visualization") using module("org.jetbrains.kotlinx:kotlin-deeplearning-visualization:$publishedArtifactsVersion") because "testing published artifacts"
             substitute project(":onnx") using module("org.jetbrains.kotlinx:kotlin-deeplearning-onnx:$publishedArtifactsVersion") because "testing published artifacts"
