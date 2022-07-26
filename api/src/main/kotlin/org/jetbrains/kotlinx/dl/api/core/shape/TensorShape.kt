@@ -214,7 +214,11 @@ public class TensorShape() {
     }
 }
 
-internal fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
+/**
+ * Get shape of array of arrays (of arrays...) of Array of elements of any type.
+ * If the most inner array does not have any elements its size is skipped in the result.
+ */
+public fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
     fun appendPrimitiveArraySize(size: Int, acc: MutableList<Long>): LongArray {
         acc += size.toLong()
         return acc.toLongArray()
@@ -240,7 +244,6 @@ internal fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
 }
 
 /**
- * Get shape of array of arrays (of arrays...) of Array of elements of any type.
- * If the most inner array does not have any elements its size is missed in result
+ * @see getDimsOfArray
  */
 internal val Array<*>.tensorShape: TensorShape get() = TensorShape(getDimsOfArray(this))

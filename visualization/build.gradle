@@ -3,6 +3,7 @@ project.setDescription("This module contains the Kotlin API for visualization of
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api project(":api")
+    api project(":tensorflow")
 }
 
 dependencies {
