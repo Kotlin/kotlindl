@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,7 +10,6 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 
 /**
  * Common preprocessing functions for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
@@ -154,7 +153,7 @@ public fun reshapeInput(inputData: FloatArray, imageShape: LongArray): Array<Arr
 
 /** Returns top-5 labels for the given [data] encoded with mapping [imageNetClassLabels]. */
 public fun predictTop5ImageNetLabels(
-    it: TensorFlowInferenceModel,
+    it: InferenceModel,
     data: FloatArray,
     imageNetClassLabels: MutableMap<Int, String>,
 ): List<Pair<String, Float>> {

@@ -7,10 +7,8 @@ package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -48,7 +46,7 @@ public class ImageRecognitionModel(
         copiedModelName: String?,
         saveOptimizerState: Boolean,
         copyWeights: Boolean
-    ): TensorFlowInferenceModel {
+    ): InferenceModel {
         TODO("Not yet implemented")
     }
 

@@ -11,7 +11,6 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import java.nio.*
 import java.util.*
 
@@ -104,7 +103,7 @@ public open class OnnxInferenceModel : InferenceModel() {
         copiedModelName: String?,
         saveOptimizerState: Boolean,
         copyWeights: Boolean
-    ): TensorFlowInferenceModel {
+    ): InferenceModel {
         TODO("Not yet implemented")
     }
 
