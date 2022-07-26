@@ -24,7 +24,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        throw UnsupportedOperationException("This layer is not supported for Sequential model!")
+        throw UnsupportedOperationException("$layerTypeName layer is not supported in Sequential models.")
     }
 
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
