@@ -89,11 +89,8 @@ public class ONNXModelHub(cacheDirectory: File) :
         }
 
         val inferenceModel = modelType.createModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
-
-        return OnnxInferenceModel.initializeONNXModel(
-            inferenceModel,
-            *executionProviders
-        ) as T
+        inferenceModel.initializeWith(*executionProviders)
+        return inferenceModel as T
     }
 }
 

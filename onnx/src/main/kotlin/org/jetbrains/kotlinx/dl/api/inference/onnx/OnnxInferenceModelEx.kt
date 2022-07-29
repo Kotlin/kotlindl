@@ -11,7 +11,7 @@ public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
     vararg providers: ExecutionProvider,
     block: (OnnxInferenceModel) -> R
 ): R {
-    this.reinitializeWith(*providers)
+    this.initializeWith(*providers)
     return this.use(block)
 }
 
@@ -19,7 +19,7 @@ public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
     providers: List<ExecutionProvider>,
     block: (OnnxInferenceModel) -> R
 ): R {
-    this.reinitializeWith(*providers.toTypedArray())
+    this.initializeWith(*providers.toTypedArray())
     return this.use(block)
 }
 
@@ -27,7 +27,7 @@ public inline fun <R> OnnxInferenceModel.inferUsing(
     vararg providers: ExecutionProvider,
     block: (OnnxInferenceModel) -> R
 ): R {
-    this.reinitializeWith(*providers)
+    this.initializeWith(*providers)
     return this.run(block)
 }
 
@@ -35,6 +35,6 @@ public inline fun <R> OnnxInferenceModel.inferUsing(
     providers: List<ExecutionProvider>,
     block: (OnnxInferenceModel) -> R
 ): R {
-    this.reinitializeWith(*providers.toTypedArray())
+    this.initializeWith(*providers.toTypedArray())
     return this.run(block)
 }

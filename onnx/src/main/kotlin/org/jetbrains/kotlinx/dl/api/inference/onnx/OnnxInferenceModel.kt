@@ -66,21 +66,38 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
             val model = OnnxInferenceModel(pathToModel)
-
-            return initializeONNXModel(model, *executionProviders)
-        }
-
-        internal fun initializeONNXModel(
-            model: OnnxInferenceModel,
-            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
-        ): OnnxInferenceModel {
-            require(!model::session.isInitialized) { "The model $model is initialized!" }
-
-            model.reinitializeWith(*executionProviders)
-            model.initInputOutputInfo()
-
+            model.initializeWith(*executionProviders)
             return model
         }
+    }
+
+    /**
+     * Initializes the model, if it's not initialized, or re-initializes it, depending on the execution providers.
+     *
+     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
+     * This method allows to set the execution provider to use.
+     * If the model is already initialized, internal session will be closed and new one will be created.
+     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
+     * If execution provider is not supported, an exception will be thrown.
+     * If empty list is passed, the model will be initialized with CPU execution provider.
+     *
+     * @param executionProviders list of execution providers to use.
+     */
+    public fun initializeWith(vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))) {
+        val uniqueProviders = collectProviders(executionProviders)
+
+        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
+            return
+        }
+
+        if (::session.isInitialized) {
+            session.close()
+        }
+
+        session = env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
+        executionProvidersInUse = uniqueProviders
+
+        initInputOutputInfo()
     }
 
     private fun initInputOutputInfo() {
@@ -102,16 +119,22 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
         outputDataType = outputTensorInfo.type
     }
 
-    /**
-     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
-     * This method allows to set the execution provider to use.
-     * If the model is already initialized, internal session will be closed and new one will be created.
-     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
-     * If execution provider is not supported, an exception will be thrown.
-     * If empty list is passed, the model will be initialized with CPU execution provider.
-     * @param executionProviders list of execution providers to use.
-     */
-    public fun reinitializeWith(vararg executionProviders: ExecutionProvider) {
+    private fun buildSessionOptions(uniqueProviders: List<ExecutionProvider>): SessionOptions {
+        val sessionOptions = SessionOptions()
+        for (provider in uniqueProviders) {
+            when (provider) {
+                is CUDA -> {
+                    sessionOptions.addCUDA(provider.deviceId)
+                }
+                is CPU -> {
+                    sessionOptions.addCPU(provider.useBFCArenaAllocator)
+                }
+            }
+        }
+        return sessionOptions
+    }
+
+    private fun collectProviders(executionProviders: Array<out ExecutionProvider>): List<ExecutionProvider> {
         for (executionProvider in executionProviders) {
             require(executionProvider.internalProviderId in OrtEnvironment.getAvailableProviders()) {
                 "The optimized execution provider $executionProvider is not available in the current environment!"
@@ -138,30 +161,7 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             }
             else -> throw IllegalArgumentException("Unable to use CPU(useArena = true) and CPU(useArena = false) at the same time!")
         }
-
-        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
-            return
-        }
-
-        if (::session.isInitialized) {
-            session.close()
-        }
-
-        val sessionOptions = SessionOptions()
-        for (provider in uniqueProviders) {
-            when (provider) {
-                is CUDA -> {
-                    sessionOptions.addCUDA(provider.deviceId)
-                }
-                is CPU -> {
-                    sessionOptions.addCPU(provider.useBFCArenaAllocator)
-                }
-            }
-        }
-
-        session = env.createSession(pathToModel, sessionOptions)
-
-        executionProvidersInUse = uniqueProviders
+        return uniqueProviders
     }
 
     /**
