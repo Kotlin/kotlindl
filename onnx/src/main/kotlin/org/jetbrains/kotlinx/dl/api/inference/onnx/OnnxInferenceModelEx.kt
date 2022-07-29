@@ -1,13 +1,14 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
+
 
 /**
  * Convenience extension functions for inference of ONNX models using different execution providers.
  */
 
 public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
-    vararg providers: ExecutionProviders.ExecutionProvider,
+    vararg providers: ExecutionProvider,
     block: (OnnxInferenceModel) -> R
 ): R {
     this.reinitializeWith(*providers)
@@ -15,7 +16,7 @@ public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
 }
 
 public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
-    providers: List<ExecutionProviders.ExecutionProvider>,
+    providers: List<ExecutionProvider>,
     block: (OnnxInferenceModel) -> R
 ): R {
     this.reinitializeWith(*providers.toTypedArray())
@@ -23,7 +24,7 @@ public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
 }
 
 public inline fun <R> OnnxInferenceModel.inferUsing(
-    vararg providers: ExecutionProviders.ExecutionProvider,
+    vararg providers: ExecutionProvider,
     block: (OnnxInferenceModel) -> R
 ): R {
     this.reinitializeWith(*providers)
@@ -31,9 +32,9 @@ public inline fun <R> OnnxInferenceModel.inferUsing(
 }
 
 public inline fun <R> OnnxInferenceModel.inferUsing(
-    providers: List<ExecutionProviders.ExecutionProvider>,
+    providers: List<ExecutionProvider>,
     block: (OnnxInferenceModel) -> R
 ): R {
     this.reinitializeWith(*providers.toTypedArray())
-    return this.use(block)
+    return this.run(block)
 }

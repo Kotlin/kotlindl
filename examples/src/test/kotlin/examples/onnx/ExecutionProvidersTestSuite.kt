@@ -1,14 +1,18 @@
 package examples.onnx
 
 import examples.onnx.cv.runImageRecognitionPrediction
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider.CPU
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider.CUDA
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.assertThrows
+import java.io.File
 
 class ExecutionProvidersTestSuite {
     private fun resnetModelsInference(executionProvider: ExecutionProvider) {
@@ -50,5 +54,47 @@ class ExecutionProvidersTestSuite {
     @Disabled("CUDA environment should be set up for this test")
     fun cudaTest() {
         resnetModelsInference(CUDA())
+    }
+    @Test
+    fun executorProvidersComparisonTest() {
+        assertEquals(CPU(), CPU(true))
+
+        assertNotEquals(CPU(), CPU(false))
+
+        assertNotEquals(CUDA(), CUDA(1))
+
+        assertEquals(
+            listOf(CPU(), CUDA()),
+            listOf(CPU(), CUDA())
+        )
+
+        assertNotEquals(
+            listOf(CPU(), CUDA()),
+            listOf(CPU(false), CUDA())
+        )
+    }
+
+    @Test
+    fun executionProvidersDuplicatesTest() {
+        val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+        val model = modelHub.loadModel(ONNXModels.CV.ResNet18())
+
+        model.use {
+            assertDoesNotThrow {
+                model.reinitializeWith(CPU(), CPU(), CPU())
+            }
+        }
+    }
+
+    @Test
+    fun twoCpuExecutorsWithDifferentAllocatorsTest() {
+        val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+        val model = modelHub.loadModel(ONNXModels.CV.ResNet18())
+
+        model.use {
+            assertThrows<IllegalArgumentException> {
+                model.reinitializeWith(CPU(), CPU(false))
+            }
+        }
     }
 }

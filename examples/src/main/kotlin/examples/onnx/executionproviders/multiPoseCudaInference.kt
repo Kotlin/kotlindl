@@ -8,7 +8,7 @@ package examples.onnx.executionproviders
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProviders.ExecutionProvider.CUDA
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -25,7 +25,7 @@ import java.io.File
 fun multiPoseCudaInference() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.PoseDetection.MoveNetMultiPoseLighting
-    val model = modelHub.loadModel(modelType)
+    val model = modelHub.loadModel(modelType, CUDA())
 
     model.inferUsing(CUDA(0)) {
         println(it)

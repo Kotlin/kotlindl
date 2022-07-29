@@ -13,6 +13,8 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -53,18 +55,7 @@ public class ONNXModelHub(cacheDirectory: File) :
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
-            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + NO_TOP_PREFIX + MODEL_FILE_EXTENSION
-        } else {
-            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
-        }
-
-        val inferenceModel = modelType.preInit()
-
-        return OnnxInferenceModel.initializeONNXModel(
-            inferenceModel as OnnxInferenceModel,
-            getONNXModelFile(modelFile, loadingMode).absolutePath
-        ) as T
+        return loadModel(modelType, CPU(), loadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS)
     }
 
     private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
@@ -83,8 +74,28 @@ public class ONNXModelHub(cacheDirectory: File) :
 
         return File(fileName)
     }
-}
 
+    @Suppress("UNCHECKED_CAST")
+    public fun <T : InferenceModel, U : InferenceModel> loadModel(
+        modelType: ModelType<T, U>,
+        vararg executionProviders: ExecutionProvider,
+        loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
+    ): T {
+        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
+            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + NO_TOP_PREFIX + MODEL_FILE_EXTENSION
+        } else {
+            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
+        }
+
+        val inferenceModel = modelType.preInit()
+
+        return OnnxInferenceModel.initializeONNXModel(
+            inferenceModel as OnnxInferenceModel,
+            getONNXModelFile(modelFile, loadingMode).absolutePath,
+            *executionProviders
+        ) as T
+    }
+}
 
 
 
