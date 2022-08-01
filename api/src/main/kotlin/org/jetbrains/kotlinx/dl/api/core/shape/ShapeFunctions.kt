@@ -74,33 +74,11 @@ internal fun Shape.copy(): Shape {
  * Get shape of array of arrays (of arrays...) of Array of elems of any type.
  * If the most inner array does not have any elements its size is missed in result */
 private fun getShapeOfArray(data: Array<*>): Shape {
-    fun appendPrimitiveArraySize(size: Int, acc: MutableList<Long>): LongArray {
-        acc += size.toLong()
-        return acc.toLongArray()
-    }
-
-    tailrec fun collectDims(data: Array<*>, acc: MutableList<Long>): LongArray {
-        val firstElem = data[0] ?: return acc.toLongArray()
-        acc += data.size.toLong()
-        return when (firstElem) {
-            is Array<*> -> collectDims(firstElem, acc)
-            is BooleanArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is ByteArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is CharArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is ShortArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is IntArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is LongArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is FloatArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            is DoubleArray -> appendPrimitiveArraySize(firstElem.size, acc)
-            else -> acc.toLongArray()
-        }
-    }
-    return shapeFromDims(*collectDims(data, mutableListOf()))
+    return shapeFromDims(*getDimsOfArray(data))
 }
 
 /**
- * Get shape of array of arrays (of arrays...) of Array of elems of any type.
- * If the most inner array does not have any elements its size is missed in result
+ * @see tensorShape
  */
 internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
 
