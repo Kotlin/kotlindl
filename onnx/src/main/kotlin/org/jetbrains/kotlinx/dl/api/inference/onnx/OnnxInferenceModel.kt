@@ -34,7 +34,7 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
      */
-    private lateinit var env: OrtEnvironment
+    private val env = OrtEnvironment.getEnvironment()
 
     /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
@@ -74,10 +74,7 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             model: OnnxInferenceModel,
             vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
-            require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
-
-            model.env = OrtEnvironment.getEnvironment()
 
             model.reinitializeWith(*executionProviders)
             model.initInputOutputInfo()
@@ -115,7 +112,6 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
      * @param executionProviders list of execution providers to use.
      */
     public fun reinitializeWith(vararg executionProviders: ExecutionProvider) {
-        require(::env.isInitialized) { "The model $this is not initialized!" }
         for (executionProvider in executionProviders) {
             require(executionProvider.internalProviderId in OrtEnvironment.getAvailableProviders()) {
                 "The optimized execution provider $executionProvider is not available in the current environment!"
