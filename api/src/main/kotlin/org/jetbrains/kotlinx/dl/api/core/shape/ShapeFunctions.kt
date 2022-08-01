@@ -100,21 +100,3 @@ internal fun numElementsInShape(shape: LongArray): Long {
     }
     return prod
 }
-
-/**
- * Flattens the given array of float values.
- * @return flattened array
- */
-public fun Array<*>.flattenFloats(): FloatArray {
-    val result = mutableListOf<Float>()
-
-    fun flatten(array: Any?): Unit = when (array) {
-        is FloatArray -> array.forEach { result.add(it) }
-        is Array<*> -> array.forEach { flatten(it) }
-        else -> throw IllegalArgumentException("Cannot flatten object: '$array'")
-    }
-
-    flatten(this)
-
-    return result.toFloatArray()
-}

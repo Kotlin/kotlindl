@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import org.jetbrains.kotlinx.dl.api.core.shape.flattenFloats
+import org.jetbrains.kotlinx.dl.api.core.util.flattenFloats
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
 /**
