@@ -796,7 +796,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         return longArrayOf(
             batchSize.toLong(),
-            *tail(xTensorShape)
+            *xTensorShape.tail()
         )
     }
 

@@ -172,7 +172,7 @@ fun main() {
             val xTensorShape = it.inputLayer.input.asOutput().shape()
             val tensorShape = longArrayOf(
                 1,
-                *tail(xTensorShape)
+                *xTensorShape.tail()
             )
 
             val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)

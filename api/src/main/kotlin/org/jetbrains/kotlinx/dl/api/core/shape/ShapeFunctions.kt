@@ -19,29 +19,17 @@ internal fun constArray(tf: Ops, vararg data: Int): Operand<Int> {
 
 /** Creates shape [Operand] from [Shape]. */
 internal fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
-    val shapeArray = IntArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i).toInt()
-    }
-    return tf.constant(shapeArray)
+    return tf.constant(shape.toIntArray())
 }
 
 /** Extracts dimensions as [IntArray] from [Shape]. */
 internal fun Shape.toIntArray(): IntArray {
-    val shapeArray = IntArray(numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = size(i).toInt()
-    }
-    return shapeArray
+    return IntArray(numDimensions()) { size(it).toInt() }
 }
 
 /** Extracts dimensions as [LongArray] from [Shape]. */
 internal fun Shape.toLongArray(): LongArray {
-    val shapeArray = LongArray(numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = size(i)
-    }
-    return shapeArray
+    return LongArray(numDimensions()) { size(it) }
 }
 
 /** Extracts dimensions as a [String] from [Shape]. */
@@ -49,58 +37,26 @@ internal fun Shape.contentToString(): String {
     return toLongArray().contentToString()
 }
 
-/** Returns first dimension from all dimensions [dims]. */
-internal fun head(vararg dims: Long): Long {
-    return dims[0]
+/** Returns first dimension */
+public fun Shape.head(): Long {
+    return size(0)
 }
 
-/** Returns last dimensions (except first) from [dims]. */
-internal fun tail(vararg dims: Long): LongArray {
-    return dims.copyOfRange(1, dims.size)
+/** Returns last dimensions (except first). */
+public fun Shape.tail(): LongArray {
+    return LongArray(numDimensions() - 1) { size(it + 1) }
 }
 
-/** Returns last dimensions (except first) from [shape]. */
-public fun tail(shape: Shape): LongArray {
-    val shapeArray = LongArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i)
-    }
-    return tail(*shapeArray)
-}
+/** Returns amount of elements in [Shape]. */
+internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
 
 /** Creates [Shape] object from a few [Long] values in [dims]. */
 internal fun shapeFromDims(vararg dims: Long): Shape {
     return Shape.make(head(*dims), *tail(*dims))
 }
 
-/** Returns amount of elements in Tensor with [shape]. */
-internal fun numElementsInShape(shape: LongArray): Long {
-    var prod = 1L
-    for (i in shape.indices) {
-        prod *= abs(shape[i])
-    }
-    return prod
-}
-
-/** Returns amount of elements in [Shape]. */
-internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
-
-/**
- * Flattens the given array of float values.
- * @return flattened array
- */
-public fun Array<*>.flattenFloats(): FloatArray {
-    val result = mutableListOf<Float>()
-
-    fun flatten(array: Any?): Unit = when (array) {
-        is FloatArray -> array.forEach { result.add(it) }
-        is Array<*> -> array.forEach { flatten(it) }
-        else -> throw IllegalArgumentException("Cannot flatten object: '$array'")
-    }
-
-    flatten(this)
-
-    return result.toFloatArray()
+internal fun Shape.copy(): Shape {
+    return Shape.make(head(), *tail())
 }
 
 /**
@@ -137,6 +93,39 @@ private fun getShapeOfArray(data: Array<*>): Shape {
  */
 internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
 
-internal fun Shape.copy(): Shape {
-    return Shape.make(size(0), *tail(this))
+/** Returns first dimension from all dimensions [dims]. */
+internal fun head(vararg dims: Long): Long {
+    return dims[0]
+}
+
+/** Returns last dimensions (except first) from [dims]. */
+internal fun tail(vararg dims: Long): LongArray {
+    return dims.copyOfRange(1, dims.size)
+}
+
+/** Returns amount of elements in Tensor with [shape]. */
+internal fun numElementsInShape(shape: LongArray): Long {
+    var prod = 1L
+    for (i in shape.indices) {
+        prod *= abs(shape[i])
+    }
+    return prod
+}
+
+/**
+ * Flattens the given array of float values.
+ * @return flattened array
+ */
+public fun Array<*>.flattenFloats(): FloatArray {
+    val result = mutableListOf<Float>()
+
+    fun flatten(array: Any?): Unit = when (array) {
+        is FloatArray -> array.forEach { result.add(it) }
+        is Array<*> -> array.forEach { flatten(it) }
+        else -> throw IllegalArgumentException("Cannot flatten object: '$array'")
+    }
+
+    flatten(this)
+
+    return result.toFloatArray()
 }
