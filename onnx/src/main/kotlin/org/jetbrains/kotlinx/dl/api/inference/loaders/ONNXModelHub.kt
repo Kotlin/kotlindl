@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import java.io.File
@@ -55,7 +56,7 @@ public class ONNXModelHub(cacheDirectory: File) :
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        return loadModel(modelType, CPU(), loadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS)
+        return loadModel(modelType as OnnxModelType<T, U>, CPU(), loadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS)
     }
 
     private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
@@ -77,7 +78,7 @@ public class ONNXModelHub(cacheDirectory: File) :
 
     @Suppress("UNCHECKED_CAST")
     public fun <T : InferenceModel, U : InferenceModel> loadModel(
-        modelType: ModelType<T, U>,
+        modelType: OnnxModelType<T, U>,
         vararg executionProviders: ExecutionProvider,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
     ): T {
@@ -90,7 +91,7 @@ public class ONNXModelHub(cacheDirectory: File) :
         val inferenceModel = modelType.preInit()
 
         return OnnxInferenceModel.initializeONNXModel(
-            inferenceModel as OnnxInferenceModel,
+            inferenceModel,
             getONNXModelFile(modelFile, loadingMode).absolutePath,
             *executionProviders
         ) as T

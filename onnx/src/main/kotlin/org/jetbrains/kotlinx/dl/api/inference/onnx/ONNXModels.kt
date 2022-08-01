@@ -30,12 +30,12 @@ public object ONNXModels {
         override val inputColorMode: ColorMode = ColorMode.RGB,
         /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
         internal var noTop: Boolean = false
-    ) : ModelType<T, ImageRecognitionModel> {
+    ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(modelHub.loadModel(this), this)
         }
 
-        override fun preInit(): InferenceModel {
+        override fun preInit(): OnnxInferenceModel {
             return OnnxInferenceModel()
         }
 
@@ -620,7 +620,7 @@ public object ONNXModels {
         override val channelsFirst: Boolean = true,
         override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
-        ModelType<T, U> {
+        OnnxModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD]).
@@ -973,7 +973,7 @@ public object ONNXModels {
         override val channelsFirst: Boolean = true,
         override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
-        ModelType<T, U> {
+        OnnxModelType<T, U> {
         /**
          * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
          *
@@ -1006,7 +1006,7 @@ public object ONNXModels {
         override val channelsFirst: Boolean = true,
         override val inputColorMode: ColorMode = ColorMode.RGB
     ) :
-        ModelType<T, U> {
+        OnnxModelType<T, U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
          * (edges are available in [org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.edgeKeyPointsPairs]
@@ -1118,6 +1118,13 @@ public object ONNXModels {
             }
         }
     }
+}
+
+/**
+ * Base type for [OnnxInferenceModel].
+ */
+public interface OnnxModelType<T : InferenceModel, U : InferenceModel> : ModelType<T, U> {
+    public fun preInit(): OnnxInferenceModel
 }
 
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
