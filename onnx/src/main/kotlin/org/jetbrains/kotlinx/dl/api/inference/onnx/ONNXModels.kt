@@ -35,8 +35,8 @@ public object ONNXModels {
             return ImageRecognitionModel(modelHub.loadModel(this), this)
         }
 
-        override fun createModel(): OnnxInferenceModel {
-            return OnnxInferenceModel()
+        override fun createModel(pathToModel: String): OnnxInferenceModel {
+            return OnnxInferenceModel(pathToModel)
         }
 
         /**
@@ -659,8 +659,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as SSDObjectDetectionModel
             }
 
-            override fun createModel(): SSDObjectDetectionModel {
-                return SSDObjectDetectionModel()
+            override fun createModel(pathToModel: String): SSDObjectDetectionModel {
+                return SSDObjectDetectionModel(pathToModel)
             }
         }
 
@@ -699,8 +699,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as SSDMobileNetV1ObjectDetectionModel
             }
 
-            override fun createModel(): SSDMobileNetV1ObjectDetectionModel {
-                val model = SSDMobileNetV1ObjectDetectionModel()
+            override fun createModel(pathToModel: String): SSDMobileNetV1ObjectDetectionModel {
+                val model = SSDMobileNetV1ObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 1000L, 1000L, 3L)
                 return model
             }
@@ -737,8 +737,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 512L, 512L, 3L)
                 return model
             }
@@ -774,8 +774,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 640L, 640L, 3L)
                 return model
             }
@@ -811,8 +811,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 768L, 768L, 3L)
                 return model
             }
@@ -848,8 +848,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 896L, 896L, 3L)
                 return model
             }
@@ -885,8 +885,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 1024L, 1024L, 3L)
                 return model
             }
@@ -922,8 +922,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
                 return model
             }
@@ -959,8 +959,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as EfficientDetObjectDetectionModel
             }
 
-            override fun createModel(): EfficientDetObjectDetectionModel {
-                val model = EfficientDetObjectDetectionModel()
+            override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
+                val model = EfficientDetObjectDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
                 return model
             }
@@ -994,8 +994,8 @@ public object ONNXModels {
                 return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
             }
 
-            override fun createModel(): OnnxInferenceModel {
-                return OnnxInferenceModel()
+            override fun createModel(pathToModel: String): OnnxInferenceModel {
+                return OnnxInferenceModel(pathToModel)
             }
         }
     }
@@ -1037,8 +1037,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as SinglePoseDetectionModel
             }
 
-            override fun createModel(): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel()
+            override fun createModel(pathToModel: String): SinglePoseDetectionModel {
+                return SinglePoseDetectionModel(pathToModel)
             }
         }
 
@@ -1076,8 +1076,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as MultiPoseDetectionModel
             }
 
-            override fun createModel(): MultiPoseDetectionModel {
-                val model = MultiPoseDetectionModel()
+            override fun createModel(pathToModel: String): MultiPoseDetectionModel {
+                val model = MultiPoseDetectionModel(pathToModel)
                 model.inputShape = longArrayOf(1L, 256L, 256L, 3L)
                 return model
             }
@@ -1113,8 +1113,8 @@ public object ONNXModels {
                 return modelHub.loadModel(this) as SinglePoseDetectionModel
             }
 
-            override fun createModel(): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel()
+            override fun createModel(pathToModel: String): SinglePoseDetectionModel {
+                return SinglePoseDetectionModel(pathToModel)
             }
         }
     }
@@ -1126,8 +1126,9 @@ public object ONNXModels {
 public interface OnnxModelType<T : InferenceModel, U : InferenceModel> : ModelType<T, U> {
     /**
      * Creates a new instance of the [OnnxInferenceModel] according to this [ModelType].
+     * @param pathToModel path to the model file
      */
-    public fun createModel(): OnnxInferenceModel
+    public fun createModel(pathToModel: String): OnnxInferenceModel
 }
 
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {

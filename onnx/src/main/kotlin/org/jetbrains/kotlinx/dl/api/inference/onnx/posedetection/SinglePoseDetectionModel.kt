@@ -26,7 +26,7 @@ private const val OUTPUT_NAME = "output_0"
  * It internally uses [ONNXModels.PoseDetection.MoveNetSinglePoseLighting]
  * or [ONNXModels.PoseDetection.MoveNetSinglePoseThunder] under the hood to make predictions.
  */
-public class SinglePoseDetectionModel : OnnxInferenceModel() {
+public class SinglePoseDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
     public fun detectPose(inputData: FloatArray): DetectedPose {
         val rawPrediction = this.predictRaw(inputData)
         val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<Array<FloatArray>>>)[0][0]

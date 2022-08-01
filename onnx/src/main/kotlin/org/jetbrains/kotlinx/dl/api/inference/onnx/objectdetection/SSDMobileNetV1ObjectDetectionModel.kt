@@ -29,7 +29,7 @@ private const val OUTPUT_NUMBER_OF_DETECTIONS = "num_detections:0"
  *
  * @since 0.4
  */
-public class SSDMobileNetV1ObjectDetectionModel : OnnxInferenceModel() {
+public class SSDMobileNetV1ObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *

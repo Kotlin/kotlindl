@@ -26,7 +26,7 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel : InferenceModel() {
+public open class OnnxInferenceModel(private val pathToModel: String) : InferenceModel() {
     /** Logger for the model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -54,8 +54,6 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var outputDataType: OnnxJavaType
         private set
 
-    private lateinit var pathToModel: String
-
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
 
@@ -67,21 +65,19 @@ public open class OnnxInferenceModel : InferenceModel() {
             pathToModel: String,
             vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
-            val model = OnnxInferenceModel()
+            val model = OnnxInferenceModel(pathToModel)
 
-            return initializeONNXModel(model, pathToModel, *executionProviders)
+            return initializeONNXModel(model, *executionProviders)
         }
 
         internal fun initializeONNXModel(
             model: OnnxInferenceModel,
-            pathToModel: String,
             vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
             require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
 
             model.env = OrtEnvironment.getEnvironment()
-            model.pathToModel = pathToModel
 
             model.reinitializeWith(*executionProviders)
             model.initInputOutputInfo()
