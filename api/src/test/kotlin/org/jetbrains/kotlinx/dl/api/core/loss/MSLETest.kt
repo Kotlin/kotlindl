@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -23,7 +23,7 @@ internal class MSLETest {
 
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yTrue.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yTrue.asOutput().shape().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 
@@ -49,7 +49,7 @@ internal class MSLETest {
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
             val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yPred.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 
@@ -75,7 +75,7 @@ internal class MSLETest {
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
             val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yPred.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 

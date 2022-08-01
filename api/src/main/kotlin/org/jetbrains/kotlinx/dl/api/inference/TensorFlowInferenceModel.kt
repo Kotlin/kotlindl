@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.inference
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.contentToString
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
@@ -257,10 +259,9 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
         populateVariable(assignOpName, initializerName, data)
 
-        val tensorShape = TensorShape(variableShape)
         logger.debug { "Loading the variable $variableName data" }
-        logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-        logger.debug { "Number of elements: ${tensorShape.numElements()}" }
+        logger.debug { "Variable dimensions are: ${variableShape.contentToString()}" }
+        logger.debug { "Number of elements: ${variableShape.numElements()}" }
     }
 
     private fun populateVariable(assignOpName: String, initializerName: String, data: Any) {

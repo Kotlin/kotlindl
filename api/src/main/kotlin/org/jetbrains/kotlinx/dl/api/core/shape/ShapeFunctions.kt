@@ -44,13 +44,9 @@ internal fun Shape.toLongArray(): LongArray {
     return shapeArray
 }
 
-/** Extracts dimensions as [String] from [shape]. */
-internal fun shapeArrayToString(shape: Shape): String {
-    val shapeArray = IntArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i).toInt()
-    }
-    return shapeArray.contentToString()
+/** Extracts dimensions as a [String] from [Shape]. */
+internal fun Shape.contentToString(): String {
+    return toLongArray().contentToString()
 }
 
 /** Returns first dimension from all dimensions [dims]. */
