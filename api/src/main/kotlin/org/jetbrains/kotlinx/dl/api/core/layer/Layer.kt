@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -99,11 +101,10 @@ internal fun LongArray.toIntArray(): IntArray {
 }
 
 internal fun Layer.setOutputShape(shape: Shape) {
-    val tensorShape = TensorShape(shape)
-    check(tensorShape.tail().all { elem -> elem > 0 })
+    check(shape.tail().all { elem -> elem > 0 })
     {
-        "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${tensorShape}.\n" +
+        "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${shape}.\n" +
                 "Analyze your model architecture and layer output shapes carefully to discover a problem."
     }
-    outputShape = tensorShape
+    outputShape = shape.toTensorShape()
 }

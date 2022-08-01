@@ -55,6 +55,17 @@ internal fun shapeFromDims(vararg dims: Long): Shape {
     return Shape.make(head(*dims), *tail(*dims))
 }
 
+/** Converts [TensorShape] to [Shape] object. */
+public fun TensorShape.toShape(): Shape {
+    val d = dims()
+    return Shape.make(head(*d), *tail(*d))
+}
+
+/** Converts [Shape] to [TensorShape] object. */
+public fun Shape.toTensorShape(): TensorShape {
+    return TensorShape(toLongArray())
+}
+
 internal fun Shape.copy(): Shape {
     return Shape.make(head(), *tail())
 }

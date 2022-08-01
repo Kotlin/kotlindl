@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv3dBackpropInput
@@ -107,7 +107,7 @@ public class Conv3DTranspose(
     override val outputPadding: IntArray? get() = null
 
     override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
-        val outputShape = TensorShape(computeOutputShape(input.asOutput().shape()))
+        val outputShape = computeOutputShape(input.asOutput().shape()).toTensorShape()
         val options = Conv3dBackpropInput.dilations(dilations.toLongList()).dataFormat("NDHWC")
         return tf.nn.conv3dBackpropInput(
             tf.shapeWithDynamicBatchSize(outputShape, input),
