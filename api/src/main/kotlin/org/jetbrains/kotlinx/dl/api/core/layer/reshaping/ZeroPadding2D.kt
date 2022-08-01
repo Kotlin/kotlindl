@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.tensorflow.Shape
-import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 2D input (e.g. picture).
@@ -18,7 +17,6 @@ import org.tensorflow.op.Ops
 public class ZeroPadding2D : AbstractZeroPadding {
     public val padding: IntArray
     private val dataFormat: String
-    private lateinit var inputShape: Shape
 
     /**
      * Constructs an instance of ZeroPadding2D layer
@@ -76,31 +74,7 @@ public class ZeroPadding2D : AbstractZeroPadding {
         this.dataFormat = dataFormat ?: CHANNELS_LAST
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
-        this.inputShape = inputShape
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        require(inputShape.numDimensions() == 4) { "input tensor must have 4 dimensions" }
-
-        return if (dataFormat == CHANNELS_FIRST) {
-            Shape.make(
-                inputShape.size(0),
-                inputShape.size(1),
-                inputShape.size(2) + padding[0] + padding[1],
-                inputShape.size(3) + padding[2] + padding[3]
-            )
-        } else {
-            Shape.make(
-                inputShape.size(0),
-                inputShape.size(1) + padding[0] + padding[1],
-                inputShape.size(2) + padding[2] + padding[3],
-                inputShape.size(3)
-            )
-        }
-    }
-
-    override fun paddingArrayToTfFormat(): Array<IntArray> {
+    override fun paddingArrayToTfFormat(inputShape: Shape): Array<IntArray> {
         val paddingFirstDim: IntArray
         val paddingSecondDim: IntArray
 
@@ -119,10 +93,10 @@ public class ZeroPadding2D : AbstractZeroPadding {
             }
             else -> throw IllegalArgumentException("Invalid padding argument at layer $name.")
         }
-        return paddingArraysToInputShape(paddingFirstDim, paddingSecondDim)
+        return paddingArraysToInputShape(inputShape, paddingFirstDim, paddingSecondDim)
     }
 
-    private fun paddingArraysToInputShape(paddingFirstDim: IntArray, paddingSecondDim: IntArray): Array<IntArray> {
+    private fun paddingArraysToInputShape(inputShape: Shape, paddingFirstDim: IntArray, paddingSecondDim: IntArray): Array<IntArray> {
         return when (inputShape.numDimensions()) {
             4 -> {
                 if (dataFormat == CHANNELS_FIRST) {

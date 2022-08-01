@@ -30,63 +30,33 @@ public abstract class Layer(public var name: String) {
     public var outboundLayers: MutableList<Layer> = mutableListOf()
 
     /**
-     * Extend this function to define variables in layer.
+     * Extend this function to define variables in the layer and compute layer output.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
+     * @param [input] Layer input.
+     * @param [isTraining] TensorFlow operand for switching between training and inference modes.
+     * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public abstract fun build(tf: Ops, inputShape: Shape)
-
+    public abstract fun build(tf: Ops,
+                              input: Operand<Float>,
+                              isTraining: Operand<Boolean>,
+                              numberOfLosses: Operand<Float>?): Operand<Float>
 
     /**
-     * Extend this function to define variables in layer.
+     * Extend this function to define variables in the layer and compute layer output.
      *
      * NOTE: This function should be overridden for layers with multiple inputs.
      * NOTE: Used in Functional API
      *
-     * @param [tf] TensorFlow graph API for building operations.
+     * @param [input] Layer input list.
+     * @param [isTraining] TensorFlow operand for switching between training and inference modes.
+     * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public fun buildFromInboundLayers(tf: Ops) {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, inboundLayers[0].outputShape.toShape())
-    }
-
-    /**
-     * Computes output shape, based on [inputShape] and [Layer] type.
-     */
-    public abstract fun computeOutputShape(inputShape: Shape): Shape
-
-    /**
-     * Computes output shape, based on input shapes of inbound layers.
-     *
-     * NOTE: This function should be overridden for layers with multiple inputs.
-     * NOTE: Used in Functional API
-     */
-    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
-    }
-
-    /**
-     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
-     */
-    public abstract fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float>
-
-    /**
-     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
-     */
-    public open fun forward(
-        tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return forward(tf, input[0], isTraining, numberOfLosses)
+    public open fun build(tf: Ops,
+                          input: List<Operand<Float>>,
+                          isTraining: Operand<Boolean>,
+                          numberOfLosses: Operand<Float>?): Operand<Float> {
+        return build(tf, input.first(), isTraining, numberOfLosses)
     }
 
     /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
@@ -129,10 +99,7 @@ internal fun LongArray.toIntArray(): IntArray {
 }
 
 internal fun Layer.setOutputShape(shape: Shape) {
-    setOutputShape(TensorShape(shape))
-}
-
-internal fun Layer.setOutputShape(tensorShape: TensorShape) {
+    val tensorShape = TensorShape(shape)
     check(tensorShape.tail().all { elem -> elem > 0 })
     {
         "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${tensorShape}.\n" +

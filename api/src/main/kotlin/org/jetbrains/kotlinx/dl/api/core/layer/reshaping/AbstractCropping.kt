@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -23,9 +22,7 @@ public abstract class AbstractCropping(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun forward(
+    override fun build(
         tf: Ops,
         input: Operand<Float>,
         isTraining: Operand<Boolean>,
@@ -36,7 +33,7 @@ public abstract class AbstractCropping(
 
     /**
      * The actual implementation of cropping operation which each subclassed layer needs to
-     * implement. This method will then be called from [forward] method to crop the input tensor.
+     * implement. This method will then be called from [build] method to crop the input tensor.
      */
     protected abstract fun crop(tf: Ops, input: Operand<Float>): Operand<Float>
 }

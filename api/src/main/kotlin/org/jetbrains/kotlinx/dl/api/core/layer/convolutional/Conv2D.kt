@@ -13,11 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2d.dilations
 
@@ -118,29 +116,6 @@ public class Conv2D(
             padding.paddingName,
             options
         )
-    }
-
-    protected override fun defineOutputShape(inputShape: Shape): Shape {
-        val batchSize = inputShape.size(0)
-        val rowsCount = inputShape.size(1)
-        val colsCount = inputShape.size(2)
-
-        val rows = convOutputLength(
-            rowsCount,
-            kernelSize[0],
-            padding,
-            strides[1],
-            dilations[1]
-        )
-        val cols = convOutputLength(
-            colsCount,
-            kernelSize[1],
-            padding,
-            strides[2],
-            dilations[2]
-        )
-
-        return Shape.make(batchSize, rows, cols, filters.toLong())
     }
 
     override fun kernelVarName(name: String): String = convKernelVarName(name, dim = 2)

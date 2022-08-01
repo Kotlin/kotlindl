@@ -7,9 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import java.util.*
 
@@ -43,25 +41,10 @@ public class MaxPool3D(
         name = name
     )
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        var lenDim1: Long = inputShape.size(1)
-        var lenDim2: Long = inputShape.size(2)
-        var lenDim3: Long = inputShape.size(3)
-
-        lenDim1 = convOutputLength(lenDim1, poolSize[1], padding, strides[1])
-        lenDim2 = convOutputLength(lenDim2, poolSize[2], padding, strides[2])
-        lenDim3 = convOutputLength(lenDim3, poolSize[3], padding, strides[3])
-
-        return Shape.make(inputShape.size(0), lenDim1, lenDim2, lenDim3, inputShape.size(4))
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val paddingName = padding.paddingName
         val tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()

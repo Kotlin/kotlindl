@@ -8,9 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 
@@ -56,18 +54,10 @@ public class MaxPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val steps = convOutputLength(inputShape.size(1), poolSize[1], padding, strides[1])
-        return Shape.make(inputShape.size(0), steps, inputShape.size(2))
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         /**
          * Since the low-level Java API does not provide a function for 1D max-pooling,

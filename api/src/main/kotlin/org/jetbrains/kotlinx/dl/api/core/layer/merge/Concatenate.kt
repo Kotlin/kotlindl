@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -22,39 +23,14 @@ public class Concatenate(
     public var axis: Int = 3,
     name: String = ""
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        val inputShapes = mutableListOf<TensorShape>()
-        inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
-        val newShape = inputShapes[0].clone()
-
-        var axe = axis
-        if (axis == -1) { // it influences on nasmobilemodel
-            val rank: Int = inputShapes[0].rank()
-            axe = (rank + axis) // to make axe positive
-        }
-
-
-        newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
-
-        val tensorShape = newShape.clone()
-        outputShape = tensorShape
-        return tensorShape
-    }
-
-    override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
-        require(input.size > 1) { "The number of input layers should be more than 1." }
-
-        val firstInputShape = TensorShape(input[0].asOutput().shape())
-
-        for (layer in input) {
-            val tensorShape = TensorShape(
-                layer.asOutput().shape()
-            )
-            require(
-                firstInputShape.almostEqual(tensorShape, except = axis)
-            ) {
-                "A Concatenate layer requires inputs with matching shapes except for the concat axis. " +
-                        "But shapes are the following: shape of first input is $firstInputShape and shape of layer $layer is $tensorShape."
+    override fun checkInputShapes(inputShapes: List<Shape>) {
+        require(inputShapes.size > 1) { "The number of input layers should be more than 1." }
+        val firstInputShape = TensorShape(inputShapes.first())
+        for ((index, inputShape)  in inputShapes.withIndex()) {
+            val currentInputShape = TensorShape(inputShape)
+            require(firstInputShape.almostEqual(currentInputShape, except = axis)) {
+                "A Concatenate layer requires inputs with matching shapes except for the concat axis $axis. " +
+                        "But shapes are the following: shape of first input is $firstInputShape and shape at index $index is $currentInputShape."
             }
         }
     }

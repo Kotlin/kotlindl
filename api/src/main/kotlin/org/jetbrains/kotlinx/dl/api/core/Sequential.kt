@@ -9,10 +9,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.setOutputShape
 import org.jetbrains.kotlinx.dl.api.core.layer.weights
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -142,25 +141,17 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers() {
-        inputLayer.build(tf)
-        var inputShape: Shape = inputLayer.computeOutputShape()
+    override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        var output: Operand<Float> = input
 
         layers.filter { it !is Input }.forEach { layer ->
-            layer.build(tf, inputShape)
-
-            inputShape = layer.computeOutputShape(inputShape)
-            layer.setOutputShape(inputShape)
-            logger.debug { "${layer.name}; $layer; outputShape: $inputShape" }
+            output = layer.build(tf, output, training, numberOfLossesOp)
+            layer.setOutputShape(output.asOutput().shape())
         }
-    }
 
-    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        var out: Operand<Float> = input
-        for (layer in layers) {
-            out = layer.forward(tf, out, training, numberOfLossesOp)
-        }
-        return out
+        return input to output
     }
 
     /** Returns a copy of this model. */

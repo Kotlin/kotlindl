@@ -19,36 +19,20 @@ import org.tensorflow.op.Ops
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
 public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
-    override fun build(tf: Ops, inputShape: Shape) {
-
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        throw UnsupportedOperationException("This layer is not supported for Sequential model!")
-    }
-
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        checkInputShapesOfInboundLayers() //TODO: crash efficientNet models
-        outputShape = inboundLayers[0].outputShape.clone()
-        return outputShape
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        return input
+        throw UnsupportedOperationException("$layerTypeName is not supported in Sequential models.")
     }
 
-    override fun forward(
-        tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: List<Operand<Float>>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        checkInputShapesOfInputOperands(input) //TODO: crash efficientNet models
+        checkInputShapes(input.map { it.asOutput().shape() }) //TODO: crash efficientNet models
         return tf.withName(layerTypeName).identity(mergeFunction(input, tf))
     }
 
@@ -58,30 +42,15 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         tf: Ops
     ): Operand<Float>
 
-    /** Checks input shapes of input operands. */
-    protected open fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
-        require(input.size > 1) { "The number of input layers should be more than 1." }
-
-        val firstInputShape = TensorShape(input[0].asOutput().shape())
-
-        for (layer in input) {
-            val tensorShape = TensorShape(
-                layer.asOutput().shape()
-            )
-            require(
-                firstInputShape == tensorShape
-            ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
-        }
-    }
-
-    private fun checkInputShapesOfInboundLayers() {
-        val firstInputShape = inboundLayers[0].outputShape
-
-        for (layer in inboundLayers) {
-            val tensorShape = layer.outputShape
-            require(
-                firstInputShape == tensorShape
-            ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
+    /** Checks shapes of input operands. */
+    protected open fun checkInputShapes(inputShapes: List<Shape>) {
+        require(inputShapes.size > 1) { "The number of input layers should be more than 1." }
+        val firstInputShape = TensorShape(inputShapes.first())
+        for ((index, inputShape) in inputShapes.withIndex()) {
+            val currentInputShape = TensorShape(inputShape)
+            require(firstInputShape == currentInputShape) {
+                "The shape of first input $firstInputShape should be equal to the shape $currentInputShape at input index $index."
+            }
         }
     }
 

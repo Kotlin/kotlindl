@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 import org.tensorflow.Operand
@@ -62,7 +61,12 @@ public class Dense(
 
     override var isTrainable: Boolean = true
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val inputShape = input.asOutput().shape()
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         val fanOut = outputSize
 
@@ -89,18 +93,7 @@ public class Dense(
                 biasRegularizer
             )
         }
-    }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
         val matMul = tf.linalg.matMul(input, kernel.variable)
         val signal = bias?.let { tf.math.add(matMul, it.variable) } ?: matMul
         return Activations.convert(activation).apply(tf, signal, name)

@@ -13,6 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -97,7 +98,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             if (topModel is Sequential && layers.size > 1) {
                 // establish edges in DAG
                 topLayers.subList(1, topLayers.size).forEachIndexed { index, layer ->
-                    val topLayersIndex = index - 1 + 1 
+                    val topLayersIndex = index - 1 + 1
                     // shift -1 to take previous, but shift +1 because it's an index in subList, started from 1
                     layer.inboundLayers.add(topLayers[topLayersIndex])
                 }
@@ -254,24 +255,18 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers() {
-        inputLayer.build(tf)
-        inputLayer.computeOutputShape()
+    override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to input)
 
         layers.filter { it !is Input }.forEach { layer ->
-            layer.buildFromInboundLayers(tf)
-            val outputShape = layer.computeOutputShapeFromInboundLayers()
-            layer.setOutputShape(outputShape)
-            logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
+            val out = layer.build(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
+            output[layer] = out
+            layer.setOutputShape(out.asOutput().shape())
         }
-    }
 
-    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to inputLayer.forward(tf, input, training, numberOfLossesOp))
-        for (layer in layers.filter { it !is Input }) {
-            output[layer] = layer.forward(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLossesOp)
-        }
-        return output[layers.last()]!!
+        return input to output[layers.last()]!!
     }
 
     override fun save(

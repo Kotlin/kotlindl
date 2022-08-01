@@ -76,11 +76,10 @@ internal class MaxPool3DTest {
         )
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, inputShape)
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numOfLosses).asOutput().tensor()
+            val output = layer.build(tf, inputOp, isTraining, numOfLosses).asOutput().tensor()
 
             val expectedShape = Shape.make(
                 expected.size.toLong(),

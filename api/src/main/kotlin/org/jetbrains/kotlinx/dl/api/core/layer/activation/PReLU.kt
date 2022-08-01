@@ -51,7 +51,8 @@ public class PReLU(
 
     override var isTrainable: Boolean = true
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
+        val inputShape = input.asOutput().shape()
         val alphaShapeArray = inputShape.toLongArray().drop(1).toLongArray()
         if (sharedAxes != null) {
             for (axis in sharedAxes) {
@@ -72,9 +73,7 @@ public class PReLU(
             alphaInitializer,
             alphaRegularizer
         )
-    }
 
-    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
         // It's equivalent to: `-alpha * relu(-x) + relu(x)`
         val positive = tf.nn.relu(input)
         val negative = tf.math.mul(tf.math.neg(alpha.variable), tf.nn.relu(tf.math.neg(input)))

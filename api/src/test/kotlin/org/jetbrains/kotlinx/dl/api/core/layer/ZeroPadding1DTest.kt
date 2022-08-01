@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -36,8 +36,8 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 4, inputShape[2])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 4, inputShape[2])
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 
     @Test
@@ -57,8 +57,8 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 6, inputShape[2])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 6, inputShape[2])
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 
     @Test
@@ -77,7 +77,7 @@ internal class ZeroPadding1DTest : LayerTest() {
             )
         )
         assertLayerOutputIsCorrect(layer, input, expected)
-        val expectedShape = longArrayOf(inputShape[1], inputShape[1] + 5, inputShape[2])
-        assertLayerComputedOutputShape(layer, inputShape, expectedShape)
+        val expectedShape = longArrayOf(inputShape[0], inputShape[1] + 5, inputShape[2])
+        assertLayerComputedOutputShape(layer, expectedShape)
     }
 }

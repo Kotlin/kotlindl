@@ -8,9 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 
@@ -56,19 +54,10 @@ public class AvgPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        var steps = inputShape.size(1)
-        steps = convOutputLength(steps, poolSize[1], padding, strides[1])
-        return Shape.make(inputShape.size(0), steps, inputShape.size(2))
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))

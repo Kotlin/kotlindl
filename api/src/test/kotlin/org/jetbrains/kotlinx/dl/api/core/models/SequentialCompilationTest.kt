@@ -662,18 +662,17 @@ internal class SequentialModelTest {
         )
 
         vgg11.use {
-            val exception = assertThrows(IllegalStateException::class.java) {
-                it.compile(
-                    optimizer = Adam(),
-                    loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                    metric = Metrics.ACCURACY
-                )
+            assertThrows(IllegalArgumentException::class.java) {
+                try {
+                    it.compile(
+                        optimizer = Adam(),
+                        loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                        metric = Metrics.ACCURACY
+                    )
+                } catch (e : Throwable) {
+                    throw e
+                }
             }
-            assertEquals(
-                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [None, 0, 0, 128].\n" +
-                        "Analyze your model architecture and layer output shapes carefully to discover a problem.",
-                exception.message
-            )
         }
     }
 

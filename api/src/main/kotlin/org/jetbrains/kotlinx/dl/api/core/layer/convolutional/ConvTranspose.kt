@@ -35,7 +35,7 @@ public abstract class ConvTranspose(
 
     protected abstract val outputPadding: IntArray?
 
-    override fun defineOutputShape(inputShape: Shape): Shape {
+    protected fun computeOutputShape(inputShape: Shape): Shape {
         val shapes = (kernelSize.indices).map {
             convTransposeOutputLength(
                 inputShape.size(it + 1),

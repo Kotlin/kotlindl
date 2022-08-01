@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -17,21 +18,21 @@ public abstract class AbstractZeroPadding(
 ) : Layer(name) {
     override val hasActivation: Boolean get() = false
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
     ): Operand<Float> {
-        val paddingOperand = tf.constant(paddingArrayToTfFormat())
+        val inputShape = input.asOutput().shape()
+        val paddingOperand = tf.constant(paddingArrayToTfFormat(inputShape))
         val constantValue = tf.constant(0f)
         return tf.pad(input, paddingOperand, constantValue)
     }
 
     /**
      * This function helps in computing the padding operand i.e. normalizing the padding array
-     * into a tensorflow format. This method will then be called in [forward] method that will be
+     * into a tensorflow format. This method will then be called in [build] method that will be
      * further passed to tf.pad().
      */
-    protected abstract fun paddingArrayToTfFormat(): Array<IntArray>
+    protected abstract fun paddingArrayToTfFormat(inputShape: Shape): Array<IntArray>
 }

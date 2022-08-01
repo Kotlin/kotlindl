@@ -156,7 +156,18 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         this.metrics = metrics
         this.optimizer = optimizer
 
-        buildLayers()
+        training = tf.withName("training").placeholder(
+            Boolean::class.javaObjectType,
+            Placeholder.shape(Shape.scalar())
+        )
+        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
+            getDType(),
+            Placeholder.shape(Shape.scalar())
+        )
+
+        val (input, output) = buildLayers(training, numberOfLossesOp)
+        xOp = input
+        yPredOp = output
 
         // should be after outputShape calculation
         numberOfClasses = when (val lastLayer = layers.last()) {
@@ -165,19 +176,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             else -> 1
         }
 
-        xOp = inputLayer.input
         yTrueOp = tf.placeholder(getDType()) as Operand<Float>
-        numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
-            getDType(),
-            Placeholder.shape(Shape.scalar())
-        )
-
-        training = tf.withName("training").placeholder(
-            Boolean::class.javaObjectType,
-            Placeholder.shape(Shape.scalar())
-        )
-
-        yPredOp = forward(xOp, inputLayer)
         lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, layers.trainableVariables().map { it.variable }, tf, lossOp)
 
@@ -212,11 +211,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         compile(optimizer, loss, Metrics.convert(metric))
     }
 
-    /** Common method for building the initial part of the model static graph layer by layer via calling build() method on each layer in correct order. */
-    protected abstract fun buildLayers()
-
-    /** Forms forward path as a part of the model static graph layer by layer via calling forward() method on each layer in correct order. */
-    protected abstract fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float>
+    /** Common method for building model static graph layer by layer via calling build() method on each layer in correct order. */
+    protected abstract fun buildLayers(
+        training: Operand<Boolean>,
+        numberOfLosses: Operand<Float>
+    ): Pair<Placeholder<Float>, Operand<Float>>
 
     override fun fit(
         trainingDataset: Dataset,

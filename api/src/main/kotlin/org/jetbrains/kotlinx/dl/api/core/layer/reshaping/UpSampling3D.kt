@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -39,16 +38,6 @@ public class UpSampling3D(
         require(size.all { it > 0 }) {
             "All the upsampling size factors should be positive integers."
         }
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return Shape.make(
-            inputShape.size(0),
-            inputShape.size(1) * size[0],
-            inputShape.size(2) * size[1],
-            inputShape.size(3) * size[2],
-            inputShape.size(4)
-        )
     }
 
     protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {

@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -65,7 +64,12 @@ public abstract class AbstractConv(
     public override val variables: List<KVariable>
         get() = listOfNotNull(kernel, bias)
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(tf: Ops,
+                       input: Operand<Float>,
+                       isTraining: Operand<Boolean>,
+                       numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
+        val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -96,24 +100,9 @@ public abstract class AbstractConv(
                 biasRegularizer
             )
         }
-    }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val shape = defineOutputShape(inputShape)
-        outputShape = TensorShape(shape)
-        return shape
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
         val convolution = convImplementation(tf, input)
-
         val withBias = bias?.let { tf.nn.biasAdd(convolution, it.variable) } ?: convolution
-
         return Activations.convert(activation).apply(tf, withBias, name)
     }
 
@@ -149,15 +138,6 @@ public abstract class AbstractConv(
 
     /** The actual layer operation implementation without adding the bias which is added by the abstract class. */
     protected abstract fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float>
-
-    /**
-     * Actual implementation of [computeOutputShape] which only defines the value
-     * of output shape without the need of saving it to some variable.
-     *
-     * @param inputShape which can be used to define the output shape
-     * @return the defined output shape that is saved in class variable and returned by [computeOutputShape]]
-     */
-    protected abstract fun defineOutputShape(inputShape: Shape): Shape
 }
 
 private fun multiply(values: LongArray) = values.fold(1L, Long::times)
