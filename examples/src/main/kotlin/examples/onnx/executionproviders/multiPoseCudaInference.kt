@@ -8,50 +8,85 @@ package examples.onnx.executionproviders
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
 import java.io.File
+import kotlin.system.measureTimeMillis
 
 /**
- * This example demonstrates how to infer MoveNetMultiPoseLighting model using [inferUsing] scope function:
- * - Model is obtained from [ONNXModelHub].
- * - Model detects poses on image located in resources using CUDA execution provider.
- * - Internal onnx session is not closed automatically after inference lambda is executed. The session is closed manually.
+ * This example compares the inference speed of different execution providers:
+ * - [inferUsing] scope function is used for CUDA inference. That's why the underlying session should be closed manually.
  */
 fun multiPoseCudaInference() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.PoseDetection.MoveNetMultiPoseLighting
-    val model = modelHub.loadModel(modelType, CUDA())
+    // explicitly specify CPU execution provider during model loading
+    val model = modelHub.loadModel(modelType, CPU())
 
+    val inputData = prepareInputData(modelType)
+
+    val cpuInferenceTime = cpuInference(model, inputData)
+    println("Average inference time on CPU: $cpuInferenceTime ms")
+
+    val cudaInferenceTime = cudaInference(model, inputData)
+    println("Average inference time on CUDA: $cudaInferenceTime ms")
+
+    model.close()
+}
+
+fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLighting): FloatArray {
+    val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
+    val preprocessing: Preprocessing = preprocess {
+        transformImage {
+            resize {
+                outputHeight = 256
+                outputWidth = 256
+            }
+            convert { colorMode = ColorMode.RGB }
+        }
+    }
+
+    return modelType.preprocessInput(imageFile, preprocessing)
+}
+
+fun cpuInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10): Long {
+    val totalPredictionTime = model.run {
+        measureTimeMillis {
+            repeat(n) { predictRaw(inputData) }
+        }
+    }
+
+    return totalPredictionTime / n
+}
+
+fun cudaInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10): Long {
+    /**
+     * First inference on GPU takes way longer than average due to model serialization
+     * and GPU memory buffers initialization.
+     * Making a dummy inference to 'warm up' GPU is recommended to avoid wrong inference time calculation.
+     */
     model.inferUsing(CUDA(0)) {
-        println(it)
+        it.predictRaw(inputData)
+    }
 
-        val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = 256
-                    outputWidth = 256
+    val totalPredictionTime =
+        measureTimeMillis {
+            repeat(n) {
+                model.inferUsing(CUDA(0)) {
+                    it.predictRaw(inputData)
                 }
-                convert { colorMode = ColorMode.RGB }
             }
         }
 
-        val inputData = modelType.preprocessInput(imageFile, preprocessing)
-
-        val start = System.currentTimeMillis()
-        val yhat = it.predictRaw(inputData)
-        val end = System.currentTimeMillis()
-
-        println("Prediction took ${end - start} ms")
-        println(yhat.values.toTypedArray().contentDeepToString())
-    }
-
-    model.close()
+    return totalPredictionTime / n
 }
 
 fun main(): Unit = multiPoseCudaInference()
