@@ -15,3 +15,4 @@ build/
 /api/cache/
 /pretrainedModels/
 /examples/savedmodels/
+/examples/notebooks/.ipynb_checkpoints/
