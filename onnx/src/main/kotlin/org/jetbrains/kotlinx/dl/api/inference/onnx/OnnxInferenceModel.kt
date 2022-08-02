@@ -6,14 +6,19 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import ai.onnxruntime.*
+import ai.onnxruntime.OrtSession.SessionOptions
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import java.nio.*
 import java.util.*
+
 
 private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Call reshape() to set input shape."
 
@@ -50,45 +55,122 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var outputDataType: OnnxJavaType
         private set
 
+    private lateinit var pathToModel: String
+
+    /** Execution providers currently set for the model. */
+    private lateinit var executionProvidersInUse: List<ExecutionProvider>
+
     public companion object {
         /**
          * Loads model from SavedModelBundle format.
          */
-        public fun load(pathToModel: String): OnnxInferenceModel {
+        public fun load(
+            pathToModel: String,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
+        ): OnnxInferenceModel {
             val model = OnnxInferenceModel()
 
-            return initializeONNXModel(model, pathToModel)
+            return initializeONNXModel(model, pathToModel, *executionProviders)
         }
 
         internal fun initializeONNXModel(
             model: OnnxInferenceModel,
-            pathToModel: String
+            pathToModel: String,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
             require(!model::env.isInitialized) { "The model $model is initialized!" }
             require(!model::session.isInitialized) { "The model $model is initialized!" }
 
             model.env = OrtEnvironment.getEnvironment()
-            model.session = model.env.createSession(pathToModel, OrtSession.SessionOptions())
+            model.pathToModel = pathToModel
 
-            val inputTensorInfo = model.session.inputInfo.toList()[0].second.info as TensorInfo
-            if (!model::inputShape.isInitialized) {
-                val inputDims =
-                    inputTensorInfo.shape.takeLast(3).toLongArray()
-                model.inputShape = TensorShape(1, *inputDims).dims()
-            }
-            model.inputDataType = inputTensorInfo.type
-
-            // TODO: known bug at the https://github.com/JetBrains/KotlinDL/issues/285
-            val outputTensorInfo = model.session.outputInfo.toList()[0].second.info as TensorInfo
-            if (!model::outputShape.isInitialized) {
-                val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
-                // TODO: is it obsolete? anyway we should add support of multiple outputs
-                model.outputShape = TensorShape(1, *outputDims).dims()
-            }
-            model.outputDataType = outputTensorInfo.type
+            model.reinitializeWith(*executionProviders)
+            model.initInputOutputInfo()
 
             return model
         }
+    }
+
+    private fun initInputOutputInfo() {
+        val inputTensorInfo = session.inputInfo.toList()[0].second.info as TensorInfo
+        if (!::inputShape.isInitialized) {
+            val inputDims =
+                inputTensorInfo.shape.takeLast(3).toLongArray()
+            inputShape = TensorShape(1, *inputDims).dims()
+        }
+        inputDataType = inputTensorInfo.type
+
+        // TODO: known bug at the https://github.com/JetBrains/KotlinDL/issues/285
+        val outputTensorInfo = session.outputInfo.toList()[0].second.info as TensorInfo
+        if (!::outputShape.isInitialized) {
+            val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
+            // TODO: is it obsolete? anyway we should add support of multiple outputs
+            outputShape = TensorShape(1, *outputDims).dims()
+        }
+        outputDataType = outputTensorInfo.type
+    }
+
+    /**
+     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
+     * This method allows to set the execution provider to use.
+     * If the model is already initialized, internal session will be closed and new one will be created.
+     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
+     * If execution provider is not supported, an exception will be thrown.
+     * If empty list is passed, the model will be initialized with CPU execution provider.
+     * @param executionProviders list of execution providers to use.
+     */
+    public fun reinitializeWith(vararg executionProviders: ExecutionProvider) {
+        require(::env.isInitialized) { "The model $this is not initialized!" }
+        for (executionProvider in executionProviders) {
+            require(executionProvider.internalProviderId in OrtEnvironment.getAvailableProviders()) {
+                "The optimized execution provider $executionProvider is not available in the current environment!"
+            }
+        }
+
+        val uniqueProviders = executionProviders.distinct().toMutableList()
+
+        /*
+            We ensure that the CPU execution provider is always last in the list.
+         */
+        when (uniqueProviders.count { it is CPU }) {
+            /*
+                Users can explicitly add CPU provider with BFCArenaAllocator disabled,
+                but if not present, it will be added automatically with BFCArenaAllocator enabled.
+             */
+            0 -> {
+                uniqueProviders.add(CPU(true))
+            }
+            1 -> {
+                val cpu = uniqueProviders.first { it is CPU }
+                uniqueProviders.remove(cpu)
+                uniqueProviders.add(cpu)
+            }
+            else -> throw IllegalArgumentException("Unable to use CPU(useArena = true) and CPU(useArena = false) at the same time!")
+        }
+
+        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
+            return
+        }
+
+        if (::session.isInitialized) {
+            session.close()
+        }
+
+        val sessionOptions = SessionOptions()
+        for (provider in uniqueProviders) {
+            when (provider) {
+                is CUDA -> {
+                    sessionOptions.addCUDA(provider.deviceId)
+                }
+                is CPU -> {
+                    sessionOptions.addCPU(provider.useBFCArenaAllocator)
+                }
+            }
+        }
+
+        session = env.createSession(pathToModel, sessionOptions)
+
+        executionProvidersInUse = uniqueProviders
     }
 
     /**
