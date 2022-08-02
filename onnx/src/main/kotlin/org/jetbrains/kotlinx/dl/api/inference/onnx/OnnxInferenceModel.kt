@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import java.nio.*
 import java.util.*
 
@@ -122,14 +121,7 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
     private fun buildSessionOptions(uniqueProviders: List<ExecutionProvider>): SessionOptions {
         val sessionOptions = SessionOptions()
         for (provider in uniqueProviders) {
-            when (provider) {
-                is CUDA -> {
-                    sessionOptions.addCUDA(provider.deviceId)
-                }
-                is CPU -> {
-                    sessionOptions.addCPU(provider.useBFCArenaAllocator)
-                }
-            }
+            provider.addOptionsTo(sessionOptions)
         }
         return sessionOptions
     }
