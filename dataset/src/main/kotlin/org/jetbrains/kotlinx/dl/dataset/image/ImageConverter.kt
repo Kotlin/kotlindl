@@ -298,22 +298,6 @@ public object ImageConverter {
     }
 }
 
-/**
- * Represents the number and order of color channels in the image.
- *
- * @property [channels] number of image channels
- * */
-public enum class ColorMode(public val channels: Int) {
-    /** Red, green, blue. */
-    RGB(3),
-
-    /** Blue, green, red. */
-    BGR(3),
-
-    /** Grayscale **/
-    GRAYSCALE(1)
-}
-
 internal fun BufferedImage.colorMode(): ColorMode {
     return when (type) {
         BufferedImage.TYPE_INT_RGB -> ColorMode.RGB
