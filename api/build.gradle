@@ -1,12 +1,16 @@
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
 apply plugin: 'kotlin-multiplatform'
+apply plugin: 'com.android.library'
 
 kotlin {
     jvm {
         compilations.all {
             kotlinOptions.jvmTarget = '1.8'
         }
+    }
+    android {
+        publishLibraryVariants("release")
     }
     sourceSets {
         commonMain {
@@ -24,4 +28,17 @@ kotlin {
         }
     }
     explicitApiWarning()
+}
+
+android {
+    compileSdkVersion 31
+    namespace = 'org.jetbrains.kotlinx.dl.api'
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }

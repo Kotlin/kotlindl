@@ -1,6 +1,7 @@
 project.setDescription("A KotlinDL library provides Dataset API and DSL to build image preprocessing pipeline for better Kotlin programming for Deep Learning.")
 
 apply plugin: 'kotlin-multiplatform'
+apply plugin: 'com.android.library'
 
 kotlin {
     jvm {
@@ -10,6 +11,9 @@ kotlin {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
+    }
+    android {
+        publishLibraryVariants("release")
     }
     sourceSets {
         commonMain {}
@@ -29,4 +33,17 @@ kotlin {
         }
     }
     explicitApiWarning()
+}
+
+android {
+    compileSdkVersion 31
+    namespace = 'org.jetbrains.kotlinx.dl.dataset'
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
