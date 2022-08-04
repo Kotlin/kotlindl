@@ -1,12 +1,16 @@
 project.setDescription("This module contains the Kotlin API for loading and executing the ONNX models.")
 
 apply plugin: 'kotlin-multiplatform'
+apply plugin: 'com.android.library'
 
 kotlin {
     jvm {
         compilations.all {
             kotlinOptions.jvmTarget = '1.8'
         }
+    }
+    android {
+        publishLibraryVariants("release")
     }
     sourceSets {
         commonMain {
@@ -21,6 +25,21 @@ kotlin {
                 api "org.jetbrains.kotlinx:multik-default:0.2.0"
             }
         }
+        androidMain {
+        }
     }
     explicitApiWarning()
+}
+
+android {
+    compileSdkVersion 31
+    namespace = 'org.jetbrains.kotlinx.dl.onnx'
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }

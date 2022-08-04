@@ -53,6 +53,9 @@ afterEvaluate {
                     apply from: "$rootDir/gradle/publish-mpp-root-module-in-platform.gradle"
                     publishPlatformArtifactsInRootModule(publications.jvm)
                     break
+                case 'androidRelease':
+                    it.artifactId "$moduleName-android"
+                    break
                 default:
                     it.artifactId "$moduleName-$type"
                     break
