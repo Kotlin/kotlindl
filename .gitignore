@@ -1,13 +1,10 @@
-/gradlew
-/gradlew.bat
-/gradle.properties
 /data.properties
+/local.properties
 /logs.txt
 /savedmodels/
 /.gradle/
 /.idea/
 build/
-/gradle/
 /api/out/
 /examples/out/
 /cache/
