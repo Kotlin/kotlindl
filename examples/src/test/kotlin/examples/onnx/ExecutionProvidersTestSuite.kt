@@ -81,7 +81,7 @@ class ExecutionProvidersTestSuite {
 
         model.use {
             assertDoesNotThrow {
-                model.reinitializeWith(CPU(), CPU(), CPU())
+                model.initializeWith(CPU(), CPU(), CPU())
             }
         }
     }
@@ -93,7 +93,7 @@ class ExecutionProvidersTestSuite {
 
         model.use {
             assertThrows<IllegalArgumentException> {
-                model.reinitializeWith(CPU(), CPU(false))
+                model.initializeWith(CPU(), CPU(false))
             }
         }
     }

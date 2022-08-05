@@ -26,7 +26,7 @@ private const val OUTPUT_NAME = "detections:0"
  *
  * @since 0.4
  */
-public class EfficientDetObjectDetectionModel : OnnxInferenceModel() {
+public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
     /**
      * Returns the detected object for the given image file sorted by the score.
      *

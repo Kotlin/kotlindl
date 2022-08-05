@@ -36,7 +36,7 @@ private const val INPUT_SIZE = 1200
  *
  * @since 0.3
  */
-public class SSDObjectDetectionModel : OnnxInferenceModel() {
+public class SSDObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *

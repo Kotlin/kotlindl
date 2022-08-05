@@ -28,7 +28,7 @@ private const val INPUT_SIZE = 256
  *
  * It internally uses [ONNXModels.PoseDetection.MoveNetMultiPoseLighting] under the hood to make predictions.
  */
-public class MultiPoseDetectionModel : OnnxInferenceModel() {
+public class MultiPoseDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
     public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
         val rawPrediction = this.predictRaw(inputData)
         val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]

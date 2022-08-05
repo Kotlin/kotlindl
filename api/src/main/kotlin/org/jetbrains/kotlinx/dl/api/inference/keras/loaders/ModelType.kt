@@ -60,8 +60,4 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     public fun model(modelHub: ModelHub): T {
         return modelHub.loadModel(this)
     }
-
-    public fun preInit(): InferenceModel {
-        TODO()
-    }
 }

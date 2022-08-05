@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import java.nio.*
 import java.util.*
 
@@ -26,7 +25,7 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel : InferenceModel() {
+public open class OnnxInferenceModel(private val pathToModel: String) : InferenceModel() {
     /** Logger for the model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -34,7 +33,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
      */
-    private lateinit var env: OrtEnvironment
+    private val env = OrtEnvironment.getEnvironment()
 
     /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
@@ -54,8 +53,6 @@ public open class OnnxInferenceModel : InferenceModel() {
     public lateinit var outputDataType: OnnxJavaType
         private set
 
-    private lateinit var pathToModel: String
-
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
 
@@ -67,27 +64,39 @@ public open class OnnxInferenceModel : InferenceModel() {
             pathToModel: String,
             vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
         ): OnnxInferenceModel {
-            val model = OnnxInferenceModel()
-
-            return initializeONNXModel(model, pathToModel, *executionProviders)
-        }
-
-        internal fun initializeONNXModel(
-            model: OnnxInferenceModel,
-            pathToModel: String,
-            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
-        ): OnnxInferenceModel {
-            require(!model::env.isInitialized) { "The model $model is initialized!" }
-            require(!model::session.isInitialized) { "The model $model is initialized!" }
-
-            model.env = OrtEnvironment.getEnvironment()
-            model.pathToModel = pathToModel
-
-            model.reinitializeWith(*executionProviders)
-            model.initInputOutputInfo()
-
+            val model = OnnxInferenceModel(pathToModel)
+            model.initializeWith(*executionProviders)
             return model
         }
+    }
+
+    /**
+     * Initializes the model, if it's not initialized, or re-initializes it, depending on the execution providers.
+     *
+     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
+     * This method allows to set the execution provider to use.
+     * If the model is already initialized, internal session will be closed and new one will be created.
+     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
+     * If execution provider is not supported, an exception will be thrown.
+     * If empty list is passed, the model will be initialized with CPU execution provider.
+     *
+     * @param executionProviders list of execution providers to use.
+     */
+    public fun initializeWith(vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))) {
+        val uniqueProviders = collectProviders(executionProviders)
+
+        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
+            return
+        }
+
+        if (::session.isInitialized) {
+            session.close()
+        }
+
+        session = env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
+        executionProvidersInUse = uniqueProviders
+
+        initInputOutputInfo()
     }
 
     private fun initInputOutputInfo() {
@@ -109,17 +118,15 @@ public open class OnnxInferenceModel : InferenceModel() {
         outputDataType = outputTensorInfo.type
     }
 
-    /**
-     * By default, the model is initialized with CPU execution provider with BFCArena memory allocator.
-     * This method allows to set the execution provider to use.
-     * If the model is already initialized, internal session will be closed and new one will be created.
-     * If [executionProvidersInUse] is the same as the one passed, nothing will happen.
-     * If execution provider is not supported, an exception will be thrown.
-     * If empty list is passed, the model will be initialized with CPU execution provider.
-     * @param executionProviders list of execution providers to use.
-     */
-    public fun reinitializeWith(vararg executionProviders: ExecutionProvider) {
-        require(::env.isInitialized) { "The model $this is not initialized!" }
+    private fun buildSessionOptions(uniqueProviders: List<ExecutionProvider>): SessionOptions {
+        val sessionOptions = SessionOptions()
+        for (provider in uniqueProviders) {
+            provider.addOptionsTo(sessionOptions)
+        }
+        return sessionOptions
+    }
+
+    private fun collectProviders(executionProviders: Array<out ExecutionProvider>): List<ExecutionProvider> {
         for (executionProvider in executionProviders) {
             require(executionProvider.internalProviderId in OrtEnvironment.getAvailableProviders()) {
                 "The optimized execution provider $executionProvider is not available in the current environment!"
@@ -146,30 +153,7 @@ public open class OnnxInferenceModel : InferenceModel() {
             }
             else -> throw IllegalArgumentException("Unable to use CPU(useArena = true) and CPU(useArena = false) at the same time!")
         }
-
-        if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
-            return
-        }
-
-        if (::session.isInitialized) {
-            session.close()
-        }
-
-        val sessionOptions = SessionOptions()
-        for (provider in uniqueProviders) {
-            when (provider) {
-                is CUDA -> {
-                    sessionOptions.addCUDA(provider.deviceId)
-                }
-                is CPU -> {
-                    sessionOptions.addCPU(provider.useBFCArenaAllocator)
-                }
-            }
-        }
-
-        session = env.createSession(pathToModel, sessionOptions)
-
-        executionProvidersInUse = uniqueProviders
+        return uniqueProviders
     }
 
     /**

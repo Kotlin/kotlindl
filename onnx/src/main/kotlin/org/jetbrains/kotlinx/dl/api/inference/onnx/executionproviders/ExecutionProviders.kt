@@ -1,6 +1,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders
 
 import ai.onnxruntime.OrtProvider
+import ai.onnxruntime.OrtSession
 
 /**
  * These are classes representing the supported ONNXRuntime execution providers for KotlinDL.
@@ -16,7 +17,11 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
      *  @param useBFCArenaAllocator If true, the CPU provider will use BFC arena allocator.
      *  @see [OrtProvider.CPU]
      */
-    public data class CPU(public val useBFCArenaAllocator: Boolean = true) : ExecutionProvider(OrtProvider.CPU)
+    public data class CPU(public val useBFCArenaAllocator: Boolean = true) : ExecutionProvider(OrtProvider.CPU) {
+        override fun addOptionsTo(sessionOptions: OrtSession.SessionOptions) {
+            sessionOptions.addCPU(useBFCArenaAllocator)
+        }
+    }
 
     /**
      *  CUDA execution provider.
@@ -24,5 +29,14 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
      *  @param deviceId The device ID to use.
      *  @see [OrtProvider.CUDA]
      */
-    public data class CUDA(public val deviceId: Int = 0) : ExecutionProvider(OrtProvider.CUDA)
+    public data class CUDA(public val deviceId: Int = 0) : ExecutionProvider(OrtProvider.CUDA) {
+        override fun addOptionsTo(sessionOptions: OrtSession.SessionOptions) {
+            sessionOptions.addCUDA(deviceId)
+        }
+    }
+
+    /**
+     * Adds execution provider options to the [OrtSession.SessionOptions].
+     */
+    public open fun addOptionsTo(sessionOptions: OrtSession.SessionOptions): Unit = Unit
 }
