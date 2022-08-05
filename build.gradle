@@ -47,3 +47,5 @@ task setTeamcityVersion {
         println("##teamcity[buildNumber '$version']")
     }
 }
+
+apply from: project.rootProject.file('gradle/fatJar.gradle')

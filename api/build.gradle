@@ -20,18 +20,3 @@ compileTestKotlin {
 kotlin {
     explicitApiWarning()
 }
-
-task fatJar(type: Jar) {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-    manifest {
-        attributes 'Implementation-Version': '1.15'
-    }
-    classifier 'all'
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-artifacts {
-    archives fatJar
-}
