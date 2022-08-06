@@ -1,5 +1,7 @@
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating TensorFlow models.")
 
+apply plugin: 'kotlin'
+
 dependencies {
     api project(":dataset")
     api project(":api")
@@ -24,4 +26,13 @@ test {
 
 kotlin {
     explicitApiWarning()
+}
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }

@@ -6,22 +6,10 @@
 apply plugin: 'maven-publish'
 apply from: project.rootProject.file('gradle/maven-metadata.gradle')
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
+def isMultiplatform = project.name in ["dataset", "api", "onnx"]
 
 task javadocJar(type: Jar) {
     classifier 'javadoc'
-    from javadoc
-}
-
-artifacts {
-    archives sourcesJar
-}
-
-artifacts {
-    archives javadocJar
 }
 
 def sonatypeUser = System.getenv('SONATYPE_USER')
@@ -37,24 +25,46 @@ nexusStaging {
     delayBetweenRetriesInMillis 5000
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            pom.withXml(configureMavenCentralMetadata)
-            from components.java
-            groupId project.group
-            artifactId moduleName
-            version project.version
-            artifact sourcesJar { classifier "sources" }
-            artifact javadocJar { classifier "javadoc" }
+afterEvaluate {
+    publishing {
+        if (!isMultiplatform) {
+            publications {
+                maven(MavenPublication) { publication ->
+                    pom.withXml(configureMavenCentralMetadata)
+                    from components.java
+                    artifactId moduleName
+                    groupId project.group
+                    version project.version
+                    artifact javadocJar
+                    artifact sourcesJar
+                }
+            }
+            return
         }
-    }
-    repositories {
-        maven {
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = sonatypeUser
-                password = sonatypePassword
+        publications.configureEach {
+            def type = it.name
+            switch (type) {
+                case 'kotlinMultiplatform':
+                    it.artifactId "$moduleName"
+                    break
+                default:
+                    it.artifactId "$moduleName-$type"
+                    break
+            }
+            groupId project.group
+            version project.version
+            pom.withXml(configureMavenCentralMetadata)
+            if (name != "kotlinMultiplatform") {
+                artifact javadocJar
+            }
+        }
+        repositories {
+            maven {
+                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                credentials {
+                    username = sonatypeUser
+                    password = sonatypePassword
+                }
             }
         }
     }

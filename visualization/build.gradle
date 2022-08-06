@@ -1,5 +1,7 @@
 project.setDescription("This module contains the Kotlin API for visualization of the Deep Learning models built with the KotlinDL.")
 
+apply plugin: 'kotlin'
+
 dependencies {
     api project(":api")
     api project(":tensorflow")
@@ -15,4 +17,13 @@ dependencies {
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }

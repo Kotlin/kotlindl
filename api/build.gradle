@@ -1,17 +1,27 @@
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
-dependencies {
-    api project(":dataset")
-    api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
-    api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
-    api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
-    api 'com.beust:klaxon:5.5'
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
+apply plugin: 'kotlin-multiplatform'
 
 kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = '1.8'
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(':dataset')
+            }
+        }
+        jvmMain {
+            dependencies {
+                api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
+                api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
+                api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
+                api 'com.beust:klaxon:5.5'
+            }
+        }
+    }
     explicitApiWarning()
 }

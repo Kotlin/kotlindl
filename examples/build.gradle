@@ -1,3 +1,5 @@
+apply plugin: 'kotlin'
+
 dependencies {
     api project(":api")
     api project(":tensorflow")
