@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 /**
- * This class represents the batch of data in [OnHeapDataset].
+ * This class represents the batch of data in the [Dataset].
  * @param [x] Data observations.
  * @param [y] Labels.
  * @param [size] Number of rows in batch.
