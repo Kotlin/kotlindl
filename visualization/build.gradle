@@ -1,7 +1,6 @@
 project.setDescription("This module contains the Kotlin API for visualization of the Deep Learning models built with the KotlinDL.")
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api project(":api")
     api project(":tensorflow")
 }

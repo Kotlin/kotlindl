@@ -1,5 +1,4 @@
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api project(":api")
     api project(":tensorflow")
     api project(":dataset")

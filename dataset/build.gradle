@@ -1,7 +1,6 @@
 project.setDescription("A KotlinDL library provides Dataset API and DSL to build image preprocessing pipeline for better Kotlin programming for Deep Learning.")
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'

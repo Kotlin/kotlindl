@@ -3,7 +3,6 @@ project.setDescription("This module contains the Kotlin API for building, traini
 dependencies {
     api project(":dataset")
     api project(":api")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
     testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'

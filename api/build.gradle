@@ -2,7 +2,6 @@ project.setDescription("This module contains the Kotlin API for building, traini
 
 dependencies {
     api project(":dataset")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
     api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
     api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
