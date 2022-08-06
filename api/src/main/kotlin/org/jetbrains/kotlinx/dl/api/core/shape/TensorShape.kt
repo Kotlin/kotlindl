@@ -43,7 +43,7 @@ public class TensorShape() {
     public constructor(firstDimension: Long, vararg dims: Long) : this() {
         this.dims = LongArray(dims.size + 1)
         this.dims[0] = firstDimension
-        System.arraycopy(dims, 0, this.dims, 1, dims.size)
+        dims.copyInto(this.dims, destinationOffset = 1)
     }
 
     private fun numDimensions(): Int {
@@ -163,8 +163,8 @@ public class TensorShape() {
 
     private fun concatenate(first: LongArray, vararg last: Long): LongArray {
         val dims = LongArray(first.size + last.size)
-        System.arraycopy(first, 0, dims, 0, first.size)
-        System.arraycopy(last, 0, dims, first.size, last.size)
+        first.copyInto(dims)
+        last.copyInto(dims, destinationOffset = first.size)
         return dims
     }
 
@@ -184,7 +184,7 @@ public class TensorShape() {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as TensorShape
 

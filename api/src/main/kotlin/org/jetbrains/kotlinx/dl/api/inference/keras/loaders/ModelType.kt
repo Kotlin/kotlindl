@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
 import java.io.File
 
 /**
@@ -39,19 +38,6 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
      * @param [tensorShape] Should be 3 dimensional array (HWC or CHW format)
      */
     public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray
-
-    /**
-     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
-     *
-     * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
-     */
-    public fun preprocessInput(imageFile: File, preprocessing: Preprocessing): FloatArray {
-        val (data, shape) = preprocessing(imageFile)
-        return preprocessInput(
-            data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-        )
-    }
 
     /** Returns the specially prepared pre-trained model of the type U. */
     public fun pretrainedModel(modelHub: ModelHub): U

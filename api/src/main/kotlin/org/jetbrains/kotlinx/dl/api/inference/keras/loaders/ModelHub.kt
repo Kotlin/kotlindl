@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-import mu.KLogger
-import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.nio.file.Files
@@ -23,9 +21,6 @@ internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 public abstract class ModelHub(public val cacheDirectory: File) {
     /** Url of the model storage. */
     protected val awsS3Url: String = AWS_S3_URL
-
-    /** Logger for modelZoo model. */
-    private val logger: KLogger = KotlinLogging.logger {}
 
     init {
         if (!cacheDirectory.exists()) {

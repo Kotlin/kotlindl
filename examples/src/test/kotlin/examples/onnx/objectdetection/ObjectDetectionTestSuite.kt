@@ -10,6 +10,7 @@ import examples.onnx.objectdetection.ssd.ssdLightAPI
 import examples.onnx.objectdetection.ssdmobile.ssdMobile
 import examples.onnx.objectdetection.ssdmobile.ssdMobileLightAPI
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel

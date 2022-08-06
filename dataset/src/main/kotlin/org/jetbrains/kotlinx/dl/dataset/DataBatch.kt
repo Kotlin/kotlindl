@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 /**
- * This class represents the batch of data in [OnHeapDataset].
+ * This class represents the batch of data in the [Dataset].
  * @param [x] Data observations.
  * @param [y] Labels.
  * @param [size] Number of rows in batch.
@@ -21,7 +21,7 @@ public data class DataBatch internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as DataBatch
 

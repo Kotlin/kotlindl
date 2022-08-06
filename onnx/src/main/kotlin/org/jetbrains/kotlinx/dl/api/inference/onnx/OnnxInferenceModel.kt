@@ -26,9 +26,6 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  * @since 0.3
  */
 public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel() {
-    /** Logger for the model. */
-    private val logger: KLogger = KotlinLogging.logger {}
-
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.

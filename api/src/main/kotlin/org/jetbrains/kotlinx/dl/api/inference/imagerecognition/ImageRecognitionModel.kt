@@ -131,4 +131,19 @@ public class ImageRecognitionModel(
         val (inputData, _) = preprocessing(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
     }
+
+    public companion object {
+        /**
+         * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
+         *
+         * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
+         */
+        public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Preprocessing): FloatArray {
+            val (data, shape) = preprocessing(imageFile)
+            return preprocessInput(
+                data,
+                longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
+            )
+        }
+    }
 }
