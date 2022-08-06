@@ -5,7 +5,6 @@ plugins {
     id 'org.jetbrains.dokka' version '1.5.30'
 }
 
-apply plugin: "io.codearte.nexus-staging"
 apply from: project.rootProject.file('gradle/dokka.gradle')
 
 def kotlinDLVersion = "$majorVersion.$minorVersion"
@@ -14,7 +13,6 @@ allprojects {
     group = 'org.jetbrains.kotlinx'
     version = kotlinDLVersion
 
-    apply plugin: "maven-publish"
     apply plugin: "kotlin"
 }
 
