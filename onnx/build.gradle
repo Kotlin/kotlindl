@@ -1,15 +1,26 @@
 project.setDescription("This module contains the Kotlin API for loading and executing the ONNX models.")
 
-dependencies {
-    api project(":api")
-    api 'com.microsoft.onnxruntime:onnxruntime:1.11.0'
-    api "org.jetbrains.kotlinx:multik-api:0.1.1"
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
+apply plugin: 'kotlin-multiplatform'
 
 kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = '1.8'
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":api")
+                api 'com.microsoft.onnxruntime:onnxruntime:1.11.0'
+            }
+        }
+        jvmMain {
+            dependencies {
+                api "org.jetbrains.kotlinx:multik-core:0.2.0"
+                api "org.jetbrains.kotlinx:multik-default:0.2.0"
+            }
+        }
+    }
     explicitApiWarning()
 }
