@@ -10,20 +10,14 @@ apply from: project.rootProject.file('gradle/dokka.gradle')
 def kotlinDLVersion = "$majorVersion.$minorVersion"
 
 allprojects {
+    repositories {
+        mavenCentral()
+    }
+
     group = 'org.jetbrains.kotlinx'
     version = kotlinDLVersion
 
     apply plugin: "kotlin"
-}
-
-repositories {
-    mavenCentral()
-}
-
-subprojects {
-    repositories {
-        mavenCentral()
-    }
 }
 
 def unpublishedSubprojects = ["examples"]
