@@ -25,7 +25,15 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel(private val pathToModel: String) : InferenceModel() {
+public open class OnnxInferenceModel private constructor() : InferenceModel() {
+    public constructor(modelPath: String) : this() {
+        this.pathToModel = modelPath
+    }
+
+    public constructor(modelBytes: ByteArray) : this() {
+        this.modelBytes = modelBytes
+    }
+
     /** Logger for the model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -34,6 +42,16 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
      * specific models.
      */
     private val env = OrtEnvironment.getEnvironment()
+
+    /**
+     * Path to the model file.
+     */
+    private lateinit var pathToModel: String
+
+    /**
+     * Model represented as array of bytes.
+     */
+    private lateinit var modelBytes: ByteArray
 
     /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
@@ -93,7 +111,18 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             session.close()
         }
 
-        session = env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
+        session = when {
+            ::modelBytes.isInitialized -> {
+                env.createSession(modelBytes, buildSessionOptions(uniqueProviders))
+            }
+            ::pathToModel.isInitialized -> {
+                env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
+            }
+            else -> {
+                throw IllegalStateException("OnnxInferenceModel should be initialized either with a path to the file or with model representation in bytes.")
+            }
+        }
+
         executionProvidersInUse = uniqueProviders
 
         initInputOutputInfo()
