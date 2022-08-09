@@ -46,6 +46,12 @@ afterEvaluate {
             switch (type) {
                 case 'kotlinMultiplatform':
                     it.artifactId "$moduleName"
+                    // in order to be compatible with the clients which can't read module metadata and get the correct variant
+                    // this code changes the pom file so that these clients get the jvm variant
+                    // same as done in the kotlinx.serialization library
+                    // see https://github.com/Kotlin/kotlinx.serialization/blob/16a85df254f4f1e317554eb61ee1fbe914800aa4/gradle/publishing.gradle#L70
+                    apply from: "$rootDir/gradle/publish-mpp-root-module-in-platform.gradle"
+                    publishPlatformArtifactsInRootModule(publications.jvm)
                     break
                 default:
                     it.artifactId "$moduleName-$type"
