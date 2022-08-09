@@ -2,7 +2,6 @@ project.setDescription("This module contains the Kotlin API for building, traini
 
 dependencies {
     api project(":dataset")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
     api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
     api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
@@ -13,25 +12,6 @@ compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 kotlin {
     explicitApiWarning()
-}
-
-task fatJar(type: Jar) {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-    manifest {
-        attributes 'Implementation-Version': '1.15'
-    }
-    classifier 'all'
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-artifacts {
-    archives fatJar
 }

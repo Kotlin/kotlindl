@@ -1,7 +1,6 @@
 project.setDescription("This module contains the Kotlin API for visualization of the Deep Learning models built with the KotlinDL.")
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
     api project(":api")
     api project(":tensorflow")
 }
@@ -12,21 +11,8 @@ dependencies {
     api 'org.jetbrains.lets-plot:lets-plot-batik:2.3.0', excludeSLF4JImpl
     api 'org.jetbrains.lets-plot:lets-plot-common:2.3.0', excludeSLF4JImpl
     api 'org.jetbrains.lets-plot:lets-plot-kotlin-api:2.0.1', excludeSLF4JImpl
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-test {
-    useJUnitPlatform()
 }

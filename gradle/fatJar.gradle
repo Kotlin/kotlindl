@@ -1,0 +1,23 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    api project(":api")
+    api project(":dataset")
+    api project(":tensorflow")
+    api project(":onnx")
+    api project(":visualization")
+}
+
+task fatJar(type: Jar) {
+    classifier 'all'
+    manifest {
+        attributes 'Implementation-Version': '1.15'
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+artifacts {
+    archives fatJar
+}
