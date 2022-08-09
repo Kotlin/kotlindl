@@ -25,7 +25,7 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel(private val pathToModel: String) : InferenceModel() {
+public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel() {
     /** Logger for the model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -56,17 +56,41 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
 
-    public companion object {
+    /**
+     * Constructs an ONNX inference model from the given model file.
+     */
+    public constructor(modelPath: String) : this(ModelSource.File(modelPath))
+
+    /**
+     * Constructs an ONNX inference model from the byte array representing an ONNX model.
+     */
+    public constructor(modelBytes: ByteArray) : this(ModelSource.Bytes(modelBytes))
+
+    /**
+     * This is an interface representing a possible source for loading ONNX models.
+     */
+    private sealed interface ModelSource {
         /**
-         * Loads model from SavedModelBundle format.
+         * Method for building an [OrtSession] from the model source.
          */
-        public fun load(
-            pathToModel: String,
-            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
-        ): OnnxInferenceModel {
-            val model = OnnxInferenceModel(pathToModel)
-            model.initializeWith(*executionProviders)
-            return model
+        fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession
+
+        /**
+         * ONNX serialized file.
+         */
+        class File(private val pathToModel: String) : ModelSource {
+            override fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession {
+                return environment.createSession(pathToModel, options)
+            }
+        }
+
+        /**
+         * Byte array representing an ONNX model.
+         */
+        class Bytes(private val bytes: ByteArray) : ModelSource {
+            override fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession {
+                return environment.createSession(bytes, options)
+            }
         }
     }
 
@@ -93,7 +117,8 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             session.close()
         }
 
-        session = env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
+        session = modelSource.buildSession(env, buildSessionOptions(uniqueProviders))
+
         executionProvidersInUse = uniqueProviders
 
         initInputOutputInfo()
@@ -366,5 +391,31 @@ public open class OnnxInferenceModel(private val pathToModel: String) : Inferenc
             else -> TODO()
         }
         return inputTensor
+    }
+
+    public companion object {
+        /**
+         * Loads model from serialized ONNX file.
+         */
+        public fun load(
+            pathToModel: String,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
+        ): OnnxInferenceModel {
+            val model = OnnxInferenceModel(pathToModel)
+            model.initializeWith(*executionProviders)
+            return model
+        }
+
+        /**
+         * Loads model from a byte array representing an ONNX model.
+         */
+        public fun load(
+            modelBytes: ByteArray,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
+        ): OnnxInferenceModel {
+            val model = OnnxInferenceModel(modelBytes)
+            model.initializeWith(*executionProviders)
+            return model
+        }
     }
 }
