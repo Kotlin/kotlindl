@@ -25,15 +25,7 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel private constructor() : InferenceModel() {
-    public constructor(modelPath: String) : this() {
-        this.pathToModel = modelPath
-    }
-
-    public constructor(modelBytes: ByteArray) : this() {
-        this.modelBytes = modelBytes
-    }
-
+public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel() {
     /** Logger for the model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -42,16 +34,6 @@ public open class OnnxInferenceModel private constructor() : InferenceModel() {
      * specific models.
      */
     private val env = OrtEnvironment.getEnvironment()
-
-    /**
-     * Path to the model file.
-     */
-    private lateinit var pathToModel: String
-
-    /**
-     * Model represented as array of bytes.
-     */
-    private lateinit var modelBytes: ByteArray
 
     /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
@@ -74,17 +56,41 @@ public open class OnnxInferenceModel private constructor() : InferenceModel() {
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
 
-    public companion object {
+    /**
+     * Constructs an ONNX inference model from the given model file.
+     */
+    public constructor(modelPath: String) : this(ModelSource.File(modelPath))
+
+    /**
+     * Constructs an ONNX inference model from the byte array representing an ONNX model.
+     */
+    public constructor(modelBytes: ByteArray) : this(ModelSource.Bytes(modelBytes))
+
+    /**
+     * This is an interface representing a possible source for loading ONNX models.
+     */
+    private sealed interface ModelSource {
         /**
-         * Loads model from SavedModelBundle format.
+         * Method for building an [OrtSession] from the model source.
          */
-        public fun load(
-            pathToModel: String,
-            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
-        ): OnnxInferenceModel {
-            val model = OnnxInferenceModel(pathToModel)
-            model.initializeWith(*executionProviders)
-            return model
+        fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession
+
+        /**
+         * ONNX serialized file.
+         */
+        class File(private val pathToModel: String) : ModelSource {
+            override fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession {
+                return environment.createSession(pathToModel, options)
+            }
+        }
+
+        /**
+         * Byte array representing an ONNX model.
+         */
+        class Bytes(private val bytes: ByteArray) : ModelSource {
+            override fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession {
+                return environment.createSession(bytes, options)
+            }
         }
     }
 
@@ -111,17 +117,7 @@ public open class OnnxInferenceModel private constructor() : InferenceModel() {
             session.close()
         }
 
-        session = when {
-            ::modelBytes.isInitialized -> {
-                env.createSession(modelBytes, buildSessionOptions(uniqueProviders))
-            }
-            ::pathToModel.isInitialized -> {
-                env.createSession(pathToModel, buildSessionOptions(uniqueProviders))
-            }
-            else -> {
-                throw IllegalStateException("OnnxInferenceModel should be initialized either with a path to the file or with model representation in bytes.")
-            }
-        }
+        session = modelSource.buildSession(env, buildSessionOptions(uniqueProviders))
 
         executionProvidersInUse = uniqueProviders
 
@@ -395,5 +391,31 @@ public open class OnnxInferenceModel private constructor() : InferenceModel() {
             else -> TODO()
         }
         return inputTensor
+    }
+
+    public companion object {
+        /**
+         * Loads model from serialized ONNX file.
+         */
+        public fun load(
+            pathToModel: String,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
+        ): OnnxInferenceModel {
+            val model = OnnxInferenceModel(pathToModel)
+            model.initializeWith(*executionProviders)
+            return model
+        }
+
+        /**
+         * Loads model from a byte array representing an ONNX model.
+         */
+        public fun load(
+            modelBytes: ByteArray,
+            vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))
+        ): OnnxInferenceModel {
+            val model = OnnxInferenceModel(modelBytes)
+            model.initializeWith(*executionProviders)
+            return model
+        }
     }
 }
