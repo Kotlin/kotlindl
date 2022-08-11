@@ -60,6 +60,35 @@ public class OnFlyImageDataset internal constructor(
         return Pair(train, test)
     }
 
+    /** Returns amount of data rows. */
+    override fun xSize(): Int {
+        return xFiles.size
+    }
+
+    /** Returns row by index [idx]. */
+    override fun getX(idx: Int): FloatArray {
+        return applyImagePreprocessing(xFiles[idx])
+    }
+
+    /** Returns label as [FloatArray] by index [idx]. */
+    override fun getY(idx: Int): Float {
+        return y[idx]
+    }
+
+    override fun shuffle(): OnFlyImageDataset {
+        xFiles.shuffle(Random(12L))
+        y.shuffle(Random(12L))
+        return this
+    }
+
+    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
+        return DataBatch(
+            copyImagesToBatch(xFiles, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
+            batchLength
+        )
+    }
+
     public companion object {
         /** Creates binary vector with size [numClasses] from [label]. */
         @JvmStatic
@@ -114,34 +143,5 @@ public class OnFlyImageDataset internal constructor(
                 throw AssertionError(e)
             }
         }
-    }
-
-    /** Returns amount of data rows. */
-    override fun xSize(): Int {
-        return xFiles.size
-    }
-
-    /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return applyImagePreprocessing(xFiles[idx])
-    }
-
-    /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): Float {
-        return y[idx]
-    }
-
-    override fun shuffle(): OnFlyImageDataset {
-        xFiles.shuffle(Random(12L))
-        y.shuffle(Random(12L))
-        return this
-    }
-
-    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyImagesToBatch(xFiles, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
     }
 }
