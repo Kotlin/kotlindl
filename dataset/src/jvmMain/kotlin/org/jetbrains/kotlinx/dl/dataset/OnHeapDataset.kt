@@ -205,17 +205,17 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Creates an [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to load and prepare images.
+         * Creates an [OnHeapDataset] from [pathToData] and [labels] using [dataLoader] to load and prepare images.
          */
         @JvmStatic
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            preprocessing: Preprocessing = Preprocessing()
+            dataLoader: DataLoader<File> = Preprocessing()
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
-                val x = preprocessing.prepareX(xFiles)
+                val x = dataLoader.prepareX(xFiles)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -229,8 +229,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         @JvmStatic
         public fun create(
             pathToData: File,
-            labelGenerator: LabelGenerator,
-            dataLoader: DataLoader = Preprocessing()
+            labelGenerator: LabelGenerator<File>,
+            dataLoader: DataLoader<File> = Preprocessing()
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)

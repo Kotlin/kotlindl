@@ -81,7 +81,7 @@ public class ImageRecognitionModel(
      *
      * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
      */
-    public fun predictTopKObjects(imageFile: File, dataLoader: DataLoader, topK: Int = 5): List<Pair<String, Float>> {
+    public fun predictTopKObjects(imageFile: File, dataLoader: DataLoader<File>, topK: Int = 5): List<Pair<String, Float>> {
         val (inputData, _) = dataLoader.load(imageFile)
         return predictTopKImageNetLabels(internalModel, inputData, imageNetClassLabels, topK)
     }
@@ -128,7 +128,7 @@ public class ImageRecognitionModel(
      *
      * @return The label of the recognized object with the highest probability.
      */
-    public fun predictObject(imageFile: File, dataLoader: DataLoader): String {
+    public fun predictObject(imageFile: File, dataLoader: DataLoader<File>): String {
         val (inputData, _) = dataLoader.load(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
     }
@@ -139,7 +139,7 @@ public class ImageRecognitionModel(
          *
          * It loads the data from file with the provided [dataLoader] and applied the specific preprocessing to it.
          */
-        public fun ModelType<*, *>.preprocessInput(imageFile: File, dataLoader: DataLoader): FloatArray {
+        public fun ModelType<*, *>.preprocessInput(imageFile: File, dataLoader: DataLoader<File>): FloatArray {
             val (data, shape) = dataLoader.load(imageFile)
             return preprocessInput(data, shape.dims())
         }

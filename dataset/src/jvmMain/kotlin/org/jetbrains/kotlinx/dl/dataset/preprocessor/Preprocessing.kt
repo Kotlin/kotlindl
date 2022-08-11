@@ -20,15 +20,15 @@ import java.io.File
  *
  * Could be used to handle directory of images or one image file.
  */
-public class Preprocessing: DataLoader {
+public class Preprocessing: DataLoader<File> {
     /** This stage describes the process of image loading and transformation before converting to tensor. */
     public lateinit var imagePreprocessingStage: ImagePreprocessing
 
     /** This stage describes the process of data transformation after converting to tensor. */
     public lateinit var tensorPreprocessingStage: TensorPreprocessing
 
-    override fun load(file: File): Pair<FloatArray, TensorShape> {
-        val (floats, imageShape) = invoke(file)
+    override fun load(dataSource: File): Pair<FloatArray, TensorShape> {
+        val (floats, imageShape) = invoke(dataSource)
         return floats to imageShape.toTensorShape()
     }
 

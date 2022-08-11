@@ -6,19 +6,19 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import java.io.File
 
 /**
- * And interface for loading data from [File].
+ * And interface for loading data from the provided data source.
+ * @param D data source type
  */
-public interface DataLoader {
+public interface DataLoader<D> {
     /**
-     * Load the data from the specified [file].
+     * Load the data from the specified [dataSource].
      */
-    public fun load(file: File): Pair<FloatArray, TensorShape>
+    public fun load(dataSource: D): Pair<FloatArray, TensorShape>
 
     public companion object {
-        internal fun DataLoader.prepareX(sources: Array<File>): Array<FloatArray> {
+        internal fun <D> DataLoader<D>.prepareX(sources: Array<D>): Array<FloatArray> {
             return Array(sources.size) { load(sources[it]).first }
         }
     }

@@ -17,18 +17,18 @@ import kotlin.random.Random
 /**
  * This dataset keeps all data on disk and generates batches on the fly using provided [dataLoader].
  *
- * @param [xFiles] files to load images from
- * @param [y] labels to use for the loaded images
- * @param [dataLoader] loader to load the data with from the provided files
+ * @param [x] sources to load data from
+ * @param [y] labels to use for the loaded data
+ * @param [dataLoader] data loader to load data with from the provided sources
  */
-public class OnFlyImageDataset internal constructor(
-    private val xFiles: Array<File>,
+public class OnFlyImageDataset<D> internal constructor(
+    private val x: Array<D>,
     private val y: FloatArray,
-    private val dataLoader: DataLoader,
+    private val dataLoader: DataLoader<D>,
 ) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    private fun copyImagesToBatch(src: Array<File>, start: Int, length: Int): Array<FloatArray> {
+    private fun copySourcesToBatch(src: Array<D>, start: Int, length: Int): Array<FloatArray> {
         return Array(length) { index -> dataLoader.load(src[start + index]).first }
     }
 
@@ -38,18 +38,18 @@ public class OnFlyImageDataset internal constructor(
     }
 
     /** Splits datasets on two sub-datasets according [splitRatio].*/
-    override fun split(splitRatio: Double): Pair<OnFlyImageDataset, OnFlyImageDataset> {
+    override fun split(splitRatio: Double): Pair<OnFlyImageDataset<D>, OnFlyImageDataset<D>> {
         require(splitRatio in 0.0..1.0) { "'Split ratio' argument value must be in range [0.0; 1.0]." }
 
-        val trainDatasetLastIndex = truncate(xFiles.size * splitRatio).toInt()
+        val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         val train = OnFlyImageDataset(
-            xFiles.copyOfRange(0, trainDatasetLastIndex),
+            x.copyOfRange(0, trainDatasetLastIndex),
             y.copyOfRange(0, trainDatasetLastIndex),
             dataLoader
         )
         val test = OnFlyImageDataset(
-            xFiles.copyOfRange(trainDatasetLastIndex, xFiles.size),
+            x.copyOfRange(trainDatasetLastIndex, x.size),
             y.copyOfRange(trainDatasetLastIndex, y.size),
             dataLoader
         )
@@ -59,12 +59,12 @@ public class OnFlyImageDataset internal constructor(
 
     /** Returns amount of data rows. */
     override fun xSize(): Int {
-        return xFiles.size
+        return x.size
     }
 
     /** Returns row by index [idx]. */
     override fun getX(idx: Int): FloatArray {
-        return dataLoader.load(xFiles[idx]).first
+        return dataLoader.load(x[idx]).first
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
@@ -72,15 +72,15 @@ public class OnFlyImageDataset internal constructor(
         return y[idx]
     }
 
-    override fun shuffle(): OnFlyImageDataset {
-        xFiles.shuffle(Random(12L))
+    override fun shuffle(): OnFlyImageDataset<D> {
+        x.shuffle(Random(12L))
         y.shuffle(Random(12L))
         return this
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
         return DataBatch(
-            copyImagesToBatch(xFiles, batchStart, batchLength),
+            copySourcesToBatch(x, batchStart, batchLength),
             copyLabelsToBatch(y, batchStart, batchLength),
             batchLength
         )
@@ -114,8 +114,8 @@ public class OnFlyImageDataset internal constructor(
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            dataLoader: DataLoader = Preprocessing()
-        ): OnFlyImageDataset {
+            dataLoader: DataLoader<File> = Preprocessing()
+        ): OnFlyImageDataset<File> {
             return try {
                 OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, dataLoader)
             } catch (e: IOException) {
@@ -124,14 +124,14 @@ public class OnFlyImageDataset internal constructor(
         }
 
         /**
-         * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator] using [dataLoader] to load the images.
+         * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator] using [dataLoader] to load the data.
          */
         @JvmStatic
         public fun create(
             pathToData: File,
-            labelGenerator: LabelGenerator,
-            dataLoader: DataLoader = Preprocessing()
-        ): OnFlyImageDataset {
+            labelGenerator: LabelGenerator<File>,
+            dataLoader: DataLoader<File> = Preprocessing()
+        ): OnFlyImageDataset<File> {
             return try {
                 val xFiles = OnHeapDataset.prepareFileNames(pathToData)
                 val y = labelGenerator.prepareY(xFiles)
