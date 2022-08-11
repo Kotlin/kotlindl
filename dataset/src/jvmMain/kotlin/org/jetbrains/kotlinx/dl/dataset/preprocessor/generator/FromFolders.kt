@@ -13,11 +13,11 @@ import java.io.File
  *
  * @property [mapping] The mapping from class names to class labels presented as natural numbers.
  */
-public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator {
-    override fun getLabel(file: File): Float {
-        val label = mapping[file.parentFile.name]
+public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator<File> {
+    override fun getLabel(dataSource: File): Float {
+        val label = mapping[dataSource.parentFile.name]
         if (label == null) {
-            error("The parent directory of ${file.absolutePath} is ${file.parentFile.name}. No such class name in mapping $mapping")
+            error("The parent directory of ${dataSource.absolutePath} is ${dataSource.parentFile.name}. No such class name in mapping $mapping")
         }
         return label.toFloat()
     }

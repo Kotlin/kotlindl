@@ -10,6 +10,6 @@ import java.io.File
 /**
  * This [LabelGenerator] is responsible for creation default labels with value Float.NaN.
  */
-public class EmptyLabels : LabelGenerator {
-    override fun getLabel(file: File): Float = Float.NaN
+public class EmptyLabels<D> : LabelGenerator<D> {
+    override fun getLabel(dataSource: D): Float = Float.NaN
 }

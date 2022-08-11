@@ -230,7 +230,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         @JvmStatic
         public fun create(
             pathToData: File,
-            labelGenerator: LabelGenerator,
+            labelGenerator: LabelGenerator<File>,
             preprocessing: Preprocessing = Preprocessing()
         ): OnHeapDataset {
             return try {

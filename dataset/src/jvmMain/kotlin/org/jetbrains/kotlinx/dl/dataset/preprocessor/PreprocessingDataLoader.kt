@@ -13,9 +13,9 @@ import java.io.File
 /**
  * A [DataLoader] which uses provided [Preprocessing] to prepare images.
  */
-private class PreprocessingDataLoader(private val preprocessing: Preprocessing) : DataLoader {
-    override fun load(file: File): Pair<FloatArray, TensorShape> {
-        val (floats, imageShape) = preprocessing(file)
+private class PreprocessingDataLoader(private val preprocessing: Preprocessing) : DataLoader<File> {
+    override fun load(dataSource: File): Pair<FloatArray, TensorShape> {
+        val (floats, imageShape) = preprocessing(dataSource)
         return floats to imageShape.toTensorShape()
     }
 }
@@ -23,4 +23,4 @@ private class PreprocessingDataLoader(private val preprocessing: Preprocessing) 
 /**
  * Returns a [DataLoader] instance which uses this [Preprocessing] to prepare images.
  */
-public fun Preprocessing.dataLoader(): DataLoader = PreprocessingDataLoader(this)
+public fun Preprocessing.dataLoader(): DataLoader<File> = PreprocessingDataLoader(this)
