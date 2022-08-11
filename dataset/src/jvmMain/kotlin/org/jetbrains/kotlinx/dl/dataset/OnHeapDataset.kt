@@ -59,6 +59,35 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         )
     }
 
+    /** Returns amount of data rows. */
+    override fun xSize(): Int {
+        return x.size
+    }
+
+    /** Returns row by index [idx]. */
+    override fun getX(idx: Int): FloatArray {
+        return x[idx]
+    }
+
+    /** Returns label as [FloatArray] by index [idx]. */
+    override fun getY(idx: Int): Float {
+        return y[idx]
+    }
+
+    override fun shuffle(): OnHeapDataset {
+        x.shuffle(Random(12L))
+        y.shuffle(Random(12L))
+        return this
+    }
+
+    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
+        return DataBatch(
+            copyXToBatch(x, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
+            batchLength
+        )
+    }
+
     public companion object {
         /** Creates binary vector with size [numClasses] from [label]. */
         @JvmStatic
@@ -255,35 +284,6 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
                 .toList()
                 .toTypedArray()
         }
-    }
-
-    /** Returns amount of data rows. */
-    override fun xSize(): Int {
-        return x.size
-    }
-
-    /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return x[idx]
-    }
-
-    /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): Float {
-        return y[idx]
-    }
-
-    override fun shuffle(): OnHeapDataset {
-        x.shuffle(Random(12L))
-        y.shuffle(Random(12L))
-        return this
-    }
-
-    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyXToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
     }
 }
 
