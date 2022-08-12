@@ -36,7 +36,7 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
      *
      * @param [tensorShape] Should be 3 dimensional array (HWC or CHW format)
      */
-    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray
+    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray = data
 
     /** Returns the specially prepared pre-trained model of the type U. */
     public fun pretrainedModel(modelHub: ModelHub): U

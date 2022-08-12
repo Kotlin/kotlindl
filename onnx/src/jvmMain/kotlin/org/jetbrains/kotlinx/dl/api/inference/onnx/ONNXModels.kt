@@ -389,11 +389,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b0",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -418,11 +414,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b1",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -447,11 +439,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b2",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -476,11 +464,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b3",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -505,11 +489,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b4",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -534,11 +514,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b5",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -563,11 +539,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b6",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -592,11 +564,7 @@ public object ONNXModels {
                 "models/onnx/cv/efficientnet/efficientnet-b7",
                 channelsFirst = false,
                 noTop = noTop
-            ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-        }
+            )
 
         /**
          * This model is a neural network for digit classification that take grey-scale images of digits as input and classify the major object in the image into a set of 10 different classes.
@@ -607,11 +575,7 @@ public object ONNXModels {
          * - an input with the shape (1x1x28x28)
          * - an output with the shape (1x10)
          */
-        public class Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                TODO("Not yet implemented")
-            }
-        }
+        public class Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false)
     }
 
     /** Object detection models and preprocessing. */
@@ -690,10 +654,6 @@ public object ONNXModels {
          */
         public object SSDMobileNetV1 :
             ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
                 return SSDMobileNetV1ObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -728,10 +688,6 @@ public object ONNXModels {
          */
         public object EfficientDetD0 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d0") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -765,10 +721,6 @@ public object ONNXModels {
          */
         public object EfficientDetD1 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d1") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -802,10 +754,6 @@ public object ONNXModels {
          */
         public object EfficientDetD2 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -839,10 +787,6 @@ public object ONNXModels {
          */
         public object EfficientDetD3 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d3") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -876,9 +820,6 @@ public object ONNXModels {
          */
         public object EfficientDetD4 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d4") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -913,10 +854,6 @@ public object ONNXModels {
          */
         public object EfficientDetD5 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d5") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -950,10 +887,6 @@ public object ONNXModels {
          */
         public object EfficientDetD6 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d6") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
             }
@@ -1027,10 +960,6 @@ public object ONNXModels {
          */
         public object MoveNetSinglePoseLighting :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this))
             }
@@ -1066,10 +995,6 @@ public object ONNXModels {
          */
         public object MoveNetMultiPoseLighting :
             PoseDetection<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
                 return MultiPoseDetectionModel(modelHub.loadModel(this))
             }
@@ -1103,10 +1028,6 @@ public object ONNXModels {
          */
         public object MoveNetSinglePoseThunder :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return data
-            }
-
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this))
             }
