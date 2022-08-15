@@ -27,9 +27,11 @@ import java.io.File
 public class ImageRecognitionModel(
     private val internalModel: InferenceModel,
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
-) : InferenceModel() {
+) : InferenceModel {
     /** Class labels for ImageNet dataset. */
     public val imageNetClassLabels: Map<Int, String> = loadImageNetClassLabels()
+
+    public override var name: String? by internalModel::name
 
     override val inputDimensions: LongArray
         get() = internalModel.inputDimensions
