@@ -700,7 +700,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): SSDMobileNetV1ObjectDetectionModel {
                 val model = SSDMobileNetV1ObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 1000L, 1000L, 3L)
+                model.reshape(1000L, 1000L, 3L)
                 return model
             }
         }
@@ -738,7 +738,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 512L, 512L, 3L)
+                model.reshape(512L, 512L, 3L)
                 return model
             }
         }
@@ -775,7 +775,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 640L, 640L, 3L)
+                model.reshape(640L, 640L, 3L)
                 return model
             }
         }
@@ -812,7 +812,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 768L, 768L, 3L)
+                model.reshape(768L, 768L, 3L)
                 return model
             }
         }
@@ -849,7 +849,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 896L, 896L, 3L)
+                model.reshape(896L, 896L, 3L)
                 return model
             }
         }
@@ -886,7 +886,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 1024L, 1024L, 3L)
+                model.reshape(1024L, 1024L, 3L)
                 return model
             }
         }
@@ -923,7 +923,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                model.reshape(1280L, 1280L, 3L)
                 return model
             }
         }
@@ -960,7 +960,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): EfficientDetObjectDetectionModel {
                 val model = EfficientDetObjectDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 1280L, 1280L, 3L)
+                model.reshape(1280L, 1280L, 3L)
                 return model
             }
         }
@@ -1076,7 +1076,7 @@ public object ONNXModels {
 
             override fun createModel(pathToModel: String): MultiPoseDetectionModel {
                 val model = MultiPoseDetectionModel(pathToModel)
-                model.inputShape = longArrayOf(1L, 256L, 256L, 3L)
+                model.reshape(256L, 256L, 3L)
                 return model
             }
         }

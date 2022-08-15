@@ -47,10 +47,10 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
                     classLabel = cocoCategories[items[i][6].toInt()]!!,
                     probability = probability,
                     // left, bot, right, top
-                    xMin = minOf(items[i][2] / inputShape[2], 1.0f),
-                    yMax = minOf(items[i][3] / inputShape[1], 1.0f),
-                    xMax = minOf(items[i][4] / inputShape[2], 1.0f),
-                    yMin = minOf(items[i][1] / inputShape[1], 1.0f)
+                    xMin = minOf(items[i][2] / inputDimensions[1], 1.0f),
+                    yMax = minOf(items[i][3] / inputDimensions[0], 1.0f),
+                    xMax = minOf(items[i][4] / inputDimensions[1], 1.0f),
+                    yMin = minOf(items[i][1] / inputDimensions[0], 1.0f)
                 )
                 foundObjects.add(detectedObject)
             }
@@ -71,8 +71,8 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
     public fun detectObjects(imageFile: File): List<DetectedObject> {
         val preprocessing = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputShape[1].toInt()
-                outputWidth = inputShape[2].toInt()
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
             }
             // the channels of input of EfficientDet models should be in RGB order
             // model is quite sensitive for this

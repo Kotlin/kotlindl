@@ -50,8 +50,8 @@ public class SinglePoseDetectionModel(pathToModel: String) : OnnxInferenceModel(
     }
 
     public fun detectPose(imageFile: File): DetectedPose {
-        val height = inputShape[1]
-        val width = inputShape[2]
+        val height = inputDimensions[0]
+        val width = inputDimensions[1]
 
         val preprocessing = pipeline<BufferedImage>()
             .resize {

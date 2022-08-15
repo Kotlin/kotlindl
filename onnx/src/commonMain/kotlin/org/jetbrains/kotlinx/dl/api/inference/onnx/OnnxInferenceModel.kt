@@ -34,7 +34,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     private lateinit var session: OrtSession
 
     /** Data shape for prediction. */
-    public lateinit var inputShape: LongArray
+    private lateinit var inputShape: LongArray
 
     /** Data type for input tensor. */
     public lateinit var inputDataType: OnnxJavaType
@@ -182,7 +182,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      * @param dims The input shape.
      */
     public override fun reshape(vararg dims: Long) {
-        this.inputShape = TensorShape(1, *dims).dims()
+        inputShape = longArrayOf(1, *dims)
     }
 
     override fun copy(

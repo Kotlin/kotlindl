@@ -84,8 +84,8 @@ public class SSDMobileNetV1ObjectDetectionModel(pathToModel: String) : OnnxInfer
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         val preprocessing = pipeline<BufferedImage>()
             .resize {
-                outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
-                outputWidth = this@SSDMobileNetV1ObjectDetectionModel.inputShape[2].toInt()
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
