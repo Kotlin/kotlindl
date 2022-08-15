@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -33,14 +34,6 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
      */
     public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
-    }
-
     /**
      * Detects 106 [Landmark] objects for the given [imageFile].
      */
@@ -63,6 +56,14 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         }
 
         return landMarks
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): Fan2D106FaceAlignmentModel {
+        return Fan2D106FaceAlignmentModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
 }
 

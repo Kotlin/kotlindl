@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -91,5 +92,13 @@ public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInf
         val (data, _) = preprocessing.dataLoader().load(imageFile)
         // we don't need special preprocessing here
         return this.detectObjects(data)
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): EfficientDetObjectDetectionModel {
+        return EfficientDetObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
 }

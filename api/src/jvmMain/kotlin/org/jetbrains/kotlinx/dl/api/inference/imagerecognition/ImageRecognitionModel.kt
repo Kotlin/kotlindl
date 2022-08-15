@@ -31,14 +31,6 @@ public class ImageRecognitionModel(
     /** Class labels for ImageNet dataset. */
     public val imageNetClassLabels: Map<Int, String> = loadImageNetClassLabels()
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
-    }
-
     /**
      * Predicts [topK] objects for the given [imageFile].
      * Default [DataLoader] is used to load and prepare image.
@@ -112,6 +104,14 @@ public class ImageRecognitionModel(
     public fun predictObject(imageFile: File, dataLoader: DataLoader<File>): String {
         val (inputData, _) = dataLoader.load(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): ImageRecognitionModel {
+        return ImageRecognitionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights), modelType)
     }
 
     public companion object {

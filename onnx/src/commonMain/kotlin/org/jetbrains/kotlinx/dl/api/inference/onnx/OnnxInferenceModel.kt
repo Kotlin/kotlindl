@@ -188,14 +188,6 @@ public open class OnnxInferenceModel private constructor(private val modelSource
         inputShape = longArrayOf(1, *dims)
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
-    }
-
     override val inputDimensions: LongArray
         get() = TensorShape(inputShape).tail()
 
@@ -327,6 +319,22 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): OnnxInferenceModel {
+        val model = OnnxInferenceModel(modelSource)
+        model.name = copiedModelName
+        if (::inputShape.isInitialized) {
+            model.reshape(*inputDimensions)
+        }
+        if (::session.isInitialized) {
+            model.initializeWith(*executionProvidersInUse.toTypedArray())
+        }
+        return model
     }
 
     /** Releases the ONNXRuntime - related resources. */
