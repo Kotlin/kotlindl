@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
@@ -27,10 +28,18 @@ private const val OUTPUT_NAME = "output_0"
  *
  * It internally uses [ONNXModels.PoseDetection.MoveNetSinglePoseLighting]
  * or [ONNXModels.PoseDetection.MoveNetSinglePoseThunder] under the hood to make predictions.
+ *
+ * @param internalModel model used to make predictions
  */
-public class SinglePoseDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
+public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the pose detection model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+
     public fun detectPose(inputData: FloatArray): DetectedPose {
-        val rawPrediction = this.predictRaw(inputData)
+        val rawPrediction = internalModel.predictRaw(inputData)
         val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<Array<FloatArray>>>)[0][0]
 
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()

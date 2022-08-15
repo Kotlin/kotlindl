@@ -23,25 +23,15 @@ private const val INPUT_SIZE = 192
 
 /**
  * The light-weight API for solving Face Alignment task via Fan2D106 model.
+ *
+ * @param [internalModel] model used to make predictions
  */
-public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel {
-    override val inputDimensions: LongArray
-        get() = internalModel.inputDimensions
-
-    /** Model name. */
-    public override var name: String? by internalModel::name
-
-    override fun predict(inputData: FloatArray): Int {
-        return internalModel.predict(inputData)
-    }
-
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        return internalModel.predictSoftly(inputData, predictionTensorName)
-    }
-
-    override fun reshape(vararg dims: Long) {
-        TODO()
-    }
+public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the face alignment model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
 
     override fun copy(
         copiedModelName: String?,
@@ -49,11 +39,6 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         copyWeights: Boolean
     ): InferenceModel {
         TODO("Not yet implemented")
-    }
-
-    /** Releases the model resources. */
-    override fun close() {
-        internalModel.close()
     }
 
     /**

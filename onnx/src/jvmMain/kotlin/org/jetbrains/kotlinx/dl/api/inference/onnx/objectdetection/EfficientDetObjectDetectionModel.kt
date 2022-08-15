@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -26,9 +27,17 @@ private const val OUTPUT_NAME = "detections:0"
  *
  * It internally uses [ONNXModels.ObjectDetection.EfficientDetD0] or other EfficientDet models trained on the COCO dataset.
  *
+ * @param [internalModel] model used to make predictions
+ *
  * @since 0.4
  */
-public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
+public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the object detection model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+
     /**
      * Returns the detected object for the given image file sorted by the score.
      *
@@ -36,7 +45,7 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(inputData: FloatArray): List<DetectedObject> {
-        val rawPrediction = this.predictRaw(inputData)
+        val rawPrediction = internalModel.predictRaw(inputData)
         val foundObjects = mutableListOf<DetectedObject>()
         val items = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
 
