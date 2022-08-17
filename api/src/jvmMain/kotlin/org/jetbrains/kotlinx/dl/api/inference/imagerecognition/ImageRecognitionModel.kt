@@ -27,26 +27,9 @@ import java.io.File
 public class ImageRecognitionModel(
     private val internalModel: InferenceModel,
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
-) : InferenceModel {
+) : InferenceModel by internalModel {
     /** Class labels for ImageNet dataset. */
     public val imageNetClassLabels: Map<Int, String> = loadImageNetClassLabels()
-
-    public override var name: String? by internalModel::name
-
-    override val inputDimensions: LongArray
-        get() = internalModel.inputDimensions
-
-    override fun predict(inputData: FloatArray): Int {
-        return internalModel.predict(inputData)
-    }
-
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        return internalModel.predictSoftly(inputData, predictionTensorName)
-    }
-
-    override fun reshape(vararg dims: Long) {
-        throw UnsupportedOperationException("The reshape operation is not required for this model.")
-    }
 
     override fun copy(
         copiedModelName: String?,
@@ -54,11 +37,6 @@ public class ImageRecognitionModel(
         copyWeights: Boolean
     ): InferenceModel {
         TODO("Not yet implemented")
-    }
-
-    /** Releases internal resources. */
-    override fun close() {
-        internalModel.close()
     }
 
     /**
