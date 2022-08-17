@@ -5,7 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
 
+import java.io.File
+
 /**
  * This [LabelGenerator] is responsible for creation default labels with value Float.NaN.
  */
-public class EmptyLabels : LabelGenerator
+public class EmptyLabels<D> : LabelGenerator<D> {
+    override fun getLabel(dataSource: D): Float = Float.NaN
+}

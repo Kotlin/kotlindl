@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -27,8 +28,7 @@ import kotlin.streams.toList
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
  */
-public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) :
-    Dataset() {
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
@@ -56,6 +56,35 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         return Pair(
             OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex)),
             OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size))
+        )
+    }
+
+    /** Returns amount of data rows. */
+    override fun xSize(): Int {
+        return x.size
+    }
+
+    /** Returns row by index [idx]. */
+    override fun getX(idx: Int): FloatArray {
+        return x[idx]
+    }
+
+    /** Returns label as [FloatArray] by index [idx]. */
+    override fun getY(idx: Int): Float {
+        return y[idx]
+    }
+
+    override fun shuffle(): OnHeapDataset {
+        x.shuffle(Random(12L))
+        y.shuffle(Random(12L))
+        return this
+    }
+
+    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
+        return DataBatch(
+            copyXToBatch(x, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
+            batchLength
         )
     }
 
@@ -187,7 +216,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
-                val x = prepareX(xFiles, preprocessing)
+                val x = preprocessing.dataLoader().prepareX(xFiles)
 
                 OnHeapDataset(x, labels)
             } catch (e: IOException) {
@@ -195,55 +224,23 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             }
         }
 
-        private fun prepareX(
-            xFiles: Array<File>,
-            preprocessors: Preprocessing
-        ): Array<FloatArray> {
-            return Array(xFiles.size) { preprocessors.handleFile(xFiles[it]).first }
-        }
-
-
         /**
          * Creates an [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
          */
         @JvmStatic
         public fun create(
             pathToData: File,
-            labelGenerator: LabelGenerator,
+            labelGenerator: LabelGenerator<File>,
             preprocessing: Preprocessing = Preprocessing()
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
-                val x = prepareX(xFiles, preprocessing)
-                val y = prepareY(xFiles, labelGenerator)
+                val x = preprocessing.dataLoader().prepareX(xFiles)
+                val y = labelGenerator.prepareY(xFiles)
 
                 OnHeapDataset(x, y)
             } catch (e: IOException) {
                 throw AssertionError(e)
-            }
-        }
-
-        internal fun prepareY(
-            xFiles: Array<File>,
-            labelGenerator: LabelGenerator,
-        ): FloatArray {
-            when (labelGenerator) {
-                is FromFolders -> { // TODO: probably move to the labelGenerator method a-la apply
-                    val mapping = labelGenerator.mapping
-
-                    val y = FloatArray(xFiles.size) { 0.0f }
-                    for (i in xFiles.indices) {
-                        y[i] = (mapping[xFiles[i].parentFile.name]
-                            ?: error("The parent directory of ${xFiles[i].absolutePath} is ${xFiles[i].parentFile.name}. No such class name in mapping $mapping")).toFloat()
-                    }
-                    return y
-                }
-                is EmptyLabels -> {
-                    return FloatArray(xFiles.size) { Float.NaN }
-                }
-                else -> {
-                    throw UnsupportedOperationException("Unknown label generator: ${labelGenerator}") // TODO: labelGenerator.apply(...) will be better solution here.
-                }
             }
         }
 
@@ -255,35 +252,6 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
                 .toList()
                 .toTypedArray()
         }
-    }
-
-    /** Returns amount of data rows. */
-    override fun xSize(): Int {
-        return x.size
-    }
-
-    /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return x[idx]
-    }
-
-    /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): Float {
-        return y[idx]
-    }
-
-    override fun shuffle(): OnHeapDataset {
-        x.shuffle(Random(12L))
-        y.shuffle(Random(12L))
-        return this
-    }
-
-    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyXToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
     }
 }
 

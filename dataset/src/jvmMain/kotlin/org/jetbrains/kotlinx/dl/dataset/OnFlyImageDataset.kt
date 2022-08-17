@@ -6,7 +6,9 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -14,25 +16,21 @@ import kotlin.math.truncate
 import kotlin.random.Random
 
 /**
- * This dataset keeps all data on disk and generates batches on-fly according [preprocessing] pipeline.
+ * This dataset keeps all data on disk and generates batches on the fly using provided [dataLoader].
  *
- * @param [xFiles] files to load images from
- * @param [y] labels to use for the loaded images
- * @param [preprocessing] preprocessing to apply to the loaded images
+ * @param [x] sources to load data from
+ * @param [y] labels to use for the loaded data
+ * @param [dataLoader] data loader to load data with from the provided sources
  */
-public class OnFlyImageDataset internal constructor(
-    private val xFiles: Array<File>,
+public class OnFlyImageDataset<D> internal constructor(
+    private val x: Array<D>,
     private val y: FloatArray,
-    private val preprocessing: Preprocessing,
+    private val dataLoader: DataLoader<D>,
 ) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    private fun copyImagesToBatch(src: Array<File>, start: Int, length: Int): Array<FloatArray> {
-        return Array(length) { index -> applyImagePreprocessing(src[start + index]) }
-    }
-
-    private fun applyImagePreprocessing(file: File): FloatArray {
-        return preprocessing.handleFile(file).first
+    private fun copySourcesToBatch(src: Array<D>, start: Int, length: Int): Array<FloatArray> {
+        return Array(length) { index -> dataLoader.load(src[start + index]).first }
     }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
@@ -41,23 +39,52 @@ public class OnFlyImageDataset internal constructor(
     }
 
     /** Splits datasets on two sub-datasets according [splitRatio].*/
-    override fun split(splitRatio: Double): Pair<OnFlyImageDataset, OnFlyImageDataset> {
+    override fun split(splitRatio: Double): Pair<OnFlyImageDataset<D>, OnFlyImageDataset<D>> {
         require(splitRatio in 0.0..1.0) { "'Split ratio' argument value must be in range [0.0; 1.0]." }
 
-        val trainDatasetLastIndex = truncate(xFiles.size * splitRatio).toInt()
+        val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         val train = OnFlyImageDataset(
-            xFiles.copyOfRange(0, trainDatasetLastIndex),
+            x.copyOfRange(0, trainDatasetLastIndex),
             y.copyOfRange(0, trainDatasetLastIndex),
-            preprocessing
+            dataLoader
         )
         val test = OnFlyImageDataset(
-            xFiles.copyOfRange(trainDatasetLastIndex, xFiles.size),
+            x.copyOfRange(trainDatasetLastIndex, x.size),
             y.copyOfRange(trainDatasetLastIndex, y.size),
-            preprocessing
+            dataLoader
         )
 
         return Pair(train, test)
+    }
+
+    /** Returns amount of data rows. */
+    override fun xSize(): Int {
+        return x.size
+    }
+
+    /** Returns row by index [idx]. */
+    override fun getX(idx: Int): FloatArray {
+        return dataLoader.load(x[idx]).first
+    }
+
+    /** Returns label as [FloatArray] by index [idx]. */
+    override fun getY(idx: Int): Float {
+        return y[idx]
+    }
+
+    override fun shuffle(): OnFlyImageDataset<D> {
+        x.shuffle(Random(12L))
+        y.shuffle(Random(12L))
+        return this
+    }
+
+    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
+        return DataBatch(
+            copySourcesToBatch(x, batchStart, batchLength),
+            copyLabelsToBatch(y, batchStart, batchLength),
+            batchLength
+        )
     }
 
     public companion object {
@@ -89,9 +116,9 @@ public class OnFlyImageDataset internal constructor(
             pathToData: File,
             labels: FloatArray,
             preprocessing: Preprocessing = Preprocessing()
-        ): OnFlyImageDataset {
+        ): OnFlyImageDataset<File> {
             return try {
-                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing)
+                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing.dataLoader())
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
@@ -103,45 +130,16 @@ public class OnFlyImageDataset internal constructor(
         @JvmStatic
         public fun create(
             pathToData: File,
-            labelGenerator: LabelGenerator,
-            preprocessors: Preprocessing = Preprocessing()
-        ): OnFlyImageDataset {
+            labelGenerator: LabelGenerator<File>,
+            preprocessing: Preprocessing = Preprocessing()
+        ): OnFlyImageDataset<File> {
             return try {
                 val xFiles = OnHeapDataset.prepareFileNames(pathToData)
-                val y = OnHeapDataset.prepareY(xFiles, labelGenerator)
-                OnFlyImageDataset(xFiles, y, preprocessors)
+                val y = labelGenerator.prepareY(xFiles)
+                OnFlyImageDataset(xFiles, y, preprocessing.dataLoader())
             } catch (e: IOException) {
                 throw AssertionError(e)
             }
         }
-    }
-
-    /** Returns amount of data rows. */
-    override fun xSize(): Int {
-        return xFiles.size
-    }
-
-    /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return applyImagePreprocessing(xFiles[idx])
-    }
-
-    /** Returns label as [FloatArray] by index [idx]. */
-    override fun getY(idx: Int): Float {
-        return y[idx]
-    }
-
-    override fun shuffle(): OnFlyImageDataset {
-        xFiles.shuffle(Random(12L))
-        y.shuffle(Random(12L))
-        return this
-    }
-
-    override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyImagesToBatch(xFiles, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
     }
 }

@@ -5,5 +5,18 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
 
+import java.io.File
+
 /** A parent interface for all label generators. */
-public interface LabelGenerator
+public interface LabelGenerator<D> {
+    /**
+     * Returns a label for the provided [dataSource].
+     */
+    public fun getLabel(dataSource: D): Float
+
+    public companion object {
+        internal fun <D> LabelGenerator<D>.prepareY(sources: Array<D>): FloatArray {
+            return FloatArray(sources.size) { getLabel(sources[it]) }
+        }
+    }
+}

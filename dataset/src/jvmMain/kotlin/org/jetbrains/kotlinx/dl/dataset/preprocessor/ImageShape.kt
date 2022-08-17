@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+
 /**
  * Helper class to keep widely used shape of image object presented as a 4D tensor
  * (batchSize = 1, [width], [height], [channels]).
@@ -24,4 +26,10 @@ public data class ImageShape(
     /** Returns number of elements in a tensor with the given shape. */
     public val numberOfElements: Long
         get() = width!! * height!! * channels!!
+
+    public companion object {
+        internal fun ImageShape.toTensorShape(): TensorShape {
+            return TensorShape(width!!, height!!, channels!!)
+        }
+    }
 }
