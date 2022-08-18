@@ -24,24 +24,23 @@ This way makes it easier to get the labels for all the examples based on the fol
 Now we need to create a `Dataset` from these images. 
 You can do so via the Image Preprocessing Pipeline description, and building a dataset from those. 
 
+**Note**: The preprocessing DSL has changed in KotlinDL 0.5.0.
+You can find the docs for the previous version of the DSL [here](https://github.com/Kotlin/kotlindl/blob/release_0.4/docs/transfer_learning.md).
+
 Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the ResNet'50 specific preprocessing.
 
 ```kotlin
-val preprocessing: Preprocessing = preprocess {
-    transformImage {
-        resize {
-            outputHeight = 224
-            outputWidth = 224
-            interpolation = InterpolationType.BILINEAR
-        }
-        convert { colorMode = ColorMode.BGR }
+val preprocessing = pipeline<BufferedImage>()
+    .resize {
+        outputHeight = 224
+        outputWidth = 224
+        interpolation = InterpolationType.BILINEAR
     }
-    transformTensor {
-        sharpen {
-            modelTypePreprocessing = TFModels.CV.ResNet50()
-        }
+    .convert { colorMode = ColorMode.RGB }
+    .toFloatArray { }
+    .sharpen {
+        modelTypePreprocessing = TFModels.CV.ResNet50()
     }
-}
 
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 val dataset = OnFlyImageDataset.create(
