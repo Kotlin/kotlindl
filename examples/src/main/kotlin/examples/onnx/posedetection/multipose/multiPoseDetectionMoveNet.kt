@@ -10,10 +10,14 @@ import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionM
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.jetbrains.kotlinx.dl.visualization.swing.drawRawMultiPoseLandMarks
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -31,15 +35,13 @@ fun multiPoseDetectionMoveNet() {
         println(it)
 
         val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = 256
                     outputWidth = 256
                 }
-                convert { colorMode = ColorMode.BGR }
-            }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
 
         val inputData = modelType.preprocessInput(imageFile, preprocessing)
         val yhat = it.predictRaw(inputData)
@@ -52,23 +54,19 @@ private fun visualisePoseLandmarks(
     imageFile: File,
     poseLandmarks: Array<FloatArray>
 ) {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
                 outputHeight = 256
                 outputWidth = 256
             }
-            convert { colorMode = ColorMode.BGR }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .rescale {
+            scalingCoefficient = 255f
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
-        }
-    }
 
-    val (rawImage, shape) = preprocessing(imageFile)
-    drawRawMultiPoseLandMarks(rawImage, shape, poseLandmarks)
+    val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+    drawRawMultiPoseLandMarks(rawImage, shape.toImageShape(), poseLandmarks)
 }
 
 /** */

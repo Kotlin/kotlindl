@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
@@ -23,11 +24,15 @@ import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 1
@@ -60,7 +65,7 @@ fun runONNXAdditionalTraining(
     model.use {
         println(it)
 
-        val preprocessing: Preprocessing = preprocessing(resizeTo, it)
+        val preprocessing = preprocessing(resizeTo, it)
 
         val dataset = OnFlyImageDataset.create(
             File(dogsVsCatsDatasetPath),
@@ -97,32 +102,26 @@ fun runONNXAdditionalTraining(
 fun preprocessing(
     resizeTo: Pair<Int, Int>,
     model: OnnxInferenceModel
-): Preprocessing {
-    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-            transformTensor {
-                onnx {
-                    onnxModel = model
-                }
+): Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
+    val preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .onnx {
+                onnxModel = model
             }
-        }
     } else {
-        preprocess {
-            transformImage {
-                resize {
-                    outputHeight = resizeTo.first
-                    outputWidth = resizeTo.second
-                    interpolation = InterpolationType.BILINEAR
-                }
-                convert { colorMode = ColorMode.BGR }
+        pipeline<BufferedImage>()
+            .resize {
+                outputHeight = resizeTo.first
+                outputWidth = resizeTo.second
+                interpolation = InterpolationType.BILINEAR
             }
-            transformTensor {
-                onnx {
-                    onnxModel = model
-                }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .onnx {
+                onnxModel = model
             }
-        }
     }
     return preprocessing
 }

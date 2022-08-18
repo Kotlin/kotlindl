@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.api.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessor
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.TensorPreprocessing
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.D3
@@ -18,20 +18,25 @@ import org.jetbrains.kotlinx.multik.ndarray.operations.toList
  *
  * @property [axes] Array of ints, default value is related to the typical transpose task for H, W, C to C, W, H tensor format conversion.
  */
-public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) : Preprocessor {
-    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val tensorShape = intArrayOf(
-            inputShape.width!!.toInt(),
-            inputShape.height!!.toInt(),
-            inputShape.channels!!.toInt()
-        )
+public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) :
+    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
+        val (data, inputShape) = input
+
+        val tensorShape = inputShape.dims().map { it.toInt() }.toIntArray()
+
         val ndArray = mk.ndarray<Float, D3>(data.toList(), tensorShape)
-        return ndArray.transpose(*axes).toList().toFloatArray()
+        return ndArray.transpose(*axes).toList().toFloatArray() to inputShape
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        val dims = axes.map { inputShape.dims()[it] }.toLongArray()
+        return TensorShape(dims)
     }
 }
 
 
 /** Image DSL Preprocessing extension.*/
-public fun TensorPreprocessing.transpose(sharpBlock: Transpose.() -> Unit) {
-    addOperation(Transpose().apply(sharpBlock))
+public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.transpose(sharpBlock: Transpose.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+    return PreprocessingPipeline(this, Transpose().apply(sharpBlock))
 }

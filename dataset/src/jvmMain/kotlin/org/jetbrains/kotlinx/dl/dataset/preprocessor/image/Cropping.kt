@@ -5,9 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
 import org.jetbrains.kotlinx.dl.dataset.image.getShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape.Companion.toTensorShape
 import java.awt.image.BufferedImage
 
 /**
@@ -27,9 +29,22 @@ public class Cropping(
     public var bottom: Int = 1,
     public var left: Int = 1,
     public var right: Int = 1
-) : ImagePreprocessorBase() {
+) : ImageOperationBase() {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val croppedImageShape = getOutputShape(input.getShape())
 
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
+        val result = input.getSubimage(
+            left, top,
+            croppedImageShape.width!!.toInt(),
+            croppedImageShape.height!!.toInt()
+        ).copy()
+
+        save?.save("convert_result", result)
+
+        return result
+    }
+
+    private fun getOutputShape(inputShape: ImageShape): ImageShape {
         return ImageShape(
             width = inputShape.width?.minus(left)?.minus(right),
             height = inputShape.height?.minus(top)?.minus(bottom),
@@ -37,13 +52,7 @@ public class Cropping(
         )
     }
 
-    override fun apply(image: BufferedImage): BufferedImage {
-        val croppedImageShape = getOutputShape(image.getShape())
-
-        return image.getSubimage(
-            left, top,
-            croppedImageShape.width!!.toInt(),
-            croppedImageShape.height!!.toInt()
-        ).copy()
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return getOutputShape(ImageShape(inputShape[0], inputShape[1], inputShape[2])).toTensorShape()
     }
 }

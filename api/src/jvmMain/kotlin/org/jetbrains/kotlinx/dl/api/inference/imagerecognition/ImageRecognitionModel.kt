@@ -5,15 +5,20 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -90,16 +95,14 @@ public class ImageRecognitionModel(
         else
             Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = height.toInt()
-                    outputWidth = width.toInt()
-                    interpolation = InterpolationType.BILINEAR
-                }
-                convert { colorMode = modelType.inputColorMode }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = height.toInt()
+                outputWidth = width.toInt()
+                interpolation = InterpolationType.BILINEAR
             }
-        }
+            .convert { colorMode = modelType.inputColorMode }
+            .toFloatArray {}
 
         return modelType.preprocessInput(imageFile, preprocessing)
     }
@@ -137,7 +140,7 @@ public class ImageRecognitionModel(
          *
          * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
          */
-        public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Preprocessing): FloatArray {
+        public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>): FloatArray {
             val (data, shape) = preprocessing.dataLoader().load(imageFile)
             return preprocessInput(data, shape.dims())
         }

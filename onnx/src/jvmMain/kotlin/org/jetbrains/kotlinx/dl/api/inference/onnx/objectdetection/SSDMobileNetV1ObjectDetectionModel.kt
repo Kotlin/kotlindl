@@ -10,10 +10,12 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val OUTPUT_BOXES = "detection_boxes:0"
@@ -80,21 +82,19 @@ public class SSDMobileNetV1ObjectDetectionModel(pathToModel: String) : OnnxInfer
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
-        val preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
-                    outputWidth = this@SSDMobileNetV1ObjectDetectionModel.inputShape[2].toInt()
-                }
-                convert { colorMode = ColorMode.RGB }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = this@SSDMobileNetV1ObjectDetectionModel.inputShape[1].toInt()
+                outputWidth = this@SSDMobileNetV1ObjectDetectionModel.inputShape[2].toInt()
             }
-        }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
 
-        val (data, shape) = preprocessing(imageFile)
+        val (data, shape) = preprocessing.dataLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
+            shape.dims()
         )
 
         return this.detectObjects(preprocessedData, topK)

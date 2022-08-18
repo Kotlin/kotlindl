@@ -11,10 +11,12 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 import java.lang.Float.min
 
@@ -51,21 +53,20 @@ public class SinglePoseDetectionModel(pathToModel: String) : OnnxInferenceModel(
         val height = inputShape[1]
         val width = inputShape[2]
 
-        val preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = height.toInt()
                     outputWidth = width.toInt()
                 }
-                convert { colorMode = ColorMode.RGB }
-            }
-        }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
 
-        val (data, shape) = preprocessing(imageFile)
+        val (data, shape) = preprocessing.dataLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
+            shape.dims()
+//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectPose(preprocessedData)

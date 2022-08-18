@@ -38,6 +38,6 @@ public class Save(
 }
 
 /** Saves the result of the enclosing [ImagePreprocessor] to the specified location. */
-public fun ImagePreprocessorBase.save(block: Save.() -> Unit) {
+public fun ImageOperationBase.save(block: Save.() -> Unit) {
     save = Save().apply(block)
 }

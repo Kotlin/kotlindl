@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.draw
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -27,19 +27,11 @@ public class Padding(
     public var left: Int = 0,
     public var right: Int = 0,
     public var mode: PaddingMode = PaddingMode.Black
-) : ImagePreprocessorBase() {
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(
-            inputShape.width?.plus(left + right.toLong()),
-            inputShape.height?.plus(top + bottom.toLong()),
-            inputShape.channels
-        )
-    }
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        val result = BufferedImage(image.width + left + right, image.height + top + bottom, image.type)
+) : ImageOperationBase() {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val result = BufferedImage(input.width + left + right, input.height + top + bottom, input.type)
         result.draw { graphics2D ->
-            graphics2D.drawImage(image, left, top, null)
+            graphics2D.drawImage(input, left, top, null)
             when (mode) {
                 is PaddingMode.Fill -> {
                     graphics2D.color = (mode as PaddingMode.Fill).color
@@ -50,7 +42,18 @@ public class Padding(
                 }
             }
         }
+
+        save?.save("padding_result", result)
+
         return result
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return when (inputShape.rank()) {
+            2 -> TensorShape(inputShape[0] + left + right, inputShape[1] + top + bottom)
+            3 -> TensorShape(inputShape[0] + left + right, inputShape[1] + top + bottom, inputShape[2])
+            else -> throw IllegalArgumentException("Padding operation is supported only for 2D and 3D tensors")
+        }
     }
 }
 

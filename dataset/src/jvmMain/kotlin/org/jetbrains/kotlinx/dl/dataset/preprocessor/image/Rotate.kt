@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
@@ -30,15 +30,10 @@ public class Rotate(
     public var interpolation: InterpolationType = InterpolationType.BICUBIC,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessorBase() {
-
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(inputShape.width, inputShape.height, inputShape.channels)
-    }
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        val width: Int = image.width
-        val height: Int = image.height
+) : ImageOperationBase() {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val width: Int = input.width
+        val height: Int = input.height
         var centerByX = width / 2
         var centerByY = height / 2
 
@@ -72,7 +67,7 @@ public class Rotate(
 
         val rotatedImage = BufferedImage(
             maxX - minX, maxY - minY,
-            image.type
+            input.type
         )
 
         val g2d = rotatedImage.createGraphics()
@@ -100,9 +95,14 @@ public class Rotate(
         val affineTransform = AffineTransform()
         affineTransform.rotate(theta, centerByX.toDouble(), centerByY.toDouble())
         g2d.transform = affineTransform
-        g2d.drawImage(image, -minX, -minY, null)
+        g2d.drawImage(input, -minX, -minY, null)
         g2d.dispose()
 
+        save?.save("rotated_result", rotatedImage)
+
         return rotatedImage
+    }
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return inputShape
     }
 }

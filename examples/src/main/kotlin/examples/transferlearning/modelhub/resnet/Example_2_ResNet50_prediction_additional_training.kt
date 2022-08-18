@@ -20,11 +20,14 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
@@ -50,21 +53,17 @@ fun resnet50additionalTraining() {
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
                 outputHeight = IMAGE_SIZE.toInt()
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.BILINEAR
             }
-            convert { colorMode = ColorMode.BGR }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .sharpen {
+            modelTypePreprocessing = TFModels.CV.ResNet50()
         }
-        transformTensor {
-            sharpen {
-                modelTypePreprocessing = TFModels.CV.ResNet50()
-            }
-        }
-    }
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(

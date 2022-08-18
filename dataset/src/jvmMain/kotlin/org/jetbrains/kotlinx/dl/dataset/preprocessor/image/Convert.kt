@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.colorMode
 import org.jetbrains.kotlinx.dl.dataset.image.imageType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.image.BufferedImage
 
 /**
@@ -16,18 +16,20 @@ import java.awt.image.BufferedImage
  *
  * @property [colorMode] target color mode.
  */
-public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImagePreprocessorBase() {
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(inputShape.width, inputShape.height, colorMode.channels.toLong())
+public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImageOperationBase() {
+    override fun apply(input: BufferedImage): BufferedImage {
+        if (input.colorMode() == colorMode) return input
+        val outputType = colorMode.imageType()
+        val result = BufferedImage(input.width, input.height, outputType)
+        val graphics = result.createGraphics()
+        graphics.drawImage(input, 0, 0, null)
+        graphics.dispose()
+
+        save?.save("convert_result", result)
+        return result
     }
 
-    override fun apply(image: BufferedImage): BufferedImage {
-        if (image.colorMode() == colorMode) return image
-        val outputType = colorMode.imageType()
-        val result = BufferedImage(image.width, image.height, outputType)
-        val graphics = result.createGraphics()
-        graphics.drawImage(image, 0, 0, null)
-        graphics.dispose()
-        return result
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return inputShape
     }
 }

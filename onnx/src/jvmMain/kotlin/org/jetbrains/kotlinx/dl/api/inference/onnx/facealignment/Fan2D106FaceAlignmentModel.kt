@@ -11,11 +11,11 @@ import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionM
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val OUTPUT_NAME = "fc1"
@@ -57,15 +57,13 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
      * Detects 106 [Landmark] objects for the given [imageFile].
      */
     public fun detectLandmarks(imageFile: File): List<Landmark> {
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = INPUT_SIZE
-                    outputWidth = INPUT_SIZE
-                }
-                convert { colorMode = ColorMode.BGR }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = INPUT_SIZE
+                outputWidth = INPUT_SIZE
             }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {}
 
         val inputData = ONNXModels.FaceAlignment.Fan2d106.preprocessInput(imageFile, preprocessing)
         val yhat = internalModel.predictRaw(inputData)

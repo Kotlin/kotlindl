@@ -5,23 +5,30 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
 
 /**
  * Applies the final image preprocessing that is specific for each of available models trained on ImageNet according chosen [modelTypePreprocessing].
  *
  * @property [modelTypePreprocessing] One the supported models pre-trained on ImageNet.
  */
-public class Sharpen(public var modelTypePreprocessing: ModelType<*, *> = TFModels.CV.VGG16()) : Preprocessor {
-    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val tensorShape = longArrayOf(inputShape.width!!, inputShape.height!!, inputShape.channels!!)
-        return modelTypePreprocessing.preprocessInput(data, tensorShape)
+public class Sharpen(public var modelTypePreprocessing: ModelType<*, *> = TFModels.CV.VGG16()) :
+    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
+        val (data, tensorShape) = input
+        return modelTypePreprocessing.preprocessInput(data, tensorShape.dims()) to tensorShape
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        throw UnsupportedOperationException("Currently it is not possible to get final shape of sharpen operation")
     }
 }
 
 
 /** Image DSL Preprocessing extension.*/
-public fun TensorPreprocessing.sharpen(sharpBlock: Sharpen.() -> Unit) {
-    addOperation(Sharpen().apply(sharpBlock))
-}
+public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.sharpen(sharpBlock: Sharpen.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> =
+    PreprocessingPipeline(this, Sharpen().apply(sharpBlock))

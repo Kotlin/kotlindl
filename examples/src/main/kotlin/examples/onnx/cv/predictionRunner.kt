@@ -15,10 +15,10 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferAndCloseUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 fun runImageRecognitionPrediction(
@@ -34,9 +34,9 @@ fun runImageRecognitionPrediction(
     val inference: (OnnxInferenceModel) -> List<Pair<String, Float>> = {
         println(it)
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+        val preprocessing = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
 
         val results = mutableListOf<Pair<String, Float>>()
         for (i in 1..8) {

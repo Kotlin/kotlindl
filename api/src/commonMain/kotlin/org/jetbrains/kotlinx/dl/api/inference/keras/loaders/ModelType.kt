@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import java.io.File
 
 /**
  * Basic interface for models loaded from S3.

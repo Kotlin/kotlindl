@@ -9,17 +9,20 @@ import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URISyntaxException
 import java.net.URL
@@ -58,9 +61,9 @@ fun runImageRecognitionPrediction(
 
         it.loadWeights(hdfFile)
 
-        val preprocessing: Preprocessing = preprocessing(resizeTo)
+        val preprocessing = preprocessing(resizeTo)
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
@@ -73,21 +76,19 @@ fun runImageRecognitionPrediction(
     }
 }
 
-internal fun preprocessing(resizeTo: Pair<Int, Int>): Preprocessing {
-    val preprocessing: Preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+internal fun preprocessing(resizeTo: Pair<Int, Int>): Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
+    val preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
     } else {
-        preprocess {
-            transformImage {
-                resize {
+        pipeline<BufferedImage>()
+            .resize {
                     outputWidth = resizeTo.first
                     outputHeight = resizeTo.second
                 }
-                convert { colorMode = ColorMode.BGR }
-            }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
     }
     return preprocessing
 }

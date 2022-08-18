@@ -3,6 +3,8 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 import org.jetbrains.kotlinx.dl.api.extension.set3D
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -13,22 +15,20 @@ import kotlin.math.roundToInt
 class PreprocessingImageTest {
     @Test
     fun resizeTest() {
-        val preprocess = preprocess {
-            transformImage {
-                resize {
+        val preprocess = pipeline<BufferedImage>()
+            .resize {
                     outputWidth = 4
                     outputHeight = 4
                     interpolation = InterpolationType.NEAREST
                 }
-            }
-            transformTensor {
-                rescale { }
-            }
-        }
+            .toFloatArray {  }
+            .rescale { }
+
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
         inputImage.setRGB(1, 1, Color.RED.rgb)
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
         Assertions.assertEquals(ImageShape(4, 4, 3), imageShape)
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { 0f }.apply {
             for (i in 0..1)
@@ -43,26 +43,24 @@ class PreprocessingImageTest {
 
     @Test
     fun cropTest() {
-        val preprocess = preprocess {
-            transformImage {
-                crop {
+        val preprocess = pipeline<BufferedImage>()
+            .crop {
                     left = 1
                     right = 0
                     top = 0
                     bottom = 1
                 }
-            }
-            transformTensor {
-                rescale { }
-            }
-        }
+            .toFloatArray {  }
+            .rescale { }
+
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
         inputImage.setRGB(1, 0, Color.GREEN.rgb)
         inputImage.setRGB(1, 1, Color.RED.rgb)
         inputImage.setRGB(0, 1, Color.GREEN.rgb)
 
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
         Assertions.assertEquals(ImageShape(1, 1, 3), imageShape)
 
         val expectedImage = FloatArray(3).apply { setRGB(0, 0, Color.GREEN, imageShape, ColorMode.BGR) }
@@ -71,21 +69,17 @@ class PreprocessingImageTest {
 
     @Test
     fun rotateTest() {
-        val preprocess = preprocess {
-            transformImage {
-                rotate {
-                    degrees = 90f
-                }
+        val preprocess = pipeline<BufferedImage>()
+            .rotate {
+                degrees = 90f
             }
-            transformTensor {
-                rescale { }
-            }
-        }
+            .toFloatArray {  }
+            .rescale { }
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
         inputImage.setRGB(1, 1, Color.RED.rgb)
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
-
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
         Assertions.assertEquals(ImageShape(2, 2, 3), imageShape)
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { 0f }
         expectedImage.setRGB(1, 0, Color.BLUE, imageShape, ColorMode.BGR)
@@ -95,24 +89,22 @@ class PreprocessingImageTest {
 
     @Test
     fun constantPaddingTest() {
-        val preprocess = preprocess {
-            transformImage {
-                pad {
+        val preprocess = pipeline<BufferedImage>()
+            .pad {
                     top = 1
                     bottom = 2
                     left = 3
                     right = 4
                     mode = PaddingMode.Fill(Color.GRAY)
                 }
-            }
-            transformTensor {
-                rescale { }
-            }
-        }
+            .toFloatArray {  }
+            .rescale { }
+
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
         inputImage.setRGB(1, 1, Color.RED.rgb)
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
 
         Assertions.assertEquals(ImageShape(9, 5, 3), imageShape)
 
@@ -143,14 +135,11 @@ class PreprocessingImageTest {
 
     @Test
     fun grayscaleTest() {
-        val preprocess = preprocess {
-            transformImage {
-                grayscale()
-            }
-            transformTensor {
-                rescale { }
-            }
-        }
+        val preprocess = pipeline<BufferedImage>()
+            .grayscale()
+            .toFloatArray {  }
+            .rescale { }
+
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         val color1 = Color(50, 150, 200)
         val color2 = Color(10, 190, 70)
@@ -160,7 +149,8 @@ class PreprocessingImageTest {
         inputImage.setRGB(0, 1, color2.rgb)
         inputImage.setRGB(1, 0, color3.rgb)
         inputImage.setRGB(1, 1, color4.rgb)
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
 
         Assertions.assertEquals(ImageShape(2, 2, 1), imageShape)
         val expectedImage = FloatArray(imageShape.numberOfElements.toInt()) { 0f }
@@ -173,14 +163,10 @@ class PreprocessingImageTest {
 
     @Test
     fun centerCropTest() {
-        val preprocess = preprocess {
-            transformImage {
-                centerCrop { size = 2 }
-            }
-            transformTensor {
-                rescale { }
-            }
-        }
+        val preprocess = pipeline<BufferedImage>()
+            .centerCrop { size = 2 }
+            .toFloatArray {  }
+            .rescale { }
 
         val color1 = Color(50, 150, 200)
         val color2 = Color(10, 190, 70)
@@ -191,7 +177,8 @@ class PreprocessingImageTest {
         inputImage.setRGB(0, 1, color2.rgb)
         inputImage.setRGB(0, 2, color3.rgb)
 
-        val (imageFloats, imageShape) = preprocess.handleImage(inputImage, "test")
+        val (imageFloats, tensorShape) = preprocess.apply(inputImage)
+        val imageShape = tensorShape.toImageShape()
         Assertions.assertEquals(ImageShape(2, 2, 3), imageShape)
 
         val expectedImage = FloatArray(12)

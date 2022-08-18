@@ -33,3 +33,11 @@ public data class ImageShape(
         }
     }
 }
+
+public fun TensorShape.toImageShape(): ImageShape {
+    return when (this.rank()) {
+        2 -> ImageShape(this[0], this[1], 1)
+        3 -> ImageShape(this[0], this[1], this[2])
+        else -> throw IllegalArgumentException("Tensor shape must be 2D or 3D to be converted to ImageShape")
+    }
+}

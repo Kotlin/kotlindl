@@ -10,13 +10,13 @@ import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionM
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.awt.image.BufferedImage
 import java.io.File
 
 class FacesTestSuite {
@@ -41,15 +41,14 @@ class FacesTestSuite {
         val model = modelHub.loadModel(modelType)
 
         model.use {
-            val preprocessing: Preprocessing = preprocess {
-                transformImage {
-                    resize {
-                        outputHeight = 192
-                        outputWidth = 192
-                    }
-                    convert { colorMode = ColorMode.BGR }
+            val preprocessing = pipeline<BufferedImage>()
+                .resize {
+                    outputHeight = 192
+                    outputWidth = 192
                 }
-            }
+                .convert { colorMode = ColorMode.BGR }
+                .toFloatArray {  }
+
             for (i in 0..8) {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
                 val inputData = modelType.preprocessInput(imageFile, preprocessing)
