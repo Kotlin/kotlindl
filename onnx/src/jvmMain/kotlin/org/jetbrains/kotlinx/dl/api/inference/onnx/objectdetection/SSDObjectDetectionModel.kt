@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -105,17 +106,11 @@ public class SSDObjectDetectionModel(private val internalModel: OnnxInferenceMod
                 }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
+            .call(ONNXModels.ObjectDetection.SSD.preprocessor)
 
+        val data = preprocessing.fileLoader().load(imageFile).first
 
-        val (data, shape) = preprocessing.fileLoader().load(imageFile)
-
-        val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
-            data,
-            shape.dims()
-//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-        )
-
-        return this.detectObjects(preprocessedData, topK)
+        return this.detectObjects(data, topK)
     }
 
     override fun copy(

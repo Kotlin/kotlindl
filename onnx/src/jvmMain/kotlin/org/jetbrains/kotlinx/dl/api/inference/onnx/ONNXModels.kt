@@ -20,6 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDete
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 
@@ -55,9 +56,8 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -78,9 +78,8 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet34 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -102,9 +101,8 @@ public object ONNXModels {
          */
         public class ResNet50 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -126,9 +124,8 @@ public object ONNXModels {
          */
         public class ResNet101 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -150,9 +147,8 @@ public object ONNXModels {
          */
         public class ResNet152 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -174,9 +170,8 @@ public object ONNXModels {
          */
         public class ResNet18v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -198,9 +193,8 @@ public object ONNXModels {
          */
         public class ResNet34v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -222,9 +216,8 @@ public object ONNXModels {
          */
         public class ResNet50v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -246,9 +239,8 @@ public object ONNXModels {
          */
         public class ResNet101v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -270,9 +262,8 @@ public object ONNXModels {
          */
         public class ResNet152v2 :
             CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return resNetOnnxPreprocessing(data, tensorShape)
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = resNetOnnxPreprocessing()
         }
 
         /**
@@ -294,10 +285,8 @@ public object ONNXModels {
          */
         public class EfficientNet4Lite :
             CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return InputType.TF.preprocessing(channelsLast = !channelsFirst)
-                    .apply(data to TensorShape(tensorShape)).first
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)
         }
 
         /**
@@ -323,9 +312,8 @@ public object ONNXModels {
                 channelsFirst = false,
                 inputColorMode = ColorMode.BGR
             ) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = InputType.CAFFE.preprocessing()
         }
 
         /**
@@ -347,9 +335,8 @@ public object ONNXModels {
          */
         public object ResNet50noTopCustom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = InputType.CAFFE.preprocessing()
         }
 
         /**
@@ -589,12 +576,10 @@ public object ONNXModels {
          */
         public object SSD :
             ObjectDetection<OnnxInferenceModel, SSDObjectDetectionModel>("models/onnx/objectdetection/ssd") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return pipeline<Pair<FloatArray, TensorShape>>()
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = pipeline<Pair<FloatArray, TensorShape>>()
                     .transpose { axes = intArrayOf(2, 0, 1) }
                     .call(InputType.TORCH.preprocessing(channelsLast = false))
-                    .apply(data to TensorShape(tensorShape)).first
-            }
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
                 return SSDObjectDetectionModel(modelHub.loadModel(this))
@@ -856,11 +841,8 @@ public object ONNXModels {
          */
         public object Fan2d106 :
             FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
-            override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return Transpose(axes = intArrayOf(2, 0, 1)).apply(
-                    data to TensorShape(tensorShape)
-                ).first
-            }
+            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+                get() = Transpose(axes = intArrayOf(2, 0, 1))
 
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
                 return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
@@ -974,9 +956,8 @@ public interface OnnxModelType<T : InferenceModel, U : InferenceModel> : ModelTy
     public val inputShape: LongArray? get() = null
 }
 
-internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
+internal fun resNetOnnxPreprocessing(): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
     return pipeline<Pair<FloatArray, TensorShape>>()
         .transpose { axes = intArrayOf(2, 0, 1) }
         .call(InputType.TF.preprocessing(channelsLast = false))
-        .apply(data to TensorShape(tensorShape)).first
 }

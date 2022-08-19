@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -69,16 +70,11 @@ public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceMo
                 }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
+            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
 
-        val (data, shape) = preprocessing.fileLoader().load(imageFile)
+        val data = preprocessing.fileLoader().load(imageFile).first
 
-        val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
-            data,
-            shape.dims()
-//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-        )
-
-        return this.detectPose(preprocessedData)
+        return this.detectPose(data)
     }
 
     override fun copy(

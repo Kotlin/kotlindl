@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -63,13 +64,14 @@ fun vgg19copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 1..8) {
-            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -81,13 +83,14 @@ fun vgg19copyModelPrediction() {
     }
 
     copiedModel.use {
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 1..8) {
-            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

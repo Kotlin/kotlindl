@@ -6,10 +6,10 @@
 package examples.onnx.posedetection.multipose
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
@@ -36,15 +36,17 @@ fun multiPoseDetectionMoveNet() {
         println(it)
 
         val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = 256
-                    outputWidth = 256
-                }
+                outputHeight = 256
+                outputWidth = 256
+            }
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
-        val inputData = modelType.preprocessInput(imageFile, preprocessing)
+        val inputData = fileDataLoader.load(imageFile).first
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
         visualisePoseLandmarks(imageFile, (yhat["output_0"] as Array<Array<FloatArray>>)[0])

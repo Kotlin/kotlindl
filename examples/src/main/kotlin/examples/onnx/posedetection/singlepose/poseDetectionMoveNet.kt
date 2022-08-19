@@ -6,10 +6,10 @@
 package examples.onnx.posedetection.singlepose
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
@@ -36,15 +36,17 @@ fun poseDetectionMoveNet() {
         println(it)
 
         val imageFile = getFileFromResource("datasets/poses/single/3.jpg")
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .resize {
                 outputHeight = 192
                 outputWidth = 192
             }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
-        val inputData = modelType.preprocessInput(imageFile, preprocessing)
+        val inputData = fileDataLoader.load(imageFile).first
 
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())

@@ -6,7 +6,6 @@
 package examples.onnx.executionproviders
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -14,7 +13,9 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -45,15 +46,17 @@ fun multiPoseCudaInference() {
 
 fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLighting): FloatArray {
     val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-    val preprocessing = pipeline<BufferedImage>()
+    val fileDataLoader = pipeline<BufferedImage>()
         .resize {
-                outputHeight = 256
-                outputWidth = 256
-            }
+            outputHeight = 256
+            outputWidth = 256
+        }
         .convert { colorMode = ColorMode.RGB }
-        .toFloatArray {  }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
 
-    return modelType.preprocessInput(imageFile, preprocessing)
+    return fileDataLoader.load(imageFile).first
 }
 
 fun cpuInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10): Long {

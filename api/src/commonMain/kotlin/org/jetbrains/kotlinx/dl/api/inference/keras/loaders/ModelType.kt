@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Identity
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 
 /**
  * Basic interface for models loaded from S3.
@@ -30,13 +33,10 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     public val inputColorMode: ColorMode
 
     /**
-     * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
-     *
-     * It takes [data] as input with shape [tensorShape] and applied the specific preprocessing according chosen modelType.
-     *
-     * @param [tensorShape] Should be 3 dimensional array (HWC or CHW format)
+     * Preprocessing [Operation] specific for this model type.
      */
-    public fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray = data
+    public val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+        get() = Identity()
 
     /** Returns the specially prepared pre-trained model of the type U. */
     public fun pretrainedModel(modelHub: ModelHub): U

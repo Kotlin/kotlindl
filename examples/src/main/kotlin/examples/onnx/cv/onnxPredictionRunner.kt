@@ -26,10 +26,9 @@ fun runONNXImageRecognitionPrediction(
     model.use {
         println(it)
 
-        val preprocessing = examples.transferlearning.preprocessing(resizeTo)
+        val fileDataLoader = examples.transferlearning.fileDataLoader(modelType, resizeTo)
         for (i in 1..8) {
-            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -21,6 +21,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -63,9 +64,7 @@ fun mobilenetWithAdditionalTraining() {
             }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray {  }
-        .sharpen {
-            modelTypePreprocessing = TFModels.CV.MobileNet()
-        }
+        .call(TFModels.CV.MobileNet().preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnHeapDataset.create(
