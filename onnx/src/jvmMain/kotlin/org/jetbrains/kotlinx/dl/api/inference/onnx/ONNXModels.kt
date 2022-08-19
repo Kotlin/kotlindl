@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.Transpose
+import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.transpose
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
@@ -19,6 +20,8 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDete
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {
@@ -587,15 +590,10 @@ public object ONNXModels {
         public object SSD :
             ObjectDetection<OnnxInferenceModel, SSDObjectDetectionModel>("models/onnx/objectdetection/ssd") {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
-                    data to TensorShape(tensorShape)
-                ).first
-
-                val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
-
-                return InputType.TORCH.preprocessing(
-                    channelsLast = false
-                ).apply(transposedData to TensorShape(transposedShape)).first
+                return pipeline<Pair<FloatArray, TensorShape>>()
+                    .transpose { axes = intArrayOf(2, 0, 1) }
+                    .call(InputType.TORCH.preprocessing(channelsLast = false))
+                    .apply(data to TensorShape(tensorShape)).first
             }
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
@@ -977,12 +975,8 @@ public interface OnnxModelType<T : InferenceModel, U : InferenceModel> : ModelTy
 }
 
 internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): FloatArray {
-    val transposedData = Transpose(axes = intArrayOf(2, 0, 1)).apply(
-        data to TensorShape(tensorShape)
-    ).first
-
-    val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
-
-    return InputType.TF.preprocessing(channelsLast = false)
-        .apply(transposedData to TensorShape(transposedShape)).first
+    return pipeline<Pair<FloatArray, TensorShape>>()
+        .transpose { axes = intArrayOf(2, 0, 1) }
+        .call(InputType.TF.preprocessing(channelsLast = false))
+        .apply(data to TensorShape(tensorShape)).first
 }
