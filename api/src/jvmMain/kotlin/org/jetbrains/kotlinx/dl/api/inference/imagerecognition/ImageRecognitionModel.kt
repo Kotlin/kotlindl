@@ -124,7 +124,7 @@ public class ImageRecognitionModel(
          * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
          */
         public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>): FloatArray {
-            val (data, shape) = preprocessing.dataLoader().load(imageFile)
+            val (data, shape) = preprocessing.fileLoader().load(imageFile)
             return preprocessInput(data, shape.dims())
         }
     }

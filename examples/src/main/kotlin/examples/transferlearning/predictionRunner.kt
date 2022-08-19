@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -63,7 +63,7 @@ fun runImageRecognitionPrediction(
 
         val preprocessing = preprocessing(resizeTo)
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)

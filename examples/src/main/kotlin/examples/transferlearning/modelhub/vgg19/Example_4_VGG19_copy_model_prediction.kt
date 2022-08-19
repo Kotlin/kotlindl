@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
@@ -68,7 +68,7 @@ fun vgg19copyModelPrediction() {
             .toFloatArray { }
 
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
@@ -86,7 +86,7 @@ fun vgg19copyModelPrediction() {
             .toFloatArray { }
 
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.fileLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)

@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionRe
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -88,7 +88,7 @@ public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceMod
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
 
-        val (data, shape) = preprocessing.dataLoader().load(imageFile)
+        val (data, shape) = preprocessing.fileLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
             data,

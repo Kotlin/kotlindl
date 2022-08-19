@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -99,7 +99,7 @@ public class SSDMobileNetV1ObjectDetectionModel(private val internalModel: OnnxI
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
 
-        val (data, shape) = preprocessing.dataLoader().load(imageFile)
+        val (data, shape) = preprocessing.fileLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessInput(
             data,
