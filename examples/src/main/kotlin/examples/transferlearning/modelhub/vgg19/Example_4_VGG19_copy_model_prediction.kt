@@ -45,6 +45,12 @@ fun vgg19copyModelPrediction() {
     val modelType = TFModels.CV.VGG19()
     val model = modelHub.loadModel(modelType)
 
+    val fileDataLoader = pipeline<BufferedImage>()
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
+
     val imageNetClassLabels = modelHub.loadClassLabels()
 
     var copiedModel: Sequential
@@ -64,12 +70,6 @@ fun vgg19copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
-
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
@@ -83,12 +83,6 @@ fun vgg19copyModelPrediction() {
     }
 
     copiedModel.use {
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
-
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 

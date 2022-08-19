@@ -17,11 +17,12 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
@@ -79,21 +80,18 @@ fun runImageRecognitionPrediction(
 internal fun fileDataLoader(modelType: ModelType<*, *>,
                             resizeTo: Pair<Int, Int>
 ): DataLoader<File> {
-    return if (resizeTo.first == 224 && resizeTo.second == 224) {
-        pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+    val resize = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        Identity<BufferedImage>()
     } else {
-        pipeline<BufferedImage>()
-            .resize {
-                outputWidth = resizeTo.first
-                outputHeight = resizeTo.second
-            }
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+        Resize(
+            outputWidth = resizeTo.first,
+            outputHeight = resizeTo.second
+        )
     }
+    return pipeline<BufferedImage>()
+        .call(resize)
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
 }

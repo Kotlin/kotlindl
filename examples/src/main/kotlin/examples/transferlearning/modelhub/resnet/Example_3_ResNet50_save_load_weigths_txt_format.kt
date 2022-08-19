@@ -49,6 +49,12 @@ fun main() {
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
+    val fileDataLoader = pipeline<BufferedImage>()
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
+
     val imageNetClassLabels = modelHub.loadClassLabels()
 
     model.use {
@@ -63,12 +69,6 @@ fun main() {
         val hdfFile = modelHub.loadWeights(modelType)
 
         it.loadWeights(hdfFile)
-
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
-            .call(modelType.preprocessor)
-            .fileLoader()
 
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
@@ -97,12 +97,6 @@ fun main() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL_2))
 
     inferenceModel.use {
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
-            .call(modelType.preprocessor)
-            .fileLoader()
-
         for (i in 1..8) {
             it.reshape(224, 224, 3)
 
@@ -128,12 +122,6 @@ fun main() {
         it.logSummary()
 
         it.loadWeights(File(PATH_TO_MODEL))
-
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
-            .call(modelType.preprocessor)
-            .fileLoader()
 
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first

@@ -39,6 +39,12 @@ fun resnet50copyModelPrediction() {
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
+    val fileDataLoader = pipeline<BufferedImage>()
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
+
     val imageNetClassLabels = modelHub.loadClassLabels()
 
     var copiedModel: Functional
@@ -58,12 +64,6 @@ fun resnet50copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
-
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
@@ -77,12 +77,6 @@ fun resnet50copyModelPrediction() {
     }
 
     copiedModel.use {
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
-
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
