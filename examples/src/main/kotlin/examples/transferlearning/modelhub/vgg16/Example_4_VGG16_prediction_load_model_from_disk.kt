@@ -11,14 +11,14 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.preprocessInput
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -62,7 +62,8 @@ fun main() {
                 colorMode = ColorMode.BGR
             )
 
-            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
+            val inputData = InputType.CAFFE.preprocessing()
+                .apply(floatArray to TensorShape(model.inputDimensions)).first
 
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -11,11 +11,11 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.preprocessInput
 
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
@@ -68,7 +68,7 @@ public object TFModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -97,7 +97,7 @@ public object TFModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -119,7 +119,7 @@ public object TFModels {
         public class ResNet18(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet18", inputShape = inputShape) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -141,7 +141,7 @@ public object TFModels {
         public class ResNet34(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet34", inputShape = inputShape) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -172,7 +172,7 @@ public object TFModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -203,7 +203,7 @@ public object TFModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -234,7 +234,7 @@ public object TFModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.CAFFE)
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -260,7 +260,7 @@ public object TFModels {
         public class ResNet50v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet50v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -286,7 +286,7 @@ public object TFModels {
         public class ResNet101v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet101v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -312,7 +312,7 @@ public object TFModels {
         public class ResNet152v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet152v2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -336,7 +336,7 @@ public object TFModels {
         public class MobileNet(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/mobilenet", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -360,7 +360,7 @@ public object TFModels {
         public class MobileNetV2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/mobilenetv2", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -384,7 +384,7 @@ public object TFModels {
         public class Inception(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/inception", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -408,7 +408,7 @@ public object TFModels {
         public class Xception(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/xception", inputShape = inputShape, noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -432,7 +432,7 @@ public object TFModels {
         public class DenseNet121(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+                return InputType.TORCH.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -456,7 +456,7 @@ public object TFModels {
         public class DenseNet169(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+                return InputType.TORCH.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -480,7 +480,7 @@ public object TFModels {
         public class DenseNet201(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TORCH)
+                return InputType.TORCH.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -504,7 +504,7 @@ public object TFModels {
         public class NASNetMobile(noTop: Boolean = false) :
             CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3), noTop = noTop) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -532,7 +532,7 @@ public object TFModels {
             }
 
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(data, tensorShape, inputType = InputType.TF)
+                return InputType.TF.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
     }

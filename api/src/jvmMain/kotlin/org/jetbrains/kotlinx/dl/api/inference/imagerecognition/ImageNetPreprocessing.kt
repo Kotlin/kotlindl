@@ -6,31 +6,17 @@
 package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 
-/**
- * Common preprocessing functions for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
- *
- * It takes [floatArray] as input with shape [tensorShape] and calls specific preprocessing according chosen [inputType].
- */
-public fun preprocessInput(
-    floatArray: FloatArray,
-    tensorShape: LongArray? = null,
-    inputType: InputType,
-    channelsLast: Boolean = true
-): FloatArray {
-    return when (inputType) {
-        InputType.TF -> floatArray.map { it / 127.5f - 1 }.toFloatArray()
-        InputType.CAFFE -> caffeStylePreprocessing(floatArray, tensorShape!!, channelsLast)
-        InputType.TORCH -> torchStylePreprocessing(floatArray, tensorShape!!, channelsLast)
+/** TF-style preprocessing. */
+internal class TfStylePreprocessing : FloatArrayOperation() {
+    override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
+        return data.map { it / 127.5f - 1 }.toFloatArray()
     }
 }
 
 /** Torch-style preprocessing. */
-public fun torchStylePreprocessing(
-    input: FloatArray,
-    imageShape: LongArray,
-    channelsLastParameter: Boolean = true
-): FloatArray {
+internal fun torchStylePreprocessing(channelsLastParameter: Boolean = true): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
     return pipeline<Pair<FloatArray, TensorShape>>()
         .rescale { scalingCoefficient = 255f }
         .normalize {
@@ -38,20 +24,14 @@ public fun torchStylePreprocessing(
             std = floatArrayOf(0.229f, 0.224f, 0.225f)
             channelsLast = channelsLastParameter
         }
-        .apply(input to TensorShape(imageShape)).first
 }
 
 /** Caffe-style preprocessing. */
-public fun caffeStylePreprocessing(
-    input: FloatArray,
-    imageShape: LongArray,
-    channelsLastParameter: Boolean = true
-): FloatArray {
+internal fun caffeStylePreprocessing(channelsLastParameter: Boolean = true): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
     return pipeline<Pair<FloatArray, TensorShape>>()
         .normalize {
             mean = floatArrayOf(103.939f, 116.779f, 123.68f)
             std = floatArrayOf(1f, 1f, 1f)
             channelsLast = channelsLastParameter
         }
-        .apply(input to TensorShape(imageShape)).first
 }

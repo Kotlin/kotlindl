@@ -19,7 +19,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDete
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.preprocessInput
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {
@@ -293,12 +292,8 @@ public object ONNXModels {
         public class EfficientNet4Lite :
             CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(
-                    data,
-                    tensorShape,
-                    inputType = InputType.TF,
-                    channelsLast = !channelsFirst
-                )
+                return InputType.TF.preprocessing(channelsLast = !channelsFirst)
+                    .apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -326,11 +321,7 @@ public object ONNXModels {
                 inputColorMode = ColorMode.BGR
             ) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(
-                    data,
-                    tensorShape,
-                    inputType = InputType.CAFFE
-                )
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -354,11 +345,7 @@ public object ONNXModels {
         public object ResNet50noTopCustom :
             CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
             override fun preprocessInput(data: FloatArray, tensorShape: LongArray): FloatArray {
-                return preprocessInput(
-                    data,
-                    tensorShape,
-                    inputType = InputType.CAFFE
-                )
+                return InputType.CAFFE.preprocessing().apply(data to TensorShape(tensorShape)).first
             }
         }
 
@@ -606,12 +593,9 @@ public object ONNXModels {
 
                 val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
-                return preprocessInput(
-                    transposedData,
-                    transposedShape,
-                    inputType = InputType.TORCH,
+                return InputType.TORCH.preprocessing(
                     channelsLast = false
-                )
+                ).apply(transposedData to TensorShape(transposedShape)).first
             }
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
@@ -999,10 +983,6 @@ internal fun resNetOnnxPreprocessing(data: FloatArray, tensorShape: LongArray): 
 
     val transposedShape = longArrayOf(tensorShape[2], tensorShape[0], tensorShape[1])
 
-    return preprocessInput(
-        transposedData,
-        transposedShape,
-        inputType = InputType.TF,
-        channelsLast = false
-    )
+    return InputType.TF.preprocessing(channelsLast = false)
+        .apply(transposedData to TensorShape(transposedShape)).first
 }
