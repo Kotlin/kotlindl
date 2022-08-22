@@ -27,8 +27,7 @@ private class PreprocessingDataLoader(
 
         val image = dataSource.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }
 
-        val (floats, imageShape) = preprocessing.apply(image)
-        return floats to imageShape
+        return preprocessing.apply(image)
     }
 }
 

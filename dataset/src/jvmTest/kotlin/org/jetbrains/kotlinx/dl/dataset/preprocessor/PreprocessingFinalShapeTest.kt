@@ -23,7 +23,7 @@ class PreprocessingFinalShapeTest {
                 interpolation = InterpolationType.NEAREST
             }
             .toFloatArray { }
-        assertEquals(TensorShape(100, 100, 3), preprocess.getOutputShape(TensorShape(1000, 1000, 3)))
+        assertEquals(TensorShape(100, 100, -1), preprocess.getOutputShape(TensorShape(-1, -1, -1)))
     }
 
     @Test
