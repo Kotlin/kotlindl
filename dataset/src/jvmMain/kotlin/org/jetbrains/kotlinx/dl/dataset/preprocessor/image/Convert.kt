@@ -29,7 +29,13 @@ public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImageOpe
         return result
     }
 
+    /**
+     * Takes result color mode into account when computing output shape.
+     */
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        return inputShape
+        return when (inputShape.rank()) {
+            2, 3 -> TensorShape(inputShape[0], inputShape[1], colorMode.channels.toLong())
+            else -> throw IllegalArgumentException("Input shape must have 2 or 3 dimensions")
+        }
     }
 }

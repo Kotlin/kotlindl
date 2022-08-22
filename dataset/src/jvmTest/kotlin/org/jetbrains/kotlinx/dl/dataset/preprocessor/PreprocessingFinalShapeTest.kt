@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -116,5 +117,29 @@ class PreprocessingFinalShapeTest {
             .centerCrop { size = 15 }
             .toFloatArray { }
         assertEquals(TensorShape(15, 15, 1), preprocess.getOutputShape(TensorShape(10, 20, 1)))
+    }
+
+    @Test
+    fun convertImageToGrayscaleTest() {
+        val preprocess = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.GRAYSCALE }
+            .toFloatArray { }
+
+        val image = BufferedImage(10, 20, BufferedImage.TYPE_3BYTE_BGR)
+        val (_, actualShape) = preprocess.apply(image)
+
+        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(10, 20, 1)))
+    }
+
+    @Test
+    fun convertImageToRGBTest() {
+        val preprocess = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray { }
+
+        val image = BufferedImage(10, 20, BufferedImage.TYPE_3BYTE_BGR)
+        val (_, actualShape) = preprocess.apply(image)
+
+        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(10, 20, 3)))
     }
 }
