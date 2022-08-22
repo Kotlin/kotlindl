@@ -34,6 +34,9 @@ public data class ImageShape(
     }
 }
 
+/**
+ * Convenience function to create an [ImageShape] from [TensorShape].
+ */
 public fun TensorShape.toImageShape(): ImageShape {
     val width = if (this[0] == -1L) null else this[0]
     val height = if (this[1] == -1L) null else this[1]
