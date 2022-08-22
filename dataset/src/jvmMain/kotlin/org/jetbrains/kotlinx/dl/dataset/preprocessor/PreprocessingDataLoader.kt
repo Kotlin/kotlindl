@@ -9,11 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape.Companion.toTensorShape
 import java.awt.image.BufferedImage
 import java.io.File
-import java.nio.channels.FileLock
 
 /**
  * A [DataLoader] which uses provided [Preprocessing] to prepare images.

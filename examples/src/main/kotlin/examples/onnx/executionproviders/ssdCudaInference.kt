@@ -17,7 +17,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
-import java.nio.Buffer
 
 /**
  * This example demonstrates how to infer SSD model using [inferAndCloseUsing] scope function:

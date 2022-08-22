@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.Transpose
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
@@ -19,8 +20,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDete
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.Transpose
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {

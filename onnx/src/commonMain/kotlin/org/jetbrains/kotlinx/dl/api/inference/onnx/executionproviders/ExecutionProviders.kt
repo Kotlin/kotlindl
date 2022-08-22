@@ -2,6 +2,8 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders
 
 import ai.onnxruntime.OrtProvider
 import ai.onnxruntime.OrtSession
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 
 /**
  * These are classes representing the supported ONNXRuntime execution providers for KotlinDL.

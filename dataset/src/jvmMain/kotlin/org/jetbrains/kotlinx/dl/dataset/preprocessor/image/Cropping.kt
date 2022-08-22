@@ -7,10 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
-import org.jetbrains.kotlinx.dl.dataset.image.getShape
 import org.jetbrains.kotlinx.dl.dataset.image.getTensorShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape.Companion.toTensorShape
 import java.awt.image.BufferedImage
 
 /**

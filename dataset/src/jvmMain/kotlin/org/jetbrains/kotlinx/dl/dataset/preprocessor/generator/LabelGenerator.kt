@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
 
-import java.io.File
-
 /** A parent interface for all label generators. */
 public interface LabelGenerator<D> {
     /**
