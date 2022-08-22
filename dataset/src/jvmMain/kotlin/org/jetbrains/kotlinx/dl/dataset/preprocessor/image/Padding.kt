@@ -49,9 +49,12 @@ public class Padding(
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        val outputWidth = if (inputShape[0] == -1L) -1 else inputShape[0] + left + right
+        val outputHeight = if (inputShape[1] == -1L) -1 else inputShape[1] + top + bottom
+
         return when (inputShape.rank()) {
-            2 -> TensorShape(inputShape[0] + left + right, inputShape[1] + top + bottom)
-            3 -> TensorShape(inputShape[0] + left + right, inputShape[1] + top + bottom, inputShape[2])
+            2 -> TensorShape(outputWidth, outputHeight)
+            3 -> TensorShape(outputWidth, outputHeight, inputShape[2])
             else -> throw IllegalArgumentException("Padding operation is supported only for 2D and 3D tensors")
         }
     }

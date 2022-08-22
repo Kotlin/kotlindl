@@ -33,8 +33,14 @@ public class CenterCrop(public var size: Int = -1) : ImageOperationBase() {
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
         if (size <= 0) return inputShape
-        return TensorShape(size.toLong(), size.toLong(), inputShape[2])
+
+        return when (inputShape.rank()) {
+            2 -> TensorShape(size.toLong(), size.toLong())
+            3 -> TensorShape(size.toLong(), size.toLong(), inputShape[2])
+            else -> throw IllegalArgumentException("CenterCrop operation is only supported for 2D and 3D tensors")
+        }
     }
+
     private fun padIfNecessary(image: BufferedImage): BufferedImage {
         if (image.width < size || image.height < size) {
             val verticalSpace = (size - image.height).coerceAtLeast(0)

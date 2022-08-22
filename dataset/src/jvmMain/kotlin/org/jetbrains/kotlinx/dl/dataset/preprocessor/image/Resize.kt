@@ -66,9 +66,7 @@ public class Resize(
         return when (inputShape.rank()) {
             2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
             3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
-            else -> {
-                throw IllegalArgumentException("Resize operation is only supported for 2D and 3D tensors.")
-            }
+            else -> throw IllegalArgumentException("Resize operation is only supported for 2D and 3D tensors.")
         }
     }
 }
