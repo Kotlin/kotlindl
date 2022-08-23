@@ -8,6 +8,9 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = '1.8'
         }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
     }
     android {
         publishLibraryVariants("release")
@@ -23,6 +26,16 @@ kotlin {
             dependencies {
                 api "org.jetbrains.kotlinx:multik-core:0.2.0"
                 api "org.jetbrains.kotlinx:multik-default:0.2.0"
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+                implementation project(":api")
+                implementation project(":dataset")
             }
         }
         androidMain {

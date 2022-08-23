@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
 import org.jetbrains.kotlinx.multik.api.mk
@@ -23,13 +24,19 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) :
     override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
         val (data, inputShape) = input
 
+        require(inputShape.rank() == axes.size) { "Transpose operation expected input with ${axes.size} dimensions, but got input with ${inputShape.rank()} dimensions" }
+
         val tensorShape = inputShape.dims().map { it.toInt() }.toIntArray()
 
         val ndArray = mk.ndarray<Float, D3>(data.toList(), tensorShape)
-        return ndArray.transpose(*axes).toList().toFloatArray() to inputShape
+        val transposed = ndArray.transpose(*axes)
+
+        return transposed.toList().toFloatArray() to transposed.shape.toTensorShape()
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        require(inputShape.rank() == axes.size) { "Transpose operation expected input with ${axes.size} dimensions, but got input with ${inputShape.rank()} dimensions" }
+
         val dims = axes.map { inputShape.dims()[it] }.toLongArray()
         return TensorShape(dims)
     }

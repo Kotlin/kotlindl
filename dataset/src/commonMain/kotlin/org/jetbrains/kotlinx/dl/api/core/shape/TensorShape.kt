@@ -247,3 +247,8 @@ public fun getDimsOfArray(data: kotlin.Array<*>): LongArray {
  * @see getDimsOfArray
  */
 public val Array<*>.tensorShape: TensorShape get() = TensorShape(getDimsOfArray(this))
+
+/**
+ * Wraps an IntArray to TensorShape.
+ */
+public fun IntArray.toTensorShape(): TensorShape = TensorShape(this.map(Int::toLong).toLongArray())
