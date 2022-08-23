@@ -34,9 +34,6 @@ fun efficientNetB0Prediction() {
     model.use {
         println(it)
 
-//        val preprocessing: Preprocessing = preprocess {
-//            transformImage { convert { colorMode = ColorMode.BGR } }
-//        }
         val preprocessing = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {  }
@@ -57,4 +54,3 @@ fun efficientNetB0Prediction() {
 
 /** */
 fun main(): Unit = efficientNetB0Prediction()
-

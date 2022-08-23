@@ -60,8 +60,8 @@ fun vgg19additionalTraining() {
 
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
+            outputHeight = IMAGE_SIZE
+            outputWidth = IMAGE_SIZE
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }

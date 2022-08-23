@@ -59,8 +59,8 @@ fun resnet50onDogsVsCatsDataset() {
 internal fun runResNetTraining(modelBuilderFunction: KFunction4<Long, Int, Long, Activations, Functional>) {
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
+            outputHeight = IMAGE_SIZE
+            outputWidth = IMAGE_SIZE
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }
