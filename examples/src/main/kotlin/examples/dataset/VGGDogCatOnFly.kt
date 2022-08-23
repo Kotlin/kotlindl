@@ -190,8 +190,8 @@ private val vgg11 = Sequential.of(
 fun main() {
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-            outputHeight = IMAGE_SIZE
-            outputWidth = IMAGE_SIZE
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
             interpolation = InterpolationType.NEAREST
         }
         .convert { colorMode = ColorMode.BGR }

@@ -196,8 +196,8 @@ fun main() {
             degrees = 90f
         }
         .resize {
-            outputHeight = IMAGE_SIZE
-            outputWidth = IMAGE_SIZE
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
             interpolation = InterpolationType.NEAREST
         }
         .convert { colorMode = ColorMode.BGR }

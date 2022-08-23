@@ -57,8 +57,8 @@ fun mobilenetWithAdditionalTraining() {
 
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-                outputHeight = IMAGE_SIZE
-                outputWidth = IMAGE_SIZE
+                outputHeight = IMAGE_SIZE.toInt()
+                outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.BILINEAR
             }
         .convert { colorMode = ColorMode.BGR }

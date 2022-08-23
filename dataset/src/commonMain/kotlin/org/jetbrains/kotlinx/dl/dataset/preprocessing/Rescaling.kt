@@ -14,19 +14,12 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
  *
  * @property [scalingCoefficient] Scaling coefficient.
  */
-public class Rescaling(public var scalingCoefficient: Float = 255f) :
-    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
-
-    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
-        val (data, inputShape) = input
-
+public class Rescaling(public var scalingCoefficient: Float = 255f) : FloatArrayOperation() {
+    override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
         for (i in data.indices) {
             data[i] = data[i] / scalingCoefficient
         }
-        return data to inputShape
-    }
 
-    override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        return inputShape
+        return data
     }
 }

@@ -12,13 +12,11 @@ import kotlin.math.sqrt
  * @property [mean] an array of mean values for each channel.
  * @property [std] an array of std values for each channel.
  */
-public class Normalizing : Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+public class Normalizing : FloatArrayOperation() {
     public lateinit var mean: FloatArray
     public lateinit var std: FloatArray
-    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
-        val (data, inputShape) = input
-
-        val channels = inputShape.tail().last().toInt()
+    override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
+        val channels = shape.tail().last().toInt()
         require(mean.size == channels) {
             "Expected to get one mean value for each image channel. " +
                     "However ${mean.size} values was given for image with $channels channels."
@@ -32,11 +30,7 @@ public class Normalizing : Operation<Pair<FloatArray, TensorShape>, Pair<FloatAr
             data[i] = (data[i] - mean[i % channels]) / std[i % channels]
         }
 
-        return data to inputShape
-    }
-
-    override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        return inputShape
+        return data
     }
 }
 
