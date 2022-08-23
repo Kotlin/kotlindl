@@ -34,6 +34,15 @@ public fun predictTopNLabels(
     return top5
 }
 
+/** Returns top-5 labels for the given [data] encoded with mapping [classLabels]. */
+public fun predictTop5Labels(
+    it: InferenceModel,
+    data: FloatArray,
+    classLabels: Map<Int, String>,
+): List<Pair<String, Float>> {
+    return predictTopNLabels(it, data, classLabels, topN = 5)
+}
+
 /** Forms mapping of class label to class name for the ImageNet dataset. */
 public fun loadImageNetClassLabels(): Map<Int, String> {
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"

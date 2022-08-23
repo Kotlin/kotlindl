@@ -5,11 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.core.util.flattenFloats
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
 /**
  * Common preprocessing functions for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
@@ -149,57 +145,4 @@ public fun reshapeInput(inputData: FloatArray, imageShape: LongArray): Array<Arr
     }
 
     return reshaped
-}
-
-/** Returns top-5 labels for the given [data] encoded with mapping [imageNetClassLabels]. */
-public fun predictTop5ImageNetLabels(
-    it: InferenceModel,
-    data: FloatArray,
-    imageNetClassLabels: Map<Int, String>,
-): List<Pair<String, Float>> {
-    return predictTopKImageNetLabels(it, data, imageNetClassLabels)
-}
-
-/** Returns [topK] labels for the given [data] encoded with mapping [imageNetClassLabels]. */
-public fun predictTopKImageNetLabels(
-    it: InferenceModel,
-    data: FloatArray,
-    imageNetClassLabels: Map<Int, String>,
-    topK: Int = 5
-): List<Pair<String, Float>> {
-    require(topK <= data.size) { "TopK parameter value: $topK should be equal or less than number of elements in data: ${data.size}." }
-
-    val predictionVector = it.predictSoftly(data).toMutableList()
-    val predictionVector2 = it.predictSoftly(data).toMutableList() // get copy of previous vector
-
-    val topKResult: MutableList<Pair<String, Float>> = mutableListOf()
-    for (j in 1..topK) {
-        val max = predictionVector2.maxOrNull()
-        val indexOfElem = predictionVector.indexOf(max!!)
-        topKResult.add(Pair(imageNetClassLabels[indexOfElem]!!, predictionVector[indexOfElem]))
-        predictionVector2.remove(max)
-    }
-
-    return topKResult
-}
-
-/** Forms mapping of class label to class name for the ImageNet dataset. */
-public fun prepareImageNetHumanReadableClassLabels(): Map<Int, String> {
-    val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
-
-    fun parse(name: String): Any? {
-        val cls = Parser::class.java
-        return cls.getResourceAsStream(name)?.let { inputStream ->
-            return Parser.default().parse(inputStream, Charsets.UTF_8)
-        }
-    }
-
-    val classIndices = parse(pathToIndices) as JsonObject
-
-    val imageNetClassIndices = mutableMapOf<Int, String>()
-
-    for (key in classIndices.keys) {
-        imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
-    }
-    return imageNetClassIndices
 }
