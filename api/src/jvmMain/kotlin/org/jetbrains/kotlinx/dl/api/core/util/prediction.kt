@@ -11,15 +11,14 @@ import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
 /** Returns top-N labels for the given [floatArray] encoded with mapping [labels]. */
-public fun predictTopNLabels(
-    it: InferenceModel,
+public fun InferenceModel.predictTopNLabels(
     floatArray: FloatArray,
     labels: Map<Int, String>,
     topN: Int = 5
 ): List<Pair<String, Float>> {
-    val predictionVector = it.predictSoftly(floatArray).toMutableList()
+    val predictionVector = predictSoftly(floatArray).toMutableList()
     val predictionVector2 =
-        it.predictSoftly(floatArray).toMutableList() //NOTE: don't remove this row, it gets a copy of previous vector
+        predictSoftly(floatArray).toMutableList() //NOTE: don't remove this row, it gets a copy of previous vector
 
     check(predictionVector.size >= topN) { "TopN should be less or equal than ${predictionVector.size}." }
 
@@ -35,12 +34,11 @@ public fun predictTopNLabels(
 }
 
 /** Returns top-5 labels for the given [data] encoded with mapping [classLabels]. */
-public fun predictTop5Labels(
-    it: InferenceModel,
+public fun InferenceModel.predictTop5Labels(
     data: FloatArray,
     classLabels: Map<Int, String>,
 ): List<Pair<String, Float>> {
-    return predictTopNLabels(it, data, classLabels, topN = 5)
+    return predictTopNLabels(data, classLabels, topN = 5)
 }
 
 /** Forms mapping of class label to class name for the ImageNet dataset. */

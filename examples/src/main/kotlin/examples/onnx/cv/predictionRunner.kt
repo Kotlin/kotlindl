@@ -45,7 +45,7 @@ fun runImageRecognitionPrediction(
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            results.addAll(predictTopNLabels(it, inputData, imageNetClassLabels))
+            results.addAll(it.predictTopNLabels(inputData, imageNetClassLabels))
         }
 
         results

@@ -72,7 +72,7 @@ public class ImageRecognitionModel(
      */
     public fun predictTopKObjects(imageFile: File, topK: Int = 5): List<Pair<String, Float>> {
         val inputData = preprocessData(imageFile)
-        return predictTopNLabels(internalModel, inputData, imageNetClassLabels, topK)
+        return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
     }
 
     /**
@@ -89,7 +89,7 @@ public class ImageRecognitionModel(
                                   topK: Int = 5
     ): List<Pair<String, Float>> {
         val (inputData, _) = dataLoader.load(imageFile)
-        return predictTopNLabels(internalModel, inputData, imageNetClassLabels, topK)
+        return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
     }
 
     private fun preprocessData(imageFile: File): FloatArray {
