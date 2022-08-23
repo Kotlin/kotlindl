@@ -33,7 +33,7 @@ public class MultiPoseDetectionModel(pathToModel: String) : OnnxInferenceModel(p
         val rawPrediction = this.predictRaw(inputData)
         val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
 
-        val result = MultiPoseDetectionResult(mutableListOf())
+        val poses = mutableListOf<Pair<DetectedObject, DetectedPose>>()
 
         rawPoseLandMarks.forEachIndexed { poseIndex, floats ->
             val foundPoseLandmarks = mutableListOf<PoseLandmark>()
@@ -61,12 +61,12 @@ public class MultiPoseDetectionModel(pathToModel: String) : OnnxInferenceModel(p
             val foundPoseEdges = buildPoseEdges(foundPoseLandmarks)
             val detectedPose = DetectedPose(foundPoseLandmarks, foundPoseEdges)
 
-            if (detectedObject.probability > confidence) result.multiplePoses.add(
+            if (detectedObject.probability > confidence) poses.add(
                 Pair(detectedObject, detectedPose)
             )
         }
 
-        return result
+        return MultiPoseDetectionResult(poses)
     }
 
     public fun detectPoses(imageFile: File, confidence: Float = 0.1f): MultiPoseDetectionResult {

@@ -201,7 +201,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelLayersFromConfiguration(
             configuration: File,
             inputShape: IntArray? = null
-        ): MutableList<Layer> {
+        ): List<Layer> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
             val functionalConfig = loadSerializedModel(configuration)
@@ -240,7 +240,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelLayersFromDefaultConfiguration(
             modelDirectory: File,
             inputShape: IntArray? = null
-        ): MutableList<Layer> {
+        ): List<Layer> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")

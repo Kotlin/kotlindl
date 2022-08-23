@@ -72,7 +72,7 @@ public class SinglePoseDetectionModel(pathToModel: String) : OnnxInferenceModel(
     }
 }
 
-internal fun buildPoseEdges(foundPoseLandmarks: MutableList<PoseLandmark>): MutableList<PoseEdge> {
+internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>): List<PoseEdge> {
     val foundPoseEdges = mutableListOf<PoseEdge>()
     edgeKeyPointsPairs.forEach {
         val startPoint = foundPoseLandmarks[it.first]

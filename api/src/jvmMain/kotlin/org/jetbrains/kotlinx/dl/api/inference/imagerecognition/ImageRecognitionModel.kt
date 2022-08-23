@@ -24,7 +24,7 @@ public class ImageRecognitionModel(
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
 ) : InferenceModel() {
     /** Class labels for ImageNet dataset. */
-    public val imageNetClassLabels: MutableMap<Int, String> = loadImageNetClassLabels()
+    public val imageNetClassLabels: Map<Int, String> = loadImageNetClassLabels()
 
     override val inputDimensions: LongArray
         get() = internalModel.inputDimensions

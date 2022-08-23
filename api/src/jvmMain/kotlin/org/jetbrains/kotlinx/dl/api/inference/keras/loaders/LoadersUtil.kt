@@ -155,7 +155,7 @@ public fun reshapeInput(inputData: FloatArray, imageShape: LongArray): Array<Arr
 public fun predictTop5ImageNetLabels(
     it: InferenceModel,
     data: FloatArray,
-    imageNetClassLabels: MutableMap<Int, String>,
+    imageNetClassLabels: Map<Int, String>,
 ): List<Pair<String, Float>> {
     return predictTopKImageNetLabels(it, data, imageNetClassLabels)
 }
@@ -164,7 +164,7 @@ public fun predictTop5ImageNetLabels(
 public fun predictTopKImageNetLabels(
     it: InferenceModel,
     data: FloatArray,
-    imageNetClassLabels: MutableMap<Int, String>,
+    imageNetClassLabels: Map<Int, String>,
     topK: Int = 5
 ): List<Pair<String, Float>> {
     require(topK <= data.size) { "TopK parameter value: $topK should be equal or less than number of elements in data: ${data.size}." }
@@ -184,7 +184,7 @@ public fun predictTopKImageNetLabels(
 }
 
 /** Forms mapping of class label to class name for the ImageNet dataset. */
-public fun prepareImageNetHumanReadableClassLabels(): MutableMap<Int, String> {
+public fun prepareImageNetHumanReadableClassLabels(): Map<Int, String> {
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 
     fun parse(name: String): Any? {

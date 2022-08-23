@@ -14,9 +14,9 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 public fun predictTopNLabels(
     it: InferenceModel,
     floatArray: FloatArray,
-    labels: MutableMap<Int, String>,
+    labels: Map<Int, String>,
     topN: Int = 5
-): MutableMap<Int, Pair<String, Float>> {
+): Map<Int, Pair<String, Float>> {
     val predictionVector = it.predictSoftly(floatArray).toMutableList()
     val predictionVector2 =
         it.predictSoftly(floatArray).toMutableList() //NOTE: don't remove this row, it gets a copy of previous vector
@@ -35,7 +35,7 @@ public fun predictTopNLabels(
 }
 
 /** Forms mapping of class label to class name for the ImageNet dataset. */
-public fun loadImageNetClassLabels(): MutableMap<Int, String> {
+public fun loadImageNetClassLabels(): Map<Int, String> {
     val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 
     fun parse(name: String): Any? {

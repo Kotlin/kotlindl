@@ -61,7 +61,7 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?, inputShap
  */
 internal fun loadSequentialModelLayers(config: KerasModel?,
                                        inputShape: IntArray? = null
-): Pair<Input, MutableList<Layer>> {
+): Pair<Input, List<Layer>> {
     val kerasLayers = config!!.config!!.layers!!
 
     val input = createInputLayer(kerasLayers.first(), inputShape)
@@ -173,7 +173,7 @@ internal fun deserializeFunctionalModel(functionalConfig: KerasModel?, inputShap
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadFunctionalModelLayers(config: KerasModel?, inputShape: IntArray? = null): MutableList<Layer> {
+internal fun loadFunctionalModelLayers(config: KerasModel?, inputShape: IntArray? = null): List<Layer> {
     val layers = mutableListOf<Layer>()
     val layersByNames = mutableMapOf<String, Layer>()
 
@@ -212,7 +212,7 @@ internal fun loadSerializedModel(jsonConfigFile: File) = try {
 
 private fun convertToLayer(
     kerasLayer: KerasLayer,
-    layersByName: MutableMap<String, Layer>
+    layersByName: Map<String, Layer>
 ): Layer {
     val layer = convertToLayer(kerasLayer)
     val inboundLayers = mutableListOf<Layer>()

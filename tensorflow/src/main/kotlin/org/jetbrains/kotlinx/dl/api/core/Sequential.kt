@@ -87,7 +87,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         @JvmStatic
         public fun loadModelLayersFromConfiguration(configuration: File,
                                                     inputShape: IntArray? = null
-        ): Pair<Input, MutableList<Layer>> {
+        ): Pair<Input, List<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
             val config = loadSerializedModel(configuration)
@@ -126,7 +126,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun loadModelLayersFromDefaultConfiguration(
             modelDirectory: File,
             inputShape: IntArray? = null
-        ): Pair<Input, MutableList<Layer>> {
+        ): Pair<Input, List<Layer>> {
             require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
 
             val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")

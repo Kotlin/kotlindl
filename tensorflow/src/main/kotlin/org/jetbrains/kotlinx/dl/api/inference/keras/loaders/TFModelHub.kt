@@ -184,7 +184,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
     }
 
     /** Forms mapping of class label to class name for the ImageNet dataset. */
-    public fun loadClassLabels(): MutableMap<Int, String> {
+    public fun loadClassLabels(): Map<Int, String> {
         val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
 
         fun parse(name: String): Any? {
