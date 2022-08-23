@@ -11,12 +11,15 @@ import kotlin.math.sqrt
  * ```
  * @property [mean] an array of mean values for each channel.
  * @property [std] an array of std values for each channel.
+ * @property [channelsLast] true is channel dimension is the last one, false if it's the first one.
  */
 public class Normalizing : FloatArrayOperation() {
     public lateinit var mean: FloatArray
     public lateinit var std: FloatArray
+    public var channelsLast: Boolean = true
+
     override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
-        val channels = shape.tail().last().toInt()
+        val channels = if (channelsLast) shape.tail().last().toInt() else shape.head().toInt()
         require(mean.size == channels) {
             "Expected to get one mean value for each image channel. " +
                     "However ${mean.size} values was given for image with $channels channels."
@@ -27,7 +30,8 @@ public class Normalizing : FloatArrayOperation() {
         }
 
         for (i in data.indices) {
-            data[i] = (data[i] - mean[i % channels]) / std[i % channels]
+            val c = if (channelsLast) i % channels else i / (shape.numElements() / channels).toInt()
+            data[i] = (data[i] - mean[c]) / std[c]
         }
 
         return data
