@@ -16,14 +16,14 @@ public fun predictTopNLabels(
     floatArray: FloatArray,
     labels: Map<Int, String>,
     topN: Int = 5
-): Map<Int, Pair<String, Float>> {
+): List<Pair<String, Float>> {
     val predictionVector = it.predictSoftly(floatArray).toMutableList()
     val predictionVector2 =
         it.predictSoftly(floatArray).toMutableList() //NOTE: don't remove this row, it gets a copy of previous vector
 
     check(predictionVector.size >= topN) { "TopN should be less or equal than ${predictionVector.size}." }
 
-    val top5: MutableMap<Int, Pair<String, Float>> = mutableMapOf()
+    val top5 = mutableListOf<Pair<String, Float>>()
     for (j in 1..topN) {
         val max = predictionVector2.maxOrNull()
         val indexOfElem = predictionVector.indexOf(max!!)
