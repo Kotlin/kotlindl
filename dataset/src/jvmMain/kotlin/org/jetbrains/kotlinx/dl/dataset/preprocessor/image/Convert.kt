@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.colorMode
 import org.jetbrains.kotlinx.dl.dataset.image.imageType
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -16,7 +17,7 @@ import java.awt.image.BufferedImage
  *
  * @property [colorMode] target color mode.
  */
-public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImageOperationBase() {
+public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         if (input.colorMode() == colorMode) return input
         val outputType = colorMode.imageType()
@@ -25,7 +26,6 @@ public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImageOpe
         graphics.drawImage(input, 0, 0, null)
         graphics.dispose()
 
-        save?.save("convert_result", result)
         return result
     }
 

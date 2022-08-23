@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
@@ -30,7 +31,7 @@ public class Rotate(
     public var interpolation: InterpolationType = InterpolationType.BICUBIC,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImageOperationBase() {
+) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         val width: Int = input.width
         val height: Int = input.height
@@ -97,8 +98,6 @@ public class Rotate(
         g2d.transform = affineTransform
         g2d.drawImage(input, -minX, -minY, null)
         g2d.dispose()
-
-        save?.save("rotated_result", rotatedImage)
 
         return rotatedImage
     }

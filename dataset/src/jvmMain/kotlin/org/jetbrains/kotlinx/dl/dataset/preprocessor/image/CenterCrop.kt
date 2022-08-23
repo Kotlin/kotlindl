@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -16,7 +17,7 @@ import java.awt.image.BufferedImage
  *
  * @property [size] target image size.
  */
-public class CenterCrop(public var size: Int = -1) : ImageOperationBase() {
+public class CenterCrop(public var size: Int = -1) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         if (size <= 0 || (input.width == size && input.height == size)) return input
 
@@ -27,7 +28,6 @@ public class CenterCrop(public var size: Int = -1) : ImageOperationBase() {
             size, size
         ).copy()
 
-        save?.save("center_crop_result", result)
         return result
     }
 

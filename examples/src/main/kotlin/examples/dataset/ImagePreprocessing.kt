@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -50,7 +51,7 @@ fun main() {
             scalingCoefficient = 255f
         }
 
-    val resource: URL = ImageOperationBase::class.java.getResource("/datasets/vgg")
+    val resource: URL = Operation::class.java.getResource("/datasets/vgg")
     val imageDirectory = Paths.get(resource.toURI()).toFile()
     val dataset = OnFlyImageDataset.create(imageDirectory, EmptyLabels(), preprocessing)
     val batchIter: Dataset.BatchIterator = dataset.batchIterator(8)

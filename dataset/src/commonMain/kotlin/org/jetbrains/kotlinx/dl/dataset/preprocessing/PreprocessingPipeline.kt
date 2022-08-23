@@ -19,4 +19,4 @@ public class PreprocessingPipeline<I, M, O>(
 /**
  * An entry point for building preprocessing pipeline.
  */
-public fun<I> pipeline() = Identity<I>()
+public fun<I> pipeline(): Identity<I> = Identity()

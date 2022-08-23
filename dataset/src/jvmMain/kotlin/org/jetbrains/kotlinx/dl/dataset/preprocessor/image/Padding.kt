@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.draw
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -27,7 +28,7 @@ public class Padding(
     public var left: Int = 0,
     public var right: Int = 0,
     public var mode: PaddingMode = PaddingMode.Black
-) : ImageOperationBase() {
+) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         val result = BufferedImage(input.width + left + right, input.height + top + bottom, input.type)
         result.draw { graphics2D ->
@@ -42,8 +43,6 @@ public class Padding(
                 }
             }
         }
-
-        save?.save("padding_result", result)
 
         return result
     }

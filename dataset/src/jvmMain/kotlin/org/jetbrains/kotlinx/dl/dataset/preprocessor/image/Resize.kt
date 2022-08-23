@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 
@@ -30,7 +31,7 @@ public class Resize(
     public var interpolation: InterpolationType = InterpolationType.BILINEAR,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImageOperationBase() {
+) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         val resizedImage = BufferedImage(outputWidth, outputHeight, input.type)
         val graphics2D = resizedImage.createGraphics()
@@ -56,8 +57,6 @@ public class Resize(
 
         graphics2D.drawImage(input, 0, 0, outputWidth, outputHeight, null)
         graphics2D.dispose()
-
-        save?.save("resized_result", resizedImage)
 
         return resizedImage
     }

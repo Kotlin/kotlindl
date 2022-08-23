@@ -7,13 +7,9 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.mean
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.normalize
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.std
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ImageOperationBase
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
@@ -24,14 +20,14 @@ import java.nio.file.Paths
  * It shows how to compute mean and std values for the dataset and how to use these values for normalization.
  */
 fun main() {
-    val resource = ImageOperationBase::class.java.getResource("/datasets/vgg")!!
+    val resource = Operation::class.java.getResource("/datasets/vgg")!!
     val imageDirectory = Paths.get(resource.toURI()).toFile()
     val images = OnHeapDataset.create(imageDirectory, EmptyLabels()).x
     val datasetMean = mean(*images, channels = 3)
     val datasetStd = std(*images, channels = 3)
     println("Dataset mean is ${datasetMean.contentToString()}\nDataset std is ${datasetStd.contentToString()}")
 
-    val imageResource = ImageOperationBase::class.java.getResource("/datasets/vgg/image2.jpg")
+    val imageResource = Operation::class.java.getResource("/datasets/vgg/image2.jpg")
     val image = File(imageResource!!.toURI())
     val imageFloats = ImageConverter.toRawFloatArray(image)
     println(

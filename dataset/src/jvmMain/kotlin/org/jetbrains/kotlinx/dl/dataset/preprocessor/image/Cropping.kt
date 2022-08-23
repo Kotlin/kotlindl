@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
 import org.jetbrains.kotlinx.dl.dataset.image.getTensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -27,7 +28,7 @@ public class Cropping(
     public var bottom: Int = 1,
     public var left: Int = 1,
     public var right: Int = 1
-) : ImageOperationBase() {
+) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
         val croppedImageShape = getOutputShape(input.getTensorShape())
         val (width, height, _) = croppedImageShape.dims()
@@ -37,8 +38,6 @@ public class Cropping(
             width.toInt(),
             height.toInt()
         ).copy()
-
-        save?.save("convert_result", result)
 
         return result
     }

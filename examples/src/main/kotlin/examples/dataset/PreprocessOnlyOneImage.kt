@@ -7,6 +7,8 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.onResult
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
@@ -14,6 +16,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
 import javax.swing.JFrame
 
 /**
@@ -24,8 +27,6 @@ import javax.swing.JFrame
  * - image visualisation with the [ImagePanel].
  */
 fun main() {
-    val preprocessedImagesDirectory = File("processedImages")
-
     val preprocessing = pipeline<BufferedImage>()
         .crop {
             left = 100
@@ -40,10 +41,8 @@ fun main() {
             outputWidth = 400
             outputHeight = 400
             interpolation = InterpolationType.NEAREST
-            save {
-                dirLocation = preprocessedImagesDirectory
-            }
         }
+        .onResult { ImageIO.write(it, "jpg", File("image2.jpg")) }
         .pad {
             top = 10
             bottom = 40
@@ -57,7 +56,7 @@ fun main() {
             scalingCoefficient = 255f
         }
 
-    val imageResource = ImageOperationBase::class.java.getResource("/datasets/vgg/image2.jpg")
+    val imageResource = Operation::class.java.getResource("/datasets/vgg/image2.jpg")
     val image = File(imageResource!!.toURI())
     val (rawImage, shape) = preprocessing.dataLoader().load(image)
 
