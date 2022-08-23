@@ -5,9 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
 import io.jhdf.HdfFile
 import mu.KLogger
 import mu.KotlinLogging
@@ -15,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.freeze
+import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.io.File
 import java.net.URL
@@ -185,23 +183,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
 
     /** Forms mapping of class label to class name for the ImageNet dataset. */
     public fun loadClassLabels(): Map<Int, String> {
-        val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
-
-        fun parse(name: String): Any? {
-            val cls = Parser::class.java
-            return cls.getResourceAsStream(name)?.let { inputStream ->
-                return Parser.default().parse(inputStream, Charsets.UTF_8)
-            }
-        }
-
-        val classIndices = parse(pathToIndices) as JsonObject
-
-        val imageNetClassIndices = mutableMapOf<Int, String>()
-
-        for (key in classIndices.keys) {
-            imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
-        }
-        return imageNetClassIndices
+        return loadImageNetClassLabels()
     }
 
     /**
