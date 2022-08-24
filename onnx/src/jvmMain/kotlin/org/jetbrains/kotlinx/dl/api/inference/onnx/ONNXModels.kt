@@ -646,7 +646,7 @@ public object ONNXModels {
          */
         public object SSDMobileNetV1 :
             ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
-            override val inputShape: LongArray? = longArrayOf(1000L, 1000L, 3L)
+            override val inputShape: LongArray = longArrayOf(1000L, 1000L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
                 return SSDMobileNetV1ObjectDetectionModel(modelHub.loadModel(this))
@@ -676,7 +676,7 @@ public object ONNXModels {
          */
         public object EfficientDetD0 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d0") {
-            override val inputShape: LongArray? = longArrayOf(512L, 512L, 3L)
+            override val inputShape: LongArray = longArrayOf(512L, 512L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -705,7 +705,7 @@ public object ONNXModels {
          */
         public object EfficientDetD1 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d1") {
-            override val inputShape: LongArray? = longArrayOf(640L, 640L, 3L)
+            override val inputShape: LongArray = longArrayOf(640L, 640L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -734,7 +734,7 @@ public object ONNXModels {
          */
         public object EfficientDetD2 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
-            override val inputShape: LongArray? = longArrayOf(768L, 768L, 3L)
+            override val inputShape: LongArray = longArrayOf(768L, 768L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -763,7 +763,7 @@ public object ONNXModels {
          */
         public object EfficientDetD3 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d3") {
-            override val inputShape: LongArray? = longArrayOf(896L, 896L, 3L)
+            override val inputShape: LongArray = longArrayOf(896L, 896L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -792,7 +792,7 @@ public object ONNXModels {
          */
         public object EfficientDetD4 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d4") {
-            override val inputShape: LongArray? = longArrayOf(1024L, 1024L, 3L)
+            override val inputShape: LongArray = longArrayOf(1024L, 1024L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -821,7 +821,7 @@ public object ONNXModels {
          */
         public object EfficientDetD5 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d5") {
-            override val inputShape: LongArray? = longArrayOf(1280L, 1280L, 3L)
+            override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -850,7 +850,7 @@ public object ONNXModels {
          */
         public object EfficientDetD6 :
             ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d6") {
-            override val inputShape: LongArray? = longArrayOf(1280L, 1280L, 3L)
+            override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
                 return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
@@ -946,7 +946,7 @@ public object ONNXModels {
          */
         public object MoveNetMultiPoseLighting :
             PoseDetection<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
-            override val inputShape: LongArray? = longArrayOf(256L, 256L, 3L)
+            override val inputShape: LongArray = longArrayOf(256L, 256L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
                 return MultiPoseDetectionModel(modelHub.loadModel(this))

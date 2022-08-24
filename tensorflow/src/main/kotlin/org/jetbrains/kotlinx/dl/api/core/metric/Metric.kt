@@ -51,9 +51,9 @@ public abstract class Metric(
         public fun convertBack(metric: Metric): Metrics {
             return when (metric) {
                 is Accuracy -> Metrics.ACCURACY
-                is org.jetbrains.kotlinx.dl.api.core.metric.MAE -> Metrics.MAE
-                is org.jetbrains.kotlinx.dl.api.core.metric.MSE -> Metrics.MSE
-                is org.jetbrains.kotlinx.dl.api.core.metric.MSLE -> Metrics.MSLE
+                is MAE -> Metrics.MAE
+                is MSE -> Metrics.MSE
+                is MSLE -> Metrics.MSLE
                 else -> Metrics.ACCURACY
             }
         }

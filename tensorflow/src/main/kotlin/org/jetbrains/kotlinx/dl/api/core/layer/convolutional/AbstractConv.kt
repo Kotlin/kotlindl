@@ -26,14 +26,14 @@ import kotlin.math.roundToInt
  * @property [kernelSize] numbers used by default in calculation of layer weights and i/o shapes
  * @property [strides] numbers used by default in calculation of layer weights and i/o shapes
  * @property [dilations] numbers to keep for the dilations for implementation
- * @property [activation] activation used in [forward] operation implementation
+ * @property [activation] activation used in [build] operation implementation
  * @property [kernelInitializer] initializer used in actual kernel variable filling implementation
  * @property [biasInitializer] initializer used in actual bias variable filling implementation
  * @property [kernelRegularizer] regularizer function used in actual kernel variable filling implementation
  * @property [biasRegularizer] regularizer function used in actual bias variable filling implementation
  * @property [activityRegularizer] regularizer function applied to the output of the layer
  * @property [padding] numbers to keep for the padding for implementation
- * @property [useBias] flag if bias should be used during actual [forward] implementation
+ * @property [useBias] flag if bias should be used during actual [build] implementation
  * @constructor Creates [AbstractConv] object
  *
  * @param name of the layer to name its variables

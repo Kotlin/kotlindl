@@ -81,7 +81,7 @@ public class ImageRecognitionModel(
 
     /**
      * Predicts object for the given [imageFile].
-     * Default [Preprocessing] is applied to an image.
+     * Default preprocessing [Operation] is applied to an image.
      *
      * @param [imageFile] Input image [File].
      * @see preprocessData

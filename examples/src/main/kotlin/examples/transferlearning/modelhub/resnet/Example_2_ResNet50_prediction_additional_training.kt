@@ -45,7 +45,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * - New Dense layers are added and initialized via defined initializers.
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun resnet50additionalTraining() {

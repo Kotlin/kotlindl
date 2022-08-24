@@ -22,7 +22,7 @@ import java.nio.file.Paths
 import javax.swing.JFrame
 
 /**
- * This example shows how to do image preprocessing from scratch using [Preprocessing] DSL.
+ * This example shows how to do image preprocessing from scratch using preprocessing DSL.
  *
  * It includes:
  * - dataset creation from images located in resource folder;

@@ -46,7 +46,7 @@ private const val EPOCHS = 2
  * - New Dense layers are added and initialized via defined initializers.
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  *
  * @see <a href="https://arxiv.org/abs/1409.1556">

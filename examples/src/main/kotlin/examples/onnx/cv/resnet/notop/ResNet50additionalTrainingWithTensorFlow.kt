@@ -58,7 +58,7 @@ private val topModel = Sequential.of(
  * - Model is re-trained on [dogsCatsDatasetPath] dataset.
  *
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun resnet50additionalTraining() {

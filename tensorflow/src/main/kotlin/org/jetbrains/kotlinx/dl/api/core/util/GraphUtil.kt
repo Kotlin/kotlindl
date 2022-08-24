@@ -5,10 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.util
 
-import Stack
-import pop
-import push
-
 /**
  * Topologically sort nodes in the DAG defined by a provided start node and a function returning next nodes.
  * @param [start] a node from which to start the sort

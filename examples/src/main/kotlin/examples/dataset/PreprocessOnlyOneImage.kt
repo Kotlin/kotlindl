@@ -20,7 +20,7 @@ import javax.imageio.ImageIO
 import javax.swing.JFrame
 
 /**
- * This example shows how to do image preprocessing using [Preprocessing] DSL for only one image.
+ * This example shows how to do image preprocessing using preprocessing DSL for only one image.
  *
  * It includes:
  * - image preprocessing;

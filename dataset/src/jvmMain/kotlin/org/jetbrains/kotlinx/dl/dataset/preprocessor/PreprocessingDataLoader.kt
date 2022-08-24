@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 
 /**
- * A [DataLoader] which uses provided [Preprocessing] to prepare images.
+ * A [DataLoader] which uses provided [Operation] to prepare images.
  */
 private class PreprocessingDataLoader(
     private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
@@ -32,7 +32,7 @@ private class PreprocessingDataLoader(
 }
 
 /**
- * Returns a [DataLoader] instance which uses this [Preprocessing] to prepare images.
+ * Returns a [DataLoader] instance which uses this [Operation] to prepare images.
  */
 public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.dataLoader(): DataLoader<File> =
     PreprocessingDataLoader(this)
