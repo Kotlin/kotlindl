@@ -126,8 +126,8 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceMod
     model.use {
         val preprocessing = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = it.inputShape[1].toInt()
-                    outputWidth = it.inputShape[2].toInt()
+                    outputHeight = it.inputDimensions[0].toInt()
+                    outputWidth = it.inputDimensions[1].toInt()
                 }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {  }

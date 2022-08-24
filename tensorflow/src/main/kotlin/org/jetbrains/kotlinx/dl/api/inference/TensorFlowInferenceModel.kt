@@ -28,7 +28,7 @@ import java.util.*
  *
  * Provides functionality to make predictions and model loading.
  */
-public open class TensorFlowInferenceModel : InferenceModel() {
+public open class TensorFlowInferenceModel : InferenceModel {
     /** The namespace wrapper for all TensorFlow graph operations. */
     protected lateinit var tf: Ops
 
@@ -62,6 +62,9 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
+
+    /** Model name. */
+    public var name: String? = null
 
     /**
      * Generates output prediction for the input sample.

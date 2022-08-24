@@ -5,9 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -36,9 +38,17 @@ private const val INPUT_SIZE = 1200
  *  @see <a href="https://github.com/lji72/inference/blob/tf_ssd_resent34_align_onnx/others/cloud/single_stage_detector/tensorflow/dataset_config/coco_labelmap.txt">
  *     Example mapping</a>
  *
+ * @param [internalModel] model used to make predictions
+
  * @since 0.3
  */
-public class SSDObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
+public class SSDObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the object detection model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *
@@ -49,7 +59,7 @@ public class SSDObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(p
      * @return List of [DetectedObject] sorted by score.
      */
     public fun  detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
-        val rawPrediction = this.predictRaw(inputData)
+        val rawPrediction = internalModel.predictRaw(inputData)
 
         val foundObjects = mutableListOf<DetectedObject>()
         val boxes = (rawPrediction[OUTPUT_BOXES] as Array<Array<FloatArray>>)[0]
@@ -107,5 +117,13 @@ public class SSDObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(p
         )
 
         return this.detectObjects(preprocessedData, topK)
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): SSDObjectDetectionModel {
+        return SSDObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
 }

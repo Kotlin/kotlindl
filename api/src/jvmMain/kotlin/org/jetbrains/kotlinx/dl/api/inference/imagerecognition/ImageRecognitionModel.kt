@@ -27,37 +27,9 @@ import java.io.File
 public class ImageRecognitionModel(
     private val internalModel: InferenceModel,
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
-) : InferenceModel() {
+) : InferenceModel by internalModel {
     /** Class labels for ImageNet dataset. */
     public val imageNetClassLabels: Map<Int, String> = loadImageNetClassLabels()
-
-    override val inputDimensions: LongArray
-        get() = internalModel.inputDimensions
-
-    override fun predict(inputData: FloatArray): Int {
-        return internalModel.predict(inputData)
-    }
-
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        return internalModel.predictSoftly(inputData, predictionTensorName)
-    }
-
-    override fun reshape(vararg dims: Long) {
-        throw UnsupportedOperationException("The reshape operation is not required for this model.")
-    }
-
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
-    }
-
-    /** Releases internal resources. */
-    override fun close() {
-        internalModel.close()
-    }
 
     /**
      * Predicts [topK] objects for the given [imageFile].
@@ -132,6 +104,14 @@ public class ImageRecognitionModel(
     public fun predictObject(imageFile: File, dataLoader: DataLoader<File>): String {
         val (inputData, _) = dataLoader.load(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): ImageRecognitionModel {
+        return ImageRecognitionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights), modelType)
     }
 
     public companion object {

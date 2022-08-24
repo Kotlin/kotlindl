@@ -37,7 +37,7 @@ fun main() {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        visualise(imageFile, detectedObjects, detectionModel.inputShape)
+        visualise(imageFile, detectedObjects, longArrayOf(1, *detectionModel.inputDimensions))
     }
 }
 
@@ -48,8 +48,8 @@ internal fun visualise(
 ) {
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-            outputWidth = inputShape[1].toInt()
-            outputHeight = inputShape[2].toInt()
+            outputWidth = inputShape[0].toInt()
+            outputHeight = inputShape[1].toInt()
         }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray { }

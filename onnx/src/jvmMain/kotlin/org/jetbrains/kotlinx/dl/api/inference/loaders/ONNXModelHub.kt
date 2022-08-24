@@ -87,7 +87,8 @@ public class ONNXModelHub(cacheDirectory: File) :
             S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
         }
 
-        val inferenceModel = modelType.createModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
+        val inferenceModel = OnnxInferenceModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
+        modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
         return inferenceModel as T
     }

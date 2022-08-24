@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -23,35 +24,15 @@ private const val INPUT_SIZE = 192
 
 /**
  * The light-weight API for solving Face Alignment task via Fan2D106 model.
+ *
+ * @param [internalModel] model used to make predictions
  */
-public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel() {
-    override val inputDimensions: LongArray
-        get() = internalModel.inputDimensions
-
-    override fun predict(inputData: FloatArray): Int {
-        return internalModel.predict(inputData)
-    }
-
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        return internalModel.predictSoftly(inputData, predictionTensorName)
-    }
-
-    override fun reshape(vararg dims: Long) {
-        TODO()
-    }
-
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
-    }
-
-    /** Releases the model resources. */
-    override fun close() {
-        internalModel.close()
-    }
+public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the face alignment model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
 
     /**
      * Detects 106 [Landmark] objects for the given [imageFile].
@@ -75,6 +56,14 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         }
 
         return landMarks
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): Fan2D106FaceAlignmentModel {
+        return Fan2D106FaceAlignmentModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
 }
 

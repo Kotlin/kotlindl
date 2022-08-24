@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -26,9 +28,17 @@ private const val OUTPUT_NAME = "detections:0"
  *
  * It internally uses [ONNXModels.ObjectDetection.EfficientDetD0] or other EfficientDet models trained on the COCO dataset.
  *
+ * @param [internalModel] model used to make predictions
+ *
  * @since 0.4
  */
-public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(pathToModel) {
+public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    /**
+     * Constructs the object detection model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+
     /**
      * Returns the detected object for the given image file sorted by the score.
      *
@@ -36,7 +46,7 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(inputData: FloatArray): List<DetectedObject> {
-        val rawPrediction = this.predictRaw(inputData)
+        val rawPrediction = internalModel.predictRaw(inputData)
         val foundObjects = mutableListOf<DetectedObject>()
         val items = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
 
@@ -47,10 +57,10 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
                     classLabel = cocoCategories[items[i][6].toInt()]!!,
                     probability = probability,
                     // left, bot, right, top
-                    xMin = minOf(items[i][2] / inputShape[2], 1.0f),
-                    yMax = minOf(items[i][3] / inputShape[1], 1.0f),
-                    xMax = minOf(items[i][4] / inputShape[2], 1.0f),
-                    yMin = minOf(items[i][1] / inputShape[1], 1.0f)
+                    xMin = minOf(items[i][2] / inputDimensions[1], 1.0f),
+                    yMax = minOf(items[i][3] / inputDimensions[0], 1.0f),
+                    xMax = minOf(items[i][4] / inputDimensions[1], 1.0f),
+                    yMin = minOf(items[i][1] / inputDimensions[0], 1.0f)
                 )
                 foundObjects.add(detectedObject)
             }
@@ -71,8 +81,8 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
     public fun detectObjects(imageFile: File): List<DetectedObject> {
         val preprocessing = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputShape[1].toInt()
-                outputWidth = inputShape[2].toInt()
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
             }
             // the channels of input of EfficientDet models should be in RGB order
             // model is quite sensitive for this
@@ -82,5 +92,13 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
         val (data, _) = preprocessing.dataLoader().load(imageFile)
         // we don't need special preprocessing here
         return this.detectObjects(data)
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): EfficientDetObjectDetectionModel {
+        return EfficientDetObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
 }

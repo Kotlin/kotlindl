@@ -23,7 +23,7 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel() {
+public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel {
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
@@ -34,7 +34,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     private lateinit var session: OrtSession
 
     /** Data shape for prediction. */
-    public lateinit var inputShape: LongArray
+    private lateinit var inputShape: LongArray
 
     /** Data type for input tensor. */
     public lateinit var inputDataType: OnnxJavaType
@@ -50,6 +50,9 @@ public open class OnnxInferenceModel private constructor(private val modelSource
 
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
+
+    /** Model name. */
+    public var name: String? = null
 
     /**
      * Constructs an ONNX inference model from the given model file.
@@ -182,15 +185,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      * @param dims The input shape.
      */
     public override fun reshape(vararg dims: Long) {
-        this.inputShape = TensorShape(1, *dims).dims()
-    }
-
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): InferenceModel {
-        TODO("Not yet implemented")
+        inputShape = longArrayOf(1, *dims)
     }
 
     override val inputDimensions: LongArray
@@ -324,6 +319,22 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
+    }
+
+    override fun copy(
+        copiedModelName: String?,
+        saveOptimizerState: Boolean,
+        copyWeights: Boolean
+    ): OnnxInferenceModel {
+        val model = OnnxInferenceModel(modelSource)
+        model.name = copiedModelName
+        if (::inputShape.isInitialized) {
+            model.reshape(*inputDimensions)
+        }
+        if (::session.isInitialized) {
+            model.initializeWith(*executionProvidersInUse.toTypedArray())
+        }
+        return model
     }
 
     /** Releases the ONNXRuntime - related resources. */

@@ -17,7 +17,7 @@ fun main() {
 
     model.use { detectionModel ->
         println(detectionModel)
-        detectionModel.inputShape = longArrayOf(1, 1300, 900, 3)
+        detectionModel.reshape(1300, 900, 3)
 
         val imageFile = getFileFromResource("datasets/detection/image3.jpg")
         val detectedObjects =
@@ -27,7 +27,7 @@ fun main() {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        visualise(imageFile, detectedObjects, detectionModel.inputShape)
+        visualise(imageFile, detectedObjects, longArrayOf(1, *detectionModel.inputDimensions))
     }
 }
 
