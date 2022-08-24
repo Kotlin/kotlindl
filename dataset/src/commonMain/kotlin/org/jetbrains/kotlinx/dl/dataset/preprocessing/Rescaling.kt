@@ -3,7 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.dataset.preprocessor
+package org.jetbrains.kotlinx.dl.dataset.preprocessing
+
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+
 
 /**
  * This preprocessor defines the Rescaling operation.
@@ -11,11 +14,12 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
  *
  * @property [scalingCoefficient] Scaling coefficient.
  */
-public class Rescaling(public var scalingCoefficient: Float = 255f) : Preprocessor {
-    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
+public class Rescaling(public var scalingCoefficient: Float = 255f) : FloatArrayOperation() {
+    override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
         for (i in data.indices) {
             data[i] = data[i] / scalingCoefficient
         }
+
         return data
     }
 }

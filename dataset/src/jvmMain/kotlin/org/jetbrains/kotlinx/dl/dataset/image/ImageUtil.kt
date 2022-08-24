@@ -1,5 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
@@ -21,4 +22,8 @@ internal fun BufferedImage.copy(): BufferedImage {
 
 internal fun BufferedImage.getShape(): ImageShape {
     return ImageShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
+}
+
+internal fun BufferedImage.getTensorShape(): TensorShape {
+    return TensorShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
 }

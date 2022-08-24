@@ -20,10 +20,11 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
@@ -62,11 +63,12 @@ fun main() {
 
         it.loadWeights(hdfFile)
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+        val preprocessing = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
@@ -93,13 +95,14 @@ fun main() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL_2))
 
     inferenceModel.use {
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+        val preprocessing = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 1..8) {
             it.reshape(224, 224, 3)
 
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model.inputDimensions)
 
             val res = it.predict(inputData)
@@ -123,11 +126,12 @@ fun main() {
 
         it.loadWeights(File(PATH_TO_MODEL))
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+        val preprocessing = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val inputData = modelType.preprocessInput(image, model2.inputDimensions)
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

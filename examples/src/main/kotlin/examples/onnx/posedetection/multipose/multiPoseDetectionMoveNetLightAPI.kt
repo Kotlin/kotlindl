@@ -6,13 +6,20 @@
 package examples.onnx.posedetection.multipose
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -43,27 +50,23 @@ fun multiPoseDetectionMoveNetLightAPI() {
                 }
             }
 
-            val (rawImage, shape) = preprocessing(imageFile)
-            drawMultiPoseLandMarks(rawImage, shape, detectedPoses)
+            val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+            drawMultiPoseLandMarks(rawImage, shape.toImageShape(), detectedPoses)
         }
     }
 }
 
-private fun preprocessing(): Preprocessing {
-    return preprocess {
-        transformImage {
-            resize {
-                outputHeight = 256
-                outputWidth = 256
-            }
-            convert { colorMode = ColorMode.BGR }
+private fun preprocessing(): Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
+    return pipeline<BufferedImage>()
+        .resize {
+            outputHeight = 256
+            outputWidth = 256
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
         }
-    }
 }
 
 /** */

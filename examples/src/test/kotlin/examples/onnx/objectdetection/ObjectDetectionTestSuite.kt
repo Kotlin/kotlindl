@@ -16,14 +16,14 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.awt.image.BufferedImage
 import java.io.File
 
 class ObjectDetectionTestSuite {
@@ -124,15 +124,14 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceMod
     val model = modelHub.loadModel(modelType)
 
     model.use {
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = it.inputShape[1].toInt()
                     outputWidth = it.inputShape[2].toInt()
                 }
-                convert { colorMode = ColorMode.BGR }
-            }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 1..6) {
             val inputData = modelType.preprocessInput(
                 getFileFromResource("datasets/detection/image$i.jpg"),

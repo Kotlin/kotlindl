@@ -10,10 +10,12 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val OUTPUT_BOXES = "bboxes"
@@ -87,21 +89,21 @@ public class SSDObjectDetectionModel(pathToModel: String) : OnnxInferenceModel(p
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
-        val preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = INPUT_SIZE
                     outputWidth = INPUT_SIZE
                 }
-                convert { colorMode = ColorMode.RGB }
-            }
-        }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
 
-        val (data, shape) = preprocessing(imageFile)
+
+        val (data, shape) = preprocessing.dataLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.ObjectDetection.SSD.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
+            shape.dims()
+//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectObjects(preprocessedData, topK)

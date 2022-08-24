@@ -7,20 +7,32 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape.Companion.toTensorShape
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
  * A [DataLoader] which uses provided [Preprocessing] to prepare images.
  */
-private class PreprocessingDataLoader(private val preprocessing: Preprocessing) : DataLoader<File> {
+private class PreprocessingDataLoader(
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+) : DataLoader<File> {
     override fun load(dataSource: File): Pair<FloatArray, TensorShape> {
-        val (floats, imageShape) = preprocessing(dataSource)
-        return floats to imageShape.toTensorShape()
+        require(dataSource.exists()) { "File '$dataSource' does not exist." }
+        require(dataSource.isFile) {
+            if (dataSource.isDirectory) "File '$dataSource' is a directory."
+            else "File '$dataSource' is not a normal file."
+        }
+
+        val image = dataSource.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }
+
+        return preprocessing.apply(image)
     }
 }
 
 /**
  * Returns a [DataLoader] instance which uses this [Preprocessing] to prepare images.
  */
-public fun Preprocessing.dataLoader(): DataLoader<File> = PreprocessingDataLoader(this)
+public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.dataLoader(): DataLoader<File> =
+    PreprocessingDataLoader(this)

@@ -14,11 +14,11 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferUsing
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.system.measureTimeMillis
 
@@ -45,15 +45,13 @@ fun multiPoseCudaInference() {
 
 fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLighting): FloatArray {
     val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
                 outputHeight = 256
                 outputWidth = 256
             }
-            convert { colorMode = ColorMode.RGB }
-        }
-    }
+        .convert { colorMode = ColorMode.RGB }
+        .toFloatArray {  }
 
     return modelType.preprocessInput(imageFile, preprocessing)
 }

@@ -5,8 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -16,22 +17,28 @@ import java.awt.image.BufferedImage
  *
  * @property [size] target image size.
  */
-public class CenterCrop(public var size: Int = -1) : ImagePreprocessorBase() {
+public class CenterCrop(public var size: Int = -1) : Operation<BufferedImage, BufferedImage> {
+    override fun apply(input: BufferedImage): BufferedImage {
+        if (size <= 0 || (input.width == size && input.height == size)) return input
 
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        if (size <= 0) return inputShape
-        return ImageShape(size.toLong(), size.toLong(), inputShape.channels)
-    }
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        if (size <= 0 || (image.width == size && image.height == size)) return image
-
-        val paddedImage = padIfNecessary(image)
-        return paddedImage.getSubimage(
+        val paddedImage = padIfNecessary(input)
+        val result = paddedImage.getSubimage(
             (paddedImage.width - size) / 2,
             (paddedImage.height - size) / 2,
             size, size
         ).copy()
+
+        return result
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        if (size <= 0) return inputShape
+
+        return when (inputShape.rank()) {
+            2 -> TensorShape(size.toLong(), size.toLong())
+            3 -> TensorShape(size.toLong(), size.toLong(), inputShape[2])
+            else -> throw IllegalArgumentException("CenterCrop operation is only supported for 2D and 3D tensors")
+        }
     }
 
     private fun padIfNecessary(image: BufferedImage): BufferedImage {

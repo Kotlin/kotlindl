@@ -5,8 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.draw
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -27,19 +28,11 @@ public class Padding(
     public var left: Int = 0,
     public var right: Int = 0,
     public var mode: PaddingMode = PaddingMode.Black
-) : ImagePreprocessorBase() {
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(
-            inputShape.width?.plus(left + right.toLong()),
-            inputShape.height?.plus(top + bottom.toLong()),
-            inputShape.channels
-        )
-    }
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        val result = BufferedImage(image.width + left + right, image.height + top + bottom, image.type)
+) : Operation<BufferedImage, BufferedImage> {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val result = BufferedImage(input.width + left + right, input.height + top + bottom, input.type)
         result.draw { graphics2D ->
-            graphics2D.drawImage(image, left, top, null)
+            graphics2D.drawImage(input, left, top, null)
             when (mode) {
                 is PaddingMode.Fill -> {
                     graphics2D.color = (mode as PaddingMode.Fill).color
@@ -50,7 +43,19 @@ public class Padding(
                 }
             }
         }
+
         return result
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        val outputWidth = if (inputShape[0] == -1L) -1 else inputShape[0] + left + right
+        val outputHeight = if (inputShape[1] == -1L) -1 else inputShape[1] + top + bottom
+
+        return when (inputShape.rank()) {
+            2 -> TensorShape(outputWidth, outputHeight)
+            3 -> TensorShape(outputWidth, outputHeight, inputShape[2])
+            else -> throw IllegalArgumentException("Padding operation is supported only for 2D and 3D tensors")
+        }
     }
 }
 

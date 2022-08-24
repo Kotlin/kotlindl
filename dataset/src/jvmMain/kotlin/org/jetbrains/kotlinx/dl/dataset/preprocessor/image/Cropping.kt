@@ -5,9 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.copy
-import org.jetbrains.kotlinx.dl.dataset.image.getShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.image.getTensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -27,23 +28,28 @@ public class Cropping(
     public var bottom: Int = 1,
     public var left: Int = 1,
     public var right: Int = 1
-) : ImagePreprocessorBase() {
+) : Operation<BufferedImage, BufferedImage> {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val croppedImageShape = getOutputShape(input.getTensorShape())
+        val (width, height, _) = croppedImageShape.dims()
 
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(
-            width = inputShape.width?.minus(left)?.minus(right),
-            height = inputShape.height?.minus(top)?.minus(bottom),
-            channels = inputShape.channels
-        )
+        val result = input.getSubimage(
+            left, top,
+            width.toInt(),
+            height.toInt()
+        ).copy()
+
+        return result
     }
 
-    override fun apply(image: BufferedImage): BufferedImage {
-        val croppedImageShape = getOutputShape(image.getShape())
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        val outputWidth = if (inputShape[0] == -1L) -1 else inputShape[0] - left - right
+        val outputHeight = if (inputShape[1] == -1L) -1 else inputShape[1] - top - bottom
 
-        return image.getSubimage(
-            left, top,
-            croppedImageShape.width!!.toInt(),
-            croppedImageShape.height!!.toInt()
-        ).copy()
+        return when (inputShape.rank()) {
+            2 -> TensorShape(outputWidth, outputHeight)
+            3 -> TensorShape(outputWidth, outputHeight, inputShape[2])
+            else -> throw IllegalArgumentException("Cropping operation is applicable only to images with rank 2 or 3")
+        }
     }
 }

@@ -11,10 +11,15 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.jetbrains.kotlinx.dl.visualization.swing.drawRawLandMarks
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -31,15 +36,14 @@ fun main() {
     model.use {
         println(it)
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = 192
                     outputWidth = 192
                 }
-                convert { colorMode = ColorMode.BGR }
-            }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 0..8) {
             val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
 
@@ -57,21 +61,17 @@ fun visualiseLandMarks(
     imageFile: File,
     landmarks: Map<String, Any>
 ) {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputWidth = 192
-                outputHeight = 192
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
+            outputWidth = 192
+            outputHeight = 192
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
         }
-    }
 
-    val (rawImage, shape) = preprocessing(imageFile)
-    drawRawLandMarks(rawImage, shape, landmarks)
+    val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+    drawRawLandMarks(rawImage, ImageShape(shape[0], shape[1], shape[2]), landmarks)
 }

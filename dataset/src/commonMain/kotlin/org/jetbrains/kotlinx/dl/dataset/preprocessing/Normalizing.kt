@@ -1,5 +1,6 @@
-package org.jetbrains.kotlinx.dl.dataset.preprocessor
+package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import kotlin.math.sqrt
 
 /**
@@ -11,12 +12,11 @@ import kotlin.math.sqrt
  * @property [mean] an array of mean values for each channel.
  * @property [std] an array of std values for each channel.
  */
-public class Normalizing : Preprocessor {
+public class Normalizing : FloatArrayOperation() {
     public lateinit var mean: FloatArray
     public lateinit var std: FloatArray
-
-    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val channels = inputShape.channels!!.toInt()
+    override fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray {
+        val channels = shape.tail().last().toInt()
         require(mean.size == channels) {
             "Expected to get one mean value for each image channel. " +
                     "However ${mean.size} values was given for image with $channels channels."

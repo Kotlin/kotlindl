@@ -10,10 +10,15 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
+import java.awt.image.BufferedImage
 import java.io.File
 
 fun main() {
@@ -41,23 +46,19 @@ internal fun visualise(
     detectedObjects: List<DetectedObject>,
     inputShape: LongArray
 ) {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputWidth = inputShape[1].toInt()
-                outputHeight = inputShape[2].toInt()
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
+            outputWidth = inputShape[1].toInt()
+            outputHeight = inputShape[2].toInt()
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
         }
-    }
 
-    val (rawImage, shape) = preprocessing(imageFile)
-    drawDetectedObjects(rawImage, shape, detectedObjects)
+    val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+    drawDetectedObjects(rawImage, shape.toImageShape(), detectedObjects)
 }
 
 

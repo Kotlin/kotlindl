@@ -33,3 +33,18 @@ public data class ImageShape(
         }
     }
 }
+
+/**
+ * Convenience function to create an [ImageShape] from [TensorShape].
+ */
+public fun TensorShape.toImageShape(): ImageShape {
+    val width = if (this[0] == -1L) null else this[0]
+    val height = if (this[1] == -1L) null else this[1]
+    val channels = if (this[2] == -1L) null else this[2]
+
+    return when (this.rank()) {
+        2 -> ImageShape(width, height, 1)
+        3 -> ImageShape(width, height, channels)
+        else -> throw IllegalArgumentException("Tensor shape must be 2D or 3D to be converted to ImageShape")
+    }
+}

@@ -11,10 +11,15 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -47,23 +52,18 @@ private fun visualise(
     imageFile: File,
     detectedObjects: List<DetectedObject>
 ) {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputWidth = 1200
-                outputHeight = 1200
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
+            outputWidth = 1200
+            outputHeight = 1200
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
         }
-    }
 
-    val rawImage = preprocessing(imageFile).first
+    val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
 
-    drawDetectedObjects(rawImage, ImageShape(1200, 1200, 3), detectedObjects)
+    drawDetectedObjects(rawImage, shape.toImageShape(), detectedObjects)
 }
-

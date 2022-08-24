@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.colorMode
 import org.jetbrains.kotlinx.dl.dataset.image.imageType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 
 /**
@@ -16,18 +17,25 @@ import java.awt.image.BufferedImage
  *
  * @property [colorMode] target color mode.
  */
-public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : ImagePreprocessorBase() {
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(inputShape.width, inputShape.height, colorMode.channels.toLong())
+public class Convert(public var colorMode: ColorMode = ColorMode.BGR) : Operation<BufferedImage, BufferedImage> {
+    override fun apply(input: BufferedImage): BufferedImage {
+        if (input.colorMode() == colorMode) return input
+        val outputType = colorMode.imageType()
+        val result = BufferedImage(input.width, input.height, outputType)
+        val graphics = result.createGraphics()
+        graphics.drawImage(input, 0, 0, null)
+        graphics.dispose()
+
+        return result
     }
 
-    override fun apply(image: BufferedImage): BufferedImage {
-        if (image.colorMode() == colorMode) return image
-        val outputType = colorMode.imageType()
-        val result = BufferedImage(image.width, image.height, outputType)
-        val graphics = result.createGraphics()
-        graphics.drawImage(image, 0, 0, null)
-        graphics.dispose()
-        return result
+    /**
+     * Takes result color mode into account when computing output shape.
+     */
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return when (inputShape.rank()) {
+            2, 3 -> TensorShape(inputShape[0], inputShape[1], colorMode.channels.toLong())
+            else -> throw IllegalArgumentException("Input shape must have 2 or 3 dimensions")
+        }
     }
 }

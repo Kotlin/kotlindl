@@ -10,11 +10,11 @@ import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionM
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -30,16 +30,14 @@ fun ssd() {
 
     model.use {
         println(it)
-
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = 1200
-                    outputWidth = 1200
-                }
-                convert { colorMode = ColorMode.BGR }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = 1200
+                outputWidth = 1200
             }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray {  }
+
         for (i in 1..6) {
             val inputData = modelType.preprocessInput(
                 getFileFromResource("datasets/detection/image$i.jpg"),
@@ -57,4 +55,3 @@ fun ssd() {
 
 /** */
 fun main(): Unit = ssd()
-

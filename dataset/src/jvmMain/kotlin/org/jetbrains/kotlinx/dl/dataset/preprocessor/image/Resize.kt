@@ -5,7 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 
@@ -30,14 +31,9 @@ public class Resize(
     public var interpolation: InterpolationType = InterpolationType.BILINEAR,
     public var renderingSpeed: RenderingSpeed = RenderingSpeed.MEDIUM,
     public var enableAntialiasing: Boolean = true
-) : ImagePreprocessorBase() {
-
-    override fun getOutputShape(inputShape: ImageShape): ImageShape {
-        return ImageShape(outputWidth.toLong(), outputHeight.toLong(), inputShape.channels)
-    }
-
-    override fun apply(image: BufferedImage): BufferedImage {
-        val resizedImage = BufferedImage(outputWidth, outputHeight, image.type)
+) : Operation<BufferedImage, BufferedImage> {
+    override fun apply(input: BufferedImage): BufferedImage {
+        val resizedImage = BufferedImage(outputWidth, outputHeight, input.type)
         val graphics2D = resizedImage.createGraphics()
 
         val renderingHint = when (interpolation) {
@@ -59,9 +55,17 @@ public class Resize(
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         }
 
-        graphics2D.drawImage(image, 0, 0, outputWidth, outputHeight, null)
+        graphics2D.drawImage(input, 0, 0, outputWidth, outputHeight, null)
         graphics2D.dispose()
 
         return resizedImage
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return when (inputShape.rank()) {
+            2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
+            3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
+            else -> throw IllegalArgumentException("Resize operation is only supported for 2D and 3D tensors.")
+        }
     }
 }

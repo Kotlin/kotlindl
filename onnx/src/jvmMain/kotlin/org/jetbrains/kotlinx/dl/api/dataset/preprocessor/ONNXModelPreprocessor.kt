@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessor
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.TensorPreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
 
 /**
  * Applies the given [onnxModel] as a preprocessing stage.
@@ -17,14 +17,18 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.TensorPreprocessing
  * @property [outputIndex] Index of the output to be passed forward.
  */
 public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) :
-    Preprocessor {
-    override fun apply(data: FloatArray, inputShape: ImageShape): FloatArray {
-        val (prediction, _) = onnxModel!!.predictRawWithShapes(data)[outputIndex]
-        return prediction.array()
+    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
+        val (prediction, rawShape) = onnxModel!!.predictRawWithShapes(input.first)[outputIndex]
+        return prediction.array() to TensorShape(rawShape)
+    }
+
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return TensorShape(onnxModel!!.outputShape)
     }
 }
 
 /** Image DSL Preprocessing extension.*/
-public fun TensorPreprocessing.onnx(block: ONNXModelPreprocessor.() -> Unit) {
-    addOperation(ONNXModelPreprocessor(null).apply(block))
+public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.onnx(block: ONNXModelPreprocessor.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+    return PreprocessingPipeline(this, ONNXModelPreprocessor(null).apply(block))
 }

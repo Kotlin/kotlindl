@@ -23,11 +23,14 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.sharpen
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val TRAINING_BATCH_SIZE = 8
@@ -42,21 +45,17 @@ fun runImageRecognitionTransferLearning(
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
                 outputHeight = modelType.inputShape?.get(0) ?: 224
                 outputWidth = modelType.inputShape?.get(0) ?: 224
                 interpolation = InterpolationType.BILINEAR
             }
-            convert { colorMode = ColorMode.BGR }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .sharpen {
+            modelTypePreprocessing = modelType
         }
-        transformTensor {
-            sharpen {
-                modelTypePreprocessing = modelType
-            }
-        }
-    }
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(
@@ -141,21 +140,17 @@ fun runImageRecognitionTransferLearningOnTopModel(
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputHeight = modelType.inputShape?.get(0) ?: 224
-                outputWidth = modelType.inputShape?.get(0) ?: 224
-                interpolation = InterpolationType.BILINEAR
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
+            outputHeight = modelType.inputShape?.get(0) ?: 224
+            outputWidth = modelType.inputShape?.get(0) ?: 224
+            interpolation = InterpolationType.BILINEAR
         }
-        transformTensor {
-            sharpen {
-                modelTypePreprocessing = modelType
-            }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .sharpen {
+            modelTypePreprocessing = modelType
         }
-    }
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(

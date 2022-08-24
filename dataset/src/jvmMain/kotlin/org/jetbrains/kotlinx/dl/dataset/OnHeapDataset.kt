@@ -5,11 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -212,7 +215,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            preprocessing: Preprocessing = Preprocessing()
+            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)
@@ -231,7 +234,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
-            preprocessing: Preprocessing = Preprocessing()
+            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
         ): OnHeapDataset {
             return try {
                 val xFiles = prepareFileNames(pathToData)

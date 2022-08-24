@@ -12,11 +12,12 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val CLASS_LABEL = "person"
@@ -70,21 +71,20 @@ public class MultiPoseDetectionModel(pathToModel: String) : OnnxInferenceModel(p
     }
 
     public fun detectPoses(imageFile: File, confidence: Float = 0.1f): MultiPoseDetectionResult {
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
                     outputHeight = INPUT_SIZE
                     outputWidth = INPUT_SIZE
                 }
-                convert { colorMode = ColorMode.RGB }
-            }
-        }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
 
-        val (data, shape) = preprocessing(imageFile)
+        val (data, shape) = preprocessing.dataLoader().load(imageFile)
 
         val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
             data,
-            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
+            shape.dims()
+//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
         )
 
         return this.detectPoses(preprocessedData, confidence)

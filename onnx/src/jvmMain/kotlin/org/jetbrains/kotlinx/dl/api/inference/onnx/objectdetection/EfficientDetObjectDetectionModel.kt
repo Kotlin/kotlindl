@@ -10,10 +10,12 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val OUTPUT_NAME = "detections:0"
@@ -67,19 +69,17 @@ public class EfficientDetObjectDetectionModel(pathToModel: String) : OnnxInferen
      * @return List of [DetectedObject] sorted by score.
      */
     public fun detectObjects(imageFile: File): List<DetectedObject> {
-        val preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = inputShape[1].toInt()
-                    outputWidth = inputShape[2].toInt()
-                }
-                // the channels of input of EfficientDet models should be in RGB order
-                // model is quite sensitive for this
-                convert { colorMode = ColorMode.RGB }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = inputShape[1].toInt()
+                outputWidth = inputShape[2].toInt()
             }
-        }
+            // the channels of input of EfficientDet models should be in RGB order
+            // model is quite sensitive for this
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
 
-        val (data, _) = preprocessing(imageFile)
+        val (data, _) = preprocessing.dataLoader().load(imageFile)
         // we don't need special preprocessing here
         return this.detectObjects(data)
     }
