@@ -2,37 +2,48 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
 import android.graphics.Bitmap
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import java.nio.FloatBuffer
+import org.jetbrains.kotlinx.dl.dataset.image.argB8888ToNCHWArray
+import org.jetbrains.kotlinx.dl.dataset.image.argB8888ToNHWCArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.TensorLayout.NCHW
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.TensorLayout.NHWC
+
 
 /**
  * Converts [Bitmap] to float array representation.
  */
-// TODO support other image formats
-// TODO address performance issues
-public class ConvertToFloatArray : Operation<Bitmap, Pair<FloatArray, TensorShape>> {
+public class ConvertToFloatArray(private var layout: TensorLayout = NCHW) :
+    Operation<Bitmap, Pair<FloatArray, TensorShape>> {
+    private val channels = 3
     override fun apply(input: Bitmap): Pair<FloatArray, TensorShape> {
-        val imgData = FloatBuffer.allocate(
-            input.width * input.height * 3
-        )
-        imgData.rewind()
-        val stride = input.width * input.height
-        val bmpData = IntArray(stride.toInt())
-        input.getPixels(bmpData, 0, input.width, 0, 0, input.width, input.height)
-        var idx: Int = 0
-        for (i in 0 until input.width) {
-            for (j in 0 until input.height) {
-                val pixelValue = bmpData[idx++]
-                imgData.put((pixelValue shr 16 and 0xFF).toFloat())
-                imgData.put((pixelValue shr 8 and 0xFF).toFloat())
-                imgData.put((pixelValue and 0xFF).toFloat())
-            }
+        require(input.config == Bitmap.Config.ARGB_8888) { "Only ARGB_8888 bitmaps are supported currently" }
+
+        val w = input.width
+        val h = input.height
+
+        val encodedPixels = IntArray(w * h)
+        input.getPixels(encodedPixels, 0, w, 0, 0, w, h)
+
+        val tensor = when (layout) {
+            NCHW -> argB8888ToNCHWArray(encodedPixels, w, h, channels)
+            NHWC -> argB8888ToNHWCArray(encodedPixels, w, h, channels)
         }
 
-        imgData.rewind()
-        return imgData.array() to TensorShape(input.width.toLong(), input.height.toLong(), 3)
+        val shape = when (layout) {
+            NCHW -> TensorShape(channels.toLong(), h.toLong(), w.toLong())
+            NHWC -> TensorShape(h.toLong(), w.toLong(), channels.toLong())
+        }
+
+        return tensor to shape
     }
 
-    override fun getFinalShape(inputShape: TensorShape): TensorShape {
-        return inputShape
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
+        return when (inputShape.rank()) {
+            2, 3 -> when (layout) {
+                NCHW -> TensorShape(channels.toLong(), inputShape[0], inputShape[1])
+                NHWC -> TensorShape(inputShape[0], inputShape[1], channels.toLong())
+            }
+
+            else -> throw IllegalArgumentException("Input shape must be 1D or 2D")
+        }
     }
 }

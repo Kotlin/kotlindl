@@ -21,18 +21,18 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
  * @property [outputHeight] The output height.
  */
 public class Resize(
-    public var outputWidth: Int = 100,
-    public var outputHeight: Int = 100,
+    private var outputWidth: Int = 100,
+    private var outputHeight: Int = 100,
 ) : Operation<Bitmap, Bitmap> {
     override fun apply(input: Bitmap): Bitmap {
         return Bitmap.createScaledBitmap(input, outputWidth, outputHeight, true)
     }
 
-    override fun getFinalShape(inputShape: TensorShape): TensorShape {
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
         return when (inputShape.rank()) {
             2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
             3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
-            else -> throw IllegalArgumentException("Input shape must have rank 2 or 3")
+            else -> throw IllegalArgumentException("Input shape must expected to be 2D or 3D")
         }
     }
 }

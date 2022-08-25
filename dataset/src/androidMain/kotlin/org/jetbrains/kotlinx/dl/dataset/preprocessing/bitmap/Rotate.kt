@@ -18,14 +18,14 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
  * @property [degrees] The rotation angle.
  */
 public class Rotate(
-    public var degrees: Float = 0.0f,
+    private var degrees: Float = 0.0f,
 ) : Operation<Bitmap, Bitmap> {
     override fun apply(input: Bitmap): Bitmap {
         val matrix = Matrix().apply { postRotate(degrees) }
         return Bitmap.createBitmap(input, 0, 0, input.width, input.height, matrix, true)
     }
 
-    override fun getFinalShape(inputShape: TensorShape): TensorShape {
+    override fun getOutputShape(inputShape: TensorShape): TensorShape {
         return inputShape
     }
 }
