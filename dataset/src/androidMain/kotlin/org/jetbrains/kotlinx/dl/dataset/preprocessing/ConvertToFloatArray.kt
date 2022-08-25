@@ -10,6 +10,9 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.TensorLayout.NHWC
 
 /**
  * Converts [Bitmap] to float array representation.
+ * Only [Bitmap.Config.ARGB_8888] is supported.
+ *
+ * @param layout [TensorLayout] of the resulting array.
  */
 public class ConvertToFloatArray(private var layout: TensorLayout = NCHW) :
     Operation<Bitmap, Pair<FloatArray, TensorShape>> {

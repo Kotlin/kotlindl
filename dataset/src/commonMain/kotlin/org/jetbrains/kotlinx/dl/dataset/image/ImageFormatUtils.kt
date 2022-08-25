@@ -1,5 +1,8 @@
 package org.jetbrains.kotlinx.dl.dataset.image
 
+/**
+ * Decodes an ARGB8888 encoded pixel array to a float array containing the red, green, blue components in NCWH layout.
+ */
 public fun argB8888ToNCHWArray(encodedPixels: IntArray, width: Int, height: Int, channels: Int): FloatArray {
     val output = FloatArray(width * height * channels)
     val stride = width * height
@@ -20,6 +23,9 @@ public fun argB8888ToNCHWArray(encodedPixels: IntArray, width: Int, height: Int,
     return output
 }
 
+/**
+ * Decodes an ARGB8888 encoded pixel array to a float array containing the red, green, blue components in NHWC layout.
+ */
 public fun argB8888ToNHWCArray(encodedPixels: IntArray, width: Int, height: Int, channels: Int): FloatArray {
     val output = FloatArray(width * height * channels)
 
@@ -35,6 +41,9 @@ public fun argB8888ToNHWCArray(encodedPixels: IntArray, width: Int, height: Int,
     return output
 }
 
+/**
+ * Decodes an ARGB8888 encoded pixel to a red, green, blue components.
+ */
 public fun decodeARGB8888Pixel(pixelValue: Int): Triple<Float, Float, Float> {
     val r = (pixelValue shr 16 and 0xFF).toFloat()
     val g = (pixelValue shr 8 and 0xFF).toFloat()
