@@ -218,7 +218,6 @@ class ReluGraphics2(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
 */
 fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects: List<DetectedObject>) {
     val frame = JFrame("Filters")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(DetectedObjectJPanel(dst, imageShape, detectedObjects))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -229,7 +228,6 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
 
 fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: Map<String, Any>) {
     val frame = JFrame("Landmarks")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(RawLandMarksJPanel(dst, imageShape, landmarks))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -240,7 +238,6 @@ fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: Map<Str
 
 fun drawDetectedPose(dst: FloatArray, imageShape: ImageShape, detectedPose: DetectedPose) {
     val frame = JFrame("Filters")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(DetectedPoseJPanel(dst, imageShape, detectedPose))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -251,7 +248,6 @@ fun drawDetectedPose(dst: FloatArray, imageShape: ImageShape, detectedPose: Dete
 
 fun drawRawPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
     val frame = JFrame("Landmarks")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(RawPosePointsJPanel(dst, imageShape, posepoints))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -265,7 +261,6 @@ fun drawMultiPoseLandMarks(dst: FloatArray,
                            multiPoseDetectionResult: MultiPoseDetectionResult
 ) {
     val frame = JFrame("Landmarks")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(MultiPosePointsJPanel(dst, imageShape, multiPoseDetectionResult))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -276,7 +271,6 @@ fun drawMultiPoseLandMarks(dst: FloatArray,
 
 fun drawRawMultiPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
     val frame = JFrame("Landmarks")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(RawMultiPosePointsJPanel(dst, imageShape, posepoints))
     frame.pack()
     frame.setLocationRelativeTo(null)
@@ -287,7 +281,6 @@ fun drawRawMultiPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoint
 
 fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
     val frame = JFrame("Landmarks")
-    @Suppress("UNCHECKED_CAST")
     frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
     frame.pack()
     frame.setLocationRelativeTo(null)
