@@ -13,51 +13,26 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionRe
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.*
 import java.awt.image.BufferedImage
-import javax.swing.JFrame
 import javax.swing.JPanel
 
 
 fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects: List<DetectedObject>) {
-    val frame = JFrame("Filters")
-    frame.contentPane.add(DetectedObjectJPanel(dst, imageShape, detectedObjects))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Filters", DetectedObjectJPanel(dst, imageShape, detectedObjects))
 }
 
 fun drawDetectedPose(dst: FloatArray, imageShape: ImageShape, detectedPose: DetectedPose) {
-    val frame = JFrame("Filters")
-    frame.contentPane.add(DetectedPoseJPanel(dst, imageShape, detectedPose))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Filters", DetectedPoseJPanel(dst, imageShape, detectedPose))
 }
 
 fun drawMultiPoseLandMarks(dst: FloatArray,
                            imageShape: ImageShape,
                            multiPoseDetectionResult: MultiPoseDetectionResult
 ) {
-    val frame = JFrame("Landmarks")
-    frame.contentPane.add(MultiPosePointsJPanel(dst, imageShape, multiPoseDetectionResult))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Landmarks", MultiPosePointsJPanel(dst, imageShape, multiPoseDetectionResult))
 }
 
 fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
-    val frame = JFrame("Landmarks")
-    frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Landmarks", LandMarksJPanel(dst, imageShape, landmarks))
 }
 
 class MultiPosePointsJPanel(

@@ -6,8 +6,9 @@
 package org.jetbrains.kotlinx.dl.visualization.swing
 
 import org.jetbrains.kotlinx.dl.visualization.letsplot.TensorImageData
-import java.awt.*
-import javax.swing.JFrame
+import java.awt.Color
+import java.awt.Dimension
+import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
@@ -155,29 +156,22 @@ class ReluGraphics2(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
 }
 
 fun drawActivations(activations: List<*>) {
-    val frame = JFrame("Visualise the matrix weights on Relu")
     @Suppress("UNCHECKED_CAST")
-    frame.contentPane.add(ReluGraphics(activations[0] as TensorImageData))
-    frame.setSize(1500, 1500)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
-
-    val frame2 = JFrame("Visualise the matrix weights on Relu_1")
+    showFrame(
+        "Visualise the matrix weights on Relu", ReluGraphics(activations[0] as TensorImageData),
+        Dimension(1500, 1500)
+    )
     @Suppress("UNCHECKED_CAST")
-    frame2.contentPane.add(ReluGraphics2(activations[1] as TensorImageData))
-    frame2.setSize(1500, 1500)
-    frame2.isVisible = true
-    frame2.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame2.isResizable = false
+    showFrame(
+        "Visualise the matrix weights on Relu_1", ReluGraphics2(activations[1] as TensorImageData),
+        Dimension(1500, 1500)
+    )
 }
 
 fun drawFilters(filters: Array<*>, colorCoefficient: Double = 2.0) {
-    val frame = JFrame("Filters")
     @Suppress("UNCHECKED_CAST")
-    frame.contentPane.add(Conv2dJPanel(filters as TensorImageData, colorCoefficient))
-    frame.setSize(1000, 1000)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame(
+        "Filters", Conv2dJPanel(filters as TensorImageData, colorCoefficient),
+        Dimension(1000, 1000)
+    )
 }
