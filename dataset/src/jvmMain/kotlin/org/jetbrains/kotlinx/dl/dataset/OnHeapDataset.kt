@@ -133,15 +133,11 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             featuresExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> FloatArray
         ): Pair<OnHeapDataset, OnHeapDataset> {
-            return try {
-                val xTrain = featuresExtractor(trainFeaturesPath)
-                val yTrain = labelExtractor(trainLabelsPath, numClasses)
-                val xTest = featuresExtractor(testFeaturesPath)
-                val yTest = labelExtractor(testLabelsPath, numClasses)
-                Pair(OnHeapDataset(xTrain, yTrain), OnHeapDataset(xTest, yTest))
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            val xTrain = featuresExtractor(trainFeaturesPath)
+            val yTrain = labelExtractor(trainLabelsPath, numClasses)
+            val xTest = featuresExtractor(testFeaturesPath)
+            val yTest = labelExtractor(testLabelsPath, numClasses)
+            return OnHeapDataset(xTrain, yTrain) to OnHeapDataset(xTest, yTest)
         }
 
         /**
@@ -157,16 +153,12 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             featuresExtractor: (String) -> Array<FloatArray>,
             labelExtractor: (String, Int) -> FloatArray
         ): OnHeapDataset {
-            return try {
-                val features = featuresExtractor(featuresPath)
-                val labels = labelExtractor(labelsPath, numClasses)
+            val features = featuresExtractor(featuresPath)
+            val labels = labelExtractor(labelsPath, numClasses)
 
-                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
-                OnHeapDataset(features, labels)
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnHeapDataset(features, labels)
         }
 
         /**
@@ -178,16 +170,12 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             featuresGenerator: () -> Array<FloatArray>,
             labelGenerator: () -> FloatArray
         ): OnHeapDataset {
-            return try {
-                val features = featuresGenerator()
-                val labels = labelGenerator()
+            val features = featuresGenerator()
+            val labels = labelGenerator()
 
-                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
-                OnHeapDataset(features, labels)
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnHeapDataset(features, labels)
         }
 
         /**
@@ -199,54 +187,45 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             features: Array<FloatArray>,
             labels: FloatArray
         ): OnHeapDataset {
-            return try {
-                check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
+            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
 
-                OnHeapDataset(features, labels)
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnHeapDataset(features, labels)
         }
 
         /**
          * Creates an [OnHeapDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
          */
         @JvmStatic
+        @Throws(IOException::class)
         public fun create(
             pathToData: File,
             labels: FloatArray,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         ): OnHeapDataset {
-            return try {
-                val xFiles = prepareFileNames(pathToData)
-                val x = preprocessing.dataLoader().prepareX(xFiles)
+            val xFiles = prepareFileNames(pathToData)
+            val x = preprocessing.dataLoader().prepareX(xFiles)
 
-                OnHeapDataset(x, labels)
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnHeapDataset(x, labels)
         }
 
         /**
          * Creates an [OnHeapDataset] from [pathToData] and [labelGenerator] with [preprocessing] to prepare images.
          */
         @JvmStatic
+        @Throws(IOException::class)
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
         ): OnHeapDataset {
-            return try {
-                val xFiles = prepareFileNames(pathToData)
-                val x = preprocessing.dataLoader().prepareX(xFiles)
-                val y = labelGenerator.prepareY(xFiles)
+            val xFiles = prepareFileNames(pathToData)
+            val x = preprocessing.dataLoader().prepareX(xFiles)
+            val y = labelGenerator.prepareY(xFiles)
 
-                OnHeapDataset(x, y)
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnHeapDataset(x, y)
         }
 
+        @Throws(IOException::class)
         internal fun prepareFileNames(pathToData: File): Array<File> {
             return Files.walk(pathToData.toPath())
                 .filter { path: Path -> Files.isRegularFile(path) }

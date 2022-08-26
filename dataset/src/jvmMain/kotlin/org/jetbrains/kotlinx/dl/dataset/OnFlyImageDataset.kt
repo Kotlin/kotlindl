@@ -115,34 +115,28 @@ public class OnFlyImageDataset<D> internal constructor(
          * Create dataset [OnFlyImageDataset] from [pathToData] and [labels] using [preprocessing] to prepare images.
          */
         @JvmStatic
+        @Throws(IOException::class)
         public fun create(
             pathToData: File,
             labels: FloatArray,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
         ): OnFlyImageDataset<File> {
-            return try {
-                OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing.dataLoader())
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            return OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing.dataLoader())
         }
 
         /**
          * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator] using [preprocessing] to prepare images.
          */
         @JvmStatic
+        @Throws(IOException::class)
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
         ): OnFlyImageDataset<File> {
-            return try {
-                val xFiles = OnHeapDataset.prepareFileNames(pathToData)
-                val y = labelGenerator.prepareY(xFiles)
-                OnFlyImageDataset(xFiles, y, preprocessing.dataLoader())
-            } catch (e: IOException) {
-                throw AssertionError(e)
-            }
+            val xFiles = OnHeapDataset.prepareFileNames(pathToData)
+            val y = labelGenerator.prepareY(xFiles)
+            return OnFlyImageDataset(xFiles, y, preprocessing.dataLoader())
         }
     }
 }
