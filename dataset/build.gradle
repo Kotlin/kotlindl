@@ -30,6 +30,7 @@ kotlin {
                 implementation project(":api")
             }
         }
+        androidMain {}
     }
     explicitApiWarning()
 }
