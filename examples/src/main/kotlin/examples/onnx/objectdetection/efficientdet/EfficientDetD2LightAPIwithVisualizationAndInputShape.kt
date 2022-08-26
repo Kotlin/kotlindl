@@ -27,7 +27,7 @@ fun main() {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        visualise(imageFile, detectedObjects, longArrayOf(1, *detectionModel.inputDimensions))
+        visualise(imageFile, detectedObjects, detectionModel.inputDimensions)
     }
 }
 
