@@ -49,7 +49,7 @@ fun efficientNet4LitePrediction() {
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTopNLabels(it, inputData, imageNetClassLabels)
+            val top5 = it.predictTopNLabels(inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

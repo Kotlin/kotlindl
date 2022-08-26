@@ -7,9 +7,9 @@ package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
+import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTopKImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -44,7 +44,7 @@ public class ImageRecognitionModel(
      */
     public fun predictTopKObjects(imageFile: File, topK: Int = 5): List<Pair<String, Float>> {
         val inputData = preprocessData(imageFile)
-        return predictTopKImageNetLabels(internalModel, inputData, imageNetClassLabels, topK)
+        return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
     }
 
     /**
@@ -56,9 +56,12 @@ public class ImageRecognitionModel(
      *
      * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
      */
-    public fun predictTopKObjects(imageFile: File, dataLoader: DataLoader<File>, topK: Int = 5): List<Pair<String, Float>> {
+    public fun predictTopKObjects(imageFile: File,
+                                  dataLoader: DataLoader<File>,
+                                  topK: Int = 5
+    ): List<Pair<String, Float>> {
         val (inputData, _) = dataLoader.load(imageFile)
-        return predictTopKImageNetLabels(internalModel, inputData, imageNetClassLabels, topK)
+        return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
     }
 
     private fun preprocessData(imageFile: File): FloatArray {

@@ -9,29 +9,31 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import java.util.*
 
 /** Returns top-N labels for the given [floatArray] encoded with mapping [labels]. */
-public fun predictTopNLabels(
-    it: InferenceModel,
+public fun InferenceModel.predictTopNLabels(
     floatArray: FloatArray,
     labels: Map<Int, String>,
-    topN: Int = 5
-): Map<Int, Pair<String, Float>> {
-    val predictionVector = it.predictSoftly(floatArray).toMutableList()
-    val predictionVector2 =
-        it.predictSoftly(floatArray).toMutableList() //NOTE: don't remove this row, it gets a copy of previous vector
+    n: Int = 5
+): List<Pair<String, Float>> {
+    val prediction = predictSoftly(floatArray)
+    val topNIndexes = prediction.indexOfMaxN(n)
+    return topNIndexes.map { index -> labels[index]!! to prediction[index] }
+}
 
-    check(predictionVector.size >= topN) { "TopN should be less or equal than ${predictionVector.size}." }
+/** Returns top-5 labels for the given [data] encoded with mapping [classLabels]. */
+public fun InferenceModel.predictTop5Labels(
+    data: FloatArray,
+    classLabels: Map<Int, String>,
+): List<Pair<String, Float>> {
+    return predictTopNLabels(data, classLabels, n = 5)
+}
 
-    val top5: MutableMap<Int, Pair<String, Float>> = mutableMapOf()
-    for (j in 1..topN) {
-        val max = predictionVector2.maxOrNull()
-        val indexOfElem = predictionVector.indexOf(max!!)
-        top5[j] = Pair(labels[indexOfElem]!!, predictionVector[indexOfElem])
-        predictionVector2.remove(max)
-    }
-
-    return top5
+internal fun FloatArray.indexOfMaxN(n: Int): List<Int> {
+    val predictionsQueue = PriorityQueue<Int>(Comparator.comparing { index -> -this[index] })
+    predictionsQueue.addAll(indices)
+    return predictionsQueue.take(n)
 }
 
 /** Forms mapping of class label to class name for the ImageNet dataset. */
