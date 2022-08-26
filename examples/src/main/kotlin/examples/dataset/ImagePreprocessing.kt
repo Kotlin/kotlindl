@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.net.URL

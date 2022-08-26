@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package examples.dataset
+package org.jetbrains.kotlinx.dl.visualization.swing
 
 import java.awt.Dimension
 import java.awt.Graphics
