@@ -2,19 +2,24 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders
 
 import ai.onnxruntime.OrtProvider
 import ai.onnxruntime.OrtSession
+import ai.onnxruntime.providers.NNAPIFlags
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CUDA
+import java.util.EnumSet
 
 /**
  * These are classes representing the supported ONNXRuntime execution providers for KotlinDL.
  * The supported providers are:
  *  - [CPU] (default)
  *  - [CUDA] (could be used if the CUDA runtime is installed)
+ *  - [NNAPI] (could be used on Android if the NNAPI runtime is supported)
+ *
  * Internally, the [OrtProvider] enum is used to indicate the provider.
  */
 public sealed class ExecutionProvider(public val internalProviderId: OrtProvider) {
     /**
      *  Default CPU execution provider.
+     *  Available on all platforms.
      *
      *  @param useBFCArenaAllocator If true, the CPU provider will use BFC arena allocator.
      *  @see [OrtProvider.CPU]
@@ -27,6 +32,7 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
 
     /**
      *  CUDA execution provider.
+     *  Available only on platforms with Nvidia gpu and CUDA runtime installed.
      *
      *  @param deviceId The device ID to use.
      *  @see [OrtProvider.CUDA]
@@ -34,6 +40,22 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
     public data class CUDA(public val deviceId: Int = 0) : ExecutionProvider(OrtProvider.CUDA) {
         override fun addOptionsTo(sessionOptions: OrtSession.SessionOptions) {
             sessionOptions.addCUDA(deviceId)
+        }
+    }
+
+    /**
+     *  NNAPI execution provider.
+     *  Available only on Android.
+     *
+     *  @param flags An NNAPI flags to modify the behavior of the NNAPI execution provider.
+     *  @see [OrtProvider.NNAPI]
+     *  @see <a href=https://onnxruntime.ai/docs/execution-providers/NNAPI-ExecutionProvider.html>NNAPI documentation</a>.
+     */
+    public data class NNAPI(public val flags: Set<NNAPIFlags> = emptySet()) : ExecutionProvider(OrtProvider.NNAPI) {
+        override fun addOptionsTo(sessionOptions: OrtSession.SessionOptions) {
+            val internalNNAPIFlags = EnumSet.noneOf(NNAPIFlags::class.java)
+            flags.let { internalNNAPIFlags.addAll(it) }
+            sessionOptions.addNnapi(internalNNAPIFlags)
         }
     }
 
