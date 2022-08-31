@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor.image
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage

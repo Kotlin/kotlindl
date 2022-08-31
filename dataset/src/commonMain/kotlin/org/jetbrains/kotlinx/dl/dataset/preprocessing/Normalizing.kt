@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import kotlin.math.sqrt
 
 /**

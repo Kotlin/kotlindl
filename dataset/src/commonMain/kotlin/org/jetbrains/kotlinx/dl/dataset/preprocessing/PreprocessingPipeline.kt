@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * This class is a special type of Operation which is used to build typesafe pipeline of preprocessing operations.

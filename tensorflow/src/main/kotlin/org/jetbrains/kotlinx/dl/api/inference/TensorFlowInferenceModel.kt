@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.contentToString
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.*

@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.image
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage

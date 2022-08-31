@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Helper class to keep widely used shape of image object presented as a 4D tensor
