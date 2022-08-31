@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAli
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -37,7 +37,7 @@ fun main() {
             val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
             val landmarks = it.detectLandmarks(imageFile = imageFile)
 
-            val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+            val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
             drawLandMarks(rawImage, shape.toImageShape(), landmarks)
         }
     }

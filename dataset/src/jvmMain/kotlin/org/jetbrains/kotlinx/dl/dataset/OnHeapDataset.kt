@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.dataset
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
@@ -203,7 +203,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.dataLoader().prepareX(xFiles)
+            val x = preprocessing.fileLoader().prepareX(xFiles)
 
             return OnHeapDataset(x, labels)
         }
@@ -219,7 +219,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.dataLoader().prepareX(xFiles)
+            val x = preprocessing.fileLoader().prepareX(xFiles)
             val y = labelGenerator.prepareY(xFiles)
 
             return OnHeapDataset(x, y)

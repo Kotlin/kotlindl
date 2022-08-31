@@ -6,11 +6,12 @@
 package examples.onnx.objectdetection.efficientdet
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -25,19 +26,18 @@ fun main() {
     model.use {
         println(it)
 
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .resize {
                     outputHeight = it.inputDimensions[0].toInt()
                     outputWidth = it.inputDimensions[1].toInt()
                 }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {  }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 1..6) {
-            val inputData = modelType.preprocessInput(
-                getFileFromResource("datasets/detection/image$i.jpg"),
-                preprocessing
-            )
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/detection/image$i.jpg")).first
 
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())

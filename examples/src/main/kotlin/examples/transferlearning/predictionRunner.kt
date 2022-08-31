@@ -9,18 +9,20 @@ import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Identity
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.Resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
@@ -61,10 +63,9 @@ fun runImageRecognitionPrediction(
 
         it.loadWeights(hdfFile)
 
-        val preprocessing = preprocessing(resizeTo)
+        val fileDataLoader = fileDataLoader(modelType, resizeTo)
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -76,19 +77,21 @@ fun runImageRecognitionPrediction(
     }
 }
 
-internal fun preprocessing(resizeTo: Pair<Int, Int>): Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
-    val preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+internal fun fileDataLoader(modelType: ModelType<*, *>,
+                            resizeTo: Pair<Int, Int>
+): DataLoader<File> {
+    val resize = if (resizeTo.first == 224 && resizeTo.second == 224) {
+        Identity<BufferedImage>()
     } else {
-        pipeline<BufferedImage>()
-            .resize {
-                    outputWidth = resizeTo.first
-                    outputHeight = resizeTo.second
-                }
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+        Resize(
+            outputWidth = resizeTo.first,
+            outputHeight = resizeTo.second
+        )
     }
-    return preprocessing
+    return pipeline<BufferedImage>()
+        .call(resize)
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
 }

@@ -13,8 +13,9 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -87,16 +88,11 @@ public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceMod
                 }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
+            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
 
-        val (data, shape) = preprocessing.dataLoader().load(imageFile)
+        val data = preprocessing.fileLoader().load(imageFile).first
 
-        val preprocessedData = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessInput(
-            data,
-            shape.dims()
-//            longArrayOf(shape.width!!, shape.height!!, shape.channels!!)
-        )
-
-        return this.detectPoses(preprocessedData, confidence)
+        return this.detectPoses(data, confidence)
     }
 
     override fun copy(

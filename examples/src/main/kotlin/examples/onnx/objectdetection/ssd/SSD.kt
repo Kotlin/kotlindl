@@ -6,11 +6,12 @@
 package examples.onnx.objectdetection.ssd
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -36,13 +37,12 @@ fun ssd() {
                 outputWidth = 1200
             }
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 1..6) {
-            val inputData = modelType.preprocessInput(
-                getFileFromResource("datasets/detection/image$i.jpg"),
-                preprocessing
-            )
+            val inputData = preprocessing.load(getFileFromResource("datasets/detection/image$i.jpg")).first
 
             val start = System.currentTimeMillis()
             val yhat = it.predictRaw(inputData)

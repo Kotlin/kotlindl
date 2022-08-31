@@ -23,6 +23,7 @@ import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -79,9 +80,7 @@ fun resnet50additionalTraining() {
             }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
-            .sharpen {
-                modelTypePreprocessing = TFModels.CV.ResNet50()
-            }
+            .call(TFModels.CV.ResNet50().preprocessor)
             .onnx {
                 onnxModel = model
             }

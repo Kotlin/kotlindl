@@ -14,12 +14,16 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.inputStreamLoader
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -56,11 +60,15 @@ fun main() {
 
         it.loadWeights(hdfFile)
 
+        val inputStreamLoader = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .call(InputType.CAFFE.preprocessing())
+            .inputStreamLoader()
+
         for (i in 1..8) {
             val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
-            val floatArray = ImageConverter.toRawFloatArray(inputStream, colorMode = ColorMode.BGR)
-
-            val inputData = preprocessInput(floatArray, model.inputDimensions, inputType = InputType.CAFFE)
+            val inputData = inputStreamLoader.load(inputStream).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

@@ -22,6 +22,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
@@ -67,9 +68,7 @@ fun vgg16noTopAdditionalTraining() {
         }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray {  }
-        .sharpen {
-            modelTypePreprocessing = modelType
-        }
+        .call(modelType.preprocessor)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(

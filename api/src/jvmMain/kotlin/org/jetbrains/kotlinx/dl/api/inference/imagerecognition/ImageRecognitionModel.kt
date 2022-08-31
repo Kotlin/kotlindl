@@ -5,13 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
@@ -78,8 +77,9 @@ public class ImageRecognitionModel(
             }
             .convert { colorMode = modelType.inputColorMode }
             .toFloatArray {}
+            .call(modelType.preprocessor)
 
-        return modelType.preprocessInput(imageFile, preprocessing)
+        return preprocessing.fileLoader().load(imageFile).first
     }
 
     /**
@@ -115,17 +115,5 @@ public class ImageRecognitionModel(
         copyWeights: Boolean
     ): ImageRecognitionModel {
         return ImageRecognitionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights), modelType)
-    }
-
-    public companion object {
-        /**
-         * Common preprocessing function for the Neural Networks trained on ImageNet and whose weights are available with the keras.application.
-         *
-         * It takes preprocessing pipeline, invoke it and applied the specific preprocessing to the given data.
-         */
-        public fun ModelType<*, *>.preprocessInput(imageFile: File, preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>): FloatArray {
-            val (data, shape) = preprocessing.dataLoader().load(imageFile)
-            return preprocessInput(data, shape.dims())
-        }
     }
 }

@@ -58,7 +58,7 @@ fun main() {
 
     val imageResource = Operation::class.java.getResource("/datasets/vgg/image2.jpg")
     val image = File(imageResource!!.toURI())
-    val (rawImage, shape) = preprocessing.dataLoader().load(image)
+    val (rawImage, shape) = preprocessing.fileLoader().load(image)
 
     val bufferedImage = ImageConverter.floatArrayToBufferedImage(
         rawImage,

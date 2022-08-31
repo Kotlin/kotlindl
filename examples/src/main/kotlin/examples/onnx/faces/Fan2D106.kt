@@ -6,15 +6,15 @@
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -36,18 +36,20 @@ fun main() {
     model.use {
         println(it)
 
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .resize {
                     outputHeight = 192
                     outputWidth = 192
                 }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {  }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 0..8) {
             val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
 
-            val inputData = modelType.preprocessInput(imageFile, preprocessing)
+            val inputData = fileDataLoader.load(imageFile).first
 
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())
@@ -72,6 +74,6 @@ fun visualiseLandMarks(
             scalingCoefficient = 255f
         }
 
-    val (rawImage, shape) = preprocessing.dataLoader().load(imageFile)
+    val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
     drawRawLandMarks(rawImage, ImageShape(shape[0], shape[1], shape[2]), landmarks)
 }

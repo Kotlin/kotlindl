@@ -11,11 +11,12 @@ import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.InputStream
 
 /**
- * A [DataLoader] which uses provided [Operation] to prepare images.
+ * A [DataLoader] which loads images from files and uses provided [Operation] to process them.
  */
-private class PreprocessingDataLoader(
+private class PreprocessingFileDataLoader(
     private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
 ) : DataLoader<File> {
     override fun load(dataSource: File): Pair<FloatArray, TensorShape> {
@@ -32,7 +33,24 @@ private class PreprocessingDataLoader(
 }
 
 /**
- * Returns a [DataLoader] instance which uses this [Operation] to prepare images.
+ * A [DataLoader] which loads images from input streams and uses provided [Operation] to process them.
  */
-public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.dataLoader(): DataLoader<File> =
-    PreprocessingDataLoader(this)
+private class PreprocessingInputStreamDataLoader(
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+) : DataLoader<InputStream> {
+    override fun load(dataSource: InputStream): Pair<FloatArray, TensorShape> {
+        return preprocessing.apply(ImageConverter.toBufferedImage(dataSource))
+    }
+}
+
+/**
+ * Returns a [DataLoader] instance which loads images from files and uses this [Operation] to process them.
+ */
+public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.fileLoader(): DataLoader<File> =
+    PreprocessingFileDataLoader(this)
+
+/**
+ * Returns a [DataLoader] instance which loads images from input streams and uses this [Operation] to process them.
+ */
+public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.inputStreamLoader(): DataLoader<InputStream> =
+    PreprocessingInputStreamDataLoader(this)

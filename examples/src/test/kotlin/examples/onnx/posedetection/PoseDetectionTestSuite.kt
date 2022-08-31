@@ -6,11 +6,12 @@
 package examples.onnx.posedetection
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel.Companion.preprocessInput
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -71,15 +72,17 @@ class PoseDetectionTestSuite {
 
         model.use {
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
-            val preprocessing = pipeline<BufferedImage>()
+            val fileDataLoader = pipeline<BufferedImage>()
                 .resize {
-                        outputHeight = 192
-                        outputWidth = 192
-                    }
+                    outputHeight = 192
+                    outputWidth = 192
+                }
                 .convert { colorMode = ColorMode.BGR }
-                .toFloatArray {  }
+                .toFloatArray { }
+                .call(modelType.preprocessor)
+                .fileLoader()
 
-            val inputData = modelType.preprocessInput(imageFile, preprocessing)
+            val inputData = fileDataLoader.load(imageFile).first
 
             val yhat = it.predictRaw(inputData)
 
@@ -104,9 +107,11 @@ class PoseDetectionTestSuite {
                     outputWidth = 256
                 }
                 .convert { colorMode = ColorMode.BGR }
-                .toFloatArray {  }
+                .toFloatArray { }
+                .call(modelType.preprocessor)
+                .fileLoader()
 
-            val inputData = modelType.preprocessInput(imageFile, preprocessing)
+            val inputData = preprocessing.load(imageFile).first
 
             val yhat = it.predictRaw(inputData)
 
@@ -125,16 +130,18 @@ class PoseDetectionTestSuite {
         model.use { inferenceModel ->
             val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
 
-            val preprocessing = pipeline<BufferedImage>()
+            val dataLoader = pipeline<BufferedImage>()
                 .resize {
                     outputHeight = 256
                     outputWidth = 256
                 }
                 .convert { colorMode = ColorMode.BGR }
                 .toFloatArray { }
+                .call(modelType.preprocessor)
+                .fileLoader()
 
 
-            val inputData = modelType.preprocessInput(imageFile, preprocessing)
+            val inputData = dataLoader.load(imageFile).first
             val yhat = inferenceModel.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())
 

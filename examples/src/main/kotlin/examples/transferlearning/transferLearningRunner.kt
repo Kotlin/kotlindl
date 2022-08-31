@@ -23,13 +23,13 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.sharpen
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -53,9 +53,7 @@ fun runImageRecognitionTransferLearning(
             }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray {  }
-        .sharpen {
-            modelTypePreprocessing = modelType
-        }
+        .call(modelType.preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(
@@ -148,9 +146,7 @@ fun runImageRecognitionTransferLearningOnTopModel(
         }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray {  }
-        .sharpen {
-            modelTypePreprocessing = modelType
-        }
+        .call(modelType.preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnFlyImageDataset.create(

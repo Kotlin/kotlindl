@@ -8,7 +8,7 @@ package examples.dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
@@ -42,7 +42,7 @@ fun main() {
             std = datasetStd
         }
 
-    val (processedImageFloats, _) = preprocessing.dataLoader().load(image)
+    val (processedImageFloats, _) = preprocessing.fileLoader().load(image)
 
     println(
         "Processed image mean is ${processedImageFloats.mean(3).contentToString()}\n" +

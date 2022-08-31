@@ -11,8 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
@@ -34,13 +35,14 @@ fun resnet50CustomPrediction() {
     model.use {
         println(it)
 
-        val preprocessing = pipeline<BufferedImage>()
+        val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {  }
+            .call(modelType.preprocessor)
+            .fileLoader()
 
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

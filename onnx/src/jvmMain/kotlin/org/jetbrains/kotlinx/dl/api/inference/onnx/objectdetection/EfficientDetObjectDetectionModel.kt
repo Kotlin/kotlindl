@@ -12,7 +12,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
@@ -88,7 +88,7 @@ public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInf
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray {  }
 
-        val (data, _) = preprocessing.dataLoader().load(imageFile)
+        val (data, _) = preprocessing.fileLoader().load(imageFile)
         // we don't need special preprocessing here
         return this.detectObjects(data)
     }

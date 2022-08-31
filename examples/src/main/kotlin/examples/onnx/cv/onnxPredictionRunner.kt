@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.dataLoader
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import java.io.File
 
 fun runONNXImageRecognitionPrediction(
@@ -26,10 +26,9 @@ fun runONNXImageRecognitionPrediction(
     model.use {
         println(it)
 
-        val preprocessing = examples.transferlearning.preprocessing(resizeTo)
+        val fileDataLoader = examples.transferlearning.fileDataLoader(modelType, resizeTo)
         for (i in 1..8) {
-            val image = preprocessing.dataLoader().load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
