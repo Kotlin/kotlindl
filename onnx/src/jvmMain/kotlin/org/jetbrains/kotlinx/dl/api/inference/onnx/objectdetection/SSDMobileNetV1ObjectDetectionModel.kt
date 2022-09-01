@@ -5,20 +5,23 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 
 private const val OUTPUT_BOXES = "detection_boxes:0"
 private const val OUTPUT_CLASSES = "detection_classes:0"
@@ -36,6 +39,16 @@ private const val OUTPUT_NUMBER_OF_DETECTIONS = "num_detections:0"
  * @since 0.4
  */
 public class SSDMobileNetV1ObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+        get() = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
+            }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray { }
+            .call(ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessor)
+
     /**
      * Constructs the object detection model from a given path.
      * @param [pathToModel] path to model
@@ -83,6 +96,19 @@ public class SSDMobileNetV1ObjectDetectionModel(private val internalModel: OnnxI
     }
 
     /**
+     * Returns the top N detected object for the given image sorted by the score.
+     *
+     * NOTE: this method includes the SSD - related preprocessing.
+     *
+     * @param [image] Input image.
+     * @param [topK] The number of the detected objects with the highest score to be returned.
+     * @return List of [DetectedObject] sorted by score.
+     */
+    public fun detectObjects(image: BufferedImage, topK: Int = 5): List<DetectedObject> {
+        return detectObjects(preprocessing.apply(image).first, topK)
+    }
+
+    /**
      * Returns the top N detected object for the given image file sorted by the score.
      *
      * NOTE: this method includes the SSD - related preprocessing.
@@ -91,19 +117,9 @@ public class SSDMobileNetV1ObjectDetectionModel(private val internalModel: OnnxI
      * @param [topK] The number of the detected objects with the highest score to be returned.
      * @return List of [DetectedObject] sorted by score.
      */
+    @Throws(IOException::class)
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
-            }
-            .convert { colorMode = ColorMode.RGB }
-            .toFloatArray {  }
-            .call(ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessor)
-
-        val data = preprocessing.fileLoader().load(imageFile).first
-
-        return this.detectObjects(data, topK)
+        return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
     }
 
     override fun copy(

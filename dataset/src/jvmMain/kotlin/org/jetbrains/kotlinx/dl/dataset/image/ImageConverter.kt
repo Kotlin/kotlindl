@@ -108,6 +108,16 @@ public object ImageConverter {
         return ImageIO.read(inputStream)
     }
 
+    /**
+     * Returns [BufferedImage] extracted from [file].
+     *
+     * @param [file] source of the image
+     */
+    @Throws(IOException::class)
+    public fun toBufferedImage(file: File): BufferedImage {
+        return file.inputStream().use { inputStream -> toBufferedImage(inputStream) }
+    }
+
     private fun imageToFloatArray(image: BufferedImage, colorMode: ColorMode?): FloatArray {
         if (colorMode != null && image.colorMode() != colorMode) {
             return imageToFloatArray(Convert(colorMode = colorMode).apply(image))

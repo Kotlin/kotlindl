@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
@@ -13,14 +14,16 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 
 private const val CLASS_LABEL = "person"
 private const val OUTPUT_NAME = "output_0"
@@ -34,6 +37,16 @@ private const val INPUT_SIZE = 256
  * @param [internalModel] model used to make predictions
  */
 public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+        get() = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = INPUT_SIZE
+                outputWidth = INPUT_SIZE
+            }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray { }
+            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
+
     /**
      * Constructs the pose detection model from a given path.
      * @param [pathToModel] path to model
@@ -80,19 +93,13 @@ public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceMod
         return MultiPoseDetectionResult(poses)
     }
 
+    public fun detectPoses(image: BufferedImage, confidence: Float = 0.1f): MultiPoseDetectionResult {
+        return detectPoses(preprocessing.apply(image).first, confidence)
+    }
+
+    @Throws(IOException::class)
     public fun detectPoses(imageFile: File, confidence: Float = 0.1f): MultiPoseDetectionResult {
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                    outputHeight = INPUT_SIZE
-                    outputWidth = INPUT_SIZE
-                }
-            .convert { colorMode = ColorMode.RGB }
-            .toFloatArray {  }
-            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
-
-        val data = preprocessing.fileLoader().load(imageFile).first
-
-        return this.detectPoses(data, confidence)
+        return detectPoses(ImageConverter.toBufferedImage(imageFile), confidence)
     }
 
     override fun copy(

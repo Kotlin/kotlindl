@@ -5,11 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
@@ -18,6 +21,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 
 private const val OUTPUT_NAME = "fc1"
 private const val INPUT_SIZE = 192
@@ -28,17 +32,8 @@ private const val INPUT_SIZE = 192
  * @param [internalModel] model used to make predictions
  */
 public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
-    /**
-     * Constructs the face alignment model from a given path.
-     * @param [pathToModel] path to model
-     */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
-
-    /**
-     * Detects 106 [Landmark] objects for the given [imageFile].
-     */
-    public fun detectLandmarks(imageFile: File): List<Landmark> {
-        val fileDataLoader = pipeline<BufferedImage>()
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+        get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = INPUT_SIZE
                 outputWidth = INPUT_SIZE
@@ -46,9 +41,18 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {}
             .call(ONNXModels.FaceAlignment.Fan2d106.preprocessor)
-            .fileLoader()
 
-        val inputData = fileDataLoader.load(imageFile).first
+    /**
+     * Constructs the face alignment model from a given path.
+     * @param [pathToModel] path to model
+     */
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
+
+    /**
+     * Detects 106 [Landmark] objects for the given [image].
+     */
+    public fun detectLandmarks(image: BufferedImage): List<Landmark> {
+        val inputData = preprocessing.apply(image).first
         val yhat = internalModel.predictRaw(inputData)
 
         val landMarks = mutableListOf<Landmark>()
@@ -58,6 +62,15 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
         }
 
         return landMarks
+    }
+
+
+    /**
+     * Detects 106 [Landmark] objects for the given [imageFile].
+     */
+    @Throws(IOException::class)
+    public fun detectLandmarks(imageFile: File): List<Landmark> {
+        return detectLandmarks(ImageConverter.toBufferedImage(imageFile))
     }
 
     override fun copy(

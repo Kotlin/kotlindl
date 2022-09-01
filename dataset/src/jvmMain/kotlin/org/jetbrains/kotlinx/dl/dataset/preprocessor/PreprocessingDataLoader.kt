@@ -25,10 +25,7 @@ private class PreprocessingFileDataLoader(
             if (dataSource.isDirectory) "File '$dataSource' is a directory."
             else "File '$dataSource' is not a normal file."
         }
-
-        val image = dataSource.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }
-
-        return preprocessing.apply(image)
+        return preprocessing.apply(ImageConverter.toBufferedImage(dataSource))
     }
 }
 

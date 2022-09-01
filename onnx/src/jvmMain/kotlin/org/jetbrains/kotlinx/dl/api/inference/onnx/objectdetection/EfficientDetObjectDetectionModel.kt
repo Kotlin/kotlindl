@@ -5,19 +5,22 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.IOException
 
 private const val OUTPUT_NAME = "detections:0"
 
@@ -32,6 +35,17 @@ private const val OUTPUT_NAME = "detections:0"
  * @since 0.4
  */
 public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+        get() = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
+            }
+            // the channels of input of EfficientDet models should be in RGB order
+            // model is quite sensitive for this
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray {  }
+
     /**
      * Constructs the object detection model from a given path.
      * @param [pathToModel] path to model
@@ -70,6 +84,18 @@ public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInf
     }
 
     /**
+     * Returns the detected object for the given image sorted by the score.
+     *
+     * NOTE: this method includes the EfficientDet - related preprocessing.
+     *
+     * @param [image] Input image.
+     * @return List of [DetectedObject] sorted by score.
+     */
+    public fun detectObjects(image: BufferedImage): List<DetectedObject> {
+        return detectObjects(preprocessing.apply(image).first)
+    }
+
+    /**
      * Returns the detected object for the given image file sorted by the score.
      *
      * NOTE: this method includes the EfficientDet - related preprocessing.
@@ -77,20 +103,9 @@ public class EfficientDetObjectDetectionModel(private val internalModel: OnnxInf
      * @param [imageFile] File, should be an image.
      * @return List of [DetectedObject] sorted by score.
      */
+    @Throws(IOException::class)
     public fun detectObjects(imageFile: File): List<DetectedObject> {
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
-            }
-            // the channels of input of EfficientDet models should be in RGB order
-            // model is quite sensitive for this
-            .convert { colorMode = ColorMode.RGB }
-            .toFloatArray {  }
-
-        val (data, _) = preprocessing.fileLoader().load(imageFile)
-        // we don't need special preprocessing here
-        return this.detectObjects(data)
+        return detectObjects(ImageConverter.toBufferedImage(imageFile))
     }
 
     override fun copy(
