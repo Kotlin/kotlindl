@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * The aim of this class is to provide common functionality for all [Operation]s that can be applied to Pair<FloatArray, TensorShape>

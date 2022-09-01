@@ -1,7 +1,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
 import android.graphics.Bitmap
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.image.argB8888ToNCHWArray
 import org.jetbrains.kotlinx.dl.dataset.image.argB8888ToNHWCArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.TensorLayout.NCHW
@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.TensorLayout.NHWC
  *
  * @param layout [TensorLayout] of the resulting array.
  */
-public class ConvertToFloatArray(private var layout: TensorLayout = NCHW) :
+public class ConvertToFloatArray(public var layout: TensorLayout = NCHW) :
     Operation<Bitmap, Pair<FloatArray, TensorShape>> {
     private val channels = 3
     override fun apply(input: Bitmap): Pair<FloatArray, TensorShape> {

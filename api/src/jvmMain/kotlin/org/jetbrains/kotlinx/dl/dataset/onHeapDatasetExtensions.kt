@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.api.core.shape.tensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.tensorShape
 import kotlin.math.roundToInt
 
 

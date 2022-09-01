@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.Transpose
 import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.transpose
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel

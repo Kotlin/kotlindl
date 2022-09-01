@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /** Applies [Normalizing] preprocessor to the tensor to normalize it with given mean and std values. */
 public fun<I> Operation<I, Pair<FloatArray, TensorShape>>.normalize(block: Normalizing.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {

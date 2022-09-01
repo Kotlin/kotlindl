@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.preprocessing.bitmap
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 
 /**
@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
  * @property [degrees] The rotation angle.
  */
 public class Rotate(
-    private var degrees: Float = 0.0f,
+    public var degrees: Float = 0.0f,
 ) : Operation<Bitmap, Bitmap> {
     override fun apply(input: Bitmap): Bitmap {
         val matrix = Matrix().apply { postRotate(degrees) }

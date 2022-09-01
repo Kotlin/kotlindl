@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset.preprocessing.bitmap
 
 import android.graphics.Bitmap
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 
 /**
@@ -21,8 +21,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
  * @property [outputHeight] The output height.
  */
 public class Resize(
-    private var outputWidth: Int = 100,
-    private var outputHeight: Int = 100,
+    public var outputWidth: Int = 100,
+    public var outputHeight: Int = 100,
 ) : Operation<Bitmap, Bitmap> {
     override fun apply(input: Bitmap): Bitmap {
         return Bitmap.createScaledBitmap(input, outputWidth, outputHeight, true)

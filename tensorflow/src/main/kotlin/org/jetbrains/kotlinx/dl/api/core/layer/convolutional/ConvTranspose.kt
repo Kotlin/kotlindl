@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposePadding
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims

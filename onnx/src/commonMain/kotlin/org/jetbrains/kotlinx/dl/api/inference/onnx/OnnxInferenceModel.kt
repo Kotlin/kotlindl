@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
