@@ -46,23 +46,6 @@ public class ImageRecognitionModel(
         return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
     }
 
-    /**
-     * Predicts [topK] objects for the given [imageFile] with a custom [DataLoader] provided.
-     *
-     * @param [imageFile] Input image [File].
-     * @param [dataLoader] custom [DataLoader] instance
-     * @param [topK] Number of top ranked predictions to return
-     *
-     * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
-     */
-    public fun predictTopKObjects(imageFile: File,
-                                  dataLoader: DataLoader<File>,
-                                  topK: Int = 5
-    ): List<Pair<String, Float>> {
-        val (inputData, _) = dataLoader.load(imageFile)
-        return internalModel.predictTopNLabels(inputData, imageNetClassLabels, topK)
-    }
-
     private fun preprocessData(imageFile: File): FloatArray {
         val (width, height) = if (modelType.channelsFirst)
             Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])
@@ -93,19 +76,6 @@ public class ImageRecognitionModel(
      */
     public fun predictObject(imageFile: File): String {
         val inputData = preprocessData(imageFile)
-        return imageNetClassLabels[internalModel.predict(inputData)]!!
-    }
-
-    /**
-     * Predicts object for the given [imageFile] with a custom [DataLoader] provided.
-     *
-     * @param [imageFile] Input image [File].
-     * @param [dataLoader] custom [DataLoader] instance
-     *
-     * @return The label of the recognized object with the highest probability.
-     */
-    public fun predictObject(imageFile: File, dataLoader: DataLoader<File>): String {
-        val (inputData, _) = dataLoader.load(imageFile)
         return imageNetClassLabels[internalModel.predict(inputData)]!!
     }
 
