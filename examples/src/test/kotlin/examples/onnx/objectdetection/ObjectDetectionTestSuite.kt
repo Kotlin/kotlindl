@@ -152,8 +152,7 @@ fun efficientDetLightAPIInference(modelType: ONNXModels.ObjectDetection<OnnxInfe
 
     model.use { detectionModel ->
         val imageFile = getFileFromResource("datasets/detection/image4.jpg")
-        val detectedObjects =
-            detectionModel.detectObjects(imageFile = imageFile)
+        val detectedObjects = detectionModel.detectObjects(imageFile = imageFile, topK = 0)
 
         assertEquals(numberOfDetectedObjects, detectedObjects.size)
     }

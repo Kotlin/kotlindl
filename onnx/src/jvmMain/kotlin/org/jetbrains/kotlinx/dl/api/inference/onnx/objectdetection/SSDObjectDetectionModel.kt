@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
@@ -19,6 +18,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -45,8 +45,10 @@ private const val INPUT_SIZE = 1200
 
  * @since 0.3
  */
-public class SSDObjectDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
+    SSDObjectDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+
+    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = INPUT_SIZE
@@ -55,65 +57,13 @@ public class SSDObjectDetectionModel(private val internalModel: OnnxInferenceMod
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
             .call(ONNXModels.ObjectDetection.SSD.preprocessor)
+    override val classLabels: Map<Int, String> = cocoCategoriesForSSD
 
     /**
      * Constructs the object detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
-
-    /**
-     * Returns the top N detected object for the given image file sorted by the score.
-     *
-     * NOTE: this method doesn't include the SSD - related preprocessing.
-     *
-     * @param [inputData] Preprocessed data from the image file.
-     * @param [topK] The number of the detected objects with the highest score to be returned.
-     * @return List of [DetectedObject] sorted by score.
-     */
-    public fun  detectObjects(inputData: FloatArray, topK: Int = 5): List<DetectedObject> {
-        val rawPrediction = internalModel.predictRaw(inputData)
-
-        val foundObjects = mutableListOf<DetectedObject>()
-        val boxes = (rawPrediction[OUTPUT_BOXES] as Array<Array<FloatArray>>)[0]
-        val classIndices = (rawPrediction[OUTPUT_LABELS] as Array<LongArray>)[0]
-        val probabilities = (rawPrediction[OUTPUT_SCORES] as Array<FloatArray>)[0]
-        val numberOfFoundObjects = boxes.size
-
-        for (i in 0 until numberOfFoundObjects) {
-            val detectedObject = DetectedObject(
-                classLabel = cocoCategoriesForSSD[classIndices[i].toInt()]!!,
-                probability = probabilities[i],
-                // left, bot, right, top
-                xMin = boxes[i][0],
-                yMin = boxes[i][1],
-                xMax = boxes[i][2],
-                yMax = boxes[i][3]
-            )
-            foundObjects.add(detectedObject)
-        }
-
-        foundObjects.sortByDescending { it.probability }
-
-        if (topK > 0) {
-            return foundObjects.take(topK)
-        }
-
-        return foundObjects
-    }
-
-    /**
-     * Returns the top N detected object for the given image sorted by the score.
-     *
-     * NOTE: this method includes the SSD - related preprocessing.
-     *
-     * @param [image] Input image.
-     * @param [topK] The number of the detected objects with the highest score to be returned.
-     * @return List of [DetectedObject] sorted by score.
-     */
-    public fun detectObjects(image: BufferedImage, topK: Int): List<DetectedObject> {
-        return detectObjects(preprocessing.apply(image).first, topK)
-    }
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
     /**
      * Returns the top N detected object for the given image file sorted by the score.

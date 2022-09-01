@@ -5,12 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.MultiPoseDetectionModelBase
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
@@ -36,8 +37,10 @@ private const val INPUT_SIZE = 256
  *
  * @param [internalModel] model used to make predictions
  */
-public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+public class MultiPoseDetectionModel(override val internalModel: OnnxInferenceModel) :
+    MultiPoseDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+
+    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = INPUT_SIZE
@@ -47,57 +50,21 @@ public class MultiPoseDetectionModel(private val internalModel: OnnxInferenceMod
             .toFloatArray { }
             .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
 
+    override val outputName: String = OUTPUT_NAME
+    override val keyPointsLabels: Map<Int, String> = keyPoints
+    override val edgeKeyPoints: List<Pair<Int, Int>> = edgeKeyPointsPairs
+
     /**
      * Constructs the pose detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
-    public fun detectPoses(inputData: FloatArray, confidence: Float = 0.005f): MultiPoseDetectionResult {
-        val rawPrediction = internalModel.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
-
-        val poses = mutableListOf<Pair<DetectedObject, DetectedPose>>()
-
-        rawPoseLandMarks.forEachIndexed { poseIndex, floats ->
-            val foundPoseLandmarks = mutableListOf<PoseLandmark>()
-
-            for (keyPointIdx in 0..16) {
-                val poseLandmark = PoseLandmark(
-                    poseLandmarkLabel = keyPoints[keyPointIdx]!!,
-                    x = floats[3 * keyPointIdx + 1],
-                    y = floats[3 * keyPointIdx],
-                    probability = floats[3 * keyPointIdx + 2]
-                )
-                foundPoseLandmarks.add(poseLandmark)
-            }
-
-            // [ymin, xmin, ymax, xmax, score]
-            val detectedObject = DetectedObject(
-                classLabel = CLASS_LABEL,
-                probability = floats[55],
-                yMin = floats[53],
-                xMin = floats[52],
-                yMax = floats[51],
-                xMax = floats[54]
-            )
-
-            val foundPoseEdges = buildPoseEdges(foundPoseLandmarks)
-            val detectedPose = DetectedPose(foundPoseLandmarks, foundPoseEdges)
-
-            if (detectedObject.probability > confidence) poses.add(
-                Pair(detectedObject, detectedPose)
-            )
-        }
-
-        return MultiPoseDetectionResult(poses)
-    }
-
-    public fun detectPoses(image: BufferedImage, confidence: Float = 0.1f): MultiPoseDetectionResult {
-        return detectPoses(preprocessing.apply(image).first, confidence)
-    }
-
-    @Throws(IOException::class)
+    /**
+     * Detects poses for the given [imageFile] with the given [confidence].
+     * @param [imageFile] file containing an input image
+     * @param [confidence] confidence value to use
+     */
     public fun detectPoses(imageFile: File, confidence: Float = 0.1f): MultiPoseDetectionResult {
         return detectPoses(ImageConverter.toBufferedImage(imageFile), confidence)
     }

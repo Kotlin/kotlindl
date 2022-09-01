@@ -5,14 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModelBase
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -24,7 +22,6 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
-import java.lang.Float.min
 
 private const val OUTPUT_NAME = "output_0"
 
@@ -36,8 +33,10 @@ private const val OUTPUT_NAME = "output_0"
  *
  * @param internalModel model used to make predictions
  */
-public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceModel) :
+    SinglePoseDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+
+    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = inputDimensions[0].toInt()
@@ -47,6 +46,9 @@ public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceMo
             .toFloatArray { }
             .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
 
+    override val outputName: String = OUTPUT_NAME
+    override val keyPointsLabels: Map<Int, String> = keyPoints
+    override val edgeKeyPoints: List<Pair<Int, Int>> = edgeKeyPointsPairs
 
     /**
      * Constructs the pose detection model from a given path.
@@ -54,30 +56,10 @@ public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceMo
      */
     public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
 
-    public fun detectPose(inputData: FloatArray): DetectedPose {
-        val rawPrediction = internalModel.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<Array<FloatArray>>>)[0][0]
-
-        val foundPoseLandmarks = mutableListOf<PoseLandmark>()
-        for (i in rawPoseLandMarks.indices) {
-            val poseLandmark = PoseLandmark(
-                poseLandmarkLabel = keyPoints[i]!!,
-                x = rawPoseLandMarks[i][1],
-                y = rawPoseLandMarks[i][0],
-                probability = rawPoseLandMarks[i][2]
-            )
-            foundPoseLandmarks.add(i, poseLandmark)
-        }
-
-        val foundPoseEdges = buildPoseEdges(foundPoseLandmarks)
-
-        return DetectedPose(foundPoseLandmarks, foundPoseEdges)
-    }
-
-    public fun detectPose(image: BufferedImage): DetectedPose {
-        return detectPose(preprocessing.apply(image).first)
-    }
-
+    /**
+     * Detects a pose for the given [imageFile].
+     * @param [imageFile] file containing an input image
+     */
     @Throws(IOException::class)
     public fun detectPose(imageFile: File): DetectedPose {
         return detectPose(ImageConverter.toBufferedImage(imageFile))
@@ -90,23 +72,6 @@ public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceMo
     ): SinglePoseDetectionModel {
         return SinglePoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
-}
-
-internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>): List<PoseEdge> {
-    val foundPoseEdges = mutableListOf<PoseEdge>()
-    edgeKeyPointsPairs.forEach {
-        val startPoint = foundPoseLandmarks[it.first]
-        val endPoint = foundPoseLandmarks[it.second]
-        foundPoseEdges.add(
-            PoseEdge(
-                poseEdgeLabel = startPoint.poseLandmarkLabel + "_" + endPoint.poseLandmarkLabel,
-                probability = min(startPoint.probability, endPoint.probability),
-                start = startPoint,
-                end = endPoint
-            )
-        )
-    }
-    return foundPoseEdges
 }
 
 /**

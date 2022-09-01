@@ -5,8 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.FaceAlignmentModelBase
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -31,8 +32,10 @@ private const val INPUT_SIZE = 192
  *
  * @param [internalModel] model used to make predictions
  */
-public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+public class Fan2D106FaceAlignmentModel(override val internalModel: OnnxInferenceModel) :
+    FaceAlignmentModelBase<BufferedImage>(), InferenceModel by internalModel {
+
+    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = INPUT_SIZE
@@ -42,6 +45,8 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
             .toFloatArray {}
             .call(ONNXModels.FaceAlignment.Fan2d106.preprocessor)
 
+    override val outputName: String = OUTPUT_NAME
+
     /**
      * Constructs the face alignment model from a given path.
      * @param [pathToModel] path to model
@@ -49,24 +54,8 @@ public class Fan2D106FaceAlignmentModel(private val internalModel: OnnxInference
     public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
     /**
-     * Detects 106 [Landmark] objects for the given [image].
-     */
-    public fun detectLandmarks(image: BufferedImage): List<Landmark> {
-        val inputData = preprocessing.apply(image).first
-        val yhat = internalModel.predictRaw(inputData)
-
-        val landMarks = mutableListOf<Landmark>()
-        val floats = (yhat[OUTPUT_NAME] as Array<*>)[0] as FloatArray
-        for (i in floats.indices step 2) {
-            landMarks.add(Landmark(floats[i], floats[i + 1]))
-        }
-
-        return landMarks
-    }
-
-
-    /**
      * Detects 106 [Landmark] objects for the given [imageFile].
+     * @param [imageFile] file containing an input image
      */
     @Throws(IOException::class)
     public fun detectLandmarks(imageFile: File): List<Landmark> {
