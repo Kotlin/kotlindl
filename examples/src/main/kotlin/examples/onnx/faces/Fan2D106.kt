@@ -6,6 +6,7 @@
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
@@ -13,12 +14,12 @@ import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.visualization.swing.drawRawLandMarks
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
+import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -38,11 +39,11 @@ fun main() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = 192
-                    outputWidth = 192
-                }
+                outputHeight = 192
+                outputWidth = 192
+            }
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 
@@ -54,14 +55,20 @@ fun main() {
             val yhat = it.predictRaw(inputData)
             println(yhat.values.toTypedArray().contentDeepToString())
 
-            visualiseLandMarks(imageFile, yhat)
+            val landMarks = mutableListOf<Landmark>()
+            val floats = (yhat["fc1"] as Array<*>)[0] as FloatArray
+            for (j in floats.indices step 2) {
+                landMarks.add(Landmark((1 + floats[j]) / 2, (1 + floats[j + 1]) / 2))
+            }
+
+            visualiseLandMarks(imageFile, landMarks)
         }
     }
 }
 
 fun visualiseLandMarks(
     imageFile: File,
-    landmarks: Map<String, Any>
+    landmarks: List<Landmark>
 ) {
     val preprocessing = pipeline<BufferedImage>()
         .resize {
@@ -75,5 +82,5 @@ fun visualiseLandMarks(
         }
 
     val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-    drawRawLandMarks(rawImage, ImageShape(shape[0], shape[1], shape[2]), landmarks)
+    drawLandMarks(rawImage, shape.toImageShape(), landmarks)
 }

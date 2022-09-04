@@ -27,29 +27,9 @@ fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects
     frame.isResizable = false
 }
 
-fun drawRawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: Map<String, Any>) {
-    val frame = JFrame("Landmarks")
-    frame.contentPane.add(RawLandMarksJPanel(dst, imageShape, landmarks))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
-}
-
 fun drawDetectedPose(dst: FloatArray, imageShape: ImageShape, detectedPose: DetectedPose) {
     val frame = JFrame("Filters")
     frame.contentPane.add(DetectedPoseJPanel(dst, imageShape, detectedPose))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
-}
-
-fun drawRawPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
-    val frame = JFrame("Landmarks")
-    frame.contentPane.add(RawPosePointsJPanel(dst, imageShape, posepoints))
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.isVisible = true
@@ -70,16 +50,6 @@ fun drawMultiPoseLandMarks(dst: FloatArray,
     frame.isResizable = false
 }
 
-fun drawRawMultiPoseLandMarks(dst: FloatArray, imageShape: ImageShape, posepoints: Array<FloatArray>) {
-    val frame = JFrame("Landmarks")
-    frame.contentPane.add(RawMultiPosePointsJPanel(dst, imageShape, posepoints))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
-}
-
 fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
     val frame = JFrame("Landmarks")
     frame.contentPane.add(LandMarksJPanel(dst, imageShape, landmarks))
@@ -88,54 +58,6 @@ fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landm
     frame.isVisible = true
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.isResizable = false
-}
-
-class RawMultiPosePointsJPanel(
-    val image: FloatArray,
-    val imageShape: ImageShape,
-    private val rawPosePoints: Array<FloatArray>
-) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
-
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-        val posePoints = mutableListOf<MutableList<Triple<Float, Float, Float>>>()
-        rawPosePoints.forEachIndexed { index, floats ->
-            val poseLandmarks = mutableListOf<Triple<Float, Float, Float>>()
-            for (i in 0..50 step 3) {
-                poseLandmarks.add(i % 3, Triple(floats[i + 1], floats[i], floats[i + 2]))
-            }
-
-            //if(floats[55] > 0.1) { // threshold
-            posePoints.add(index, poseLandmarks)
-            //}
-        }
-
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        for (i in 0 until posePoints.size) {
-            val onePosePoints = posePoints[i]
-
-            for (j in onePosePoints.indices) {
-                val xLM = (size.width) * (onePosePoints[j].first)
-                val yLM = (size.height) * (onePosePoints[j].second)
-
-                graphics as Graphics2D
-                val stroke1: Stroke = BasicStroke(3f)
-                graphics.setColor(Color((6 - i) * 40, i * 20, i * 10))
-                graphics.stroke = stroke1
-                graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
-            }
-        }
-    }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
 }
 
 class MultiPosePointsJPanel(
@@ -240,82 +162,6 @@ class DetectedPoseJPanel(
             graphics.setColor(Color.MAGENTA)
             graphics.stroke = stroke1
             graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
-        }
-    }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-}
-
-class RawPosePointsJPanel(
-    val image: FloatArray,
-    val imageShape: ImageShape,
-    private val rawPosePoints: Array<FloatArray>
-) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
-
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-        val posePoints = mutableListOf<Triple<Float, Float, Float>>()
-        for (i in rawPosePoints.indices) {
-            posePoints.add(Triple(rawPosePoints[i][1], rawPosePoints[i][0], rawPosePoints[i][2])) //(y, x, score)
-        }
-
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        for (i in posePoints.indices) {
-            val xLM = (size.width) * (posePoints[i].first)
-            val yLM = (size.height) * (posePoints[i].second)
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(3f)
-            graphics.setColor(Color.RED)
-            graphics.stroke = stroke1
-            graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
-        }
-    }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-}
-
-class RawLandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: Map<String, Any>) :
-    JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
-
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-        val tempLandMarks = mutableListOf<Pair<Float, Float>>()
-        val floats = (landmarks.values.toTypedArray()[0] as Array<FloatArray>)[0]
-        for (i in floats.indices step 2) {
-            tempLandMarks.add(Pair(floats[i], floats[i + 1]))
-        }
-
-
-        val xCoefficient: Float = size.width.toFloat() / bufferedImage.width.toFloat()
-        val yCoefficient: Float = size.height.toFloat() / bufferedImage.height.toFloat()
-
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        for (i in tempLandMarks.indices) {
-            val xLM = (size.width / 2) * (1 + tempLandMarks[i].first) / xCoefficient
-            val yLM = (size.height / 2) * (1 + tempLandMarks[i].second) / yCoefficient
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(3f)
-            graphics.setColor(Color.RED)
-            graphics.stroke = stroke1
-            graphics.drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
         }
     }
 

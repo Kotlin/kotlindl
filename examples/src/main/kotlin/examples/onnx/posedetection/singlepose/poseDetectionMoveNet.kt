@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,6 +8,8 @@ package examples.onnx.posedetection.singlepose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -17,7 +19,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
-import org.jetbrains.kotlinx.dl.visualization.swing.drawRawPoseLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedPose
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -78,19 +80,30 @@ fun poseDetectionMoveNet() {
             println(keypoints[index] + " x = " + data[1] + " y =  " + data[0] + " score = " + data[2])
         }
 
-        visualisePoseLandmarks(imageFile, rawPoseLandMarks)
+        val foundPoseLandmarks = mutableListOf<PoseLandmark>()
+        for (i in rawPoseLandMarks.indices) {
+            val poseLandmark = PoseLandmark(
+                poseLandmarkLabel = keypoints[i]!!,
+                x = rawPoseLandMarks[i][1],
+                y = rawPoseLandMarks[i][0],
+                probability = rawPoseLandMarks[i][2]
+            )
+            foundPoseLandmarks.add(i, poseLandmark)
+        }
+        val detectedPose = DetectedPose(foundPoseLandmarks, emptyList())
+        visualisePoseLandmarks(imageFile, detectedPose)
     }
 }
 
 private fun visualisePoseLandmarks(
     imageFile: File,
-    poseLandmarks: Array<FloatArray>
+    detectedPose: DetectedPose
 ) {
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-                outputHeight = 256
-                outputWidth = 256
-            }
+            outputHeight = 256
+            outputWidth = 256
+        }
         .convert { colorMode = ColorMode.BGR }
         .toFloatArray { }
         .rescale {
@@ -98,7 +111,7 @@ private fun visualisePoseLandmarks(
         }
 
     val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-    drawRawPoseLandMarks(rawImage, shape.toImageShape(), poseLandmarks)
+    drawDetectedPose(rawImage, shape.toImageShape(), detectedPose)
 }
 
 /** */
