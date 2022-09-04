@@ -9,176 +9,114 @@ import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel.Companion.createImagePanel
 import java.awt.*
 import java.awt.image.BufferedImage
 
 
 fun drawDetectedObjects(bufferedImage: BufferedImage, detectedObjects: List<DetectedObject>) {
-    showFrame("Filters", DetectedObjectJPanel(bufferedImage, detectedObjects))
+    showFrame("Filters", createImagePanel(bufferedImage) {
+        drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
+    })
 }
 
 fun drawDetectedPose(bufferedImage: BufferedImage, detectedPose: DetectedPose) {
-    showFrame("Filters", DetectedPoseJPanel(bufferedImage, detectedPose))
+    showFrame("Filters", createImagePanel(bufferedImage) {
+        drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
+    })
 }
 
 fun drawMultiPoseLandMarks(bufferedImage: BufferedImage,
                            multiPoseDetectionResult: MultiPoseDetectionResult
 ) {
-    showFrame("Landmarks", MultiPosePointsJPanel(bufferedImage, multiPoseDetectionResult))
+    showFrame("Landmarks", createImagePanel(bufferedImage) {
+        drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
+    })
 }
 
 fun drawLandMarks(bufferedImage: BufferedImage, landmarks: List<Landmark>) {
-    showFrame("Landmarks", LandMarksJPanel(bufferedImage, landmarks))
+    showFrame("Landmarks", createImagePanel(bufferedImage) {
+        drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
+    })
 }
 
-class MultiPosePointsJPanel(
-    bufferedImage: BufferedImage,
-    private val multiPoseDetectionResult: MultiPoseDetectionResult
-) : ImagePanel(bufferedImage) {
+private fun Graphics2D.drawObject(detectedObject: DetectedObject,
+                                  width: Int,
+                                  height: Int,
+                                  objectColor: Color = Color.RED,
+                                  labelColor: Color = Color.ORANGE
+) {
+    val top = detectedObject.yMin * height
+    val left = detectedObject.xMin * width
+    val bottom = detectedObject.yMax * height
+    val right = detectedObject.xMax * width
+    // left, bot, right, top
 
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-        graphics.drawImage(bufferedImage, 0, 0, null)
+    // y = columnIndex
+    // x = rowIndex
+    val yRect = top
+    val xRect = left
+    color = objectColor
+    stroke = BasicStroke(6f * detectedObject.probability)
+    drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (bottom - top).toInt())
 
-        multiPoseDetectionResult.multiplePoses.forEachIndexed { i, it ->
-            val onePosePoints = it.second.poseLandmarks
 
-            for (j in onePosePoints.indices) {
-                val xLM = (size.width) * (onePosePoints[j].x)
-                val yLM = (size.height) * (onePosePoints[j].y)
+    color = labelColor
+    font = Font("Courier New", 1, 17)
+    drawString(" ${detectedObject.classLabel} : ${detectedObject.probability}", xRect.toInt(), yRect.toInt() - 8)
+}
 
-                graphics as Graphics2D
-                val stroke1: Stroke = BasicStroke(3f)
-                graphics.setColor(Color((6 - i) * 40, i * 20, i * 10))
-                graphics.stroke = stroke1
-                graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
-            }
+private fun Graphics2D.drawObjects(detectedObjects: List<DetectedObject>, width: Int, height: Int) {
+    detectedObjects.forEach { drawObject(it, width, height) }
+}
 
-            val onePoseEdges = it.second.edges
-            for (j in onePoseEdges.indices) {
-                val x1 = (size.width) * (onePoseEdges[j].start.x)
-                val y1 = (size.height) * (onePoseEdges[j].start.y)
-                val x2 = (size.width) * (onePoseEdges[j].end.x)
-                val y2 = (size.height) * (onePoseEdges[j].end.y)
+private fun Graphics2D.drawPose(detectedPose: DetectedPose, width: Int, height: Int,
+                                landmarkColor: Color = Color.RED,
+                                edgeColor: Color = Color.MAGENTA
+) {
+    color = landmarkColor
+    stroke = BasicStroke(3f)
+    detectedPose.poseLandmarks.forEach { landmark ->
+        val xLM = width * landmark.x
+        val yLM = height * landmark.y
 
-                graphics as Graphics2D
-                val stroke1: Stroke = BasicStroke(2f)
-                graphics.setColor(Color.MAGENTA)
-                graphics.stroke = stroke1
-                graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
-            }
+        drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
+    }
 
-            val detectedObject = it.first
+    color = edgeColor
+    stroke = BasicStroke(2f)
+    detectedPose.edges.forEach { edge ->
+        val x1 = width * edge.start.x
+        val y1 = height * edge.start.y
+        val x2 = width * edge.end.x
+        val y2 = height * edge.end.y
 
-            val top = detectedObject.yMin * bufferedImage.height
-            val left = detectedObject.xMin * bufferedImage.width
-            val bottom = detectedObject.yMax * bufferedImage.height
-            val right = detectedObject.xMax * bufferedImage.width
-            // left, bot, right, top
-
-            // y = columnIndex
-            // x = rowIndex
-            val yRect = top
-            val xRect = left
-            graphics as Graphics2D
-            val stroke: Stroke = BasicStroke(6f * detectedObject.probability)
-            graphics.setColor(Color.ORANGE)
-            graphics.stroke = stroke
-            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (bottom - top).toInt())
-        }
+        drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
     }
 }
 
-class DetectedPoseJPanel(
-    bufferedImage: BufferedImage,
-    private val detectedPose: DetectedPose
-) : ImagePanel(bufferedImage) {
-
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        detectedPose.poseLandmarks.forEach {
-            val xLM = (size.width) * (it.x)
-            val yLM = (size.height) * (it.y)
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(3f)
-            graphics.setColor(Color.RED)
-            graphics.stroke = stroke1
-            graphics.drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
-        }
-
-        val onePoseEdges = detectedPose.edges
-        for (j in onePoseEdges.indices) {
-            val x1 = (size.width) * (onePoseEdges[j].start.x)
-            val y1 = (size.height) * (onePoseEdges[j].start.y)
-            val x2 = (size.width) * (onePoseEdges[j].end.x)
-            val y2 = (size.height) * (onePoseEdges[j].end.y)
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(2f)
-            graphics.setColor(Color.MAGENTA)
-            graphics.stroke = stroke1
-            graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
-        }
+private fun Graphics2D.drawMultiplePoses(multiPoseDetectionResult1: MultiPoseDetectionResult,
+                                         width: Int,
+                                         height: Int
+) {
+    multiPoseDetectionResult1.multiplePoses.forEachIndexed { i, (detectedObject, detectedPose) ->
+        drawPose(
+            detectedPose, width, height,
+            Color((6 - i) * 40, i * 20, i * 10),
+            Color.MAGENTA
+        )
+        drawObject(detectedObject, width, height, Color.ORANGE)
     }
 }
 
-class LandMarksJPanel(bufferedImage: BufferedImage, private val landmarks: List<Landmark>) :
-    ImagePanel(bufferedImage) {
 
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
+private fun Graphics2D.drawLandmarks(landmarks: List<Landmark>, width: Int, height: Int) {
+    color = Color.RED
+    stroke = BasicStroke(3f)
+    landmarks.forEach { landmark ->
+        val xLM = width * landmark.xRate
+        val yLM = height * landmark.yRate
 
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        for (i in landmarks.indices) {
-            val xLM = size.width * landmarks[i].xRate
-            val yLM = size.height * landmarks[i].yRate
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(3f)
-            graphics.setColor(Color.RED)
-            graphics.stroke = stroke1
-            graphics.drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
-        }
-    }
-}
-
-class DetectedObjectJPanel(
-    bufferedImage: BufferedImage,
-    private val detectedObjects: List<DetectedObject>
-) : ImagePanel(bufferedImage) {
-
-    override fun paint(graphics: Graphics) {
-        super.paint(graphics)
-
-        graphics.drawImage(bufferedImage, 0, 0, null)
-
-        detectedObjects.forEach {
-            val pixelWidth = 1
-            val pixelHeight = 1
-
-            val top = it.yMax * bufferedImage.height * pixelHeight
-            val left = it.xMin * bufferedImage.width * pixelWidth
-            val bottom = it.yMin * bufferedImage.height * pixelHeight
-            val right = it.xMax * bufferedImage.width * pixelWidth
-            // left, bot, right, top
-
-            // y = columnIndex
-            // x = rowIndex
-            val yRect = bottom
-            val xRect = left
-            graphics.color = Color.ORANGE
-            graphics.font = Font("Courier New", 1, 17)
-            graphics.drawString(" ${it.classLabel} : ${it.probability}", xRect.toInt(), yRect.toInt() - 8)
-
-            graphics as Graphics2D
-            val stroke1: Stroke = BasicStroke(10f * it.probability)
-            graphics.setColor(Color.RED)
-            graphics.stroke = stroke1
-            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
-        }
+        drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
     }
 }
