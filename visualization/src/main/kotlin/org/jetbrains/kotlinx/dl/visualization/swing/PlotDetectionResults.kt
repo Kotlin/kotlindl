@@ -5,42 +5,36 @@
 
 package org.jetbrains.kotlinx.dl.visualization.swing
 
-import org.jetbrains.kotlinx.dl.api.extension.get3D
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.ImageShape
 import java.awt.*
 import java.awt.image.BufferedImage
-import javax.swing.JPanel
 
 
-fun drawDetectedObjects(dst: FloatArray, imageShape: ImageShape, detectedObjects: List<DetectedObject>) {
-    showFrame("Filters", DetectedObjectJPanel(dst, imageShape, detectedObjects))
+fun drawDetectedObjects(bufferedImage: BufferedImage, detectedObjects: List<DetectedObject>) {
+    showFrame("Filters", DetectedObjectJPanel(bufferedImage, detectedObjects))
 }
 
-fun drawDetectedPose(dst: FloatArray, imageShape: ImageShape, detectedPose: DetectedPose) {
-    showFrame("Filters", DetectedPoseJPanel(dst, imageShape, detectedPose))
+fun drawDetectedPose(bufferedImage: BufferedImage, detectedPose: DetectedPose) {
+    showFrame("Filters", DetectedPoseJPanel(bufferedImage, detectedPose))
 }
 
-fun drawMultiPoseLandMarks(dst: FloatArray,
-                           imageShape: ImageShape,
+fun drawMultiPoseLandMarks(bufferedImage: BufferedImage,
                            multiPoseDetectionResult: MultiPoseDetectionResult
 ) {
-    showFrame("Landmarks", MultiPosePointsJPanel(dst, imageShape, multiPoseDetectionResult))
+    showFrame("Landmarks", MultiPosePointsJPanel(bufferedImage, multiPoseDetectionResult))
 }
 
-fun drawLandMarks(dst: FloatArray, imageShape: ImageShape, landmarks: List<Landmark>) {
-    showFrame("Landmarks", LandMarksJPanel(dst, imageShape, landmarks))
+fun drawLandMarks(bufferedImage: BufferedImage, landmarks: List<Landmark>) {
+    showFrame("Landmarks", LandMarksJPanel(bufferedImage, landmarks))
 }
 
 class MultiPosePointsJPanel(
-    val image: FloatArray,
-    val imageShape: ImageShape,
+    bufferedImage: BufferedImage,
     private val multiPoseDetectionResult: MultiPoseDetectionResult
-) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
+) : ImagePanel(bufferedImage) {
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
@@ -76,10 +70,10 @@ class MultiPosePointsJPanel(
 
             val detectedObject = it.first
 
-            val top = detectedObject.yMin * imageShape.height!!
-            val left = detectedObject.xMin * imageShape.width!!
-            val bottom = detectedObject.yMax * imageShape.height!!
-            val right = detectedObject.xMax * imageShape.width!!
+            val top = detectedObject.yMin * bufferedImage.height
+            val left = detectedObject.xMin * bufferedImage.width
+            val bottom = detectedObject.yMax * bufferedImage.height
+            val right = detectedObject.xMax * bufferedImage.width
             // left, bot, right, top
 
             // y = columnIndex
@@ -93,22 +87,12 @@ class MultiPosePointsJPanel(
             graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (bottom - top).toInt())
         }
     }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
 }
 
 class DetectedPoseJPanel(
-    val image: FloatArray,
-    val imageShape: ImageShape,
+    bufferedImage: BufferedImage,
     private val detectedPose: DetectedPose
-) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
+) : ImagePanel(bufferedImage) {
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
@@ -139,19 +123,10 @@ class DetectedPoseJPanel(
             graphics.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
         }
     }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
 }
 
-class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private val landmarks: List<Landmark>) :
-    JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
+class LandMarksJPanel(bufferedImage: BufferedImage, private val landmarks: List<Landmark>) :
+    ImagePanel(bufferedImage) {
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
@@ -169,22 +144,12 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private
             graphics.drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
         }
     }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
 }
 
 class DetectedObjectJPanel(
-    val image: FloatArray,
-    val imageShape: ImageShape,
+    bufferedImage: BufferedImage,
     private val detectedObjects: List<DetectedObject>
-) : JPanel() {
-    private val bufferedImage = image.toBufferedImage(imageShape)
+) : ImagePanel(bufferedImage) {
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
@@ -195,10 +160,10 @@ class DetectedObjectJPanel(
             val pixelWidth = 1
             val pixelHeight = 1
 
-            val top = it.yMax * imageShape.height!! * pixelHeight
-            val left = it.xMin * imageShape.width!! * pixelWidth
-            val bottom = it.yMin * imageShape.height!! * pixelHeight
-            val right = it.xMax * imageShape.width!! * pixelWidth
+            val top = it.yMax * bufferedImage.height * pixelHeight
+            val left = it.xMin * bufferedImage.width * pixelWidth
+            val bottom = it.yMin * bufferedImage.height * pixelHeight
+            val right = it.xMax * bufferedImage.width * pixelWidth
             // left, bot, right, top
 
             // y = columnIndex
@@ -216,25 +181,4 @@ class DetectedObjectJPanel(
             graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
         }
     }
-
-    override fun getPreferredSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-
-    override fun getMinimumSize(): Dimension {
-        return Dimension(bufferedImage.width, bufferedImage.height)
-    }
-}
-
-private fun FloatArray.toBufferedImage(imageShape: ImageShape): BufferedImage {
-    val result = BufferedImage(imageShape.width!!.toInt(), imageShape.height!!.toInt(), BufferedImage.TYPE_INT_RGB)
-    for (i in 0 until imageShape.height!!.toInt()) { // rows
-        for (j in 0 until imageShape.width!!.toInt()) { // columns
-            val r = get3D(i, j, 2, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
-            val g = get3D(i, j, 1, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
-            val b = get3D(i, j, 0, imageShape.width!!.toInt(), imageShape.channels!!.toInt()).coerceIn(0f, 1f)
-            result.setRGB(j, i, Color(r, g, b).rgb)
-        }
-    }
-    return result
 }

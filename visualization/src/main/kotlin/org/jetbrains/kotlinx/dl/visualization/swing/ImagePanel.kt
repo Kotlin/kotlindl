@@ -15,7 +15,7 @@ import javax.swing.JPanel
  *
  * @param [bufferedImage] an image represented by a [BufferedImage].
  */
-class ImagePanel(private val bufferedImage: BufferedImage) : JPanel() {
+open class ImagePanel(protected val bufferedImage: BufferedImage) : JPanel() {
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
         val x = (size.width - bufferedImage.width) / 2
@@ -24,6 +24,10 @@ class ImagePanel(private val bufferedImage: BufferedImage) : JPanel() {
     }
 
     override fun getPreferredSize(): Dimension {
+        return Dimension(bufferedImage.width, bufferedImage.height)
+    }
+
+    override fun getMinimumSize(): Dimension {
         return Dimension(bufferedImage.width, bufferedImage.height)
     }
 }

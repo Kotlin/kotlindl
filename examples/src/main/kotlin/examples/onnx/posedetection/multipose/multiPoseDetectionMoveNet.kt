@@ -13,14 +13,12 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
 import java.awt.image.BufferedImage
 import java.io.File
@@ -40,7 +38,9 @@ fun multiPoseDetectionMoveNet() {
         println(it)
 
         val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
-        val fileDataLoader = pipeline<BufferedImage>()
+        val inputImage = ImageConverter.toBufferedImage(imageFile)
+
+        val preprocessor = pipeline<BufferedImage>()
             .resize {
                 outputHeight = 256
                 outputWidth = 256
@@ -48,9 +48,8 @@ fun multiPoseDetectionMoveNet() {
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
             .call(modelType.preprocessor)
-            .fileLoader()
 
-        val inputData = fileDataLoader.load(imageFile).first
+        val inputData = preprocessor.apply(inputImage).first
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
 
@@ -83,27 +82,8 @@ fun multiPoseDetectionMoveNet() {
         }
 
         val multiPoseDetectionResult = MultiPoseDetectionResult(poses)
-        visualisePoseLandmarks(imageFile, multiPoseDetectionResult)
+        drawMultiPoseLandMarks(inputImage, multiPoseDetectionResult)
     }
-}
-
-private fun visualisePoseLandmarks(
-    imageFile: File,
-    poseLandmarks: MultiPoseDetectionResult
-) {
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = 256
-            outputWidth = 256
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .rescale {
-            scalingCoefficient = 255f
-        }
-
-    val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-    drawMultiPoseLandMarks(rawImage, shape.toImageShape(), poseLandmarks)
 }
 
 /** */

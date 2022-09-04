@@ -9,14 +9,9 @@ import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
 import java.awt.image.BufferedImage
 import java.io.File
@@ -32,24 +27,13 @@ fun main() {
     val model = ONNXModels.FaceAlignment.Fan2d106.pretrainedModel(modelHub)
 
     model.use {
-        val preprocessing = preprocessing()
         for (i in 0..8) {
-            val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-            val landmarks = it.detectLandmarks(imageFile = imageFile)
-
-            val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-            drawLandMarks(rawImage, shape.toImageShape(), landmarks)
+            val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/faces/image$i.jpg"))
+            val landmarks = it.detectLandmarks(image)
+            val displayedImage = pipeline<BufferedImage>()
+                .resize { outputWidth = 200; outputHeight = 200 }
+                .apply(image)
+            drawLandMarks(displayedImage, landmarks)
         }
     }
 }
-
-private fun preprocessing() = pipeline<BufferedImage>()
-    .resize {
-        outputWidth = 192
-        outputHeight = 192
-    }
-    .convert { colorMode = ColorMode.BGR }
-    .toFloatArray { }
-    .rescale {
-        scalingCoefficient = 255f
-    }

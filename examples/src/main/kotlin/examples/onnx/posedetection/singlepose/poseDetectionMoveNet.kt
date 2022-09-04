@@ -11,14 +11,12 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
 import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedPose
 import java.awt.image.BufferedImage
 import java.io.File
@@ -37,8 +35,8 @@ fun poseDetectionMoveNet() {
     model.use {
         println(it)
 
-        val imageFile = getFileFromResource("datasets/poses/single/3.jpg")
-        val fileDataLoader = pipeline<BufferedImage>()
+        val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/single/3.jpg"))
+        val preprocessing = pipeline<BufferedImage>()
             .resize {
                 outputHeight = 192
                 outputWidth = 192
@@ -46,9 +44,8 @@ fun poseDetectionMoveNet() {
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }
             .call(modelType.preprocessor)
-            .fileLoader()
 
-        val inputData = fileDataLoader.load(imageFile).first
+        val inputData = preprocessing.apply(image).first
 
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
@@ -91,29 +88,13 @@ fun poseDetectionMoveNet() {
             foundPoseLandmarks.add(i, poseLandmark)
         }
         val detectedPose = DetectedPose(foundPoseLandmarks, emptyList())
-        visualisePoseLandmarks(imageFile, detectedPose)
+
+        val displayedImage = pipeline<BufferedImage>()
+            .resize { outputWidth = 300; outputHeight = 300 }
+            .apply(image)
+        drawDetectedPose(displayedImage, detectedPose)
     }
-}
-
-private fun visualisePoseLandmarks(
-    imageFile: File,
-    detectedPose: DetectedPose
-) {
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = 256
-            outputWidth = 256
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .rescale {
-            scalingCoefficient = 255f
-        }
-
-    val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-    drawDetectedPose(rawImage, shape.toImageShape(), detectedPose)
 }
 
 /** */
 fun main(): Unit = poseDetectionMoveNet()
-
