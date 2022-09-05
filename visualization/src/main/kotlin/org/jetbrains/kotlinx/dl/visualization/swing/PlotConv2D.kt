@@ -537,8 +537,8 @@ class LandMarksJPanel(val image: FloatArray, val imageShape: ImageShape, private
         graphics.drawImage(bufferedImage, 0, 0, null)
 
         for (i in landmarks.indices) {
-            val xLM = (size.width / 2) * (1 + landmarks[i].xRate)
-            val yLM = (size.height / 2) * (1 + landmarks[i].yRate)
+            val xLM = size.width * landmarks[i].xRate
+            val yLM = size.height * landmarks[i].yRate
 
             graphics as Graphics2D
             val stroke1: Stroke = BasicStroke(3f)
