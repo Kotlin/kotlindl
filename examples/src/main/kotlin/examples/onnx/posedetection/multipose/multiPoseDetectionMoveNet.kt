@@ -55,7 +55,10 @@ fun multiPoseDetectionMoveNet() {
         println(yhat.values.toTypedArray().contentDeepToString())
 
         val rawPoseLandmarks = (yhat["output_0"] as Array<Array<FloatArray>>)[0]
-        val poses = rawPoseLandmarks.map { floats ->
+        val poses = rawPoseLandmarks.mapNotNull { floats ->
+            val probability = floats[55]
+            if (probability < 0.05) return@mapNotNull null
+
             val foundPoseLandmarks = mutableListOf<PoseLandmark>()
 
             for (keyPointIdx in 0..16) {
@@ -71,7 +74,7 @@ fun multiPoseDetectionMoveNet() {
             // [ymin, xmin, ymax, xmax, score]
             val detectedObject = DetectedObject(
                 classLabel = "person",
-                probability = floats[55],
+                probability = probability,
                 yMin = floats[51],
                 xMin = floats[52],
                 yMax = floats[53],

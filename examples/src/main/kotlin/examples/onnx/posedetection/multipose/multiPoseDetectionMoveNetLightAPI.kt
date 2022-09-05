@@ -33,7 +33,7 @@ fun multiPoseDetectionMoveNetLightAPI() {
         val result = mutableMapOf<BufferedImage, MultiPoseDetectionResult>()
         for (i in 1..3) {
             val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/multi/$i.jpg"))
-            val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.0f)
+            val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.05f)
 
             detectedPoses.multiplePoses.forEach { detectedPose ->
                 println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")
