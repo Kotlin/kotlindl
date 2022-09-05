@@ -50,9 +50,9 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
             val detectedObject = DetectedObject(
                 classLabel = CLASS_LABEL,
                 probability = floats[55],
-                yMin = floats[53],
+                yMin = floats[51],
                 xMin = floats[52],
-                yMax = floats[51],
+                yMax = floats[53],
                 xMax = floats[54]
             )
 

@@ -386,13 +386,13 @@ class MultiPosePointsJPanel(
 
             // y = columnIndex
             // x = rowIndex
-            val yRect = bottom
+            val yRect = top
             val xRect = left
             graphics as Graphics2D
             val stroke: Stroke = BasicStroke(6f * detectedObject.probability)
             graphics.setColor(Color.ORANGE)
             graphics.stroke = stroke
-            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (top - bottom).toInt())
+            graphics.drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (bottom - top).toInt())
         }
     }
 
