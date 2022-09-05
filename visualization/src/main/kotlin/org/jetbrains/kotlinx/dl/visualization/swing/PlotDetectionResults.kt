@@ -17,30 +17,27 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
 
-fun drawDetectedObjects(bufferedImage: BufferedImage, detectedObjects: List<DetectedObject>) {
-    showFrame("Filters", createImagePanel(bufferedImage) {
-        drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
-    })
+fun createDetectedObjectsPanel(bufferedImage: BufferedImage,
+                               detectedObjects: List<DetectedObject>
+) = createImagePanel(bufferedImage) {
+    drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
 }
 
-fun drawDetectedPose(bufferedImage: BufferedImage, detectedPose: DetectedPose) {
-    showFrame("Filters", createImagePanel(bufferedImage) {
-        drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
-    })
+fun createDetectedPosePanel(bufferedImage: BufferedImage,
+                            detectedPose: DetectedPose
+) = createImagePanel(bufferedImage) {
+    drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
 }
 
-fun drawMultiPoseLandMarks(bufferedImage: BufferedImage,
-                           multiPoseDetectionResult: MultiPoseDetectionResult
-) {
-    showFrame("Landmarks", createImagePanel(bufferedImage) {
-        drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
-    })
+fun createMultipleDetectedPosesPanel(bufferedImage: BufferedImage,
+                                     multiPoseDetectionResult: MultiPoseDetectionResult
+) = createImagePanel(bufferedImage) {
+    drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
 }
 
-fun drawLandMarks(bufferedImage: BufferedImage, landmarks: List<Landmark>) {
-    showFrame("Landmarks", createImagePanel(bufferedImage) {
-        drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
-    })
+fun createDetectedLandmarksPanel(bufferedImage: BufferedImage, landmarks: List<Landmark>
+) = createImagePanel(bufferedImage) {
+    drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
 }
 
 private fun Graphics2D.drawObject(detectedObject: DetectedObject,

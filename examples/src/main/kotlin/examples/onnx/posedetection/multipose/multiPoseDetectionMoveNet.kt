@@ -19,7 +19,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.createMultipleDetectedPosesPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -82,7 +83,10 @@ fun multiPoseDetectionMoveNet() {
         }
 
         val multiPoseDetectionResult = MultiPoseDetectionResult(poses)
-        drawMultiPoseLandMarks(inputImage, multiPoseDetectionResult)
+        showFrame(
+            "Detection result for ${imageFile.name}",
+            createMultipleDetectedPosesPanel(inputImage, multiPoseDetectionResult)
+        )
     }
 }
 

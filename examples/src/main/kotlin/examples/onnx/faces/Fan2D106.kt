@@ -17,9 +17,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedLandmarksPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
+import java.awt.GridLayout
 import java.awt.image.BufferedImage
 import java.io.File
+import javax.swing.JPanel
 
 /**
  * This examples demonstrates the light-weight inference API with [Fan2D106FaceAlignmentModel] on Fan2d106 model:
@@ -44,8 +47,10 @@ fun main() {
             .toFloatArray { }
             .call(modelType.preprocessor)
 
-        for (i in 0..8) {
-            val inputImage = ImageConverter.toBufferedImage(getFileFromResource("datasets/faces/image$i.jpg"))
+        val result = mutableMapOf<BufferedImage, List<Landmark>>()
+        for (i in 1..8) {
+            val inputFile = getFileFromResource("datasets/faces/image$i.jpg")
+            val inputImage = ImageConverter.toBufferedImage(inputFile)
             val inputData = preprocessor.apply(inputImage).first
 
             val yhat = it.predictRaw(inputData)
@@ -56,11 +61,14 @@ fun main() {
             for (j in floats.indices step 2) {
                 landMarks.add(Landmark((1 + floats[j]) / 2, (1 + floats[j + 1]) / 2))
             }
-
-            val displayedImage = pipeline<BufferedImage>()
-                .resize { outputWidth = 200; outputHeight = 200 }
-                .apply(inputImage)
-            drawLandMarks(displayedImage, landMarks)
+            result[inputImage] = landMarks
         }
+
+        val panel = JPanel(GridLayout(2, 4))
+        val resize = pipeline<BufferedImage>().resize { outputWidth = 200; outputHeight = 200 }
+        for ((image, landmarks) in result) {
+            panel.add(createDetectedLandmarksPanel(resize.apply(image), landmarks))
+        }
+        showFrame("Face Landmarks", panel)
     }
 }

@@ -17,7 +17,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedPose
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedPosePanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -35,7 +36,8 @@ fun poseDetectionMoveNet() {
     model.use {
         println(it)
 
-        val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/single/3.jpg"))
+        val file = getFileFromResource("datasets/poses/single/3.jpg")
+        val image = ImageConverter.toBufferedImage(file)
         val preprocessing = pipeline<BufferedImage>()
             .resize {
                 outputHeight = 192
@@ -92,7 +94,7 @@ fun poseDetectionMoveNet() {
         val displayedImage = pipeline<BufferedImage>()
             .resize { outputWidth = 300; outputHeight = 300 }
             .apply(image)
-        drawDetectedPose(displayedImage, detectedPose)
+        showFrame("Detection result for $file", createDetectedPosePanel(displayedImage, detectedPose))
     }
 }
 

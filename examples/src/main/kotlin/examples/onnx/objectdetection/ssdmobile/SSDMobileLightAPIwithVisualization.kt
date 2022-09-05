@@ -18,7 +18,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedObjectsPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -35,7 +36,8 @@ fun main() {
     model.use { detectionModel ->
         println(detectionModel)
 
-        val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/vgg/image9.jpg"))
+        val file = getFileFromResource("datasets/vgg/image9.jpg")
+        val image = ImageConverter.toBufferedImage(file)
         val detectedObjects = detectionModel.detectObjects(image, topK = 50)
 
         detectedObjects.forEach {
@@ -45,6 +47,6 @@ fun main() {
         val displayedImage = pipeline<BufferedImage>()
             .resize { outputWidth = 1200; outputHeight = ((1200f / image.width) * image.height).toInt() }
             .apply(image)
-        drawDetectedObjects(displayedImage, detectedObjects)
+        showFrame("Detection result for ${file.name}", createDetectedObjectsPanel(displayedImage, detectedObjects))
     }
 }

@@ -8,9 +8,16 @@ package examples.onnx.posedetection.multipose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.visualization.swing.drawMultiPoseLandMarks
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.visualization.swing.createMultipleDetectedPosesPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.swing.BoxLayout
+import javax.swing.JPanel
 
 /**
  * This examples demonstrates the inference concept on MoveNetSinglePoseLighting model:
@@ -23,6 +30,7 @@ fun multiPoseDetectionMoveNetLightAPI() {
     val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
 
     model.use { poseDetectionModel ->
+        val result = mutableMapOf<BufferedImage, MultiPoseDetectionResult>()
         for (i in 1..3) {
             val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/multi/$i.jpg"))
             val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.0f)
@@ -37,9 +45,19 @@ fun multiPoseDetectionMoveNetLightAPI() {
                     println("   The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
                 }
             }
-
-            drawMultiPoseLandMarks(image, detectedPoses)
+            result[image] = detectedPoses
         }
+
+        val panel = JPanel()
+        panel.layout = BoxLayout(panel, BoxLayout.PAGE_AXIS)
+        val width = 450
+        for ((image, detectedPoses) in result) {
+            val displayedImage = pipeline<BufferedImage>()
+                .resize { outputWidth = width; outputHeight = width * image.height / image.width }
+                .apply(image)
+            panel.add(createMultipleDetectedPosesPanel(displayedImage, detectedPoses))
+        }
+        showFrame("Detection results", panel)
     }
 }
 

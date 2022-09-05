@@ -8,17 +8,9 @@ package examples.onnx.objectdetection.efficientdet
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedObjectsPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.io.File
 
 fun main() {
@@ -29,13 +21,14 @@ fun main() {
         println(detectionModel)
         detectionModel.reshape(1300, 900, 3)
 
-        val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/detection/image3.jpg"))
+        val file = getFileFromResource("datasets/detection/image3.jpg")
+        val image = ImageConverter.toBufferedImage(file)
         val detectedObjects = detectionModel.detectObjects(image)
 
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        drawDetectedObjects(image, detectedObjects)
+        showFrame("Detection result for ${file.name}", createDetectedObjectsPanel(image, detectedObjects))
     }
 }
