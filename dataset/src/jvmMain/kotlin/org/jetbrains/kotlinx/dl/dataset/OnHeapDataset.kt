@@ -5,13 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -20,7 +20,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.math.truncate
 import kotlin.random.Random
-import kotlin.streams.toList
 
 /**
  * Basic class to handle features [x] and labels [y].
