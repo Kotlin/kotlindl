@@ -11,6 +11,9 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel.Companion.createImagePanel
 import java.awt.*
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Line2D
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
 
@@ -46,27 +49,24 @@ private fun Graphics2D.drawObject(detectedObject: DetectedObject,
                                   objectColor: Color = Color.RED,
                                   labelColor: Color = Color.ORANGE
 ) {
-    val top = detectedObject.yMin * height
-    val left = detectedObject.xMin * width
-    val bottom = detectedObject.yMax * height
-    val right = detectedObject.xMax * width
-    // left, bot, right, top
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-    // y = columnIndex
-    // x = rowIndex
-    val yRect = top
-    val xRect = left
+    val x = detectedObject.xMin * width
+    val y = detectedObject.yMin * height
+
+    val frameWidth = 6f * detectedObject.probability
     color = objectColor
-    stroke = BasicStroke(6f * detectedObject.probability)
-    drawRect(xRect.toInt(), yRect.toInt(), (right - left).toInt(), (bottom - top).toInt())
+    stroke = BasicStroke(frameWidth)
+    draw(Rectangle2D.Float(x, y, detectedObject.xMax * width - x, detectedObject.yMax * height - y))
 
-
+    val label = "${detectedObject.classLabel} : " + "%.2f".format(detectedObject.probability)
     color = labelColor
-    font = Font("Courier New", 1, 17)
-    drawString(" ${detectedObject.classLabel} : ${detectedObject.probability}", xRect.toInt(), yRect.toInt() - 8)
+    font = font.deriveFont(Font.BOLD)
+    drawString(label, x, y - fontMetrics.maxDescent - frameWidth / 2)
 }
 
 private fun Graphics2D.drawObjects(detectedObjects: List<DetectedObject>, width: Int, height: Int) {
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     detectedObjects.forEach { drawObject(it, width, height) }
 }
 
@@ -74,24 +74,23 @@ private fun Graphics2D.drawPose(detectedPose: DetectedPose, width: Int, height: 
                                 landmarkColor: Color = Color.RED,
                                 edgeColor: Color = Color.MAGENTA
 ) {
-    color = landmarkColor
-    stroke = BasicStroke(3f)
-    detectedPose.poseLandmarks.forEach { landmark ->
-        val xLM = width * landmark.x
-        val yLM = height * landmark.y
-
-        drawOval(xLM.toInt(), yLM.toInt(), 3, 3)
-    }
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
     color = edgeColor
     stroke = BasicStroke(2f)
     detectedPose.edges.forEach { edge ->
-        val x1 = width * edge.start.x
-        val y1 = height * edge.start.y
-        val x2 = width * edge.end.x
-        val y2 = height * edge.end.y
+        draw(
+            Line2D.Float(
+                width * edge.start.x, height * edge.start.y,
+                width * edge.end.x, height * edge.end.y
+            )
+        )
+    }
 
-        drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
+    val r = 3.0f
+    color = landmarkColor
+    detectedPose.poseLandmarks.forEach { landmark ->
+        fill(Ellipse2D.Float(width * landmark.x - r, height * landmark.y - r, 2 * r, 2 * r))
     }
 }
 
@@ -99,6 +98,7 @@ private fun Graphics2D.drawMultiplePoses(multiPoseDetectionResult1: MultiPoseDet
                                          width: Int,
                                          height: Int
 ) {
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     multiPoseDetectionResult1.multiplePoses.forEachIndexed { i, (detectedObject, detectedPose) ->
         drawPose(
             detectedPose, width, height,
@@ -111,12 +111,11 @@ private fun Graphics2D.drawMultiplePoses(multiPoseDetectionResult1: MultiPoseDet
 
 
 private fun Graphics2D.drawLandmarks(landmarks: List<Landmark>, width: Int, height: Int) {
-    color = Color.RED
-    stroke = BasicStroke(3f)
-    landmarks.forEach { landmark ->
-        val xLM = width * landmark.xRate
-        val yLM = height * landmark.yRate
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-        drawOval(xLM.toInt(), yLM.toInt(), 2, 2)
+    val r = 3.0f
+    color = Color.RED
+    landmarks.forEach { landmark ->
+        fill(Ellipse2D.Float(width * landmark.xRate - r, height * landmark.yRate - r, 2 * r, 2 * r))
     }
 }
