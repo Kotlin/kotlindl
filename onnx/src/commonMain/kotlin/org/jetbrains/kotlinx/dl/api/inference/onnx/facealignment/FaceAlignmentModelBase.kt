@@ -5,12 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 
 /**
  * Base class for face alignment models.

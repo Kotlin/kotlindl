@@ -5,15 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import kotlin.math.min
 
 /**

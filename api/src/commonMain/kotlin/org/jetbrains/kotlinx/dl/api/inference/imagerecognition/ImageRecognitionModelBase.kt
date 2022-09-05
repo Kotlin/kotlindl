@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Base class for image classification models.

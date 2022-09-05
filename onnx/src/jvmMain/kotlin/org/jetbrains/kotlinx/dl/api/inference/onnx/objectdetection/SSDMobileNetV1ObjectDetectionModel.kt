@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
@@ -19,14 +18,10 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
-
-private const val OUTPUT_BOXES = "detection_boxes:0"
-private const val OUTPUT_CLASSES = "detection_classes:0"
-private const val OUTPUT_SCORES = "detection_scores:0"
-private const val OUTPUT_NUMBER_OF_DETECTIONS = "num_detections:0"
 
 /**
  * Special model class for detection objects on images
@@ -56,7 +51,7 @@ public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: Onnx
      * Constructs the object detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
     /**
      * Returns the top N detected object for the given image file sorted by the score.

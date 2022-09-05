@@ -23,9 +23,6 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 
-private const val OUTPUT_BOXES = "bboxes"
-private const val OUTPUT_LABELS = "labels"
-private const val OUTPUT_SCORES = "scores"
 private const val INPUT_SIZE = 1200
 
 /**

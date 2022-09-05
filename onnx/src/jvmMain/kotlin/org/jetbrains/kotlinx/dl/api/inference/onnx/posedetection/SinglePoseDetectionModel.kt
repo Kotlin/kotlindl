@@ -6,11 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModelBase
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -19,6 +17,7 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -54,7 +53,7 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
      * Constructs the pose detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
     /**
      * Detects a pose for the given [imageFile].

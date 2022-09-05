@@ -22,8 +22,6 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 
-private const val OUTPUT_NAME = "detections:0"
-
 /**
  * Special model class for detection objects on images
  * with built-in preprocessing and post-processing.
