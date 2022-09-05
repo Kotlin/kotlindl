@@ -20,6 +20,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.math.truncate
 import kotlin.random.Random
+import kotlin.streams.toList
 
 /**
  * Basic class to handle features [x] and labels [y].
