@@ -11,12 +11,12 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
@@ -46,7 +46,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the VGG16 architecture.
          *
@@ -74,7 +74,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the VGG19 architecture.
          *
@@ -102,7 +102,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 18 layers with ResNetv1 architecture.
          *
@@ -123,7 +123,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 34 layers with ResNetv1 architecture.
          *
@@ -144,7 +144,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
          *
@@ -174,7 +174,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 101 layers with ResNetv1 architecture.
          *
@@ -204,7 +204,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 152 layers with ResNetv1 architecture.
          *
@@ -234,7 +234,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 50 layers with ResNetv2 architecture.
          *
@@ -259,7 +259,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 101 layers with ResNetv2 architecture.
          *
@@ -284,7 +284,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * This model has 152 layers with ResNetv2 architecture.
          *
@@ -309,7 +309,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the MobileNet architecture.
          *
@@ -332,7 +332,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the MobileNetV2 architecture.
          *
@@ -355,7 +355,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the InceptionV3 architecture.
          *
@@ -378,7 +378,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the Xception architecture.
          *
@@ -401,7 +401,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the DenseNet121 architecture.
          *
@@ -424,7 +424,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the DenseNet169 architecture.
          *
@@ -447,7 +447,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the DenseNet201 architecture.
          *
@@ -470,7 +470,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the NASNetMobile architecture.
          *
@@ -493,7 +493,7 @@ public object TFModels {
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.api.core.util.loadImageNetClassLabels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels] method).
          *
          * Instantiates the NASNetLarge architecture.
          *

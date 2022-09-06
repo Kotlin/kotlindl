@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
@@ -25,10 +25,7 @@ private class PreprocessingFileDataLoader(
             if (dataSource.isDirectory) "File '$dataSource' is a directory."
             else "File '$dataSource' is not a normal file."
         }
-
-        val image = dataSource.inputStream().use { inputStream -> ImageConverter.toBufferedImage(inputStream) }
-
-        return preprocessing.apply(image)
+        return preprocessing.apply(ImageConverter.toBufferedImage(dataSource))
     }
 }
 

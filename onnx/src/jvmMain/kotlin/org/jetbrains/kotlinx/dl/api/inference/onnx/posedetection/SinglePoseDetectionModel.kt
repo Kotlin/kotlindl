@@ -9,18 +9,18 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.awt.image.BufferedImage
 import java.io.File
-import java.lang.Float.min
+import java.io.IOException
 
 private const val OUTPUT_NAME = "output_0"
 
@@ -32,49 +32,36 @@ private const val OUTPUT_NAME = "output_0"
  *
  * @param internalModel model used to make predictions
  */
-public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceModel) : InferenceModel by internalModel {
+public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceModel) :
+    SinglePoseDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+
+    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+        get() = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
+            }
+            .convert { colorMode = ColorMode.RGB }
+            .toFloatArray { }
+            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
+
+    override val outputName: String = OUTPUT_NAME
+    override val keyPointsLabels: Map<Int, String> = keyPoints
+    override val edgeKeyPoints: List<Pair<Int, Int>> = edgeKeyPointsPairs
+
     /**
      * Constructs the pose detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String): this(OnnxInferenceModel(pathToModel))
+    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
 
-    public fun detectPose(inputData: FloatArray): DetectedPose {
-        val rawPrediction = internalModel.predictRaw(inputData)
-        val rawPoseLandMarks = (rawPrediction[OUTPUT_NAME] as Array<Array<Array<FloatArray>>>)[0][0]
-
-        val foundPoseLandmarks = mutableListOf<PoseLandmark>()
-        for (i in rawPoseLandMarks.indices) {
-            val poseLandmark = PoseLandmark(
-                poseLandmarkLabel = keyPoints[i]!!,
-                x = rawPoseLandMarks[i][1],
-                y = rawPoseLandMarks[i][0],
-                probability = rawPoseLandMarks[i][2]
-            )
-            foundPoseLandmarks.add(i, poseLandmark)
-        }
-
-        val foundPoseEdges = buildPoseEdges(foundPoseLandmarks)
-
-        return DetectedPose(foundPoseLandmarks, foundPoseEdges)
-    }
-
+    /**
+     * Detects a pose for the given [imageFile].
+     * @param [imageFile] file containing an input image
+     */
+    @Throws(IOException::class)
     public fun detectPose(imageFile: File): DetectedPose {
-        val height = inputDimensions[0]
-        val width = inputDimensions[1]
-
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                    outputHeight = height.toInt()
-                    outputWidth = width.toInt()
-                }
-            .convert { colorMode = ColorMode.RGB }
-            .toFloatArray {  }
-            .call(ONNXModels.PoseDetection.MoveNetSinglePoseLighting.preprocessor)
-
-        val data = preprocessing.fileLoader().load(imageFile).first
-
-        return this.detectPose(data)
+        return detectPose(ImageConverter.toBufferedImage(imageFile))
     }
 
     override fun copy(
@@ -84,23 +71,6 @@ public class SinglePoseDetectionModel(private val internalModel: OnnxInferenceMo
     ): SinglePoseDetectionModel {
         return SinglePoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
-}
-
-internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>): List<PoseEdge> {
-    val foundPoseEdges = mutableListOf<PoseEdge>()
-    edgeKeyPointsPairs.forEach {
-        val startPoint = foundPoseLandmarks[it.first]
-        val endPoint = foundPoseLandmarks[it.second]
-        foundPoseEdges.add(
-            PoseEdge(
-                poseEdgeLabel = startPoint.poseLandmarkLabel + "_" + endPoint.poseLandmarkLabel,
-                probability = min(startPoint.probability, endPoint.probability),
-                start = startPoint,
-                end = endPoint
-            )
-        )
-    }
-    return foundPoseEdges
 }
 
 /**
