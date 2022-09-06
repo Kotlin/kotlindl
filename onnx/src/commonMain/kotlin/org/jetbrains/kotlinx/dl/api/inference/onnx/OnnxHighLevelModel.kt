@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  * @param [I] input type
  * @param [R] output type
  */
-public interface OnnxPreTrainedModel<I, R> {
+public interface OnnxHighLevelModel<I, R> {
     /**
      * Model used to make predictions.
      */

@@ -6,12 +6,12 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
 
 /**
  * Base class for face alignment models.
  */
-public abstract class FaceAlignmentModelBase<I> : OnnxPreTrainedModel<I, List<Landmark>> {
+public abstract class FaceAlignmentModelBase<I> : OnnxHighLevelModel<I, List<Landmark>> {
     /**
      * Name of the output tensor.
      */

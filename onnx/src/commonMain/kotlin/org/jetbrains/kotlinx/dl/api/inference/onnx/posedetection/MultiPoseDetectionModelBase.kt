@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 /**
  * Base class for pose detection models for detecting multiple poses per image.
  */
-public abstract class MultiPoseDetectionModelBase<I> : OnnxPreTrainedModel<I, MultiPoseDetectionResult> {
+public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, MultiPoseDetectionResult> {
     /**
      * Name of the output tensor.
      */

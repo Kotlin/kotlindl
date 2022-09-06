@@ -6,12 +6,12 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
 
 /**
  * Base class for object detection models.
  */
-public abstract class ObjectDetectionModelBase<I> : OnnxPreTrainedModel<I, List<DetectedObject>> {
+public abstract class ObjectDetectionModelBase<I> : OnnxHighLevelModel<I, List<DetectedObject>> {
     /**
      * Class labels from the dataset used for training.
      */

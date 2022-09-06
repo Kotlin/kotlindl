@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxPreTrainedModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
@@ -14,7 +14,7 @@ import kotlin.math.min
 /**
  * Base class for pose detection models for detecting a single pose per image.
  */
-public abstract class SinglePoseDetectionModelBase<I> : OnnxPreTrainedModel<I, DetectedPose> {
+public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, DetectedPose> {
 
     /**
      * Name of the output tensor.
