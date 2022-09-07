@@ -58,7 +58,7 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
             .toFloatArray { }
             .call(ONNXModels.ObjectDetection.SSD.preprocessor)
 
-    override val classLabels: Map<Int, String> = Coco(CocoVersion.V2014).labels
+    override val classLabels: Map<Int, String> = Coco.V2014.labels()
 
     /**
      * Constructs the object detection model from a given path.
@@ -79,6 +79,30 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
     }
+
+    // TODO remove code duplication due to different type of class labels array
+    override fun convert(output: Map<String, Any>): List<DetectedObject> {
+        val boxes = (output[metadata.outputBoxesName] as Array<Array<FloatArray>>)[0]
+        val classIndices = (output[metadata.outputClassesName] as Array<LongArray>)[0]
+        val probabilities = (output[metadata.outputScoresName] as Array<FloatArray>)[0]
+        val numberOfFoundObjects = boxes.size
+
+        val foundObjects = mutableListOf<DetectedObject>()
+        for (i in 0 until numberOfFoundObjects) {
+            val detectedObject = DetectedObject(
+                classLabel = if (classIndices[i].toInt() in classLabels.keys) classLabels[classIndices[i].toInt()]!! else "Unknown",
+                probability = probabilities[i],
+                // left, bot, right, top
+                xMin = boxes[i][metadata.xMinIdx],
+                yMin = boxes[i][metadata.yMinIdx],
+                xMax = boxes[i][metadata.xMinIdx + 2],
+                yMax = boxes[i][metadata.yMinIdx + 2]
+            )
+            foundObjects.add(detectedObject)
+        }
+        return foundObjects
+    }
+
 
     override fun copy(
         copiedModelName: String?,

@@ -2,6 +2,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
 import android.graphics.Bitmap
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import org.jetbrains.kotlinx.dl.dataset.Coco
@@ -22,17 +23,17 @@ public class SSDMobileNetObjectDetectionModel(override val internalModel: OnnxIn
     SSDObjectDetectionModelBase<Bitmap>(SSD_MOBILENET_METADATA),
     InferenceModel by internalModel {
 
-    override val classLabels: Map<Int, String> = Coco(V2017, zeroIndexed = true).labels
+    override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 
     private var targetRotation = 0f
+
+    override lateinit var preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
+        private set
 
     public constructor (modelBytes: ByteArray) : this(OnnxInferenceModel(modelBytes)) {
         internalModel.initializeWith(CPU())
         preprocessing = buildPreprocessingPipeline()
     }
-
-    override lateinit var preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
-        private set
 
     public fun setTargetRotation(targetRotation: Float) {
         if (this.targetRotation == targetRotation) return

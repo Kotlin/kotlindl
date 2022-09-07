@@ -46,7 +46,7 @@ public class EfficientDetObjectDetectionModel(override val internalModel: OnnxIn
             // model is quite sensitive for this
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
-    override val classLabels: Map<Int, String> = Coco(V2017).labels
+    override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = false)
 
     /**
      * Constructs the object detection model from a given path.

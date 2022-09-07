@@ -55,7 +55,7 @@ public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: Onnx
             .toFloatArray { }
             .call(ONNXModels.ObjectDetection.SSDMobileNetV1.preprocessor)
 
-    override val classLabels: Map<Int, String> = Coco(V2017).labels
+    override val classLabels: Map<Int, String> = Coco.V2017.labels()
 
     /**
      * Constructs the object detection model from a given path.

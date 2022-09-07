@@ -68,8 +68,7 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
 /**
  * Base class for object detection model based on SSD architecture.
  */
-public abstract class SSDObjectDetectionModelBase<I>(private val metadata: SSDModelMetadata) : ObjectDetectionModelBase<I>() {
-
+public abstract class SSDObjectDetectionModelBase<I>(protected val metadata: SSDModelMetadata) : ObjectDetectionModelBase<I>() {
     override fun convert(output: Map<String, Any>): List<DetectedObject> {
         val boxes = (output[metadata.outputBoxesName] as Array<Array<FloatArray>>)[0]
         val classIndices = (output[metadata.outputClassesName] as Array<FloatArray>)[0]
