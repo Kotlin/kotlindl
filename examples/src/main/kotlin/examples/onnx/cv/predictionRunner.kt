@@ -55,7 +55,7 @@ fun runImageRecognitionPrediction(
     }
 
     return if (executionProviders.isNotEmpty()) {
-        model.inferAndCloseUsing(executionProviders) { inference(it) }
+        model.inferAndCloseUsing(*executionProviders.toTypedArray()) { inference(it) }
     } else {
         model.use { inference(it) }
     }

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
+import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
@@ -14,7 +15,7 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  * @param [I] input type
  * @param [R] output type
  */
-public interface OnnxHighLevelModel<I, R> {
+public interface OnnxHighLevelModel<I, R> : AutoCloseable, ExecutionProviderCompatible {
     /**
      * Model used to make predictions.
      */
@@ -37,5 +38,9 @@ public interface OnnxHighLevelModel<I, R> {
         val preprocessedInput = preprocessing.apply(input)
         val output = internalModel.predictRaw(preprocessedInput.first)
         return convert(output)
+    }
+
+    override fun initializeWith(vararg executionProviders: ExecutionProvider) {
+        internalModel.initializeWith(*executionProviders)
     }
 }

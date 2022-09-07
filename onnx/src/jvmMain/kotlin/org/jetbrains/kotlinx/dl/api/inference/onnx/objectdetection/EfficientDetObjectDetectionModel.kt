@@ -9,7 +9,8 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategories
+import org.jetbrains.kotlinx.dl.dataset.Coco
+import org.jetbrains.kotlinx.dl.dataset.CocoVersion.V2017
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -45,7 +46,7 @@ public class EfficientDetObjectDetectionModel(override val internalModel: OnnxIn
             // model is quite sensitive for this
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
-    override val classLabels: Map<Int, String> = cocoCategories
+    override val classLabels: Map<Int, String> = Coco(V2017).labels
 
     /**
      * Constructs the object detection model from a given path.

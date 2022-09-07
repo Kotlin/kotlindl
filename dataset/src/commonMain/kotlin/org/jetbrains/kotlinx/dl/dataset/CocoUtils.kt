@@ -3,7 +3,23 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.dataset.handler
+package org.jetbrains.kotlinx.dl.dataset
+
+public class Coco(public val version: CocoVersion, zeroIndexed: Boolean = false) {
+    public val labels: Map<Int, String> = when (version) {
+        CocoVersion.V2014 -> if (zeroIndexed) toZeroIndexed(cocoCategories2014) else cocoCategories2014
+        CocoVersion.V2017 -> if (zeroIndexed) toZeroIndexed(cocoCategories2017) else cocoCategories2017
+    }
+
+    private fun toZeroIndexed(labels: Map<Int, String>) : Map<Int, String> {
+        val zeroIndexedLabels = mutableMapOf<Int, String>()
+        labels.forEach { (key, value) ->
+            zeroIndexedLabels[key - 1] = value
+        }
+        return zeroIndexedLabels
+    }
+}
+
 
 /**
  * 80 object categories in COCO dataset.
@@ -14,7 +30,7 @@ package org.jetbrains.kotlinx.dl.dataset.handler
  * @see <a href="https://cocodataset.org/#home">
  *     COCO dataset</a>
  */
-public val cocoCategoriesForSSD: Map<Int, String> = mapOf(
+public val cocoCategories2014: Map<Int, String> = mapOf(
     1 to "person",
     2 to "bicycle",
     3 to "car",
@@ -104,7 +120,7 @@ public val cocoCategoriesForSSD: Map<Int, String> = mapOf(
  * @see <a href="https://cocodataset.org/#home">
  *     COCO dataset</a>
  */
-public val cocoCategories: Map<Int, String> = mapOf(
+public val cocoCategories2017: Map<Int, String> = mapOf(
     1 to "person",
     2 to "bicycle",
     3 to "car",
@@ -186,3 +202,9 @@ public val cocoCategories: Map<Int, String> = mapOf(
     89 to "hair drier",
     90 to "toothbrush"
 )
+
+
+public enum class CocoVersion {
+    V2014,
+    V2017
+}

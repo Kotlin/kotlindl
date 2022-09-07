@@ -39,6 +39,9 @@ kotlin {
             }
         }
         androidMain {
+            dependencies {
+                api 'com.microsoft.onnxruntime:onnxruntime-mobile:latest.release'
+            }
         }
     }
     explicitApiWarning()
