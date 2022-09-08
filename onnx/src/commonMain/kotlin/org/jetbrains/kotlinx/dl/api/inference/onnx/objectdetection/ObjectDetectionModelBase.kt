@@ -78,7 +78,7 @@ public abstract class SSDObjectDetectionModelBase<I>(protected val metadata: SSD
         val foundObjects = mutableListOf<DetectedObject>()
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
-                classLabel = if (classIndices[i].toInt() in classLabels.keys) classLabels[classIndices[i].toInt()]!! else "Unknown",
+                classLabel = classLabels[classIndices[i].toInt()] ?: "Unknown",
                 probability = probabilities[i],
                 // left, bot, right, top
                 xMin = boxes[i][metadata.xMinIdx],

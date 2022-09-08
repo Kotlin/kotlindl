@@ -20,8 +20,7 @@ private val SSD_MOBILENET_METADATA = SSDModelMetadata(
 
 
 public class SSDMobileNetObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDObjectDetectionModelBase<Bitmap>(SSD_MOBILENET_METADATA),
-    InferenceModel by internalModel {
+    SSDObjectDetectionModelBase<Bitmap>(SSD_MOBILENET_METADATA) {
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 
@@ -45,18 +44,14 @@ public class SSDMobileNetObjectDetectionModel(override val internalModel: OnnxIn
     private fun buildPreprocessingPipeline(): Operation<Bitmap, Pair<FloatArray, TensorShape>> {
         return pipeline<Bitmap>()
             .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
+                outputHeight = internalModel.inputDimensions[0].toInt()
+                outputWidth = internalModel.inputDimensions[1].toInt()
             }
             .rotate { degrees = targetRotation }
             .toFloatArray { layout = TensorLayout.NHWC }
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): SSDMobileNetObjectDetectionModel {
-        return SSDMobileNetObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+    override fun close() {
+        internalModel.close()
     }
 }

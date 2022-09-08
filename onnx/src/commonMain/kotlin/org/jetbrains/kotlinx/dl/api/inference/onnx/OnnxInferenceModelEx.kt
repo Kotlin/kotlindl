@@ -7,26 +7,18 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
  * Convenience extension functions for inference of ONNX models using different execution providers.
  */
 
-public inline fun <reified M : AutoCloseable, R> M.inferAndCloseUsing(
+public inline fun <M : ExecutionProviderCompatible, R> M.inferAndCloseUsing(
     vararg providers: ExecutionProvider,
     block: (M) -> R
 ): R {
-    when (this) {
-        is ExecutionProviderCompatible -> this.initializeWith(*providers)
-        else -> throw IllegalArgumentException("Unsupported model type: ${M::class.simpleName}")
-    }
-
+    this.initializeWith(*providers)
     return this.use(block)
 }
 
-public inline fun <reified M, R> M.inferUsing(
+public inline fun <M : ExecutionProviderCompatible, R> M.inferUsing(
     vararg providers: ExecutionProvider,
     block: (M) -> R
 ): R {
-    when (this) {
-        is ExecutionProviderCompatible -> this.initializeWith(*providers)
-        else -> throw IllegalArgumentException("Unsupported model type: ${M::class.simpleName}")
-    }
-
+    this.initializeWith(*providers)
     return this.run(block)
 }

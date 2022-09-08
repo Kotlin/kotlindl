@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  * @param [I] input type
  * @param [R] output type
  */
-public interface OnnxHighLevelModel<I, R> : AutoCloseable, ExecutionProviderCompatible {
+public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible {
     /**
      * Model used to make predictions.
      */
