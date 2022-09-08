@@ -40,7 +40,7 @@ kotlin {
         }
         androidMain {
             dependencies {
-                api 'com.microsoft.onnxruntime:onnxruntime-mobile:latest.release'
+                api 'com.microsoft.onnxruntime:onnxruntime-mobile:1.11.0'
             }
         }
     }
