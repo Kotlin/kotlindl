@@ -21,7 +21,7 @@ public abstract class FaceAlignmentModelBase<I> : OnnxHighLevelModel<I, List<Lan
         val landMarks = mutableListOf<Landmark>()
         val floats = (output[outputName] as Array<*>)[0] as FloatArray
         for (i in floats.indices step 2) {
-            landMarks.add(Landmark(floats[i], floats[i + 1]))
+            landMarks.add(Landmark((1 + floats[i]) / 2, (1 + floats[i + 1]) / 2))
         }
 
         return landMarks
