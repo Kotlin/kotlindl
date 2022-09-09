@@ -7,34 +7,18 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
  * Convenience extension functions for inference of ONNX models using different execution providers.
  */
 
-public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
+public inline fun <M : ExecutionProviderCompatible, R> M.inferAndCloseUsing(
     vararg providers: ExecutionProvider,
-    block: (OnnxInferenceModel) -> R
+    block: (M) -> R
 ): R {
     this.initializeWith(*providers)
     return this.use(block)
 }
 
-public inline fun <R> OnnxInferenceModel.inferAndCloseUsing(
-    providers: List<ExecutionProvider>,
-    block: (OnnxInferenceModel) -> R
-): R {
-    this.initializeWith(*providers.toTypedArray())
-    return this.use(block)
-}
-
-public inline fun <R> OnnxInferenceModel.inferUsing(
+public inline fun <M : ExecutionProviderCompatible, R> M.inferUsing(
     vararg providers: ExecutionProvider,
-    block: (OnnxInferenceModel) -> R
+    block: (M) -> R
 ): R {
     this.initializeWith(*providers)
-    return this.run(block)
-}
-
-public inline fun <R> OnnxInferenceModel.inferUsing(
-    providers: List<ExecutionProvider>,
-    block: (OnnxInferenceModel) -> R
-): R {
-    this.initializeWith(*providers.toTypedArray())
     return this.run(block)
 }

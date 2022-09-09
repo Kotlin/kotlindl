@@ -9,7 +9,8 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.handler.cocoCategoriesForSSD
+import org.jetbrains.kotlinx.dl.dataset.Coco
+import org.jetbrains.kotlinx.dl.dataset.CocoVersion
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -24,6 +25,8 @@ import java.io.File
 import java.io.IOException
 
 private const val INPUT_SIZE = 1200
+
+private val SSD_RESNET_METADATA = SSDModelMetadata("bboxes", "labels", "scores", 1, 0)
 
 /**
  * Special model class for detection objects on images
@@ -43,7 +46,7 @@ private const val INPUT_SIZE = 1200
  * @since 0.3
  */
 public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDObjectDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+    SSDObjectDetectionModelBase<BufferedImage>(SSD_RESNET_METADATA), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -54,7 +57,8 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
             .call(ONNXModels.ObjectDetection.SSD.preprocessor)
-    override val classLabels: Map<Int, String> = cocoCategoriesForSSD
+
+    override val classLabels: Map<Int, String> = Coco.V2014.labels()
 
     /**
      * Constructs the object detection model from a given path.
@@ -75,6 +79,30 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
     }
+
+    // TODO remove code duplication due to different type of class labels array
+    override fun convert(output: Map<String, Any>): List<DetectedObject> {
+        val boxes = (output[metadata.outputBoxesName] as Array<Array<FloatArray>>)[0]
+        val classIndices = (output[metadata.outputClassesName] as Array<LongArray>)[0]
+        val probabilities = (output[metadata.outputScoresName] as Array<FloatArray>)[0]
+        val numberOfFoundObjects = boxes.size
+
+        val foundObjects = mutableListOf<DetectedObject>()
+        for (i in 0 until numberOfFoundObjects) {
+            val detectedObject = DetectedObject(
+                classLabel = classLabels[classIndices[i].toInt()] ?: "Unknown",
+                probability = probabilities[i],
+                // left, bot, right, top
+                xMin = boxes[i][metadata.xMinIdx],
+                yMin = boxes[i][metadata.yMinIdx],
+                xMax = boxes[i][metadata.xMinIdx + 2],
+                yMax = boxes[i][metadata.yMinIdx + 2]
+            )
+            foundObjects.add(detectedObject)
+        }
+        return foundObjects
+    }
+
 
     override fun copy(
         copiedModelName: String?,

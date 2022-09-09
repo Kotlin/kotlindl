@@ -23,7 +23,8 @@ private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Ca
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel {
+public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel,
+    ExecutionProviderCompatible {
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
@@ -104,7 +105,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      *
      * @param executionProviders list of execution providers to use.
      */
-    public fun initializeWith(vararg executionProviders: ExecutionProvider = arrayOf(CPU(true))) {
+    public override fun initializeWith(vararg executionProviders: ExecutionProvider) {
         val uniqueProviders = collectProviders(executionProviders)
 
         if (::executionProvidersInUse.isInitialized && uniqueProviders == executionProvidersInUse) {
@@ -169,11 +170,13 @@ public open class OnnxInferenceModel private constructor(private val modelSource
             0 -> {
                 uniqueProviders.add(CPU(true))
             }
+
             1 -> {
                 val cpu = uniqueProviders.first { it is CPU }
                 uniqueProviders.remove(cpu)
                 uniqueProviders.add(cpu)
             }
+
             else -> throw IllegalArgumentException("Unable to use CPU(useArena = true) and CPU(useArena = false) at the same time!")
         }
         return uniqueProviders
