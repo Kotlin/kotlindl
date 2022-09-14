@@ -29,7 +29,7 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  * @since 0.2
  */
-public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
+public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
     /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
