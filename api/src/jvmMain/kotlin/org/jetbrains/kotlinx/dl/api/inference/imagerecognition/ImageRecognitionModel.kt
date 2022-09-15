@@ -10,6 +10,7 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
@@ -31,7 +32,7 @@ public class ImageRecognitionModel(
     private val modelType: ModelType<out InferenceModel, out InferenceModel>
 ) : ImageRecognitionModelBase<BufferedImage>(internalModel) {
     /** Class labels for ImageNet dataset. */
-    override val classLabels: Map<Int, String> = loadImageNetClassLabels()
+    override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() {
@@ -88,25 +89,4 @@ public class ImageRecognitionModel(
     ): ImageRecognitionModel {
         return ImageRecognitionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights), modelType)
     }
-}
-
-/** Forms mapping of class label to class name for the ImageNet dataset. */
-public fun loadImageNetClassLabels(): Map<Int, String> {
-    val pathToIndices = "/datasets/vgg/imagenet_class_index.json"
-
-    fun parse(name: String): Any? {
-        val cls = Parser::class.java
-        return cls.getResourceAsStream(name)?.let { inputStream ->
-            return Parser.default().parse(inputStream, Charsets.UTF_8)
-        }
-    }
-
-    val classIndices = parse(pathToIndices) as JsonObject
-
-    val imageNetClassIndices = mutableMapOf<Int, String>()
-
-    for (key in classIndices.keys) {
-        imageNetClassIndices[key.toInt()] = (classIndices[key] as JsonArray<*>)[1].toString()
-    }
-    return imageNetClassIndices
 }

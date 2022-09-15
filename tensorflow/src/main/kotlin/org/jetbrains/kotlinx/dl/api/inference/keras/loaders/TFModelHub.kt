@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -183,7 +183,7 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
 
     /** Forms mapping of class label to class name for the ImageNet dataset. */
     public fun loadClassLabels(): Map<Int, String> {
-        return loadImageNetClassLabels()
+        return Imagenet.V1k.labels()
     }
 
     /**
