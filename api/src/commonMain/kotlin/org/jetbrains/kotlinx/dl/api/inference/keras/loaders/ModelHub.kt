@@ -18,15 +18,9 @@ internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
  *
  * @since 0.2
  */
-public abstract class ModelHub(public val cacheDirectory: File) {
+public abstract class ModelHub {
     /** Url of the model storage. */
     protected val awsS3Url: String = AWS_S3_URL
-
-    init {
-        if (!cacheDirectory.exists()) {
-            Files.createDirectories(cacheDirectory.toPath())
-        }
-    }
 
     /**
      * Loads model configuration without weights.

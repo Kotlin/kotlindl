@@ -7,12 +7,12 @@ package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.inferAndCloseUsing
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -29,8 +29,7 @@ fun runImageRecognitionPrediction(
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val imageNetClassLabels =
-        loadImageNetClassLabels()
+    val imageNetClassLabels = Imagenet.V1k.labels()
 
     val inference: (OnnxInferenceModel) -> List<Pair<String, Float>> = {
         println(it)

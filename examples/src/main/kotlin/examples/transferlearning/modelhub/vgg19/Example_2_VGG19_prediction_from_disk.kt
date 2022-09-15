@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
@@ -45,7 +45,7 @@ fun main() {
     val jsonConfigFile = getVGG19JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
-    val imageNetClassLabels = loadImageNetClassLabels()
+    val imageNetClassLabels = Imagenet.V1k.labels()
 
     model.use {
         it.compile(

@@ -12,10 +12,10 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -39,7 +39,7 @@ fun denseNet121Prediction() {
     val modelType = TFModels.CV.DenseNet121()
     val model = modelHub.loadModel(modelType)
 
-    val imageNetClassLabels = loadImageNetClassLabels()
+    val imageNetClassLabels = Imagenet.V1k.labels()
 
     model.use {
         it.compile(

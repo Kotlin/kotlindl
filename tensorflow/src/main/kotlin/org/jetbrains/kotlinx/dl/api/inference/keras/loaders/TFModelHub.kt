@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -29,7 +29,7 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  * @since 0.2
  */
-public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
+public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
     /** Logger for modelZoo model. */
     private val logger: KLogger = KotlinLogging.logger {}
 
@@ -183,7 +183,7 @@ public class TFModelHub(cacheDirectory: File) : ModelHub(cacheDirectory) {
 
     /** Forms mapping of class label to class name for the ImageNet dataset. */
     public fun loadClassLabels(): Map<Int, String> {
-        return loadImageNetClassLabels()
+        return Imagenet.V1k.labels()
     }
 
     /**

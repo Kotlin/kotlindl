@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.EfficientDetObjectDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDMobileNetV1ObjectDetectionModel
@@ -944,16 +943,6 @@ public object ONNXModels {
             }
         }
     }
-}
-
-/**
- * Base type for [OnnxInferenceModel].
- */
-public interface OnnxModelType<T : InferenceModel, U : InferenceModel> : ModelType<T, U> {
-    /**
-     * Shape of the input accepted by this model, without batch size.
-     */
-    public val inputShape: LongArray? get() = null
 }
 
 internal fun resNetOnnxPreprocessing(): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {

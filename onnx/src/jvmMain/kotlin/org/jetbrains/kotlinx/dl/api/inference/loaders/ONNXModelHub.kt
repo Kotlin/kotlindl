@@ -32,8 +32,7 @@ private const val NO_TOP_PREFIX = "-notop"
  *
  * @since 0.3
  */
-public class ONNXModelHub(cacheDirectory: File) :
-    ModelHub(cacheDirectory) {
+public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
 
     /** Logger. */
     private val logger: KLogger = KotlinLogging.logger {}

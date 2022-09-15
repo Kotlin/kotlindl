@@ -7,10 +7,10 @@ package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.loadImageNetClassLabels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import java.io.File
 
 fun runONNXImageRecognitionPrediction(
@@ -20,7 +20,7 @@ fun runONNXImageRecognitionPrediction(
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
-    val imageNetClassLabels = loadImageNetClassLabels()
+    val imageNetClassLabels = Imagenet.V1k.labels()
 
     model.use {
         println(it)
