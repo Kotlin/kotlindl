@@ -17,24 +17,36 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
 
+/**
+ * Create a component with the given [bufferedImage] and [detectedObjects] drawn on top of it.
+ */
 fun createDetectedObjectsPanel(bufferedImage: BufferedImage,
                                detectedObjects: List<DetectedObject>
 ) = createImagePanel(bufferedImage) {
     drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
 }
 
+/**
+ * Create a component with the given [bufferedImage] and [detectedPose] drawn on top of it.
+ */
 fun createDetectedPosePanel(bufferedImage: BufferedImage,
                             detectedPose: DetectedPose
 ) = createImagePanel(bufferedImage) {
     drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
 }
 
+/**
+ * Create a component with the given [bufferedImage] and [multiPoseDetectionResult] drawn on top of it.
+ */
 fun createMultipleDetectedPosesPanel(bufferedImage: BufferedImage,
                                      multiPoseDetectionResult: MultiPoseDetectionResult
 ) = createImagePanel(bufferedImage) {
     drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
 }
 
+/**
+ * Create a component with the given [bufferedImage] and [landmarks] drawn on top of it.
+ */
 fun createDetectedLandmarksPanel(bufferedImage: BufferedImage, landmarks: List<Landmark>
 ) = createImagePanel(bufferedImage) {
     drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
