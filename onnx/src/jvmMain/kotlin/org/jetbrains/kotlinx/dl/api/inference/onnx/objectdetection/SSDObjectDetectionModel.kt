@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Coco
-import org.jetbrains.kotlinx.dl.dataset.CocoVersion
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -26,7 +25,7 @@ import java.io.IOException
 
 private const val INPUT_SIZE = 1200
 
-private val SSD_RESNET_METADATA = SSDModelMetadata("bboxes", "labels", "scores", 1, 0)
+private val SSD_RESNET_METADATA = SSDLikeModelMetadata("bboxes", "labels", "scores", 1, 0)
 
 /**
  * Special model class for detection objects on images
@@ -46,7 +45,7 @@ private val SSD_RESNET_METADATA = SSDModelMetadata("bboxes", "labels", "scores",
  * @since 0.3
  */
 public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDObjectDetectionModelBase<BufferedImage>(SSD_RESNET_METADATA), InferenceModel by internalModel {
+    SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

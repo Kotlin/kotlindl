@@ -15,7 +15,7 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      * Loads ONNX model from android resources.
      * By default, the model is initialized with [ExecutionProvider.CPU] execution provider.
      *
-     * @param [modelType] model type from [OnnxModels]
+     * @param [modelType] model type from [ONNXModels]
      * @param [executionProviders] execution providers for model initialization.
      */
     @Suppress("UNCHECKED_CAST")

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModelBase
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ExecutionProviderCompatible
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
@@ -19,8 +20,8 @@ public open class ImageRecognitionModel(
     internalModel: OnnxInferenceModel,
     private val modelType: ModelType<out InferenceModel, out InferenceModel>,
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
-) : ImageRecognitionModelBase<Bitmap>(internalModel), ExecutionProviderCompatible {
-    protected var targetRotationDegrees: Float = 0.0f
+) : ImageRecognitionModelBase<Bitmap>(internalModel), ExecutionProviderCompatible, CameraXCompatibleModel {
+    override var targetRotation: Float = 0f
 
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() {
@@ -34,15 +35,10 @@ public open class ImageRecognitionModel(
                     outputHeight = height.toInt()
                     outputWidth = width.toInt()
                 }
-                .rotate { degrees = targetRotationDegrees }
+                .rotate { degrees = targetRotation }
                 .toFloatArray { layout = if (modelType.channelsFirst) TensorLayout.NCHW else TensorLayout.NHWC }
                 .call(modelType.preprocessor)
         }
-
-    public fun setTargetRotation(targetRotation: Float) {
-        if (this.targetRotationDegrees == targetRotation) return
-        this.targetRotationDegrees = targetRotation
-    }
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {
         (internalModel as OnnxInferenceModel).initializeWith(*executionProviders)

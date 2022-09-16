@@ -11,6 +11,8 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import kotlin.math.min
 
+private const val OUTPUT_NAME = "output_0"
+
 /**
  * Base class for pose detection models for detecting a single pose per image.
  */
@@ -19,17 +21,17 @@ public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, De
     /**
      * Name of the output tensor.
      */
-    protected abstract val outputName: String
+    protected val outputName: String = OUTPUT_NAME
 
     /**
      * Dictionary that maps from joint names to keypoint indices.
      */
-    protected abstract val keyPointsLabels: Map<Int, String>
+    protected val keyPointsLabels: Map<Int, String> = keyPoints
 
     /**
      * Pairs of points which define body edges.
      */
-    protected abstract val edgeKeyPoints: List<Pair<Int, Int>>
+    protected val edgeKeyPoints: List<Pair<Int, Int>> = edgeKeyPointsPairs
 
     override fun convert(output: Map<String, Any>): DetectedPose {
         val rawPoseLandMarks = (output[outputName] as Array<Array<Array<FloatArray>>>)[0][0]
@@ -73,3 +75,50 @@ internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>, edgeKeyPoint
     }
     return foundPoseEdges
 }
+
+/**
+ * Dictionary that maps from joint names to keypoint indices.
+ */
+public val keyPoints: Map<Int, String> = mapOf(
+    0 to "nose",
+    1 to "left_eye",
+    2 to "right_eye",
+    3 to "left_ear",
+    4 to "right_ear",
+    5 to "left_shoulder",
+    6 to "right_shoulder",
+    7 to "left_elbow",
+    8 to "right_elbow",
+    9 to "left_wrist",
+    10 to "right_wrist",
+    11 to "left_hip",
+    12 to "right_hip",
+    13 to "left_knee",
+    14 to "right_knee",
+    15 to "left_ankle",
+    16 to "right_ankle"
+)
+
+/**
+ * Pair of points which define body edges.
+ */
+public val edgeKeyPointsPairs: List<Pair<Int, Int>> = listOf(
+    Pair(0, 1),
+    Pair(0, 2),
+    Pair(1, 3),
+    Pair(2, 4),
+    Pair(0, 5),
+    Pair(0, 6),
+    Pair(5, 7),
+    Pair(7, 9),
+    Pair(6, 8),
+    Pair(8, 10),
+    Pair(5, 6),
+    Pair(5, 11),
+    Pair(6, 12),
+    Pair(11, 12),
+    Pair(11, 13),
+    Pair(13, 15),
+    Pair(12, 14),
+    Pair(14, 16)
+)
