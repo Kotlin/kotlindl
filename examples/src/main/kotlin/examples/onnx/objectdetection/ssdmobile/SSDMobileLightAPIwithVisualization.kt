@@ -7,10 +7,10 @@ package examples.onnx.objectdetection.ssdmobile
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
@@ -18,7 +18,8 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
-import org.jetbrains.kotlinx.dl.visualization.swing.drawDetectedObjects
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedObjectsPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -29,42 +30,23 @@ import java.io.File
  * - The detected rectangles related to the objects are drawn on the images used for prediction.
  */
 fun main() {
-    val modelHub =
-        ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSDMobileNetV1.pretrainedModel(modelHub)
 
     model.use { detectionModel ->
         println(detectionModel)
 
-        val imageFile = getFileFromResource("datasets/vgg/image9.jpg")
-        val detectedObjects =
-            detectionModel.detectObjects(imageFile = imageFile, topK = 50)
+        val file = getFileFromResource("datasets/vgg/image9.jpg")
+        val image = ImageConverter.toBufferedImage(file)
+        val detectedObjects = detectionModel.detectObjects(image, topK = 50)
 
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        visualise(imageFile, detectedObjects)
+        val displayedImage = pipeline<BufferedImage>()
+            .resize { outputWidth = 1200; outputHeight = ((1200f / image.width) * image.height).toInt() }
+            .apply(image)
+        showFrame("Detection result for ${file.name}", createDetectedObjectsPanel(displayedImage, detectedObjects))
     }
 }
-
-private fun visualise(
-    imageFile: File,
-    detectedObjects: List<DetectedObject>
-) {
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputWidth = 1000
-            outputHeight = 1000
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .rescale {
-            scalingCoefficient = 255f
-        }
-
-    val (rawImage, shape) = preprocessing.fileLoader().load(imageFile)
-
-    drawDetectedObjects(rawImage, shape.toImageShape(), detectedObjects)
-}
-

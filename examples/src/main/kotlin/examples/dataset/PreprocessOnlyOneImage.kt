@@ -13,11 +13,12 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import javax.swing.JFrame
 
 /**
  * This example shows how to do image preprocessing using preprocessing DSL for only one image.
@@ -67,10 +68,5 @@ fun main() {
         isNormalized = true
     )
 
-    val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(bufferedImage))
-    frame.pack()
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Filters", ImagePanel(bufferedImage))
 }

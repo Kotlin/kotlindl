@@ -8,27 +8,27 @@ package examples.onnx.objectdetection.efficientdet
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedObjectsPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.io.File
 
 fun main() {
-    val modelHub =
-        ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.EfficientDetD2.pretrainedModel(modelHub)
 
     model.use { detectionModel ->
         println(detectionModel)
         detectionModel.reshape(1300, 900, 3)
 
-        val imageFile = getFileFromResource("datasets/detection/image3.jpg")
-        val detectedObjects =
-            detectionModel.detectObjects(imageFile = imageFile)
+        val file = getFileFromResource("datasets/detection/image3.jpg")
+        val image = ImageConverter.toBufferedImage(file)
+        val detectedObjects = detectionModel.detectObjects(image)
 
         detectedObjects.forEach {
             println("Found ${it.classLabel} with probability ${it.probability}")
         }
 
-        visualise(imageFile, detectedObjects, detectionModel.inputDimensions)
+        showFrame("Detection result for ${file.name}", createDetectedObjectsPanel(image, detectedObjects))
     }
 }
-
-

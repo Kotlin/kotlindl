@@ -16,10 +16,11 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.EmptyLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.nio.file.Paths
-import javax.swing.JFrame
 
 /**
  * This example shows how to do image preprocessing from scratch using preprocessing DSL.
@@ -58,8 +59,6 @@ fun main() {
 
     val rawImage = batchIter.next().x[2]
 
-    val frame = JFrame("Filters")
-
     val image = ImageConverter.floatArrayToBufferedImage(
         rawImage,
         preprocessing.getOutputShape(TensorShape(-1, -1, 3)).toImageShape(),
@@ -67,9 +66,5 @@ fun main() {
         isNormalized = true
     )
 
-    frame.contentPane.add(ImagePanel(image))
-    frame.pack()
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Filters", ImagePanel(image))
 }
