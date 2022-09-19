@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
 import android.graphics.Bitmap
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
@@ -23,7 +24,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
  * @param internalModel model used to make predictions
  */
 public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SinglePoseDetectionModelBase<Bitmap>(), InferenceModel by internalModel {
+    SinglePoseDetectionModelBase<Bitmap>(), InferenceModel by internalModel, CameraXCompatibleModel {
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
             .resize {
@@ -33,7 +34,7 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
             .rotate { degrees = targetRotation }
             .toFloatArray { layout = TensorLayout.NHWC }
 
-    private var targetRotation = 0f
+    override var targetRotation: Float = 0f
 
     /**
      * Constructs the pose detection model from a model bytes.
