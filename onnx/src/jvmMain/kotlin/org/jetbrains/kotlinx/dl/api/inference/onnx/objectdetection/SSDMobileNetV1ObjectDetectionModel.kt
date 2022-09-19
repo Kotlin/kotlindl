@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Coco
-import org.jetbrains.kotlinx.dl.dataset.CocoVersion.V2017
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
@@ -25,7 +24,7 @@ import java.io.File
 import java.io.IOException
 
 
-private val SSD_MOBILENET_METADATA = SSDModelMetadata(
+private val SSD_MOBILENET_METADATA = SSDLikeModelMetadata(
     "detection_boxes:0",
     "detection_classes:0",
     "detection_scores:0",
@@ -43,7 +42,7 @@ private val SSD_MOBILENET_METADATA = SSDModelMetadata(
  * @since 0.4
  */
 public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDObjectDetectionModelBase<BufferedImage>(SSD_MOBILENET_METADATA), InferenceModel by internalModel {
+    SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
