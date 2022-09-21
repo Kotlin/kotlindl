@@ -16,12 +16,17 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionRe
 
 /**
  * Draw given [detectedObject] on the [Canvas] using [paint] for the bounding box and [labelPaint] for the label.
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
  */
 fun Canvas.drawObject(
     detectedObject: DetectedObject,
-    bounds: PreviewImageBounds,
     paint: Paint,
-    labelPaint: TextPaint
+    labelPaint: TextPaint,
+    bounds: PreviewImageBounds = bounds()
 ) {
     val rect = RectF(
         bounds.toViewX(detectedObject.xMin), bounds.toViewY(detectedObject.yMin),
@@ -37,25 +42,35 @@ fun Canvas.drawObject(
 
 /**
  * Draw given [detectedObjects] on the [Canvas] using [paint] for the bounding box and [labelPaint] for the label.
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
  */
 fun Canvas.drawObjects(
     detectedObjects: List<DetectedObject>,
-    bounds: PreviewImageBounds,
     paint: Paint,
-    labelPaint: TextPaint
+    labelPaint: TextPaint,
+    bounds: PreviewImageBounds = bounds()
 ) {
-    detectedObjects.forEach { drawObject(it, bounds, paint, labelPaint) }
+    detectedObjects.forEach { drawObject(it, paint, labelPaint, bounds) }
 }
 
 /**
  * Draw given [detectedPose] on the [Canvas] using [landmarkPaint] and [landmarkRadius] for the pose vertices,
  * and [edgePaint] for the pose edges.
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
  */
 fun Canvas.drawPose(
     detectedPose: DetectedPose,
-    bounds: PreviewImageBounds,
-    landmarkPaint: Paint, edgePaint: Paint,
-    landmarkRadius: Float
+    landmarkPaint: Paint,
+    edgePaint: Paint, landmarkRadius: Float,
+    bounds: PreviewImageBounds = bounds()
 ) {
     detectedPose.edges.forEach { edge ->
         drawLine(
@@ -73,30 +88,45 @@ fun Canvas.drawPose(
 /**
  * Draw given [detectedPoses] on the [Canvas] using [landmarkPaint] and [landmarkRadius] for the pose vertices,
  * [edgePaint] for the poses edges, [objectPaint] for the bounding box and [labelPaint] for the label.
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
  */
 fun Canvas.drawMultiplePoses(
     detectedPoses: MultiPoseDetectionResult,
-    bounds: PreviewImageBounds,
     landmarkPaint: Paint,
     edgePaint: Paint,
     objectPaint: Paint,
     labelPaint: TextPaint,
-    landmarkRadius: Float
+    landmarkRadius: Float,
+    bounds: PreviewImageBounds = bounds()
 ) {
     detectedPoses.multiplePoses.forEach { (detectedObject, detectedPose) ->
-        drawPose(detectedPose, bounds, landmarkPaint, edgePaint, landmarkRadius)
-        drawObject(detectedObject, bounds, objectPaint, labelPaint)
+        drawPose(detectedPose, landmarkPaint, edgePaint, landmarkRadius, bounds)
+        drawObject(detectedObject, objectPaint, labelPaint, bounds)
     }
 }
 
 /**
  * Draw given [landmarks] on the [Canvas] using [paint] and [radius].
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
  */
 fun Canvas.drawLandmarks(landmarks: List<Landmark>,
-                         bounds: PreviewImageBounds,
-                         paint: Paint, radius: Float
+                         paint: Paint, radius: Float,
+                         bounds: PreviewImageBounds = bounds()
 ) {
     landmarks.forEach { landmark ->
         drawCircle(bounds.toViewX(landmark.xRate), bounds.toViewY(landmark.yRate), radius, paint)
     }
 }
+
+/**
+ * Create [PreviewImageBounds] originating in the top-left corner of this [Canvas] object and matching its dimensions.
+ */
+fun Canvas.bounds() = PreviewImageBounds(0f, 0f, width.toFloat(), height.toFloat())
