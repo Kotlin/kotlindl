@@ -36,7 +36,7 @@ fun Canvas.drawObject(
 
     drawRect(rect, Paint(paint).apply { strokeWidth = frameWidth })
 
-    val label = "${detectedObject.classLabel} : " + "%.2f".format(detectedObject.probability)
+    val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
     drawText(label, rect.left, rect.top - labelPaint.fontMetrics.descent - frameWidth / 2, labelPaint)
 }
 
@@ -80,7 +80,7 @@ fun Canvas.drawPose(
         )
     }
 
-    detectedPose.poseLandmarks.forEach { landmark ->
+    detectedPose.landmarks.forEach { landmark ->
         drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), landmarkRadius, landmarkPaint)
     }
 }
@@ -103,7 +103,7 @@ fun Canvas.drawMultiplePoses(
     landmarkRadius: Float,
     bounds: PreviewImageBounds = bounds()
 ) {
-    detectedPoses.multiplePoses.forEach { (detectedObject, detectedPose) ->
+    detectedPoses.poses.forEach { (detectedObject, detectedPose) ->
         drawPose(detectedPose, landmarkPaint, edgePaint, landmarkRadius, bounds)
         drawObject(detectedObject, objectPaint, labelPaint, bounds)
     }
@@ -122,7 +122,7 @@ fun Canvas.drawLandmarks(landmarks: List<Landmark>,
                          bounds: PreviewImageBounds = bounds()
 ) {
     landmarks.forEach { landmark ->
-        drawCircle(bounds.toViewX(landmark.xRate), bounds.toViewY(landmark.yRate), radius, paint)
+        drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), radius, paint)
     }
 }
 

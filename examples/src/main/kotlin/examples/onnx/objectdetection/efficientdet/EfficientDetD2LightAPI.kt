@@ -23,7 +23,7 @@ fun main() {
             detectionModel.detectObjects(imageFile = imageFile)
 
         detectedObjects.forEach {
-            println("Found ${it.classLabel} with probability ${it.probability}")
+            println("Found ${it.label} with probability ${it.probability}")
         }
     }
 }

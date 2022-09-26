@@ -63,22 +63,22 @@ fun multiPoseDetectionMoveNet() {
 
             for (keyPointIdx in 0..16) {
                 val poseLandmark = PoseLandmark(
-                    poseLandmarkLabel = "",
                     x = floats[3 * keyPointIdx + 1],
                     y = floats[3 * keyPointIdx],
-                    probability = floats[3 * keyPointIdx + 2]
+                    probability = floats[3 * keyPointIdx + 2],
+                    label = ""
                 )
                 foundPoseLandmarks.add(poseLandmark)
             }
 
             // [ymin, xmin, ymax, xmax, score]
             val detectedObject = DetectedObject(
-                classLabel = "person",
-                probability = probability,
-                yMin = floats[51],
                 xMin = floats[52],
+                xMax = floats[54],
+                yMin = floats[51],
                 yMax = floats[53],
-                xMax = floats[54]
+                probability = probability,
+                label = "person"
             )
             val detectedPose = DetectedPose(foundPoseLandmarks, emptyList())
 

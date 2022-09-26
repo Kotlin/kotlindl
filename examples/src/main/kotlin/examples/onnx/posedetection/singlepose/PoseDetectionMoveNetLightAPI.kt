@@ -36,12 +36,12 @@ fun poseDetectionMoveNetLightAPI() {
             val image = ImageConverter.toBufferedImage(file)
             val detectedPose = poseDetectionModel.detectPose(image)
 
-            detectedPose.poseLandmarks.forEach {
-                println("Found ${it.poseLandmarkLabel} with probability ${it.probability}")
+            detectedPose.landmarks.forEach {
+                println("Found ${it.label} with probability ${it.probability}")
             }
 
             detectedPose.edges.forEach {
-                println("The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
+                println("The ${it.label} starts at ${it.start.label} and ends with ${it.end.label}")
             }
 
             result[image] = detectedPose

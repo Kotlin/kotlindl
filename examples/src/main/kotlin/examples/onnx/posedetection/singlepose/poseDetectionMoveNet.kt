@@ -82,10 +82,10 @@ fun poseDetectionMoveNet() {
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()
         for (i in rawPoseLandMarks.indices) {
             val poseLandmark = PoseLandmark(
-                poseLandmarkLabel = keypoints[i]!!,
                 x = rawPoseLandMarks[i][1],
                 y = rawPoseLandMarks[i][0],
-                probability = rawPoseLandMarks[i][2]
+                probability = rawPoseLandMarks[i][2],
+                label = keypoints[i]!!
             )
             foundPoseLandmarks.add(i, poseLandmark)
         }

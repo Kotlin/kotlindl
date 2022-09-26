@@ -68,7 +68,7 @@ private fun Graphics2D.drawObject(detectedObject: DetectedObject,
     stroke = BasicStroke(frameWidth)
     draw(Rectangle2D.Float(x, y, detectedObject.xMax * width - x, detectedObject.yMax * height - y))
 
-    val label = "${detectedObject.classLabel} : " + "%.2f".format(detectedObject.probability)
+    val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
     color = labelColor
     font = font.deriveFont(Font.BOLD)
     drawString(label, x, y - fontMetrics.maxDescent - frameWidth / 2)
@@ -98,7 +98,7 @@ private fun Graphics2D.drawPose(detectedPose: DetectedPose, width: Int, height: 
 
     val r = 3.0f
     color = landmarkColor
-    detectedPose.poseLandmarks.forEach { landmark ->
+    detectedPose.landmarks.forEach { landmark ->
         fill(Ellipse2D.Float(width * landmark.x - r, height * landmark.y - r, 2 * r, 2 * r))
     }
 }
@@ -108,7 +108,7 @@ private fun Graphics2D.drawMultiplePoses(multiPoseDetectionResult1: MultiPoseDet
                                          height: Int
 ) {
     setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    multiPoseDetectionResult1.multiplePoses.forEachIndexed { i, (detectedObject, detectedPose) ->
+    multiPoseDetectionResult1.poses.forEachIndexed { i, (detectedObject, detectedPose) ->
         drawPose(
             detectedPose, width, height,
             Color((6 - i) * 40, i * 20, i * 10),
@@ -125,6 +125,6 @@ private fun Graphics2D.drawLandmarks(landmarks: List<Landmark>, width: Int, heig
     val r = 3.0f
     color = Color.RED
     landmarks.forEach { landmark ->
-        fill(Ellipse2D.Float(width * landmark.xRate - r, height * landmark.yRate - r, 2 * r, 2 * r))
+        fill(Ellipse2D.Float(width * landmark.x - r, height * landmark.y - r, 2 * r, 2 * r))
     }
 }

@@ -30,7 +30,7 @@ fun ssdMobileLightAPI() {
             detectionModel.detectObjects(imageFile = imageFile, topK = 50)
 
         detectedObjects.forEach {
-            println("Found ${it.classLabel} with probability ${it.probability}")
+            println("Found ${it.label} with probability ${it.probability}")
         }
     }
 }

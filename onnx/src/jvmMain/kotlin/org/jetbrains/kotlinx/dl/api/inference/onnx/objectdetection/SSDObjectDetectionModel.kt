@@ -89,13 +89,13 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
         val foundObjects = mutableListOf<DetectedObject>()
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
-                classLabel = classLabels[classIndices[i].toInt()] ?: "Unknown",
-                probability = probabilities[i],
-                // left, bot, right, top
                 xMin = boxes[i][metadata.xMinIdx],
-                yMin = boxes[i][metadata.yMinIdx],
                 xMax = boxes[i][metadata.xMinIdx + 2],
-                yMax = boxes[i][metadata.yMinIdx + 2]
+                // left, bot, right, top
+                yMin = boxes[i][metadata.yMinIdx],
+                yMax = boxes[i][metadata.yMinIdx + 2],
+                probability = probabilities[i],
+                label = classLabels[classIndices[i].toInt()] ?: "Unknown"
             )
             foundObjects.add(detectedObject)
         }

@@ -29,7 +29,7 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
-            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(17, detectedPose.landmarks.size)
             assertEquals(18, detectedPose.edges.size)
         }
     }
@@ -42,7 +42,7 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
-            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(17, detectedPose.landmarks.size)
             assertEquals(18, detectedPose.edges.size)
         }
     }
@@ -55,9 +55,9 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
             val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile)
-            assertEquals(3, detectedPoses.multiplePoses.size)
-            detectedPoses.multiplePoses.forEach {
-                assertEquals(17, it.second.poseLandmarks.size)
+            assertEquals(3, detectedPoses.poses.size)
+            detectedPoses.poses.forEach {
+                assertEquals(17, it.second.landmarks.size)
                 assertEquals(18, it.second.edges.size)
             }
         }
