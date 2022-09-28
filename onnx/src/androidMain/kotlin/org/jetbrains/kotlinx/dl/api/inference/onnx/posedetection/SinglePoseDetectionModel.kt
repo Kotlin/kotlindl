@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
 import android.graphics.Bitmap
+import androidx.camera.core.ImageProxy
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
@@ -13,6 +14,8 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
 
 
 /**
@@ -31,10 +34,10 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
                 outputHeight = internalModel.inputDimensions[0].toInt()
                 outputWidth = internalModel.inputDimensions[1].toInt()
             }
-            .rotate { degrees = targetRotation }
+            .rotate { degrees = targetRotation.toFloat() }
             .toFloatArray { layout = TensorLayout.NHWC }
 
-    override var targetRotation: Float = 0f
+    override var targetRotation: Int = 0
 
     /**
      * Constructs the pose detection model from a model bytes.
@@ -47,4 +50,17 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
     override fun close() {
         internalModel.close()
     }
+}
+
+/**
+ * Detects a pose for the given [imageProxy].
+ * Internal preprocessing is updated to rotate image to match target orientation.
+ * After prediction, internal preprocessing is restored to the original state.
+ *
+ * @param [imageProxy] input image.
+ */
+public fun SinglePoseDetectionModel.detectPose(imageProxy: ImageProxy): DetectedPose {
+    val currentRotation = targetRotation
+    targetRotation = imageProxy.imageInfo.rotationDegrees
+    return detectPose(imageProxy.toBitmap()).also { targetRotation = currentRotation }
 }

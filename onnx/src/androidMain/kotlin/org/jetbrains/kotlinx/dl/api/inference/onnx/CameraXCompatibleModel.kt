@@ -8,5 +8,5 @@ public interface CameraXCompatibleModel {
      * Target image rotation.
      * @see [ImageInfo](https://developer.android.com/reference/androidx/camera/core/ImageInfo)
      */
-    public var targetRotation: Float
+    public var targetRotation: Int
 }
