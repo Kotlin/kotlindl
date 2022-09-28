@@ -25,11 +25,18 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {
-    /** Image recognition models and preprocessing. */
+    /** Image recognition models and preprocessing.
+     *
+     * @property [channelsFirst] If true it means that the second dimension is related to number of channels in image
+     *                           has short notation as `NCWH`,
+     *                           otherwise, channels are at the last position and has a short notation as `NHWC`.
+     * @property [inputColorMode] An expected channels order for the input image.
+     *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
+     * */
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean,
-        override val inputColorMode: ColorMode = ColorMode.RGB,
+        protected val channelsFirst: Boolean,
+        private val inputColorMode: ColorMode = ColorMode.RGB,
         /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
         internal var noTop: Boolean = false
     ) : OnnxModelType<T, ImageRecognitionModel> {
@@ -551,11 +558,7 @@ public object ONNXModels {
     }
 
     /** Object detection models and preprocessing. */
-    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(
-        override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true,
-        override val inputColorMode: ColorMode = ColorMode.RGB
-    ) :
+    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
         OnnxModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes
@@ -825,11 +828,7 @@ public object ONNXModels {
     }
 
     /** Face alignment models and preprocessing. */
-    public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(
-        override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true,
-        override val inputColorMode: ColorMode = ColorMode.RGB
-    ) :
+    public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
         OnnxModelType<T, U> {
         /**
          * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
@@ -850,11 +849,7 @@ public object ONNXModels {
     }
 
     /** Pose detection models. */
-    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(
-        override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true,
-        override val inputColorMode: ColorMode = ColorMode.RGB
-    ) :
+    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
         OnnxModelType<T, U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
