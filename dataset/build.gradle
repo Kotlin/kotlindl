@@ -30,7 +30,11 @@ kotlin {
                 implementation project(":api")
             }
         }
-        androidMain {}
+        androidMain {
+            dependencies {
+                api 'androidx.camera:camera-core:1.0.0-rc03'
+            }
+        }
     }
     explicitApiWarning()
 }
