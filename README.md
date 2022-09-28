@@ -200,7 +200,7 @@ On Windows, the following distributions are required:
 
 For inference of ONNX models on a CUDA device, you will also need to add the following dependencies to your project:
 ```groovy
-  api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.11.0'
+  api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1'
 ```
 To find more info about ONNXRuntime and CUDA version compatibility, please refer to the [ONNXRuntime CUDA Execution Provider page](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
 
