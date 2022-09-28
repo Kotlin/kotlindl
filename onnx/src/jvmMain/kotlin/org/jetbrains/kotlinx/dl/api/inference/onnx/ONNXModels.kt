@@ -851,6 +851,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
          */
         public object UltraFace320 : FaceDetection(longArrayOf(3L, 240, 320), "ultraface_320")
+
         /**
          * Ultra-lightweight face detection model.
          *
@@ -886,6 +887,7 @@ public object ONNXModels {
          */
         public object Fan2d106 :
             FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
+            override val inputShape: LongArray = longArrayOf(3L, 192L, 192L)
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = Transpose(axes = intArrayOf(2, 0, 1))
 

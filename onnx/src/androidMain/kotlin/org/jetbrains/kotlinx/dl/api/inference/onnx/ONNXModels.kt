@@ -4,6 +4,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.classification.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.FaceDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModelMetadata
@@ -258,6 +259,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
          */
         public object UltraFace320 : FaceDetection(longArrayOf(3L, 240, 320), "ultraface_320")
+
         /**
          * Ultra-lightweight face detection model.
          *
@@ -278,6 +280,24 @@ public object ONNXModels {
                         std = floatArrayOf(128f, 128f, 128f)
                         channelsLast = false
                     }
+        }
+    }
+
+    /** Face alignment models */
+    public sealed class FaceAlignment<T : OnnxInferenceModel, U : InferenceModel> : OnnxModelType<T, U> {
+        /**
+         * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
+         *
+         * The model have
+         * - an input with the shape (1x3x192x192)
+         * - an output with the shape (1x212)
+         */
+        public object Fan2d106 : FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>() {
+            override val inputShape: LongArray = longArrayOf(3L, 192, 192)
+            override val modelRelativePath: String = "fan_2d_106"
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+            }
         }
     }
 }
