@@ -4,7 +4,6 @@ import android.graphics.*
 import androidx.camera.core.ImageProxy
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.bitmap.Rotate
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 
 
 /**
@@ -16,10 +15,11 @@ import java.nio.ByteBuffer
  * @see <a href="https://developer.android.com/reference/androidx/camera/core/ImageAnalysis.Builder#setOutputImageFormat(int)">ImageAnalysis supported output formats</a>
  */
 public fun ImageProxy.toBitmap(applyRotation: Boolean = false): Bitmap {
-    // YUV_420_888 and RGBA_8888 are the only supported formats
     val bitmap = when (format) {
         ImageFormat.YUV_420_888 -> yuv4208888ToBitmap(this)
-        else -> rgba8888ToBitmap(this)
+        // It's unclear why PixelFormat is used here instead of ImageFormat, but this is documented behavior
+        PixelFormat.RGBA_8888 -> rgba8888ToBitmap(this)
+        else -> throw IllegalStateException("Unsupported image format: $format. Please check the documentation of Android ImageAnalysis API for supported formats.")
     }
 
     return if (applyRotation) {
@@ -32,15 +32,14 @@ public fun ImageProxy.toBitmap(applyRotation: Boolean = false): Bitmap {
 
 private fun rgba8888ToBitmap(image: ImageProxy) : Bitmap {
     val encodedImage = image.planes[0]
-    val buffer: ByteBuffer = encodedImage.buffer
-    val pixelStride: Int = encodedImage.pixelStride
-    val rowStride: Int = encodedImage.rowStride
-    val rowPadding: Int = rowStride - pixelStride * image.width
+    val pixelStride = encodedImage.pixelStride
+    val rowStride = encodedImage.rowStride
+    val rowPadding = rowStride - pixelStride * image.width
     val bitmap = Bitmap.createBitmap(
         image.width + rowPadding / pixelStride,
         image.height, Bitmap.Config.ARGB_8888
     )
-    bitmap.copyPixelsFromBuffer(buffer)
+    bitmap.copyPixelsFromBuffer(encodedImage.buffer)
 
     return bitmap
 }
