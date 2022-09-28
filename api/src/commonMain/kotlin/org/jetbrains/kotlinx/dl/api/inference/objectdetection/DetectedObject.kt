@@ -21,5 +21,5 @@ public data class DetectedObject(
     val yMin: Float,
     val yMax: Float,
     val probability: Float,
-    val label: String
+    val label: String? = null
 )

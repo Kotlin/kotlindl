@@ -52,7 +52,7 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
                     yMin = minOf(items[i][1] / internalModel.inputDimensions[0], 1.0f),
                     yMax = minOf(items[i][3] / internalModel.inputDimensions[0], 1.0f),
                     probability = probability,
-                    label = classLabels[items[i][6].toInt()]!!
+                    label = classLabels[items[i][6].toInt()]
                 )
                 foundObjects.add(detectedObject)
             }
@@ -84,7 +84,7 @@ public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMe
                 yMin = boxes[i][metadata.yMinIdx],
                 yMax = boxes[i][metadata.yMinIdx + 2],
                 probability = probabilities[i],
-                label = classLabels[classIndices[i].toInt()] ?: "Unknown"
+                label = classLabels[classIndices[i].toInt()]
             )
             foundObjects.add(detectedObject)
         }

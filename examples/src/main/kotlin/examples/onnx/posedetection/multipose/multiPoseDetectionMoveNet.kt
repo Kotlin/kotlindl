@@ -77,8 +77,7 @@ fun multiPoseDetectionMoveNet() {
                 xMax = floats[54],
                 yMin = floats[51],
                 yMax = floats[53],
-                probability = probability,
-                label = "person"
+                probability = probability
             )
             val detectedPose = DetectedPose(foundPoseLandmarks, emptyList())
 

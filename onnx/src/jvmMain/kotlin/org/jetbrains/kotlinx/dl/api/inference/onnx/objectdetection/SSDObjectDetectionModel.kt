@@ -95,7 +95,7 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
                 yMin = boxes[i][metadata.yMinIdx],
                 yMax = boxes[i][metadata.yMinIdx + 2],
                 probability = probabilities[i],
-                label = classLabels[classIndices[i].toInt()] ?: "Unknown"
+                label = classLabels[classIndices[i].toInt()]
             )
             foundObjects.add(detectedObject)
         }

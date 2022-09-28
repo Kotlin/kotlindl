@@ -36,8 +36,10 @@ fun Canvas.drawObject(
 
     drawRect(rect, Paint(paint).apply { strokeWidth = frameWidth })
 
-    val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
-    drawText(label, rect.left, rect.top - labelPaint.fontMetrics.descent - frameWidth / 2, labelPaint)
+    if (detectedObject.label != null) {
+        val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
+        drawText(label, rect.left, rect.top - labelPaint.fontMetrics.descent - frameWidth / 2, labelPaint)
+    }
 }
 
 /**

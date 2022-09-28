@@ -68,10 +68,12 @@ private fun Graphics2D.drawObject(detectedObject: DetectedObject,
     stroke = BasicStroke(frameWidth)
     draw(Rectangle2D.Float(x, y, detectedObject.xMax * width - x, detectedObject.yMax * height - y))
 
-    val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
-    color = labelColor
-    font = font.deriveFont(Font.BOLD)
-    drawString(label, x, y - fontMetrics.maxDescent - frameWidth / 2)
+    if (detectedObject.label != null) {
+        val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
+        color = labelColor
+        font = font.deriveFont(Font.BOLD)
+        drawString(label, x, y - fontMetrics.maxDescent - frameWidth / 2)
+    }
 }
 
 private fun Graphics2D.drawObjects(detectedObjects: List<DetectedObject>, width: Int, height: Int) {

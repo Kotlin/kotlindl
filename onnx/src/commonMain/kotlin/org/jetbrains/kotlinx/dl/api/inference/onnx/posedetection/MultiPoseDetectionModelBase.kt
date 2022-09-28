@@ -52,8 +52,7 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
                 xMax = floats[54],
                 yMin = floats[51],
                 yMax = floats[53],
-                probability = floats[55],
-                label = CLASS_LABEL
+                probability = floats[55]
             )
 
             val foundPoseEdges = buildPoseEdges(foundPoseLandmarks, edgeKeyPoints)
@@ -75,9 +74,5 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
             detectedObject.probability > confidence
         }
         return MultiPoseDetectionResult(filteredPoses)
-    }
-
-    private companion object {
-        private const val CLASS_LABEL = "person"
     }
 }
