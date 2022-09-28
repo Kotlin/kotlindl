@@ -23,7 +23,7 @@ public object ONNXModels {
         override val inputColorMode: ColorMode = ColorMode.RGB,
     ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, this)
+            return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, channelsFirst, preprocessor)
         }
 
         /**
@@ -78,8 +78,8 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
                 return ImageRecognitionModel(
                     modelHub.loadModel(this),
-                    this,
-                    Imagenet.V1001.labels()
+                    channelsFirst,
+                    classLabels = Imagenet.V1001.labels()
                 )
             }
         }

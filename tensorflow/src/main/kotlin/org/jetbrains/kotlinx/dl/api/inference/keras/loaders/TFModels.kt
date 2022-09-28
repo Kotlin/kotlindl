@@ -535,6 +535,6 @@ public object TFModels {
 
         model.loadWeights(hdfFile)
 
-        return ImageRecognitionModel(model, modelType)
+        return ImageRecognitionModel(model, modelType.inputColorMode, modelType.channelsFirst, modelType.preprocessor)
     }
 }

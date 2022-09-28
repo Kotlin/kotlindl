@@ -34,7 +34,7 @@ public object ONNXModels {
         internal var noTop: Boolean = false
     ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return ImageRecognitionModel(modelHub.loadModel(this), this)
+            return ImageRecognitionModel(modelHub.loadModel(this), inputColorMode, channelsFirst, preprocessor)
         }
 
         /**

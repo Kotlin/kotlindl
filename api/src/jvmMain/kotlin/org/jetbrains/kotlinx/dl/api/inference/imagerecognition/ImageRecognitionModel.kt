@@ -5,13 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -29,14 +27,16 @@ import java.io.IOException
  */
 public class ImageRecognitionModel(
     internalModel: InferenceModel,
-    private val modelType: ModelType<out InferenceModel, out InferenceModel>
+    private val inputColorMode: ColorMode,
+    private val channelsFirst: Boolean,
+    private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity()
 ) : ImageRecognitionModelBase<BufferedImage>(internalModel) {
     /** Class labels for ImageNet dataset. */
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() {
-            val (width, height) = if (modelType.channelsFirst)
+            val (width, height) = if (channelsFirst)
                 Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])
             else
                 Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
@@ -47,9 +47,9 @@ public class ImageRecognitionModel(
                     outputWidth = width.toInt()
                     interpolation = InterpolationType.BILINEAR
                 }
-                .convert { colorMode = modelType.inputColorMode }
+                .convert { colorMode = inputColorMode }
                 .toFloatArray {}
-                .call(modelType.preprocessor)
+                .call(preprocessor)
         }
 
     /**
@@ -87,6 +87,11 @@ public class ImageRecognitionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): ImageRecognitionModel {
-        return ImageRecognitionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights), modelType)
+        return ImageRecognitionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            inputColorMode,
+            channelsFirst,
+            preprocessor
+        )
     }
 }

@@ -1,15 +1,12 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.classification
 
 import android.graphics.Bitmap
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModelBase
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ExecutionProviderCompatible
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
-import org.jetbrains.kotlinx.dl.dataset.imagenetLabels
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
@@ -18,14 +15,15 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  */
 public open class ImageRecognitionModel(
     internalModel: OnnxInferenceModel,
-    private val modelType: ModelType<out InferenceModel, out InferenceModel>,
+    private val channelsFirst: Boolean,
+    private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 ) : ImageRecognitionModelBase<Bitmap>(internalModel), ExecutionProviderCompatible, CameraXCompatibleModel {
     override var targetRotation: Float = 0f
 
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() {
-            val (width, height) = if (modelType.channelsFirst)
+            val (width, height) = if (channelsFirst)
                 Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])
             else
                 Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
@@ -36,8 +34,8 @@ public open class ImageRecognitionModel(
                     outputWidth = width.toInt()
                 }
                 .rotate { degrees = targetRotation }
-                .toFloatArray { layout = if (modelType.channelsFirst) TensorLayout.NCHW else TensorLayout.NHWC }
-                .call(modelType.preprocessor)
+                .toFloatArray { layout = if (channelsFirst) TensorLayout.NCHW else TensorLayout.NHWC }
+                .call(preprocessor)
         }
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {
