@@ -6,15 +6,11 @@
 package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import java.io.File
-import java.nio.file.Files
 
 internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**
- * This is an abstract class which provides methods for loading models, its weights and labels (for prediction purposes) to the local [cacheDirectory].
- *
- * @property [cacheDirectory] The directory for all loaded models and datasets. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
+ * This is an abstract class which provides methods for loading models, its weights and labels (for prediction purposes).
  *
  * @since 0.2
  */
@@ -51,7 +47,6 @@ public abstract class ModelHub {
     /**
      *
      */
-    @Suppress("UNCHECKED_CAST")
     public operator fun <T : InferenceModel, U : InferenceModel> get(modelType: ModelType<T, U>): U {
         return loadPretrainedModel(modelType = modelType)
     }
