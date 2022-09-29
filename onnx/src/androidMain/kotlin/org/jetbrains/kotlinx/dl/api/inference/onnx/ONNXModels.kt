@@ -89,6 +89,7 @@ public object ONNXModels {
                 return ImageRecognitionModel(
                     modelHub.loadModel(this),
                     channelsFirst,
+                    preprocessor,
                     classLabels = Imagenet.V1001.labels()
                 )
             }
