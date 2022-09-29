@@ -12,6 +12,11 @@ import org.tensorflow.Shape
 /**
  * Zero-padding layer for 2D input (e.g. picture).
  * This layer can add rows and columns of zeros at the top, bottom, left and right side of an image tensor.
+ *
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * __Output shape:__ 4D tensor with shape `(batch_size, padded_rows, padded_cols, channels)`.
+ *
  * @property [padding] 4 numbers  interpreted as `(top_pad, bottom_pad, left_pad, right_pad)`.
  */
 public class ZeroPadding2D : AbstractZeroPadding {
