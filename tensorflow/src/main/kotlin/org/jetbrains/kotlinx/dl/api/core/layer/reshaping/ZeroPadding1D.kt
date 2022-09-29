@@ -10,6 +10,11 @@ import org.tensorflow.Shape
 /**
  * Zero-padding layer for 1D input (e.g. audio).
  * This layer can add zeros in the rows of the audio tensor
+ *
+ * __Input shape:__  3D tensor with shape `(batch_size, axis_to_pad, features)`.
+ *
+ * __Output shape:__ 3D tensor with shape `(batch_size, padded_axis, features)`.
+ *
  * @property [padding] 2 numbers  interpreted as `(left_pad, right_pad)`.
  *
  * @since 0.3
