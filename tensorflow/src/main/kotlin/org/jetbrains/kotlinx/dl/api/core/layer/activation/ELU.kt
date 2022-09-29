@@ -21,6 +21,11 @@ import org.tensorflow.op.Ops
  * the activation closer to zero which enable faster learning as they
  * bring the gradient to the natural gradient.
  *
+ * __Input shape__:  Arbitrary. Use the keyword argument `input_shape`
+ *                   (tuple of integers, does not include the samples axis)
+ *                   when using this layer as the first layer in a model.
+ * __Output shape__: Same shape as the input.
+ *
  * @property [alpha] Hyperparameter that controls the value to which
  * an ELU saturates for negative net inputs. Should be > 0.
  * @constructor Creates [ELU] object.
