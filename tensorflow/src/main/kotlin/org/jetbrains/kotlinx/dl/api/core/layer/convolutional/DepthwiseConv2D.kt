@@ -30,6 +30,11 @@ import org.tensorflow.op.nn.DepthwiseConv2dNative
  * The `depthMultiplier` argument controls how many
  * output channels are generated per input channel in the depthwise step.
  *
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * __Output shape:__ 4D tensor with shape `(batch_size, new_rows, new_cols, channels * depth_multiplier)`.
+ *                   `rows` and `cols` values might have changed due to padding.
+ *
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.
  * NOTE: Specifying any stride value != 1 is incompatible with specifying any `dilation_rate` value != 1.
