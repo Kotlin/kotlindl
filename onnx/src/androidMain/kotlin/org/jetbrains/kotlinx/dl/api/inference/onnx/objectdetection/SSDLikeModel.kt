@@ -1,12 +1,17 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
 import android.graphics.Bitmap
+import androidx.camera.core.ImageProxy
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.detectPose
 import org.jetbrains.kotlinx.dl.dataset.Coco
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
@@ -24,7 +29,7 @@ public class SSDLikeModel(override val internalModel: OnnxInferenceModel, metada
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 
-    override var targetRotation: Float = 0f
+    override var targetRotation: Int = 0
 
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
@@ -32,10 +37,27 @@ public class SSDLikeModel(override val internalModel: OnnxInferenceModel, metada
                 outputHeight = internalModel.inputDimensions[0].toInt()
                 outputWidth = internalModel.inputDimensions[1].toInt()
             }
-            .rotate { degrees = targetRotation }
+            .rotate { degrees = targetRotation.toFloat() }
             .toFloatArray { layout = TensorLayout.NHWC }
 
     override fun close() {
         internalModel.close()
     }
 }
+
+/**
+ * Returns the detected object for the given image sorted by the score.
+ * Internal preprocessing is updated to rotate image to match target orientation.
+ * After prediction, internal preprocessing is restored to the original state.
+ *
+ * @param [imageProxy] Input image.
+ * @param [topK] The number of the detected objects with the highest score to be returned.
+ * @return List of [DetectedObject] sorted by score.
+ */
+public fun ObjectDetectionModelBase<Bitmap>.detectObjects(imageProxy: ImageProxy, topK: Int = 3): List<DetectedObject> =
+    when (this) {
+        is CameraXCompatibleModel -> {
+            doWithRotation(imageProxy.imageInfo.rotationDegrees) { detectObjects(imageProxy.toBitmap(), topK) }
+        }
+        else -> detectObjects(imageProxy.toBitmap(applyRotation = true), topK)
+    }

@@ -21,6 +21,8 @@ public class Rotate(
     public var degrees: Float = 0.0f,
 ) : Operation<Bitmap, Bitmap> {
     override fun apply(input: Bitmap): Bitmap {
+        if (degrees == 0f) return input
+
         val matrix = Matrix().apply { postRotate(degrees) }
         return Bitmap.createBitmap(input, 0, 0, input.width, input.height, matrix, true)
     }
