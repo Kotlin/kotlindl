@@ -17,6 +17,10 @@ import org.tensorflow.op.core.Squeeze
  *
  * Downsamples the input by taking maximum value over a temporal window of size [poolSize].
  *
+ * __Input shape:__  3D tensor with shape `(batch_size, steps, features)`.
+ *
+ * __Output shape:__ 3D tensor with shape `(batch_size, downsampled_steps, features)`.
+ *
  * @property [poolSize] Size of the temporal pooling window for each dimension of input.
  * @property [strides] The amount of shift for pooling window per each input dimension in each pooling step.
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no padding, or
