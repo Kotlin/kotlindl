@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
 
@@ -59,8 +60,10 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
  *
  * @param [imageProxy] input image.
  */
-public fun SinglePoseDetectionModel.detectPose(imageProxy: ImageProxy): DetectedPose {
-    val currentRotation = targetRotation
-    targetRotation = imageProxy.imageInfo.rotationDegrees
-    return detectPose(imageProxy.toBitmap()).also { targetRotation = currentRotation }
-}
+public fun SinglePoseDetectionModelBase<Bitmap>.detectPose(imageProxy: ImageProxy): DetectedPose =
+    when (this) {
+        is CameraXCompatibleModel -> {
+            doWithRotation(imageProxy.imageInfo.rotationDegrees) { detectPose(imageProxy.toBitmap()) }
+        }
+        else -> detectPose(imageProxy.toBitmap(applyRotation = true))
+    }

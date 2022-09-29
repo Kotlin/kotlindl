@@ -6,7 +6,9 @@ import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionM
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ExecutionProviderCompatible
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.detectPose
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
@@ -54,11 +56,13 @@ public open class ImageRecognitionModel(
  *
  * @return The label of the recognized object with the highest probability.
  */
-public fun ImageRecognitionModel.predictObject(imageProxy: ImageProxy): String {
-    val currentRotation = targetRotation
-    targetRotation = imageProxy.imageInfo.rotationDegrees
-    return predictObject(imageProxy.toBitmap()).also { targetRotation = currentRotation }
-}
+public fun ImageRecognitionModelBase<Bitmap>.predictObject(imageProxy: ImageProxy): String =
+    when (this) {
+        is CameraXCompatibleModel -> {
+            doWithRotation(imageProxy.imageInfo.rotationDegrees) { predictObject(imageProxy.toBitmap()) }
+        }
+        else -> predictObject(imageProxy.toBitmap(applyRotation = true))
+    }
 
 /**
  * Predicts [topK] objects for the given [imageProxy].
@@ -70,11 +74,13 @@ public fun ImageRecognitionModel.predictObject(imageProxy: ImageProxy): String {
  *
  * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
  */
-public fun ImageRecognitionModel.predictTopKObjects(
+public fun ImageRecognitionModelBase<Bitmap>.predictTopKObjects(
     imageProxy: ImageProxy,
     topK: Int = 5
-): List<Pair<String, Float>> {
-    val currentRotation = targetRotation
-    targetRotation = imageProxy.imageInfo.rotationDegrees
-    return predictTopKObjects(imageProxy.toBitmap(), topK).also { targetRotation = currentRotation }
-}
+): List<Pair<String, Float>> =
+    when (this) {
+        is CameraXCompatibleModel -> {
+            doWithRotation(imageProxy.imageInfo.rotationDegrees) { predictTopKObjects(imageProxy.toBitmap(), topK) }
+        }
+        else -> predictTopKObjects(imageProxy.toBitmap(applyRotation = true), topK)
+    }

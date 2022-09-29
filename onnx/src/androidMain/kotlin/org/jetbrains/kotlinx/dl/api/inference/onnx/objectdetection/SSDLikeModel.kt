@@ -7,6 +7,8 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
+import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.detectPose
 import org.jetbrains.kotlinx.dl.dataset.Coco
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
@@ -52,8 +54,10 @@ public class SSDLikeModel(override val internalModel: OnnxInferenceModel, metada
  * @param [topK] The number of the detected objects with the highest score to be returned.
  * @return List of [DetectedObject] sorted by score.
  */
-public fun SSDLikeModel.detectObjects(imageProxy: ImageProxy, topK: Int = 3): List<DetectedObject> {
-    val currentRotation = targetRotation
-    targetRotation = imageProxy.imageInfo.rotationDegrees
-    return detectObjects(imageProxy.toBitmap(), topK).also { targetRotation = currentRotation }
-}
+public fun ObjectDetectionModelBase<Bitmap>.detectObjects(imageProxy: ImageProxy, topK: Int = 3): List<DetectedObject> =
+    when (this) {
+        is CameraXCompatibleModel -> {
+            doWithRotation(imageProxy.imageInfo.rotationDegrees) { detectObjects(imageProxy.toBitmap(), topK) }
+        }
+        else -> detectObjects(imageProxy.toBitmap(applyRotation = true), topK)
+    }
