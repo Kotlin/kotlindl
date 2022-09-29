@@ -14,7 +14,9 @@ import org.tensorflow.op.Ops
 /**
  * Average pooling layer for 2D inputs (e.g. images).
  *
- * NOTE: Works with tensors which must have rank 4 (batch, height, width, channels).
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * __Output shape:__ 4D tensor with shape `(batch_size, pooled_rows, pooled_cols, channels)`.
  *
  * @property [poolSize] The size of the sliding window for each dimension of input tensor (pool batch, pool height, pool width, pool channels).
  * Usually, pool batch and pool channels are equal to 1.
