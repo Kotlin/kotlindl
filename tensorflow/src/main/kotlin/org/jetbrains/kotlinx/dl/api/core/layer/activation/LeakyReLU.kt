@@ -20,6 +20,7 @@ import org.tensorflow.op.Ops
  * __Input shape:__  Arbitrary. Use the keyword argument `input_shape`
  *                   (tuple of integers, does not include the batch axis)
  *                   when using this layer as the first layer in a model.
+ *
  * __Output shape:__ 2D tensor with shape `(batch_size, channels)`.
  *
  * @property [alpha] Negative slope coefficient. Should be >= 0.

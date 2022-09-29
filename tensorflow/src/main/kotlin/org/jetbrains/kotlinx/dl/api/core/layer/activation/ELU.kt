@@ -24,6 +24,7 @@ import org.tensorflow.op.Ops
  * __Input shape__:  Arbitrary. Use the keyword argument `input_shape`
  *                   (tuple of integers, does not include the samples axis)
  *                   when using this layer as the first layer in a model.
+ *
  * __Output shape__: Same shape as the input.
  *
  * @property [alpha] Hyperparameter that controls the value to which

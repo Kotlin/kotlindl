@@ -24,6 +24,7 @@ import org.tensorflow.op.core.ReduceSum
  * __Input shape:__  Arbitrary. Use the keyword argument `input_shape`
  *                   (tuple of integers, does not include the samples axis)
  *                   when using this layer as the first layer in a model.
+ *
  * __Output shape:__ Same shape as the input.
  *
  * @property [axis] along which the softmax normalization is applied.
