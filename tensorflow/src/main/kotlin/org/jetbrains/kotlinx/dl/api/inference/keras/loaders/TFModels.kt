@@ -24,11 +24,18 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  * All weights are imported from the `Keras.applications` or `ONNX.models` project and preprocessed with the KotlinDL project.
  */
 public object TFModels {
-    /** Image recognition models and preprocessing. */
+    /** Image recognition models and preprocessing.
+     *
+     * @property [channelsFirst] If true it means that the second dimension is related to number of channels in image
+     *                           has short notation as `NCWH`,
+     *                           otherwise, channels are at the last position and has a short notation as `NHWC`.
+     * @property [inputColorMode] An expected channels order for the input image.
+     *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
+     * */
     public sealed class CV<T : GraphTrainableModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean = false,
-        override val inputColorMode: ColorMode = ColorMode.RGB,
+        private val channelsFirst: Boolean = false,
+        private val inputColorMode: ColorMode = ColorMode.RGB,
         public var inputShape: IntArray? = null,
         internal var noTop: Boolean = false
     ) : ModelType<T, ImageRecognitionModel> {
@@ -41,7 +48,8 @@ public object TFModels {
         }
 
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return buildImageRecognitionModel(modelHub, this)
+            val model = loadModel(modelHub, this)
+            return ImageRecognitionModel(model, inputColorMode, channelsFirst, preprocessor)
         }
 
         /**
@@ -518,10 +526,7 @@ public object TFModels {
         }
     }
 
-    private fun buildImageRecognitionModel(
-        modelHub: ModelHub,
-        modelType: ModelType<out GraphTrainableModel, ImageRecognitionModel>
-    ): ImageRecognitionModel {
+    private fun loadModel(modelHub: ModelHub, modelType: CV<out GraphTrainableModel>): GraphTrainableModel {
         modelHub as TFModelHub
         val model = modelHub.loadModel(modelType)
         // TODO: this part is not needed for inference (if we could add manually Softmax at the end of the graph)
@@ -534,7 +539,6 @@ public object TFModels {
         val hdfFile = modelHub.loadWeights(modelType)
 
         model.loadWeights(hdfFile)
-
-        return ImageRecognitionModel(model, modelType)
+        return model
     }
 }

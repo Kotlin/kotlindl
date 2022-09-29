@@ -9,21 +9,31 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModelM
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.normalize
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Set of pretrained mobile-friendly ONNX models
  */
 public object ONNXModels {
-    /** Image classification models */
+    /** Image classification models.
+     *
+     * @property [channelsFirst] If true it means that the second dimension is related to number of channels in image
+     *                           has short notation as `NCWH`,
+     *                           otherwise, channels are at the last position and has a short notation as `NHWC`.
+     * @property [inputColorMode] An expected channels order for the input image.
+     *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
+     * */
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
-        override val channelsFirst: Boolean,
-        override val inputColorMode: ColorMode = ColorMode.RGB,
+        protected val channelsFirst: Boolean,
+        private val inputColorMode: ColorMode = ColorMode.RGB,
     ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, this)
+            return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, channelsFirst, preprocessor)
         }
 
         /**
@@ -78,19 +88,16 @@ public object ONNXModels {
             override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
                 return ImageRecognitionModel(
                     modelHub.loadModel(this),
-                    this,
-                    Imagenet.V1001.labels()
+                    channelsFirst,
+                    classLabels = Imagenet.V1001.labels()
                 )
             }
         }
     }
 
     /** Pose detection models. */
-    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(
-        override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true,
-        override val inputColorMode: ColorMode = ColorMode.RGB
-    ) : OnnxModelType<T, U> {
+    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<T, U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
          * (edges are available in [org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.edgeKeyPointsPairs]
@@ -147,11 +154,8 @@ public object ONNXModels {
     }
 
     /** Object detection models and preprocessing. */
-    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(
-        override val modelRelativePath: String,
-        override val channelsFirst: Boolean = true,
-        override val inputColorMode: ColorMode = ColorMode.RGB
-    ) : OnnxModelType<T, U> {
+    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.dataset.Coco.V2017]).
