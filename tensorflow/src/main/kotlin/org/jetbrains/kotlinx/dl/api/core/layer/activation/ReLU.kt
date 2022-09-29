@@ -19,6 +19,13 @@ import org.tensorflow.op.Ops
  * f(x) = x,                               if threshold <= x < maxValue
  * f(x) = negativeSlope * (x - threshold), if x < threshold
  * ```
+ *
+ * __Input shape:__  Arbitrary. Use the keyword argument `input_shape`
+ *                   (tuple of integers, does not include the batch axis)
+ *                   when using this layer as the first layer in a model.
+ *
+ * __Output shape:__ Same shape as the input.
+ *
  * @property [maxValue] Maximum activation value. Should be >= 0.
  * @property [negativeSlope] Negative slope coefficient. Should be >= 0.
  * @property [threshold] Threshold value for threshold activation.
