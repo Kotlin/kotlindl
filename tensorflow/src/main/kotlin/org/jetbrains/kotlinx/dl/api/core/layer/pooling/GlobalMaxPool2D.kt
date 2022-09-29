@@ -14,6 +14,10 @@ import org.tensorflow.op.Ops
  *
  * Downsamples the input by taking the maximum value over spatial dimensions.
  *
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * __Output shape:__ 2D tensor with shape `(batch_size, channels)`.
+ *
  * @since 0.3
  */
 public class GlobalMaxPool2D(
