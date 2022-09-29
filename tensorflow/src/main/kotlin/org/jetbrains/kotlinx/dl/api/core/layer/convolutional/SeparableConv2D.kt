@@ -33,6 +33,11 @@ import kotlin.math.roundToInt
  * Intuitively, separable convolutions can be understood as
  * a way to factorize a convolution kernel into two smaller kernels, or as an extreme version of an Inception block.
  *
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
+ *
+ * __Output shape:__ 4D tensor with shape `(batch_size, new_rows, new_cols, filters)`.
+ *                   `rows` and `cols` values might have changed due to padding.
+ *
  * @property [filters] The dimensionality of the output space (i.e. the number of filters in the convolution).
  * @property [kernelSize] Two long numbers, specifying the height and width of the 2D convolution window.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.
