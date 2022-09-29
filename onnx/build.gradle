@@ -1,25 +1,61 @@
 project.setDescription("This module contains the Kotlin API for loading and executing the ONNX models.")
 
-dependencies {
-    api project(":api")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21'
-    api 'com.microsoft.onnxruntime:onnxruntime:1.11.0'
-    api "org.jetbrains.kotlinx:multik-api:0.1.1"
-}
-
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
+apply plugin: 'kotlin-multiplatform'
+apply plugin: 'com.android.library'
 
 kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = '1.8'
+        }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
+    android {
+        publishLibraryVariants("release")
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":api")
+                api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
+            }
+        }
+        jvmMain {
+            dependencies {
+                api "org.jetbrains.kotlinx:multik-core:0.2.0"
+                api "org.jetbrains.kotlinx:multik-default:0.2.0"
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+                implementation project(":api")
+                implementation project(":dataset")
+            }
+        }
+        androidMain {
+            dependencies {
+                api 'com.microsoft.onnxruntime:onnxruntime-mobile:1.12.1'
+            }
+        }
+    }
     explicitApiWarning()
 }
 
-test {
-    useJUnitPlatform()
+android {
+    compileSdkVersion 31
+    namespace = 'org.jetbrains.kotlinx.dl.onnx'
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }

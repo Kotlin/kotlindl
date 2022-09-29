@@ -21,11 +21,15 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
@@ -44,7 +48,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
  * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to images before prediction via [Sharpen] stage.
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun mobilenetWithAdditionalTraining() {
@@ -52,21 +56,15 @@ fun mobilenetWithAdditionalTraining() {
     val modelType = TFModels.CV.MobileNet()
     val model = modelHub.loadModel(modelType)
 
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
                 outputHeight = IMAGE_SIZE.toInt()
                 outputWidth = IMAGE_SIZE.toInt()
                 interpolation = InterpolationType.BILINEAR
             }
-            convert { colorMode = ColorMode.BGR }
-        }
-        transformTensor {
-            sharpen {
-                modelTypePreprocessing = TFModels.CV.MobileNet()
-            }
-        }
-    }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .call(TFModels.CV.MobileNet().preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
     val dataset = OnHeapDataset.create(

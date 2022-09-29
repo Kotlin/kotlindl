@@ -7,72 +7,66 @@ package examples.dataset
 
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.onResult
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.Color
+import java.awt.image.BufferedImage
 import java.io.File
-import javax.swing.JFrame
+import javax.imageio.ImageIO
 
 /**
- * This example shows how to do image preprocessing using [Preprocessing] DSL for only one image.
+ * This example shows how to do image preprocessing using preprocessing DSL for only one image.
  *
  * It includes:
  * - image preprocessing;
  * - image visualisation with the [ImagePanel].
  */
 fun main() {
-    val preprocessedImagesDirectory = File("processedImages")
-
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            crop {
-                left = 100
-                right = 0
-                top = 100
-                bottom = 0
-            }
-            rotate {
-                degrees = 0f
-            }
-            resize {
-                outputWidth = 400
-                outputHeight = 400
-                interpolation = InterpolationType.NEAREST
-                save {
-                    dirLocation = preprocessedImagesDirectory
-                }
-            }
-            pad {
-                top = 10
-                bottom = 40
-                left = 10
-                right = 10
-                mode = PaddingMode.Fill(Color.WHITE)
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .crop {
+            left = 100
+            right = 0
+            top = 100
+            bottom = 0
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .rotate {
+            degrees = 0f
         }
-    }
+        .resize {
+            outputWidth = 400
+            outputHeight = 400
+            interpolation = InterpolationType.NEAREST
+        }
+        .onResult { ImageIO.write(it, "jpg", File("image2.jpg")) }
+        .pad {
+            top = 10
+            bottom = 40
+            left = 10
+            right = 10
+            mode = PaddingMode.Fill(Color.WHITE)
+        }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
+        }
 
-    val imageResource = ImagePreprocessing::class.java.getResource("/datasets/vgg/image2.jpg")
+    val imageResource = Operation::class.java.getResource("/datasets/vgg/image2.jpg")
     val image = File(imageResource!!.toURI())
-    val rawImage = preprocessing(image).first
+    val (rawImage, shape) = preprocessing.fileLoader().load(image)
 
     val bufferedImage = ImageConverter.floatArrayToBufferedImage(
         rawImage,
-        preprocessing.getFinalShape(),
+        shape.toImageShape(),
         ColorMode.BGR,
         isNormalized = true
     )
 
-    val frame = JFrame("Filters")
-    frame.contentPane.add(ImagePanel(bufferedImage))
-    frame.pack()
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    showFrame("Filters", ImagePanel(bufferedImage))
 }

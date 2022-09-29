@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -8,11 +8,18 @@ package examples.onnx.posedetection.singlepose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.visualization.swing.drawRawPoseLandMarks
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedPosePanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -29,18 +36,18 @@ fun poseDetectionMoveNet() {
     model.use {
         println(it)
 
-        val imageFile = getFileFromResource("datasets/poses/single/3.jpg")
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = 192
-                    outputWidth = 192
-                }
-                convert { colorMode = ColorMode.BGR }
+        val file = getFileFromResource("datasets/poses/single/3.jpg")
+        val image = ImageConverter.toBufferedImage(file)
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = 192
+                outputWidth = 192
             }
-        }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .call(modelType.preprocessor)
 
-        val inputData = modelType.preprocessInput(imageFile, preprocessing)
+        val inputData = preprocessing.apply(image).first
 
         val yhat = it.predictRaw(inputData)
         println(yhat.values.toTypedArray().contentDeepToString())
@@ -72,33 +79,24 @@ fun poseDetectionMoveNet() {
             println(keypoints[index] + " x = " + data[1] + " y =  " + data[0] + " score = " + data[2])
         }
 
-        visualisePoseLandmarks(imageFile, rawPoseLandMarks)
-    }
-}
-
-private fun visualisePoseLandmarks(
-    imageFile: File,
-    poseLandmarks: Array<FloatArray>
-) {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputHeight = 256
-                outputWidth = 256
-            }
-            convert { colorMode = ColorMode.BGR }
+        val foundPoseLandmarks = mutableListOf<PoseLandmark>()
+        for (i in rawPoseLandMarks.indices) {
+            val poseLandmark = PoseLandmark(
+                poseLandmarkLabel = keypoints[i]!!,
+                x = rawPoseLandMarks[i][1],
+                y = rawPoseLandMarks[i][0],
+                probability = rawPoseLandMarks[i][2]
+            )
+            foundPoseLandmarks.add(i, poseLandmark)
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
-        }
-    }
+        val detectedPose = DetectedPose(foundPoseLandmarks, emptyList())
 
-    val (rawImage, shape) = preprocessing(imageFile)
-    drawRawPoseLandMarks(rawImage, shape, poseLandmarks)
+        val displayedImage = pipeline<BufferedImage>()
+            .resize { outputWidth = 300; outputHeight = 300 }
+            .apply(image)
+        showFrame("Detection result for $file", createDetectedPosePanel(displayedImage, detectedPose))
+    }
 }
 
 /** */
 fun main(): Unit = poseDetectionMoveNet()
-

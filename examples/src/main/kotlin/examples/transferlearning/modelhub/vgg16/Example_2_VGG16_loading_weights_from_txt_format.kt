@@ -11,15 +11,16 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.InputType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.prepareImageNetHumanReadableClassLabels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.preprocessInput
+import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
+import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
+import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileReader
 import java.util.*
@@ -41,7 +42,7 @@ fun main() {
     val jsonConfigFile = getVGG16JSONConfigFile()
     val model = Sequential.loadModelConfiguration(jsonConfigFile)
 
-    val imageNetClassLabels = prepareImageNetHumanReadableClassLabels()
+    val imageNetClassLabels = Imagenet.V1k.labels()
 
     model.use {
         it.compile(
@@ -55,16 +56,18 @@ fun main() {
 
         it.loadWeights(getVGG16WeightsFile())
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
+        val fileLoader = pipeline<BufferedImage>()
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .call(InputType.CAFFE.preprocessing())
+            .fileLoader()
+
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = preprocessInput(image, model.inputDimensions, inputType = InputType.CAFFE)
+            val inputData = fileLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
             val res = it.predict(inputData, "Activation_predictions")
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
+            val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
@@ -93,7 +96,3 @@ private fun getVGG16WeightsFile(): File {
 
     return File(vgg16h5TxtWeightsPath)
 }
-
-
-
-

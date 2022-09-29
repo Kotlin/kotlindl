@@ -198,6 +198,12 @@ On Windows, the following distributions are required:
 - [cudnn-7.6.3](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
+For inference of ONNX models on a CUDA device, you will also need to add the following dependencies to your project:
+```groovy
+  api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1'
+```
+To find more info about ONNXRuntime and CUDA version compatibility, please refer to the [ONNXRuntime CUDA Execution Provider page](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
+
 ## Logging
 
 By default, the API module uses the [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from the specific logger implementation.

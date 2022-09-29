@@ -6,18 +6,19 @@
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformTensor
-import org.jetbrains.kotlinx.dl.visualization.swing.drawLandMarks
+import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedLandmarksPanel
+import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
+import java.awt.GridLayout
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.swing.JPanel
 
 /**
  * This examples demonstrates the light-weight inference API with [Fan2D106FaceAlignmentModel] on Fan2d106 model:
@@ -30,28 +31,19 @@ fun main() {
     val model = ONNXModels.FaceAlignment.Fan2d106.pretrainedModel(modelHub)
 
     model.use {
-        val preprocessing = preprocessing()
-        for (i in 0..8) {
-            val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-            val landmarks = it.detectLandmarks(imageFile = imageFile)
+        val result = mutableMapOf<BufferedImage, List<Landmark>>()
+        for (i in 1..8) {
+            val file = getFileFromResource("datasets/faces/image$i.jpg")
+            val image = ImageConverter.toBufferedImage(file)
+            val landmarks = it.detectLandmarks(image)
+            result[image] = landmarks
+        }
 
-            val (rawImage, shape) = preprocessing(imageFile)
-            drawLandMarks(rawImage, shape, landmarks)
+        val panel = JPanel(GridLayout(2, 4))
+        val resize = pipeline<BufferedImage>().resize { outputWidth = 200; outputHeight = 200 }
+        for ((image, landmarks) in result) {
+            panel.add(createDetectedLandmarksPanel(resize.apply(image), landmarks))
         }
-    }
-}
-
-private fun preprocessing() = preprocess {
-    transformImage {
-        resize {
-            outputWidth = 192
-            outputHeight = 192
-        }
-        convert { colorMode = ColorMode.BGR }
-    }
-    transformTensor {
-        rescale {
-            scalingCoefficient = 255f
-        }
+        showFrame("Face Landmarks", panel)
     }
 }

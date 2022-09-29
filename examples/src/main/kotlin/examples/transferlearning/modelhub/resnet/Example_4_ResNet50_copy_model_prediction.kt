@@ -11,15 +11,17 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
+import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.predictTop5ImageNetLabels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.Preprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.preprocess
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.transformImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -36,6 +38,12 @@ fun resnet50copyModelPrediction() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
+
+    val fileDataLoader = pipeline<BufferedImage>()
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .call(modelType.preprocessor)
+        .fileLoader()
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -56,34 +64,26 @@ fun resnet50copyModelPrediction() {
 
         copiedModel = it.copy(copyWeights = true)
 
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
+            val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)
 
             println(top5.toString())
         }
     }
 
     copiedModel.use {
-        val preprocessing: Preprocessing = preprocess {
-            transformImage { convert { colorMode = ColorMode.BGR } }
-        }
         for (i in 1..8) {
-            val image = preprocessing(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val inputData = modelType.preprocessInput(image, model.inputDimensions)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = predictTop5ImageNetLabels(it, inputData, imageNetClassLabels)
+            val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)
 
             println(top5.toString())
         }

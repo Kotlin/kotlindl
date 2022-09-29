@@ -24,8 +24,10 @@ import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.*
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -169,7 +171,7 @@ private val vgg11 = Sequential.of(
  * This example shows how to do image classification from scratch using [vgg11] model, without leveraging pre-trained weights.
  * We demonstrate the workflow on the Cifar'10 classification dataset.
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  *
  * It includes:
  * - dataset loading from S3
@@ -182,30 +184,26 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun main() {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            crop {
-                left = 2
-                right = 2
-                top = 2
-                bottom = 2
-            }
-            rotate {
-                degrees = 90f
-            }
-            resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.NEAREST
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .crop {
+            left = 2
+            right = 2
+            top = 2
+            bottom = 2
         }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+        .rotate {
+            degrees = 90f
         }
-    }
+        .resize {
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
+            interpolation = InterpolationType.NEAREST
+        }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray { }
+        .rescale {
+            scalingCoefficient = 255f
+        }
 
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)

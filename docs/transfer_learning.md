@@ -26,22 +26,22 @@ You can do so via the Image Preprocessing Pipeline description, and building a d
 
 Here's code that will go through a folder structure received via ```dogsCatsSmallDatasetPath()```, loads and resizes the images, and applies the VGG-19 specific preprocessing.
 
+
+**Note**: The preprocessing DSL has changed in KotlinDL 0.5.0.
+You can find the docs for the previous version of the DSL [here](https://github.com/Kotlin/kotlindl/blob/release_0.4/docs/transfer_learning.md).
+
 ```kotlin
-val preprocessing: Preprocessing = preprocess {
-    transformImage {
-        resize {
-            outputHeight = 224
-            outputWidth = 224
-            interpolation = InterpolationType.BILINEAR
-        }
-        convert { colorMode = ColorMode.BGR }
+val preprocessing = pipeline<BufferedImage>()
+    .resize {
+        outputHeight = 224
+        outputWidth = 224
+        interpolation = InterpolationType.BILINEAR
     }
-    transformTensor {
-        sharpen {
-            modelTypePreprocessing = TFModels.CV.VGG19()
-        }
+    .convert { colorMode = ColorMode.BGR }
+    .toFloatArray { }
+    .sharpen {
+        modelTypePreprocessing = TFModels.CV.VGG19()
     }
-}
 
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 

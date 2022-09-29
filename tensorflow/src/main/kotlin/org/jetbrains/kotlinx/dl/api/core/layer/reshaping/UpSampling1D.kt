@@ -1,0 +1,45 @@
+/*
+ * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
+
+import org.tensorflow.Operand
+import org.tensorflow.op.Ops
+
+/**
+ * Upsampling layer for 1D input.
+ *
+ * Repeats each step of the second axis [size] times.
+ *
+ * Input shape: 3D tensor with shape `(batch_size, steps, features)`.
+ *
+ * Output shape: 3D tensor with shape `(batch_size, steps * size, features)`.
+ *
+ * @property [size] Upsampling factor (i.e. number of repeats).
+ *
+ * @since 0.3
+ */
+public class UpSampling1D(
+    public val size: Int = 2,
+    name: String = "",
+) : AbstractUpSampling(
+    sizeInternal = intArrayOf(size),
+    interpolationInternal = InterpolationMethod.NEAREST,
+    name = name,
+) {
+    init {
+        require(size > 0) {
+            "The upsampling size should be a positive integer."
+        }
+    }
+
+    protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {
+        return repeat(tf, input, repeats = size, axis = 1)
+    }
+
+    override fun toString(): String {
+        return "UpSampling1D(name = $name, size=$size, hasActivation=$hasActivation)"
+    }
+}

@@ -24,8 +24,11 @@ import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
 import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/vgg11"
@@ -176,14 +179,12 @@ private val vgg11 = Sequential.of(
  * - model evaluation
  */
 fun vgg() {
-    val preprocessing: Preprocessing = preprocess {
-        transformImage { convert { colorMode = ColorMode.BGR } }
-        transformTensor {
-            rescale {
-                scalingCoefficient = 255f
-            }
+    val preprocessing = pipeline<BufferedImage>()
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .rescale {
+            scalingCoefficient = 255f
         }
-    }
 
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
     val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)

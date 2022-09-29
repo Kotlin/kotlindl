@@ -19,11 +19,15 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
@@ -42,7 +46,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * - New Dense layers are added and initialized via defined initializers.
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun resnet50additionalTrainingWithHelper() {
@@ -52,21 +56,15 @@ fun resnet50additionalTrainingWithHelper() {
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
 
-    val preprocessing: Preprocessing = preprocess {
-        transformImage {
-            resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.BILINEAR
-            }
-            convert { colorMode = ColorMode.BGR }
+    val preprocessing = pipeline<BufferedImage>()
+        .resize {
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
+            interpolation = InterpolationType.BILINEAR
         }
-        transformTensor {
-            sharpen {
-                modelTypePreprocessing = TFModels.CV.ResNet50()
-            }
-        }
-    }
+        .convert { colorMode = ColorMode.BGR }
+        .toFloatArray {  }
+        .call(TFModels.CV.ResNet50().preprocessor)
 
     val dataset = OnFlyImageDataset.create(
         File(dogsCatsImages),

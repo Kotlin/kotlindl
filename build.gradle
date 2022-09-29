@@ -1,38 +1,23 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.jetbrains.kotlin.multiplatform' version '1.7.10' apply false
+    id 'com.android.application' apply false
     id 'maven-publish'
     id 'io.codearte.nexus-staging' version '0.22.0'
     id 'org.jetbrains.dokka' version '1.5.30'
 }
 
-apply plugin: "io.codearte.nexus-staging"
 apply from: project.rootProject.file('gradle/dokka.gradle')
 
 def kotlinDLVersion = "$majorVersion.$minorVersion"
 
 allprojects {
-    group = 'org.jetbrains.kotlinx'
-    version = kotlinDLVersion
-
-    apply plugin: "maven-publish"
-    apply plugin: "kotlin"
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-repositories {
-    mavenCentral()
-}
-
-subprojects {
     repositories {
+        google()
         mavenCentral()
     }
+
+    group = 'org.jetbrains.kotlinx'
+    version = kotlinDLVersion
 }
 
 def unpublishedSubprojects = ["examples"]
@@ -47,3 +32,5 @@ task setTeamcityVersion {
         println("##teamcity[buildNumber '$version']")
     }
 }
+
+apply from: project.rootProject.file('gradle/fatJar.gradle')

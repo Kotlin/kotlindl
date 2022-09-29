@@ -15,17 +15,20 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 1
@@ -53,7 +56,7 @@ private val topModel = Sequential.of(
  * - Model is re-trained on [dogsCatsDatasetPath] dataset.
  *
  *
- * We use the [Preprocessing] DSL to describe the dataset generation pipeline.
+ * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun efficientNetB0AdditionalTraining() {
@@ -64,21 +67,17 @@ fun efficientNetB0AdditionalTraining() {
 
     model.use {
         println(it)
-        val preprocessing: Preprocessing = preprocess {
-            transformImage {
-                resize {
-                    outputHeight = IMAGE_SIZE.toInt()
-                    outputWidth = IMAGE_SIZE.toInt()
-                    interpolation = InterpolationType.BILINEAR
-                }
-                convert { colorMode = ColorMode.BGR }
+        val preprocessing = pipeline<BufferedImage>()
+            .resize {
+                outputHeight = IMAGE_SIZE.toInt()
+                outputWidth = IMAGE_SIZE.toInt()
+                interpolation = InterpolationType.BILINEAR
             }
-            transformTensor {
-                onnx {
-                    onnxModel = model
-                }
+            .convert { colorMode = ColorMode.BGR }
+            .toFloatArray { }
+            .onnx {
+                onnxModel = model
             }
-        }
 
         val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
         val dataset = OnFlyImageDataset.create(
@@ -106,5 +105,3 @@ fun efficientNetB0AdditionalTraining() {
 
 /** */
 fun main(): Unit = efficientNetB0AdditionalTraining()
-
-
