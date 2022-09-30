@@ -19,13 +19,13 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":api")
-                api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
             }
         }
         jvmMain {
             dependencies {
                 api "org.jetbrains.kotlinx:multik-core:0.2.0"
                 api "org.jetbrains.kotlinx:multik-default:0.2.0"
+                api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
             }
         }
         jvmTest {
