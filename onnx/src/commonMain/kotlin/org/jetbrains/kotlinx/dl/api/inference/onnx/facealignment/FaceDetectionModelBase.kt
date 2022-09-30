@@ -42,13 +42,19 @@ public abstract class FaceDetectionModelBase<I> : OnnxHighLevelModel<I, List<Det
         return suppressNonMaxBoxes(detectedObjects, topK, iouThreshold)
     }
 
-    private companion object {
+    public companion object {
         private const val THRESHOLD = 0.7
         private const val EPS = Float.MIN_VALUE
 
-        private fun suppressNonMaxBoxes(boxes: List<DetectedObject>,
-                                        topK: Int = -1,
-                                        threshold: Float = 0.5f
+        /**
+         * Performs non-maximum suppression to filter out boxes with the IoU greater than threshold.
+         * @param [boxes] boxes to filter
+         * @param [topK] how many boxes to include in the result. Negative or zero means to include everything.
+         * @param [threshold] threshold IoU value
+         */
+        public fun suppressNonMaxBoxes(boxes: List<DetectedObject>,
+                                       topK: Int = -1,
+                                       threshold: Float = 0.5f
         ): List<DetectedObject> {
             val sortedBoxes = boxes.toMutableList().apply { sortByDescending { it.probability } }
             val result = mutableListOf<DetectedObject>()
@@ -62,7 +68,10 @@ public abstract class FaceDetectionModelBase<I> : OnnxHighLevelModel<I, List<Det
             return result
         }
 
-        private fun iou(box1: DetectedObject, box2: DetectedObject): Float {
+        /**
+         * Computes the intersection over union value for the [box1] and [box2].
+         */
+        public fun iou(box1: DetectedObject, box2: DetectedObject): Float {
             val xMin = max(box1.xMin, box2.xMin)
             val yMin = max(box1.yMin, box2.yMin)
             val xMax = min(box1.xMax, box2.xMax)

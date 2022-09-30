@@ -6,11 +6,15 @@
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
 import android.graphics.Bitmap
+import androidx.camera.core.ImageProxy
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
@@ -21,10 +25,10 @@ import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
  */
 public class FaceDetectionModel(override val internalModel: OnnxInferenceModel) : FaceDetectionModelBase<Bitmap>(),
     CameraXCompatibleModel, InferenceModel by internalModel {
-    override var targetRotation: Float = 0f
+    override var targetRotation: Int = 0
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
-            .rotate { degrees = targetRotation }
+            .rotate { degrees = targetRotation.toFloat() }
             .resize {
                 outputWidth = internalModel.inputDimensions[2].toInt()
                 outputHeight = internalModel.inputDimensions[1].toInt()
@@ -35,4 +39,20 @@ public class FaceDetectionModel(override val internalModel: OnnxInferenceModel) 
     override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
         return FaceDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
     }
+}
+
+/**
+ * Detects [topK] faces on the given [imageProxy]. If [topK] is negative all detected faces are returned.
+ * @param [iouThreshold] threshold IoU value for the non-maximum suppression applied during postprocessing
+ */
+public fun FaceDetectionModelBase<Bitmap>.detectFaces(imageProxy: ImageProxy,
+                                                      topK: Int = 5,
+                                                      iouThreshold: Float = 0.5f
+): List<DetectedObject> {
+    if (this is CameraXCompatibleModel) {
+        return doWithRotation(imageProxy.imageInfo.rotationDegrees) {
+            detectFaces(imageProxy.toBitmap(), topK, iouThreshold)
+        }
+    }
+    return detectFaces(imageProxy.toBitmap(applyRotation = true), topK, iouThreshold)
 }
