@@ -8,18 +8,18 @@ package org.jetbrains.kotlinx.dl.api.inference.objectdetection
 /**
  * This data class represents the detected object on the given image.
  *
- * @property [classLabel] The predicted class's name
- * @property [probability] The probability of the predicted class.
- * @property [xMax] The maximum X coordinate for the bounding box containing the predicted object.
  * @property [xMin] The minimum X coordinate for the bounding box containing the predicted object.
- * @property [yMax] The maximum Y coordinate for the bounding box containing the predicted object.
+ * @property [xMax] The maximum X coordinate for the bounding box containing the predicted object.
  * @property [yMin] The minimum Y coordinate for the bounding box containing the predicted object.
+ * @property [yMax] The maximum Y coordinate for the bounding box containing the predicted object.
+ * @property [probability] The probability of the predicted class.
+ * @property [label] The predicted class's name
  */
 public data class DetectedObject(
-    val classLabel: String,
-    val probability: Float,
-    val xMax: Float,
     val xMin: Float,
+    val xMax: Float,
+    val yMin: Float,
     val yMax: Float,
-    val yMin: Float
+    val probability: Float,
+    val label: String? = null
 )

@@ -36,7 +36,7 @@ fun main() {
         val detectedObjects = detectionModel.detectObjects(image, topK = 20)
 
         detectedObjects.forEach {
-            println("Found ${it.classLabel} with probability ${it.probability}")
+            println("Found ${it.label} with probability ${it.probability}")
         }
 
         val displayedImage = pipeline<BufferedImage>()

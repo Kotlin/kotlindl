@@ -25,7 +25,7 @@ fun main() {
         val detectedObjects = detectionModel.detectObjects(image)
 
         detectedObjects.forEach {
-            println("Found ${it.classLabel} with probability ${it.probability}")
+            println("Found ${it.label} with probability ${it.probability}")
         }
 
         showFrame("Detection result for ${file.name}", createDetectedObjectsPanel(image, detectedObjects))

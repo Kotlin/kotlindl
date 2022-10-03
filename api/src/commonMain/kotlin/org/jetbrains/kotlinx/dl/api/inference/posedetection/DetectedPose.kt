@@ -8,10 +8,10 @@ package org.jetbrains.kotlinx.dl.api.inference.posedetection
 /**
  * This data class represents the human's pose detected on the given image.
  *
- * @property [poseLandmarks] The list of detected [PoseLandmark]s for the given image.
+ * @property [landmarks] The list of detected [PoseLandmark]s for the given image.
  * @property [edges] The list of edges connecting the detected [PoseLandmark]s.
  */
 public data class DetectedPose(
-    val poseLandmarks: List<PoseLandmark>,
+    val landmarks: List<PoseLandmark>,
     val edges: List<PoseEdge>
 )

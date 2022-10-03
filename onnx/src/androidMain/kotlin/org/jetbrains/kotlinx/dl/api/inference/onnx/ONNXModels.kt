@@ -4,6 +4,8 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.classification.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.FaceDetectionModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModelMetadata
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
@@ -232,6 +234,69 @@ public object ONNXModels {
 
             override fun pretrainedModel(modelHub: ModelHub): SSDLikeModel {
                 return SSDLikeModel(modelHub.loadModel(this), METADATA)
+            }
+        }
+    }
+
+    /** Face detection models */
+    public sealed class FaceDetection(override val inputShape: LongArray, override val modelRelativePath: String) :
+        OnnxModelType<OnnxInferenceModel, FaceDetectionModel> {
+        override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            get() = defaultPreprocessor
+
+        override fun pretrainedModel(modelHub: ModelHub): FaceDetectionModel {
+            return FaceDetectionModel(modelHub.loadModel(this))
+        }
+
+        /**
+         * Ultra-lightweight face detection model.
+         *
+         * Model accepts input of the shape (1 x 3 x 240 x 320)
+         * Model outputs two arrays (1 x 4420 x 2) and (1 x 4420 x 4) of scores and boxes.
+         *
+         * Threshold filtration and non-max suppression are applied during postprocessing.
+         *
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
+         */
+        public object UltraFace320 : FaceDetection(longArrayOf(3L, 240, 320), "ultraface_320")
+
+        /**
+         * Ultra-lightweight face detection model.
+         *
+         * Model accepts input of the shape (1 x 3 x 480 x 640)
+         * Model outputs two arrays (1 x 4420 x 2) and (1 x 4420 x 4) of scores and boxes.
+         *
+         * Threshold filtration and non-max suppression are applied during postprocessing.
+         *
+         * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
+         */
+        public object UltraFace640 : FaceDetection(longArrayOf(3L, 480, 640), "ultraface_640")
+
+        public companion object {
+            public val defaultPreprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> =
+                pipeline<Pair<FloatArray, TensorShape>>()
+                    .normalize {
+                        mean = floatArrayOf(127f, 127f, 127f)
+                        std = floatArrayOf(128f, 128f, 128f)
+                        channelsLast = false
+                    }
+        }
+    }
+
+    /** Face alignment models */
+    public sealed class FaceAlignment<T : OnnxInferenceModel, U : InferenceModel> : OnnxModelType<T, U> {
+        /**
+         * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
+         *
+         * The model have
+         * - an input with the shape (1x3x192x192)
+         * - an output with the shape (1x212)
+         */
+        public object Fan2d106 : FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>() {
+            override val inputShape: LongArray = longArrayOf(3L, 192, 192)
+            override val modelRelativePath: String = "fan_2d_106"
+            override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
             }
         }
     }

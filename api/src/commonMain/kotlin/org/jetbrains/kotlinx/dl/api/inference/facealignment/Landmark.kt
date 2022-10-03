@@ -5,5 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.facealignment
 
-/** Face landmark located on (xRate/xMaxSize, yRate/yMaxSize) point. */
-public data class Landmark(public val xRate: Float, public val yRate: Float)
+/**
+ * Represents a face landmark as a point on the image with two coordinates relative to the top-left corner.
+ * Both coordinates have values between 0 and 1.
+ * */
+public data class Landmark(public val x: Float, public val y: Float)

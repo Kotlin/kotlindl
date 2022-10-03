@@ -38,22 +38,21 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
 
             for (keyPointIdx in 0..16) {
                 val poseLandmark = PoseLandmark(
-                    poseLandmarkLabel = keyPointsLabels[keyPointIdx]!!,
                     x = floats[3 * keyPointIdx + 1],
                     y = floats[3 * keyPointIdx],
-                    probability = floats[3 * keyPointIdx + 2]
+                    probability = floats[3 * keyPointIdx + 2],
+                    label = keyPointsLabels[keyPointIdx]!!
                 )
                 foundPoseLandmarks.add(poseLandmark)
             }
 
             // [ymin, xmin, ymax, xmax, score]
             val detectedObject = DetectedObject(
-                classLabel = CLASS_LABEL,
-                probability = floats[55],
-                yMin = floats[51],
                 xMin = floats[52],
+                xMax = floats[54],
+                yMin = floats[51],
                 yMax = floats[53],
-                xMax = floats[54]
+                probability = floats[55]
             )
 
             val foundPoseEdges = buildPoseEdges(foundPoseLandmarks, edgeKeyPoints)
@@ -71,13 +70,9 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
      */
     public fun detectPoses(image: I, confidence: Float = 0.1f): MultiPoseDetectionResult {
         val result = predict(image)
-        val filteredPoses = result.multiplePoses.filter { (detectedObject, _) ->
+        val filteredPoses = result.poses.filter { (detectedObject, _) ->
             detectedObject.probability > confidence
         }
         return MultiPoseDetectionResult(filteredPoses)
-    }
-
-    private companion object {
-        private const val CLASS_LABEL = "person"
     }
 }

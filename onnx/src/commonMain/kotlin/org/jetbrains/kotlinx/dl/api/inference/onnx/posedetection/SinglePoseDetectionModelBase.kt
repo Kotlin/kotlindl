@@ -39,7 +39,7 @@ public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, De
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()
         for (i in rawPoseLandMarks.indices) {
             val poseLandmark = PoseLandmark(
-                poseLandmarkLabel = keyPointsLabels[i]!!,
+                label = keyPointsLabels[i]!!,
                 x = rawPoseLandMarks[i][1],
                 y = rawPoseLandMarks[i][0],
                 probability = rawPoseLandMarks[i][2]
@@ -66,10 +66,10 @@ internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>, edgeKeyPoint
         val endPoint = foundPoseLandmarks[it.second]
         foundPoseEdges.add(
             PoseEdge(
-                poseEdgeLabel = startPoint.poseLandmarkLabel + "_" + endPoint.poseLandmarkLabel,
-                probability = min(startPoint.probability, endPoint.probability),
                 start = startPoint,
-                end = endPoint
+                end = endPoint,
+                probability = min(startPoint.probability, endPoint.probability),
+                label = startPoint.label + "_" + endPoint.label
             )
         )
     }

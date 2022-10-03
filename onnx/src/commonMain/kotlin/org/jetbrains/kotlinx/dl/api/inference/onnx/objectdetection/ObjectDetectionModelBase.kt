@@ -46,13 +46,13 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
             val probability = items[i][5]
             if (probability != 0.0f) {
                 val detectedObject = DetectedObject(
-                    classLabel = classLabels[items[i][6].toInt()]!!,
-                    probability = probability,
-                    // left, bot, right, top
                     xMin = minOf(items[i][2] / internalModel.inputDimensions[1], 1.0f),
-                    yMax = minOf(items[i][3] / internalModel.inputDimensions[0], 1.0f),
                     xMax = minOf(items[i][4] / internalModel.inputDimensions[1], 1.0f),
-                    yMin = minOf(items[i][1] / internalModel.inputDimensions[0], 1.0f)
+                    // left, bot, right, top
+                    yMin = minOf(items[i][1] / internalModel.inputDimensions[0], 1.0f),
+                    yMax = minOf(items[i][3] / internalModel.inputDimensions[0], 1.0f),
+                    probability = probability,
+                    label = classLabels[items[i][6].toInt()]
                 )
                 foundObjects.add(detectedObject)
             }
@@ -78,13 +78,13 @@ public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMe
         val foundObjects = mutableListOf<DetectedObject>()
         for (i in 0 until numberOfFoundObjects) {
             val detectedObject = DetectedObject(
-                classLabel = classLabels[classIndices[i].toInt()] ?: "Unknown",
-                probability = probabilities[i],
-                // left, bot, right, top
                 xMin = boxes[i][metadata.xMinIdx],
-                yMin = boxes[i][metadata.yMinIdx],
                 xMax = boxes[i][metadata.xMinIdx + 2],
-                yMax = boxes[i][metadata.yMinIdx + 2]
+                // left, bot, right, top
+                yMin = boxes[i][metadata.yMinIdx],
+                yMax = boxes[i][metadata.yMinIdx + 2],
+                probability = probabilities[i],
+                label = classLabels[classIndices[i].toInt()]
             )
             foundObjects.add(detectedObject)
         }

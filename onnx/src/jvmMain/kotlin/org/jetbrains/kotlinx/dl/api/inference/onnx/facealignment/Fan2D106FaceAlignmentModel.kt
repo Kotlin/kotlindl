@@ -23,7 +23,6 @@ import java.io.File
 import java.io.IOException
 
 private const val OUTPUT_NAME = "fc1"
-private const val INPUT_SIZE = 192
 
 /**
  * The light-weight API for solving Face Alignment task via Fan2D106 model.
@@ -36,8 +35,8 @@ public class Fan2D106FaceAlignmentModel(override val internalModel: OnnxInferenc
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = INPUT_SIZE
-                outputWidth = INPUT_SIZE
+                outputWidth = internalModel.inputDimensions[2].toInt()
+                outputHeight = internalModel.inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray {}

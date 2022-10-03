@@ -35,14 +35,14 @@ fun multiPoseDetectionMoveNetLightAPI() {
             val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/multi/$i.jpg"))
             val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.05f)
 
-            detectedPoses.multiplePoses.forEach { detectedPose ->
-                println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")
-                detectedPose.second.poseLandmarks.forEach {
-                    println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
+            detectedPoses.poses.forEach { detectedPose ->
+                println("Found ${detectedPose.first.label} with probability ${detectedPose.first.probability}")
+                detectedPose.second.landmarks.forEach {
+                    println("   Found ${it.label} with probability ${it.probability}")
                 }
 
                 detectedPose.second.edges.forEach {
-                    println("   The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
+                    println("   The ${it.label} starts at ${it.start.label} and ends with ${it.end.label}")
                 }
             }
             result[image] = detectedPoses
