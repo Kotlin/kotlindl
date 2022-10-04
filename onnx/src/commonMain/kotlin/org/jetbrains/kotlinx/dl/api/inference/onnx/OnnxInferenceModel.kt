@@ -7,11 +7,11 @@ package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.nio.*
 import java.util.*
 
@@ -238,7 +238,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     }
 
     private fun predictSoftly(inputData: FloatArray, outputTensorIdx: Int): FloatArray {
-        val inputTensor = createInputTensor(inputData)
+        val inputTensor = env.createTensor(inputData, inputDataType, inputShape)
 
         val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
@@ -264,7 +264,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
         require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
 
-        val inputTensor = createInputTensor(inputData)
+        val inputTensor = env.createTensor(inputData, inputDataType, inputShape)
 
         val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
 
@@ -355,54 +355,51 @@ public open class OnnxInferenceModel private constructor(private val modelSource
         return "OnnxModel(session=$session)"
     }
 
-    private fun createInputTensor(inputData: FloatArray): OnnxTensor {
-        val inputTensor = when (inputDataType) {
-            OnnxJavaType.FLOAT -> OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), inputShape)
-            OnnxJavaType.DOUBLE -> OnnxTensor.createTensor(
-                env,
-                DoubleBuffer.wrap(inputData.map { it.toDouble() }.toDoubleArray()),
-                inputShape
-            )
-
-            OnnxJavaType.INT8 -> OnnxTensor.createTensor(
-                env,
-                ByteBuffer.wrap(inputData.map { it.toInt().toByte() }.toByteArray()),
-                inputShape
-            )
-
-            OnnxJavaType.INT16 -> OnnxTensor.createTensor(
-                env,
-                ShortBuffer.wrap(inputData.map { it.toInt().toShort() }.toShortArray()),
-                inputShape
-            )
-
-            OnnxJavaType.INT32 -> OnnxTensor.createTensor(
-                env,
-                IntBuffer.wrap(inputData.map { it.toInt() }.toIntArray()),
-                inputShape
-            )
-
-            OnnxJavaType.INT64 -> OnnxTensor.createTensor(
-                env,
-                LongBuffer.wrap(inputData.map { it.toLong() }.toLongArray()),
-                inputShape
-            )
-
-            OnnxJavaType.STRING -> TODO()
-            OnnxJavaType.UINT8 -> OnnxTensor.createTensor(
-                env,
-                ByteBuffer.wrap(inputData.map { it.toInt().toUByte().toByte() }.toByteArray()),
-                inputShape,
-                OnnxJavaType.UINT8
-            )
-
-            OnnxJavaType.UNKNOWN -> TODO()
-            else -> TODO()
-        }
-        return inputTensor
-    }
-
     public companion object {
+        private fun OrtEnvironment.createTensor(data: FloatArray,
+                                                dataType: OnnxJavaType,
+                                                shape: LongArray
+        ): OnnxTensor {
+            val inputTensor = when (dataType) {
+                OnnxJavaType.FLOAT -> OnnxTensor.createTensor(this, FloatBuffer.wrap(data), shape)
+                OnnxJavaType.DOUBLE -> OnnxTensor.createTensor(
+                    this,
+                    DoubleBuffer.wrap(data.map { it.toDouble() }.toDoubleArray()),
+                    shape
+                )
+                OnnxJavaType.INT8 -> OnnxTensor.createTensor(
+                    this,
+                    ByteBuffer.wrap(data.map { it.toInt().toByte() }.toByteArray()),
+                    shape
+                )
+                OnnxJavaType.INT16 -> OnnxTensor.createTensor(
+                    this,
+                    ShortBuffer.wrap(data.map { it.toInt().toShort() }.toShortArray()),
+                    shape
+                )
+                OnnxJavaType.INT32 -> OnnxTensor.createTensor(
+                    this,
+                    IntBuffer.wrap(data.map { it.toInt() }.toIntArray()),
+                    shape
+                )
+                OnnxJavaType.INT64 -> OnnxTensor.createTensor(
+                    this,
+                    LongBuffer.wrap(data.map { it.toLong() }.toLongArray()),
+                    shape
+                )
+                OnnxJavaType.STRING -> TODO()
+                OnnxJavaType.UINT8 -> OnnxTensor.createTensor(
+                    this,
+                    ByteBuffer.wrap(data.map { it.toInt().toUByte().toByte() }.toByteArray()),
+                    shape,
+                    OnnxJavaType.UINT8
+                )
+                OnnxJavaType.UNKNOWN -> TODO()
+                else -> TODO()
+            }
+            return inputTensor
+        }
+
         /**
          * Loads model from serialized ONNX file.
          */
