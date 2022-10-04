@@ -13,10 +13,7 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionP
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import java.nio.*
-import java.util.*
 
-
-private const val RESHAPE_MISSED_MESSAGE = "Model input shape is not defined. Call reshape() to set input shape."
 
 /**
  * Inference model built on ONNX format.
@@ -199,8 +196,6 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
-
         val outputTensorName = when {
             predictionTensorName.isEmpty() -> session.outputNames.first()
             else -> predictionTensorName
@@ -210,9 +205,14 @@ public open class OnnxInferenceModel private constructor(private val modelSource
 
         throwIfOutputNotSupported(outputTensorName, "predictSoftly")
 
-        val outputIdx = session.outputInfo.keys.indexOf(outputTensorName)
-
-        return predictSoftly(inputData, outputIdx)
+        return predictRaw(inputData) { outputTensor ->
+            val outputIdx = session.outputInfo.keys.indexOf(outputTensorName)
+            val outputInfo = session.outputInfo.toList()[outputIdx].second.info as TensorInfo
+            when {
+                outputInfo.shape.size > 1 -> (outputTensor[outputIdx].value as Array<FloatArray>)[0]
+                else -> outputTensor[outputIdx].value as FloatArray
+            }
+        }
     }
 
     /**
@@ -237,24 +237,6 @@ public open class OnnxInferenceModel private constructor(private val modelSource
         return predictSoftly(inputData, session.outputNames.first())
     }
 
-    private fun predictSoftly(inputData: FloatArray, outputTensorIdx: Int): FloatArray {
-        val inputTensor = env.createTensor(inputData, inputDataType, inputShape)
-
-        val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
-
-        val outputInfo = session.outputInfo.toList()[outputTensorIdx].second.info as TensorInfo
-
-        val outputProbs: FloatArray = when {
-            outputInfo.shape.size > 1 -> (outputTensor[outputTensorIdx].value as Array<FloatArray>)[0]
-            else -> outputTensor[outputTensorIdx].value as FloatArray
-        }
-
-        outputTensor.close()
-        inputTensor.close()
-
-        return outputProbs
-    }
-
     /**
      * Returns list of multidimensional arrays with data from model outputs.
      *
@@ -262,25 +244,16 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      * you should prefer [predictRawWithShapes] in this case.
      */
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
-        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
+        return predictRaw(inputData) { outputTensor ->
+            val result = mutableMapOf<String, Any>()
 
-        val inputTensor = env.createTensor(inputData, inputDataType, inputShape)
+            outputTensor.forEach {
+                result[it.key] = it.value.value
+            }
 
-        val outputTensor = session.run(Collections.singletonMap(session.inputNames.toList()[0], inputTensor))
-
-        val result = mutableMapOf<String, Any>()
-
-        outputTensor.forEach {
-            result[it.key] = it.value.value
+            result.toMap()
         }
-
-        outputTensor.close()
-        inputTensor.close()
-
-        return result.toMap()
     }
-
-    // TODO: refactor predictRaw and predictRawWithShapes to extract the common functionality
 
     /**
      *  Returns list of pairs <data; shape> from model outputs.
@@ -288,28 +261,20 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     // TODO: add tests for many available models
     // TODO: return map
     public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        require(::inputShape.isInitialized) { RESHAPE_MISSED_MESSAGE }
-
         session.outputInfo.keys.forEach {
             throwIfOutputNotSupported(it, "predictRawWithShapes")
         }
 
-        val preparedData = FloatBuffer.wrap(inputData)
+        return predictRaw(inputData) { outputTensor ->
+            val result = mutableListOf<Pair<FloatBuffer, LongArray>>()
 
-        val tensor = OnnxTensor.createTensor(env, preparedData, inputShape)
-        val output = session.run(Collections.singletonMap(session.inputNames.toList()[0], tensor))
+            outputTensor.forEach {
+                val onnxTensorShape = (it.value.info as TensorInfo).shape
+                result.add(Pair((it.value as OnnxTensor).floatBuffer, onnxTensorShape))
+            }
 
-        val result = mutableListOf<Pair<FloatBuffer, LongArray>>()
-
-        output.forEach {
-            val onnxTensorShape = (it.value.info as TensorInfo).shape
-            result.add(Pair((it.value as OnnxTensor).floatBuffer, onnxTensorShape))
+            result.toList()
         }
-
-        output.close()
-        tensor.close()
-
-        return result.toList()
     }
 
     /**
@@ -322,6 +287,16 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      */
     public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         TODO("ONNX doesn't support extraction outputs from the intermediate levels of the model.")
+    }
+
+    private fun <R> predictRaw(inputData: FloatArray, extractResult: (OrtSession.Result) -> R): R {
+        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+
+        return env.createTensor(inputData, inputDataType, inputShape).use { inputTensor ->
+            session.run(mapOf(session.inputNames.first() to inputTensor)).use { output ->
+                extractResult(output)
+            }
+        }
     }
 
     override fun copy(
