@@ -9,6 +9,9 @@ import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getValues
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.throwIfOutputNotSupported
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider.CPU
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
@@ -201,17 +204,10 @@ public open class OnnxInferenceModel private constructor(private val modelSource
                     " The model only has following outputs - ${session.outputInfo.keys}"
         }
 
-        throwIfOutputNotSupported(outputTensorName, "predictSoftly")
+        val outputInfo = session.outputInfo.getValue(outputTensorName).info
+        throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
 
-        return predictRaw(inputData) { output ->
-            val outputIdx = session.outputInfo.keys.indexOf(outputTensorName)
-            val outputInfo = session.outputInfo.getValue(outputTensorName).info as TensorInfo
-            val outputValue = output[outputIdx].value
-            when {
-                outputInfo.shape.size > 1 -> (outputValue as Array<FloatArray>)[0]
-                else -> outputValue as FloatArray
-            }
-        }
+        return predictRaw(inputData) { output -> output.getFloatArray(outputTensorName) }
     }
 
     /**
@@ -228,31 +224,17 @@ public open class OnnxInferenceModel private constructor(private val modelSource
      * Returns list of multidimensional arrays with data from model outputs.
      *
      * NOTE: This operation can be quite slow for high dimensional tensors,
-     * you should prefer [predictRawWithShapes] in this case.
+     * use [predictRaw] with custom output processing for better performance.
      */
     public fun predictRaw(inputData: FloatArray): Map<String, Any> {
-        return predictRaw(inputData) { output -> output.associate { it.key to it.value.value } }
+        return predictRaw(inputData) { it.getValues() }
     }
 
     /**
-     *  Returns list of pairs <data; shape> from model outputs.
+     * Runs prediction on a given [inputData] and calls [extractResult] function to process output.
+     * @see OrtSessionResultConversions
      */
-    // TODO: add tests for many available models
-    // TODO: return map
-    public fun predictRawWithShapes(inputData: FloatArray): List<Pair<FloatBuffer, LongArray>> {
-        session.outputInfo.keys.forEach {
-            throwIfOutputNotSupported(it, "predictRawWithShapes")
-        }
-
-        return predictRaw(inputData) { output ->
-            output.map {
-                val onnxTensorShape = (it.value.info as TensorInfo).shape
-                (it.value as OnnxTensor).floatBuffer to onnxTensorShape
-            }
-        }
-    }
-
-    private fun <R> predictRaw(inputData: FloatArray, extractResult: (OrtSession.Result) -> R): R {
+    public fun <R> predictRaw(inputData: FloatArray, extractResult: (OrtSession.Result) -> R): R {
         require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
 
         return env.createTensor(inputData, inputDataType, inputShape).use { inputTensor ->
@@ -260,18 +242,6 @@ public open class OnnxInferenceModel private constructor(private val modelSource
                 extractResult(output)
             }
         }
-    }
-
-    /**
-     * Currently, some methods only support float tensors as model output.
-     * This method checks if model output satisfies these requirements.
-     */
-    // TODO: add support for all ONNX output types (see https://github.com/Kotlin/kotlindl/issues/367)
-    private fun throwIfOutputNotSupported(outputName: String, method: String) {
-        val outputInfo = session.outputInfo.getValue(outputName).info
-        require(outputInfo !is MapInfo) { "Output $outputName is a Map, but currently method $method supports only float Tensor outputs. Please use predictRaw method instead." }
-        require(outputInfo !is SequenceInfo) { "Output '$outputName' is a Sequence, but currently method $method supports only float Tensor outputs. Please use predictRaw method instead." }
-        require(outputInfo is TensorInfo && outputInfo.type == OnnxJavaType.FLOAT) { "Currently method $method supports only float Tensor outputs, but output '$outputName' is not a float Tensor. Please use predictRaw method instead." }
     }
 
     override fun copy(
