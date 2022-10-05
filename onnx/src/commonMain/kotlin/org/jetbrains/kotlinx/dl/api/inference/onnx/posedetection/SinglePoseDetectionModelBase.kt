@@ -5,7 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
@@ -33,8 +35,8 @@ public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, De
      */
     protected val edgeKeyPoints: List<Pair<Int, Int>> = edgeKeyPointsPairs
 
-    override fun convert(output: Map<String, Any>): DetectedPose {
-        val rawPoseLandMarks = (output[outputName] as Array<Array<Array<FloatArray>>>)[0][0]
+    override fun convert(output: OrtSession.Result): DetectedPose {
+        val rawPoseLandMarks = output.get2DFloatArray(outputName)
 
         val foundPoseLandmarks = mutableListOf<PoseLandmark>()
         for (i in rawPoseLandMarks.indices) {

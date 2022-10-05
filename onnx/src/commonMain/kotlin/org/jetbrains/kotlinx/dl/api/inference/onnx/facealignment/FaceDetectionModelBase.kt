@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
 import java.lang.Float.min
 import kotlin.math.max
 
@@ -15,9 +17,9 @@ import kotlin.math.max
  */
 public abstract class FaceDetectionModelBase<I> : OnnxHighLevelModel<I, List<DetectedObject>> {
 
-    override fun convert(output: Map<String, Any>): List<DetectedObject> {
-        val scores = (output["scores"] as Array<*>)[0] as Array<FloatArray>
-        val boxes = (output["boxes"] as Array<*>)[0] as Array<FloatArray>
+    override fun convert(output: OrtSession.Result): List<DetectedObject> {
+        val scores = output.get2DFloatArray("scores")
+        val boxes = output.get2DFloatArray("boxes")
 
         if (scores.isEmpty()) return emptyList()
 

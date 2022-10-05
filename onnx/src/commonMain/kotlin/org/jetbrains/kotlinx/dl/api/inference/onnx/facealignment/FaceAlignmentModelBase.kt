@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
 
 /**
  * Base class for face alignment models.
@@ -17,9 +19,9 @@ public abstract class FaceAlignmentModelBase<I> : OnnxHighLevelModel<I, List<Lan
      */
     protected abstract val outputName: String
 
-    override fun convert(output: Map<String, Any>): List<Landmark> {
+    override fun convert(output: OrtSession.Result): List<Landmark> {
         val landMarks = mutableListOf<Landmark>()
-        val floats = (output[outputName] as Array<*>)[0] as FloatArray
+        val floats = output.getFloatArray(outputName)
         for (i in floats.indices step 2) {
             landMarks.add(Landmark((1 + floats[i]) / 2, (1 + floats[i + 1]) / 2))
         }

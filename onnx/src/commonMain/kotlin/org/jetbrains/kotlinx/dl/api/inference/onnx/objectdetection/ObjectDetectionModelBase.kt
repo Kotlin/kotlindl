@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
 
 /**
  * Base class for object detection models.
@@ -38,9 +41,9 @@ public abstract class ObjectDetectionModelBase<I> : OnnxHighLevelModel<I, List<D
  */
 public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionModelBase<I>() {
 
-    override fun convert(output: Map<String, Any>): List<DetectedObject> {
+    override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val foundObjects = mutableListOf<DetectedObject>()
-        val items = (output[OUTPUT_NAME] as Array<Array<FloatArray>>)[0]
+        val items = output.get2DFloatArray(OUTPUT_NAME)
 
         for (i in items.indices) {
             val probability = items[i][5]
@@ -69,10 +72,10 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
  * Base class for object detection model based on SSD architecture.
  */
 public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMetadata) : ObjectDetectionModelBase<I>() {
-    override fun convert(output: Map<String, Any>): List<DetectedObject> {
-        val boxes = (output[metadata.outputBoxesName] as Array<Array<FloatArray>>)[0]
-        val classIndices = (output[metadata.outputClassesName] as Array<FloatArray>)[0]
-        val probabilities = (output[metadata.outputScoresName] as Array<FloatArray>)[0]
+    override fun convert(output: OrtSession.Result): List<DetectedObject> {
+        val boxes = output.get2DFloatArray(metadata.outputBoxesName)
+        val classIndices = output.getFloatArray(metadata.outputClassesName)
+        val probabilities = output.getFloatArray(metadata.outputScoresName)
         val numberOfFoundObjects = boxes.size
 
         val foundObjects = mutableListOf<DetectedObject>()

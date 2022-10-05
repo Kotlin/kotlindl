@@ -5,10 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getLongArray
 import org.jetbrains.kotlinx.dl.dataset.Coco
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
@@ -80,10 +84,10 @@ public class SSDObjectDetectionModel(override val internalModel: OnnxInferenceMo
     }
 
     // TODO remove code duplication due to different type of class labels array
-    override fun convert(output: Map<String, Any>): List<DetectedObject> {
-        val boxes = (output[metadata.outputBoxesName] as Array<Array<FloatArray>>)[0]
-        val classIndices = (output[metadata.outputClassesName] as Array<LongArray>)[0]
-        val probabilities = (output[metadata.outputScoresName] as Array<FloatArray>)[0]
+    override fun convert(output: OrtSession.Result): List<DetectedObject> {
+        val boxes = output.get2DFloatArray(metadata.outputBoxesName)
+        val classIndices = output.getLongArray(metadata.outputClassesName)
+        val probabilities = output.getFloatArray(metadata.outputScoresName)
         val numberOfFoundObjects = boxes.size
 
         val foundObjects = mutableListOf<DetectedObject>()
