@@ -216,6 +216,37 @@ public object OrtSessionResultConversions {
     }
 
     /**
+     * Returns the output by [name] as an Array<FloatArray>. This operation could be slow for high dimensional tensors,
+     * in which case [getFloatArray] should be used.
+     */
+    public fun OrtSession.Result.get2DFloatArray(name: String): Array<FloatArray> {
+        return get(name).get().get2DFloatArray()
+    }
+
+    /**
+     * Returns the output at [index] as an Array<FloatArray>. This operation could be slow for high dimensional tensors,
+     * in which case [getFloatArray] should be used.
+     */
+    public fun OrtSession.Result.get2DFloatArray(index: Int): Array<FloatArray> {
+        return get(index).get2DFloatArray()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun OnnxValue.get2DFloatArray(): Array<FloatArray> {
+        throwIfOutputNotSupported(info, toString(), "get2DFloatArray", OnnxJavaType.FLOAT)
+        val shape = (info as TensorInfo).shape
+        val depth = shape.size - 2
+        require(depth >= 0 && shape.slice(0 until depth).all { it == 1L }) {
+            "Output of shape $shape can't be converted to the Array<FloatArray>."
+        }
+        var result = value as Array<*>
+        repeat(depth) {
+            result = result[0] as Array<*>
+        }
+        return result as Array<FloatArray>
+    }
+
+    /**
      * Returns all values from this [OrtSession.Result]. This operation could be slow for high dimensional tensors,
      * in which case functions that return one dimensional array such as [getFloatArray] or [getLongArray] should be used.
      * @see OnnxValue.getValue

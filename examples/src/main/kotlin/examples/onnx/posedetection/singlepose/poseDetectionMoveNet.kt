@@ -8,6 +8,7 @@ package examples.onnx.posedetection.singlepose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
@@ -49,10 +50,10 @@ fun poseDetectionMoveNet() {
 
         val inputData = preprocessing.apply(image).first
 
-        val yhat = it.predictRaw(inputData)
-        println(yhat.values.toTypedArray().contentDeepToString())
-
-        val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+        val rawPoseLandMarks = it.predictRaw(inputData) { result ->
+            result.get2DFloatArray("output_0")
+        }
+        println(rawPoseLandMarks.contentDeepToString())
 
         // Dictionary that maps from joint names to keypoint indices.
         val keypoints = mapOf(

@@ -8,6 +8,7 @@ package examples.onnx.objectdetection.ssd
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -45,10 +46,10 @@ fun ssd() {
             val inputData = preprocessing.load(getFileFromResource("datasets/detection/image$i.jpg")).first
 
             val start = System.currentTimeMillis()
-            val yhat = it.predictRaw(inputData)
+            val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0)}
             val end = System.currentTimeMillis()
             println("Prediction took ${end - start} ms")
-            println(yhat.values.toTypedArray().contentDeepToString())
+            println(yhat.contentToString())
         }
     }
 }
