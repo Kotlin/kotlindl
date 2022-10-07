@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 
 import ai.onnxruntime.OrtSession
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -48,7 +48,7 @@ public class SSDObjectDetectionModel(
     modelKindDescription: String? = null
 ) : SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA, modelKindDescription), InferenceModel by internalModel {
 
-    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = inputDimensions[1].toInt()

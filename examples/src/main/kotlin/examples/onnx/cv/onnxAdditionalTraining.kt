@@ -5,6 +5,7 @@
 
 package examples.onnx.cv
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
@@ -15,7 +16,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
@@ -97,7 +97,7 @@ fun runONNXAdditionalTraining(
 fun preprocessing(
     resizeTo: Pair<Int, Int>,
     model: OnnxInferenceModel
-): Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
+): Operation<BufferedImage, FloatData> {
     val preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
         pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }

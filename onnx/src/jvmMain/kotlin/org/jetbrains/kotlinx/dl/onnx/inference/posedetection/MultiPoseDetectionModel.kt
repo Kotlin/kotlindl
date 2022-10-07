@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference.posedetection
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -31,7 +31,7 @@ public class MultiPoseDetectionModel(
     modelKindDescription: String? = null
 ) : MultiPoseDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
-    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputHeight = inputDimensions[0].toInt()

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.preprocessing.image
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import java.awt.image.BufferedImage
@@ -12,8 +13,8 @@ import java.awt.image.BufferedImage
 /**
  * Converts [BufferedImage] to float array representation.
  */
-public class ConvertToFloatArray : Operation<BufferedImage, Pair<FloatArray, TensorShape>> {
-    override fun apply(input: BufferedImage): Pair<FloatArray, TensorShape> {
+public class ConvertToFloatArray : Operation<BufferedImage, FloatData> {
+    override fun apply(input: BufferedImage): FloatData {
         return ImageConverter.toRawFloatArray(input) to input.getShape()
     }
 

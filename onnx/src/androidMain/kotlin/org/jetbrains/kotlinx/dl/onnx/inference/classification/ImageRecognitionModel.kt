@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference.classification
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -27,14 +27,14 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
 public open class ImageRecognitionModel(
     internalModel: OnnxInferenceModel,
     private val channelsFirst: Boolean,
-    private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
+    private val preprocessor: Operation<FloatData, FloatData> = Identity(),
     modelKindDescription: String? = null,
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 ) : ImageRecognitionModelBase<Bitmap>(internalModel, modelKindDescription), ExecutionProviderCompatible,
     CameraXCompatibleModel {
     override var targetRotation: Int = 0
 
-    override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<Bitmap, FloatData>
         get() {
             val (width, height) = if (channelsFirst)
                 Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.preprocessing.image
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 import java.awt.image.BufferedImage
@@ -50,6 +50,6 @@ public fun <I> Operation<I, BufferedImage>.centerCrop(block: CenterCrop.() -> Un
 }
 
 /** Applies [ConvertToFloatArray] operation to convert the image to a float array. */
-public fun <I> Operation<I, BufferedImage>.toFloatArray(block: ConvertToFloatArray.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, BufferedImage>.toFloatArray(block: ConvertToFloatArray.() -> Unit): Operation<I, FloatData> {
     return PreprocessingPipeline(this, ConvertToFloatArray().apply(block))
 }

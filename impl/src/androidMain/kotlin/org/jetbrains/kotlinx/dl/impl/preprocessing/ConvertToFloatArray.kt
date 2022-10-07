@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.impl.preprocessing
 
 import android.graphics.Bitmap
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout.NCHW
@@ -21,9 +22,9 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.argB8888ToNHWCArray
  * @param layout [TensorLayout] of the resulting array.
  */
 public class ConvertToFloatArray(public var layout: TensorLayout = NCHW) :
-    Operation<Bitmap, Pair<FloatArray, TensorShape>> {
+    Operation<Bitmap, FloatData> {
     private val channels = 3
-    override fun apply(input: Bitmap): Pair<FloatArray, TensorShape> {
+    override fun apply(input: Bitmap): FloatData {
         require(input.config == Bitmap.Config.ARGB_8888) { "Only ARGB_8888 bitmaps are supported currently" }
 
         val w = input.width

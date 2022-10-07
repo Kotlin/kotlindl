@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -20,8 +21,8 @@ internal class TfStylePreprocessing : FloatArrayOperation() {
 }
 
 /** Torch-style preprocessing. */
-internal fun torchStylePreprocessing(channelsLastParameter: Boolean = true): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
-    return pipeline<Pair<FloatArray, TensorShape>>()
+internal fun torchStylePreprocessing(channelsLastParameter: Boolean = true): Operation<FloatData, FloatData> {
+    return pipeline<FloatData>()
         .rescale { scalingCoefficient = 255f }
         .normalize {
             mean = floatArrayOf(0.485f, 0.456f, 0.406f)
@@ -31,8 +32,8 @@ internal fun torchStylePreprocessing(channelsLastParameter: Boolean = true): Ope
 }
 
 /** Caffe-style preprocessing. */
-internal fun caffeStylePreprocessing(channelsLastParameter: Boolean = true): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
-    return pipeline<Pair<FloatArray, TensorShape>>()
+internal fun caffeStylePreprocessing(channelsLastParameter: Boolean = true): Operation<FloatData, FloatData> {
+    return pipeline<FloatData>()
         .normalize {
             mean = floatArrayOf(103.939f, 116.779f, 123.68f)
             std = floatArrayOf(1f, 1f, 1f)

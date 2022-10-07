@@ -5,7 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.floats
 
 /**
  * And interface for loading data from the provided data source.
@@ -15,11 +16,11 @@ public interface DataLoader<D> {
     /**
      * Load the data from the specified [dataSource].
      */
-    public fun load(dataSource: D): Pair<FloatArray, TensorShape>
+    public fun load(dataSource: D): FloatData
 
     public companion object {
         internal fun <D> DataLoader<D>.prepareX(sources: Array<D>): Array<FloatArray> {
-            return Array(sources.size) { load(sources[it]).first }
+            return Array(sources.size) { load(sources[it]).floats }
         }
     }
 }

@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.impl.preprocessing
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.RequiresApi
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Crop
@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Rotate
  */
 
 /** Applies [ConvertToFloatArray] operation to convert the [Bitmap] to a float array. */
-public fun <I> Operation<I, Bitmap>.toFloatArray(block: ConvertToFloatArray.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, Bitmap>.toFloatArray(block: ConvertToFloatArray.() -> Unit): Operation<I, FloatData> {
     return PreprocessingPipeline(this, ConvertToFloatArray().apply(block))
 }
 

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.loaders
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -22,7 +22,7 @@ public interface ModelType<T : InferenceModel, U : InferenceModel> {
     /**
      * Preprocessing [Operation] specific for this model type.
      */
-    public val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+    public val preprocessor: Operation<FloatData, FloatData>
         get() = Identity()
 
     /** Returns the specially prepared pre-trained model of the type U. */

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 
 /**
@@ -18,7 +18,7 @@ public enum class InputType {
      * then will zero-center each color channel with respect to the ImageNet dataset, without scaling.
      */
     CAFFE {
-        public override fun preprocessing(channelsLast: Boolean): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+        public override fun preprocessing(channelsLast: Boolean): Operation<FloatData, FloatData> {
             return caffeStylePreprocessing(channelsLast)
         }
     },
@@ -27,7 +27,7 @@ public enum class InputType {
      * This preprocessing will scale pixels between -1 and 1, sample-wise.
      */
     TF {
-        public override fun preprocessing(channelsLast: Boolean): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+        public override fun preprocessing(channelsLast: Boolean): Operation<FloatData, FloatData> {
             return TfStylePreprocessing()
         }
     },
@@ -37,7 +37,7 @@ public enum class InputType {
      * then will normalize each channel with respect to the ImageNet dataset.
      */
     TORCH {
-        public override fun preprocessing(channelsLast: Boolean): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+        public override fun preprocessing(channelsLast: Boolean): Operation<FloatData, FloatData> {
             return torchStylePreprocessing(channelsLast)
         }
     };
@@ -46,5 +46,5 @@ public enum class InputType {
      * Returns preprocessing [Operation] corresponding to this preprocessing type.
      * @param [channelsLast] reflects whether channel dimension is the first or the last.
      */
-    public abstract fun preprocessing(channelsLast: Boolean = true): Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+    public abstract fun preprocessing(channelsLast: Boolean = true): Operation<FloatData, FloatData>
 }
