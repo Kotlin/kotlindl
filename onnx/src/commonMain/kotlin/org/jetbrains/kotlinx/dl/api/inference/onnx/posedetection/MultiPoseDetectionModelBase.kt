@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
@@ -30,8 +32,8 @@ public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, Mul
      */
     protected abstract val edgeKeyPoints: List<Pair<Int, Int>>
 
-    override fun convert(output: Map<String, Any>): MultiPoseDetectionResult {
-        val rawPoseLandMarks = (output[outputName] as Array<Array<FloatArray>>)[0]
+    override fun convert(output: OrtSession.Result): MultiPoseDetectionResult {
+        val rawPoseLandMarks = output.get2DFloatArray(outputName)
 
         val poses = rawPoseLandMarks.map { floats ->
             val foundPoseLandmarks = mutableListOf<PoseLandmark>()

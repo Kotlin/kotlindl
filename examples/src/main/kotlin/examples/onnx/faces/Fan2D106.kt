@@ -9,6 +9,7 @@ import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
@@ -53,11 +54,10 @@ fun main() {
             val inputImage = ImageConverter.toBufferedImage(inputFile)
             val inputData = preprocessor.apply(inputImage).first
 
-            val yhat = it.predictRaw(inputData)
-            println(yhat.values.toTypedArray().contentDeepToString())
+            val floats = it.predictRaw(inputData) { output -> output.getFloatArray("fc1") }
+            println(floats.contentToString())
 
             val landMarks = mutableListOf<Landmark>()
-            val floats = (yhat["fc1"] as Array<*>)[0] as FloatArray
             for (j in floats.indices step 2) {
                 landMarks.add(Landmark((1 + floats[j]) / 2, (1 + floats[j + 1]) / 2))
             }

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.onnx
 
+import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
@@ -29,15 +30,14 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible {
     /**
      * Converts raw model output to the result.
      */
-    public fun convert(output: Map<String, Any>): R
+    public fun convert(output: OrtSession.Result): R
 
     /**
      * Makes prediction on the given [input].
      */
     public fun predict(input: I): R {
         val preprocessedInput = preprocessing.apply(input)
-        val output = internalModel.predictRaw(preprocessedInput.first)
-        return convert(output)
+        return internalModel.predictRaw(preprocessedInput.first) { convert(it) }
     }
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {

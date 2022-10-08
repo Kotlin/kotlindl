@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.api.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArrayWithShape
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
+import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Applies the given [onnxModel] as a preprocessing stage.
@@ -19,8 +20,10 @@ import org.jetbrains.kotlinx.dl.dataset.preprocessing.PreprocessingPipeline
 public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) :
     Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
     override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
-        val (prediction, rawShape) = onnxModel!!.predictRawWithShapes(input.first)[outputIndex]
-        return prediction.array() to TensorShape(rawShape)
+        val (prediction, rawShape) = onnxModel!!.predictRaw(input.first) { output ->
+            return@predictRaw output.getFloatArrayWithShape(outputIndex)
+        }
+        return prediction to TensorShape(rawShape)
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {

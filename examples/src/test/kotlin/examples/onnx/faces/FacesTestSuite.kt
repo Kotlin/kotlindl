@@ -8,6 +8,7 @@ package examples.onnx.faces
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -56,8 +57,8 @@ class FacesTestSuite {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
                 val inputData = fileDataLoader.load(imageFile).first
 
-                val yhat = it.predictRaw(inputData)
-                assertEquals(212, (yhat.values.toTypedArray()[0] as Array<FloatArray>)[0].size)
+                val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0) }
+                assertEquals(212, yhat.size)
             }
         }
     }

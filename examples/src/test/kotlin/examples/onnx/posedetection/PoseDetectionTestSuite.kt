@@ -8,6 +8,7 @@ package examples.onnx.posedetection
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.inference.onnx.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -84,9 +85,9 @@ class PoseDetectionTestSuite {
 
             val inputData = fileDataLoader.load(imageFile).first
 
-            val yhat = it.predictRaw(inputData)
-
-            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+            val rawPoseLandMarks = it.predictRaw(inputData) { result ->
+                result.get2DFloatArray("output_0")
+            }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -113,9 +114,9 @@ class PoseDetectionTestSuite {
 
             val inputData = preprocessing.load(imageFile).first
 
-            val yhat = it.predictRaw(inputData)
-
-            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+            val rawPoseLandMarks = it.predictRaw(inputData) { result ->
+                result.get2DFloatArray("output_0")
+            }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -142,10 +143,10 @@ class PoseDetectionTestSuite {
 
 
             val inputData = dataLoader.load(imageFile).first
-            val yhat = inferenceModel.predictRaw(inputData)
-            println(yhat.values.toTypedArray().contentDeepToString())
-
-            val rawPosesLandMarks = (yhat["output_0"] as Array<Array<FloatArray>>)[0]
+            val rawPosesLandMarks = inferenceModel.predictRaw(inputData) { result ->
+                result.get2DFloatArray("output_0")
+            }
+            println(rawPosesLandMarks.contentDeepToString())
 
             assertEquals(6, rawPosesLandMarks.size)
             rawPosesLandMarks.forEach {
