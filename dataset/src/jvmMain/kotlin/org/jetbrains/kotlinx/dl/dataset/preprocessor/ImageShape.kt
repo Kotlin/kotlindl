@@ -26,12 +26,6 @@ public data class ImageShape(
     /** Returns number of elements in a tensor with the given shape. */
     public val numberOfElements: Long
         get() = width!! * height!! * channels!!
-
-    public companion object {
-        internal fun ImageShape.toTensorShape(): TensorShape {
-            return TensorShape(width!!, height!!, channels!!)
-        }
-    }
 }
 
 /**

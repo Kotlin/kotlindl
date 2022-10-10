@@ -8,7 +8,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.ExecutionProviderCompatible
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
 import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
-import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.detectPose
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap

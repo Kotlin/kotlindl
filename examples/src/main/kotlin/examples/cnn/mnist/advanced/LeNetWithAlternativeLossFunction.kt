@@ -22,13 +22,13 @@ private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 100
 
 private val lenet5Classic = buildLetNet5Classic(
-    image_width = IMAGE_SIZE,
-    image_height = IMAGE_SIZE,
-    num_channels = NUM_CHANNELS,
-    num_classes = NUMBER_OF_CLASSES,
-    layers_activation = Activations.Relu,
-    classifier_activation = Activations.Softmax,
-    random_seed = SEED,
+    imageWidth = IMAGE_SIZE,
+    imageHeight = IMAGE_SIZE,
+    numChannels = NUM_CHANNELS,
+    numClasses = NUMBER_OF_CLASSES,
+    layersActivation = Activations.Relu,
+    classifierActivation = Activations.Softmax,
+    randomSeed = SEED,
 )
 
 /**

@@ -23,5 +23,5 @@ public fun <I, O> Operation<I,O>.onResult(block: (O) -> Unit): Operation<I, O> {
  * Applies provided [operation] to the preprocessing pipeline.
  */
 public fun <I, M, O> Operation<I, M>.call(operation: Operation<M, O>): Operation<I, O> {
-    return PreprocessingPipeline<I, M, O>(this, operation)
+    return PreprocessingPipeline(this, operation)
 }

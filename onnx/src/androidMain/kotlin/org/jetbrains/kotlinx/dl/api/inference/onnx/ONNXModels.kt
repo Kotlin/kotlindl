@@ -1,4 +1,4 @@
-package org.jetbrains.kotlinx.dl.api.inference.onnx;
+package org.jetbrains.kotlinx.dl.api.inference.onnx
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType

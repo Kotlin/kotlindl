@@ -12,29 +12,6 @@ private fun dilatedFilterSize(filterSize: Int, dilation: Int): Int {
     return filterSize + (filterSize - 1) * (dilation - 1)
 }
 
-private fun ConvPadding.value(filterSize: Int): Int {
-    return when (this) {
-        ConvPadding.VALID -> 0
-        ConvPadding.SAME -> filterSize - 1
-        ConvPadding.FULL -> 2 * filterSize - 1
-    }
-}
-
-/**
- * Calculates output length after applying convolution operation on a single axis.
- */
-internal fun convOutputLength(
-    inputLength: Long,
-    filterSize: Int,
-    padding: ConvPadding,
-    stride: Int,
-    dilation: Int = 1
-): Long {
-    val dilatedFilterSize = dilatedFilterSize(filterSize, dilation)
-    val outputLength = inputLength - filterSize + 1 + padding.value(dilatedFilterSize)
-    return ((outputLength + stride - 1).toFloat() / stride).toLong()
-}
-
 /**
  * Calculates output length after applying transposed convolution operation on a single axis.
  */

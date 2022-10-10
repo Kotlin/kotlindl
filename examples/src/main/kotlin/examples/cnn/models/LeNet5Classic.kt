@@ -24,26 +24,26 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
  *    Gradient-based learning applied to document recognition:[Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, 1998]</a>
  */
 internal fun buildLetNet5Classic(
-    image_width: Long,
-    image_height: Long,
-    num_channels: Long,
-    num_classes: Int,
-    layers_activation: Activations,
-    classifier_activation: Activations,
-    random_seed: Long,
+    imageWidth: Long,
+    imageHeight: Long,
+    numChannels: Long,
+    numClasses: Int,
+    layersActivation: Activations,
+    classifierActivation: Activations,
+    randomSeed: Long,
 ): Sequential {
     return Sequential.of(
         Input(
-            image_width,
-            image_height,
-            num_channels,
+            imageWidth,
+            imageHeight,
+            numChannels,
         ),
         Conv2D(
             filters = 6,
             kernelSize = 5,
             strides = 1,
-            activation = layers_activation,
-            kernelInitializer = GlorotNormal(random_seed),
+            activation = layersActivation,
+            kernelInitializer = GlorotNormal(randomSeed),
             biasInitializer = Zeros(),
             padding = ConvPadding.SAME,
         ),
@@ -56,8 +56,8 @@ internal fun buildLetNet5Classic(
             filters = 16,
             kernelSize = 5,
             strides = 1,
-            activation = layers_activation,
-            kernelInitializer = GlorotNormal(random_seed),
+            activation = layersActivation,
+            kernelInitializer = GlorotNormal(randomSeed),
             biasInitializer = Zeros(),
             padding = ConvPadding.SAME,
         ),
@@ -69,20 +69,20 @@ internal fun buildLetNet5Classic(
         Flatten(),
         Dense(
             outputSize = 120,
-            activation = layers_activation,
-            kernelInitializer = GlorotNormal(random_seed),
+            activation = layersActivation,
+            kernelInitializer = GlorotNormal(randomSeed),
             biasInitializer = Constant(0.1f),
         ),
         Dense(
             outputSize = 84,
             activation = Activations.Tanh,
-            kernelInitializer = GlorotNormal(random_seed),
+            kernelInitializer = GlorotNormal(randomSeed),
             biasInitializer = Constant(0.1f),
         ),
         Dense(
-            outputSize = num_classes,
-            activation = classifier_activation,
-            kernelInitializer = GlorotNormal(random_seed),
+            outputSize = numClasses,
+            activation = classifierActivation,
+            kernelInitializer = GlorotNormal(randomSeed),
             biasInitializer = Constant(0.1f),
         )
     )

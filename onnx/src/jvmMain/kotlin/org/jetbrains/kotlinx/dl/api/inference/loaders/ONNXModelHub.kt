@@ -49,7 +49,6 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return An example of [OnnxInferenceModel].
      */
-    @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode

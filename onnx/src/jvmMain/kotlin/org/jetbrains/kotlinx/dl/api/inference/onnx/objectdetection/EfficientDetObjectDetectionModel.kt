@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Coco
-import org.jetbrains.kotlinx.dl.dataset.CocoVersion.V2017
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation

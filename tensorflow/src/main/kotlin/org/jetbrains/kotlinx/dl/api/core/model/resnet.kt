@@ -280,7 +280,7 @@ private fun stack2(
 ): Layer {
     var x = pointer
 
-    x = block2(x, filters, conv_shortcut = true, stride = stride1, name = name + "_block1")
+    x = block2(x, filters, convShortcut = true, stride = stride1, name = name + "_block1")
     for (i in 2 until blocks) {
         x = block2(
             x,
@@ -371,7 +371,7 @@ private fun block2(
     pointer: Layer,
     filters: Int,
     kernelSize: Int = 3,
-    conv_shortcut: Boolean = false,
+    convShortcut: Boolean = false,
     name: String,
     stride: Int = 1
 ): Layer {
@@ -382,7 +382,7 @@ private fun block2(
 
     val shortcut: Layer
 
-    if (conv_shortcut) {
+    if (convShortcut) {
         shortcut = Conv2D(
             filters = 4 * filters,
             kernelSize = intArrayOf(1, 1),

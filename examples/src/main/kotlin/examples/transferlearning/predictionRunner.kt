@@ -81,7 +81,7 @@ internal fun fileDataLoader(modelType: ModelType<*, *>,
                             resizeTo: Pair<Int, Int>
 ): DataLoader<File> {
     val resize = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        Identity<BufferedImage>()
+        Identity()
     } else {
         Resize(
             outputWidth = resizeTo.first,

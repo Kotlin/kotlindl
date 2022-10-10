@@ -80,7 +80,7 @@ private fun getShapeOfArray(data: Array<*>): Shape {
 }
 
 /**
- * @see tensorShape
+ * @see TensorShape
  */
 internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
 

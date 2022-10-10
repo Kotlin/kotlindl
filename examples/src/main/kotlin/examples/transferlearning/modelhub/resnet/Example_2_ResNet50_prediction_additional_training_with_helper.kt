@@ -21,7 +21,6 @@ import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
 import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
@@ -34,7 +33,6 @@ private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
-private const val NUM_CHANNELS = 3L
 private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 

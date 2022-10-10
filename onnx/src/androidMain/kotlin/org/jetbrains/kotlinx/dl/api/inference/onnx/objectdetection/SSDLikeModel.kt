@@ -8,7 +8,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.doWithRotation
-import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.detectPose
 import org.jetbrains.kotlinx.dl.dataset.Coco
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
