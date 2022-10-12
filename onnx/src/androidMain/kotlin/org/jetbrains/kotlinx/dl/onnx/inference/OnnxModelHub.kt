@@ -7,9 +7,9 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 
 import android.content.Context
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**

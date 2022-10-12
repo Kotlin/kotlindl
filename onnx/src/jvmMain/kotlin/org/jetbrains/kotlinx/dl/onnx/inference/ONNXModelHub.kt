@@ -8,9 +8,9 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 import mu.KLogger
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import java.io.File
 import java.net.URL

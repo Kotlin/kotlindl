@@ -7,8 +7,8 @@ package org.jetbrains.kotlinx.dl.dataset
 
 import io.jhdf.HdfFile
 import io.jhdf.api.Dataset
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.AWS_S3_URL
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.LoadingMode
+import org.jetbrains.kotlinx.dl.api.inference.loaders.AWS_S3_URL
+import org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import org.jetbrains.kotlinx.dl.dataset.handler.*
 import java.io.*

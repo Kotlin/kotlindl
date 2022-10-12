@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.kotlinx.dl.api.inference.keras.loaders
+package org.jetbrains.kotlinx.dl.api.inference.loaders
 
 import io.jhdf.HdfFile
 import mu.KLogger

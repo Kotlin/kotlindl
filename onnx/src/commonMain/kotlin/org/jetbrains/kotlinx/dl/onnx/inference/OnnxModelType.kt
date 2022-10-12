@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelType
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 
 /**
  * Base type for [OnnxInferenceModel].

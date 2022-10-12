@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.transpose
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.FaceDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.EfficientDetObjectDetectionModel

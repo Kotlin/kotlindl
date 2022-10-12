@@ -6,7 +6,7 @@
 package examples.transferlearning.modelhub.inception
 
 import examples.transferlearning.runImageRecognitionTransferLearning
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class InceptionTestSuite {

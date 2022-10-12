@@ -7,8 +7,8 @@ package examples.transferlearning.modelhub.nasnet
 
 
 import examples.transferlearning.runImageRecognitionPrediction
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 
 /**
  * This examples demonstrates the inference concept on NasNetMobile model:

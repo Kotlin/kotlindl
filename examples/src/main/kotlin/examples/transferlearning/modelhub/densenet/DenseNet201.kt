@@ -16,8 +16,8 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.LayerBatchNormPaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.LayerConvOrDensePaths
 import org.jetbrains.kotlinx.dl.api.inference.keras.MissedWeightsStrategy
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsByPaths
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
