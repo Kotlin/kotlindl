@@ -26,6 +26,7 @@ kotlin {
                 api "org.jetbrains.kotlinx:multik-core:0.2.0"
                 api "org.jetbrains.kotlinx:multik-default:0.2.0"
                 api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
+                api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
             }
         }
         jvmTest {

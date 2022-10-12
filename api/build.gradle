@@ -24,9 +24,7 @@ kotlin {
         jvmMain {
             dependencies {
                 api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
-                api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
                 api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
-                api 'com.beust:klaxon:5.5'
             }
         }
         jvmTest {
