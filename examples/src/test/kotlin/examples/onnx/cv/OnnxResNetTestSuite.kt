@@ -10,7 +10,7 @@ import examples.onnx.cv.resnet.notop.resnet50CustomPrediction
 import examples.onnx.cv.resnet.notop.resnet50additionalTraining
 import examples.onnx.cv.resnet.resnet18LightAPIPrediction
 import examples.onnx.cv.resnet.resnet18prediction
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.junit.jupiter.api.Test
 
 class OnnxResNetTestSuite {
