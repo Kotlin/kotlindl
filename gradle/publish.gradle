@@ -54,7 +54,9 @@ afterEvaluate {
                     publishPlatformArtifactsInRootModule(publications.jvm)
                     break
                 case 'androidRelease':
-                    it.artifactId "$moduleName-android"
+                    def artifact = it
+                    // afterEvaluate here is needed to workaround https://youtrack.jetbrains.com/issue/KT-53520
+                    afterEvaluate { artifact.artifactId "$moduleName-android" }
                     break
                 default:
                     it.artifactId "$moduleName-$type"
