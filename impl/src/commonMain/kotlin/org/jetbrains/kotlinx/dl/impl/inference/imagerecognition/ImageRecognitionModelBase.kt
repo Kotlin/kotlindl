@@ -6,8 +6,8 @@
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 
 /**
  * Base class for image classification models.

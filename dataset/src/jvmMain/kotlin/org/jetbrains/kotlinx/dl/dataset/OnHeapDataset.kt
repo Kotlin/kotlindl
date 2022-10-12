@@ -5,13 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator.Companion.prepareY
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ConvertToFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -104,18 +104,6 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         @JvmStatic
         public fun convertByteToFloat(label: Byte): Float {
             return (label.toInt() and 0xFF).toFloat()
-        }
-
-        /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
-        @JvmStatic
-        public fun toNormalizedVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)).toFloat() / 255f }
-        }
-
-        /** Converts [bytes] to [FloatArray]. */
-        @JvmStatic
-        public fun toRawVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF).toFloat()) }
         }
 
         /**

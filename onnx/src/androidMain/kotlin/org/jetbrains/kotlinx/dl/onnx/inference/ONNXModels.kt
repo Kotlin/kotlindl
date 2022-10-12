@@ -5,21 +5,21 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
+import org.jetbrains.kotlinx.dl.impl.preprocessing.normalize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rescale
 import org.jetbrains.kotlinx.dl.onnx.inference.classification.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.FaceDetectionModel
+import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDLikeModel
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDLikeModelMetadata
 import org.jetbrains.kotlinx.dl.onnx.inference.posedetection.SinglePoseDetectionModel
-import org.jetbrains.kotlinx.dl.dataset.Imagenet
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.normalize
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * Set of pretrained mobile-friendly ONNX models

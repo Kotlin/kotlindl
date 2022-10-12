@@ -21,8 +21,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.dataset.fashionMnist
-import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
 
 /**
  * What's about Functional DSL with Functional API usage in KotlinDL directly?

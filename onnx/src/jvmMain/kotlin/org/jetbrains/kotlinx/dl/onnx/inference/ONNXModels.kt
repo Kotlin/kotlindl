@@ -18,12 +18,12 @@ import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDMobileNetV1Obj
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.posedetection.SinglePoseDetectionModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.normalize
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.normalize
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {

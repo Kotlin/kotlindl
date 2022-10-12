@@ -7,14 +7,19 @@ package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout
+import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
+import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
+import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
 
 /**
  * The light-weight API for solving Face Alignment task.

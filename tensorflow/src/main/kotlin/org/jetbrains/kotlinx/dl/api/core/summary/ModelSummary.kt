@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.api.core.summary
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 
 /**
  * The common information about model.

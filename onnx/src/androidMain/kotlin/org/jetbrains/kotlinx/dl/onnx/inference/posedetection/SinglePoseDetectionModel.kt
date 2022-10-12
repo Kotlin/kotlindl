@@ -11,12 +11,17 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.camerax.toBitmap
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
+import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout
+import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
+import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
 
 
 /**

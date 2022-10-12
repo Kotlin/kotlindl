@@ -4,7 +4,7 @@
  */
 apply plugin: 'org.jetbrains.dokka'
 
-def documentedSubprojects = ["api", "dataset", "tensorflow", "onnx", "visualization", "examples"]
+def documentedSubprojects = ["api", "impl", "dataset", "tensorflow", "onnx", "visualization", "examples"]
 subprojects {
     if (!(name in documentedSubprojects)) return
     apply plugin: 'org.jetbrains.dokka'

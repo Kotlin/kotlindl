@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.loaders
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Identity
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 
 /**
  * Basic interface for models loaded from S3.

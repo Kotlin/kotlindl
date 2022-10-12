@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
-internal const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
+public const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**
  * This is an abstract class which provides methods for loading models, its weights and labels (for prediction purposes).

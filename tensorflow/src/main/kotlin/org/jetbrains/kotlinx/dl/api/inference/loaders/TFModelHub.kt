@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import java.io.File
 import java.net.URL
 import java.nio.file.Files

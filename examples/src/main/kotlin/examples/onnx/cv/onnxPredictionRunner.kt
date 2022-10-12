@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabel
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import java.io.File
 
 fun runONNXImageRecognitionPrediction(

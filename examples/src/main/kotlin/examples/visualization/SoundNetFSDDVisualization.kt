@@ -16,11 +16,11 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
+import org.jetbrains.kotlinx.dl.dataset.embedded.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
-import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigitDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
-import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.freeSpokenDigitDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.embedded.freeSpokenDigits
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.visualization.letsplot.columnPlot
 import org.jetbrains.kotlinx.dl.visualization.letsplot.soundPlot
 import java.io.File

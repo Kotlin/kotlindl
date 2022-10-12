@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.inference
 
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.dataset.Dataset
 
 /**
  * The basic interface for all models which defines the basic functions required for inference tasks only.
@@ -50,47 +49,4 @@ public interface InferenceModel : AutoCloseable {
         saveOptimizerState: Boolean = false,
         copyWeights: Boolean = true
     ): InferenceModel
-
-
-    /**
-     * Predicts labels for all observation in [dataset].
-     *
-     * NOTE: Slow method.
-     *
-     * @param [dataset] Dataset.
-     */
-    public fun predict(dataset: Dataset): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
-
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
-    }
-
-    /**
-     * Evaluates [dataset] via [metric].
-     *
-     * NOTE: Slow method.
-     */
-    public fun evaluate(
-        dataset: Dataset,
-        metric: Metrics
-    ): Double {
-
-        return if (metric == Metrics.ACCURACY) {
-            var counter = 0
-            for (i in 0 until dataset.xSize()) {
-                val predictedLabel = predict(dataset.getX(i))
-                if (predictedLabel == dataset.getY(i).toInt())
-                    counter++
-            }
-
-            (counter.toDouble() / dataset.xSize())
-        } else {
-            Double.NaN
-        }
-    }
 }

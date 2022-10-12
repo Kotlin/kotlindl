@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator.Companion.prepareY
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ConvertToFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
