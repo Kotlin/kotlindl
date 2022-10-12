@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModel
 import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDLikeModelMetadata
 import org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection.SinglePoseDetectionModel
 import org.jetbrains.kotlinx.dl.dataset.Imagenet
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.normalize
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
@@ -26,13 +25,10 @@ public object ONNXModels {
      * @property [channelsFirst] If true it means that the second dimension is related to number of channels in image
      *                           has short notation as `NCWH`,
      *                           otherwise, channels are at the last position and has a short notation as `NHWC`.
-     * @property [inputColorMode] An expected channels order for the input image.
-     *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
     public sealed class CV<T : InferenceModel>(
         override val modelRelativePath: String,
-        protected val channelsFirst: Boolean,
-        private val inputColorMode: ColorMode = ColorMode.RGB,
+        protected val channelsFirst: Boolean
     ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, channelsFirst, preprocessor)
