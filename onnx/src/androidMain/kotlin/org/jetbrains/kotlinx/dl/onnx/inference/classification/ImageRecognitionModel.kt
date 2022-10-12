@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference.classification
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModelBase
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModelBase
 import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.onnx.inference.ExecutionProviderCompatible
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel

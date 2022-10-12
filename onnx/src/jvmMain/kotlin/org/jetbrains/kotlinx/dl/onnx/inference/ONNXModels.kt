@@ -8,8 +8,8 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.Transpose
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.transpose
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.FaceDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel

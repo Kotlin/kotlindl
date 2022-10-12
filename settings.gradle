@@ -15,6 +15,7 @@ pluginManagement {
 
 rootProject.name = 'KotlinDL'
 include("api")
+include("impl")
 include("tensorflow")
 include("visualization")
 include("examples")

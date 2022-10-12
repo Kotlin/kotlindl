@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.InputType
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.classification.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
