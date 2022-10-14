@@ -5,15 +5,15 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException

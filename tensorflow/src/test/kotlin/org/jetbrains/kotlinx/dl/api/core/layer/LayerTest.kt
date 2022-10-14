@@ -7,8 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.impl.util.flattenFloats
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
+import org.jetbrains.kotlinx.dl.impl.util.flattenFloats
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.tensorflow.*
 import org.tensorflow.op.Ops

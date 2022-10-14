@@ -18,17 +18,13 @@ import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.InterpolationType
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.*
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import java.awt.image.BufferedImage
 import java.io.File
 

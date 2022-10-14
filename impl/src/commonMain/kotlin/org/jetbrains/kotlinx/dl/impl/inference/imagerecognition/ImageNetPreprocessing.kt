@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.impl.preprocessing.*
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.FloatArrayOperation
+import org.jetbrains.kotlinx.dl.impl.preprocessing.normalize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rescale
 
 /** TF-style preprocessing. */
 internal class TfStylePreprocessing : FloatArrayOperation() {

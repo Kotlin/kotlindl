@@ -5,15 +5,15 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.impl.dataset.Coco
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException

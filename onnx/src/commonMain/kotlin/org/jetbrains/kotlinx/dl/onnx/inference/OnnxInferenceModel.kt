@@ -7,14 +7,14 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
-import org.jetbrains.kotlinx.dl.impl.util.argmax
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getValues
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.throwIfOutputNotSupported
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CPU
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import java.nio.*
 
 

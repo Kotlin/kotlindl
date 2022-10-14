@@ -6,9 +6,9 @@
 package org.jetbrains.kotlinx.dl.impl.preprocessing
 
 import android.graphics.Bitmap
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Rotate
 

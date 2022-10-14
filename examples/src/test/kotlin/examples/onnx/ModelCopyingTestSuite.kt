@@ -7,9 +7,9 @@ package examples.onnx
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel

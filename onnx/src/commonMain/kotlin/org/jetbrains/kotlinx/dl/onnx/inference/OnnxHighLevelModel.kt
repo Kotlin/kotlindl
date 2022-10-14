@@ -6,9 +6,9 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.OrtSession
-import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
-import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**
  * Base class for pre-trained high-level onnx models.

@@ -5,13 +5,9 @@
 
 package org.jetbrains.kotlinx.dl.impl.preprocessing
 
-import org.jetbrains.kotlinx.dl.impl.util.set3D
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.impl.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageShape
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toImageShape
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
+import org.jetbrains.kotlinx.dl.impl.util.set3D
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color

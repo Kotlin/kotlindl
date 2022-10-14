@@ -6,14 +6,14 @@
 package examples.onnx.posedetection.singlepose
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
+import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
-import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedPosePanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage

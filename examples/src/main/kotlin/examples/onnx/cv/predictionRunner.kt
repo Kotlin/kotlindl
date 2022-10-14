@@ -6,19 +6,19 @@
 package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.onnx.inference.inferAndCloseUsing
-import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 

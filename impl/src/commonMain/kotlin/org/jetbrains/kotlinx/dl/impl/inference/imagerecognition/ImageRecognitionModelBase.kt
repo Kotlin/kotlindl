@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 
 /**

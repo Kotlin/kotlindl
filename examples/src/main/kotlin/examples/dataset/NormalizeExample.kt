@@ -8,8 +8,8 @@ package examples.dataset
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.dataset.generator.EmptyLabels
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.impl.preprocessing.mean

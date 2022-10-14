@@ -26,12 +26,12 @@ import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder

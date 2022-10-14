@@ -7,21 +7,21 @@ package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.impl.dataset.Coco
+import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout
+import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
+import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
+import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
-import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.impl.dataset.Coco
-import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout
-import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
-import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
-import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
 
 /**
  * Special model class for detection objects on images with built-in preprocessing and post-processing.

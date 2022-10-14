@@ -7,12 +7,12 @@ package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.facealignment.Fan2D106FaceAlignmentModel
 import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedLandmarksPanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.GridLayout

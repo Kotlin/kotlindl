@@ -8,9 +8,8 @@ package org.jetbrains.kotlinx.dl.onnx.inference.executionproviders
 import ai.onnxruntime.OrtProvider
 import ai.onnxruntime.OrtSession
 import ai.onnxruntime.providers.NNAPIFlags
-import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CPU
-import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CUDA
-import java.util.EnumSet
+import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.*
+import java.util.*
 
 /**
  * These are classes representing the supported ONNXRuntime execution providers for KotlinDL.

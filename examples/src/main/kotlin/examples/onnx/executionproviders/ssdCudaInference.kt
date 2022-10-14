@@ -5,17 +5,17 @@
 package examples.onnx.executionproviders
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CUDA
 import org.jetbrains.kotlinx.dl.onnx.inference.inferAndCloseUsing
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 

@@ -7,11 +7,11 @@ package org.jetbrains.kotlinx.dl.impl.preprocessing
 
 import android.graphics.Bitmap
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.argB8888ToNCHWArray
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.argB8888ToNHWCArray
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout.NCHW
 import org.jetbrains.kotlinx.dl.impl.preprocessing.TensorLayout.NHWC
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.argB8888ToNCHWArray
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.argB8888ToNHWCArray
 
 
 /**

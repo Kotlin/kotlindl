@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.inference
 
-import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-
 /**
  * The basic interface for all models which defines the basic functions required for inference tasks only.
  */

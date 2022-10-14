@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor
 
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArrayWithShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArrayWithShape
 
 /**
  * Applies the given [onnxModel] as a preprocessing stage.

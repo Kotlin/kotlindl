@@ -5,13 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import java.awt.image.BufferedImage
 import java.io.File
