@@ -9,7 +9,7 @@ import examples.onnx.cv.efficicentnet.efficientNetB0Prediction
 import examples.onnx.cv.efficicentnet.lightAPI.efficientNetB0EasyPrediction
 import examples.onnx.cv.efficicentnet.lightAPI.efficientNetB7LightAPIPrediction
 import examples.onnx.cv.efficicentnet.notop.efficientNetB0AdditionalTraining
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.junit.jupiter.api.Test
 
 class OnnxEfficientNetTestSuite {

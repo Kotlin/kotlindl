@@ -6,8 +6,8 @@
 package examples.onnx.cv.resnet
 
 import examples.onnx.cv.runImageRecognitionPrediction
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 
 /**
  * This examples demonstrates the inference concept on ResNet'18 model:

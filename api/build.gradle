@@ -1,52 +1,20 @@
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'com.android.library'
+apply plugin: 'kotlin'
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
-    android {
-        publishLibraryVariants("release")
-    }
-    sourceSets {
-        commonMain {
-            dependencies {
-                api project(':dataset')
-            }
-        }
-        jvmMain {
-            dependencies {
-                api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
-                api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
-            }
-        }
-        jvmTest {
-            dependencies {
-                implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-            }
-        }
-    }
     explicitApiWarning()
 }
 
-android {
-    compileSdkVersion 31
-    namespace = 'org.jetbrains.kotlinx.dl.api'
-    defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 31
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }

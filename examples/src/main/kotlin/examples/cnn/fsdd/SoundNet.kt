@@ -18,9 +18,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.dataset.FSDD_SOUND_DATA_SIZE
-import org.jetbrains.kotlinx.dl.dataset.freeSpokenDigits
-import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.FSDD_SOUND_DATA_SIZE
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.freeSpokenDigits
 
 private const val EPOCHS = 20 // 20, at least, is recommended
 private const val TRAINING_BATCH_SIZE = 64

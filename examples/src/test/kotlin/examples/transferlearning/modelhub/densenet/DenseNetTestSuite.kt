@@ -6,7 +6,7 @@
 package examples.transferlearning.modelhub.densenet
 
 import examples.transferlearning.runImageRecognitionTransferLearningOnTopModel
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class DenseNetTestSuite {

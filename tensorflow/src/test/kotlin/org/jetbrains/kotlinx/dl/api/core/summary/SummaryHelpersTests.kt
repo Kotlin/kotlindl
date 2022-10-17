@@ -1,6 +1,6 @@
 package org.jetbrains.kotlinx.dl.api.core.summary
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

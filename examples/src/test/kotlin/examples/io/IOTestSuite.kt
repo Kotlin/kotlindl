@@ -1,7 +1,7 @@
 package examples.io
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import javax.imageio.ImageIO

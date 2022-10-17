@@ -24,9 +24,9 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L1;
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2;
 import org.jetbrains.kotlinx.dl.api.core.summary.HelpersKt;
-import org.jetbrains.kotlinx.dl.dataset.EmbeddedDatasetsKt;
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset;
-import org.jetbrains.kotlinx.dl.dataset.handler.MnistUtilKt;
+import org.jetbrains.kotlinx.dl.dataset.embedded.EmbeddedDatasetsKt;
+import org.jetbrains.kotlinx.dl.dataset.embedded.MnistUtilKt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

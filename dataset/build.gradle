@@ -1,53 +1,27 @@
 project.setDescription("A KotlinDL library provides Dataset API and DSL to build image preprocessing pipeline for better Kotlin programming for Deep Learning.")
 
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'com.android.library'
+apply plugin: 'kotlin'
+
+dependencies {
+    api project(':api')
+    api project(':impl')
+    api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3' // for csv parsing
+    api 'io.jhdf:jhdf:0.5.7' // for hdf5 parsing
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
-    android {
-        publishLibraryVariants("release")
-    }
-    sourceSets {
-        commonMain {}
-        jvmMain {
-            dependencies {
-                implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.8.2'
-            }
-        }
-        jvmTest {
-            dependencies {
-                implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-                implementation project(":api")
-            }
-        }
-        androidMain {
-            dependencies {
-                api 'androidx.camera:camera-core:1.0.0-rc03'
-            }
-        }
-    }
     explicitApiWarning()
 }
 
-android {
-    compileSdkVersion 31
-    namespace = 'org.jetbrains.kotlinx.dl.dataset'
-    defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 31
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+task sourcesJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }

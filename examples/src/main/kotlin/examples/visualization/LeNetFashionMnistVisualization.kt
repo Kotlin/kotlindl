@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.dataset.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
 import org.jetbrains.kotlinx.dl.visualization.letsplot.*
 import org.jetbrains.kotlinx.dl.visualization.swing.drawActivations
 import org.jetbrains.kotlinx.dl.visualization.swing.drawFilters
