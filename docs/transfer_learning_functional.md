@@ -38,9 +38,7 @@ val preprocessing = pipeline<BufferedImage>()
     }
     .convert { colorMode = ColorMode.RGB }
     .toFloatArray { }
-    .sharpen {
-        modelTypePreprocessing = TFModels.CV.ResNet50()
-    }
+    .call(TFModels.CV.ResNet50().preprocessor)
 
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 val dataset = OnFlyImageDataset.create(
