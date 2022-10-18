@@ -42,6 +42,23 @@ on how to add Kotlin code to your existing Java codebase.
   
 That's it! Now you're ready to [build your first neural network](create_your_first_nn.md). 
 
+## Working with Kotlin DL in Android Studio
+1. Open an Android project where you want to use Kotlin DL, or create a new Android project in Android Studio as described in the [Android documentation](https://developer.android.com/training/basics/firstapp).
+2. Add the Kotlin DL dependency to your project's build files. 
+    * Add the following to the top-level `build.gradle` file:
+   ```kotlin
+   repositories {
+       mavenCentral()
+   }
+   ```
+   * Add the following to the `build.gradle` file in the application module:
+   ```kotlin
+   dependencies {
+       implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]")
+   }
+   ```
+3. Please check out the [Documentation](https://kotlin.github.io/kotlindl/) and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo) for more details.
+
 ## Working with Kotlin DL in a Jupyter Notebook
 If you want to experiment with Kotlin DL, and use it interactively, you can choose to work with it in a [Jupyter Notebook](https://jupyter.org). 
 In this case, you will need to install Jupyter, add the 
