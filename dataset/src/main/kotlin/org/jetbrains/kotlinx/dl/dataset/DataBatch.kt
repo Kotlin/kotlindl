@@ -16,7 +16,9 @@ public data class DataBatch internal constructor(
     val y: FloatArray,
     val size: Int
 ) {
-    /** */
+    /**
+     * Returns 2-dimensional shape of the data batch.
+     */
     public fun shape(elementSize: Int): List<Long> = listOf(size.toLong(), elementSize.toLong())
 
     override fun equals(other: Any?): Boolean {

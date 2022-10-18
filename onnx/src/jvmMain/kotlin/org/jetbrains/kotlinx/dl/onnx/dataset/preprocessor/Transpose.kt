@@ -43,7 +43,9 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) :
 }
 
 
-/** Image DSL Preprocessing extension.*/
+/**
+ * The DSL extension function for [Transpose] operation.
+ */
 public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.transpose(sharpBlock: Transpose.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
     return PreprocessingPipeline(this, Transpose().apply(sharpBlock))
 }

@@ -40,7 +40,9 @@ public enum class Imagenet {
     }
 }
 
-
+/**
+ * Map of Imagenet labels.
+ */
 public val imagenetLabels: Map<Int, String> = mapOf(
     0 to "tench",
     1 to "goldfish",
