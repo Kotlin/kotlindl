@@ -48,7 +48,7 @@ kotlin {
 
 android {
     compileSdkVersion 31
-    namespace = 'org.jetbrains.kotlinx.dl.api'
+    namespace = 'org.jetbrains.kotlinx.dl.impl'
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 31
