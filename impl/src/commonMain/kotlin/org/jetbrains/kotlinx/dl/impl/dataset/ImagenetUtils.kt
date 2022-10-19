@@ -11,9 +11,20 @@ package org.jetbrains.kotlinx.dl.impl.dataset
  * but some models also output additional 'background' class.
  */
 public enum class Imagenet {
+    /**
+     * Vanilla ImageNet labels with 1000 classes.
+     */
     V1k,
+
+    /**
+     * ImageNet labels with 1001 classes, where the 0th class is 'background'.
+     */
     V1001;
 
+    /**
+     * Returns map of Imagenet labels according to the [Imagenet] version.
+     * @param [zeroIndexed] if true, then labels are indexed from 0, otherwise from 1.
+     */
     public fun labels(zeroIndexed: Boolean = true): Map<Int, String> {
         return when (this) {
             V1k -> if (!zeroIndexed) toOneIndexed(imagenetLabels) else imagenetLabels

@@ -14,6 +14,11 @@ import kotlin.math.max
 import kotlin.math.min
 
 
+/**
+ * Panel for visualization of convolutional filters.
+ * @param [dst] array of filters.
+ * @param [colorCoefficient] multiplier for color intensity.
+ */
 class Conv2dJPanel(
     private val dst: Array<Array<Array<FloatArray>>>,
     private val colorCoefficient: Double = 2.0
@@ -71,6 +76,9 @@ class Conv2dJPanel1(private val dst: Array<Array<Array<FloatArray>>>) : JPanel()
     }
 }
 
+/**
+ * Panel for visualization of activation maps.
+ */
 class ReluGraphics(private val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
     override fun paint(g: Graphics) {
         for (k in 0 until 32) {

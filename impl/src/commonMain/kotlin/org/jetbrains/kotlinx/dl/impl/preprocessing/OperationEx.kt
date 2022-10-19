@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
  */
 public fun <I, O> Operation<I, O>.onResult(block: (O) -> Unit): Operation<I, O> {
     return PreprocessingPipeline(this, object : Operation<O, O> {
+        @Suppress("ReturnInsideFinallyBlock")
         override fun apply(input: O): O {
             try {
                 block(input)

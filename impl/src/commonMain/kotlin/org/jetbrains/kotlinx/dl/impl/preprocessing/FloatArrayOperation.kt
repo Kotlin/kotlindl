@@ -13,6 +13,9 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
  * and simplify the implementation of a new [Operation]s.
  */
 public abstract class FloatArrayOperation : Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+    /**
+     * Actual implementation of the [Operation] that should be applied to the [data].
+     */
     protected abstract fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray
 
     override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
