@@ -23,7 +23,7 @@ import javax.swing.JPanel
  * This examples demonstrates the inference concept on MoveNetSinglePoseLighting model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing is applied to images before prediction.
+ * - Special preprocessing is applied to each image before prediction.
  */
 fun poseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

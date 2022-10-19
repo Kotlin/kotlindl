@@ -25,7 +25,7 @@ import java.io.File
  * This examples demonstrates the inference concept on SSD model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing is applied to images before prediction.
+ * - Special preprocessing is applied to each image before prediction.
  */
 fun multiPoseDetectionMoveNet() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

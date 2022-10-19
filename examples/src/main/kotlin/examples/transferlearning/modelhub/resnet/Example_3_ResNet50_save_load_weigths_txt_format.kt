@@ -36,7 +36,7 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to each image before prediction.
  * - Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.
  * - It saves all the data to the project root directory.
  * - The first [TensorFlowInferenceModel] is created via graph and weights loading.
