@@ -130,3 +130,62 @@ val detections = model.inferAndCloseUsing(CPU()) {
 
 For more information about the KotlinDL ONNX API, please refer to the [Documentation](https://kotlin.github.io/kotlindl/) and [examples](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx).
 Please, also check out the [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo) for more details.
+
+## ONNX Execution providers support
+KotlinDL currently supports the following EPs:
+* CPU (default)
+* CUDA (for the devices with GPU and CUDA support)
+* NNAPI (for Android devices with API 27+)
+
+It is required to have the CUDA configured on your machine to use the CUDA EP.
+Please, also check how to configure dependencies for the execution on a GPU in the [Readme.md](../README.md#running-kotlindl-on-gpu)
+
+There are a few options for specifying the EP to use.
+The models loaded using the ONNXModelHub API are instantiated with the default CPU EP.
+```kotlin
+val modelHub = ONNXModelHub(...)
+val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub) // default CPU EP is used
+```
+You can also specify the EP explicitly using the following syntax:
+```kotlin
+val model = modelHub.loadModel(ONNXModels.CV.EfficientNet4Lite, NNAPI())
+```
+
+Please note that when using a low-level API ONNXInferenceModel, you need to specify the EP explicitly.
+You can do it using the functions `inferUsing` and `inferAndCloseUsing`.
+Those functions explicitly declare the EPs to be used for inference in their scope.
+Although these two functions have the same goal to initialize the model with the given
+execution providers explicitly, they have a little different behavior.
+`inferAndCloseUsing` has Kotlin's 'use' scope function semantics, i.e., it closes the model at the end of the block;
+meanwhile, `inferUsing` is designed for repeated use and has Kotlin's 'run' scope function semantics.
+```kotlin
+val model = OnnxInferenceModel(...)
+
+model.inferAndCloseUsing(CPU()) {
+    val result = it.predictRaw(image) { output -> ... }
+}
+```
+<em>Usage of inferUsingAndClose for one-time inference with CPU execution provider</em>
+```kotlin
+val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(...)
+
+model.inferUsing(CUDA()) { poseDetectionModel ->
+    for (image in images) {
+        val result = it.predictRaw(image) { output -> ... }
+        ...
+    }
+}
+
+model.close()
+```
+<em>Usage of inferUsing for recurring inference with CUDA execution provider</em>
+
+Another option is to use the initializeWith function to configure EPs for the model instance.
+
+```kotlin
+val model = OnnxInferenceModel(...)
+model.initializeWith(NNAPI())
+```
+<em>Loading and initialization of the model with NNAPI execution provider</em>
+
+

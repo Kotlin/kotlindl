@@ -54,7 +54,7 @@ That's it! Now you're ready to [build your first neural network](create_your_fir
    * Add the following to the `build.gradle` file in the application module:
    ```kotlin
    dependencies {
-       implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]")
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
    }
    ```
 3. Please check out the [Documentation](https://kotlin.github.io/kotlindl/) and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo) for more details.

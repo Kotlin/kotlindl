@@ -7,7 +7,7 @@ KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Ke
 Under the hood, it uses TensorFlow Java API and ONNX Runtime API for Java. KotlinDL offers simple APIs for training deep learning models from scratch, 
 importing existing Keras and ONNX models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
-This project aims to make Deep Learning easier for JVM developers and simplify deploying deep learning models in JVM production environments.
+This project aims to make Deep Learning easier for JVM and Android developers and simplify deploying deep learning models in production environments.
 
 Here's an example of what a classic convolutional neural network LeNet would look like in KotlinDL:
 
@@ -101,6 +101,7 @@ fun main() {
 - [TensorFlow Engine](#tensorflow-engine)
 - [Limitations](#limitations)
 - [How to configure KotlinDL in your project](#how-to-configure-kotlindl-in-your-project)
+- [Working with KotlinDL in Android projects](#working-with-kotlindl-in-android-projects)
 - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
 - [Documentation](#documentation)
 - [Examples and tutorials](#examples-and-tutorials)
@@ -143,7 +144,7 @@ Or add just one dependency if you don’t need ONNX and visualization:
    dependencies {
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
    }
-``` 
+```
 The latest KotlinDL version is 0.4.0.
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
@@ -154,8 +155,17 @@ You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin ker
 ```kotlin
    @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
 ```
-
 For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
+
+## Working with KotlinDL in Android projects
+KotlinDL supports an inference of ONNX models on the Android platform.
+To use KotlinDL in your Android project, add the following dependency to your build.gradle file:
+```kotlin
+dependencies {
+    implementation ("'org.jetbrains.kotlinx:kotlin-deeplearning-onnx-android:[KOTLIN-DL-VERSION]")
+}
+```
+For more details, please refer to the [Quick Start Guide](docs/quick_start_guide.md#working-with-kotlin-dl-in-android-studio).
 
 ## Documentation
 
@@ -176,8 +186,10 @@ At this point, please feel free to check out the following tutorials we have pre
 - [Importing a Keras model](docs/importing_keras_model.md) 
 - [Transfer learning](docs/transfer_learning.md)
 - [Transfer learning with Functional API](docs/transfer_learning_functional.md)
+- [Running inference with ONNX models on JVM](docs/inference_onnx_model.md#desktop-jvm)
+- [Running inference with ONNX models on Android](docs/inference_onnx_model.md#android)
 
-For more inspiration, take a look at the [code examples](examples) in this repo.
+For more inspiration, take a look at the [code examples](examples) in this repo and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo).
 
 ## Running KotlinDL on GPU
 
