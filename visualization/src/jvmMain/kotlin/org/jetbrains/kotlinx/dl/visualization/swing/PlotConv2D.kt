@@ -57,25 +57,6 @@ class Conv2dJPanel(
     }
 }
 
-class Conv2dJPanel1(private val dst: Array<Array<Array<FloatArray>>>) : JPanel() {
-    override fun paint(g: Graphics) {
-
-        for (k in 0 until 32) {
-            for (i in dst.indices) {
-                for (j in dst[i].indices) {
-                    val float = dst[i][j][0][k]
-                    val grey = (min(1.0f, max(float * 2, 0.0f)) * 255).toInt()
-                    val color = Color(grey, grey, grey)
-                    g.color = color
-                    g.fillRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
-                    g.color = Color.BLACK
-                    g.drawRect(10 + i * 20 + k % 8 * 105, 10 + j * 20 + k * 15, 10, 10)
-                }
-            }
-        }
-    }
-}
-
 /**
  * Panel for visualization of activation maps.
  */

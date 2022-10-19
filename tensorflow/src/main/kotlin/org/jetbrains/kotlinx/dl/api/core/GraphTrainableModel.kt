@@ -105,6 +105,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
             if (layer.parentModel != null) logger.warn { "Layer ${layer.name} is a part of model ${layer.parentModel}" }
 
+            @Suppress("LeakingThis")
             layer.parentModel = this
         }
 

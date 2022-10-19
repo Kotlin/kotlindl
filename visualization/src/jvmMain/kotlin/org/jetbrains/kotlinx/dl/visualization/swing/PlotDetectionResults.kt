@@ -15,6 +15,7 @@ import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
+import javax.swing.JPanel
 
 
 /**
@@ -23,7 +24,7 @@ import java.awt.image.BufferedImage
 fun createDetectedObjectsPanel(
     bufferedImage: BufferedImage,
     detectedObjects: List<DetectedObject>
-) = createImagePanel(bufferedImage) {
+): JPanel = createImagePanel(bufferedImage) {
     drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
 }
 
@@ -33,7 +34,7 @@ fun createDetectedObjectsPanel(
 fun createDetectedPosePanel(
     bufferedImage: BufferedImage,
     detectedPose: DetectedPose
-) = createImagePanel(bufferedImage) {
+): JPanel = createImagePanel(bufferedImage) {
     drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
 }
 
@@ -43,7 +44,7 @@ fun createDetectedPosePanel(
 fun createMultipleDetectedPosesPanel(
     bufferedImage: BufferedImage,
     multiPoseDetectionResult: MultiPoseDetectionResult
-) = createImagePanel(bufferedImage) {
+): JPanel = createImagePanel(bufferedImage) {
     drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
 }
 
@@ -52,7 +53,7 @@ fun createMultipleDetectedPosesPanel(
  */
 fun createDetectedLandmarksPanel(
     bufferedImage: BufferedImage, landmarks: List<Landmark>
-) = createImagePanel(bufferedImage) {
+): JPanel = createImagePanel(bufferedImage) {
     drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
 }
 
@@ -95,19 +96,19 @@ private fun Graphics2D.drawPose(
 
     color = edgeColor
     stroke = BasicStroke(2f)
-    detectedPose.edges.forEach { edge ->
+    detectedPose.edges.forEach { (start, end, _, _) ->
         draw(
             Line2D.Float(
-                width * edge.start.x, height * edge.start.y,
-                width * edge.end.x, height * edge.end.y
+                width * start.x, height * start.y,
+                width * end.x, height * end.y
             )
         )
     }
 
     val r = 3.0f
     color = landmarkColor
-    detectedPose.landmarks.forEach { landmark ->
-        fill(Ellipse2D.Float(width * landmark.x - r, height * landmark.y - r, 2 * r, 2 * r))
+    detectedPose.landmarks.forEach { (x, y, _, _) ->
+        fill(Ellipse2D.Float(width * x - r, height * y - r, 2 * r, 2 * r))
     }
 }
 
@@ -133,7 +134,7 @@ private fun Graphics2D.drawLandmarks(landmarks: List<Landmark>, width: Int, heig
 
     val r = 3.0f
     color = Color.RED
-    landmarks.forEach { landmark ->
-        fill(Ellipse2D.Float(width * landmark.x - r, height * landmark.y - r, 2 * r, 2 * r))
+    landmarks.forEach { (x, y) ->
+        fill(Ellipse2D.Float(width * x - r, height * y - r, 2 * r, 2 * r))
     }
 }

@@ -10,18 +10,18 @@ This dataset contains 70,000 images that fall into ten different categories of c
 Each example is a 28x28 grayscale image associated with a single label that matches one of the 10 classes. 
 Here are the labels and how they map to the actual classes:
 
-| Label        | Class           | 
-| ------------- |:-------------:| 
-| 0      | T-shirt/top | 
-| 1      | Trousers |
-| 2      | Pullover |
-| 3      | Dress |
-| 4      | Coat |
-| 5      | Sandals |
-| 6      | Shirt |
-| 7      | Sneakers |
-| 8      | Bag |
-| 9      | Ankle boots |
+| Label |    Class    | 
+|-------|:-----------:| 
+| 0     | T-shirt/top | 
+| 1     |  Trousers   |
+| 2     |  Pullover   |
+| 3     |    Dress    |
+| 4     |    Coat     |
+| 5     |   Sandals   |
+| 6     |    Shirt    |
+| 7     |  Sneakers   |
+| 8     |     Bag     |
+| 9     | Ankle boots |
 
 For this example, we are planning to use a numeric representation for string categories, called string-to-number encoding. 
 We'll later use this to get human-readable predictions:

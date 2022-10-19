@@ -21,13 +21,12 @@ public class CenterCrop(public var size: Int = -1) : Operation<BufferedImage, Bu
         if (size <= 0 || (input.width == size && input.height == size)) return input
 
         val paddedImage = padIfNecessary(input)
-        val result = paddedImage.getSubimage(
+
+        return paddedImage.getSubimage(
             (paddedImage.width - size) / 2,
             (paddedImage.height - size) / 2,
             size, size
         ).copy()
-
-        return result
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
