@@ -37,7 +37,7 @@ fun efficientNetB0Prediction() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

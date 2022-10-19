@@ -59,8 +59,9 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?, inputShap
  * @param config Model configuration.
  * @return Pair of <input layer; list of layers>.
  */
-internal fun loadSequentialModelLayers(config: KerasModel?,
-                                       inputShape: IntArray? = null
+internal fun loadSequentialModelLayers(
+    config: KerasModel?,
+    inputShape: IntArray? = null
 ): Pair<Input, List<Layer>> {
     val kerasLayers = config!!.config!!.layers!!
 

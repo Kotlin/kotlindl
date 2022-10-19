@@ -42,7 +42,10 @@ internal object WeightMappings {
         }
     }
 
-    internal fun getLayerVariablePathTemplates(layer: ParametrizedLayer, layerPaths: LayerPaths?): Map<KVariable, String>? {
+    internal fun getLayerVariablePathTemplates(
+        layer: ParametrizedLayer,
+        layerPaths: LayerPaths?
+    ): Map<KVariable, String>? {
         return when (layer) {
             is Dense -> getDenseVariablesPathTemplates(layer, layerPaths)
             is ConvTranspose -> getConvTransposeVariablePathTemplates(layer, layerPaths)
@@ -72,8 +75,9 @@ internal object WeightMappings {
         return mapOfNotNull("kernel:0" to layer.kernel, "bias:0" to layer.bias)
     }
 
-    private fun getConvTransposeVariablePathTemplates(layer: ConvTranspose,
-                                                      layerPaths: LayerPaths?
+    private fun getConvTransposeVariablePathTemplates(
+        layer: ConvTranspose,
+        layerPaths: LayerPaths?
     ): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(layer.name, KERNEL_DATA_PATH_TEMPLATE, BIAS_DATA_PATH_TEMPLATE)
@@ -87,8 +91,9 @@ internal object WeightMappings {
         return mapOfNotNull("depthwise_kernel:0" to layer.kernel, "depthwise_bias:0" to layer.bias)
     }
 
-    private fun getDepthwiseConv2DVariablePathTemplates(layer: DepthwiseConv2D,
-                                                        layerPaths: LayerPaths?
+    private fun getDepthwiseConv2DVariablePathTemplates(
+        layer: DepthwiseConv2D,
+        layerPaths: LayerPaths?
     ): Map<KVariable, String> {
         val layerConvOrDensePaths = layerPaths as? LayerConvOrDensePaths
             ?: LayerConvOrDensePaths(
@@ -110,8 +115,9 @@ internal object WeightMappings {
         )
     }
 
-    private fun getSeparableConv2DVariablePathTemplates(layer: SeparableConv2D,
-                                                        layerPaths: LayerPaths?
+    private fun getSeparableConv2DVariablePathTemplates(
+        layer: SeparableConv2D,
+        layerPaths: LayerPaths?
     ): Map<KVariable, String> {
         val layerSeparableConv2DPaths = layerPaths as? LayerSeparableConv2DPaths
             ?: LayerSeparableConv2DPaths(

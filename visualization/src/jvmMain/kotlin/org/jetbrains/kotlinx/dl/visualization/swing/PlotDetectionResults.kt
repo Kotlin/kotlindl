@@ -20,8 +20,9 @@ import java.awt.image.BufferedImage
 /**
  * Create a component with the given [bufferedImage] and [detectedObjects] drawn on top of it.
  */
-fun createDetectedObjectsPanel(bufferedImage: BufferedImage,
-                               detectedObjects: List<DetectedObject>
+fun createDetectedObjectsPanel(
+    bufferedImage: BufferedImage,
+    detectedObjects: List<DetectedObject>
 ) = createImagePanel(bufferedImage) {
     drawObjects(detectedObjects, bufferedImage.width, bufferedImage.height)
 }
@@ -29,8 +30,9 @@ fun createDetectedObjectsPanel(bufferedImage: BufferedImage,
 /**
  * Create a component with the given [bufferedImage] and [detectedPose] drawn on top of it.
  */
-fun createDetectedPosePanel(bufferedImage: BufferedImage,
-                            detectedPose: DetectedPose
+fun createDetectedPosePanel(
+    bufferedImage: BufferedImage,
+    detectedPose: DetectedPose
 ) = createImagePanel(bufferedImage) {
     drawPose(detectedPose, bufferedImage.width, bufferedImage.height)
 }
@@ -38,8 +40,9 @@ fun createDetectedPosePanel(bufferedImage: BufferedImage,
 /**
  * Create a component with the given [bufferedImage] and [multiPoseDetectionResult] drawn on top of it.
  */
-fun createMultipleDetectedPosesPanel(bufferedImage: BufferedImage,
-                                     multiPoseDetectionResult: MultiPoseDetectionResult
+fun createMultipleDetectedPosesPanel(
+    bufferedImage: BufferedImage,
+    multiPoseDetectionResult: MultiPoseDetectionResult
 ) = createImagePanel(bufferedImage) {
     drawMultiplePoses(multiPoseDetectionResult, bufferedImage.width, bufferedImage.height)
 }
@@ -47,16 +50,18 @@ fun createMultipleDetectedPosesPanel(bufferedImage: BufferedImage,
 /**
  * Create a component with the given [bufferedImage] and [landmarks] drawn on top of it.
  */
-fun createDetectedLandmarksPanel(bufferedImage: BufferedImage, landmarks: List<Landmark>
+fun createDetectedLandmarksPanel(
+    bufferedImage: BufferedImage, landmarks: List<Landmark>
 ) = createImagePanel(bufferedImage) {
     drawLandmarks(landmarks, bufferedImage.width, bufferedImage.height)
 }
 
-private fun Graphics2D.drawObject(detectedObject: DetectedObject,
-                                  width: Int,
-                                  height: Int,
-                                  objectColor: Color = Color.RED,
-                                  labelColor: Color = Color.ORANGE
+private fun Graphics2D.drawObject(
+    detectedObject: DetectedObject,
+    width: Int,
+    height: Int,
+    objectColor: Color = Color.RED,
+    labelColor: Color = Color.ORANGE
 ) {
     setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
@@ -81,9 +86,10 @@ private fun Graphics2D.drawObjects(detectedObjects: List<DetectedObject>, width:
     detectedObjects.forEach { drawObject(it, width, height) }
 }
 
-private fun Graphics2D.drawPose(detectedPose: DetectedPose, width: Int, height: Int,
-                                landmarkColor: Color = Color.RED,
-                                edgeColor: Color = Color.MAGENTA
+private fun Graphics2D.drawPose(
+    detectedPose: DetectedPose, width: Int, height: Int,
+    landmarkColor: Color = Color.RED,
+    edgeColor: Color = Color.MAGENTA
 ) {
     setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
@@ -105,9 +111,10 @@ private fun Graphics2D.drawPose(detectedPose: DetectedPose, width: Int, height: 
     }
 }
 
-private fun Graphics2D.drawMultiplePoses(multiPoseDetectionResult1: MultiPoseDetectionResult,
-                                         width: Int,
-                                         height: Int
+private fun Graphics2D.drawMultiplePoses(
+    multiPoseDetectionResult1: MultiPoseDetectionResult,
+    width: Int,
+    height: Int
 ) {
     setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     multiPoseDetectionResult1.poses.forEachIndexed { i, (detectedObject, detectedPose) ->

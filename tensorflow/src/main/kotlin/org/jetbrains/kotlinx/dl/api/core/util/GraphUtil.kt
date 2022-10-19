@@ -24,10 +24,11 @@ internal fun <T> sortTopologically(start: T, nextNodes: (T) -> Collection<T>): L
     return sortedList
 }
 
-private fun <T> recursiveTopologicalSort(currentNode: T,
-                                         stack: Stack<T>,
-                                         visited: MutableSet<T>,
-                                         nextNodes: (T) -> Collection<T>
+private fun <T> recursiveTopologicalSort(
+    currentNode: T,
+    stack: Stack<T>,
+    visited: MutableSet<T>,
+    nextNodes: (T) -> Collection<T>
 ) {
     visited.add(currentNode)
 

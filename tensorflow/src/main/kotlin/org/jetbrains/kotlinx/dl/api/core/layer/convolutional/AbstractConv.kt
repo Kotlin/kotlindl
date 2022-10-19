@@ -64,10 +64,11 @@ public abstract class AbstractConv(
     public override val variables: List<KVariable>
         get() = listOfNotNull(kernel, bias)
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape
@@ -77,7 +78,7 @@ public abstract class AbstractConv(
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
         val fanIn = (inputDepth * multiply(kernelSize.toLongArray())).toInt()
         val fanOut = ((outputDepth * multiply(kernelSize.toLongArray())).toDouble() /
-                     multiply(strides.toLongArray()).toDouble()).roundToInt()
+                multiply(strides.toLongArray()).toDouble()).roundToInt()
 
         kernel = createVariable(
             tf,

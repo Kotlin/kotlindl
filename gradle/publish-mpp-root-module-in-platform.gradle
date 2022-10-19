@@ -1,3 +1,6 @@
+import org.gradle.execution.plan.Node
+import org.w3c.dom.NodeList
+
 /*
  * Copyright 2014-2022 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
@@ -39,7 +42,7 @@ project.ext.publishPlatformArtifactsInRootModule = { MavenPublication platformPu
             }
         }
 
-        tasks.matching { it.name == "generatePomFileForKotlinMultiplatformPublication"}.configureEach {
+        tasks.matching { it.name == "generatePomFileForKotlinMultiplatformPublication" }.configureEach {
             dependsOn(tasks["generatePomFileFor${platformPublication.name.capitalize()}Publication"])
         }
     }

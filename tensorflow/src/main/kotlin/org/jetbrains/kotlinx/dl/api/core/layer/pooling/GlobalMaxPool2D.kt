@@ -23,10 +23,11 @@ public class GlobalMaxPool2D(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return tf.max(input, tf.constant(intArrayOf(1, 2)))
     }

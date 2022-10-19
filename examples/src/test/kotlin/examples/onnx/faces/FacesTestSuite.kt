@@ -49,7 +49,7 @@ class FacesTestSuite {
                     outputWidth = 192
                 }
                 .convert { colorMode = ColorMode.BGR }
-                .toFloatArray {  }
+                .toFloatArray { }
                 .call(modelType.preprocessor)
                 .fileLoader()
 

@@ -26,10 +26,11 @@ import org.tensorflow.op.Ops
 public class GlobalAvgPool3D(
     name: String = ""
 ) : Layer(name) {
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
     }

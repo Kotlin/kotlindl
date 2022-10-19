@@ -39,10 +39,12 @@ public abstract class Layer(public var name: String) {
      * @param [isTraining] TensorFlow operand for switching between training and inference modes.
      * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public abstract fun build(tf: Ops,
-                              input: Operand<Float>,
-                              isTraining: Operand<Boolean>,
-                              numberOfLosses: Operand<Float>?): Operand<Float>
+    public abstract fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float>
 
     /**
      * Extend this function to define variables in the layer and compute layer output.
@@ -54,10 +56,12 @@ public abstract class Layer(public var name: String) {
      * @param [isTraining] TensorFlow operand for switching between training and inference modes.
      * @param [numberOfLosses] TensorFlow operand for batch size data.
      */
-    public open fun build(tf: Ops,
-                          input: List<Operand<Float>>,
-                          isTraining: Operand<Boolean>,
-                          numberOfLosses: Operand<Float>?): Operand<Float> {
+    public open fun build(
+        tf: Ops,
+        input: List<Operand<Float>>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float> {
         return build(tf, input.first(), isTraining, numberOfLosses)
     }
 

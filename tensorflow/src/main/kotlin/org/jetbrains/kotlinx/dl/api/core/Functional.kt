@@ -255,7 +255,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
+    override fun buildLayers(
+        training: Operand<Boolean>,
+        numberOfLosses: Operand<Float>
+    ): Pair<Placeholder<Float>, Operand<Float>> {
         val input = inputLayer.build(tf)
         inputLayer.setOutputShape(input.asOutput().shape())
         val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to input)

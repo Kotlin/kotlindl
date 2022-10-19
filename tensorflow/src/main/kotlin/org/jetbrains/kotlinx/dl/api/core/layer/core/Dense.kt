@@ -61,10 +61,11 @@ public class Dense(
 
     override var isTrainable: Boolean = true
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()

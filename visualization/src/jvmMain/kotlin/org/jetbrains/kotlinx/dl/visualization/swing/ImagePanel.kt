@@ -38,7 +38,7 @@ open class ImagePanel(private val bufferedImage: BufferedImage) : JPanel() {
          * and allows to draw on it using the given [draw] function.
          */
         fun createImagePanel(bufferedImage: BufferedImage, draw: Graphics2D.() -> Unit): JPanel {
-            return object: ImagePanel(bufferedImage) {
+            return object : ImagePanel(bufferedImage) {
                 override fun paint(graphics: Graphics) {
                     super.paint(graphics)
                     (graphics as Graphics2D).draw()

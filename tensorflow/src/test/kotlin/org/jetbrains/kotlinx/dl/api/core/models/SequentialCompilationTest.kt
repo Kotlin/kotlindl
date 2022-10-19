@@ -669,7 +669,7 @@ internal class SequentialModelTest {
                         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
                         metric = Metrics.ACCURACY
                     )
-                } catch (e : Throwable) {
+                } catch (e: Throwable) {
                     throw e
                 }
             }

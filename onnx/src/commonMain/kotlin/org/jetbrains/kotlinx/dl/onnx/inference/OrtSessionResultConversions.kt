@@ -257,10 +257,11 @@ public object OrtSessionResultConversions {
      * Checks if [valueInfo] corresponds to a Tensor of the specified [type].
      * If it does not satisfy the requirements, exception with a message containing [valueName] and calling [method] name is thrown.
      */
-    internal fun throwIfOutputNotSupported(valueInfo: ValueInfo,
-                                           valueName: String,
-                                           method: String,
-                                           type: OnnxJavaType
+    internal fun throwIfOutputNotSupported(
+        valueInfo: ValueInfo,
+        valueName: String,
+        method: String,
+        type: OnnxJavaType
     ) {
         require(valueInfo !is MapInfo) { "Output $valueName is a Map, but currently method $method supports only $type Tensor outputs." }
         require(valueInfo !is SequenceInfo) { "Output '$valueName' is a Sequence, but currently method $method supports $type float Tensor outputs." }

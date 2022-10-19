@@ -29,10 +29,11 @@ public class Reshape(
 ) : Layer(name) {
     private lateinit var units: Constant<Int>
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         units = tf.constant(IntArray(targetShape.size + 1) {
             if (it == 0) -1 else targetShape[it - 1]

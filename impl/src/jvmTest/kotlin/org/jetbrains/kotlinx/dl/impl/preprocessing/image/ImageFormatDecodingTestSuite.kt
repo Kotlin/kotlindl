@@ -37,17 +37,21 @@ class ImageFormatDecodingTestSuite {
     fun argb8888ToNCHWTest() {
         val nchw = argB8888ToNCHWArray(encodedPixels, w, h, 3)
 
-        assert(nchw.contentEquals(
-            floatArrayOf(50.0f, 210.0f, 10.0f, 210.0f, 150.0f, 40.0f, 190.0f, 160.0f, 200.0f, 40.0f, 70.0f, 60.0f)
-        ))
+        assert(
+            nchw.contentEquals(
+                floatArrayOf(50.0f, 210.0f, 10.0f, 210.0f, 150.0f, 40.0f, 190.0f, 160.0f, 200.0f, 40.0f, 70.0f, 60.0f)
+            )
+        )
     }
 
     @Test
     fun argb8888ToNHWCTest() {
         val nchw = argB8888ToNHWCArray(encodedPixels, w, h, 3)
 
-        assert(nchw.contentEquals(
-            floatArrayOf(50.0f, 150.0f, 200.0f, 210.0f, 40.0f, 40.0f, 10.0f, 190.0f, 70.0f, 210.0f, 160.0f, 60.0f)
-        ))
+        assert(
+            nchw.contentEquals(
+                floatArrayOf(50.0f, 150.0f, 200.0f, 210.0f, 40.0f, 40.0f, 10.0f, 190.0f, 70.0f, 210.0f, 160.0f, 60.0f)
+            )
+        )
     }
 }

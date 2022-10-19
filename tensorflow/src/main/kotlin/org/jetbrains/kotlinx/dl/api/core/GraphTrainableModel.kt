@@ -405,7 +405,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
                 if (validationIsEnabled) {
                     val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
-                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metric.convertBack(it)] }.toList()
+                    val validationMetricValues =
+                        metrics.map { evaluationResult.metrics[Metric.convertBack(it)] }.toList()
                     // TODO: probably I should it by name, not by type
                     val validationLossValue = evaluationResult.lossValue
                     epochTrainingEvent.valLossValue = validationLossValue
@@ -530,7 +531,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                             }
 
                             val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(),
-                                                        averageMetricAccum.map { it.toDouble() })
+                                averageMetricAccum.map { it.toDouble() })
                             evaluationHistory.appendBatch(batchEvent)
 
                             callbacks.forEach {

@@ -14,14 +14,14 @@ public enum class Coco {
     V2014,
     V2017;
 
-    public fun labels(zeroIndexed: Boolean = false) : Map<Int, String> {
+    public fun labels(zeroIndexed: Boolean = false): Map<Int, String> {
         return when (this) {
             V2014 -> if (zeroIndexed) toZeroIndexed(cocoCategories2014) else cocoCategories2014
             V2017 -> if (zeroIndexed) toZeroIndexed(cocoCategories2017) else cocoCategories2017
         }
     }
 
-    private fun toZeroIndexed(labels: Map<Int, String>) : Map<Int, String> {
+    private fun toZeroIndexed(labels: Map<Int, String>): Map<Int, String> {
         val zeroIndexedLabels = mutableMapOf<Int, String>()
         labels.forEach { (key, value) ->
             zeroIndexedLabels[key - 1] = value

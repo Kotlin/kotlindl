@@ -55,9 +55,10 @@ public class History {
  * @param lossValue Final value of loss function.
  * @param metricValues Final values of chosen metrics.
  */
-public class BatchEvent(public val batchIndex: Int,
-                        public val lossValue: Double,
-                        public val metricValues: List<Double>
+public class BatchEvent(
+    public val batchIndex: Int,
+    public val lossValue: Double,
+    public val metricValues: List<Double>
 ) {
     override fun toString(): String {
         return "BatchEvent(batchIndex=$batchIndex, lossValue=$lossValue, metricValues=$metricValues)"

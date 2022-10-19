@@ -46,7 +46,7 @@ fun ssd() {
             val inputData = preprocessing.load(getFileFromResource("datasets/detection/image$i.jpg")).first
 
             val start = System.currentTimeMillis()
-            val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0)}
+            val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0) }
             val end = System.currentTimeMillis()
             println("Prediction took ${end - start} ms")
             println(yhat.contentToString())

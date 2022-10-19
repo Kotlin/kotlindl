@@ -10,11 +10,11 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 
 /** Applies [Normalizing] preprocessor to the tensor to normalize it with given mean and std values. */
-public fun<I> Operation<I, Pair<FloatArray, TensorShape>>.normalize(block: Normalizing.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.normalize(block: Normalizing.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
     return PreprocessingPipeline(this, Normalizing().apply(block))
 }
 
 /** Applies [Rescaling] preprocessor to the tensor to scale each value by a given coefficient. */
-public fun<I> Operation<I, Pair<FloatArray, TensorShape>>.rescale(block: Rescaling.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.rescale(block: Rescaling.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
     return PreprocessingPipeline(this, Rescaling().apply(block))
 }

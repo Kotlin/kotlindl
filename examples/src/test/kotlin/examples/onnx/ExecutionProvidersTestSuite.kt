@@ -55,6 +55,7 @@ class ExecutionProvidersTestSuite {
     fun cudaTest() {
         resnetModelsInference(CUDA())
     }
+
     @Test
     fun executorProvidersComparisonTest() {
         assertEquals(CPU(), CPU(true))

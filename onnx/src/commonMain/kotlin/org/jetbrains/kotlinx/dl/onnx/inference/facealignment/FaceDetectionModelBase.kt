@@ -54,9 +54,10 @@ public abstract class FaceDetectionModelBase<I> : OnnxHighLevelModel<I, List<Det
          * @param [topK] how many boxes to include in the result. Negative or zero means to include everything.
          * @param [threshold] threshold IoU value
          */
-        public fun suppressNonMaxBoxes(boxes: List<DetectedObject>,
-                                       topK: Int = -1,
-                                       threshold: Float = 0.5f
+        public fun suppressNonMaxBoxes(
+            boxes: List<DetectedObject>,
+            topK: Int = -1,
+            threshold: Float = 0.5f
         ): List<DetectedObject> {
             val sortedBoxes = boxes.toMutableList().apply { sortByDescending { it.probability } }
             val result = mutableListOf<DetectedObject>()

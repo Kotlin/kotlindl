@@ -19,6 +19,7 @@ public interface Operation<I, O> {
      * @return an output of the operation of type [O].
      */
     public fun apply(input: I): O
+
     /**
      * Returns shape of the output of the operation having input of shape [inputShape].
      * @param inputShape is a shape of the input.

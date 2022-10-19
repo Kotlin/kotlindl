@@ -19,11 +19,11 @@ class PreprocessingImageTest {
     fun resizeTest() {
         val preprocess = pipeline<BufferedImage>()
             .resize {
-                    outputWidth = 4
-                    outputHeight = 4
-                    interpolation = InterpolationType.NEAREST
-                }
-            .toFloatArray {  }
+                outputWidth = 4
+                outputHeight = 4
+                interpolation = InterpolationType.NEAREST
+            }
+            .toFloatArray { }
             .rescale { }
 
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
@@ -47,12 +47,12 @@ class PreprocessingImageTest {
     fun cropTest() {
         val preprocess = pipeline<BufferedImage>()
             .crop {
-                    left = 1
-                    right = 0
-                    top = 0
-                    bottom = 1
-                }
-            .toFloatArray {  }
+                left = 1
+                right = 0
+                top = 0
+                bottom = 1
+            }
+            .toFloatArray { }
             .rescale { }
 
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
@@ -75,7 +75,7 @@ class PreprocessingImageTest {
             .rotate {
                 degrees = 90f
             }
-            .toFloatArray {  }
+            .toFloatArray { }
             .rescale { }
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
         inputImage.setRGB(0, 0, Color.BLUE.rgb)
@@ -93,13 +93,13 @@ class PreprocessingImageTest {
     fun constantPaddingTest() {
         val preprocess = pipeline<BufferedImage>()
             .pad {
-                    top = 1
-                    bottom = 2
-                    left = 3
-                    right = 4
-                    mode = PaddingMode.Fill(Color.GRAY)
-                }
-            .toFloatArray {  }
+                top = 1
+                bottom = 2
+                left = 3
+                right = 4
+                mode = PaddingMode.Fill(Color.GRAY)
+            }
+            .toFloatArray { }
             .rescale { }
 
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
@@ -139,7 +139,7 @@ class PreprocessingImageTest {
     fun grayscaleTest() {
         val preprocess = pipeline<BufferedImage>()
             .grayscale()
-            .toFloatArray {  }
+            .toFloatArray { }
             .rescale { }
 
         val inputImage = BufferedImage(2, 2, BufferedImage.TYPE_3BYTE_BGR)
@@ -167,7 +167,7 @@ class PreprocessingImageTest {
     fun centerCropTest() {
         val preprocess = pipeline<BufferedImage>()
             .centerCrop { size = 2 }
-            .toFloatArray {  }
+            .toFloatArray { }
             .rescale { }
 
         val color1 = Color(50, 150, 200)
@@ -195,9 +195,10 @@ class PreprocessingImageTest {
                 ColorMode.RGB -> floatArrayOf(color.red / 255f, color.green / 255f, color.blue / 255f)
                 ColorMode.BGR -> floatArrayOf(color.blue / 255f, color.green / 255f, color.red / 255f)
                 ColorMode.GRAYSCALE -> {
-                    floatArrayOf(((0.299 * color.red) +
-                                  (0.587 * color.green) +
-                                  (0.114 * color.blue)).roundToInt() / 255f
+                    floatArrayOf(
+                        ((0.299 * color.red) +
+                                (0.587 * color.green) +
+                                (0.114 * color.blue)).roundToInt() / 255f
                     )
                 }
             }

@@ -41,10 +41,11 @@ public class MaxPool3D(
         name = name
     )
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val paddingName = padding.paddingName
         val tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()

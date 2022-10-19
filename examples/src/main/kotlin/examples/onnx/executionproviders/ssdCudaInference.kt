@@ -33,11 +33,11 @@ fun ssdCudaInference() {
     model.inferAndCloseUsing(CUDA()) {
         val preprocessing = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = 1200
-                    outputWidth = 1200
-                }
+                outputHeight = 1200
+                outputWidth = 1200
+            }
             .convert { colorMode = ColorMode.RGB }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

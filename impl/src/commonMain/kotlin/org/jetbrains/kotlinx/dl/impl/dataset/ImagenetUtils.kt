@@ -14,7 +14,7 @@ public enum class Imagenet {
     V1k,
     V1001;
 
-    public fun labels(zeroIndexed: Boolean = true) : Map<Int, String> {
+    public fun labels(zeroIndexed: Boolean = true): Map<Int, String> {
         return when (this) {
             V1k -> if (!zeroIndexed) toOneIndexed(imagenetLabels) else imagenetLabels
             V1001 -> if (!zeroIndexed) toOneIndexed(addBackgroundLabel(imagenetLabels)) else
@@ -22,7 +22,7 @@ public enum class Imagenet {
         }
     }
 
-    private fun toOneIndexed(labels: Map<Int, String>) : Map<Int, String> {
+    private fun toOneIndexed(labels: Map<Int, String>): Map<Int, String> {
         val zeroIndexedLabels = mutableMapOf<Int, String>()
         labels.forEach { (key, value) ->
             zeroIndexedLabels[key + 1] = value
@@ -30,7 +30,7 @@ public enum class Imagenet {
         return zeroIndexedLabels
     }
 
-    private fun addBackgroundLabel(labels: Map<Int, String>) : Map<Int, String> {
+    private fun addBackgroundLabel(labels: Map<Int, String>): Map<Int, String> {
         val labelsWithBackground = mutableMapOf<Int, String>()
         labelsWithBackground[0] = "background"
         labels.forEach { (key, value) ->
