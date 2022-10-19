@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -72,6 +72,13 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
         return File(fileName)
     }
 
+    /**
+     * This method loads model from ONNX model zoo corresponding to the specified [modelType].
+     * The [loadingMode] parameter defines the strategy of existing model use-case handling.
+     * If [loadingMode] is [LoadingMode.SKIP_LOADING_IF_EXISTS] and the model is already loaded, then the model will be loaded from the local [cacheDirectory].
+     * If [loadingMode] is [LoadingMode.OVERRIDE_IF_EXISTS] the model will be overridden even if it is already loaded.
+     * [executionProviders] is a list of execution providers which will be used for model inference.
+     */
     @Suppress("UNCHECKED_CAST")
     public fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: OnnxModelType<T, U>,

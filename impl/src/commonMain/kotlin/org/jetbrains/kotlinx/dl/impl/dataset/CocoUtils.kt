@@ -5,7 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.impl.dataset
 
-
+/**
+ * This enum represents a types of COCO dataset labels.
+ * Some models are trained on the COCO dataset with 80 classes (2014), and some models are trained on the COCO dataset with 91 classes (2017).
+ * Also, sometimes labels are indexed from 1, and sometimes from 0.
+ */
 public enum class Coco {
     V2014,
     V2017;
@@ -207,9 +211,3 @@ public val cocoCategories2017: Map<Int, String> = mapOf(
     89 to "hair drier",
     90 to "toothbrush"
 )
-
-
-public enum class CocoVersion {
-    V2014,
-    V2017
-}

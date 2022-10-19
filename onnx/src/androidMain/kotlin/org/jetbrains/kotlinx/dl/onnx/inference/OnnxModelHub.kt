@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -35,7 +35,12 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
         return inferenceModel as T
     }
 
-
+    /**
+     * It's equivalent to [loadModel] with [ExecutionProvider.CPU] execution provider.
+     *
+     * @param [modelType] model type from [ONNXModels]
+     * @param [loadingMode] it's ignored
+     */
     override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode /* unused */,

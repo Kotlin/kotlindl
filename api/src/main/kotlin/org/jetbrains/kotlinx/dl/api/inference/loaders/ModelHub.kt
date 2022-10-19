@@ -45,7 +45,7 @@ public abstract class ModelHub {
     }
 
     /**
-     *
+     * This operator equivalent to [loadPretrainedModel].
      */
     public operator fun <T : InferenceModel, U : InferenceModel> get(modelType: ModelType<T, U>): U {
         return loadPretrainedModel(modelType = modelType)
