@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
     id 'io.codearte.nexus-staging' version '0.22.0'
     id 'org.jetbrains.dokka' version '1.5.30'
+    id "com.gradle.plugin-publish" version "1.0.0" apply false
 }
 
 apply from: project.rootProject.file('gradle/dokka.gradle')
@@ -20,7 +21,7 @@ allprojects {
     version = kotlinDLVersion
 }
 
-def unpublishedSubprojects = ["examples"]
+def unpublishedSubprojects = ["examples", "gradlePlugin"]
 
 subprojects {
     if (name in unpublishedSubprojects) return
