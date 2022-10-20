@@ -39,7 +39,6 @@ afterEvaluate {
                     artifact sourcesJar
                 }
             }
-            logger.warn(project.name)
             return
         }
         publications.configureEach {
