@@ -6,12 +6,12 @@
 package org.jetbrains.kotlinx.dl.gradle
 
 private const val ROOT_FOLDER = "models/onnx/mobile"
-private const val SUFFIX = "ort"
+private const val ORT_EXTENSION = "ort"
 
 /**
  * A list of pretrained models available for download.
  */
-enum class ModelType(subfolderName: String, fileName: String) {
+enum class ModelType(subfolderName: String, fileName: String, extension: String = ORT_EXTENSION) {
     EfficientNet4Lite("cv", "efficientnet_lite4"),
     MobilenetV1("cv", "mobilenet_v1"),
     MoveNetSinglePoseLighting("poseestimation", "movenet_singlepose_lighting_13"),
@@ -25,5 +25,5 @@ enum class ModelType(subfolderName: String, fileName: String) {
     /**
      * Server path for the model.
      */
-    val serverPath = "$ROOT_FOLDER/$subfolderName/$fileName.$SUFFIX"
+    val serverPath = "$ROOT_FOLDER/$subfolderName/$fileName.$extension"
 }
