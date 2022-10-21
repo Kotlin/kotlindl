@@ -29,7 +29,7 @@ afterEvaluate {
     publishing {
         if (!isMultiplatform) {
             publications {
-                maven(MavenPublication) { publication ->
+                maven(MavenPublication) {
                     pom.withXml(configureMavenCentralMetadata)
                     from components.java
                     artifactId moduleName
