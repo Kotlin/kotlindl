@@ -56,7 +56,7 @@ fun resnet50noTopAdditionalTraining() {
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(modelType.preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -76,7 +76,7 @@ fun resnet50noTopAdditionalTraining() {
 
     val newGlobalAvgPool2DLayer = GlobalAvgPool2D(
         name = "top_avg_pool",
-        )
+    )
     newGlobalAvgPool2DLayer.inboundLayers.add(layers.last())
     layers.add(
         newGlobalAvgPool2DLayer

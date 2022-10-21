@@ -23,7 +23,7 @@ import java.io.File
  * This examples demonstrates the inference concept on EfficientNet4Lite model:
  * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in EfficientNet4Lite during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in EfficientNet4Lite during training on ImageNet dataset) is applied to each image before prediction.
  */
 fun efficientNet4LitePrediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
@@ -38,7 +38,7 @@ fun efficientNet4LitePrediction() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

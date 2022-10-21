@@ -33,10 +33,11 @@ public class Dropout(
     name: String = ""
 ) : Layer(name), NoGradients {
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         /* if (isTraining) {
              val trainingFactor = tf.placeholderWithDefault(tf.constant(1.0f), Shape.scalar())

@@ -54,10 +54,11 @@ public class AvgPool1D(
         }
     }
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))

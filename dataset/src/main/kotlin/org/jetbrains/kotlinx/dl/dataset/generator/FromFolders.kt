@@ -16,9 +16,7 @@ import java.io.File
 public class FromFolders(public val mapping: Map<String, Int>) : LabelGenerator<File> {
     override fun getLabel(dataSource: File): Float {
         val label = mapping[dataSource.parentFile.name]
-        if (label == null) {
-            error("The parent directory of ${dataSource.absolutePath} is ${dataSource.parentFile.name}. No such class name in mapping $mapping")
-        }
+            ?: error("The parent directory of ${dataSource.absolutePath} is ${dataSource.parentFile.name}. No such class name in mapping $mapping")
         return label.toFloat()
     }
 }

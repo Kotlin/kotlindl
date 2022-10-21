@@ -500,8 +500,7 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
         }
         val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
         val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(upper)
-        val mask = (maskLower || maskUpper)
-        return when (mask) {
+        return when (maskLower || maskUpper) {
             false -> tf.constant(0) as Operand<Float>
             true -> features
         }

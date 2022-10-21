@@ -101,6 +101,7 @@ public class Rotate(
 
         return rotatedImage
     }
+
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
         return inputShape
     }

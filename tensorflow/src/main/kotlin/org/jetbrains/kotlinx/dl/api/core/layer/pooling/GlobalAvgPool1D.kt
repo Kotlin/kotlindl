@@ -24,10 +24,11 @@ public class GlobalAvgPool1D(
     name: String = ""
 ) : Layer(name) {
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val stepAxis = 1
         // TODO support for masking

@@ -42,7 +42,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.
  * - New Dense layers are added and initialized via defined initializers.
  * - Model is re-trained on [dogsCatsSmallDatasetPath] dataset.
- * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to images before prediction via [Sharpen] stage.
+ * - Special preprocessing (used in MobileNet during training on ImageNet dataset) is applied to each image before prediction via [Sharpen] stage.
  *
  * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
@@ -54,12 +54,12 @@ fun mobilenetWithAdditionalTraining() {
 
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.BILINEAR
-            }
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
+            interpolation = InterpolationType.BILINEAR
+        }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(TFModels.CV.MobileNet().preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()

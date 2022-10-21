@@ -28,11 +28,11 @@ fun main() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = it.inputDimensions[0].toInt()
-                    outputWidth = it.inputDimensions[1].toInt()
-                }
+                outputHeight = it.inputDimensions[0].toInt()
+                outputWidth = it.inputDimensions[1].toInt()
+            }
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

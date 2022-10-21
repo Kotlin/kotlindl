@@ -276,9 +276,10 @@ public open class OnnxInferenceModel private constructor(private val modelSource
     }
 
     public companion object {
-        private fun OrtEnvironment.createTensor(data: FloatArray,
-                                                dataType: OnnxJavaType,
-                                                shape: LongArray
+        private fun OrtEnvironment.createTensor(
+            data: FloatArray,
+            dataType: OnnxJavaType,
+            shape: LongArray
         ): OnnxTensor {
             checkTensorMatchesInputShape(data, shape)
 

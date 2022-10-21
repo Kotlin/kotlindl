@@ -396,13 +396,12 @@ private fun block2(
         )(preact)
     } else {
         shortcut = if (stride > 1) {
-            val layer = MaxPool2D(
+            return MaxPool2D(
                 poolSize = intArrayOf(1, 3, 3, 1),
                 strides = intArrayOf(1, 2, 2, 1),
                 padding = ConvPadding.VALID,
                 name = "pool1_pool"
             )(x)
-            return layer
         } else x
 
     }

@@ -7,6 +7,9 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
+/**
+ * This is the URL of the remote storage for downloading the models files.
+ */
 public const val AWS_S3_URL: String = "https://kotlindl.s3.amazonaws.com"
 
 /**

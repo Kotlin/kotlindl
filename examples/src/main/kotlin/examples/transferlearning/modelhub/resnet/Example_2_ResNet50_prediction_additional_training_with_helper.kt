@@ -57,7 +57,7 @@ fun resnet50additionalTrainingWithHelper() {
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(TFModels.CV.ResNet50().preprocessor)
 
     val dataset = OnFlyImageDataset.create(

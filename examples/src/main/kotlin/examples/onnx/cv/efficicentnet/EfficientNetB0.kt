@@ -23,7 +23,7 @@ import java.io.File
  * This examples demonstrates the inference concept on EfficientNetB0 (exported from Keras to ONNX) model:
  * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to each image before prediction.
  */
 fun efficientNetB0Prediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
@@ -37,7 +37,7 @@ fun efficientNetB0Prediction() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

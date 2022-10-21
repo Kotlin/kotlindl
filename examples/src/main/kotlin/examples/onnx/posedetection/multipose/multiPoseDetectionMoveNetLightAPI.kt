@@ -23,7 +23,7 @@ import javax.swing.JPanel
  * This examples demonstrates the inference concept on MoveNetSinglePoseLighting model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing is applied to images before prediction.
+ * - Special preprocessing is applied to each image before prediction.
  */
 fun multiPoseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
@@ -35,13 +35,13 @@ fun multiPoseDetectionMoveNetLightAPI() {
             val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/multi/$i.jpg"))
             val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.05f)
 
-            detectedPoses.poses.forEach { detectedPose ->
-                println("Found ${detectedPose.first.label} with probability ${detectedPose.first.probability}")
-                detectedPose.second.landmarks.forEach {
+            detectedPoses.poses.forEach { (bbox, pose) ->
+                println("Found ${bbox.label} with probability ${bbox.probability}")
+                pose.landmarks.forEach {
                     println("   Found ${it.label} with probability ${it.probability}")
                 }
 
-                detectedPose.second.edges.forEach {
+                pose.edges.forEach {
                     println("   The ${it.label} starts at ${it.start.label} and ends with ${it.end.label}")
                 }
             }

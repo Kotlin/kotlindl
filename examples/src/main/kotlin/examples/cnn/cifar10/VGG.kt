@@ -181,7 +181,7 @@ private val vgg11 = Sequential.of(
 fun vgg() {
     val preprocessing = pipeline<BufferedImage>()
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .rescale {
             scalingCoefficient = 255f
         }

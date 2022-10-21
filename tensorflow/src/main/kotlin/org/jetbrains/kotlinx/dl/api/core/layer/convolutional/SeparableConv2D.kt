@@ -124,10 +124,11 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape (make warning here)

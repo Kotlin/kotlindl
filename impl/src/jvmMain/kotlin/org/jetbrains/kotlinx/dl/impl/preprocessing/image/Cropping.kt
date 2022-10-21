@@ -31,13 +31,11 @@ public class Cropping(
         val croppedImageShape = getOutputShape(input.getTensorShape())
         val (width, height, _) = croppedImageShape.dims()
 
-        val result = input.getSubimage(
+        return input.getSubimage(
             left, top,
             width.toInt(),
             height.toInt()
         ).copy()
-
-        return result
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {

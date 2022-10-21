@@ -31,10 +31,11 @@ public class RepeatVector(
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }
     }
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val x = tf.expandDims(input, tf.constant(1))
         val pattern = tf.stack(listOf(tf.constant(1), tf.constant(n), tf.constant(1)))

@@ -109,9 +109,10 @@ class ModelCopyingTestSuite {
     }
 
     companion object {
-        private fun <M : InferenceModel, R> runCopyTest(modelTypes: List<ModelType<OnnxInferenceModel, M>>,
-                                                        fileName: String,
-                                                        detect: M.(File) -> R
+        private fun <M : InferenceModel, R> runCopyTest(
+            modelTypes: List<ModelType<OnnxInferenceModel, M>>,
+            fileName: String,
+            detect: M.(File) -> R
         ) {
             val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
             val imageFile = getFileFromResource(fileName)

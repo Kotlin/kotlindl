@@ -19,6 +19,8 @@ import java.util.*
  *  - [NNAPI] (could be used on Android if the NNAPI runtime is supported)
  *
  * Internally, the [OrtProvider] enum is used to indicate the provider.
+ *
+ * @param [internalProviderId] the [OrtProvider] enum value
  */
 public sealed class ExecutionProvider(public val internalProviderId: OrtProvider) {
     /**

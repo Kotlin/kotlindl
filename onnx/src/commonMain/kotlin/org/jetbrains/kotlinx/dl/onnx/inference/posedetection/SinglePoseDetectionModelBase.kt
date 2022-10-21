@@ -61,7 +61,10 @@ public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, De
     public fun detectPose(image: I): DetectedPose = predict(image)
 }
 
-internal fun buildPoseEdges(foundPoseLandmarks: List<PoseLandmark>, edgeKeyPoints: List<Pair<Int, Int>>): List<PoseEdge> {
+internal fun buildPoseEdges(
+    foundPoseLandmarks: List<PoseLandmark>,
+    edgeKeyPoints: List<Pair<Int, Int>>
+): List<PoseEdge> {
     val foundPoseEdges = mutableListOf<PoseEdge>()
     edgeKeyPoints.forEach {
         val startPoint = foundPoseLandmarks[it.first]

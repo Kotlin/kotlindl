@@ -51,12 +51,12 @@ fun resnet50additionalTraining() {
 
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.BILINEAR
-            }
+            outputHeight = IMAGE_SIZE.toInt()
+            outputWidth = IMAGE_SIZE.toInt()
+            interpolation = InterpolationType.BILINEAR
+        }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(TFModels.CV.ResNet50().preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()

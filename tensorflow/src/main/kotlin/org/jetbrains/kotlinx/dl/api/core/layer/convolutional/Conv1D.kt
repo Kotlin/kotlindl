@@ -163,8 +163,9 @@ public class Conv1D(
          * and squeezes the result by removing the dimension added previously.
          * This allows to perform 2D operations on 1D inputs.
          */
-        internal fun Ops.withExpandedDimensions(input: Operand<Float>,
-                                                operation: (Operand<Float>) -> Operand<Float>
+        internal fun Ops.withExpandedDimensions(
+            input: Operand<Float>,
+            operation: (Operand<Float>) -> Operand<Float>
         ): Operand<Float> {
             val expandedInput = expandDims(input, constant(EXTRA_DIM))
             val expandedOutput = operation(expandedInput)

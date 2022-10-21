@@ -127,11 +127,11 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceMod
     model.use {
         val fileDataLoader = pipeline<BufferedImage>()
             .resize {
-                    outputHeight = it.inputDimensions[0].toInt()
-                    outputWidth = it.inputDimensions[1].toInt()
-                }
+                outputHeight = it.inputDimensions[0].toInt()
+                outputWidth = it.inputDimensions[1].toInt()
+            }
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 
@@ -144,8 +144,9 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceMod
     }
 }
 
-fun efficientDetLightAPIInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>,
-                                  numberOfDetectedObjects: Int
+fun efficientDetLightAPIInference(
+    modelType: ONNXModels.ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>,
+    numberOfDetectedObjects: Int
 ) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadPretrainedModel(modelType)

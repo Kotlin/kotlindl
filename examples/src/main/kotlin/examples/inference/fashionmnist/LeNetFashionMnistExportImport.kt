@@ -19,19 +19,6 @@ private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 500
 private const val TEST_BATCH_SIZE = 1000
 
-private val fashionMnistLabelEncoding = mapOf(
-    0 to "T-shirt/top",
-    1 to "Trouser",
-    2 to "Pullover",
-    3 to "Dress",
-    4 to "Coat",
-    5 to "Sandal",
-    6 to "Shirt",
-    7 to "Sneaker",
-    8 to "Bag",
-    9 to "Ankle boot"
-)
-
 /**
  * This examples demonstrates model and model weights export and import back:
  * - Model is exported as graph in .pb format, weights are exported in custom (txt) format.

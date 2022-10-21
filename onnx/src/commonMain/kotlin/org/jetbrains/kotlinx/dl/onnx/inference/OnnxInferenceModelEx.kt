@@ -12,6 +12,10 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
  * Convenience extension functions for inference of ONNX models using different execution providers.
  */
 
+/**
+ * Extension function for explicitly specifying the execution provider for specific code block.
+ * Follows [kotlin.use] semantics.
+ */
 public inline fun <M : ExecutionProviderCompatible, R> M.inferAndCloseUsing(
     vararg providers: ExecutionProvider,
     block: (M) -> R
@@ -20,6 +24,10 @@ public inline fun <M : ExecutionProviderCompatible, R> M.inferAndCloseUsing(
     return this.use(block)
 }
 
+/**
+ * Extension function for explicitly specifying the execution provider for specific code block.
+ * Follows [kotlin.run] semantics.
+ */
 public inline fun <M : ExecutionProviderCompatible, R> M.inferUsing(
     vararg providers: ExecutionProvider,
     block: (M) -> R

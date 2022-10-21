@@ -85,8 +85,9 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return Pair of <input layer; list of layers>.
          */
         @JvmStatic
-        public fun loadModelLayersFromConfiguration(configuration: File,
-                                                    inputShape: IntArray? = null
+        public fun loadModelLayersFromConfiguration(
+            configuration: File,
+            inputShape: IntArray? = null
         ): Pair<Input, List<Layer>> {
             require(configuration.isFile) { "${configuration.absolutePath} is not a file. Should be a .json file with configuration." }
 
@@ -141,7 +142,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers(training: Operand<Boolean>, numberOfLosses: Operand<Float>): Pair<Placeholder<Float>, Operand<Float>> {
+    override fun buildLayers(
+        training: Operand<Boolean>,
+        numberOfLosses: Operand<Float>
+    ): Pair<Placeholder<Float>, Operand<Float>> {
         val input = inputLayer.build(tf)
         inputLayer.setOutputShape(input.asOutput().shape())
         var output: Operand<Float> = input

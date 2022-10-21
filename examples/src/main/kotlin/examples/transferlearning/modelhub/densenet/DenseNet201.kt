@@ -32,7 +32,7 @@ import java.io.File
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in DenseNet201 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in DenseNet201 during training on ImageNet dataset) is applied to each image before prediction.
  *
  * NOTE: Input resolution is 224*224
  */
@@ -72,7 +72,7 @@ fun denseNet201Prediction() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .convert { colorMode = ColorMode.BGR }
-            .toFloatArray {  }
+            .toFloatArray { }
             .call(modelType.preprocessor)
             .fileLoader()
 

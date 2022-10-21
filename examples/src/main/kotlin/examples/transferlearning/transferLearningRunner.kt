@@ -43,12 +43,12 @@ fun runImageRecognitionTransferLearning(
 
     val preprocessing = pipeline<BufferedImage>()
         .resize {
-                outputHeight = modelType.inputShape?.get(0) ?: 224
-                outputWidth = modelType.inputShape?.get(0) ?: 224
-                interpolation = InterpolationType.BILINEAR
-            }
+            outputHeight = modelType.inputShape?.get(0) ?: 224
+            outputWidth = modelType.inputShape?.get(0) ?: 224
+            interpolation = InterpolationType.BILINEAR
+        }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(modelType.preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()
@@ -141,7 +141,7 @@ fun runImageRecognitionTransferLearningOnTopModel(
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(modelType.preprocessor)
 
     val dogsCatsImages = dogsCatsSmallDatasetPath()

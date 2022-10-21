@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
  * This examples demonstrates the inference concept on ResNet'18 model:
  * - Model configuration, model weights and labels are obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'18 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'18 during training on ImageNet dataset) is applied to each image before prediction.
  */
 fun resnet18prediction() {
     runImageRecognitionPrediction(ONNXModels.CV.ResNet18())

@@ -62,7 +62,7 @@ fun vgg16noTopAdditionalTraining() {
             interpolation = InterpolationType.BILINEAR
         }
         .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
+        .toFloatArray { }
         .call(modelType.preprocessor)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()

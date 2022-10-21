@@ -70,8 +70,10 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
 
 /**
  * Base class for object detection model based on SSD architecture.
+ * @param [metadata] SSD-like model metadata. Used for decoding the output.
  */
-public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMetadata) : ObjectDetectionModelBase<I>() {
+public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMetadata) :
+    ObjectDetectionModelBase<I>() {
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val boxes = output.get2DFloatArray(metadata.outputBoxesName)
         val classIndices = output.getFloatArray(metadata.outputClassesName)
@@ -95,10 +97,29 @@ public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMe
     }
 }
 
+/**
+ * This class aggregates the metadata of the SSD-like model used for decoding the output.
+ * The class is exists mostly for reducing code duplication.
+ */
 public data class SSDLikeModelMetadata(
+    /**
+     * The name of the output tensor with the bounding boxes.
+     */
     public val outputBoxesName: String,
+    /**
+     * The name of the output tensor with the class indices.
+     */
     public val outputClassesName: String,
+    /**
+     * The name of the output tensor with classes confidence scores.
+     */
     public val outputScoresName: String,
+    /**
+     * The index of the yMin coordinate in the bounding box encoded representation.
+     */
     public val yMinIdx: Int,
+    /**
+     * The index of the xMin coordinate in the bounding box encoded representation.
+     */
     public val xMinIdx: Int
 )

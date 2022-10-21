@@ -11,17 +11,28 @@ package org.jetbrains.kotlinx.dl.impl.dataset
  * Also, sometimes labels are indexed from 1, and sometimes from 0.
  */
 public enum class Coco {
+    /**
+     * COCO labels of version 2014 with 80 classes.
+     */
     V2014,
+
+    /**
+     * COCO labels of version 2014 with 80 classes.
+     */
     V2017;
 
-    public fun labels(zeroIndexed: Boolean = false) : Map<Int, String> {
+    /**
+     * Returns map of COCO labels according to the [Coco] version.
+     * @param [zeroIndexed] if true, then labels are indexed from 0, otherwise from 1.
+     */
+    public fun labels(zeroIndexed: Boolean = false): Map<Int, String> {
         return when (this) {
             V2014 -> if (zeroIndexed) toZeroIndexed(cocoCategories2014) else cocoCategories2014
             V2017 -> if (zeroIndexed) toZeroIndexed(cocoCategories2017) else cocoCategories2017
         }
     }
 
-    private fun toZeroIndexed(labels: Map<Int, String>) : Map<Int, String> {
+    private fun toZeroIndexed(labels: Map<Int, String>): Map<Int, String> {
         val zeroIndexedLabels = mutableMapOf<Int, String>()
         labels.forEach { (key, value) ->
             zeroIndexedLabels[key - 1] = value

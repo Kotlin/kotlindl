@@ -18,10 +18,11 @@ public abstract class AbstractZeroPadding(
 ) : Layer(name) {
     override val hasActivation: Boolean get() = false
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         val paddingOperand = tf.constant(paddingArrayToTfFormat(inputShape))

@@ -35,6 +35,9 @@ public abstract class ConvTranspose(
 
     protected abstract val outputPadding: IntArray?
 
+    /**
+     * Computes the output shape of the layer given the input shape.
+     */
     protected fun computeOutputShape(inputShape: Shape): Shape {
         val shapes = (kernelSize.indices).map {
             convTransposeOutputLength(

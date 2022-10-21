@@ -32,7 +32,7 @@ import java.util.*
  * This examples demonstrates the inference concept on VGG'19 model:
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in VGG'19 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in VGG'19 during training on ImageNet dataset) is applied to each image before prediction.
  * - No additional training.
  * - No new layers are added.
  *

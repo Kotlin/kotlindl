@@ -96,7 +96,11 @@ public class ZeroPadding2D : AbstractZeroPadding {
         return paddingArraysToInputShape(inputShape, paddingFirstDim, paddingSecondDim)
     }
 
-    private fun paddingArraysToInputShape(inputShape: Shape, paddingFirstDim: IntArray, paddingSecondDim: IntArray): Array<IntArray> {
+    private fun paddingArraysToInputShape(
+        inputShape: Shape,
+        paddingFirstDim: IntArray,
+        paddingSecondDim: IntArray
+    ): Array<IntArray> {
         return when (inputShape.numDimensions()) {
             4 -> {
                 if (dataFormat == CHANNELS_FIRST) {
