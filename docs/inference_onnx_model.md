@@ -69,8 +69,27 @@ On Android, the primary input data type is `Bitmap` the common image representat
 
 ### Inference of the model included into KotlinDL Model Zoo
 In this section, the same pose detection model will be used.
-One more thing to mention is that KotlinDL expects the model files to be located in the application resources. You can download the required models using Gradle plugin or manually. *TODO update*
+One more thing to mention is that KotlinDL expects the model files to be located in the application resources. 
+You can download the required models manually or use a Gradle plugins which downloads them automatically before the build.
 
+To use the Gradle plugin, apply it in the build script:
+```groovy
+plugins {
+  id "org.jetbrains.kotlinx.kotlin-deeplearning-gradle-plugin" version "[KOTLIN-DL-VERSION]"
+}
+```
+
+Configure plugin in the `downloadKotlinDLModels` section.
+```groovy
+downloadKotlinDLModels {
+    models = ["MoveNetSinglePoseLighting"] // list of model type names to download
+    sourceSet = "main"                     // optional name of the target source set ("main" by default)
+    overwrite = false                      // optional parameter to overwrite existing files ("true" by default)
+}
+```
+
+The plugin creates a task named `downloadKotlinDLModels` which is executed automatically before project is build 
+or can be executed manually if needed.
 
 Also note that input data type is `Bitmap` instead of `BufferedImage`.
 ```kotlin
