@@ -7,6 +7,7 @@ package examples.onnx.cv.resnet.notop
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
@@ -29,6 +30,7 @@ fun resnet50CustomPrediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.CV.ResNet50custom
     val model = modelHub.loadModel(modelType)
+    model.printSummary()
 
     val imageNetClassLabels = Imagenet.V1k.labels()
 

@@ -59,6 +59,7 @@ public data class OnnxModelSummary(
         result.add(thickLineSeparator)
         result.add("Model type: ONNX")
         result.add(lineSeparator)
+        result.add(thickLineSeparator)
 
         val inputSubtable = formatTable(
             inputRows,

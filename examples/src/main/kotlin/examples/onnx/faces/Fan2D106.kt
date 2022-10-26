@@ -8,6 +8,7 @@ package examples.onnx.faces
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
@@ -31,6 +32,7 @@ fun main() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.FaceAlignment.Fan2d106
     val model = modelHub.loadModel(modelType)
+    model.printSummary()
 
     model.use {
         println(it)

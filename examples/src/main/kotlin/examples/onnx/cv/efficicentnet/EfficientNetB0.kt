@@ -7,6 +7,7 @@ package examples.onnx.cv.efficicentnet
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
@@ -29,6 +30,7 @@ fun efficientNetB0Prediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.CV.EfficientNetB0()
     val model = modelHub.loadModel(modelType)
+    model.printSummary()
 
     val imageNetClassLabels = Imagenet.V1k.labels()
 

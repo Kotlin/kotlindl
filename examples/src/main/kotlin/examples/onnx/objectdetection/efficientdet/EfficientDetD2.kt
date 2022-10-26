@@ -7,6 +7,7 @@ package examples.onnx.objectdetection.efficientdet
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
@@ -22,6 +23,7 @@ fun main() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = ONNXModels.ObjectDetection.EfficientDetD2
     val model = modelHub.loadModel(modelType)
+    model.printSummary()
 
     model.use {
         println(it)

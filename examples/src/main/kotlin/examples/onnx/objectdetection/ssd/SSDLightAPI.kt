@@ -6,6 +6,7 @@
 package examples.onnx.objectdetection.ssd
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDObjectDetectionModel
@@ -20,6 +21,7 @@ fun ssdLightAPI() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { detectionModel ->
         println(detectionModel)
