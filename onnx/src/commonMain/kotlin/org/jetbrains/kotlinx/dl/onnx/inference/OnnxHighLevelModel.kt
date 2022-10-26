@@ -6,8 +6,11 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.OrtSession
+import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**
@@ -16,7 +19,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
  * @param [I] input type
  * @param [R] output type
  */
-public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible {
+public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWithSummary {
     /**
      * Model used to make predictions.
      */
@@ -26,6 +29,8 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible {
      * Preprocessing operation specific to this model.
      */
     public val preprocessing: Operation<I, Pair<FloatArray, TensorShape>>
+
+    public val specificType: OnnxModelType<*, *>?
 
     /**
      * Converts raw model output to the result.
@@ -42,5 +47,9 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible {
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {
         internalModel.initializeWith(*executionProviders)
+    }
+
+    override fun summary(): ModelSummary {
+        return ModelHubModelSummary(internalModel.summary(), specificType)
     }
 }

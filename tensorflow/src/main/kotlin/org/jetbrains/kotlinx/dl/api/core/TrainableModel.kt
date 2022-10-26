@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
 import org.jetbrains.kotlinx.dl.api.core.loss.LossFunction
@@ -16,7 +17,6 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -26,7 +26,7 @@ import java.io.FileNotFoundException
 /**
  * Base abstract class for all trainable models.
  */
-public abstract class TrainableModel : TensorFlowInferenceModel() {
+public abstract class TrainableModel : TensorFlowInferenceModel(), ModelWithSummary {
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
@@ -475,13 +475,6 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
             callbacks
         )
     }
-
-    /**
-     * Returns model summary.
-     *
-     * @return model summary
-     */
-    public abstract fun summary(): ModelSummary
 
     override fun toString(): String {
         return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"

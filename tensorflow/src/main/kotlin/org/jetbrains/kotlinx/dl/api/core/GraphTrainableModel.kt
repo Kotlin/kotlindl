@@ -24,7 +24,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -987,12 +987,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return "GraphTrainableModel(numberOfLayers=${layers.size}) ${super.toString()}"
     }
 
-    public override fun summary(): ModelSummary {
+    public override fun summary(): TfModelSummary {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         val (trainableLayers, frozenLayers) = layers.partition { it.isTrainable }
 
-        return ModelSummary(
+        return TfModelSummary(
             type = this::class.simpleName.toString(),
             name = name,
             layersSummaries = layers.map { layer ->

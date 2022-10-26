@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class SummaryHelpersTests {
-    private val sequentialModel = ModelSummary(
+    private val sequentialModel = TfModelSummary(
         type = "Sequential",
         name = "My sequential NN model",
         layersSummaries = listOf(
@@ -22,7 +22,7 @@ internal class SummaryHelpersTests {
         frozenParamsCount = 0
     )
 
-    private val functionalModel = ModelSummary(
+    private val functionalModel = TfModelSummary(
         type = "Functional",
         name = "My functional NN model",
         layersSummaries = listOf(
@@ -133,7 +133,7 @@ internal class SummaryHelpersTests {
 
     @Test
     fun formatFunctionalModelSummaryWithCustomFormatting() {
-        functionalModel.format(
+        functionalModel.customFormat(
             layerNameColumnName = "Name of the layer along with its type",
             outputShapeColumnName = "Output shape",
             paramsCountColumnName = "# of parameters",
@@ -187,7 +187,7 @@ internal class SummaryHelpersTests {
                 "Total params: 222666",
                 ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
             ),
-            functionalModel.format(
+            functionalModel.customFormat(
                 layerNameColumnName = "Name of the layer along with its type",
                 outputShapeColumnName = "Output shape",
                 paramsCountColumnName = "# of parameters",

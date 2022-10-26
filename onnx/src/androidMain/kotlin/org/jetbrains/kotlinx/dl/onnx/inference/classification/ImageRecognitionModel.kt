@@ -15,10 +15,7 @@ import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModelBase
 import org.jetbrains.kotlinx.dl.impl.preprocessing.*
 import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
-import org.jetbrains.kotlinx.dl.onnx.inference.ExecutionProviderCompatible
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
+import org.jetbrains.kotlinx.dl.onnx.inference.*
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**
@@ -28,8 +25,10 @@ public open class ImageRecognitionModel(
     internalModel: OnnxInferenceModel,
     private val channelsFirst: Boolean,
     private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
+    specificType: OnnxModelType<*, *>? = null,
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
-) : ImageRecognitionModelBase<Bitmap>(internalModel), ExecutionProviderCompatible, CameraXCompatibleModel {
+) : ImageRecognitionModelBase<Bitmap>(internalModel, specificType), ExecutionProviderCompatible,
+    CameraXCompatibleModel {
     override var targetRotation: Int = 0
 
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
@@ -68,6 +67,7 @@ public fun ImageRecognitionModelBase<Bitmap>.predictObject(imageProxy: ImageProx
         is CameraXCompatibleModel -> {
             doWithRotation(imageProxy.imageInfo.rotationDegrees) { predictObject(imageProxy.toBitmap()) }
         }
+
         else -> predictObject(imageProxy.toBitmap(applyRotation = true))
     }
 
@@ -89,5 +89,6 @@ public fun ImageRecognitionModelBase<Bitmap>.predictTopKObjects(
         is CameraXCompatibleModel -> {
             doWithRotation(imageProxy.imageInfo.rotationDegrees) { predictTopKObjects(imageProxy.toBitmap(), topK) }
         }
+
         else -> predictTopKObjects(imageProxy.toBitmap(applyRotation = true), topK)
     }

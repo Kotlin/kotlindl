@@ -56,7 +56,7 @@ public object TFModels {
 
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             val model = loadModel(modelHub, this)
-            return ImageRecognitionModel(model, inputColorMode, channelsFirst, preprocessor)
+            return ImageRecognitionModel(model, inputColorMode, channelsFirst, preprocessor, this)
         }
 
         @Suppress("UNCHECKED_CAST")

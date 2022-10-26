@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -24,8 +25,9 @@ public class ImageRecognitionModel(
     internalModel: InferenceModel,
     private val inputColorMode: ColorMode,
     private val channelsFirst: Boolean,
-    private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity()
-) : ImageRecognitionModelBase<BufferedImage>(internalModel) {
+    private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
+    specificType: ModelType<*, *>? = null
+) : ImageRecognitionModelBase<BufferedImage>(internalModel, specificType) {
     /** Class labels for ImageNet dataset. */
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 

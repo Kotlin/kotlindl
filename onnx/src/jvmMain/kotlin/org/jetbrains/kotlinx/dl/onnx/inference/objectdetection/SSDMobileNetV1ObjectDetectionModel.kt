@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -37,8 +38,10 @@ private val SSD_MOBILENET_METADATA = SSDLikeModelMetadata(
  *
  * @since 0.4
  */
-public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA), InferenceModel by internalModel {
+public class SSDMobileNetV1ObjectDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    specificType: OnnxModelType<*, *>? = null
+) : SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA, specificType), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

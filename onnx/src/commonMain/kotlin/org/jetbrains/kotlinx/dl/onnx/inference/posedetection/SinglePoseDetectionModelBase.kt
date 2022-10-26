@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
 import kotlin.math.min
 
@@ -18,7 +19,8 @@ private const val OUTPUT_NAME = "output_0"
 /**
  * Base class for pose detection models for detecting a single pose per image.
  */
-public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, DetectedPose> {
+public abstract class SinglePoseDetectionModelBase<I>(override val specificType: OnnxModelType<*, *>? = null) :
+    OnnxHighLevelModel<I, DetectedPose> {
 
     /**
      * Name of the output tensor.

@@ -11,12 +11,14 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
 
 /**
  * Base class for pose detection models for detecting multiple poses per image.
  */
-public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, MultiPoseDetectionResult> {
+public abstract class MultiPoseDetectionModelBase<I>(override val specificType: OnnxModelType<*, *>? = null) :
+    OnnxHighLevelModel<I, MultiPoseDetectionResult> {
     /**
      * Name of the output tensor.
      */

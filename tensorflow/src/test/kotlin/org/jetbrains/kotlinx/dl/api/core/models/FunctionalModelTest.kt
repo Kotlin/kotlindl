@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -88,7 +88,7 @@ internal class FunctionalModelTest {
         assertEquals("functional_model", model.name)
 
         assertEquals(
-            ModelSummary(
+            TfModelSummary(
                 type = "Functional",
                 name = "functional_model",
                 layersSummaries = listOf(
