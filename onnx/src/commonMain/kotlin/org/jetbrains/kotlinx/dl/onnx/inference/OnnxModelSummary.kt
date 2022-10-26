@@ -9,6 +9,13 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import java.lang.IllegalStateException
 
+/**
+ * Summary of the OnnxInferenceModel.
+ * Contains information about input and output variables of the model.
+ *
+ * @param [inputsSummaries] list of summaries of the input variables along with their names
+ * @param [outputsSummaries] list of summaries of the output variables along with their names
+ */
 public data class OnnxModelSummary(
     private val inputsSummaries: List<Pair<String, VariableSummary>>,
     private val outputsSummaries: List<Pair<String, VariableSummary>>,
@@ -110,7 +117,13 @@ public data class OnnxModelSummary(
     }
 }
 
+/**
+ * Interface to produce text description of the ONNX variable.
+ */
 public interface VariableSummary {
+    /**
+     * Returns text description of the variable.
+     */
     public fun toSummaryRow(): String
 }
 
@@ -149,7 +162,7 @@ internal fun ValueInfo.summary(): VariableSummary {
         is TensorInfo -> summary()
         is MapInfo -> summary()
         is SequenceInfo -> summary()
-        else -> throw IllegalStateException()
+        else -> throw IllegalStateException("Unknown type of ValueInfo: ${this.javaClass.simpleName}")
     }
 }
 

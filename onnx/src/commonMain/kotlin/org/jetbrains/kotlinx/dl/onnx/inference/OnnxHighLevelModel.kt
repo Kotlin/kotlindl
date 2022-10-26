@@ -30,7 +30,12 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
      */
     public val preprocessing: Operation<I, Pair<FloatArray, TensorShape>>
 
-    public val specificType: OnnxModelType<*, *>?
+    /**
+     * Corresponding [OnnxModelType] from [ONNXModels].
+     * Used for model summary.
+     * Should be null for custom models.
+     */
+    public val type: OnnxModelType<*, *>?
 
     /**
      * Converts raw model output to the result.
@@ -50,6 +55,6 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
     }
 
     override fun summary(): ModelSummary {
-        return ModelHubModelSummary(internalModel.summary(), specificType)
+        return ModelHubModelSummary(internalModel.summary(), type)
     }
 }

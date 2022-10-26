@@ -16,7 +16,7 @@ import kotlin.math.max
 /**
  * Base class for face detection models.
  */
-public abstract class FaceDetectionModelBase<I>(override val specificType: OnnxModelType<*, *>? = null) :
+public abstract class FaceDetectionModelBase<I>(override val type: OnnxModelType<*, *>? = null) :
     OnnxHighLevelModel<I, List<DetectedObject>> {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {

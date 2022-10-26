@@ -17,10 +17,11 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 /**
  * Base class for image classification models.
  * @property [internalModel] model used for prediction
+ * @property [type] Corresponding [ModelType]. Used for model summary. Should be null for custom models.
  */
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel,
-    protected val specificType: ModelType<*, *>? = null
+    protected val type: ModelType<*, *>? = null
 ) : InferenceModel by internalModel, ModelWithSummary {
     /**
      * Preprocessing operation specific to this model.
@@ -64,9 +65,9 @@ public abstract class ImageRecognitionModelBase<I>(
 
     override fun summary(): ModelSummary {
         return if (internalModel is ModelWithSummary) {
-            ModelHubModelSummary(internalModel.summary(), specificType)
+            ModelHubModelSummary(internalModel.summary(), type)
         } else {
-            ModelHubModelSummary(EmptySummary(), specificType)
+            ModelHubModelSummary(EmptySummary(), type)
         }
     }
 }

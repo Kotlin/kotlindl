@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFl
 /**
  * Base class for object detection models.
  */
-public abstract class ObjectDetectionModelBase<I>(override val specificType: OnnxModelType<*, *>? = null) :
+public abstract class ObjectDetectionModelBase<I>(override val type: OnnxModelType<*, *>? = null) :
     OnnxHighLevelModel<I, List<DetectedObject>> {
     /**
      * Class labels from the dataset used for training.
