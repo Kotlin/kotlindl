@@ -32,8 +32,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.*
  */
 public class SSDLikeModel(
     override val internalModel: OnnxInferenceModel, metadata: SSDLikeModelMetadata,
-    specificType: OnnxModelType<*, *>? = null
-) : SSDLikeModelBase<Bitmap>(metadata, specificType), CameraXCompatibleModel, InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : SSDLikeModelBase<Bitmap>(metadata, modelType), CameraXCompatibleModel, InferenceModel by internalModel {
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 

@@ -30,8 +30,8 @@ private const val INPUT_SIZE = 256
  */
 public class MultiPoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : MultiPoseDetectionModelBase<BufferedImage>(specificType), InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : MultiPoseDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

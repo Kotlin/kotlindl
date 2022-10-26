@@ -28,8 +28,8 @@ private const val OUTPUT_NAME = "fc1"
  */
 public class Fan2D106FaceAlignmentModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : FaceAlignmentModelBase<BufferedImage>(specificType), InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : FaceAlignmentModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

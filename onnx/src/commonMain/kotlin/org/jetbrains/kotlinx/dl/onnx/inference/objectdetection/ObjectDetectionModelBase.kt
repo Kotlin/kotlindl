@@ -41,8 +41,8 @@ public abstract class ObjectDetectionModelBase<I>(override val type: OnnxModelTy
 /**
  * Base class for object detection models based on EfficientDet architecture.
  */
-public abstract class EfficientDetObjectDetectionModelBase<I>(specificType: OnnxModelType<*, *>? = null) :
-    ObjectDetectionModelBase<I>(specificType) {
+public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: OnnxModelType<*, *>? = null) :
+    ObjectDetectionModelBase<I>(modelType) {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val foundObjects = mutableListOf<DetectedObject>()
@@ -77,8 +77,8 @@ public abstract class EfficientDetObjectDetectionModelBase<I>(specificType: Onnx
  */
 public abstract class SSDLikeModelBase<I>(
     protected val metadata: SSDLikeModelMetadata,
-    specificType: OnnxModelType<*, *>? = null
-) : ObjectDetectionModelBase<I>(specificType) {
+    modelType: OnnxModelType<*, *>? = null
+) : ObjectDetectionModelBase<I>(modelType) {
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val boxes = output.get2DFloatArray(metadata.outputBoxesName)
         val classIndices = output.getFloatArray(metadata.outputClassesName)

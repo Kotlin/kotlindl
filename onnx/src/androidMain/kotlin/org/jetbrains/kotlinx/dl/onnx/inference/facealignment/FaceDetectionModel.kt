@@ -24,8 +24,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.*
  */
 public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : FaceDetectionModelBase<Bitmap>(specificType), CameraXCompatibleModel, InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : FaceDetectionModelBase<Bitmap>(modelType), CameraXCompatibleModel, InferenceModel by internalModel {
     override var targetRotation: Int = 0
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()

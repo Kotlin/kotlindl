@@ -31,8 +31,8 @@ import java.io.IOException
  */
 public class EfficientDetObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : EfficientDetObjectDetectionModelBase<BufferedImage>(specificType), InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

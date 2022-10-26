@@ -30,8 +30,8 @@ import java.io.IOException
  */
 public class SinglePoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : SinglePoseDetectionModelBase<BufferedImage>(specificType), InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : SinglePoseDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

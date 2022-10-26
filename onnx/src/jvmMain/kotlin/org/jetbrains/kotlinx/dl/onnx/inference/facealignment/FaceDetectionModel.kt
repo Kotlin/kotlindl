@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage
  */
 public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : FaceDetectionModelBase<BufferedImage>(specificType), InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : FaceDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {

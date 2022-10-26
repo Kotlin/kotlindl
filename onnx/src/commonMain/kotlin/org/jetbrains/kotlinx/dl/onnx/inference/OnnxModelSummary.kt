@@ -22,8 +22,25 @@ public data class OnnxModelSummary(
 ) : ModelSummary {
     override fun format(
         columnSeparator: String,
-        lineSeparator: Char,
-        thickLineSeparator: Char
+        lineSeparatorSymbol: Char,
+        thickLineSeparatorSymbol: Char
+    ): List<String> {
+        return customFormat(columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol)
+    }
+
+    /**
+     * Format function with customizable column names.
+     * @param [inputsColumnHeader] title of the column with input variables
+     * @param [outputsColumnHeader] title of the column with output variables
+     * @param [typeColumnHeader] title of the column with variable types
+     */
+    public fun customFormat(
+        columnSeparator: String,
+        lineSeparatorSymbol: Char,
+        thickLineSeparatorSymbol: Char,
+        inputsColumnHeader: String = "Inputs",
+        outputsColumnHeader: String = "Outputs",
+        typeColumnHeader: String = "Type"
     ): List<String> {
         val inputRows = inputsSummaries.map { (name, summary) ->
             listOf(name, summary.toSummaryRow())
@@ -38,10 +55,6 @@ public data class OnnxModelSummary(
         fun List<String>.calcColumnWidth(headerWidth: Int) =
             maxOfOrNull { it.length }?.coerceAtLeast(headerWidth) ?: headerWidth
 
-        val inputsColumnHeader = "Inputs"
-        val outputsColumnHeader = "Outputs"
-        val typeColumnHeader = "Type"
-
         // Calculate number of columns along with their widths
         val nameColumnWidth =
             allRows.map { it[0] }.calcColumnWidth(maxOf(inputsColumnHeader.length, outputsColumnHeader.length))
@@ -51,8 +64,8 @@ public data class OnnxModelSummary(
 
         // Calculate whole table width and prepare strings that will be used as line separators
         val tableWidth = columnsWidths.sum() + (columnsWidths.size - 1).coerceAtLeast(0) * columnSeparator.length
-        val lineSeparator = lineSeparator.toString().repeat(tableWidth)
-        val thickLineSeparator = thickLineSeparator.toString().repeat(tableWidth)
+        val lineSeparator = lineSeparatorSymbol.toString().repeat(tableWidth)
+        val thickLineSeparator = thickLineSeparatorSymbol.toString().repeat(tableWidth)
 
         val result = mutableListOf<String>()
 
@@ -61,7 +74,7 @@ public data class OnnxModelSummary(
         result.add(lineSeparator)
         result.add(thickLineSeparator)
 
-        val inputSubtable = formatTable(
+        val inputSubTable = formatTable(
             inputRows,
             inputsColumnHeader,
             typeColumnHeader,
@@ -71,10 +84,10 @@ public data class OnnxModelSummary(
             columnsWidths
         )
 
-        result.addAll(inputSubtable)
+        result.addAll(inputSubTable)
         result.add(thickLineSeparator)
 
-        val outputSubtable = formatTable(
+        val outputSubTable = formatTable(
             outputRows,
             outputsColumnHeader,
             typeColumnHeader,
@@ -84,7 +97,7 @@ public data class OnnxModelSummary(
             columnsWidths
         )
 
-        result.addAll(outputSubtable)
+        result.addAll(outputSubTable)
         result.add(thickLineSeparator)
 
         return result
@@ -157,24 +170,14 @@ internal data class OnnxSequenceVariableSummary(
     override fun toSummaryRow() = "Seqeunce {dtype=${dtype.name}, length=$length}"
 }
 
+internal fun ValueInfo.summary() = when {
+    this is TensorInfo -> OnnxTensorVariableSummary(type, TensorShape(shape))
+    this is MapInfo -> OnnxMapVariableSummary(size, keyType, valueType)
+    this is SequenceInfo && sequenceOfMaps -> OnnxMapsSequenceVariableSummary(
+        length,
+        OnnxMapVariableSummary(mapInfo.size, mapInfo.keyType, mapInfo.valueType)
+    )
 
-internal fun ValueInfo.summary(): VariableSummary {
-    return when (this) {
-        is TensorInfo -> summary()
-        is MapInfo -> summary()
-        is SequenceInfo -> summary()
-        else -> throw IllegalStateException("Unknown type of ValueInfo: ${this.javaClass.simpleName}")
-    }
-}
-
-internal fun TensorInfo.summary() = OnnxTensorVariableSummary(type, TensorShape(shape))
-
-internal fun MapInfo.summary() = OnnxMapVariableSummary(size, keyType, valueType)
-
-internal fun SequenceInfo.summary(): VariableSummary {
-    return if (sequenceOfMaps) {
-        OnnxMapsSequenceVariableSummary(length, mapInfo.summary())
-    } else {
-        OnnxSequenceVariableSummary(length, sequenceType)
-    }
+    this is SequenceInfo -> OnnxSequenceVariableSummary(length, sequenceType)
+    else -> throw IllegalStateException("Unknown type of ValueInfo: ${this.javaClass.simpleName}")
 }

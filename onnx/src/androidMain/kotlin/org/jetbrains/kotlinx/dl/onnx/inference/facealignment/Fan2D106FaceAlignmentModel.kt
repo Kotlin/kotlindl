@@ -29,8 +29,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
  */
 public class Fan2D106FaceAlignmentModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : FaceAlignmentModelBase<Bitmap>(specificType), CameraXCompatibleModel, InferenceModel by internalModel {
+    modelType: OnnxModelType<*, *>? = null
+) : FaceAlignmentModelBase<Bitmap>(modelType), CameraXCompatibleModel, InferenceModel by internalModel {
     override val outputName: String = "fc1"
     override var targetRotation: Int = 0
 

@@ -11,15 +11,15 @@ public interface ModelSummary {
      * Rows should form a table with clean and readable structure.
      *
      * @param [columnSeparator] text chunk that will be used as column separator for the output table
-     * @param [lineSeparator] character that will be used to produce a string to separate rows of the output table
-     * @param [thickLineSeparator] character that will be used to produce a string to separate blocks of the output table
+     * @param [lineSeparatorSymbol] character that will be used to produce a string to separate rows of the output table
+     * @param [thickLineSeparatorSymbol] character that will be used to produce a string to separate blocks of the output table
      *
      * @return formatted model summary
      */
     public fun format(
         columnSeparator: String = " ",
-        lineSeparator: Char = '_',
-        thickLineSeparator: Char = '='
+        lineSeparatorSymbol: Char = '_',
+        thickLineSeparatorSymbol: Char = '='
     ): List<String>
 }
 
@@ -29,8 +29,8 @@ public interface ModelSummary {
 public class EmptySummary : ModelSummary {
     override fun format(
         columnSeparator: String,
-        lineSeparator: Char,
-        thickLineSeparator: Char
+        lineSeparatorSymbol: Char,
+        thickLineSeparatorSymbol: Char
     ): List<String> = emptyList()
 }
 
@@ -47,10 +47,10 @@ public class ModelHubModelSummary(
 ) : ModelSummary {
     override fun format(
         columnSeparator: String,
-        lineSeparator: Char,
-        thickLineSeparator: Char
+        lineSeparatorSymbol: Char,
+        thickLineSeparatorSymbol: Char
     ): List<String> {
-        val table = internalSummary.format(columnSeparator, lineSeparator, thickLineSeparator)
+        val table = internalSummary.format(columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol)
 
         if (modelType == null) return table
 
@@ -58,7 +58,7 @@ public class ModelHubModelSummary(
         if (table.isEmpty()) return listOf(modelTypeHeader)
 
         val tableWidth = table.first().length
-        val separator = thickLineSeparator.toString().repeat(tableWidth)
+        val separator = thickLineSeparatorSymbol.toString().repeat(tableWidth)
 
         val tableWithHeader = mutableListOf(separator, modelTypeHeader)
         table.forEach(tableWithHeader::add)

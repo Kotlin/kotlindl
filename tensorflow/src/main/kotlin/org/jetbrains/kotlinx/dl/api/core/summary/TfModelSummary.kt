@@ -22,13 +22,13 @@ public data class TfModelSummary(
     val totalParamsCount: Long = trainableParamsCount + frozenParamsCount
     override fun format(
         columnSeparator: String,
-        lineSeparator: Char,
-        thickLineSeparator: Char
+        lineSeparatorSymbol: Char,
+        thickLineSeparatorSymbol: Char
     ): List<String> {
         return customFormat(
             columnSeparator = columnSeparator,
-            lineSeparator = lineSeparator,
-            thickLineSeparator = thickLineSeparator
+            lineSeparatorSymbol = lineSeparatorSymbol,
+            thickLineSeparatorSymbol = thickLineSeparatorSymbol
         )
     }
 
@@ -39,8 +39,8 @@ public data class TfModelSummary(
      * @param [paramsCountColumnName] title of the column with layer parameter counts
      * @param [connectedToColumnName] title of the column with layers that are inputs for a layer
      * @param [columnSeparator] text chunk that will be used as column separator for the layer description table
-     * @param [lineSeparator] character that will be used to produce a string to separate rows of the layer description table
-     * @param [thickLineSeparator] character that will be used to produce a string to separate general model description,
+     * @param [lineSeparatorSymbol] character that will be used to produce a string to separate rows of the layer description table
+     * @param [thickLineSeparatorSymbol] character that will be used to produce a string to separate general model description,
      * header and body of the table with layers description, and description footer
      * @param [withConnectionsColumn] flag that turns on/off displaying of the column with names of inbound layers
      * @return description of model summary as list of strings, which are suitable for printing or logging
@@ -51,8 +51,8 @@ public data class TfModelSummary(
         paramsCountColumnName: String = "Param #      ",
         connectedToColumnName: String = "Connected to               ",
         columnSeparator: String = " ",
-        lineSeparator: Char = '_',
-        thickLineSeparator: Char = '=',
+        lineSeparatorSymbol: Char = '_',
+        thickLineSeparatorSymbol: Char = '=',
         withConnectionsColumn: Boolean = layersSummaries.any { it.inboundLayers.size > 1 }
     ): List<String> {
         // Prepare string data for resulting table
@@ -82,8 +82,8 @@ public data class TfModelSummary(
 
         // Calculate whole table width and prepare strings that will be used as line separators
         val tableWidth = columnsWidths.sum() + (columnsWidths.size - 1).coerceAtLeast(0) * columnSeparator.length
-        val lineSeparator = lineSeparator.toString().repeat(tableWidth)
-        val thickLineSeparator = thickLineSeparator.toString().repeat(tableWidth)
+        val lineSeparator = lineSeparatorSymbol.toString().repeat(tableWidth)
+        val thickLineSeparator = thickLineSeparatorSymbol.toString().repeat(tableWidth)
 
         // Function to format single line of output to look like table row
         fun formatLine(vararg strs: String): String = columnsWidths

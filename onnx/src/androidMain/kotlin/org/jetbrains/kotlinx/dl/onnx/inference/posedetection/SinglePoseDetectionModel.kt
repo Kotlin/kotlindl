@@ -31,8 +31,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
  */
 public class SinglePoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    specificType: OnnxModelType<*, *>? = null
-) : SinglePoseDetectionModelBase<Bitmap>(specificType), InferenceModel by internalModel, CameraXCompatibleModel {
+    modelType: OnnxModelType<*, *>? = null
+) : SinglePoseDetectionModelBase<Bitmap>(modelType), InferenceModel by internalModel, CameraXCompatibleModel {
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
             .resize {

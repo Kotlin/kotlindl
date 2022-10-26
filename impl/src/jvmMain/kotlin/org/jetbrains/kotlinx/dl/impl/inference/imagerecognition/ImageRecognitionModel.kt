@@ -26,8 +26,8 @@ public class ImageRecognitionModel(
     private val inputColorMode: ColorMode,
     private val channelsFirst: Boolean,
     private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
-    specificType: ModelType<*, *>? = null
-) : ImageRecognitionModelBase<BufferedImage>(internalModel, specificType) {
+    modelType: ModelType<*, *>? = null
+) : ImageRecognitionModelBase<BufferedImage>(internalModel, modelType) {
     /** Class labels for ImageNet dataset. */
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 

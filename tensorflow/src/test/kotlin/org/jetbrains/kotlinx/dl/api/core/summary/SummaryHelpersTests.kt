@@ -139,8 +139,8 @@ internal class SummaryHelpersTests {
             paramsCountColumnName = "# of parameters",
             connectedToColumnName = "Inbound connections",
             columnSeparator = "::",
-            lineSeparator = '.',
-            thickLineSeparator = ':',
+            lineSeparatorSymbol = '.',
+            thickLineSeparatorSymbol = ':',
         ).forEach { println(it) }
 
         assertEquals(
@@ -193,8 +193,8 @@ internal class SummaryHelpersTests {
                 paramsCountColumnName = "# of parameters",
                 connectedToColumnName = "Inbound connections",
                 columnSeparator = "::",
-                lineSeparator = '.',
-                thickLineSeparator = ':',
+                lineSeparatorSymbol = '.',
+                thickLineSeparatorSymbol = ':',
             )
         )
     }
