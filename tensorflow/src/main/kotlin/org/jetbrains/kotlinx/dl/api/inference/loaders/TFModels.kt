@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -17,11 +18,15 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import java.io.File
 
 /**
  * Supported models for inference and transfer learning, trained on ImageNet dataset.
  *
  * All weights are imported from the `Keras.applications` or `ONNX.models` project and preprocessed with the KotlinDL project.
+ *
+ * @see TFModelType
+ * @see TFModelHub
  */
 public object TFModels {
     /** Image recognition models and preprocessing.
@@ -38,7 +43,7 @@ public object TFModels {
         private val inputColorMode: ColorMode = ColorMode.RGB,
         public var inputShape: IntArray? = null,
         noTop: Boolean = false
-    ) : ModelType<T, ImageRecognitionModel> {
+    ) : TFModelType<T, ImageRecognitionModel> {
 
         override val modelRelativePath: String = if (noTop) "$relativePath/notop" else relativePath
 
@@ -52,6 +57,11 @@ public object TFModels {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             val model = loadModel(modelHub, this)
             return ImageRecognitionModel(model, inputColorMode, channelsFirst, preprocessor)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        override fun loadModelConfiguration(jsonFile: File): T {
+            return (Functional.loadModelConfiguration(jsonFile, inputShape) as T).apply { freeze() }
         }
 
         /**
@@ -80,6 +90,10 @@ public object TFModels {
             ) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.CAFFE.preprocessing()
+
+            override fun loadModelConfiguration(jsonFile: File): Sequential {
+                return Sequential.loadModelConfiguration(jsonFile, inputShape).apply { freeze() }
+            }
         }
 
         /**
@@ -108,6 +122,10 @@ public object TFModels {
             ) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.CAFFE.preprocessing()
+
+            override fun loadModelConfiguration(jsonFile: File): Sequential {
+                return Sequential.loadModelConfiguration(jsonFile, inputShape).apply { freeze() }
+            }
         }
 
         /**

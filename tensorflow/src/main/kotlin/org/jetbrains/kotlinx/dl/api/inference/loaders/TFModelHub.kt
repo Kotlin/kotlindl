@@ -8,10 +8,6 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 import io.jhdf.HdfFile
 import mu.KLogger
 import mu.KotlinLogging
-import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.freeze
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import java.io.File
@@ -28,6 +24,9 @@ private const val WEIGHTS_FILE_NAME = "/weights.h5"
  *
  * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  * @since 0.2
+ *
+ * @see TFModelType
+ * @see TFModels
  */
 public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
     /** Logger for modelZoo model. */
@@ -46,134 +45,12 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
-    @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
         val jsonConfigFile = getJSONConfigFile(modelType, loadingMode)
-        return when (modelType) {
-            is TFModels.CV.VGG16 -> freezeAllLayers(
-                Sequential.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.VGG19 -> freezeAllLayers(
-                Sequential.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet18 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet34 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet50 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet101 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet152 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet50v2 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet101v2 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.ResNet152v2 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.MobileNet -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.MobileNetV2 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.Inception -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.Xception -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.DenseNet121 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.DenseNet169 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.DenseNet201 -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.NASNetMobile -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            is TFModels.CV.NASNetLarge -> freezeAllLayers(
-                Functional.loadModelConfiguration(
-                    jsonConfigFile,
-                    modelType.inputShape
-                )
-            ) as T
-            else -> TODO()
-        }
-    }
-
-    private fun freezeAllLayers(model: GraphTrainableModel): GraphTrainableModel {
-        model.freeze()
-        return model
+        return (modelType as TFModelType).loadModelConfiguration(jsonConfigFile)
     }
 
     /** Forms mapping of class label to class name for the ImageNet dataset. */
