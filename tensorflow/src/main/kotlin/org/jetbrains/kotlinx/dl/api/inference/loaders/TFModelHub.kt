@@ -51,12 +51,7 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        val jsonConfigFile = if (modelType is TFModels.CV) {
-            getJSONConfigFile(modelType, loadingMode, modelType.noTop)
-        } else {
-            getJSONConfigFile(modelType, loadingMode)
-        }
-
+        val jsonConfigFile = getJSONConfigFile(modelType, loadingMode)
         return when (modelType) {
             is TFModels.CV.VGG16 -> freezeAllLayers(
                 Sequential.loadModelConfiguration(
@@ -197,15 +192,23 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
         modelType: ModelType<*, *>,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
     ): HdfFile {
-        val noTop = if (modelType is TFModels.CV) modelType.noTop else false
-        return getWeightsFile(modelType, loadingMode, noTop)
+        val modelDirectory = "/" + modelType.modelRelativePath
+        val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
+        val weightsURL = awsS3Url + modelDirectory + WEIGHTS_FILE_NAME
+        val fileName = cacheDirectory.absolutePath + relativeWeightsPath
+        val file = File(fileName)
+        if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
+            val inputStream = URL(weightsURL).openStream()
+            logger.info { "Weights loading is started!" }
+            Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
+            logger.info { "Weights loading is finished!" }
+        }
+        return HdfFile(File(fileName))
     }
 
     /** Returns JSON file with model configuration, saved from Keras 2.x. */
-    private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): File {
-        var modelDirectory = "/" + modelType.modelRelativePath
-        if (noTop) modelDirectory += "/notop"
-
+    private fun getJSONConfigFile(modelType: ModelType<*, *>, loadingMode: LoadingMode): File {
+        val modelDirectory = "/" + modelType.modelRelativePath
         val relativeConfigPath = modelDirectory + MODEL_CONFIG_FILE_NAME
         val configURL = awsS3Url + modelDirectory + MODEL_CONFIG_FILE_NAME
 
@@ -223,26 +226,6 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
         }
 
         return File(fileName)
-    }
-
-    /** Returns .h5 file with model weights, saved from Keras 2.x. */
-    private fun getWeightsFile(modelType: ModelType<*, *>, loadingMode: LoadingMode, noTop: Boolean = false): HdfFile {
-        var modelDirectory = "/" + modelType.modelRelativePath
-        if (noTop) modelDirectory += "/notop"
-
-        val relativeWeightsPath = modelDirectory + WEIGHTS_FILE_NAME
-        val weightsURL = awsS3Url + modelDirectory + WEIGHTS_FILE_NAME
-
-        val fileName = cacheDirectory.absolutePath + relativeWeightsPath
-        val file = File(fileName)
-        if (!file.exists() || loadingMode == LoadingMode.OVERRIDE_IF_EXISTS) {
-            val inputStream = URL(weightsURL).openStream()
-            logger.info { "Weights loading is started!" }
-            Files.copy(inputStream, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
-            logger.info { "Weights loading is finished!" }
-        }
-
-        return HdfFile(File(fileName))
     }
 }
 

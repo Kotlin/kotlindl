@@ -33,12 +33,14 @@ public object TFModels {
      *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
     public sealed class CV<T : GraphTrainableModel>(
-        override val modelRelativePath: String,
+        relativePath: String,
         private val channelsFirst: Boolean = false,
         private val inputColorMode: ColorMode = ColorMode.RGB,
         public var inputShape: IntArray? = null,
-        internal var noTop: Boolean = false
+        noTop: Boolean = false
     ) : ModelType<T, ImageRecognitionModel> {
+
+        override val modelRelativePath: String = if (noTop) "$relativePath/notop" else relativePath
 
         init {
             if (inputShape != null) {

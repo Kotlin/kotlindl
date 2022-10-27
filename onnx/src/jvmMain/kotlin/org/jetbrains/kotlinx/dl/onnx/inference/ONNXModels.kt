@@ -36,12 +36,14 @@ public object ONNXModels {
      *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
     public sealed class CV<T : InferenceModel>(
-        override val modelRelativePath: String,
+        relativePath: String,
         protected val channelsFirst: Boolean,
         private val inputColorMode: ColorMode = ColorMode.RGB,
         /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
-        internal var noTop: Boolean = false
+        noTop: Boolean = false
     ) : OnnxModelType<T, ImageRecognitionModel> {
+        override val modelRelativePath: String = if (noTop) "$relativePath-notop" else relativePath
+
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(modelHub.loadModel(this), inputColorMode, channelsFirst, preprocessor)
         }
