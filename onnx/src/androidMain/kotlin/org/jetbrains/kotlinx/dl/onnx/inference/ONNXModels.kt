@@ -42,7 +42,7 @@ public object ONNXModels {
         /**
          * Image classification model based on EfficientNet-Lite architecture.
          * Trained on ImageNet 1k dataset.
-         * (labels are available via [org.jetbrains.kotlinx.dl.dataset.Imagenet.labels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.labels] method).
          *
          * EfficientNet-Lite 4 is the largest variant and most accurate of the set of EfficientNet-Lite model.
          * It is an integer-only quantized model that produces the highest accuracy of all the EfficientNet models.
@@ -65,7 +65,7 @@ public object ONNXModels {
         /**
          * Image classification model based on MobileNetV1 architecture.
          * Trained on ImageNet 1k dataset.
-         * (labels are available via [org.jetbrains.kotlinx.dl.dataset.Imagenet.labels] method).
+         * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.labels] method).
          *
          * MobileNetV1 is small, low-latency, low-power model and can be run efficiently on mobile devices
          *
@@ -162,7 +162,7 @@ public object ONNXModels {
         OnnxModelType<T, U> {
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.Coco.V2017]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017]).
          *
          * SSD-MobilenetV1 is an object detection model that uses a Single Shot MultiBox Detector (SSD) approach
          * to predict object classes for boundary boxes.
@@ -202,7 +202,7 @@ public object ONNXModels {
 
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
-         * (labels are available in [org.jetbrains.kotlinx.dl.dataset.Coco.V2017]).
+         * (labels are available in [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017]).
          *
          * Internally it uses the EfficientNetLite as backbone network.
          *
