@@ -2,12 +2,10 @@ plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '1.7.10' apply false
     id 'com.android.application' apply false
     id 'maven-publish'
-    id 'io.codearte.nexus-staging' version '0.22.0'
-    id 'org.jetbrains.dokka' version '1.5.30'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
     id "com.gradle.plugin-publish" version "1.0.0" apply false
+    id 'org.jetbrains.dokka' version '1.5.30'
 }
-
-apply from: project.rootProject.file('gradle/dokka.gradle')
 
 def kotlinDLVersion = "$majorVersion.$minorVersion"
 
@@ -21,11 +19,26 @@ allprojects {
     version = kotlinDLVersion
 }
 
-def unpublishedSubprojects = ["examples", "gradlePlugin"]
+apply from: project.rootProject.file('gradle/fatJar.gradle')
+apply from: project.rootProject.file('gradle/dokka.gradle')
 
+def unpublishedSubprojects = ["examples", "gradlePlugin"]
 subprojects {
     if (name in unpublishedSubprojects) return
     apply from: project.rootProject.file('gradle/publish.gradle')
+}
+
+def sonatypeUser = System.getenv('SONATYPE_USER')
+def sonatypePassword = System.getenv('SONATYPE_PASSWORD')
+nexusPublishing {
+    packageGroup = project.group.toString()
+    repositories {
+        sonatype {
+            username = sonatypeUser
+            password = sonatypePassword
+            repositoryDescription = "kotlinx.kotlindl staging repository, version: $version"
+        }
+    }
 }
 
 task setTeamcityVersion {
@@ -33,5 +46,3 @@ task setTeamcityVersion {
         println("##teamcity[buildNumber '$version']")
     }
 }
-
-apply from: project.rootProject.file('gradle/fatJar.gradle')
