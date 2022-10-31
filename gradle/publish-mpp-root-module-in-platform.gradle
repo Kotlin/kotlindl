@@ -9,9 +9,6 @@
  * metadata can still get the platform artifact and transitive dependencies from the POM
  * (see details in https://youtrack.jetbrains.com/issue/KT-39184#focus=streamItem-27-4115233.0-0)
  */
-import org.gradle.execution.plan.Node
-import org.w3c.dom.NodeList
-
 project.ext.publishPlatformArtifactsInRootModule = { MavenPublication platformPublication ->
     afterEvaluate {
         XmlProvider platformXml = null
