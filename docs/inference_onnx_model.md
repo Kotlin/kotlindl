@@ -72,7 +72,17 @@ In this section, the same pose detection model will be used.
 One more thing to mention is that KotlinDL expects the model files to be located in the application resources. 
 You can download the required models manually or use a Gradle plugins which downloads them automatically before the build.
 
-To use the Gradle plugin, apply it in the build script:
+To use the Gradle plugin, ensure that `google` and `gradlePluginPortal` repositories are listed in the `settings.gradle` file:
+```groovy
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+}
+```
+
+Then apply the plugin in the build script:
 ```groovy
 plugins {
   id "org.jetbrains.kotlinx.kotlin-deeplearning-gradle-plugin" version "[KOTLIN-DL-VERSION]"
