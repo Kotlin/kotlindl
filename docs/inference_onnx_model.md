@@ -69,15 +69,15 @@ On Android, the primary input data type is `Bitmap` the common image representat
 Another difference is that model files need to be downloaded separately.
 
 ### Inference of the model included into KotlinDL Model Zoo
-In this section, the same pose detection model will be used. Note that input data type is `Bitmap` instead of `BufferedImage`.
+In this section, the single pose detection model will be used. Note that input data type is `Bitmap` instead of `BufferedImage`.
 ```kotlin
 val modelHub = ONNXModelHub(context) // Android context is required to access the application resources
-val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+val model = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
 
 val bitmap = BitmapFactory.decodeStream(imageResource)
 
-val detectedPoses = model.inferAndCloseUsing(CPU()) {
-    model.detectPoses(image = bitmap, confidence = 0.05f)
+val detectedPose = model.inferAndCloseUsing(CPU()) {
+    model.detectPose(image = bitmap, confidence = 0.05f)
 }
 ```
 
