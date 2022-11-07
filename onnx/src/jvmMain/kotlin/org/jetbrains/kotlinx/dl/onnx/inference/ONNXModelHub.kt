@@ -20,7 +20,6 @@ import java.nio.file.StandardCopyOption
 
 private const val S3_FOLDER_SEPARATOR = "/"
 private const val MODEL_FILE_EXTENSION = ".onnx"
-private const val NO_TOP_PREFIX = "-notop"
 
 /**
  * This class provides methods for loading ONNX model to the local [cacheDirectory].
@@ -86,12 +85,7 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
         vararg executionProviders: ExecutionProvider,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
     ): T {
-        val modelFile = if (modelType is ONNXModels.CV && modelType.noTop) {
-            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + NO_TOP_PREFIX + MODEL_FILE_EXTENSION
-        } else {
-            S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
-        }
-
+        val modelFile = S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
         val inferenceModel = OnnxInferenceModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
         modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
