@@ -3,6 +3,7 @@ package org.jetbrains.kotlinx.dl.onnx.summary
 import ai.onnxruntime.OnnxJavaType
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.print
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxTensorVariableSummary
@@ -12,12 +13,13 @@ import org.junit.jupiter.api.Test
 class OnnxModelsSummaryTests {
     @Test
     fun formatOfEfficientNetB0InternalModelSummaryTest() {
+        efficientNetB0InternalModelSummary.print()
+        internalModelExpectedFormat.forEach(System.out::println)
         assertEquals(
             internalModelExpectedFormat,
             efficientNetB0InternalModelSummary.format()
         )
     }
-
 
     @Test
     fun formatOfEfficientNetB0SummaryTest() {
@@ -61,16 +63,13 @@ class OnnxModelsSummaryTests {
         "=========================================================",
         "Model type: ONNX",
         "_________________________________________________________",
-        "=========================================================",
         "Inputs      Type                                         ",
         "=========================================================",
         "input       Tensor {dtype=FLOAT, shape [-1, 224, 224, 3]}",
         "_________________________________________________________",
-        "=========================================================",
         "Outputs     Type                                         ",
         "=========================================================",
         "predictions Tensor {dtype=FLOAT, shape [-1, 1000]}       ",
         "_________________________________________________________",
-        "========================================================="
     )
 }

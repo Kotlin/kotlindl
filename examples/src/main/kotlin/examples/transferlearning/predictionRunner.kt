@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
@@ -57,6 +58,7 @@ fun runImageRecognitionPrediction(
             metric = Metrics.ACCURACY
         )
 
+        it.printSummary()
         it.logSummary()
 
         val hdfFile = modelHub.loadWeights(modelType)

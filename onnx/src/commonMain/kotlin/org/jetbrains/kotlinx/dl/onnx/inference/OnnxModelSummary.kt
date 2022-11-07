@@ -6,7 +6,7 @@ import ai.onnxruntime.SequenceInfo
 import ai.onnxruntime.TensorInfo
 import ai.onnxruntime.ValueInfo
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.*
 import java.lang.IllegalStateException
 
 /**
@@ -43,91 +43,32 @@ public data class OnnxModelSummary(
         typeColumnHeader: String = "Type"
     ): List<String> {
         val inputRows = inputsSummaries.map { (name, summary) ->
-            listOf(name, summary.toSummaryRow())
+            TableRow(listOf(name, summary.toSummaryRow()))
         }
 
         val outputRows = outputsSummaries.map { (name, summary) ->
-            listOf(name, summary.toSummaryRow())
+            TableRow(listOf(name, summary.toSummaryRow()))
         }
 
-        val allRows = inputRows + outputRows
+        val header = SimpleSection(
+            listOf(TableRow("Model type: ONNX")),
+            lineSeparatorSymbol,
+            thickLineSeparatorSymbol
+        )
 
-        fun List<String>.calcColumnWidth(headerWidth: Int) =
-            maxOfOrNull { it.length }?.coerceAtLeast(headerWidth) ?: headerWidth
-
-        // Calculate number of columns along with their widths
-        val nameColumnWidth =
-            allRows.map { it[0] }.calcColumnWidth(maxOf(inputsColumnHeader.length, outputsColumnHeader.length))
-        val typeColumnWidth = allRows.map { it[1] }.calcColumnWidth(typeColumnHeader.length)
-
-        val columnsWidths = intArrayOf(nameColumnWidth, typeColumnWidth)
-
-        // Calculate whole table width and prepare strings that will be used as line separators
-        val tableWidth = columnsWidths.sum() + (columnsWidths.size - 1).coerceAtLeast(0) * columnSeparator.length
-        val lineSeparator = lineSeparatorSymbol.toString().repeat(tableWidth)
-        val thickLineSeparator = thickLineSeparatorSymbol.toString().repeat(tableWidth)
-
-        val result = mutableListOf<String>()
-
-        result.add(thickLineSeparator)
-        result.add("Model type: ONNX")
-        result.add(lineSeparator)
-        result.add(thickLineSeparator)
-
-        val inputSubTable = formatTable(
+        val inputsSection = SectionWithColumns(
             inputRows,
-            inputsColumnHeader,
-            typeColumnHeader,
-            columnSeparator,
-            lineSeparator,
-            thickLineSeparator,
-            columnsWidths
+            listOf(inputsColumnHeader, typeColumnHeader),
+            columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol
         )
 
-        result.addAll(inputSubTable)
-        result.add(thickLineSeparator)
-
-        val outputSubTable = formatTable(
+        val outputsSection = SectionWithColumns(
             outputRows,
-            outputsColumnHeader,
-            typeColumnHeader,
-            columnSeparator,
-            lineSeparator,
-            thickLineSeparator,
-            columnsWidths
+            listOf(outputsColumnHeader, typeColumnHeader),
+            columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol
         )
 
-        result.addAll(outputSubTable)
-        result.add(thickLineSeparator)
-
-        return result
-    }
-
-    private fun formatTable(
-        table: List<List<String>>,
-        nameColumnHeader: String,
-        typeColumnHeader: String,
-        columnSeparator: String,
-        lineSeparator: String,
-        thickLineSeparator: String,
-        columnsWidths: IntArray
-    ): List<String> {
-        fun formatLine(vararg strs: String): String = columnsWidths
-            .mapIndexed { index, columnWidth -> (strs.getOrNull(index) ?: "").padEnd(columnWidth) }
-            .joinToString(separator = columnSeparator)
-
-        val result = mutableListOf<String>()
-
-        result.add(formatLine(nameColumnHeader, typeColumnHeader))
-
-        result.add(thickLineSeparator)
-
-        table.forEach { row ->
-            result.add(formatLine(row[0], row[1]))
-            result.add(lineSeparator)
-        }
-
-        return result
+        return formatTable(header, inputsSection, outputsSection)
     }
 }
 
