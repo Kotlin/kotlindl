@@ -65,14 +65,37 @@ val detections = model.inferAndCloseUsing(CPU()) {
 ## Android
 The inference on Android is almost identical to the Desktop JVM counterpart.
 Slight differences appear due to the different image representations supported on a specific platform.
-On Android, the primary input data type is `Bitmap` the common image representation on the Android platform.
+On Android, the primary input data type is `Bitmap` the common image representation on the Android platform. 
+Another difference is that model files need to be downloaded separately.
 
 ### Inference of the model included into KotlinDL Model Zoo
-In this section, the same pose detection model will be used.
-One more thing to mention is that KotlinDL expects the model files to be located in the application resources. 
+In this section, the single pose detection model will be used. Note that input data type is `Bitmap` instead of `BufferedImage`.
+```kotlin
+val modelHub = ONNXModelHub(context) // Android context is required to access the application resources
+val model = ONNXModels.PoseDetection.MoveNetSinglePoseLighting.pretrainedModel(modelHub)
+
+val bitmap = BitmapFactory.decodeStream(imageResource)
+
+val detectedPose = model.inferAndCloseUsing(CPU()) {
+    model.detectPose(image = bitmap, confidence = 0.05f)
+}
+```
+
+### Downloading pre-trained KotlinDL Model Zoo models
+KotlinDL expects the model files to be located in the application resources.
 You can download the required models manually or use a Gradle plugins which downloads them automatically before the build.
 
-To use the Gradle plugin, apply it in the build script:
+To use the Gradle plugin, ensure that `google` and `gradlePluginPortal` repositories are listed in the `settings.gradle` file:
+```groovy
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+}
+```
+
+Then apply the plugin in the build script:
 ```groovy
 plugins {
   id "org.jetbrains.kotlinx.kotlin-deeplearning-gradle-plugin" version "[KOTLIN-DL-VERSION]"
@@ -91,17 +114,6 @@ downloadKotlinDLModels {
 The plugin creates a task named `downloadKotlinDLModels` which is executed automatically before project is build 
 or can be executed manually if needed.
 
-Also note that input data type is `Bitmap` instead of `BufferedImage`.
-```kotlin
-val modelHub = ONNXModelHub(context) // Android context is required to access the application resources
-val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
-
-val bitmap = BitmapFactory.decodeStream(imageResource)
-
-val detectedPoses = model.inferAndCloseUsing(CPU()) {
-    model.detectPoses(image = bitmap, confidence = 0.05f)
-}
-```
 ### Inference of custom ONNX model
 In this section we will use the same model as in the corresponding Desktop JVM section.
 Note that model instance is created from the byte representation of the model file loaded from the application resources.
