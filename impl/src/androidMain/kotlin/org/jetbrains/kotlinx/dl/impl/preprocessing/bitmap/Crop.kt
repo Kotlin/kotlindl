@@ -64,10 +64,6 @@ public class Crop(
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        return when (inputShape.rank()) {
-            2 -> TensorShape(width.toLong(), height.toLong())
-            3 -> TensorShape(width.toLong(), height.toLong(), inputShape[2])
-            else -> throw IllegalArgumentException("Input shape must expected to be 2D or 3D")
-        }
+        return Resize.createOutputImageShape(inputShape, width, height)
     }
 }

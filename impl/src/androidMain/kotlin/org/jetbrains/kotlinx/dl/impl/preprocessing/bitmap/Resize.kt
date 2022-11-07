@@ -29,10 +29,16 @@ public class Resize(
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        return when (inputShape.rank()) {
-            2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
-            3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
-            else -> throw IllegalArgumentException("Input shape must expected to be 2D or 3D")
+        return createOutputImageShape(inputShape, outputWidth, outputHeight)
+    }
+
+    public companion object {
+        internal fun createOutputImageShape(inputShape: TensorShape, outputWidth: Int, outputHeight: Int): TensorShape {
+            return when (inputShape.rank()) {
+                2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
+                3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
+                else -> throw IllegalArgumentException("Input shape is expected to be 2D or 3D")
+            }
         }
     }
 }
