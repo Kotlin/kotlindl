@@ -6,9 +6,12 @@
 package org.jetbrains.kotlinx.dl.impl.preprocessing
 
 import android.graphics.Bitmap
+import android.os.Build
+import androidx.annotation.RequiresApi
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
+import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Crop
 import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap.Rotate
 
@@ -29,4 +32,10 @@ public fun <I> Operation<I, Bitmap>.resize(block: Resize.() -> Unit): Operation<
 /** Applies [Rotate] operation to rotate the [Bitmap] by an arbitrary angle (specified in degrees). */
 public fun <I> Operation<I, Bitmap>.rotate(block: Rotate.() -> Unit): Operation<I, Bitmap> {
     return PreprocessingPipeline(this, Rotate().apply(block))
+}
+
+/** Applies [Crop] operation to crop the [Bitmap] at a specified region. */
+@RequiresApi(Build.VERSION_CODES.O)
+public fun <I> Operation<I, Bitmap>.crop(block: Crop.() -> Unit): Operation<I, Bitmap> {
+    return PreprocessingPipeline(this, Crop().apply(block))
 }
