@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.posedetection
 
+import org.jetbrains.kotlinx.dl.api.inference.FlatShape
+
 /**
  * This data class represents the human's pose detected on the given image.
  *
@@ -14,4 +16,8 @@ package org.jetbrains.kotlinx.dl.api.inference.posedetection
 public data class DetectedPose(
     val landmarks: List<PoseLandmark>,
     val edges: List<PoseEdge>
-)
+) : FlatShape<DetectedPose> {
+    override fun map(mapping: (Float, Float) -> Pair<Float, Float>): DetectedPose {
+        return DetectedPose(landmarks.map { it.map(mapping) }, edges.map { it.map(mapping) })
+    }
+}
