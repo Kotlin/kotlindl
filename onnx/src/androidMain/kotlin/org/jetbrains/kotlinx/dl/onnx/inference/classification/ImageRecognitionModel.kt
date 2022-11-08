@@ -25,9 +25,9 @@ public open class ImageRecognitionModel(
     internalModel: OnnxInferenceModel,
     private val channelsFirst: Boolean,
     private val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> = Identity(),
-    modelType: OnnxModelType<*, *>? = null,
+    modelKindDescription: String? = null,
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
-) : ImageRecognitionModelBase<Bitmap>(internalModel, modelType), ExecutionProviderCompatible,
+) : ImageRecognitionModelBase<Bitmap>(internalModel, modelKindDescription), ExecutionProviderCompatible,
     CameraXCompatibleModel {
     override var targetRotation: Int = 0
 

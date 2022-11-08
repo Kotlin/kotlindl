@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
 import java.lang.Float.min
 import kotlin.math.max
@@ -16,7 +15,7 @@ import kotlin.math.max
 /**
  * Base class for face detection models.
  */
-public abstract class FaceDetectionModelBase<I>(override val type: OnnxModelType<*, *>? = null) :
+public abstract class FaceDetectionModelBase<I>(override val modelKindDescription: String? = null) :
     OnnxHighLevelModel<I, List<DetectedObject>> {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {

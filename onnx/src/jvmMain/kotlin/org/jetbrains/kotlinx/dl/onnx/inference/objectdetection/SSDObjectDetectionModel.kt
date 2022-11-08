@@ -16,7 +16,6 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getLongArray
@@ -47,8 +46,8 @@ private val SSD_RESNET_METADATA = SSDLikeModelMetadata("bboxes", "labels", "scor
  */
 public class SSDObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    modelType: OnnxModelType<*, *>? = null
-) : SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA, modelType), InferenceModel by internalModel {
+    modelKindDescription: String? = null
+) : SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA, modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

@@ -32,8 +32,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.*
  */
 public class SSDLikeModel(
     override val internalModel: OnnxInferenceModel, metadata: SSDLikeModelMetadata,
-    modelType: OnnxModelType<*, *>? = null
-) : SSDLikeModelBase<Bitmap>(metadata, modelType), CameraXCompatibleModel, InferenceModel by internalModel {
+    modelKindDescription: String? = null
+) : SSDLikeModelBase<Bitmap>(metadata, modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 
@@ -67,5 +67,6 @@ public fun ObjectDetectionModelBase<Bitmap>.detectObjects(imageProxy: ImageProxy
         is CameraXCompatibleModel -> {
             doWithRotation(imageProxy.imageInfo.rotationDegrees) { detectObjects(imageProxy.toBitmap(), topK) }
         }
+
         else -> detectObjects(imageProxy.toBitmap(applyRotation = true), topK)
     }

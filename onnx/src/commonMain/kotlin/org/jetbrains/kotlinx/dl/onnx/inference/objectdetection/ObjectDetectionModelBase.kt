@@ -8,14 +8,13 @@ package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 
 /**
  * Base class for object detection models.
  */
-public abstract class ObjectDetectionModelBase<I>(override val type: OnnxModelType<*, *>? = null) :
+public abstract class ObjectDetectionModelBase<I>(override val modelKindDescription: String? = null) :
     OnnxHighLevelModel<I, List<DetectedObject>> {
     /**
      * Class labels from the dataset used for training.
@@ -41,7 +40,7 @@ public abstract class ObjectDetectionModelBase<I>(override val type: OnnxModelTy
 /**
  * Base class for object detection models based on EfficientDet architecture.
  */
-public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: OnnxModelType<*, *>? = null) :
+public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: String? = null) :
     ObjectDetectionModelBase<I>(modelType) {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
@@ -77,7 +76,7 @@ public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: OnnxMod
  */
 public abstract class SSDLikeModelBase<I>(
     protected val metadata: SSDLikeModelMetadata,
-    modelType: OnnxModelType<*, *>? = null
+    modelType: String? = null
 ) : ObjectDetectionModelBase<I>(modelType) {
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val boxes = output.get2DFloatArray(metadata.outputBoxesName)

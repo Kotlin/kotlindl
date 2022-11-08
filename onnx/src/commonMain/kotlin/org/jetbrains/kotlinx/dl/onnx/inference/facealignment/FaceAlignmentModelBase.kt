@@ -8,13 +8,12 @@ package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 
 /**
  * Base class for face alignment models.
  */
-public abstract class FaceAlignmentModelBase<I>(override val type: OnnxModelType<*, *>? = null) :
+public abstract class FaceAlignmentModelBase<I>(override val modelKindDescription: String? = null) :
     OnnxHighLevelModel<I, List<Landmark>> {
     /**
      * Name of the output tensor.

@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -28,8 +27,8 @@ private const val OUTPUT_NAME = "fc1"
  */
 public class Fan2D106FaceAlignmentModel(
     override val internalModel: OnnxInferenceModel,
-    modelType: OnnxModelType<*, *>? = null
-) : FaceAlignmentModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
+    modelKindDescription: String? = null
+) : FaceAlignmentModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test
 class OnnxModelsSummaryTests {
     @Test
     fun formatOfEfficientNetB0InternalModelSummaryTest() {
-        efficientNetB0InternalModelSummary.print()
-        internalModelExpectedFormat.forEach(System.out::println)
         assertEquals(
             internalModelExpectedFormat,
             efficientNetB0InternalModelSummary.format()
@@ -56,7 +54,7 @@ class OnnxModelsSummaryTests {
 
     private val efficientNetB0Summary = ModelHubModelSummary(
         internalSummary = efficientNetB0InternalModelSummary,
-        modelType = ONNXModels.CV.EfficientNetB0()
+        modelKindDescription = ONNXModels.CV.EfficientNetB0()::class.simpleName
     )
 
     private val internalModelExpectedFormat = listOf(

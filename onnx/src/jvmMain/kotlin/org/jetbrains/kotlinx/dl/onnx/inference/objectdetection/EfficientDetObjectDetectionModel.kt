@@ -14,7 +14,6 @@ import org.jetbrains.kotlinx.dl.impl.dataset.Coco
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -31,8 +30,8 @@ import java.io.IOException
  */
 public class EfficientDetObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    modelType: OnnxModelType<*, *>? = null
-) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
+    modelKindDescription: String? = null
+) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()

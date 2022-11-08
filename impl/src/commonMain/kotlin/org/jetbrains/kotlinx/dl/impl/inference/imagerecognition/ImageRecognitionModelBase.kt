@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.summary.EmptySummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
@@ -17,11 +16,11 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 /**
  * Base class for image classification models.
  * @property [internalModel] model used for prediction
- * @property [type] Corresponding [ModelType]. Used for model summary. Should be null for custom models.
+ * @property [modelKindDescription] High-level description of the model. Used for model summary printing. For the models from [OnnxModels] it equals to the string representation of [OnnxModelType]
  */
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel,
-    protected val type: ModelType<*, *>? = null
+    protected val modelKindDescription: String? = null
 ) : InferenceModel by internalModel, ModelWithSummary {
     /**
      * Preprocessing operation specific to this model.
@@ -65,9 +64,9 @@ public abstract class ImageRecognitionModelBase<I>(
 
     override fun summary(): ModelSummary {
         return if (internalModel is ModelWithSummary) {
-            ModelHubModelSummary(internalModel.summary(), type)
+            ModelHubModelSummary(internalModel.summary(), modelKindDescription)
         } else {
-            ModelHubModelSummary(EmptySummary(), type)
+            ModelHubModelSummary(EmptySummary(), modelKindDescription)
         }
     }
 }

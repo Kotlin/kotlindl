@@ -43,7 +43,7 @@ public class EmptySummary : ModelSummary {
  */
 public class ModelHubModelSummary(
     private val internalSummary: ModelSummary,
-    private val modelType: ModelType<*, *>?
+    private val modelKindDescription: String?
 ) : ModelSummary {
     override fun format(
         columnSeparator: String,
@@ -52,9 +52,9 @@ public class ModelHubModelSummary(
     ): List<String> {
         val table = internalSummary.format(columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol)
 
-        if (modelType == null) return table
+        if (modelKindDescription == null) return table
 
-        val modelTypeHeader = "${modelType::class.simpleName} model summary"
+        val modelTypeHeader = "$modelKindDescription model summary"
         if (table.isEmpty()) return listOf(modelTypeHeader)
 
         val tableWidth = table.first().length

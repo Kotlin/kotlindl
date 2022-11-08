@@ -16,7 +16,6 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType
 import java.awt.image.BufferedImage
 
 /**
@@ -27,8 +26,8 @@ import java.awt.image.BufferedImage
  */
 public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    modelType: OnnxModelType<*, *>? = null
-) : FaceDetectionModelBase<BufferedImage>(modelType), InferenceModel by internalModel {
+    modelKindDescription: String? = null
+) : FaceDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
