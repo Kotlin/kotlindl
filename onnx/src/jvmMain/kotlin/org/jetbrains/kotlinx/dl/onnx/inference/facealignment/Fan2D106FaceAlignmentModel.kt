@@ -62,7 +62,10 @@ public class Fan2D106FaceAlignmentModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): Fan2D106FaceAlignmentModel {
-        return Fan2D106FaceAlignmentModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return Fan2D106FaceAlignmentModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }
 

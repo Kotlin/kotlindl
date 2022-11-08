@@ -70,6 +70,9 @@ public class EfficientDetObjectDetectionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): EfficientDetObjectDetectionModel {
-        return EfficientDetObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return EfficientDetObjectDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

@@ -79,6 +79,9 @@ public class SSDMobileNetV1ObjectDetectionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): SSDMobileNetV1ObjectDetectionModel {
-        return SSDMobileNetV1ObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return SSDMobileNetV1ObjectDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

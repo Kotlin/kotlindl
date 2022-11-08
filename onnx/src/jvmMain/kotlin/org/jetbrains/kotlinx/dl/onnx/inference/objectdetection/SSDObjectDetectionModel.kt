@@ -110,6 +110,9 @@ public class SSDObjectDetectionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): SSDObjectDetectionModel {
-        return SSDObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return SSDObjectDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

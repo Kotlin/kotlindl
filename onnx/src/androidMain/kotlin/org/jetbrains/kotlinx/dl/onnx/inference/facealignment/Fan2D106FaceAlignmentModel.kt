@@ -42,7 +42,10 @@ public class Fan2D106FaceAlignmentModel(
         .toFloatArray { layout = TensorLayout.NCHW }
 
     override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return Fan2D106FaceAlignmentModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return Fan2D106FaceAlignmentModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }
 

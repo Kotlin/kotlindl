@@ -16,7 +16,8 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 /**
  * Base class for image classification models.
  * @property [internalModel] model used for prediction
- * @property [modelKindDescription] High-level description of the model. Used for model summary printing. For the models from [OnnxModels] it equals to the string representation of [OnnxModelType]
+ * @property [modelKindDescription] High-level description of the model. Used for model summary printing.
+ * For the models from ModelHub it equals to the string representation of [ModelType].
  */
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel,

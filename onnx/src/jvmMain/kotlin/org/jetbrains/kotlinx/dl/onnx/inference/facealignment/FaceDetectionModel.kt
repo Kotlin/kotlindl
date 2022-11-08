@@ -39,6 +39,9 @@ public class FaceDetectionModel(
             .call(ONNXModels.FaceDetection.defaultPreprocessor)
 
     override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return FaceDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return FaceDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

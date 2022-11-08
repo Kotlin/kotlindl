@@ -62,6 +62,9 @@ public class SinglePoseDetectionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): SinglePoseDetectionModel {
-        return SinglePoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return SinglePoseDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

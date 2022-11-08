@@ -66,6 +66,9 @@ public class MultiPoseDetectionModel(
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): MultiPoseDetectionModel {
-        return MultiPoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return MultiPoseDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

@@ -1,7 +1,5 @@
 package org.jetbrains.kotlinx.dl.api.summary
 
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
-
 /**
  * Common interface for model summary.
  */
@@ -36,14 +34,14 @@ public class EmptySummary : ModelSummary {
 
 /**
  * The summary for the models from ModelHub.
- * It appends corresponding [ModelType] to the header of the model summary.
+ * It appends corresponding [modelKindDescription] to the header of the model summary.
  *
  * @property [modelType] type of the model, aka. model architecture. E.g. VGG16, ResNet50, etc.
  * @property [internalSummary] summary of the internal model used for inference
  */
 public class ModelHubModelSummary(
     private val internalSummary: ModelSummary,
-    private val modelKindDescription: String?
+    private val modelKindDescription: String? = null
 ) : ModelSummary {
     override fun format(
         columnSeparator: String,
@@ -61,7 +59,7 @@ public class ModelHubModelSummary(
         val separator = thickLineSeparatorSymbol.toString().repeat(tableWidth)
 
         val tableWithHeader = mutableListOf(separator, modelTypeHeader)
-        table.forEach(tableWithHeader::add)
+        tableWithHeader.addAll(table)
 
         return tableWithHeader
     }
