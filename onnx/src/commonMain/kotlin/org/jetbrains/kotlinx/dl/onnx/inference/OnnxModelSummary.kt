@@ -43,32 +43,33 @@ public data class OnnxModelSummary(
         typeColumnHeader: String = "Type"
     ): List<String> {
         val inputRows = inputsSummaries.map { (name, summary) ->
-            TableRow(listOf(name, summary.toSummaryRow()))
+            TableRow(name, summary.toSummaryRow())
         }
 
         val outputRows = outputsSummaries.map { (name, summary) ->
-            TableRow(listOf(name, summary.toSummaryRow()))
+            TableRow(name, summary.toSummaryRow())
         }
 
         val header = SimpleSection(
-            listOf(TableRow("Model type: ONNX")),
-            lineSeparatorSymbol,
-            thickLineSeparatorSymbol
+            listOf("Model type: ONNX")
         )
 
         val inputsSection = SectionWithColumns(
             inputRows,
-            listOf(inputsColumnHeader, typeColumnHeader),
-            columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol
+            listOf(inputsColumnHeader, typeColumnHeader)
         )
 
         val outputsSection = SectionWithColumns(
             outputRows,
-            listOf(outputsColumnHeader, typeColumnHeader),
-            columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol
+            listOf(outputsColumnHeader, typeColumnHeader)
         )
 
-        return formatTable(header, inputsSection, outputsSection)
+        return formatTable(
+            listOf(header, inputsSection, outputsSection),
+            columnSeparator,
+            lineSeparatorSymbol,
+            thickLineSeparatorSymbol
+        )
     }
 }
 

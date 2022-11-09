@@ -55,14 +55,22 @@ public data class TfModelSummary(
         thickLineSeparatorSymbol: Char = '=',
         withConnectionsColumn: Boolean = layersSummaries.any { it.inboundLayers.size > 1 }
     ): List<String> {
-        // Prepare string data for resulting table
+        val headerRows = mutableListOf("Model type: $type")
+        name?.let { headerRows.add("Model name: $it") }
+
+        val header = SimpleSection(headerRows)
+
         val rows = layersSummaries.map { layer ->
-            SummaryRow(
-                layerName = "${layer.name}(${layer.type})",
-                outputShape = layer.outputShape.toString(),
-                paramsCount = layer.paramsCount.toString(),
-                inboundLayers = layer.inboundLayers
-            ).toTableRow(withConnectionsColumn)
+            val cells = mutableListOf(
+                Cell("${layer.name}(${layer.type})"),
+                Cell(layer.outputShape.toString()),
+                Cell(layer.paramsCount.toString())
+            )
+            if (withConnectionsColumn) {
+                cells.add(Cell(layer.inboundLayers))
+            }
+
+            TableRow(cells)
         }
 
         val columnNames = if (withConnectionsColumn) {
@@ -71,25 +79,23 @@ public data class TfModelSummary(
             listOf(layerNameColumnName, outputShapeColumnName, paramsCountColumnName)
         }
 
-        val headerRows = mutableListOf(TableRow("Model type: $type"))
-        name?.let { headerRows.add(TableRow("Model name: $it")) }
-
-        val header = SimpleSection(headerRows, lineSeparatorSymbol, thickLineSeparatorSymbol)
-
         val mainSection =
-            SectionWithColumns(rows, columnNames, columnSeparator, lineSeparatorSymbol, thickLineSeparatorSymbol)
+            SectionWithColumns(rows, columnNames)
 
         val footer = SimpleSection(
             listOf(
-                TableRow("Total trainable params: $trainableParamsCount"),
-                TableRow("Total frozen params: $frozenParamsCount"),
-                TableRow("Total params: $totalParamsCount")
-            ),
+                "Total trainable params: $trainableParamsCount",
+                "Total frozen params: $frozenParamsCount",
+                "Total params: $totalParamsCount"
+            )
+        )
+
+        return formatTable(
+            listOf(header, mainSection, footer),
+            columnSeparator,
             lineSeparatorSymbol,
             thickLineSeparatorSymbol
         )
-
-        return formatTable(header, mainSection, footer)
     }
 }
 
@@ -108,23 +114,3 @@ public data class LayerSummary(
     /** Input layers for the described layer. */
     val inboundLayers: List<String>
 )
-
-private data class SummaryRow(
-    val layerName: String,
-    val outputShape: String,
-    val paramsCount: String,
-    val inboundLayers: List<String>
-) {
-    fun toTableRow(withInboundLayers: Boolean): TableRow {
-        return if (withInboundLayers) {
-            val rows = mutableListOf(
-                listOf(layerName, outputShape, paramsCount, inboundLayers.firstOrNull() ?: "")
-            )
-
-            inboundLayers.drop(1).forEach { rows.add(listOf("", "", "", it)) }
-            TableRow(rows)
-        } else {
-            TableRow(listOf(layerName, outputShape, paramsCount))
-        }
-    }
-}

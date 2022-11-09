@@ -3,7 +3,6 @@ package org.jetbrains.kotlinx.dl.onnx.summary
 import ai.onnxruntime.OnnxJavaType
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
-import org.jetbrains.kotlinx.dl.api.summary.print
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxTensorVariableSummary
