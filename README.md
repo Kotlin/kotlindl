@@ -98,71 +98,73 @@ fun main() {
 
 ## Table of Contents
 
-- [TensorFlow Engine](#tensorflow-engine)
-- [Limitations](#limitations)
+- [Library Structure](#library-structure)
 - [How to configure KotlinDL in your project](#how-to-configure-kotlindl-in-your-project)
-- [Working with KotlinDL in Android projects](#working-with-kotlindl-in-android-projects)
-- [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
+  - [Working with KotlinDL in Android projects](#working-with-kotlindl-in-android-projects)
+  - [Working with KotlinDL in Jupyter Notebook](#working-with-kotlindl-in-jupyter-notebook)
 - [Documentation](#documentation)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
 - [Logging](#logging)
 - [Fat Jar issue](#fat-jar-issue)
-- [Reporting issues/Support](#reporting-issuessupport)
+- [Limitations](#limitations)
 - [Contributing](#contributing)
+- [Reporting issues/Support](#reporting-issuessupport)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-## TensorFlow Engine
-KotlinDL is built on top of the TensorFlow 1.15 Java API. 
-The Java API for TensorFlow 2.+ has recently had its first public release, and this project will be switching to it in the nearest future. 
-This, however, does not affect the high-level API.
+## Library Structure
 
+KotlinDL consists of the several modules:
+* `kotlin-deeplearning-api` api interfaces and classes
+* `kotlin-deeplearning-impl` implementation classes and utilities
+* `kotlin-deeplearning-onnx` inference with ONNX Runtime
+* `kotlin-deeplearning-tensorflow` learning and inference with TensorFlow
+* `kotlin-deeplearning-visualization` visualization utilities
+
+Module `kotlin-deeplearning-tensorflow` is only available for desktop JVM, while other artifacts could also be used on Android.
 
 ## How to configure KotlinDL in your project
-To use the full power of KotlinDL (including the `onnx` and `visualization` modules) in your project, add the following dependencies to your build.gradle file:
 
+To use KotlinDL in your project, ensure that `mavenCentral` is added to the repositories list:
 ```groovy
-   repositories {
-      mavenCentral()
-   }
-   
-   dependencies {
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
-   }
+repositories {
+    mavenCentral()
+}
 ```
-
-Or add just one dependency if you don’t need ONNX and visualization:
-
+Then add the necessary dependencies to your `build.gradle` file. 
+Use `kotlin-deeplearning-onnx` module for inference with ONNX Runtime in desktop and Android projects:
 ```groovy
-   repositories {
-      mavenCentral()
-   }
-   
-   dependencies {
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
-   }
+dependencies {
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+}
 ```
-The latest KotlinDL version is 0.4.0.
+To use the full power of KotlinDL in your project for JVM, add the following dependencies to your `build.gradle` file:
+```groovy
+dependencies {
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:[KOTLIN-DL-VERSION]'
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
+}
+```
+The latest KotlinDL version is `0.5.0-alpha-1`, the latest stable version is `0.4.0`.
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
-## Working with KotlinDL in Jupyter Notebook
-You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the following dependency in your notebook: 
+### Working with KotlinDL in Jupyter Notebook
+You can work with KotlinDL interactively in Jupyter Notebook with the Kotlin kernel. To do so, add the required dependencies in your notebook: 
 
 ```kotlin
-   @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
+@file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:[KOTLIN-DL-VERSION]")
 ```
 For more details on installing Jupyter Notebook and adding the Kotlin kernel, check out the [Quick Start Guide](docs/quick_start_guide.md).
 
-## Working with KotlinDL in Android projects
+### Working with KotlinDL in Android projects
 KotlinDL supports an inference of ONNX models on the Android platform.
 To use KotlinDL in your Android project, add the following dependency to your build.gradle file:
 ```kotlin
 dependencies {
-    implementation ("'org.jetbrains.kotlinx:kotlin-deeplearning-onnx-android:[KOTLIN-DL-VERSION]")
+    implementation ("'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]")
 }
 ```
 For more details, please refer to the [Quick Start Guide](docs/quick_start_guide.md#working-with-kotlin-dl-in-android-studio).
@@ -189,7 +191,7 @@ At this point, please feel free to check out the following tutorials we have pre
 - [Running inference with ONNX models on JVM](docs/inference_onnx_model.md#desktop-jvm)
 - [Running inference with ONNX models on Android](docs/inference_onnx_model.md#android)
 
-For more inspiration, take a look at the [code examples](examples) in this repo and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo).
+For more inspiration, take a look at the [code examples](examples) in this repository and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo).
 
 ## Running KotlinDL on GPU
 
@@ -350,7 +352,8 @@ Currently, only a limited set of deep learning architectures are supported. Here
 * Other layers:
   - `Permute`, `RepeatVector`.
 
-KotlinDL supports model inference in JVM backend applications only.
+TensorFlow 1.15 Java API is currently used for layer implementation, but this project will be switching to the TensorFlow 2.+ in the nearest future. 
+This, however, does not affect the high-level API. Inference with TensorFlow models is currently supported only on desktop. 
 
 ## Contributing
 
