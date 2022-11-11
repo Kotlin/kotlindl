@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.posedetection
 
+import org.jetbrains.kotlinx.dl.api.inference.FlatShape
+
 /**
  * This data class represents one point of the detected human's pose.
  *
@@ -18,4 +20,9 @@ public data class PoseLandmark(
     val y: Float,
     val probability: Float,
     val label: String,
-)
+): FlatShape<PoseLandmark> {
+    override fun map(mapping: (Float, Float) -> Pair<Float, Float>): PoseLandmark {
+        val (x1, y1) = mapping(x, y)
+        return PoseLandmark(x1, y1, probability, label)
+    }
+}
