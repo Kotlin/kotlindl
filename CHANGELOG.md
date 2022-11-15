@@ -1,3 +1,78 @@
+# 0.5.0 (TBA) Inference on Android with ONNX Runtime
+Features:
+* Added Android inference support
+  * Built Android artifacts for "impl", "onnx" and "visualization" modules [#422](https://github.com/Kotlin/kotlindl/issues/422)
+  * Added Android-specific models to the model zoo
+    * Classification [#438](https://github.com/Kotlin/kotlindl/issues/438):
+      * `EfficientNet4Lite`
+      * `MobilenetV1` 
+    * Object Detection:
+      * `SSDMobileNetV1` [#440](https://github.com/Kotlin/kotlindl/issues/440)
+      * `EfficientDetLite0` [#443](https://github.com/Kotlin/kotlindl/issues/443)
+    * Pose Detection [#442](https://github.com/Kotlin/kotlindl/issues/442):
+      * `MoveNetSinglePoseLighting`
+      * `MoveNetSinglePoseThunder`
+    * Face Detection [#461](https://github.com/Kotlin/kotlindl/pull/461):
+      * `UltraFace320`
+      * `UltraFace640`
+    * Face Alignment [#441](https://github.com/Kotlin/kotlindl/issues/441):
+      * `Fan2d106` 
+  * Implemented preprocessing operations working on Android `Bitmap` [#416](https://github.com/Kotlin/kotlindl/issues/416), 
+    [#478](https://github.com/Kotlin/kotlindl/pull/478):
+    * `Resize`
+    * `Rotate`
+    * `Crop`
+    * `ConvertToFloatArray`
+  * Added utility functions to convert `ImageProxy` to `Bitmap` [#458](https://github.com/Kotlin/kotlindl/pull/458)
+  * Added `NNAPI` execution provider [#420](https://github.com/Kotlin/kotlindl/issues/420)
+  * Added api to create `OnnxInferenceModel` from the `ByteArray` representation [#415](https://github.com/Kotlin/kotlindl/issues/415)
+  * Introduced a gradle task to download model hub models before the build [#444](https://github.com/Kotlin/kotlindl/issues/444)
+  * Added utility functions to draw detection results on Android `Canvas` [#450](https://github.com/Kotlin/kotlindl/pull/450)
+* Implemented new preprocessing API [#425](https://github.com/Kotlin/kotlindl/pull/425)
+  * Introduced an `Operation` interface to represent a preprocessing operation for any input and output
+  * Added `PreprocessingPipeline` class to combine operations together in a type-safe manner
+  * Re-implemented old operations with the new API
+  * Added convenience functions such as `pipeline` to start a new preprocessing pipeline, 
+    `call` to invoke operations defined elsewhere, `onResult` to access intermediate preprocessing results
+  * Converted `ModelType#preprocessInput` function to `Operation` [#429](https://github.com/Kotlin/kotlindl/pull/429)
+  * Converted common preprocessing functions for models trained on ImageNet to `Operation` [#429](https://github.com/Kotlin/kotlindl/pull/429)
+* Added new ONNX features
+  * Added execution providers support (`CPU`, `CUDA`, `NNAPI`) and convenient extensions for inference with them 
+    [#386](https://github.com/Kotlin/kotlindl/issues/386)
+  * Added validation of input shape [#385](https://github.com/Kotlin/kotlindl/issues/385)
+* Added `Imagenet` enum to represent different Imagenet dataset labels and added support for zero indexed COCO labels
+  [#438](https://github.com/Kotlin/kotlindl/issues/438) [#446](https://github.com/Kotlin/kotlindl/pull/446)
+* Implemented unified summary printing for Tensorflow and ONNX models [#368](https://github.com/Kotlin/kotlindl/issues/368)
+* Added `FlatShape` interface to allow manipulating the detected shapes in a unified way [#480](https://github.com/Kotlin/kotlindl/pull/480)
+* Introduced `DataLoader` interface for loading and preprocessing data for dataset implementations [#424](https://github.com/Kotlin/kotlindl/pull/424)
+* Improved swing visualization utilities [#379](https://github.com/Kotlin/kotlindl/issues/379)
+  [#388](https://github.com/Kotlin/kotlindl/issues/388)
+* Simplified `Layer` interface to leave only `build` function to be implemented and remove explicit output shape computation
+  [#408](https://github.com/Kotlin/kotlindl/pull/408)  
+
+Breaking changes:
+* Refactored module structure and packages [#412](https://github.com/Kotlin/kotlindl/pull/412) [#469](https://github.com/Kotlin/kotlindl/pull/469)
+  * Extracted "tensorflow" module for learning and inference with Tensorflow backend
+  * Extracted "impl" module for implementation classes and utilities
+  * Moved preprocessing operation implementations to the "impl" module
+  * Removed dependency of "api" module on the "dataset" module
+  * Changed packages for "api", "impl", "dataset" and "onnx" so that they match the corresponding module name
+* Preprocessing classes such as `Preprocessing`, `ImagePreprocessing`, `ImagePreprocessor`,
+  `ImageSaver`, `TensorPreprocessing`, `Preprocessor` got removed in favor of the new preprocessing API [#425](https://github.com/Kotlin/kotlindl/pull/425)
+* Removed `Sharpen` preprocessor since the `ModelType#preprocessor` field was introduced, which can be used in the preprocessing
+  pipeline using the `call` function [#429](https://github.com/Kotlin/kotlindl/pull/429)
+
+Bugfixes:
+* Fix loading of jpeg files not supported by standard java ImageIO [#384](https://github.com/Kotlin/kotlindl/issues/384)
+* Updated ONNX Runtime version to enable inference on M1 chips [#361](https://github.com/Kotlin/kotlindl/issues/361)
+* Fixed channel ordering in for image recognition models [#400](https://github.com/Kotlin/kotlindl/issues/400)
+* Avoid warnings from `loadWeightsForFrozenLayers` function for layers without parameters [#382](https://github.com/Kotlin/kotlindl/issues/382)
+
+New documentation and examples:
+* [Inference with KotlinDL and ONNX Runtime on desktop and Android](https://github.com/Kotlin/kotlindl/blob/master/docs/inference_onnx_model.md)
+* [KotlinDL ONNX Model Zoo](https://github.com/Kotlin/kotlindl/blob/master/docs/onnx_model_zoo.md)
+* [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo)
+
 # 0.4.0 (01/06/2022) Pose Detection, EfficientDet for Object Detection and EfficientNet for Image Recognition
 Features:
 * Added the PoseNet model family to the ONNX Model Hub. [#269](https://github.com/Kotlin/kotlindl/issues/269)
