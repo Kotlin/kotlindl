@@ -6,6 +6,8 @@
 package org.jetbrains.kotlinx.dl.api.inference.objectdetection
 
 import org.jetbrains.kotlinx.dl.api.inference.FlatShape
+import java.lang.Float.max
+import java.lang.Float.min
 
 /**
  * This data class represents the detected object on the given image.
@@ -26,8 +28,8 @@ public data class DetectedObject(
     val label: String? = null
 ): FlatShape<DetectedObject> {
     override fun map(mapping: (Float, Float) -> Pair<Float, Float>): DetectedObject {
-        val (xMin1, yMin1) = mapping(xMin, yMin)
-        val (xMax1, yMax1) = mapping(xMax, yMax)
-        return DetectedObject(xMin1, xMax1, yMin1, yMax1, probability, label)
+        val (x1, y1) = mapping(xMin, yMin)
+        val (x2, y2) = mapping(xMax, yMax)
+        return DetectedObject(min(x1, x2), max(x1, x2), min(y1, y2), max(y1, y2), probability, label)
     }
 }
