@@ -36,7 +36,12 @@ public object ONNXModels {
         protected val channelsFirst: Boolean
     ) : OnnxModelType<T, ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return ImageRecognitionModel(modelHub.loadModel(this) as OnnxInferenceModel, channelsFirst, preprocessor)
+            return ImageRecognitionModel(
+                modelHub.loadModel(this) as OnnxInferenceModel,
+                channelsFirst,
+                preprocessor,
+                this::class.simpleName
+            )
         }
 
         /**
@@ -93,6 +98,7 @@ public object ONNXModels {
                     modelHub.loadModel(this),
                     channelsFirst,
                     preprocessor,
+                    this::class.simpleName,
                     classLabels = Imagenet.V1001.labels()
                 )
             }
@@ -125,7 +131,7 @@ public object ONNXModels {
         public object MoveNetSinglePoseLighting :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("movenet_singlepose_lighting_13") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel(modelHub.loadModel(this))
+                return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -152,7 +158,7 @@ public object ONNXModels {
         public object MoveNetSinglePoseThunder :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("movenet_thunder") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel(modelHub.loadModel(this))
+                return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
     }
@@ -196,7 +202,7 @@ public object ONNXModels {
             )
 
             override fun pretrainedModel(modelHub: ModelHub): SSDLikeModel {
-                return SSDLikeModel(modelHub.loadModel(this), METADATA)
+                return SSDLikeModel(modelHub.loadModel(this), METADATA, this::class.simpleName)
             }
         }
 
@@ -234,7 +240,7 @@ public object ONNXModels {
             )
 
             override fun pretrainedModel(modelHub: ModelHub): SSDLikeModel {
-                return SSDLikeModel(modelHub.loadModel(this), METADATA)
+                return SSDLikeModel(modelHub.loadModel(this), METADATA, this::class.simpleName)
             }
         }
     }
@@ -246,7 +252,7 @@ public object ONNXModels {
             get() = defaultPreprocessor
 
         override fun pretrainedModel(modelHub: ModelHub): FaceDetectionModel {
-            return FaceDetectionModel(modelHub.loadModel(this))
+            return FaceDetectionModel(modelHub.loadModel(this), this::class.simpleName)
         }
 
         /**
@@ -297,7 +303,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(3L, 192, 192)
             override val modelRelativePath: String = "fan_2d_106"
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
-                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
     }

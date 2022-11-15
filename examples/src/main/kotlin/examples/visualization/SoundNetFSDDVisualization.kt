@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import org.jetbrains.kotlinx.dl.dataset.embedded.FSDD_SOUND_DATA_SIZE
 import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES

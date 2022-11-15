@@ -7,6 +7,7 @@ package examples.onnx.objectdetection.ssd
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
@@ -27,6 +28,7 @@ fun main() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSD.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { detectionModel ->
         println(detectionModel)

@@ -8,6 +8,7 @@ package examples.onnx.posedetection.multipose
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
@@ -28,6 +29,7 @@ import javax.swing.JPanel
 fun multiPoseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { poseDetectionModel ->
         val result = mutableMapOf<BufferedImage, MultiPoseDetectionResult>()

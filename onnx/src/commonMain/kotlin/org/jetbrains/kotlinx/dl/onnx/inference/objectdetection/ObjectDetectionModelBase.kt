@@ -14,7 +14,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFl
 /**
  * Base class for object detection models.
  */
-public abstract class ObjectDetectionModelBase<I> : OnnxHighLevelModel<I, List<DetectedObject>> {
+public abstract class ObjectDetectionModelBase<I>(override val modelKindDescription: String? = null) :
+    OnnxHighLevelModel<I, List<DetectedObject>> {
     /**
      * Class labels from the dataset used for training.
      */
@@ -39,7 +40,8 @@ public abstract class ObjectDetectionModelBase<I> : OnnxHighLevelModel<I, List<D
 /**
  * Base class for object detection models based on EfficientDet architecture.
  */
-public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionModelBase<I>() {
+public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: String? = null) :
+    ObjectDetectionModelBase<I>(modelType) {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val foundObjects = mutableListOf<DetectedObject>()
@@ -72,8 +74,10 @@ public abstract class EfficientDetObjectDetectionModelBase<I> : ObjectDetectionM
  * Base class for object detection model based on SSD architecture.
  * @param [metadata] SSD-like model metadata. Used for decoding the output.
  */
-public abstract class SSDLikeModelBase<I>(protected val metadata: SSDLikeModelMetadata) :
-    ObjectDetectionModelBase<I>() {
+public abstract class SSDLikeModelBase<I>(
+    protected val metadata: SSDLikeModelMetadata,
+    modelType: String? = null
+) : ObjectDetectionModelBase<I>(modelType) {
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
         val boxes = output.get2DFloatArray(metadata.outputBoxesName)
         val classIndices = output.getFloatArray(metadata.outputClassesName)

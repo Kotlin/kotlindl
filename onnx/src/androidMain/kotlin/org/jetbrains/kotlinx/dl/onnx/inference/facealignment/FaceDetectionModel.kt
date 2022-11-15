@@ -14,10 +14,7 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.preprocessing.*
 import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
+import org.jetbrains.kotlinx.dl.onnx.inference.*
 
 /**
  * Face detection model implementation.
@@ -25,8 +22,10 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
  * @see ONNXModels.FaceDetection.UltraFace320
  * @see ONNXModels.FaceDetection.UltraFace640
  */
-public class FaceDetectionModel(override val internalModel: OnnxInferenceModel) : FaceDetectionModelBase<Bitmap>(),
-    CameraXCompatibleModel, InferenceModel by internalModel {
+public class FaceDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : FaceDetectionModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
     override var targetRotation: Int = 0
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
@@ -39,7 +38,10 @@ public class FaceDetectionModel(override val internalModel: OnnxInferenceModel) 
             .call(ONNXModels.FaceDetection.defaultPreprocessor)
 
     override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return FaceDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return FaceDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }
 
@@ -47,9 +49,10 @@ public class FaceDetectionModel(override val internalModel: OnnxInferenceModel) 
  * Detects [topK] faces on the given [imageProxy]. If [topK] is negative all detected faces are returned.
  * @param [iouThreshold] threshold IoU value for the non-maximum suppression applied during postprocessing
  */
-public fun FaceDetectionModelBase<Bitmap>.detectFaces(imageProxy: ImageProxy,
-                                                      topK: Int = 5,
-                                                      iouThreshold: Float = 0.5f
+public fun FaceDetectionModelBase<Bitmap>.detectFaces(
+    imageProxy: ImageProxy,
+    topK: Int = 5,
+    iouThreshold: Float = 0.5f
 ): List<DetectedObject> {
     if (this is CameraXCompatibleModel) {
         return doWithRotation(imageProxy.imageInfo.rotationDegrees) {

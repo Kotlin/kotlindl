@@ -7,6 +7,7 @@ package examples.onnx.cv.efficicentnet
 
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
@@ -30,6 +31,7 @@ fun efficientNet4LitePrediction() {
 
     val modelType = ONNXModels.CV.EfficientNet4Lite()
     val model = modelHub.loadModel(modelType)
+    model.printSummary()
 
     val imageNetClassLabels = Imagenet.V1k.labels()
 

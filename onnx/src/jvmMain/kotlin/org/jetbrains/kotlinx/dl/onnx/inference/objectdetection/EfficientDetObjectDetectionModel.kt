@@ -28,8 +28,10 @@ import java.io.IOException
  *
  * @since 0.4
  */
-public class EfficientDetObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    EfficientDetObjectDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+public class EfficientDetObjectDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -68,6 +70,9 @@ public class EfficientDetObjectDetectionModel(override val internalModel: OnnxIn
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): EfficientDetObjectDetectionModel {
-        return EfficientDetObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return EfficientDetObjectDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

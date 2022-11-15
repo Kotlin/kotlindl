@@ -6,6 +6,7 @@
 package examples.onnx.objectdetection.efficientdet
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import java.io.File
@@ -14,6 +15,7 @@ fun main() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.EfficientDetD2.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { detectionModel ->
         println(detectionModel)

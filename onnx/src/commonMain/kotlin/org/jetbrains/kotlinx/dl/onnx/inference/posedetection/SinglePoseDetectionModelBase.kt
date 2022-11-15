@@ -18,7 +18,8 @@ private const val OUTPUT_NAME = "output_0"
 /**
  * Base class for pose detection models for detecting a single pose per image.
  */
-public abstract class SinglePoseDetectionModelBase<I> : OnnxHighLevelModel<I, DetectedPose> {
+public abstract class SinglePoseDetectionModelBase<I>(override val modelKindDescription: String? = null) :
+    OnnxHighLevelModel<I, DetectedPose> {
 
     /**
      * Name of the output tensor.

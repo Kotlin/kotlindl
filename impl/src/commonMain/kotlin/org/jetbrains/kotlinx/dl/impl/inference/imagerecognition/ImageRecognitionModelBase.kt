@@ -5,17 +5,24 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
+import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.summary.EmptySummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 
 /**
  * Base class for image classification models.
  * @property [internalModel] model used for prediction
+ * @property [modelKindDescription] High-level description of the model. Used for model summary printing.
+ * For the models from ModelHub it equals to the string representation of [ModelType].
  */
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel,
-) : InferenceModel by internalModel {
+    protected val modelKindDescription: String? = null
+) : InferenceModel by internalModel, ModelWithSummary {
     /**
      * Preprocessing operation specific to this model.
      */
@@ -54,5 +61,13 @@ public abstract class ImageRecognitionModelBase<I>(
     public fun predictTopKObjects(image: I, topK: Int = 5): List<Pair<String, Float>> {
         val (input, _) = preprocessing.apply(image)
         return internalModel.predictTopNLabels(input, classLabels, topK)
+    }
+
+    override fun summary(): ModelSummary {
+        return if (internalModel is ModelWithSummary) {
+            ModelHubModelSummary(internalModel.summary(), modelKindDescription)
+        } else {
+            ModelHubModelSummary(EmptySummary(), modelKindDescription)
+        }
     }
 }

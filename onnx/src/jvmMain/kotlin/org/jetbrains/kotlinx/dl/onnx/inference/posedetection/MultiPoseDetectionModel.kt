@@ -27,8 +27,10 @@ private const val INPUT_SIZE = 256
  *
  * @param [internalModel] model used to make predictions
  */
-public class MultiPoseDetectionModel(override val internalModel: OnnxInferenceModel) :
-    MultiPoseDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+public class MultiPoseDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : MultiPoseDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -64,6 +66,9 @@ public class MultiPoseDetectionModel(override val internalModel: OnnxInferenceMo
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): MultiPoseDetectionModel {
-        return MultiPoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return MultiPoseDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

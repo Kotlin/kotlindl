@@ -13,7 +13,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFl
 /**
  * Base class for face alignment models.
  */
-public abstract class FaceAlignmentModelBase<I> : OnnxHighLevelModel<I, List<Landmark>> {
+public abstract class FaceAlignmentModelBase<I>(override val modelKindDescription: String? = null) :
+    OnnxHighLevelModel<I, List<Landmark>> {
     /**
      * Name of the output tensor.
      */

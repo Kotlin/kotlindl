@@ -1,11 +1,12 @@
 package org.jetbrains.kotlinx.dl.api.core.summary
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.summary.print
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class SummaryHelpersTests {
-    private val sequentialModel = ModelSummary(
+    private val sequentialModel = TfModelSummary(
         type = "Sequential",
         name = "My sequential NN model",
         layersSummaries = listOf(
@@ -22,7 +23,7 @@ internal class SummaryHelpersTests {
         frozenParamsCount = 0
     )
 
-    private val functionalModel = ModelSummary(
+    private val functionalModel = TfModelSummary(
         type = "Functional",
         name = "My functional NN model",
         layersSummaries = listOf(
@@ -47,6 +48,7 @@ internal class SummaryHelpersTests {
 
     @Test
     fun formatSequentialModelSummary() {
+        sequentialModel.print()
         assertEquals(
             listOf(
                 "==============================================================================",
@@ -75,7 +77,7 @@ internal class SummaryHelpersTests {
                 "Total trainable params: 1663370",
                 "Total frozen params: 0",
                 "Total params: 1663370",
-                "=============================================================================="
+                "______________________________________________________________________________"
             ),
             sequentialModel.format()
         )
@@ -125,7 +127,7 @@ internal class SummaryHelpersTests {
                 "Total trainable params: 2570",
                 "Total frozen params: 220096",
                 "Total params: 222666",
-                "=========================================================================================================="
+                "__________________________________________________________________________________________________________"
             ),
             functionalModel.format()
         )
@@ -133,14 +135,14 @@ internal class SummaryHelpersTests {
 
     @Test
     fun formatFunctionalModelSummaryWithCustomFormatting() {
-        functionalModel.format(
+        functionalModel.customFormat(
             layerNameColumnName = "Name of the layer along with its type",
             outputShapeColumnName = "Output shape",
             paramsCountColumnName = "# of parameters",
             connectedToColumnName = "Inbound connections",
             columnSeparator = "::",
-            lineSeparator = '.',
-            thickLineSeparator = ':',
+            lineSeparatorSymbol = '.',
+            thickLineSeparatorSymbol = ':',
         ).forEach { println(it) }
 
         assertEquals(
@@ -185,16 +187,16 @@ internal class SummaryHelpersTests {
                 "Total trainable params: 2570",
                 "Total frozen params: 220096",
                 "Total params: 222666",
-                ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+                "..............................................................................................."
             ),
-            functionalModel.format(
+            functionalModel.customFormat(
                 layerNameColumnName = "Name of the layer along with its type",
                 outputShapeColumnName = "Output shape",
                 paramsCountColumnName = "# of parameters",
                 connectedToColumnName = "Inbound connections",
                 columnSeparator = "::",
-                lineSeparator = '.',
-                thickLineSeparator = ':',
+                lineSeparatorSymbol = '.',
+                thickLineSeparatorSymbol = ':',
             )
         )
     }

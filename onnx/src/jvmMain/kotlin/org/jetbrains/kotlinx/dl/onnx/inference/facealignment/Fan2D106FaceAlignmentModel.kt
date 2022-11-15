@@ -25,8 +25,10 @@ private const val OUTPUT_NAME = "fc1"
  *
  * @param [internalModel] model used to make predictions
  */
-public class Fan2D106FaceAlignmentModel(override val internalModel: OnnxInferenceModel) :
-    FaceAlignmentModelBase<BufferedImage>(), InferenceModel by internalModel {
+public class Fan2D106FaceAlignmentModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : FaceAlignmentModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -60,7 +62,10 @@ public class Fan2D106FaceAlignmentModel(override val internalModel: OnnxInferenc
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): Fan2D106FaceAlignmentModel {
-        return Fan2D106FaceAlignmentModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return Fan2D106FaceAlignmentModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }
 

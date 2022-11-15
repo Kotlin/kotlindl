@@ -7,6 +7,7 @@ package examples.transferlearning.modelhub.resnet
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import java.io.File
 
 /**
@@ -23,6 +24,7 @@ fun resnet50easyPrediction() {
         TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
     val model = TFModels.CV.ResNet50().pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use {
         for (i in 1..8) {

@@ -5,6 +5,7 @@
 package examples.onnx.cv.efficicentnet.lightAPI
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
@@ -20,6 +21,7 @@ fun efficientNetB7LightAPIPrediction() {
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
     val model = ONNXModels.CV.EfficientNetB7().pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use {
         for (i in 1..8) {

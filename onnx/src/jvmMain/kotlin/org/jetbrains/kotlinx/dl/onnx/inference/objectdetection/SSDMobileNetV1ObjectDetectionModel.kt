@@ -37,8 +37,10 @@ private val SSD_MOBILENET_METADATA = SSDLikeModelMetadata(
  *
  * @since 0.4
  */
-public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA), InferenceModel by internalModel {
+public class SSDMobileNetV1ObjectDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA, modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -77,6 +79,9 @@ public class SSDMobileNetV1ObjectDetectionModel(override val internalModel: Onnx
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): SSDMobileNetV1ObjectDetectionModel {
-        return SSDMobileNetV1ObjectDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return SSDMobileNetV1ObjectDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

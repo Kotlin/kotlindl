@@ -27,8 +27,10 @@ import java.io.IOException
  *
  * @param internalModel model used to make predictions
  */
-public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceModel) :
-    SinglePoseDetectionModelBase<BufferedImage>(), InferenceModel by internalModel {
+public class SinglePoseDetectionModel(
+    override val internalModel: OnnxInferenceModel,
+    modelKindDescription: String? = null
+) : SinglePoseDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
 
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
@@ -60,6 +62,9 @@ public class SinglePoseDetectionModel(override val internalModel: OnnxInferenceM
         saveOptimizerState: Boolean,
         copyWeights: Boolean
     ): SinglePoseDetectionModel {
-        return SinglePoseDetectionModel(internalModel.copy(copiedModelName, saveOptimizerState, copyWeights))
+        return SinglePoseDetectionModel(
+            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
+            modelKindDescription
+        )
     }
 }

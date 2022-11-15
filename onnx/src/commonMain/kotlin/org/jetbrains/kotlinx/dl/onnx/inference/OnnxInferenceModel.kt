@@ -7,8 +7,10 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getValues
@@ -23,8 +25,9 @@ import java.nio.*
  *
  * @since 0.3
  */
-public open class OnnxInferenceModel private constructor(private val modelSource: ModelSource) : InferenceModel,
-    ExecutionProviderCompatible {
+public open class OnnxInferenceModel private constructor(
+    private val modelSource: ModelSource
+) : InferenceModel, ExecutionProviderCompatible, ModelWithSummary {
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
@@ -266,12 +269,19 @@ public open class OnnxInferenceModel private constructor(private val modelSource
         env.close()
     }
 
-    // TODO: make ONNX model description (see https://github.com/Kotlin/kotlindl/issues/368)
+    override fun summary(): ModelSummary {
+        val inputSummaries = session.inputInfo
+            .mapValues { (_, node) -> node.info.summary() }
+            .toList()
+
+        val outputSummaries = session.outputInfo
+            .mapValues { (_, node) -> node.info.summary() }
+            .toList()
+
+        return OnnxModelSummary(inputSummaries, outputSummaries)
+    }
+
     override fun toString(): String {
-        println(session.inputNames)
-        println(session.inputInfo)
-        println(session.outputNames)
-        println(session.outputInfo)
         return "OnnxModel(session=$session)"
     }
 
@@ -290,26 +300,31 @@ public open class OnnxInferenceModel private constructor(private val modelSource
                     DoubleBuffer.wrap(data.map { it.toDouble() }.toDoubleArray()),
                     shape
                 )
+
                 OnnxJavaType.INT8 -> OnnxTensor.createTensor(
                     this,
                     ByteBuffer.wrap(data.map { it.toInt().toByte() }.toByteArray()),
                     shape
                 )
+
                 OnnxJavaType.INT16 -> OnnxTensor.createTensor(
                     this,
                     ShortBuffer.wrap(data.map { it.toInt().toShort() }.toShortArray()),
                     shape
                 )
+
                 OnnxJavaType.INT32 -> OnnxTensor.createTensor(
                     this,
                     IntBuffer.wrap(data.map { it.toInt() }.toIntArray()),
                     shape
                 )
+
                 OnnxJavaType.INT64 -> OnnxTensor.createTensor(
                     this,
                     LongBuffer.wrap(data.map { it.toLong() }.toLongArray()),
                     shape
                 )
+
                 OnnxJavaType.STRING -> TODO()
                 OnnxJavaType.UINT8 -> OnnxTensor.createTensor(
                     this,
@@ -317,6 +332,7 @@ public open class OnnxInferenceModel private constructor(private val modelSource
                     shape,
                     OnnxJavaType.UINT8
                 )
+
                 OnnxJavaType.UNKNOWN -> TODO()
                 else -> TODO()
             }

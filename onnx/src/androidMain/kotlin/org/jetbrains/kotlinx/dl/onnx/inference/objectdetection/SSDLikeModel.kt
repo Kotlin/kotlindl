@@ -18,10 +18,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
 import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
 import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
-import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
+import org.jetbrains.kotlinx.dl.onnx.inference.*
 
 /**
  * Special model class for detection objects on images with built-in preprocessing and post-processing.
@@ -33,8 +30,10 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
  *
  * @since 0.5
  */
-public class SSDLikeModel(override val internalModel: OnnxInferenceModel, metadata: SSDLikeModelMetadata) :
-    SSDLikeModelBase<Bitmap>(metadata), CameraXCompatibleModel, InferenceModel by internalModel {
+public class SSDLikeModel(
+    override val internalModel: OnnxInferenceModel, metadata: SSDLikeModelMetadata,
+    modelKindDescription: String? = null
+) : SSDLikeModelBase<Bitmap>(metadata, modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 
@@ -68,5 +67,6 @@ public fun ObjectDetectionModelBase<Bitmap>.detectObjects(imageProxy: ImageProxy
         is CameraXCompatibleModel -> {
             doWithRotation(imageProxy.imageInfo.rotationDegrees) { detectObjects(imageProxy.toBitmap(), topK) }
         }
+
         else -> detectObjects(imageProxy.toBitmap(applyRotation = true), topK)
     }

@@ -45,7 +45,13 @@ public object ONNXModels {
         override val modelRelativePath: String = if (noTop) "$relativePath-notop" else relativePath
 
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
-            return ImageRecognitionModel(modelHub.loadModel(this), inputColorMode, channelsFirst, preprocessor)
+            return ImageRecognitionModel(
+                modelHub.loadModel(this),
+                inputColorMode,
+                channelsFirst,
+                preprocessor,
+                this::class.simpleName
+            )
         }
 
         /**
@@ -588,7 +594,7 @@ public object ONNXModels {
                     .call(InputType.TORCH.preprocessing(channelsLast = false))
 
             override fun pretrainedModel(modelHub: ModelHub): SSDObjectDetectionModel {
-                return SSDObjectDetectionModel(modelHub.loadModel(this))
+                return SSDObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -622,7 +628,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(1000L, 1000L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
-                return SSDMobileNetV1ObjectDetectionModel(modelHub.loadModel(this))
+                return SSDMobileNetV1ObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -652,7 +658,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(512L, 512L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -681,7 +687,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(640L, 640L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -710,7 +716,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(768L, 768L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -739,7 +745,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(896L, 896L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -768,7 +774,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(1024L, 1024L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -797,7 +803,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -826,7 +832,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
-                return EfficientDetObjectDetectionModel(modelHub.loadModel(this))
+                return EfficientDetObjectDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
     }
@@ -839,7 +845,7 @@ public object ONNXModels {
             get() = defaultPreprocessor
 
         override fun pretrainedModel(modelHub: ModelHub): FaceDetectionModel {
-            return FaceDetectionModel(modelHub.loadModel(this))
+            return FaceDetectionModel(modelHub.loadModel(this), this::class.simpleName)
         }
 
         /**
@@ -894,7 +900,7 @@ public object ONNXModels {
                 get() = Transpose(axes = intArrayOf(2, 0, 1))
 
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {
-                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this))
+                return Fan2D106FaceAlignmentModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
     }
@@ -925,7 +931,7 @@ public object ONNXModels {
         public object MoveNetSinglePoseLighting :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel(modelHub.loadModel(this))
+                return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -958,7 +964,7 @@ public object ONNXModels {
             override val inputShape: LongArray = longArrayOf(256L, 256L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
-                return MultiPoseDetectionModel(modelHub.loadModel(this))
+                return MultiPoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
 
@@ -985,7 +991,7 @@ public object ONNXModels {
         public object MoveNetSinglePoseThunder :
             PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
-                return SinglePoseDetectionModel(modelHub.loadModel(this))
+                return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
         }
     }

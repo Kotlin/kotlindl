@@ -16,7 +16,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2D
 /**
  * Base class for pose detection models for detecting multiple poses per image.
  */
-public abstract class MultiPoseDetectionModelBase<I> : OnnxHighLevelModel<I, MultiPoseDetectionResult> {
+public abstract class MultiPoseDetectionModelBase<I>(override val modelKindDescription: String? = null) :
+    OnnxHighLevelModel<I, MultiPoseDetectionResult> {
     /**
      * Name of the output tensor.
      */
