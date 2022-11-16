@@ -66,7 +66,12 @@ public open class OnnxInferenceModel private constructor(
     /**
      * Constructs an ONNX inference model from the byte array representing an ONNX model.
      */
-    public constructor(modelBytes: ByteArray) : this(ModelSource.Bytes(modelBytes))
+    public constructor(modelBytes: ByteArray) : this(ModelSource.Bytes { modelBytes })
+
+    /**
+     * Constructs an ONNX inference model from the function which returns a byte array representing an ONNX model.
+     */
+    public constructor(loadBytes: () -> ByteArray) : this(ModelSource.Bytes(loadBytes))
 
     /**
      * This is an interface representing a possible source for loading ONNX models.
@@ -87,11 +92,11 @@ public open class OnnxInferenceModel private constructor(
         }
 
         /**
-         * Byte array representing an ONNX model.
+         * Loader for a byte array representing an ONNX model.
          */
-        class Bytes(private val bytes: ByteArray) : ModelSource {
+        class Bytes(private val loadBytes: () -> ByteArray) : ModelSource {
             override fun buildSession(environment: OrtEnvironment, options: SessionOptions): OrtSession {
-                return environment.createSession(bytes, options)
+                return environment.createSession(loadBytes(), options)
             }
         }
     }
