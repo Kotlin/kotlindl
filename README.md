@@ -121,8 +121,9 @@ KotlinDL consists of the several modules:
 * `kotlin-deeplearning-onnx` inference with ONNX Runtime
 * `kotlin-deeplearning-tensorflow` learning and inference with TensorFlow
 * `kotlin-deeplearning-visualization` visualization utilities
+* `kotlin-deeplearning-dataset` dataset classes
 
-Module `kotlin-deeplearning-tensorflow` is only available for desktop JVM, while other artifacts could also be used on Android.
+Modules `kotlin-deeplearning-tensorflow` and `kotlin-deeplearning-dataset` are only available for desktop JVM, while other artifacts could also be used on Android.
 
 ## How to configure KotlinDL in your project
 
