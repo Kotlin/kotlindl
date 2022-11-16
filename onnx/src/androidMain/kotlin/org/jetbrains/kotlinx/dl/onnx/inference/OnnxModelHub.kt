@@ -29,7 +29,9 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
         vararg executionProviders: ExecutionProvider = arrayOf(ExecutionProvider.CPU())
     ): T {
         val modelResourceId = context.resources.getIdentifier(modelType.modelRelativePath, "raw", context.packageName)
-        val inferenceModel = OnnxInferenceModel(context.resources.openRawResource(modelResourceId).readBytes())
+        val inferenceModel = OnnxInferenceModel(context.resources.openRawResource(modelResourceId).use {
+            it.readBytes()
+        })
         modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
         return inferenceModel as T
