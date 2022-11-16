@@ -265,7 +265,9 @@ public open class OnnxInferenceModel private constructor(
 
     /** Releases the ONNXRuntime - related resources. */
     override fun close() {
-        session.close()
+        if (::session.isInitialized) {
+            session.close()
+        }
         env.close()
     }
 
