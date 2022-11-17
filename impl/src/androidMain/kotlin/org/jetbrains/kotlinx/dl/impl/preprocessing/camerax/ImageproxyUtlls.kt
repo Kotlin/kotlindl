@@ -28,8 +28,11 @@ public fun ImageProxy.toBitmap(applyRotation: Boolean = false): Bitmap {
     }
 
     return if (applyRotation) {
-        val rotation = Rotate(imageInfo.rotationDegrees.toFloat())
-        rotation.apply(bitmap).also { bitmap.recycle() }
+        val rotatedBitmap = Rotate(imageInfo.rotationDegrees.toFloat()).apply(bitmap)
+        if (rotatedBitmap != bitmap) {
+            bitmap.recycle()
+        }
+        rotatedBitmap
     } else {
         bitmap
     }
