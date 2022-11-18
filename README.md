@@ -148,7 +148,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]'
 }
 ```
-The latest KotlinDL version is `0.5.0-alpha-1`, the latest stable version is `0.4.0`.
+The latest KotlinDL version is `0.5.0-alpha-2`, the latest stable version is `0.4.0`.
 
 For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
 
