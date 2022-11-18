@@ -17,7 +17,7 @@ Features:
       * `UltraFace640`
     * Face Alignment [#441](https://github.com/Kotlin/kotlindl/issues/441):
       * `Fan2d106` 
-  * Implemented preprocessing operations working on Android `Bitmap` [#416](https://github.com/Kotlin/kotlindl/issues/416), 
+  * Implemented preprocessing operations working on Android `Bitmap` [#416](https://github.com/Kotlin/kotlindl/issues/416) 
     [#478](https://github.com/Kotlin/kotlindl/pull/478):
     * `Resize`
     * `Rotate`
@@ -39,6 +39,8 @@ Features:
 * Added new ONNX features
   * Added execution providers support (`CPU`, `CUDA`, `NNAPI`) and convenient extensions for inference with them 
     [#386](https://github.com/Kotlin/kotlindl/issues/386)
+  * Introduced `OnnxInferenceModel#predictRaw` function which allows custom `OrtSession.Result` processing and extension functions
+    to extract common data types from the result [#465](https://github.com/Kotlin/kotlindl/pull/465)
   * Added validation of input shape [#385](https://github.com/Kotlin/kotlindl/issues/385)
 * Added `Imagenet` enum to represent different Imagenet dataset labels and added support for zero indexed COCO labels
   [#438](https://github.com/Kotlin/kotlindl/issues/438) [#446](https://github.com/Kotlin/kotlindl/pull/446)
