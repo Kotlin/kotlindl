@@ -1,0 +1,9 @@
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
+}
+
+include ':app'
+rootProject.name = "KotlinDL Demo Android App"

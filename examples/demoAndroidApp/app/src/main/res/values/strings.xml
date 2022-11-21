@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">KotlinDL demo app</string>
+    <string name="models_dropdown">Select model</string>
+    <string name="inference_time">Inference Time</string>
+    <string name="kotlindl">KotlinDL Demo</string>
+    <string name="inference_time_placeholder">%d ms</string>
+    <string name="model_type_classification">Classification</string>
+    <string name="model_type_object_detection">Object Detection</string>
+    <string name="model_type_pose_detection">Pose Det.</string>
+    <string name="model_type_face_alignment">Face Alignment</string>
+    <string name="pipeline_ssd_mobilenet_v1">SSDMobilenetV1</string>
+    <string name="pipeline_efficient_net_lite_4">EfficientNet4Lite</string>
+    <string name="pipeline_mobilenet_v1">MobilenetV1</string>
+    <string name="pipeline_shufflenet">Shufflenet</string>
+    <string name="pipeline_efficient_det_lite_0">EfficientDetLite0</string>
+    <string name="pipeline_move_net_single_pose_lighting">MoveNetSinglePose</string>
+    <string name="pipeline_face_alignment">UltraFace320 + Fan2d106</string>
+    <string name="label_pose">pose</string>
+    <string name="label_face">face</string>
+    <string name="label_objects">%d objects</string>
+</resources>

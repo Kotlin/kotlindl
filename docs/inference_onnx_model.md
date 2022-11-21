@@ -160,7 +160,7 @@ val detections = model.inferAndCloseUsing(CPU()) {
 ```
 
 For more information about the KotlinDL ONNX API, please refer to the [Documentation](https://kotlin.github.io/kotlindl/) and [examples](https://github.com/Kotlin/kotlindl/tree/master/examples/src/main/kotlin/examples/onnx).
-Please, also check out the [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo) for more details.
+Please, also check out the [Sample Android App](/examples/demoAndroidApp) for more details.
 
 ## ONNX Execution providers support
 KotlinDL currently supports the following EPs:

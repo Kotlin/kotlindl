@@ -57,7 +57,7 @@ That's it! Now you're ready to [build your first neural network](create_your_fir
        implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]'
    }
    ```
-3. Please check out the [Documentation](https://kotlin.github.io/kotlindl/) and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo) for more details.
+3. Please check out the [Documentation](https://kotlin.github.io/kotlindl/) and [Sample Android App]() for more details.
 
 ## Working with Kotlin DL in a Jupyter Notebook
 If you want to experiment with Kotlin DL, and use it interactively, you can choose to work with it in a [Jupyter Notebook](https://jupyter.org). 

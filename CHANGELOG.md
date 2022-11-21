@@ -73,7 +73,7 @@ Bugfixes:
 New documentation and examples:
 * [Inference with KotlinDL and ONNX Runtime on desktop and Android](https://github.com/Kotlin/kotlindl/blob/master/docs/inference_onnx_model.md)
 * [KotlinDL ONNX Model Zoo](https://github.com/Kotlin/kotlindl/blob/master/docs/onnx_model_zoo.md)
-* [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo)
+* [Sample Android App](/examples/demoAndroidApp)
 
 # 0.4.0 (01/06/2022) Pose Detection, EfficientDet for Object Detection and EfficientNet for Image Recognition
 Features:
