@@ -6,8 +6,8 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter.floatArrayToBufferedImage
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter.toRawFloatArray
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageShape
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
 import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
@@ -93,12 +93,11 @@ fun main() {
         .rotate90Ccw {}
 
     val ndArray = pipeline.apply(image)
-    val (h, w, _) = ndArray.shape
+    val (height, width, _) = ndArray.shape
 
-    val result = ImageConverter.floatArrayToBufferedImage(
+    val result = floatArrayToBufferedImage(
         ndArray.toFloatArray(),
-        ImageShape(w.toLong(), h.toLong(), 3L),
-        ColorMode.RGB,
+        width, height, ColorMode.RGB,
         isNormalized = false
     )
 

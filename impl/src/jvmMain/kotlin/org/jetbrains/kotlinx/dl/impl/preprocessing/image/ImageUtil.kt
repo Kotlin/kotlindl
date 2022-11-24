@@ -24,10 +24,6 @@ internal fun BufferedImage.copy(): BufferedImage {
     return result
 }
 
-internal fun BufferedImage.getShape(): ImageShape {
-    return ImageShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
-}
-
-internal fun BufferedImage.getTensorShape(): TensorShape {
+internal fun BufferedImage.getShape(): TensorShape {
     return TensorShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
 }

@@ -58,7 +58,7 @@ fun main() {
 
     val image = ImageConverter.floatArrayToBufferedImage(
         rawImage,
-        preprocessing.getOutputShape(TensorShape(-1, -1, 3)).toImageShape(),
+        preprocessing.getOutputShape(TensorShape(-1, -1, 3)),
         ColorMode.GRAYSCALE,
         isNormalized = true
     )

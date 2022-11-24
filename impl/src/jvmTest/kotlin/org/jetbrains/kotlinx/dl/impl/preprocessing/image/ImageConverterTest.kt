@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.preprocessing.image
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.impl.preprocessing.PreprocessingImageTest.Companion.setRGB
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -44,7 +45,7 @@ class ImageConverterTest {
 
         val targetImage = ImageConverter.toNormalizedFloatArray(sourceImage, targetColorMode)
 
-        val expectedImage = FloatArray(sourceImage.getShape().numberOfElements.toInt()) { 0f }
+        val expectedImage = FloatArray(sourceImage.getShape().numElements().toInt()) { 0f }
         expectedImage.setRGB(0, 0, color1, sourceImage.getShape(), targetColorMode)
         expectedImage.setRGB(0, 1, color2, sourceImage.getShape(), targetColorMode)
         expectedImage.setRGB(1, 0, color3, sourceImage.getShape(), targetColorMode)
@@ -83,7 +84,7 @@ class ImageConverterTest {
 
         val targetImage = ImageConverter.floatArrayToBufferedImage(
             tfNormalized,
-            ImageShape(2, 2),
+            2, 2,
             arrayColorMode = ColorMode.BGR
         ) {
             it.forEachIndexed { idx, v -> it[idx] = round((v + 1) * 127.5f) }
@@ -122,7 +123,7 @@ class ImageConverterTest {
 
             val targetImage = ImageConverter.floatArrayToBufferedImage(
                 sourceArray,
-                ImageShape(2, 2),
+                2, 2,
                 sourceImage.colorMode(),
                 isNormalized = true
             )
@@ -152,7 +153,7 @@ class ImageConverterTest {
 
             val targetImage = ImageConverter.floatArrayToBufferedImage(
                 sourceArray,
-                ImageShape(2, 2),
+                2, 2,
                 sourceImage.colorMode(),
                 isNormalized = false
             )

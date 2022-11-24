@@ -28,7 +28,7 @@ public class Cropping(
     public var right: Int = 1
 ) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
-        val croppedImageShape = getOutputShape(input.getTensorShape())
+        val croppedImageShape = getOutputShape(input.getShape())
         val (width, height, _) = croppedImageShape.dims()
 
         return input.getSubimage(
