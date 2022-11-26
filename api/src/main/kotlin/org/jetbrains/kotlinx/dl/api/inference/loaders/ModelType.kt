@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
  * @param T the type of the basic model for common functionality.
  * @param U the type of the pre-trained model for usage in Easy API.
  */
-public interface ModelType<T : InferenceModel, U : InferenceModel> {
+public interface ModelType<T : InferenceModel, U> {
     /** Relative path to model for local and S3 buckets storages. */
     public val modelRelativePath: String
 
