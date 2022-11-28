@@ -29,9 +29,7 @@ public data class DataBatch internal constructor(
 
         if (!x.contentDeepEquals(other.x)) return false
         if (!y.contentEquals(other.y)) return false
-        if (size != other.size) return false
-
-        return true
+        return size == other.size
     }
 
     override fun hashCode(): Int {

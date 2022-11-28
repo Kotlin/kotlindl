@@ -188,9 +188,7 @@ public class TensorShape() {
 
         other as TensorShape
 
-        if (!dims.contentEquals(other.dims)) return false
-
-        return true
+        return dims.contentEquals(other.dims)
     }
 
     override fun hashCode(): Int {

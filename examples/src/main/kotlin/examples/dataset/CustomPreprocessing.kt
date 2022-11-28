@@ -41,7 +41,7 @@ private fun <I> Operation<I, BufferedImage>.toNdArray(block: ConvertToNdArray.()
     return PreprocessingPipeline(this, ConvertToNdArray().apply(block))
 }
 
-private class SwapChannels() : Operation<D3Array<Float>, D3Array<Float>> {
+private class SwapChannels : Operation<D3Array<Float>, D3Array<Float>> {
     override fun apply(input: D3Array<Float>): D3Array<Float> {
         val (w, h, _) = input.shape
         for (i in 0 until w) {
@@ -64,7 +64,7 @@ private fun <I> Operation<I, D3Array<Float>>.swapChannels(block: SwapChannels.()
     return PreprocessingPipeline(this, SwapChannels().apply(block))
 }
 
-private class Rotate90Ccw() : Operation<D3Array<Float>, D3Array<Float>> {
+private class Rotate90Ccw : Operation<D3Array<Float>, D3Array<Float>> {
     override fun apply(input: D3Array<Float>): D3Array<Float> {
         return input.transpose(1,0,2)
     }
