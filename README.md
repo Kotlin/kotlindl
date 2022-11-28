@@ -192,7 +192,7 @@ At this point, please feel free to check out the following tutorials we have pre
 - [Running inference with ONNX models on JVM](docs/inference_onnx_model.md#desktop-jvm)
 - [Running inference with ONNX models on Android](docs/inference_onnx_model.md#android)
 
-For more inspiration, take a look at the [code examples](examples) in this repository and [Sample Android App](https://github.com/ermolenkodev/ort_mobile_demo).
+For more inspiration, take a look at the [code examples](examples) in this repository and [Sample Android App](https://github.com/Kotlin/kotlindl-app-sample).
 
 ## Running KotlinDL on GPU
 
