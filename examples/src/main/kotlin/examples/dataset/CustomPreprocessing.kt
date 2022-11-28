@@ -11,12 +11,13 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageShape
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
 import org.jetbrains.kotlinx.dl.visualization.swing.ImagePanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
-import org.jetbrains.kotlinx.multik.api.*
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.multik.api.mk
+import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.D3Array
 import org.jetbrains.kotlinx.multik.ndarray.data.get
 import org.jetbrains.kotlinx.multik.ndarray.data.set
 import org.jetbrains.kotlinx.multik.ndarray.operations.toFloatArray
+import java.awt.image.BufferedImage
 import java.io.File
 
 
@@ -66,7 +67,7 @@ private fun <I> Operation<I, D3Array<Float>>.swapChannels(block: SwapChannels.()
 
 private class Rotate90Ccw : Operation<D3Array<Float>, D3Array<Float>> {
     override fun apply(input: D3Array<Float>): D3Array<Float> {
-        return input.transpose(1,0,2)
+        return input.transpose(1, 0, 2)
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {

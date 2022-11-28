@@ -14,7 +14,10 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.preprocessing.*
 import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.onnx.inference.*
+import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 
 /**
  * Face detection model implementation.

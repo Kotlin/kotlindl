@@ -17,7 +17,10 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
 import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
 import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
-import org.jetbrains.kotlinx.dl.onnx.inference.*
+import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 
@@ -32,7 +35,8 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
 public class SinglePoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : SinglePoseDetectionModelBase<Bitmap>(modelKindDescription), InferenceModel by internalModel, CameraXCompatibleModel {
+) : SinglePoseDetectionModelBase<Bitmap>(modelKindDescription), InferenceModel by internalModel,
+    CameraXCompatibleModel {
     override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
         get() = pipeline<Bitmap>()
             .resize {

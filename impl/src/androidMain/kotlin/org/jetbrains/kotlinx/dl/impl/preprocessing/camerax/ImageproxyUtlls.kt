@@ -38,7 +38,7 @@ public fun ImageProxy.toBitmap(applyRotation: Boolean = false): Bitmap {
     }
 }
 
-private fun rgba8888ToBitmap(image: ImageProxy) : Bitmap {
+private fun rgba8888ToBitmap(image: ImageProxy): Bitmap {
     val encodedImage = image.planes[0]
     val pixelStride = encodedImage.pixelStride
     val rowStride = encodedImage.rowStride
@@ -52,7 +52,7 @@ private fun rgba8888ToBitmap(image: ImageProxy) : Bitmap {
     return bitmap
 }
 
-private fun yuv4208888ToBitmap(image: ImageProxy) : Bitmap {
+private fun yuv4208888ToBitmap(image: ImageProxy): Bitmap {
     val nv21 = yuv420888ToNv21(image)
     val yuvImage = YuvImage(nv21, ImageFormat.NV21, image.width, image.height, null)
     return yuvImage.toBitmap()
@@ -174,7 +174,8 @@ public fun imageToByteBuffer(image: ImageProxy, outputBuffer: ByteArray, pixelCo
         for (row in 0 until planeHeight) {
             // Move buffer position to the beginning of this row
             planeBuffer.position(
-                (row + planeCrop.top) * rowStride + planeCrop.left * pixelStride)
+                (row + planeCrop.top) * rowStride + planeCrop.left * pixelStride
+            )
 
             if (pixelStride == 1 && outputStride == 1) {
                 // When there is a single stride value for pixel and output, we can just copy

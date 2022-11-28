@@ -18,7 +18,10 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
 import org.jetbrains.kotlinx.dl.impl.preprocessing.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.rotate
 import org.jetbrains.kotlinx.dl.impl.preprocessing.toFloatArray
-import org.jetbrains.kotlinx.dl.onnx.inference.*
+import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 
 /**
  * Special model class for detection objects on images with built-in preprocessing and post-processing.

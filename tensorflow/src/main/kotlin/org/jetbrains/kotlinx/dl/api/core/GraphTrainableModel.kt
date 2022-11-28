@@ -532,7 +532,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                             }
 
                             val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(),
-                                averageMetricAccum.map { it.toDouble() })
+                                                        averageMetricAccum.map { it.toDouble() })
                             evaluationHistory.appendBatch(batchEvent)
 
                             callbacks.forEach {

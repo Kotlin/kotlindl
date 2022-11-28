@@ -10,9 +10,9 @@ import org.jetbrains.kotlinx.dl.api.core.Functional
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 /** Just loading ToyResNet trained in Keras, making a copy and using for prediction. */
 fun main() {

@@ -45,7 +45,7 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      */
     override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
-        loadingMode: LoadingMode /* unused */,
+        loadingMode: LoadingMode, /* unused */
     ): T {
         return loadModel(modelType as OnnxModelType<T, U>)
     }

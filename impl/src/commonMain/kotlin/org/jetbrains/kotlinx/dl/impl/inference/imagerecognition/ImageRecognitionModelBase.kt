@@ -5,13 +5,13 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
-import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.summary.EmptySummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 
 /**
  * Base class for image classification models.

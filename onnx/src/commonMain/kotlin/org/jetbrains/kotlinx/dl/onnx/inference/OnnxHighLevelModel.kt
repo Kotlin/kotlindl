@@ -6,11 +6,11 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.OrtSession
-import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
-import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**

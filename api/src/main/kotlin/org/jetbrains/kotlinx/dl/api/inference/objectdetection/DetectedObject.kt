@@ -26,7 +26,7 @@ public data class DetectedObject(
     val yMax: Float,
     val probability: Float,
     val label: String? = null
-): FlatShape<DetectedObject> {
+) : FlatShape<DetectedObject> {
     override fun map(mapping: (Float, Float) -> Pair<Float, Float>): DetectedObject {
         val (x1, y1) = mapping(xMin, yMin)
         val (x2, y2) = mapping(xMax, yMax)

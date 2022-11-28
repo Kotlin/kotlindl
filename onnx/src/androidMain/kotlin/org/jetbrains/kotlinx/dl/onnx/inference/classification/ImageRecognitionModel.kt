@@ -15,7 +15,10 @@ import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModelBase
 import org.jetbrains.kotlinx.dl.impl.preprocessing.*
 import org.jetbrains.kotlinx.dl.impl.preprocessing.camerax.toBitmap
-import org.jetbrains.kotlinx.dl.onnx.inference.*
+import org.jetbrains.kotlinx.dl.onnx.inference.CameraXCompatibleModel
+import org.jetbrains.kotlinx.dl.onnx.inference.ExecutionProviderCompatible
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 
 /**

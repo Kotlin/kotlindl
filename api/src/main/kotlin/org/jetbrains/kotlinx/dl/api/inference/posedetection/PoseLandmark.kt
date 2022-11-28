@@ -20,7 +20,7 @@ public data class PoseLandmark(
     val y: Float,
     val probability: Float,
     val label: String,
-): FlatShape<PoseLandmark> {
+) : FlatShape<PoseLandmark> {
     override fun map(mapping: (Float, Float) -> Pair<Float, Float>): PoseLandmark {
         val (x1, y1) = mapping(x, y)
         return PoseLandmark(x1, y1, probability, label)

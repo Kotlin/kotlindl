@@ -1,13 +1,8 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
-import ai.onnxruntime.MapInfo
-import ai.onnxruntime.OnnxJavaType
-import ai.onnxruntime.SequenceInfo
-import ai.onnxruntime.TensorInfo
-import ai.onnxruntime.ValueInfo
+import ai.onnxruntime.*
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.*
-import java.lang.IllegalStateException
 
 /**
  * Summary of the OnnxInferenceModel.
