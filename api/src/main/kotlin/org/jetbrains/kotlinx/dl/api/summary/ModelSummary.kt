@@ -36,7 +36,7 @@ public class EmptySummary : ModelSummary {
  * The summary for the models from ModelHub.
  * It appends corresponding [modelKindDescription] to the header of the model summary.
  *
- * @property [modelType] type of the model, aka. model architecture. E.g. VGG16, ResNet50, etc.
+ * @property [modelKindDescription] type of the model, aka. model architecture. E.g. VGG16, ResNet50, etc.
  * @property [internalSummary] summary of the internal model used for inference
  */
 public class ModelHubModelSummary(

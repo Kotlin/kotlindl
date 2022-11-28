@@ -11,7 +11,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 public interface CameraXCompatibleModel {
     /**
      * Target image rotation.
-     * @see [ImageInfo](https://developer.android.com/reference/androidx/camera/core/ImageInfo)
+     * @see androidx.camera.core.ImageInfo
      */
     public var targetRotation: Int
 }

@@ -33,7 +33,7 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
     /**
      * High-level description of the model.
      * Used for model summary printing.
-     * For the models from [OnnxModels] it equals to the string representation of [OnnxModelType]
+     * For the model hub models it equals to the string representation of the [OnnxModelType]
      */
     public val modelKindDescription: String?
 
