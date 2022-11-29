@@ -145,10 +145,14 @@ public open class TensorFlowInferenceModel : InferenceModel {
         }
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean, // TODO, check this case
-        copyWeights: Boolean
+    override fun copy(): TensorFlowInferenceModel {
+        return copy(copiedModelName = null, saveOptimizerState = false, copyWeights = true)
+    }
+
+    public fun copy(
+        copiedModelName: String? = null,
+        saveOptimizerState: Boolean = false, // TODO, check this case
+        copyWeights: Boolean = true
     ): TensorFlowInferenceModel {
         val model = TensorFlowInferenceModel()
         model.kGraph = this.kGraph.copy()

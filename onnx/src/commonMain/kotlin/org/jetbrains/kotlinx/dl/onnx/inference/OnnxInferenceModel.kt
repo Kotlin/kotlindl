@@ -271,13 +271,8 @@ public open class OnnxInferenceModel private constructor(
         }
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): OnnxInferenceModel {
+    override fun copy(): OnnxInferenceModel {
         val model = OnnxInferenceModel(modelSource)
-        model.name = copiedModelName
         if (inputShape != null) {
             model.reshape(*inputDimensions)
         }
