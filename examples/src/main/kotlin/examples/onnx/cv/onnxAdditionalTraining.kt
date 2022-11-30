@@ -49,7 +49,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun runONNXAdditionalTraining(
-    modelType: ONNXModels.CV<out OnnxInferenceModel>,
+    modelType: ONNXModels.CV,
     resizeTo: Pair<Int, Int> = Pair(224, 224)
 ) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

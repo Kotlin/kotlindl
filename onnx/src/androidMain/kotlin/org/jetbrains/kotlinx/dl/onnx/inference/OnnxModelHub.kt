@@ -24,17 +24,17 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      * @param [executionProviders] execution providers for model initialization.
      */
     @Suppress("UNCHECKED_CAST")
-    public fun <T : InferenceModel, U : InferenceModel> loadModel(
-        modelType: OnnxModelType<T, U>,
+    public fun loadModel(
+        modelType: OnnxModelType<*>,
         vararg executionProviders: ExecutionProvider = arrayOf(ExecutionProvider.CPU())
-    ): T {
+    ): OnnxInferenceModel {
         val modelResourceId = context.resources.getIdentifier(modelType.modelRelativePath, "raw", context.packageName)
         val inferenceModel = OnnxInferenceModel {
             context.resources.openRawResource(modelResourceId).use { it.readBytes() }
         }
         modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
-        return inferenceModel as T
+        return inferenceModel
     }
 
     /**
@@ -43,10 +43,11 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      * @param [modelType] model type from [ONNXModels]
      * @param [loadingMode] it's ignored
      */
+    @Suppress("UNCHECKED_CAST")
     override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode, /* unused */
     ): T {
-        return loadModel(modelType as OnnxModelType<T, U>)
+        return loadModel(modelType as OnnxModelType<U>) as T
     }
 }

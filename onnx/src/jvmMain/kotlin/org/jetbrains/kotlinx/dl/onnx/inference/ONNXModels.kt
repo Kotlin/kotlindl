@@ -35,13 +35,13 @@ public object ONNXModels {
      * @property [inputColorMode] An expected channels order for the input image.
      *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
-    public sealed class CV<T : InferenceModel>(
+    public sealed class CV(
         relativePath: String,
         protected val channelsFirst: Boolean,
         private val inputColorMode: ColorMode = ColorMode.RGB,
         /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
         noTop: Boolean = false
-    ) : OnnxModelType<T, ImageRecognitionModel> {
+    ) : OnnxModelType<ImageRecognitionModel> {
         override val modelRelativePath: String = if (noTop) "$relativePath-notop" else relativePath
 
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
@@ -71,7 +71,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet18 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
+        public class ResNet18 : CV("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -93,7 +93,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet34 : CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
+        public class ResNet34 : CV("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -116,7 +116,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet50 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -139,7 +139,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet101 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -162,7 +162,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet152 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -185,7 +185,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet18v2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -208,7 +208,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet34v2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -231,7 +231,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet50v2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -254,7 +254,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet101v2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -277,7 +277,7 @@ public object ONNXModels {
          *    Official ResNet model from ONNX Github.</a>
          */
         public class ResNet152v2 :
-            CV<OnnxInferenceModel>("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
+            CV("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -300,7 +300,7 @@ public object ONNXModels {
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
         public class EfficientNet4Lite :
-            CV<OnnxInferenceModel>("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
+            CV("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)
         }
@@ -323,7 +323,7 @@ public object ONNXModels {
          *    Official ResNet model from Keras.applications.</a>
          */
         public object ResNet50custom :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/custom/resnet50",
                 channelsFirst = false,
                 inputColorMode = ColorMode.BGR
@@ -350,7 +350,7 @@ public object ONNXModels {
          *    Official ResNet model from Keras.applications.</a>
          */
         public object ResNet50noTopCustom :
-            CV<OnnxInferenceModel>("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
+            CV("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.CAFFE.preprocessing()
         }
@@ -374,7 +374,7 @@ public object ONNXModels {
          *    Official EfficientNetB0 model from Keras.applications.</a>
          */
         public class EfficientNetB0(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b0",
                 channelsFirst = false,
                 noTop = noTop
@@ -399,7 +399,7 @@ public object ONNXModels {
          *    Official EfficientNetB1 model from Keras.applications.</a>
          */
         public class EfficientNetB1(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b1",
                 channelsFirst = false,
                 noTop = noTop
@@ -424,7 +424,7 @@ public object ONNXModels {
          *    Official EfficientNetB2 model from Keras.applications.</a>
          */
         public class EfficientNetB2(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b2",
                 channelsFirst = false,
                 noTop = noTop
@@ -449,7 +449,7 @@ public object ONNXModels {
          *    Official EfficientNetB3 model from Keras.applications.</a>
          */
         public class EfficientNetB3(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b3",
                 channelsFirst = false,
                 noTop = noTop
@@ -474,7 +474,7 @@ public object ONNXModels {
          *    Official EfficientNetB4 model from Keras.applications.</a>
          */
         public class EfficientNetB4(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b4",
                 channelsFirst = false,
                 noTop = noTop
@@ -499,7 +499,7 @@ public object ONNXModels {
          *    Official EfficientNetB5 model from Keras.applications.</a>
          */
         public class EfficientNetB5(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b5",
                 channelsFirst = false,
                 noTop = noTop
@@ -524,7 +524,7 @@ public object ONNXModels {
          *    Official EfficientNetB6 model from Keras.applications.</a>
          */
         public class EfficientNetB6(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b6",
                 channelsFirst = false,
                 noTop = noTop
@@ -549,7 +549,7 @@ public object ONNXModels {
          *    Official EfficientNetB7 model from Keras.applications.</a>
          */
         public class EfficientNetB7(noTop: Boolean = false) :
-            CV<OnnxInferenceModel>(
+            CV(
                 "models/onnx/cv/efficientnet/efficientnet-b7",
                 channelsFirst = false,
                 noTop = noTop
@@ -564,12 +564,12 @@ public object ONNXModels {
          * - an input with the shape (1x1x28x28)
          * - an output with the shape (1x10)
          */
-        public class Lenet : CV<OnnxInferenceModel>("models/onnx/cv/custom/mnist", channelsFirst = false)
+        public class Lenet : CV("models/onnx/cv/custom/mnist", channelsFirst = false)
     }
 
     /** Object detection models and preprocessing. */
-    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
-        OnnxModelType<T, U> {
+    public sealed class ObjectDetection<U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<U> {
         /**
          * This model is a real-time neural network for object detection that detects 80 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2014.labels] method).
@@ -587,7 +587,7 @@ public object ONNXModels {
          *    Detailed description of SSD model and its pre- and postprocessing in onnx/models repository.</a>
          */
         public object SSD :
-            ObjectDetection<OnnxInferenceModel, SSDObjectDetectionModel>("models/onnx/objectdetection/ssd") {
+            ObjectDetection<SSDObjectDetectionModel>("models/onnx/objectdetection/ssd") {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = pipeline<Pair<FloatArray, TensorShape>>()
                     .transpose { axes = intArrayOf(2, 0, 1) }
@@ -624,7 +624,7 @@ public object ONNXModels {
          *    Detailed description of SSD model and its pre- and postprocessing in onnx/models repository.</a>
          */
         public object SSDMobileNetV1 :
-            ObjectDetection<OnnxInferenceModel, SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
+            ObjectDetection<SSDMobileNetV1ObjectDetectionModel>("models/onnx/objectdetection/ssd_mobilenet_v1") {
             override val inputShape: LongArray = longArrayOf(1000L, 1000L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): SSDMobileNetV1ObjectDetectionModel {
@@ -654,7 +654,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD0 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d0") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d0") {
             override val inputShape: LongArray = longArrayOf(512L, 512L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -683,7 +683,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD1 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d1") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d1") {
             override val inputShape: LongArray = longArrayOf(640L, 640L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -712,7 +712,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD2 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d2") {
             override val inputShape: LongArray = longArrayOf(768L, 768L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -741,7 +741,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD3 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d3") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d3") {
             override val inputShape: LongArray = longArrayOf(896L, 896L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -770,7 +770,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD4 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d4") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d4") {
             override val inputShape: LongArray = longArrayOf(1024L, 1024L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -799,7 +799,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD5 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d5") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d5") {
             override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -828,7 +828,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetD6 :
-            ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d6") {
+            ObjectDetection<EfficientDetObjectDetectionModel>("models/onnx/objectdetection/efficientdet/efficientdet-d6") {
             override val inputShape: LongArray = longArrayOf(1280L, 1280L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): EfficientDetObjectDetectionModel {
@@ -839,7 +839,7 @@ public object ONNXModels {
 
     /** Face detection models */
     public sealed class FaceDetection(override val inputShape: LongArray, modelName: String) :
-        OnnxModelType<OnnxInferenceModel, FaceDetectionModel> {
+        OnnxModelType<FaceDetectionModel> {
         override val modelRelativePath: String = "models/onnx/facealignment/$modelName"
         override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
             get() = defaultPreprocessor
@@ -884,8 +884,8 @@ public object ONNXModels {
     }
 
     /** Face alignment models and preprocessing. */
-    public sealed class FaceAlignment<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
-        OnnxModelType<T, U> {
+    public sealed class FaceAlignment<U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<U> {
         /**
          * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
          *
@@ -894,7 +894,7 @@ public object ONNXModels {
          * - an output with the shape (1x212)
          */
         public object Fan2d106 :
-            FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
+            FaceAlignment<Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
             override val inputShape: LongArray = longArrayOf(3L, 192L, 192L)
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = Transpose(axes = intArrayOf(2, 0, 1))
@@ -906,8 +906,8 @@ public object ONNXModels {
     }
 
     /** Pose detection models. */
-    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
-        OnnxModelType<T, U> {
+    public sealed class PoseDetection<U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
          * (edges are available in [org.jetbrains.kotlinx.dl.onnx.inference.posedetection.edgeKeyPointsPairs]
@@ -929,7 +929,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseLighting :
-            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
+            PoseDetection<SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_singlepose_lighting_13") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
@@ -960,7 +960,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetMultiPoseLighting :
-            PoseDetection<OnnxInferenceModel, MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
+            PoseDetection<MultiPoseDetectionModel>("models/onnx/poseestimation/movenet_multipose_lighting") {
             override val inputShape: LongArray = longArrayOf(256L, 256L, 3L)
 
             override fun pretrainedModel(modelHub: ModelHub): MultiPoseDetectionModel {
@@ -989,7 +989,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseThunder :
-            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
+            PoseDetection<SinglePoseDetectionModel>("models/onnx/poseestimation/movenet_thunder") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }

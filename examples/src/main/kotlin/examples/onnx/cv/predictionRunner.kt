@@ -23,7 +23,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 
 fun runImageRecognitionPrediction(
-    modelType: ONNXModels.CV<OnnxInferenceModel>,
+    modelType: ONNXModels.CV,
     executionProviders: List<ExecutionProvider> = emptyList()
 ): List<Pair<String, Float>> {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
