@@ -17,16 +17,16 @@ import java.io.File
 class ExecutionProvidersTestSuite {
     private fun resnetModelsInference(executionProvider: ExecutionProvider) {
         val modelsToTest = listOf(
-            ONNXModels.CV.ResNet101(),
-            ONNXModels.CV.ResNet101v2(),
-            ONNXModels.CV.ResNet152(),
-            ONNXModels.CV.ResNet152v2(),
-            ONNXModels.CV.ResNet18(),
-            ONNXModels.CV.ResNet18v2(),
-            ONNXModels.CV.ResNet34(),
-            ONNXModels.CV.ResNet34v2(),
-            ONNXModels.CV.ResNet50(),
-            ONNXModels.CV.ResNet50v2(),
+            ONNXModels.CV.ResNet101,
+            ONNXModels.CV.ResNet101v2,
+            ONNXModels.CV.ResNet152,
+            ONNXModels.CV.ResNet152v2,
+            ONNXModels.CV.ResNet18,
+            ONNXModels.CV.ResNet18v2,
+            ONNXModels.CV.ResNet34,
+            ONNXModels.CV.ResNet34v2,
+            ONNXModels.CV.ResNet50,
+            ONNXModels.CV.ResNet50v2,
             ONNXModels.CV.ResNet50custom,
         )
 
@@ -78,7 +78,7 @@ class ExecutionProvidersTestSuite {
     @Test
     fun executionProvidersDuplicatesTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = modelHub.loadModel(ONNXModels.CV.ResNet18())
+        val model = modelHub.loadModel(ONNXModels.CV.ResNet18)
 
         model.use {
             assertDoesNotThrow {
@@ -90,7 +90,7 @@ class ExecutionProvidersTestSuite {
     @Test
     fun twoCpuExecutorsWithDifferentAllocatorsTest() {
         val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-        val model = modelHub.loadModel(ONNXModels.CV.ResNet18())
+        val model = modelHub.loadModel(ONNXModels.CV.ResNet18)
 
         model.use {
             assertThrows<IllegalArgumentException> {

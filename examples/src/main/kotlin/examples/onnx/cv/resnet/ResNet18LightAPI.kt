@@ -20,7 +20,7 @@ fun resnet18LightAPIPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = ONNXModels.CV.ResNet18().pretrainedModel(modelHub)
+    val model = ONNXModels.CV.ResNet18.pretrainedModel(modelHub)
     model.printSummary()
 
     model.use {
