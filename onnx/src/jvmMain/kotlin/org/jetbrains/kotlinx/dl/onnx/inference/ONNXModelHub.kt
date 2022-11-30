@@ -49,10 +49,7 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        return loadModel(
-            modelType as OnnxModelType<T, U>,
-            ExecutionProvider.CPU(), loadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
-        )
+        return loadModel(modelType as OnnxModelType<T, U>, ExecutionProvider.CPU(), loadingMode = loadingMode)
     }
 
     private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
