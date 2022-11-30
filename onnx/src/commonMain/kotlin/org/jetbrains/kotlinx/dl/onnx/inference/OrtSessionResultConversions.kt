@@ -261,10 +261,13 @@ public object OrtSessionResultConversions {
         valueInfo: ValueInfo,
         valueName: String,
         method: String,
-        type: OnnxJavaType
+        type: OnnxJavaType? = null
     ) {
-        require(valueInfo !is MapInfo) { "Output '$valueName' is a Map, but currently method '$method' supports only $type Tensor outputs." }
-        require(valueInfo !is SequenceInfo) { "Output '$valueName' is a Sequence, but currently method '$method' supports $type Tensor outputs." }
-        require(valueInfo is TensorInfo && valueInfo.type == type) { "Currently method '$method' supports only $type Tensor outputs, but output '$valueName' is not a $type Tensor." }
+        val typeString = type?.toString()?.let { "$it " } ?: ""
+        require(valueInfo !is MapInfo) { "Output '$valueName' is a Map, but currently method '$method' supports only ${typeString}Tensor outputs." }
+        require(valueInfo !is SequenceInfo) { "Output '$valueName' is a Sequence, but currently method '$method' supports ${typeString}Tensor outputs." }
+        if (type != null) {
+            require(valueInfo is TensorInfo && valueInfo.type == type) { "Currently method '$method' supports only ${typeString}Tensor outputs, but output '$valueName' is not a ${typeString}Tensor." }
+        }
     }
 }
