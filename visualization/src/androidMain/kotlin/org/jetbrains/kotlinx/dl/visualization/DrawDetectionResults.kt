@@ -123,9 +123,21 @@ fun Canvas.drawLandmarks(landmarks: List<Landmark>,
                          paint: Paint, radius: Float,
                          bounds: PreviewImageBounds = bounds()
 ) {
-    landmarks.forEach { landmark ->
-        drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), radius, paint)
-    }
+    landmarks.forEach { landmark -> drawLandmark(landmark, paint, radius, bounds) }
+}
+
+/**
+ * Draw a given [landmark] on the [Canvas] using [paint] and [radius].
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
+ */
+fun Canvas.drawLandmark(landmark: Landmark, paint: Paint, radius: Float,
+                        bounds: PreviewImageBounds = bounds()
+) {
+    drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), radius, paint)
 }
 
 /**
