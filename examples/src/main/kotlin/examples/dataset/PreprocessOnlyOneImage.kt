@@ -59,12 +59,7 @@ fun main() {
     val image = File(imageResource!!.toURI())
     val (rawImage, shape) = preprocessing.fileLoader().load(image)
 
-    val bufferedImage = ImageConverter.floatArrayToBufferedImage(
-        rawImage,
-        shape.toImageShape(),
-        ColorMode.BGR,
-        isNormalized = true
-    )
+    val bufferedImage = ImageConverter.floatArrayToBufferedImage(rawImage, shape, ColorMode.BGR, isNormalized = true)
 
     showFrame("Filters", ImagePanel(bufferedImage))
 }
