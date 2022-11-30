@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import java.io.File
 
 fun runONNXImageRecognitionPrediction(
-    modelType: ONNXModels.CV<out OnnxInferenceModel>,
+    modelType: ONNXModels.CV,
     resizeTo: Pair<Int, Int> = Pair(224, 224)
 ) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))

@@ -31,10 +31,10 @@ public object ONNXModels {
      *                           has short notation as `NCWH`,
      *                           otherwise, channels are at the last position and has a short notation as `NHWC`.
      * */
-    public sealed class CV<T : InferenceModel>(
+    public sealed class CV(
         override val modelRelativePath: String,
         protected val channelsFirst: Boolean
-    ) : OnnxModelType<T, ImageRecognitionModel> {
+    ) : OnnxModelType<ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(
                 modelHub.loadModel(this) as OnnxInferenceModel,
@@ -62,7 +62,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
-        public class EfficientNet4Lite : CV<OnnxInferenceModel>("efficientnet_lite4", channelsFirst = false) {
+        public class EfficientNet4Lite : CV("efficientnet_lite4", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)
         }
@@ -83,7 +83,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
-        public class MobilenetV1 : CV<OnnxInferenceModel>("mobilenet_v1", channelsFirst = false) {
+        public class MobilenetV1 : CV("mobilenet_v1", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = pipeline<Pair<FloatArray, TensorShape>>()
                     .rescale { scalingCoefficient = 255f }
@@ -106,8 +106,8 @@ public object ONNXModels {
     }
 
     /** Pose detection models. */
-    public sealed class PoseDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
-        OnnxModelType<T, U> {
+    public sealed class PoseDetection<U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
          * (edges are available in [org.jetbrains.kotlinx.dl.onnx.inference.posedetection.edgeKeyPointsPairs]
@@ -129,7 +129,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseLighting :
-            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("movenet_singlepose_lighting_13") {
+            PoseDetection<SinglePoseDetectionModel>("movenet_singlepose_lighting_13") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
@@ -156,7 +156,7 @@ public object ONNXModels {
          *    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a>
          */
         public object MoveNetSinglePoseThunder :
-            PoseDetection<OnnxInferenceModel, SinglePoseDetectionModel>("movenet_thunder") {
+            PoseDetection<SinglePoseDetectionModel>("movenet_thunder") {
             override fun pretrainedModel(modelHub: ModelHub): SinglePoseDetectionModel {
                 return SinglePoseDetectionModel(modelHub.loadModel(this), this::class.simpleName)
             }
@@ -164,8 +164,8 @@ public object ONNXModels {
     }
 
     /** Object detection models and preprocessing. */
-    public sealed class ObjectDetection<T : InferenceModel, U : InferenceModel>(override val modelRelativePath: String) :
-        OnnxModelType<T, U> {
+    public sealed class ObjectDetection<U : InferenceModel>(override val modelRelativePath: String) :
+        OnnxModelType<U> {
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available in [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017]).
@@ -192,7 +192,7 @@ public object ONNXModels {
          *    Detailed description of SSD model and its pre- and postprocessing in onnx/models repository.</a>
          */
         public object SSDMobileNetV1 :
-            ObjectDetection<OnnxInferenceModel, SSDLikeModel>("ssd_mobilenet_v1") {
+            ObjectDetection<SSDLikeModel>("ssd_mobilenet_v1") {
 
             private val METADATA = SSDLikeModelMetadata(
                 "TFLite_Detection_PostProcess",
@@ -230,7 +230,7 @@ public object ONNXModels {
          *    Tutorial which shows how to covert the EfficientDet models to ONNX using tf2onnx.</a>
          */
         public object EfficientDetLite0 :
-            ObjectDetection<OnnxInferenceModel, SSDLikeModel>("efficientdet_lite0") {
+            ObjectDetection<SSDLikeModel>("efficientdet_lite0") {
 
             private val METADATA = SSDLikeModelMetadata(
                 "StatefulPartitionedCall:3",
@@ -247,7 +247,7 @@ public object ONNXModels {
 
     /** Face detection models */
     public sealed class FaceDetection(override val inputShape: LongArray, override val modelRelativePath: String) :
-        OnnxModelType<OnnxInferenceModel, FaceDetectionModel> {
+        OnnxModelType<FaceDetectionModel> {
         override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
             get() = defaultPreprocessor
 
@@ -291,7 +291,7 @@ public object ONNXModels {
     }
 
     /** Face alignment models */
-    public sealed class FaceAlignment<T : OnnxInferenceModel, U : InferenceModel> : OnnxModelType<T, U> {
+    public sealed class FaceAlignment<U : InferenceModel> : OnnxModelType<U> {
         /**
          * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
          *
@@ -299,7 +299,7 @@ public object ONNXModels {
          * - an input with the shape (1x3x192x192)
          * - an output with the shape (1x212)
          */
-        public object Fan2d106 : FaceAlignment<OnnxInferenceModel, Fan2D106FaceAlignmentModel>() {
+        public object Fan2d106 : FaceAlignment<Fan2D106FaceAlignmentModel>() {
             override val inputShape: LongArray = longArrayOf(3L, 192, 192)
             override val modelRelativePath: String = "fan_2d_106"
             override fun pretrainedModel(modelHub: ModelHub): Fan2D106FaceAlignmentModel {

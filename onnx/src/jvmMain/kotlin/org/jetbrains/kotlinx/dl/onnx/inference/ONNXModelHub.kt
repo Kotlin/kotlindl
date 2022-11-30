@@ -45,11 +45,12 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return An example of [OnnxInferenceModel].
      */
+    @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {
-        return loadModel(modelType as OnnxModelType<T, U>, ExecutionProvider.CPU(), loadingMode = loadingMode)
+        return loadModel(modelType as OnnxModelType<U>, ExecutionProvider.CPU(), loadingMode = loadingMode) as T
     }
 
     private fun getONNXModelFile(modelFile: String, loadingMode: LoadingMode): File {
@@ -76,16 +77,15 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
      * If [loadingMode] is [LoadingMode.OVERRIDE_IF_EXISTS] the model will be overridden even if it is already loaded.
      * [executionProviders] is a list of execution providers which will be used for model inference.
      */
-    @Suppress("UNCHECKED_CAST")
-    public fun <T : InferenceModel, U : InferenceModel> loadModel(
-        modelType: OnnxModelType<T, U>,
+    public fun loadModel(
+        modelType: OnnxModelType<*>,
         vararg executionProviders: ExecutionProvider,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS,
-    ): T {
+    ): OnnxInferenceModel {
         val modelFile = S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
         val inferenceModel = OnnxInferenceModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
         modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
-        return inferenceModel as T
+        return inferenceModel
     }
 }

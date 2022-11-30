@@ -120,7 +120,7 @@ class ObjectDetectionTestSuite {
 }
 
 
-fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>) {
+fun efficientDetInference(modelType: ONNXModels.ObjectDetection<EfficientDetObjectDetectionModel>) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
@@ -145,7 +145,7 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<OnnxInferenceMod
 }
 
 fun efficientDetLightAPIInference(
-    modelType: ONNXModels.ObjectDetection<OnnxInferenceModel, EfficientDetObjectDetectionModel>,
+    modelType: ONNXModels.ObjectDetection<EfficientDetObjectDetectionModel>,
     numberOfDetectedObjects: Int
 ) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
