@@ -60,7 +60,7 @@ Breaking changes:
   * Removed dependency of "api" module on the "dataset" module
   * Changed packages for "api", "impl", "dataset" and "onnx" so that they match the corresponding module name
 * Preprocessing classes such as `Preprocessing`, `ImagePreprocessing`, `ImagePreprocessor`,
-  `ImageSaver`, `TensorPreprocessing`, `Preprocessor` got removed in favor of the new preprocessing API [#425](https://github.com/Kotlin/kotlindl/pull/425)
+  `ImageSaver`, `ImageShape`, `TensorPreprocessing`, `Preprocessor` got removed in favor of the new preprocessing API [#425](https://github.com/Kotlin/kotlindl/pull/425)
 * Removed `Sharpen` preprocessor since the `ModelType#preprocessor` field was introduced, which can be used in the preprocessing
   pipeline using the `call` function [#429](https://github.com/Kotlin/kotlindl/pull/429)
 
