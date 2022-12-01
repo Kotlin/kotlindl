@@ -29,7 +29,7 @@ import java.io.File
 fun efficientNet4LitePrediction() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val modelType = ONNXModels.CV.EfficientNet4Lite()
+    val modelType = ONNXModels.CV.EfficientNet4Lite
     val model = modelHub.loadModel(modelType)
     model.printSummary()
 

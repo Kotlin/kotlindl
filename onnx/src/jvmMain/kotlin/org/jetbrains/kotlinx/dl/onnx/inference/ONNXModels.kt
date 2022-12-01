@@ -71,7 +71,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet18 : CV("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
+        public object ResNet18 : CV("models/onnx/cv/resnet/resnet18-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -93,7 +93,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet34 : CV("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
+        public object ResNet34 : CV("models/onnx/cv/resnet/resnet34-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
         }
@@ -115,7 +115,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet50 :
+        public object ResNet50 :
             CV("models/onnx/cv/resnet/resnet50-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -138,7 +138,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet101 :
+        public object ResNet101 :
             CV("models/onnx/cv/resnet/resnet101-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -161,7 +161,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet152 :
+        public object ResNet152 :
             CV("models/onnx/cv/resnet/resnet152-v1", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -184,7 +184,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet18v2 :
+        public object ResNet18v2 :
             CV("models/onnx/cv/resnet/resnet18-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -207,7 +207,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet34v2 :
+        public object ResNet34v2 :
             CV("models/onnx/cv/resnet/resnet34-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -230,7 +230,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet50v2 :
+        public object ResNet50v2 :
             CV("models/onnx/cv/resnet/resnet50-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -253,7 +253,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet101v2 :
+        public object ResNet101v2 :
             CV("models/onnx/cv/resnet/resnet101-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -276,7 +276,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/resnet">
          *    Official ResNet model from ONNX Github.</a>
          */
-        public class ResNet152v2 :
+        public object ResNet152v2 :
             CV("models/onnx/cv/resnet/resnet152-v2", channelsFirst = true) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = resNetOnnxPreprocessing()
@@ -299,7 +299,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
-        public class EfficientNet4Lite :
+        public object EfficientNet4Lite :
             CV("models/onnx/cv/efficientnet/efficientnet-lite4", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)

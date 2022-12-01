@@ -62,7 +62,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
-        public class EfficientNet4Lite : CV("efficientnet_lite4", channelsFirst = false) {
+        public object EfficientNet4Lite : CV("efficientnet_lite4", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)
         }
@@ -83,7 +83,7 @@ public object ONNXModels {
          * @see <a href="https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4">
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
-        public class MobilenetV1 : CV("mobilenet_v1", channelsFirst = false) {
+        public object MobilenetV1 : CV("mobilenet_v1", channelsFirst = false) {
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = pipeline<Pair<FloatArray, TensorShape>>()
                     .rescale { scalingCoefficient = 255f }

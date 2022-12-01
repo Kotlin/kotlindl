@@ -34,7 +34,7 @@ class ModelCopyingTestSuite {
                 ONNXModels.CV.EfficientNetB5(),
                 ONNXModels.CV.EfficientNetB6(),
                 ONNXModels.CV.EfficientNetB7(),
-                ONNXModels.CV.EfficientNet4Lite()
+                ONNXModels.CV.EfficientNet4Lite
             ),
             "datasets/vgg/image0.jpg",
             ImageRecognitionModel::predictObject
@@ -45,17 +45,17 @@ class ModelCopyingTestSuite {
     fun resNetCopyTest() {
         runCopyTest(
             listOf(
-                ONNXModels.CV.ResNet18(),
-                ONNXModels.CV.ResNet18v2(),
-                ONNXModels.CV.ResNet34(),
-                ONNXModels.CV.ResNet34v2(),
-                ONNXModels.CV.ResNet50(),
-                ONNXModels.CV.ResNet50v2(),
+                ONNXModels.CV.ResNet18,
+                ONNXModels.CV.ResNet18v2,
+                ONNXModels.CV.ResNet34,
+                ONNXModels.CV.ResNet34v2,
+                ONNXModels.CV.ResNet50,
+                ONNXModels.CV.ResNet50v2,
                 ONNXModels.CV.ResNet50custom,
-                ONNXModels.CV.ResNet101(),
-                ONNXModels.CV.ResNet101v2(),
-                ONNXModels.CV.ResNet152(),
-                ONNXModels.CV.ResNet152v2()
+                ONNXModels.CV.ResNet101,
+                ONNXModels.CV.ResNet101v2,
+                ONNXModels.CV.ResNet152,
+                ONNXModels.CV.ResNet152v2
             ),
             "datasets/vgg/image0.jpg",
             ImageRecognitionModel::predictObject
