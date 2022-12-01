@@ -263,8 +263,8 @@ public object OrtSessionResultConversions {
         method: String,
         type: OnnxJavaType
     ) {
-        require(valueInfo !is MapInfo) { "Output $valueName is a Map, but currently method $method supports only $type Tensor outputs." }
-        require(valueInfo !is SequenceInfo) { "Output '$valueName' is a Sequence, but currently method $method supports $type float Tensor outputs." }
-        require(valueInfo is TensorInfo && valueInfo.type == type) { "Currently method $method supports only $type Tensor outputs, but output '$valueName' is not a float Tensor." }
+        require(valueInfo !is MapInfo) { "Output '$valueName' is a Map, but currently method '$method' supports only $type Tensor outputs." }
+        require(valueInfo !is SequenceInfo) { "Output '$valueName' is a Sequence, but currently method '$method' supports $type Tensor outputs." }
+        require(valueInfo is TensorInfo && valueInfo.type == type) { "Currently method '$method' supports only $type Tensor outputs, but output '$valueName' is not a $type Tensor." }
     }
 }
