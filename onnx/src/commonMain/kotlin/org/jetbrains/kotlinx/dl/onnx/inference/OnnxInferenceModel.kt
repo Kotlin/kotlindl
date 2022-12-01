@@ -227,22 +227,48 @@ public open class OnnxInferenceModel private constructor(
 
     /**
      * Runs prediction on a given [inputData] and calls [extractResult] function to process output.
+     * For models with multiple inputs, [inputData] is passed as a first input.
      * @see OrtSessionResultConversions
      */
     public fun <R> predictRaw(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
-        val modelShape = inputInfo.getShape(0)
-        val dataShape = longArrayOf(1L, *inputData.shape.dims())
-        require(modelShape.matches(dataShape)) {
-            "Data shape for input $name does not match the model input shape. Data shape: $dataShape, model shape: $modelShape"
-        }
-        require(dataShape.all { it >= 0 }) { "Data shape is not defined: $dataShape" }
+        return predictRaw(mapOf(inputInfo.getName(0) to inputData), extractResult)
+    }
 
-        return env.createTensor(inputData.floats, inputInfo.getType(0), dataShape)
-            .use { inputTensor ->
-                session.run(mapOf(inputInfo.getName(0) to inputTensor)).use { output ->
-                    extractResult(output)
-                }
+    /**
+     * Runs prediction on a given [inputs] and calls [extractResult] function to process output.
+     * @see OrtSessionResultConversions
+     */
+    public fun <R> predictRaw(inputs: Map<String, FloatData>, extractResult: (OrtSession.Result) -> R): R {
+        val tensors = inputs.toTensors()
+        try {
+            return session.run(tensors).use { output -> extractResult(output) }
+        } finally {
+            tensors.values.forEach(OnnxTensor::close)
+        }
+    }
+
+    private fun Map<String, FloatData>.toTensors(): Map<String, OnnxTensor> {
+        // do the checks separately to avoid exceptions during tensor creation
+        val triples = mapValues { (name, floatData) ->
+            require(name in inputInfo) {
+                "There is no input with name '$name'." +
+                        " The model only has following inputs: ${inputInfo.keys}"
             }
+
+            val modelShape = inputInfo.getShape(name)
+            val dataShape = longArrayOf(1L, *floatData.shape.dims())
+            require(modelShape.matches(dataShape)) {
+                "Data shape for input $name does not match the model input shape. Data shape: $dataShape, model shape: $modelShape"
+            }
+            require(dataShape.all { it >= 0 }) { "Data shape is not defined: $dataShape" }
+
+            Triple(floatData.floats, dataShape, inputInfo.getType(name))
+        }
+
+        return triples.mapValues { (_, triple) ->
+            val (data, shape, type) = triple
+            env.createTensor(data, type, shape)
+        }
     }
 
     override fun copy(
@@ -286,14 +312,22 @@ public open class OnnxInferenceModel private constructor(
 
         private fun Map<String, NodeInfo>.getShape(index: Int): LongArray {
             val (name, nodeInfo) = asIterable().elementAt(index)
-            throwIfOutputNotSupported(nodeInfo.info, name, "getShape")
-            val shape = (nodeInfo.info as TensorInfo).shape
+            return nodeInfo.getShape(name)
+        }
+
+        private fun Map<String, NodeInfo>.getShape(name: String): LongArray {
+            return getValue(name).getShape(name)
+        }
+
+        private fun NodeInfo.getShape(name: String): LongArray {
+            throwIfOutputNotSupported(info, name, "getShape")
+            val shape = (info as TensorInfo).shape
             if (shape[0] >= 0) return shape
             return (listOf(1L) + shape.drop(1)).toLongArray() // use batch size 1
         }
 
-        private fun Map<String, NodeInfo>.getType(index: Int): OnnxJavaType {
-            val (name, nodeInfo) = asIterable().elementAt(index)
+        private fun Map<String, NodeInfo>.getType(name: String): OnnxJavaType {
+            val nodeInfo = getValue(name)
             throwIfOutputNotSupported(nodeInfo.info, name, "getType")
             return (nodeInfo.info as TensorInfo).type
         }
