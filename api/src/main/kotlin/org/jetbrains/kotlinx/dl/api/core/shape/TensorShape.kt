@@ -14,15 +14,11 @@ public class TensorShape() {
     private lateinit var dims: LongArray
 
     public companion object {
-        /** Returns first dimension from all dimensions [dims]. */
-        public fun head(vararg dims: Long): Long {
-            return dims[0]
-        }
+        /** Returns first dimension from all dimensions of this array. */
+        public fun LongArray.head(): Long = this[0]
 
-        /** Returns last dimensions (except first) from [dims]. */
-        public fun tail(vararg dims: Long): LongArray {
-            return dims.copyOfRange(1, dims.size)
-        }
+        /** Returns last dimensions (except first) from this array. */
+        public fun LongArray.tail(): LongArray = copyOfRange(1, size)
     }
 
     /**

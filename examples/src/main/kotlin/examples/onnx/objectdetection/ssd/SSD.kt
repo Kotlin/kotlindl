@@ -45,7 +45,7 @@ fun ssd() {
             .fileLoader()
 
         for (i in 1..6) {
-            val inputData = preprocessing.load(getFileFromResource("datasets/detection/image$i.jpg")).first
+            val inputData = preprocessing.load(getFileFromResource("datasets/detection/image$i.jpg"))
 
             val start = System.currentTimeMillis()
             val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0) }

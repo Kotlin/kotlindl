@@ -46,7 +46,7 @@ fun poseDetectionMoveNet() {
             .toFloatArray { }
             .call(modelType.preprocessor)
 
-        val inputData = preprocessing.apply(image).first
+        val inputData = preprocessing.apply(image)
 
         val rawPoseLandMarks = it.predictRaw(inputData) { result ->
             result.get2DFloatArray("output_0")

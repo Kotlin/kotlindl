@@ -50,7 +50,7 @@ fun main() {
         for (i in 1..8) {
             val inputFile = getFileFromResource("datasets/faces/image$i.jpg")
             val inputImage = ImageConverter.toBufferedImage(inputFile)
-            val inputData = preprocessor.apply(inputImage).first
+            val inputData = preprocessor.apply(inputImage)
 
             val floats = it.predictRaw(inputData) { output -> output.getFloatArray("fc1") }
             println(floats.contentToString())

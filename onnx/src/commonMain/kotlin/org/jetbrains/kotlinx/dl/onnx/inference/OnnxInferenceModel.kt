@@ -7,7 +7,11 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.floats
+import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape.Companion.tail
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
@@ -193,7 +197,10 @@ public open class OnnxInferenceModel private constructor(
         val outputInfo = outputInfo.getValue(outputTensorName).info
         throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
 
-        return predictRaw(inputData) { output -> output.getFloatArray(outputTensorName) }
+        val shape = (inputShape ?: inputInfo.getShape(0)).tail()
+        val floatData = FloatData(inputData, TensorShape(shape))
+
+        return predictRaw(floatData) { output -> output.getFloatArray(outputTensorName) }
     }
 
     /**
@@ -202,8 +209,10 @@ public open class OnnxInferenceModel private constructor(
      * @param [inputData] The single example with unknown vector of probabilities.
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
-    public fun predictSoftly(inputData: FloatArray): FloatArray {
-        return predictSoftly(inputData, outputInfo.getName(0))
+    public fun predictSoftly(inputData: FloatData): FloatArray {
+        return predictRaw(inputData) { output ->
+            output.getFloatArray(outputInfo.getName(0))
+        }
     }
 
     /**
@@ -212,7 +221,7 @@ public open class OnnxInferenceModel private constructor(
      * NOTE: This operation can be quite slow for high dimensional tensors,
      * use [predictRaw] with custom output processing for better performance.
      */
-    public fun predictRaw(inputData: FloatArray): Map<String, Any> {
+    public fun predictRaw(inputData: FloatData): Map<String, Any> {
         return predictRaw(inputData) { it.getValues() }
     }
 
@@ -220,12 +229,15 @@ public open class OnnxInferenceModel private constructor(
      * Runs prediction on a given [inputData] and calls [extractResult] function to process output.
      * @see OrtSessionResultConversions
      */
-    public fun <R> predictRaw(inputData: FloatArray, extractResult: (OrtSession.Result) -> R): R {
-        require(inputShape != null || inputInfo.getShape(0).all { it >= 0 }) {
-            "Model input shape is not defined. Call reshape() to set input shape."
+    public fun <R> predictRaw(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
+        val modelShape = inputInfo.getShape(0)
+        val dataShape = longArrayOf(1L, *inputData.shape.dims())
+        require(modelShape.matches(dataShape)) {
+            "Data shape for input $name does not match the model input shape. Data shape: $dataShape, model shape: $modelShape"
         }
+        require(dataShape.all { it >= 0 }) { "Data shape is not defined: $dataShape" }
 
-        return env.createTensor(inputData, inputInfo.getType(0), inputShape ?: inputInfo.getShape(0))
+        return env.createTensor(inputData.floats, inputInfo.getType(0), dataShape)
             .use { inputTensor ->
                 session.run(mapOf(inputInfo.getName(0) to inputTensor)).use { output ->
                     extractResult(output)
@@ -284,6 +296,17 @@ public open class OnnxInferenceModel private constructor(
             val (name, nodeInfo) = asIterable().elementAt(index)
             throwIfOutputNotSupported(nodeInfo.info, name, "getType")
             return (nodeInfo.info as TensorInfo).type
+        }
+
+        private fun LongArray.matches(other: LongArray): Boolean {
+            if (size != other.size) return false
+            for (i in indices) {
+                val value = get(i)
+                val otherValue = other[i]
+                if (value < 0 || otherValue < 0) continue
+                if (value != otherValue) return false
+            }
+            return true
         }
 
         private fun OrtEnvironment.createTensor(

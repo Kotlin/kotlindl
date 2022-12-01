@@ -21,7 +21,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFl
 public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) :
     Operation<FloatData, FloatData> {
     override fun apply(input: FloatData): FloatData {
-        val (prediction, rawShape) = onnxModel!!.predictRaw(input.first) { output ->
+        val (prediction, rawShape) = onnxModel!!.predictRaw(input) { output ->
             return@predictRaw output.getFloatArrayWithShape(outputIndex)
         }
         return prediction to TensorShape(rawShape)
