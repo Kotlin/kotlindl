@@ -18,7 +18,6 @@ import java.awt.image.BufferedImage
 import java.io.File
 
 private const val OUTPUT_NAME = "output_0"
-private const val INPUT_SIZE = 256
 
 /**
  * MultiPoseDetectionModel is an ultra-fast and accurate model that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
@@ -35,8 +34,8 @@ public class MultiPoseDetectionModel(
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = INPUT_SIZE
-                outputWidth = INPUT_SIZE
+                outputHeight = inputDimensions[0].toInt()
+                outputWidth = inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
