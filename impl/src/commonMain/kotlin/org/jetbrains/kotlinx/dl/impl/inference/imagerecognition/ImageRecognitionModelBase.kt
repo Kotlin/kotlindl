@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel,
     protected val modelKindDescription: String? = null
-) : InferenceModel by internalModel, ModelWithSummary {
+) : ModelWithSummary, AutoCloseable {
     /**
      * Preprocessing operation specific to this model.
      */
@@ -70,4 +70,6 @@ public abstract class ImageRecognitionModelBase<I>(
             ModelHubModelSummary(EmptySummary(), modelKindDescription)
         }
     }
+
+    override fun close(): Unit = internalModel.close()
 }

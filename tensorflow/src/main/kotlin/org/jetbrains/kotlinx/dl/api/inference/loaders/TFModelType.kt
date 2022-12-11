@@ -15,7 +15,7 @@ import java.io.File
  * @see TFModels
  * @see TFModelHub
  */
-public interface TFModelType<T : TensorFlowInferenceModel, U : InferenceModel> : ModelType<T, U> {
+public interface TFModelType<T : TensorFlowInferenceModel, U> : ModelType<T, U> {
     /**
      * Loads model configuration from the provided [jsonFile].
      */

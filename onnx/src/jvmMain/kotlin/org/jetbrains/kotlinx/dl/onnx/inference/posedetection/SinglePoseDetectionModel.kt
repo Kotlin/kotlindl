@@ -30,13 +30,13 @@ import java.io.IOException
 public class SinglePoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : SinglePoseDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
+) : SinglePoseDetectionModelBase<BufferedImage>(modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
+                outputHeight = internalModel.inputDimensions[0].toInt()
+                outputWidth = internalModel.inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
@@ -57,14 +57,5 @@ public class SinglePoseDetectionModel(
         return detectPose(ImageConverter.toBufferedImage(imageFile))
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): SinglePoseDetectionModel {
-        return SinglePoseDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }

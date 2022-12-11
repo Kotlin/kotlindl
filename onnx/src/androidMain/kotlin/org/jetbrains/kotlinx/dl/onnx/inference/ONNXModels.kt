@@ -106,7 +106,7 @@ public object ONNXModels {
     }
 
     /** Pose detection models. */
-    public sealed class PoseDetection<U : InferenceModel>(override val modelRelativePath: String) :
+    public sealed class PoseDetection<U>(override val modelRelativePath: String) :
         OnnxModelType<U> {
         /**
          * This model is a convolutional neural network model that runs on RGB images and predicts human joint locations of a single person.
@@ -164,7 +164,7 @@ public object ONNXModels {
     }
 
     /** Object detection models and preprocessing. */
-    public sealed class ObjectDetection<U : InferenceModel>(override val modelRelativePath: String) :
+    public sealed class ObjectDetection<U>(override val modelRelativePath: String) :
         OnnxModelType<U> {
         /**
          * This model is a real-time neural network for object detection that detects 90 different classes
@@ -291,7 +291,7 @@ public object ONNXModels {
     }
 
     /** Face alignment models */
-    public sealed class FaceAlignment<U : InferenceModel> : OnnxModelType<U> {
+    public sealed class FaceAlignment<U> : OnnxModelType<U> {
         /**
          * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
          *

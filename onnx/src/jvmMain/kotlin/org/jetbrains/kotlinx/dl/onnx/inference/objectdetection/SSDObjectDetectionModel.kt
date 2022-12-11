@@ -46,13 +46,13 @@ private val SSD_RESNET_METADATA = SSDLikeModelMetadata("bboxes", "labels", "scor
 public class SSDObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA, modelKindDescription), InferenceModel by internalModel {
+) : SSDLikeModelBase<BufferedImage>(SSD_RESNET_METADATA, modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputDimensions[1].toInt()
-                outputWidth = inputDimensions[2].toInt()
+                outputHeight = internalModel.inputDimensions[1].toInt()
+                outputWidth = internalModel.inputDimensions[2].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
@@ -103,15 +103,5 @@ public class SSDObjectDetectionModel(
         return foundObjects
     }
 
-
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): SSDObjectDetectionModel {
-        return SSDObjectDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }
