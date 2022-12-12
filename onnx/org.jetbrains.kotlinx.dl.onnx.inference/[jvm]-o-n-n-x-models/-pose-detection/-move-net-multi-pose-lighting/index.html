@@ -1,0 +1,133 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>MoveNetMultiPoseLighting</title>
+</head><body><link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script><script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script><link href="../../../../../styles/style.css" rel="Stylesheet"><link href="../../../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../../../../scripts/main.js" async></script>
+  
+    <div id="container">
+      <div id="leftColumn"><a href="../../../../../index.html">
+            <div id="logo"></div>
+          </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <script type="text/javascript" src="../../../../../scripts/main.js"></script><div id="leftToggler"><span class="icon-toggler"></span></div>
+
+        <div class="main-content" id="content" pageids="onnx::org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetMultiPoseLighting///PointingToDeclaration//-896627412">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../../index.html">onnx</a>/<a href="../../../index.html">org.jetbrains.kotlinx.dl.onnx.inference</a>/<a href="../../index.html">[jvm]ONNXModels</a>/<a href="../index.html">PoseDetection</a>/<a href="index.html">MoveNetMultiPoseLighting</a></div>
+            <div class="pull-right d-flex">
+              <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":onnx:dokkaHtmlPartial/jvmMain">jvm</button></div>
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Move</span><wbr><span>Net</span><wbr><span>Multi</span><wbr><span>Pose</span><wbr><span><span>Lighting</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><div class="symbol monospace">object <a href="index.html">MoveNetMultiPoseLighting</a> : <a href="../index.html">ONNXModels.PoseDetection</a>&lt;<a href="../../../../org.jetbrains.kotlinx.dl.onnx.inference.posedetection/-multi-pose-detection-model/index.html">MultiPoseDetectionModel</a>&gt; <span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">A convolutional neural network model that runs on RGB images and predicts human joint locations of people in the image frame. The main differentiator between this MoveNet.MultiPose and its precedent, MoveNet.SinglePose model, is that this model is able to detect multiple people in the image frame at the same time while still achieving real-time speed.</p><p class="paragraph">(edges are available in <a href="../../../../../onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/index.html">org.jetbrains.kotlinx.dl.onnx.inference.posedetection.edgeKeyPointsPairs</a> and keypoints are in <a href="../../../../../onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/index.html">org.jetbrains.kotlinx.dl.onnx.inference.posedetection.keyPoints</a>).</p><p class="paragraph">The <code>``predictRaw``</code> method returns a float32 tensor of shape (1, 6, 56).</p><ul><li><p class="paragraph">The first dimension is the batch dimension, which is always equal to 1.</p></li><li><p class="paragraph">The second dimension corresponds to the maximum number of instance detections.</p></li><li><p class="paragraph">The model can detect up to 6 people in the image frame simultaneously.</p></li><li><p class="paragraph">The third dimension represents the predicted bounding box/keypoint locations and scores.</p></li><li><p class="paragraph">The first 17 * 3 elements are the keypoint locations and scores in the format: <code>``[y_0, x_0, s_0, y_1, x_1, s_1, …, y_16, x_16, s_16]``</code>,     where y_i, x_i, s_i are the yx-coordinates (normalized to image frame, e.g. range in <code>``[0.0, 1.0]``</code>) and confidence scores of the i-th joint correspondingly.</p></li><li><p class="paragraph">The order of the 17 keypoint joints is: <code>``[nose, left eye, right eye, left ear, right ear, left shoulder, right shoulder, left elbow, right elbow, left wrist, right wrist, left hip, right hip, left knee, right knee, left ankle, right ankle]``</code>.</p></li><li><p class="paragraph">The remaining 5 elements <code>``[ymin, xmin, ymax, xmax, score]``</code> represent the region of the bounding box (in normalized coordinates) and the confidence score of the instance.</p></li></ul><p class="paragraph">@see <a href="https://blog.tensorflow.org/2021/05/next-generation-pose-detection-with-movenet-and-tensorflowjs.html">     Detailed description of MoveNet architecture in TensorFlow blog.</a> @see <a href="https://tfhub.dev/google/movenet/multipose/lightning/1">    TensorFlow Model Hub with the MoveNetLighting model converted to ONNX.</a></p></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="913487821%2FFunctions%2F-896627412" anchor-label="model" id="913487821%2FFunctions%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-move-net-single-pose-thunder/index.html#913487821%2FFunctions%2F-896627412"><span><span>model</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="913487821%2FFunctions%2F-896627412"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><div class="symbol monospace">open fun <a href="../-move-net-single-pose-thunder/index.html#913487821%2FFunctions%2F-896627412">model</a>(modelHub: <a href="../../../../../api/org.jetbrains.kotlinx.dl.api.inference.loaders/-model-hub/index.html">ModelHub</a>): <a href="../../../../../onnx/org.jetbrains.kotlinx.dl.onnx.inference/-onnx-inference-model/index.html">OnnxInferenceModel</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="82649564%2FFunctions%2F-896627412" anchor-label="pretrainedModel" id="82649564%2FFunctions%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="pretrained-model.html"><span>pretrained</span><wbr><span><span>Model</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="82649564%2FFunctions%2F-896627412"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><div class="symbol monospace">open override fun <a href="pretrained-model.html">pretrainedModel</a>(modelHub: <a href="../../../../../api/org.jetbrains.kotlinx.dl.api.inference.loaders/-model-hub/index.html">ModelHub</a>): <a href="../../../../org.jetbrains.kotlinx.dl.onnx.inference.posedetection/-multi-pose-detection-model/index.html">MultiPoseDetectionModel</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Properties</h2>
+              <div class="table" data-togglable="Properties"><a data-name="1053277320%2FProperties%2F-896627412" anchor-label="inputShape" id="1053277320%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="input-shape.html">inputShape</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1053277320%2FProperties%2F-896627412"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><a data-name="1053277320%2FProperties%2F-896627412" anchor-label="inputShape" id="1053277320%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a><div class="symbol monospace">open override val <a href="input-shape.html">inputShape</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long-array/index.html">LongArray</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1053277320%2FProperties%2F-896627412" anchor-label="inputShape" id="1053277320%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a><p class="paragraph">Shape of the input accepted by this model, without batch size.</p></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1781289205%2FProperties%2F-896627412" anchor-label="modelRelativePath" id="-1781289205%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../model-relative-path.html">modelRelativePath</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1781289205%2FProperties%2F-896627412"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><a data-name="-1781289205%2FProperties%2F-896627412" anchor-label="modelRelativePath" id="-1781289205%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a><div class="symbol monospace">open override val <a href="../model-relative-path.html">modelRelativePath</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1156405539%2FProperties%2F-896627412" anchor-label="preprocessor" id="-1156405539%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a>
+                <div class="table-row" data-filterable-current=":onnx:dokkaHtmlPartial/jvmMain" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-move-net-single-pose-thunder/index.html#-1156405539%2FProperties%2F-896627412">preprocessor</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1156405539%2FProperties%2F-896627412"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="platform-tags ">
+                        <div class="platform-tag jvm-like">jvm</div>
+                      </div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":onnx:dokkaHtmlPartial/jvmMain"><a data-name="-1156405539%2FProperties%2F-896627412" anchor-label="preprocessor" id="-1156405539%2FProperties%2F-896627412" data-filterable-set=":onnx:dokkaHtmlPartial/jvmMain"></a><div class="symbol monospace">open val <a href="../-move-net-single-pose-thunder/index.html#-1156405539%2FProperties%2F-896627412">preprocessor</a>: <a href="../../../../../api/org.jetbrains.kotlinx.dl.api.preprocessing/-operation/index.html">Operation</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float-array/index.html">FloatArray</a>, <a href="../../../../../api/org.jetbrains.kotlinx.dl.api.core.shape/-tensor-shape/index.html">TensorShape</a>&gt;, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a>&lt;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float-array/index.html">FloatArray</a>, <a href="../../../../../api/org.jetbrains.kotlinx.dl.api.core.shape/-tensor-shape/index.html">TensorShape</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+
