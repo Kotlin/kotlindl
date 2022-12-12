@@ -838,7 +838,7 @@ public object ONNXModels {
     }
 
     /** Face detection models */
-    public sealed class FaceDetection(override val inputShape: LongArray, modelName: String) :
+    public sealed class FaceDetection(modelName: String) :
         OnnxModelType<FaceDetectionModel> {
         override val modelRelativePath: String = "models/onnx/facealignment/$modelName"
         override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
@@ -858,7 +858,7 @@ public object ONNXModels {
          *
          * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
          */
-        public object UltraFace320 : FaceDetection(longArrayOf(3L, 240, 320), "ultraface_320")
+        public object UltraFace320 : FaceDetection("ultraface_320")
 
         /**
          * Ultra-lightweight face detection model.
@@ -870,7 +870,7 @@ public object ONNXModels {
          *
          * @see <a href="https://github.com/onnx/models/tree/main/vision/body_analysis/ultraface">Ultra-lightweight face detection model</a>
          */
-        public object UltraFace640 : FaceDetection(longArrayOf(3L, 480, 640), "ultraface_640")
+        public object UltraFace640 : FaceDetection("ultraface_640")
 
         public companion object {
             public val defaultPreprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> =
@@ -895,7 +895,6 @@ public object ONNXModels {
          */
         public object Fan2d106 :
             FaceAlignment<Fan2D106FaceAlignmentModel>("models/onnx/facealignment/fan_2d_106") {
-            override val inputShape: LongArray = longArrayOf(3L, 192L, 192L)
             override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
                 get() = Transpose(axes = intArrayOf(2, 0, 1))
 

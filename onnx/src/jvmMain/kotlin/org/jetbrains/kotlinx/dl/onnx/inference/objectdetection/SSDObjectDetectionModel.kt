@@ -23,7 +23,6 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 
-private const val INPUT_SIZE = 1200
 
 private val SSD_RESNET_METADATA = SSDLikeModelMetadata("bboxes", "labels", "scores", 1, 0)
 
@@ -52,8 +51,8 @@ public class SSDObjectDetectionModel(
     override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = INPUT_SIZE
-                outputWidth = INPUT_SIZE
+                outputHeight = inputDimensions[1].toInt()
+                outputWidth = inputDimensions[2].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
