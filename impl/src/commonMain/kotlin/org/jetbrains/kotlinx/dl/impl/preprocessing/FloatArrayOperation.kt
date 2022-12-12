@@ -5,20 +5,21 @@
 
 package org.jetbrains.kotlinx.dl.impl.preprocessing
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 
 /**
- * The aim of this class is to provide common functionality for all [Operation]s that can be applied to Pair<FloatArray, TensorShape>
+ * The aim of this class is to provide common functionality for all [Operation]s that can be applied to FloatData
  * and simplify the implementation of a new [Operation]s.
  */
-public abstract class FloatArrayOperation : Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
+public abstract class FloatArrayOperation : Operation<FloatData, FloatData> {
     /**
      * Actual implementation of the [Operation] that should be applied to the [data].
      */
     protected abstract fun applyImpl(data: FloatArray, shape: TensorShape): FloatArray
 
-    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
+    override fun apply(input: FloatData): FloatData {
         val (data, shape) = input
         return applyImpl(data, shape) to getOutputShape(shape)
     }

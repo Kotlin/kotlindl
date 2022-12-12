@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
@@ -190,7 +190,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+            preprocessing: Operation<BufferedImage, FloatData>
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
             val x = preprocessing.fileLoader().prepareX(xFiles)
@@ -206,7 +206,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
+            preprocessing: Operation<BufferedImage, FloatData> = ConvertToFloatArray()
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
             val x = preprocessing.fileLoader().prepareX(xFiles)

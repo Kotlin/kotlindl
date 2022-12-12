@@ -1,6 +1,7 @@
 package examples.onnx
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -26,7 +27,7 @@ class OnnxOutputsSupportTestSuite {
     @Test
     fun predictRawLgbmSequenceOutputTest() {
         assertDoesNotThrow {
-            model.predictRaw(features)
+            model.predictRaw(features to TensorShape(27))
         }
     }
 }

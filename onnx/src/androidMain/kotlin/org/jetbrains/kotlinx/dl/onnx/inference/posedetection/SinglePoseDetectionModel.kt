@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference.posedetection
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -37,7 +37,7 @@ public class SinglePoseDetectionModel(
     modelKindDescription: String? = null
 ) : SinglePoseDetectionModelBase<Bitmap>(modelKindDescription), InferenceModel by internalModel,
     CameraXCompatibleModel {
-    override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<Bitmap, FloatData>
         get() = pipeline<Bitmap>()
             .resize {
                 outputHeight = internalModel.inputDimensions[0].toInt()

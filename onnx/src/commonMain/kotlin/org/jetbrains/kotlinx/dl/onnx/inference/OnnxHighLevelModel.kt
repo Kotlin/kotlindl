@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.OrtSession
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.summary.ModelHubModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
@@ -28,7 +28,7 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
     /**
      * Preprocessing operation specific to this model.
      */
-    public val preprocessing: Operation<I, Pair<FloatArray, TensorShape>>
+    public val preprocessing: Operation<I, FloatData>
 
     /**
      * High-level description of the model.
@@ -47,7 +47,7 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
      */
     public fun predict(input: I): R {
         val preprocessedInput = preprocessing.apply(input)
-        return internalModel.predictRaw(preprocessedInput.first) { convert(it) }
+        return internalModel.predictRaw(preprocessedInput) { convert(it) }
     }
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {

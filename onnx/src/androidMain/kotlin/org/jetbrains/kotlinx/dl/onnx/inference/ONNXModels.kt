@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -63,7 +63,7 @@ public object ONNXModels {
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
         public object EfficientNet4Lite : CV("efficientnet_lite4", channelsFirst = false) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing(channelsLast = !channelsFirst)
         }
 
@@ -84,8 +84,8 @@ public object ONNXModels {
          *    Official EfficientNet4Lite model from ONNX Github.</a>
          */
         public object MobilenetV1 : CV("mobilenet_v1", channelsFirst = false) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
-                get() = pipeline<Pair<FloatArray, TensorShape>>()
+            override val preprocessor: Operation<FloatData, FloatData>
+                get() = pipeline<FloatData>()
                     .rescale { scalingCoefficient = 255f }
                     .normalize {
                         mean = floatArrayOf(0.5f, 0.5f, 0.5f)
@@ -248,7 +248,7 @@ public object ONNXModels {
     /** Face detection models */
     public sealed class FaceDetection(override val modelRelativePath: String) :
         OnnxModelType<FaceDetectionModel> {
-        override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+        override val preprocessor: Operation<FloatData, FloatData>
             get() = defaultPreprocessor
 
         override fun pretrainedModel(modelHub: ModelHub): FaceDetectionModel {
@@ -280,8 +280,8 @@ public object ONNXModels {
         public object UltraFace640 : FaceDetection("ultraface_640")
 
         public companion object {
-            public val defaultPreprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> =
-                pipeline<Pair<FloatArray, TensorShape>>()
+            public val defaultPreprocessor: Operation<FloatData, FloatData> =
+                pipeline<FloatData>()
                     .normalize {
                         mean = floatArrayOf(127f, 127f, 127f)
                         std = floatArrayOf(128f, 128f, 128f)

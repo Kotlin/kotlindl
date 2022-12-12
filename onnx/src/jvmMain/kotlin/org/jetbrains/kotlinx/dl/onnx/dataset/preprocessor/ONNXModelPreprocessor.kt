@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
@@ -18,9 +19,9 @@ import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFl
  * @property [outputIndex] Index of the output to be passed forward.
  */
 public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, public var outputIndex: Int = 0) :
-    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
-    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
-        val (prediction, rawShape) = onnxModel!!.predictRaw(input.first) { output ->
+    Operation<FloatData, FloatData> {
+    override fun apply(input: FloatData): FloatData {
+        val (prediction, rawShape) = onnxModel!!.predictRaw(input) { output ->
             return@predictRaw output.getFloatArrayWithShape(outputIndex)
         }
         return prediction to TensorShape(rawShape)
@@ -32,6 +33,6 @@ public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, pu
 }
 
 /** Image DSL Preprocessing extension.*/
-public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.onnx(block: ONNXModelPreprocessor.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, FloatData>.onnx(block: ONNXModelPreprocessor.() -> Unit): Operation<I, FloatData> {
     return PreprocessingPipeline(this, ONNXModelPreprocessor(null).apply(block))
 }

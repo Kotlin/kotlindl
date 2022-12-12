@@ -7,7 +7,11 @@ package org.jetbrains.kotlinx.dl.onnx.inference
 
 import ai.onnxruntime.*
 import ai.onnxruntime.OrtSession.SessionOptions
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.floats
+import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape.Companion.tail
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
@@ -37,23 +41,20 @@ public open class OnnxInferenceModel private constructor(
     /** Wraps an ONNX model and allows inference calls. */
     private lateinit var session: OrtSession
 
-    /** Data shape for prediction. */
-    private lateinit var inputShape: LongArray
+    /** Model input information */
+    private lateinit var inputInfo: Map<String, NodeInfo>
 
-    /** Data type for input tensor. */
-    public lateinit var inputDataType: OnnxJavaType
-        private set
-
-    /** Data shape for prediction. */
-    public lateinit var outputShape: LongArray
-        private set
-
-    /** Data type for output tensor. */
-    public lateinit var outputDataType: OnnxJavaType
-        private set
+    /** Model output information */
+    private lateinit var outputInfo: Map<String, NodeInfo>
 
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
+
+    /** Data shape of the first input tensor. Set explicitly when the model can accept variable shape input. */
+    private var inputShape: LongArray? = null
+
+    /** Data shape of the first output tensor. */
+    public val outputShape: LongArray get() = outputInfo.getShape(0)
 
     /** Model name. */
     public var name: String? = null
@@ -125,28 +126,9 @@ public open class OnnxInferenceModel private constructor(
         }
 
         session = modelSource.buildSession(env, buildSessionOptions(uniqueProviders))
-
         executionProvidersInUse = uniqueProviders
-
-        initInputOutputInfo()
-    }
-
-    private fun initInputOutputInfo() {
-        val inputTensorInfo = session.inputInfo.toList()[0].second.info as TensorInfo
-        if (!::inputShape.isInitialized) {
-            val inputDims = inputTensorInfo.shape.takeLast(3).toLongArray()
-            inputShape = TensorShape(1, *inputDims).dims()
-        }
-        inputDataType = inputTensorInfo.type
-
-        // TODO: known bug at the https://github.com/JetBrains/KotlinDL/issues/285
-        val outputTensorInfo = session.outputInfo.toList()[0].second.info as TensorInfo
-        if (!::outputShape.isInitialized) {
-            val outputDims = outputTensorInfo.shape.takeLast(3).toLongArray()
-            // TODO: is it obsolete? anyway we should add support of multiple outputs
-            outputShape = TensorShape(1, *outputDims).dims()
-        }
-        outputDataType = outputTensorInfo.type
+        inputInfo = session.inputInfo
+        outputInfo = session.outputInfo
     }
 
     private fun buildSessionOptions(uniqueProviders: List<ExecutionProvider>): SessionOptions {
@@ -199,23 +181,26 @@ public open class OnnxInferenceModel private constructor(
     }
 
     override val inputDimensions: LongArray
-        get() = TensorShape(inputShape).tail()
+        get() = TensorShape(inputShape ?: inputInfo.getShape(0)).tail()
 
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        val outputTensorName = predictionTensorName.ifEmpty { session.outputNames.first() }
-        require(outputTensorName in session.outputInfo) {
+        val outputTensorName = predictionTensorName.ifEmpty { outputInfo.getName(0) }
+        require(outputTensorName in outputInfo) {
             "There is no output with name '$outputTensorName'." +
-                    " The model only has following outputs - ${session.outputInfo.keys}"
+                    " The model only has following outputs - ${outputInfo.keys}"
         }
 
-        val outputInfo = session.outputInfo.getValue(outputTensorName).info
+        val outputInfo = outputInfo.getValue(outputTensorName).info
         throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
 
-        return predictRaw(inputData) { output -> output.getFloatArray(outputTensorName) }
+        val shape = (inputShape ?: inputInfo.getShape(0)).tail()
+        val floatData = FloatData(inputData, TensorShape(shape))
+
+        return predictRaw(floatData) { output -> output.getFloatArray(outputTensorName) }
     }
 
     /**
@@ -224,8 +209,10 @@ public open class OnnxInferenceModel private constructor(
      * @param [inputData] The single example with unknown vector of probabilities.
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
-    public fun predictSoftly(inputData: FloatArray): FloatArray {
-        return predictSoftly(inputData, session.outputNames.first())
+    public fun predictSoftly(inputData: FloatData): FloatArray {
+        return predictRaw(inputData) { output ->
+            output.getFloatArray(outputInfo.getName(0))
+        }
     }
 
     /**
@@ -234,21 +221,53 @@ public open class OnnxInferenceModel private constructor(
      * NOTE: This operation can be quite slow for high dimensional tensors,
      * use [predictRaw] with custom output processing for better performance.
      */
-    public fun predictRaw(inputData: FloatArray): Map<String, Any> {
+    public fun predictRaw(inputData: FloatData): Map<String, Any> {
         return predictRaw(inputData) { it.getValues() }
     }
 
     /**
      * Runs prediction on a given [inputData] and calls [extractResult] function to process output.
+     * For models with multiple inputs, [inputData] is passed as a first input.
      * @see OrtSessionResultConversions
      */
-    public fun <R> predictRaw(inputData: FloatArray, extractResult: (OrtSession.Result) -> R): R {
-        require(::inputShape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+    public fun <R> predictRaw(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
+        return predictRaw(mapOf(inputInfo.getName(0) to inputData), extractResult)
+    }
 
-        return env.createTensor(inputData, inputDataType, inputShape).use { inputTensor ->
-            session.run(mapOf(session.inputNames.first() to inputTensor)).use { output ->
-                extractResult(output)
+    /**
+     * Runs prediction on a given [inputs] and calls [extractResult] function to process output.
+     * @see OrtSessionResultConversions
+     */
+    public fun <R> predictRaw(inputs: Map<String, FloatData>, extractResult: (OrtSession.Result) -> R): R {
+        val tensors = inputs.toTensors()
+        try {
+            return session.run(tensors).use { output -> extractResult(output) }
+        } finally {
+            tensors.values.forEach(OnnxTensor::close)
+        }
+    }
+
+    private fun Map<String, FloatData>.toTensors(): Map<String, OnnxTensor> {
+        // do the checks separately to avoid exceptions during tensor creation
+        val triples = mapValues { (name, floatData) ->
+            require(name in inputInfo) {
+                "There is no input with name '$name'." +
+                        " The model only has following inputs: ${inputInfo.keys}"
             }
+
+            val modelShape = inputInfo.getShape(name)
+            val dataShape = longArrayOf(1L, *floatData.shape.dims())
+            require(modelShape.matches(dataShape)) {
+                "Data shape for input $name does not match the model input shape. Data shape: $dataShape, model shape: $modelShape"
+            }
+            require(dataShape.all { it >= 0 }) { "Data shape is not defined: $dataShape" }
+
+            Triple(floatData.floats, dataShape, inputInfo.getType(name))
+        }
+
+        return triples.mapValues { (_, triple) ->
+            val (data, shape, type) = triple
+            env.createTensor(data, type, shape)
         }
     }
 
@@ -259,7 +278,7 @@ public open class OnnxInferenceModel private constructor(
     ): OnnxInferenceModel {
         val model = OnnxInferenceModel(modelSource)
         model.name = copiedModelName
-        if (::inputShape.isInitialized) {
+        if (inputShape != null) {
             model.reshape(*inputDimensions)
         }
         if (::session.isInitialized) {
@@ -277,14 +296,8 @@ public open class OnnxInferenceModel private constructor(
     }
 
     override fun summary(): ModelSummary {
-        val inputSummaries = session.inputInfo
-            .mapValues { (_, node) -> node.info.summary() }
-            .toList()
-
-        val outputSummaries = session.outputInfo
-            .mapValues { (_, node) -> node.info.summary() }
-            .toList()
-
+        val inputSummaries = inputInfo.mapValues { (_, node) -> node.info.summary() }.toList()
+        val outputSummaries = outputInfo.mapValues { (_, node) -> node.info.summary() }.toList()
         return OnnxModelSummary(inputSummaries, outputSummaries)
     }
 
@@ -293,6 +306,43 @@ public open class OnnxInferenceModel private constructor(
     }
 
     public companion object {
+        private fun Map<String, NodeInfo>.getName(index: Int): String {
+            return asIterable().elementAt(index).key
+        }
+
+        private fun Map<String, NodeInfo>.getShape(index: Int): LongArray {
+            val (name, nodeInfo) = asIterable().elementAt(index)
+            return nodeInfo.getShape(name)
+        }
+
+        private fun Map<String, NodeInfo>.getShape(name: String): LongArray {
+            return getValue(name).getShape(name)
+        }
+
+        private fun NodeInfo.getShape(name: String): LongArray {
+            throwIfOutputNotSupported(info, name, "getShape")
+            val shape = (info as TensorInfo).shape
+            if (shape[0] >= 0) return shape
+            return (listOf(1L) + shape.drop(1)).toLongArray() // use batch size 1
+        }
+
+        private fun Map<String, NodeInfo>.getType(name: String): OnnxJavaType {
+            val nodeInfo = getValue(name)
+            throwIfOutputNotSupported(nodeInfo.info, name, "getType")
+            return (nodeInfo.info as TensorInfo).type
+        }
+
+        private fun LongArray.matches(other: LongArray): Boolean {
+            if (size != other.size) return false
+            for (i in indices) {
+                val value = get(i)
+                val otherValue = other[i]
+                if (value < 0 || otherValue < 0) continue
+                if (value != otherValue) return false
+            }
+            return true
+        }
+
         private fun OrtEnvironment.createTensor(
             data: FloatArray,
             dataType: OnnxJavaType,

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset.preprocessing
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
@@ -17,9 +17,9 @@ import java.io.InputStream
  * A [DataLoader] which loads images from files and uses provided [Operation] to process them.
  */
 private class PreprocessingFileDataLoader(
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+    private val preprocessing: Operation<BufferedImage, FloatData>
 ) : DataLoader<File> {
-    override fun load(dataSource: File): Pair<FloatArray, TensorShape> {
+    override fun load(dataSource: File): FloatData {
         require(dataSource.exists()) { "File '$dataSource' does not exist." }
         require(dataSource.isFile) {
             if (dataSource.isDirectory) "File '$dataSource' is a directory."
@@ -33,9 +33,9 @@ private class PreprocessingFileDataLoader(
  * A [DataLoader] which loads images from input streams and uses provided [Operation] to process them.
  */
 private class PreprocessingInputStreamDataLoader(
-    private val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+    private val preprocessing: Operation<BufferedImage, FloatData>
 ) : DataLoader<InputStream> {
-    override fun load(dataSource: InputStream): Pair<FloatArray, TensorShape> {
+    override fun load(dataSource: InputStream): FloatData {
         return preprocessing.apply(ImageConverter.toBufferedImage(dataSource))
     }
 }
@@ -43,11 +43,11 @@ private class PreprocessingInputStreamDataLoader(
 /**
  * Returns a [DataLoader] instance which loads images from files and uses this [Operation] to process them.
  */
-public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.fileLoader(): DataLoader<File> =
+public fun Operation<BufferedImage, FloatData>.fileLoader(): DataLoader<File> =
     PreprocessingFileDataLoader(this)
 
 /**
  * Returns a [DataLoader] instance which loads images from input streams and uses this [Operation] to process them.
  */
-public fun Operation<BufferedImage, Pair<FloatArray, TensorShape>>.inputStreamLoader(): DataLoader<InputStream> =
+public fun Operation<BufferedImage, FloatData>.inputStreamLoader(): DataLoader<InputStream> =
     PreprocessingInputStreamDataLoader(this)

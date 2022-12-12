@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.summary.EmptySummary
@@ -26,7 +26,7 @@ public abstract class ImageRecognitionModelBase<I>(
     /**
      * Preprocessing operation specific to this model.
      */
-    protected abstract val preprocessing: Operation<I, Pair<FloatArray, TensorShape>>
+    protected abstract val preprocessing: Operation<I, FloatData>
 
     /**
      * Class labels from the dataset used for training.

@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.facealignment.Landmark
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -33,7 +33,7 @@ public class Fan2D106FaceAlignmentModel(
     override val outputName: String = "fc1"
     override var targetRotation: Int = 0
 
-    override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>> = pipeline<Bitmap>()
+    override val preprocessing: Operation<Bitmap, FloatData> = pipeline<Bitmap>()
         .resize {
             outputWidth = internalModel.inputDimensions[2].toInt()
             outputHeight = internalModel.inputDimensions[1].toInt()

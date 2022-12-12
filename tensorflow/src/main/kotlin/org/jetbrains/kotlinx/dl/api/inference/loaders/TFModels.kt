@@ -5,14 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.loaders
 
-import org.jetbrains.kotlinx.dl.api.core.Functional
-import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
-import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.jetbrains.kotlinx.dl.api.core.freeze
+import org.jetbrains.kotlinx.dl.api.core.*
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
@@ -88,7 +84,7 @@ public object TFModels {
                 noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
 
             override fun loadModelConfiguration(jsonFile: File): Sequential {
@@ -120,7 +116,7 @@ public object TFModels {
                 noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
 
             override fun loadModelConfiguration(jsonFile: File): Sequential {
@@ -145,7 +141,7 @@ public object TFModels {
          */
         public class ResNet18(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet18", inputShape = inputShape) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
         }
 
@@ -166,7 +162,7 @@ public object TFModels {
          */
         public class ResNet34(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet34", inputShape = inputShape) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
         }
 
@@ -196,7 +192,7 @@ public object TFModels {
                 noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
         }
 
@@ -226,7 +222,7 @@ public object TFModels {
                 noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
         }
 
@@ -256,7 +252,7 @@ public object TFModels {
                 noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.CAFFE.preprocessing()
         }
 
@@ -281,7 +277,7 @@ public object TFModels {
          */
         public class ResNet50v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet50v2", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -306,7 +302,7 @@ public object TFModels {
          */
         public class ResNet101v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet101v2", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -331,7 +327,7 @@ public object TFModels {
          */
         public class ResNet152v2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/resnet152v2", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -354,7 +350,7 @@ public object TFModels {
          */
         public class MobileNet(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/mobilenet", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -377,7 +373,7 @@ public object TFModels {
          */
         public class MobileNetV2(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/mobilenetv2", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -400,7 +396,7 @@ public object TFModels {
          */
         public class Inception(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/inception", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -423,7 +419,7 @@ public object TFModels {
          */
         public class Xception(noTop: Boolean = false, inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/xception", inputShape = inputShape, noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -446,7 +442,7 @@ public object TFModels {
          */
         public class DenseNet121(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = false) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
 
@@ -469,7 +465,7 @@ public object TFModels {
          */
         public class DenseNet169(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = false) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
 
@@ -492,7 +488,7 @@ public object TFModels {
          */
         public class DenseNet201(inputShape: IntArray? = null) :
             CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = false) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
 
@@ -515,7 +511,7 @@ public object TFModels {
          */
         public class NASNetMobile(noTop: Boolean = false) :
             CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3), noTop = noTop) {
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
 
@@ -542,7 +538,7 @@ public object TFModels {
                 require(inputShape!![0] >= 331 && inputShape[1] >= 331) { "Width and height should be no smaller than 331 for the model ${this.javaClass.kotlin.simpleName}." }
             }
 
-            override val preprocessor: Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>>
+            override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
     }

@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 
 import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -30,7 +30,7 @@ public class FaceDetectionModel(
     modelKindDescription: String? = null
 ) : FaceDetectionModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
     override var targetRotation: Int = 0
-    override val preprocessing: Operation<Bitmap, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<Bitmap, FloatData>
         get() = pipeline<Bitmap>()
             .rotate { degrees = targetRotation.toFloat() }
             .resize {

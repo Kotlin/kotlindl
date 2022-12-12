@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference.facealignment
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -28,7 +28,7 @@ public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
 ) : FaceDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
-    override val preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+    override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
                 outputWidth = internalModel.inputDimensions[2].toInt()

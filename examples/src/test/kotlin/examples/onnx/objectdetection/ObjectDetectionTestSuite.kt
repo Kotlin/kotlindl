@@ -136,7 +136,7 @@ fun efficientDetInference(modelType: ONNXModels.ObjectDetection<EfficientDetObje
             .fileLoader()
 
         for (i in 1..6) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/detection/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/detection/image$i.jpg"))
 
             val yhat = it.predictRaw(inputData)
             assertTrue { yhat.containsKey("detections:0") }

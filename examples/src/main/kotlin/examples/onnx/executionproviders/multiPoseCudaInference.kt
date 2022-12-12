@@ -6,6 +6,7 @@
 package examples.onnx.executionproviders
 
 import examples.transferlearning.getFileFromResource
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.preprocessing.call
@@ -44,7 +45,7 @@ fun multiPoseCudaInference() {
     model.close()
 }
 
-fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLighting): FloatArray {
+fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLighting): FloatData {
     val imageFile = getFileFromResource("datasets/poses/multi/2.jpg")
     val fileDataLoader = pipeline<BufferedImage>()
         .resize {
@@ -56,10 +57,10 @@ fun prepareInputData(modelType: ONNXModels.PoseDetection.MoveNetMultiPoseLightin
         .call(modelType.preprocessor)
         .fileLoader()
 
-    return fileDataLoader.load(imageFile).first
+    return fileDataLoader.load(imageFile)
 }
 
-fun cpuInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10): Long {
+fun cpuInference(model: OnnxInferenceModel, inputData: FloatData, n: Int = 10): Long {
     val totalPredictionTime = model.run {
         measureTimeMillis {
             repeat(n) { predictRaw(inputData) }
@@ -69,7 +70,7 @@ fun cpuInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10):
     return totalPredictionTime / n
 }
 
-fun cudaInference(model: OnnxInferenceModel, inputData: FloatArray, n: Int = 10): Long {
+fun cudaInference(model: OnnxInferenceModel, inputData: FloatData, n: Int = 10): Long {
     /**
      * First inference on GPU takes way longer than average due to model serialization
      * and GPU memory buffers initialization.

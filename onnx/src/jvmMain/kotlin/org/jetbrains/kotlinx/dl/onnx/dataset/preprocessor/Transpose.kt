@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
@@ -20,8 +21,8 @@ import org.jetbrains.kotlinx.multik.ndarray.operations.toList
  * @property [axes] Array of ints, default value is related to the typical transpose task for H, W, C to C, W, H tensor format conversion.
  */
 public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) :
-    Operation<Pair<FloatArray, TensorShape>, Pair<FloatArray, TensorShape>> {
-    override fun apply(input: Pair<FloatArray, TensorShape>): Pair<FloatArray, TensorShape> {
+    Operation<FloatData, FloatData> {
+    override fun apply(input: FloatData): FloatData {
         val (data, inputShape) = input
 
         require(inputShape.rank() == axes.size) { "Transpose operation expected input with ${axes.size} dimensions, but got input with ${inputShape.rank()} dimensions" }
@@ -46,6 +47,6 @@ public class Transpose(public var axes: IntArray = intArrayOf(2, 0, 1)) :
 /**
  * The DSL extension function for [Transpose] operation.
  */
-public fun <I> Operation<I, Pair<FloatArray, TensorShape>>.transpose(sharpBlock: Transpose.() -> Unit): Operation<I, Pair<FloatArray, TensorShape>> {
+public fun <I> Operation<I, FloatData>.transpose(sharpBlock: Transpose.() -> Unit): Operation<I, FloatData> {
     return PreprocessingPipeline(this, Transpose().apply(sharpBlock))
 }
