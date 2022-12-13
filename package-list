@@ -9,7 +9,219 @@ $dokka.location:/LeNetClassic/SEED/#/PointingToDeclaration/examples/[root]/-le-
 $dokka.location:/LeNetClassic/TEST_BATCH_SIZE/#/PointingToDeclaration/examples/[root]/-le-net-classic/-t-e-s-t_-b-a-t-c-h_-s-i-z-e.html
 $dokka.location:/LeNetClassic/TRAINING_BATCH_SIZE/#/PointingToDeclaration/examples/[root]/-le-net-classic/-t-r-a-i-n-i-n-g_-b-a-t-c-h_-s-i-z-e.html
 $dokka.location:/LeNetClassic/main/#java.lang.String[]/PointingToDeclaration/examples/[root]/-le-net-classic/main.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-face-detection-model/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel/FaceDetectionModel/#org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel#kotlin.String?/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-face-detection-model/-face-detection-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel/copy/#kotlin.String?#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-face-detection-model/copy.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel/internalModel/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-face-detection-model/internal-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel/preprocessing/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-face-detection-model/preprocessing.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/FaceDetectionModel/targetRotation/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[android]-face-detection-model/target-rotation.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/Fan2D106FaceAlignmentModel/#kotlin.String/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/-fan2-d106-face-alignment-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/Fan2D106FaceAlignmentModel/#org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel#kotlin.String?/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/-fan2-d106-face-alignment-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/copy/#kotlin.String?#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/copy.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/detectLandmarks/#java.io.File/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/detect-landmarks.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/internalModel/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/internal-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/preprocessing/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[jvm]-fan2-d106-face-alignment-model/preprocessing.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.facealignment/Fan2D106FaceAlignmentModel/targetRotation/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.facealignment/[android]-fan2-d106-face-alignment-model/target-rotation.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/SinglePoseDetectionModel/#kotlin.ByteArray/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[android]-single-pose-detection-model/-single-pose-detection-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/SinglePoseDetectionModel/#kotlin.String/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/-single-pose-detection-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/SinglePoseDetectionModel/#org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel#kotlin.String?/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/-single-pose-detection-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/close/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[android]-single-pose-detection-model/close.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/copy/#kotlin.String?#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/copy.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/detectPose/#java.io.File/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/detect-pose.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/internalModel/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/internal-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/preprocessing/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[jvm]-single-pose-detection-model/preprocessing.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference.posedetection/SinglePoseDetectionModel/targetRotation/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference.posedetection/[android]-single-pose-detection-model/target-rotation.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-model-hub/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/ONNXModelHub/#android.content.Context/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-model-hub/-o-n-n-x-model-hub.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/ONNXModelHub/#java.io.File/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-model-hub/-o-n-n-x-model-hub.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/cacheDirectory/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-model-hub/cache-directory.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/loadModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType[TypeParam(bounds=[org.jetbrains.kotlinx.dl.api.inference.InferenceModel]),TypeParam(bounds=[org.jetbrains.kotlinx.dl.api.inference.InferenceModel])]#org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-model-hub/load-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/loadModel/#org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType[*]#kotlin.Array[org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider]#org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-model-hub/load-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModelHub/loadModel/#org.jetbrains.kotlinx.dl.onnx.inference.OnnxModelType[*]#kotlin.Array[org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider]/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-model-hub/load-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNet4Lite///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net4-lite/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNet4Lite/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net4-lite/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB0///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b0/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB0/EfficientNetB0/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b0/-efficient-net-b0.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB1///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b1/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB1/EfficientNetB1/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b1/-efficient-net-b1.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB2/EfficientNetB2/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b2/-efficient-net-b2.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB3///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b3/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB3/EfficientNetB3/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b3/-efficient-net-b3.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB4///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b4/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB4/EfficientNetB4/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b4/-efficient-net-b4.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB5///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b5/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB5/EfficientNetB5/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b5/-efficient-net-b5.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB6///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b6/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB6/EfficientNetB6/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b6/-efficient-net-b6.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB7///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b7/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.EfficientNetB7/EfficientNetB7/#kotlin.Boolean/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-efficient-net-b7/-efficient-net-b7.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.Lenet///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-lenet/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.Lenet/Lenet/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-lenet/-lenet.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.MobilenetV1///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-c-v/-mobilenet-v1/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.MobilenetV1/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-c-v/-mobilenet-v1/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.MobilenetV1/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-c-v/-mobilenet-v1/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet101///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net101/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet101/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net101/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet101v2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net101v2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet101v2/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net101v2/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet152///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net152/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet152/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net152/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet152v2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net152v2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet152v2/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net152v2/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet18///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net18/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet18/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net18/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet18v2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net18v2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet18v2/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net18v2/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet34///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net34/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet34/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net34/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet34v2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net34v2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet34v2/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net34v2/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50custom///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50custom/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50custom/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50custom/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50noTopCustom///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50no-top-custom/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50noTopCustom/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50no-top-custom/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50v2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50v2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV.ResNet50v2/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/-res-net50v2/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.CV/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-c-v/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment.Fan2d106///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-alignment/-fan2d106/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment.Fan2d106/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-face-alignment/-fan2d106/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment.Fan2d106/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-alignment/-fan2d106/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment.Fan2d106/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-alignment/-fan2d106/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-alignment/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceAlignment/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-alignment/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection.Companion///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/-companion/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection.Companion/defaultPreprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/-companion/default-preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection.UltraFace320///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/-ultra-face320/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection.UltraFace640///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/-ultra-face640/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.FaceDetection/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-face-detection/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD0///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d0/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD0/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d0/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD0/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d0/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD1///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d1/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD1/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d1/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD1/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d1/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD2///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d2/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD2/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d2/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD2/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d2/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD3///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d3/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD3/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d3/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD3/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d3/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD4///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d4/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD4/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d4/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD4/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d4/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD5///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d5/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD5/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d5/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD5/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d5/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD6///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d6/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD6/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d6/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetD6/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-efficient-det-d6/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetLite0///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-object-detection/-efficient-det-lite0/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.EfficientDetLite0/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[android]-o-n-n-x-models/-object-detection/-efficient-det-lite0/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSD///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSD/preprocessor/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d/preprocessor.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSD/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSDMobileNetV1///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d-mobile-net-v1/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSDMobileNetV1/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d-mobile-net-v1/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection.SSDMobileNetV1/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/-s-s-d-mobile-net-v1/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.ObjectDetection/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-object-detection/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetMultiPoseLighting///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-multi-pose-lighting/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetMultiPoseLighting/inputShape/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-multi-pose-lighting/input-shape.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetMultiPoseLighting/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-multi-pose-lighting/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetSinglePoseLighting///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-single-pose-lighting/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetSinglePoseLighting/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-single-pose-lighting/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetSinglePoseThunder///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-single-pose-thunder/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection.MoveNetSinglePoseThunder/pretrainedModel/#org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/-move-net-single-pose-thunder/pretrained-model.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/index.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels.PoseDetection/modelRelativePath/#/PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/-pose-detection/model-relative-path.html
+$dokka.location:org.jetbrains.kotlinx.dl.onnx.inference/ONNXModels///PointingToDeclaration/onnx/org.jetbrains.kotlinx.dl.onnx.inference/[jvm]-o-n-n-x-models/index.html
 module:api
+org.jetbrains.kotlinx.dl.api.core.metric
+org.jetbrains.kotlinx.dl.api.core.shape
+org.jetbrains.kotlinx.dl.api.inference
+org.jetbrains.kotlinx.dl.api.inference.facealignment
+org.jetbrains.kotlinx.dl.api.inference.loaders
+org.jetbrains.kotlinx.dl.api.inference.objectdetection
+org.jetbrains.kotlinx.dl.api.inference.posedetection
+org.jetbrains.kotlinx.dl.api.preprocessing
+org.jetbrains.kotlinx.dl.api.summary
+module:dataset
+org.jetbrains.kotlinx.dl.dataset
+org.jetbrains.kotlinx.dl.dataset.audio.wav
+org.jetbrains.kotlinx.dl.dataset.embedded
+org.jetbrains.kotlinx.dl.dataset.generator
+org.jetbrains.kotlinx.dl.dataset.preprocessing
+module:examples
+examples.cnn.cifar10
+examples.cnn.dogscats
+examples.cnn.fashionmnist
+examples.cnn.fsdd
+examples.cnn.mnist
+examples.cnn.mnist.advanced
+examples.custom
+examples.dataset
+examples.experimental.batchnorm
+examples.inference
+examples.inference.cifar10
+examples.inference.fashionmnist
+examples.inference.mnist
+examples.inference.optimizers
+examples.inference.savedmodel
+examples.inference.saveload
+examples.ml
+examples.onnx.cv
+examples.onnx.cv.efficicentnet
+examples.onnx.cv.efficicentnet.lightAPI
+examples.onnx.cv.efficicentnet.notop
+examples.onnx.cv.lenet
+examples.onnx.cv.resnet
+examples.onnx.cv.resnet.notop
+examples.onnx.executionproviders
+examples.onnx.faces
+examples.onnx.objectdetection.efficientdet
+examples.onnx.objectdetection.ssd
+examples.onnx.objectdetection.ssdmobile
+examples.onnx.posedetection.multipose
+examples.onnx.posedetection.singlepose
+examples.transferlearning
+examples.transferlearning.lenet
+examples.transferlearning.modelhub.densenet
+examples.transferlearning.modelhub.inception
+examples.transferlearning.modelhub.mobilenet
+examples.transferlearning.modelhub.nasnet
+examples.transferlearning.modelhub.resnet
+examples.transferlearning.modelhub.vgg16
+examples.transferlearning.modelhub.vgg19
+examples.transferlearning.toyresnet
+examples.visualization
+module:impl
+org.jetbrains.kotlinx.dl.impl.dataset
+org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
+org.jetbrains.kotlinx.dl.impl.preprocessing
+org.jetbrains.kotlinx.dl.impl.preprocessing.bitmap
+org.jetbrains.kotlinx.dl.impl.preprocessing.camerax
+org.jetbrains.kotlinx.dl.impl.preprocessing.image
+org.jetbrains.kotlinx.dl.impl.summary
+org.jetbrains.kotlinx.dl.impl.util
+module:onnx
+org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor
+org.jetbrains.kotlinx.dl.onnx.inference
+org.jetbrains.kotlinx.dl.onnx.inference.classification
+org.jetbrains.kotlinx.dl.onnx.inference.executionproviders
+org.jetbrains.kotlinx.dl.onnx.inference.facealignment
+org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
+org.jetbrains.kotlinx.dl.onnx.inference.posedetection
+module:tensorflow
 org.jetbrains.kotlinx.dl.api.core
 org.jetbrains.kotlinx.dl.api.core.activation
 org.jetbrains.kotlinx.dl.api.core.callback
@@ -36,72 +248,10 @@ org.jetbrains.kotlinx.dl.api.core.summary
 org.jetbrains.kotlinx.dl.api.core.util
 org.jetbrains.kotlinx.dl.api.extension
 org.jetbrains.kotlinx.dl.api.inference
-org.jetbrains.kotlinx.dl.api.inference.facealignment
-org.jetbrains.kotlinx.dl.api.inference.imagerecognition
 org.jetbrains.kotlinx.dl.api.inference.keras
-org.jetbrains.kotlinx.dl.api.inference.keras.loaders
-org.jetbrains.kotlinx.dl.api.inference.objectdetection
-org.jetbrains.kotlinx.dl.api.inference.posedetection
-org.jetbrains.kotlinx.dl.api.inference.savedmodel
-org.jetbrains.kotlinx.dl.dataset
-org.jetbrains.kotlinx.dl.dataset.handler
-org.jetbrains.kotlinx.dl.dataset.preprocessor
-module:dataset
-org.jetbrains.kotlinx.dl.dataset
-org.jetbrains.kotlinx.dl.dataset.audio.wav
-org.jetbrains.kotlinx.dl.dataset.image
-org.jetbrains.kotlinx.dl.dataset.preprocessor
-org.jetbrains.kotlinx.dl.dataset.preprocessor.generator
-org.jetbrains.kotlinx.dl.dataset.preprocessor.image
-module:examples
-examples.cnn.cifar10
-examples.cnn.dogscats
-examples.cnn.fashionmnist
-examples.cnn.fsdd
-examples.cnn.mnist
-examples.cnn.mnist.advanced
-examples.custom
-examples.dataset
-examples.experimental.batchnorm
-examples.inference
-examples.inference.cifar10
-examples.inference.fashionmnist
-examples.inference.mnist
-examples.inference.optimizers
-examples.inference.savedmodel
-examples.inference.saveload
-examples.ml
-examples.onnx.cv
-examples.onnx.cv.efficicentnet
-examples.onnx.cv.efficicentnet.lightAPI
-examples.onnx.cv.efficicentnet.notop
-examples.onnx.cv.lenet
-examples.onnx.cv.resnet
-examples.onnx.cv.resnet.notop
-examples.onnx.faces
-examples.onnx.objectdetection.efficientdet
-examples.onnx.objectdetection.ssd
-examples.onnx.objectdetection.ssdmobile
-examples.onnx.posedetection.multipose
-examples.onnx.posedetection.singlepose
-examples.transferlearning
-examples.transferlearning.lenet
-examples.transferlearning.modelhub.densenet
-examples.transferlearning.modelhub.inception
-examples.transferlearning.modelhub.mobilenet
-examples.transferlearning.modelhub.nasnet
-examples.transferlearning.modelhub.resnet
-examples.transferlearning.modelhub.vgg16
-examples.transferlearning.modelhub.vgg19
-examples.transferlearning.toyresnet
-examples.visualization
-module:onnx
 org.jetbrains.kotlinx.dl.api.inference.loaders
-org.jetbrains.kotlinx.dl.api.inference.onnx
-org.jetbrains.kotlinx.dl.api.inference.onnx.facealignment
-org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection
-org.jetbrains.kotlinx.dl.api.inference.onnx.posedetection
-org.jetbrains.kotlinx.dl.dataset.preprocessor
+org.jetbrains.kotlinx.dl.api.inference.savedmodel
 module:visualization
+org.jetbrains.kotlinx.dl.visualization
 org.jetbrains.kotlinx.dl.visualization.letsplot
 org.jetbrains.kotlinx.dl.visualization.swing

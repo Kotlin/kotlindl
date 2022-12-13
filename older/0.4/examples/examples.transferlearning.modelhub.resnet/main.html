@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>main</title>
+</head><body><link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script><script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script><link href="../../styles/style.css" rel="Stylesheet"><link href="../../styles/logo-styles.css" rel="Stylesheet"><link href="../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../scripts/clipboard.js" async></script><script type="text/javascript" src="../../scripts/navigation-loader.js" async></script><script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script><script type="text/javascript" src="../../scripts/main.js" async></script>
+  
+    <div id="container">
+      <div id="leftColumn"><a href="../../index.html">
+            <div id="logo"></div>
+          </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <script type="text/javascript" src="../../scripts/main.js"></script><div id="leftToggler"><span class="icon-toggler"></span></div>
+
+        <div class="main-content" id="content" pageids="examples::examples.transferlearning.modelhub.resnet//main/#/PointingToDeclaration//-1406603681">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../index.html">examples</a>/<a href="index.html">examples.transferlearning.modelhub.resnet</a>/<a href="main.html">main</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span><span>main</span></span></h1>
+          </div>
+<div class="divergent-group" data-filterable-current=":examples:dokkaHtmlPartial/main" data-filterable-set=":examples:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":examples:dokkaHtmlPartial/main"><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+<div class="divergent-group" data-filterable-current=":examples:dokkaHtmlPartial/main" data-filterable-set=":examples:dokkaHtmlPartial/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":examples:dokkaHtmlPartial/main"><div class="symbol monospace">fun <a href="main.html">main</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">This examples demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:</p><ul><li><p class="paragraph">Model configuration, model weights and labels are obtained from <a href="../../api/org.jetbrains.kotlinx.dl.api.inference.keras.loaders/-t-f-model-hub/index.html">TFModelHub</a>.</p></li><li><p class="paragraph">Weights are loaded from .h5 file, configuration is loaded from .json file.</p></li><li><p class="paragraph">Model predicts on a few images located in resources.</p></li><li><p class="paragraph">Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.</p></li><li><p class="paragraph">Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.</p></li><li><p class="paragraph">It saves all the data to the project root directory.</p></li><li><p class="paragraph">The first <a href="../../api/org.jetbrains.kotlinx.dl.api.inference/-tensor-flow-inference-model/index.html">TensorFlowInferenceModel</a> is created via graph and weights loading.</p></li><li><p class="paragraph">Model again predicts on a few images located in resources.</p></li><li><p class="paragraph">The second <a href="../../api/org.jetbrains.kotlinx.dl.api.core/-functional/index.html">Functional</a> model is created via JSON configuration and weights loading.</p></li><li><p class="paragraph">Model again predicts on a few images located in resources.</p></li></ul></div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  
+</body></html>
+
+
