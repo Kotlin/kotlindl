@@ -17,13 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
-import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
@@ -50,23 +47,6 @@ fun resnet50additionalTrainingNoTopWithHelper() {
     val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     val noTopModel = modelHub.loadModel(modelType)
 
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = IMAGE_SIZE
-            outputWidth = IMAGE_SIZE
-            interpolation = InterpolationType.BILINEAR
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .call(TFModels.CV.ResNet50().preprocessor)
-
-    val dataset = OnFlyImageDataset.create(
-        File(dogsCatsSmallDatasetPath()),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
-
     val hdfFile = modelHub.loadWeights(modelType)
 
     val topModel = Sequential.of(
@@ -91,6 +71,13 @@ fun resnet50additionalTrainingNoTopWithHelper() {
     )
 
     val model = Functional.of(pretrainedModel = noTopModel, topModel = topModel)
+
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsSmallDatasetPath()),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(model)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     model.use {
         it.compile(

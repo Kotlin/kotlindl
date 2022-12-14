@@ -6,20 +6,15 @@
 package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.onnx.inference.inferAndCloseUsing
-import java.awt.image.BufferedImage
 import java.io.File
 
 fun runImageRecognitionPrediction(
@@ -34,11 +29,7 @@ fun runImageRecognitionPrediction(
     val inference: (OnnxInferenceModel) -> List<Pair<String, Float>> = {
         println(it)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+        val fileDataLoader = modelType.createPreprocessing(model).fileLoader()
 
         val results = mutableListOf<Pair<String, Float>>()
         for (i in 1..8) {

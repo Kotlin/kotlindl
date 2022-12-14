@@ -13,15 +13,10 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
-import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -58,11 +53,7 @@ fun vgg19prediction() {
 
         it.loadWeights(hdfFile)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+        val fileDataLoader = modelType.createPreprocessing(it).fileLoader()
 
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first

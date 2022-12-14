@@ -30,72 +30,72 @@ class OnnxEfficientNetTestSuite {
 
     @Test
     fun efficientNetB1PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB1(), resizeTo = Pair(240, 240))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB1())
     }
 
     @Test
     fun efficientNetB1AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB1(noTop = true), resizeTo = Pair(240, 240))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB1(noTop = true))
     }
 
     @Test
     fun efficientNetB2PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB2(), resizeTo = Pair(260, 260))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB2())
     }
 
     @Test
     fun efficientNetB2AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB2(noTop = true), resizeTo = Pair(260, 260))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB2(noTop = true))
     }
 
     @Test
     fun efficientNetB3PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB3(), resizeTo = Pair(300, 300))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB3())
     }
 
     @Test
     fun efficientNetB3AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB3(noTop = true), resizeTo = Pair(300, 300))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB3(noTop = true))
     }
 
     @Test
     fun efficientNetB4PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB4(), resizeTo = Pair(380, 380))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB4())
     }
 
     @Test
     fun efficientNetB4AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB4(noTop = true), resizeTo = Pair(380, 380))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB4(noTop = true))
     }
 
     @Test
     fun efficientNetB5PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB5(), resizeTo = Pair(456, 456))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB5())
     }
 
     @Test
     fun efficientNetB5AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB5(noTop = true), resizeTo = Pair(456, 456))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB5(noTop = true))
     }
 
     @Test
     fun efficientNetB6PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB6(), resizeTo = Pair(528, 528))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB6())
     }
 
     @Test
     fun efficientNetB6AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB6(noTop = true), resizeTo = Pair(528, 528))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB6(noTop = true))
     }
 
     @Test
     fun efficientNetB7PredictionTest() {
-        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB7(), resizeTo = Pair(600, 600))
+        runONNXImageRecognitionPrediction(ONNXModels.CV.EfficientNetB7())
     }
 
     @Test
     fun efficientNetB7AdditionalTrainingTest() {
-        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB7(noTop = true), resizeTo = Pair(600, 600))
+        runONNXAdditionalTraining(ONNXModels.CV.EfficientNetB7(noTop = true))
     }
 
     @Test

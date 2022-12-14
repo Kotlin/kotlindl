@@ -16,20 +16,16 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
-import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 8
 private const val TEST_BATCH_SIZE = 16
 private const val NUM_CLASSES = 2
-private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
@@ -47,25 +43,6 @@ fun resnet50additionalTrainingWithHelper() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
-
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
-            interpolation = InterpolationType.BILINEAR
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .call(TFModels.CV.ResNet50().preprocessor)
-
-    val dataset = OnFlyImageDataset.create(
-        File(dogsCatsImages),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
 
@@ -90,6 +67,13 @@ fun resnet50additionalTrainingWithHelper() {
     )
 
     val model2 = Functional.of(pretrainedModel = pretrainedModel, topModel = topModel)
+
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsSmallDatasetPath()),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(model2)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     model2.use {
         it.compile(

@@ -31,22 +31,7 @@ public class ImageRecognitionModel(
     override val classLabels: Map<Int, String> = Imagenet.V1k.labels()
 
     override val preprocessing: Operation<BufferedImage, FloatData>
-        get() {
-            val (width, height) = if (channelsFirst)
-                Pair(internalModel.inputDimensions[1], internalModel.inputDimensions[2])
-            else
-                Pair(internalModel.inputDimensions[0], internalModel.inputDimensions[1])
-
-            return pipeline<BufferedImage>()
-                .resize {
-                    outputHeight = height.toInt()
-                    outputWidth = width.toInt()
-                    interpolation = InterpolationType.BILINEAR
-                }
-                .convert { colorMode = inputColorMode }
-                .toFloatArray {}
-                .call(preprocessor)
-        }
+        get() = createPreprocessing(internalModel, channelsFirst, inputColorMode, preprocessor)
 
     /**
      * Predicts [topK] objects for the given [imageFile].
@@ -90,5 +75,34 @@ public class ImageRecognitionModel(
             preprocessor,
             modelKindDescription
         )
+    }
+
+    public companion object {
+        /**
+         * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData].
+         * Image is resized to fit the [model] input dimensions (according to the [channelsFirst] property),
+         * converted to the given [inputColorMode], transformed to the [FloatArray] which is processed with the given
+         * [preprocessor].
+         */
+        public fun createPreprocessing(model: InferenceModel,
+                                       channelsFirst: Boolean,
+                                       inputColorMode: ColorMode,
+                                       preprocessor: Operation<FloatData, FloatData> = Identity()
+        ): Operation<BufferedImage, FloatData> {
+            val (width, height) = if (channelsFirst)
+                Pair(model.inputDimensions[1], model.inputDimensions[2])
+            else
+                Pair(model.inputDimensions[0], model.inputDimensions[1])
+
+            return pipeline<BufferedImage>()
+                .resize {
+                    outputHeight = height.toInt()
+                    outputWidth = width.toInt()
+                    interpolation = InterpolationType.BILINEAR
+                }
+                .convert { colorMode = inputColorMode }
+                .toFloatArray {}
+                .call(preprocessor)
+        }
     }
 }

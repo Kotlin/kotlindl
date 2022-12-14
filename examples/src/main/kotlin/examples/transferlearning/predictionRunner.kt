@@ -10,22 +10,13 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.Identity
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.api.summary.printSummary
-import org.jetbrains.kotlinx.dl.dataset.DataLoader
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.Resize
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
-import java.awt.image.BufferedImage
 import java.io.File
 import java.net.URISyntaxException
 import java.net.URL
@@ -42,10 +33,7 @@ fun getFileFromResource(fileName: String): File {
     }
 }
 
-fun runImageRecognitionPrediction(
-    modelType: TFModels.CV<out GraphTrainableModel>,
-    resizeTo: Pair<Int, Int> = Pair(224, 224)
-) {
+fun runImageRecognitionPrediction(modelType: TFModels.CV<out GraphTrainableModel>) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
 
@@ -65,7 +53,7 @@ fun runImageRecognitionPrediction(
 
         it.loadWeights(hdfFile)
 
-        val fileDataLoader = fileDataLoader(modelType, resizeTo)
+        val fileDataLoader = modelType.createPreprocessing(it).fileLoader()
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
 
@@ -77,24 +65,4 @@ fun runImageRecognitionPrediction(
             println(top5.toString())
         }
     }
-}
-
-internal fun fileDataLoader(
-    modelType: ModelType<*, *>,
-    resizeTo: Pair<Int, Int>
-): DataLoader<File> {
-    val resize = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        Identity()
-    } else {
-        Resize(
-            outputWidth = resizeTo.first,
-            outputHeight = resizeTo.second
-        )
-    }
-    return pipeline<BufferedImage>()
-        .call(resize)
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .call(modelType.preprocessor)
-        .fileLoader()
 }

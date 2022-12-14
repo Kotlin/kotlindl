@@ -6,18 +6,13 @@
 package examples.onnx.cv.efficicentnet
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
 import java.io.File
 
 /**
@@ -37,11 +32,7 @@ fun efficientNetB0Prediction() {
     model.use {
         println(it)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+        val fileDataLoader = modelType.createPreprocessing(it).fileLoader()
 
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first

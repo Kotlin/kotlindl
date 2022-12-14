@@ -9,11 +9,14 @@ import org.jetbrains.kotlinx.dl.api.core.*
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -540,6 +543,15 @@ public object TFModels {
 
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
+        }
+
+        public companion object {
+            /**
+             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             */
+            public fun CV<*>.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+                return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
+            }
         }
     }
 
