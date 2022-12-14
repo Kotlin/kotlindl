@@ -1,4 +1,4 @@
-# 0.5.0 (TBA) Inference on Android with ONNX Runtime
+# 0.5.0 (14/12/2022) Inference on Android with ONNX Runtime
 Features:
 * Added Android inference support
   * Built Android artifacts for "impl", "onnx" and "visualization" modules [#422](https://github.com/Kotlin/kotlindl/issues/422)
