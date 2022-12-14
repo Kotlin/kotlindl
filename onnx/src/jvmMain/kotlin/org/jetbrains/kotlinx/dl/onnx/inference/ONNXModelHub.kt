@@ -40,10 +40,11 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
     }
 
     /**
-     * Loads model configuration without weights.
+     * Loads a pre-trained [OnnxInferenceModel] from the ONNX model zoo.
      *
+     * @param [modelType] Model type to load.
      * @param [loadingMode] Strategy of existing model use-case handling.
-     * @return An example of [OnnxInferenceModel].
+     * @return An instance of [OnnxInferenceModel].
      */
     @Suppress("UNCHECKED_CAST")
     public override fun <T : InferenceModel, U : InferenceModel> loadModel(
@@ -71,7 +72,7 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
     }
 
     /**
-     * This method loads model from ONNX model zoo corresponding to the specified [modelType].
+     * This method loads model from the ONNX model zoo corresponding to the specified [modelType].
      * The [loadingMode] parameter defines the strategy of existing model use-case handling.
      * If [loadingMode] is [LoadingMode.SKIP_LOADING_IF_EXISTS] and the model is already loaded, then the model will be loaded from the local [cacheDirectory].
      * If [loadingMode] is [LoadingMode.OVERRIDE_IF_EXISTS] the model will be overridden even if it is already loaded.

@@ -37,7 +37,7 @@ public object ONNXModels {
     ) : OnnxModelType<ImageRecognitionModel> {
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(
-                modelHub.loadModel(this) as OnnxInferenceModel,
+                modelHub.loadModel(this),
                 channelsFirst,
                 preprocessor,
                 this::class.simpleName

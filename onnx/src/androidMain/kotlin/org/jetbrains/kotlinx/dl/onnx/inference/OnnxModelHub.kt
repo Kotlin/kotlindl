@@ -23,7 +23,6 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      * @param [modelType] model type from [ONNXModels]
      * @param [executionProviders] execution providers for model initialization.
      */
-    @Suppress("UNCHECKED_CAST")
     public fun loadModel(
         modelType: OnnxModelType<*>,
         vararg executionProviders: ExecutionProvider = arrayOf(ExecutionProvider.CPU())

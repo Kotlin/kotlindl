@@ -70,7 +70,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1409.1556">
          *     Very Deep Convolutional Networks for Large-Scale Image Recognition</a>
@@ -102,7 +102,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1409.1556">
          *     Very Deep Convolutional Networks for Large-Scale Image Recognition</a>
@@ -178,7 +178,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -208,7 +208,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -238,7 +238,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -268,7 +268,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -293,7 +293,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -318,7 +318,7 @@ public object TFModels {
          *
          * NOTE: ResNet v2 uses pre-activation function whereas ResNet v1 uses post-activation for the residual blocks.
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -341,7 +341,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1704.04861">
          *     MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications/a>
@@ -364,7 +364,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1801.04381">
          *     MobileNetV2: Inverted Residuals and Linear Bottlenecks/a>
@@ -384,10 +384,10 @@ public object TFModels {
          * Instantiates the InceptionV3 architecture.
          *
          * The model have
-         * - an input with the shape (1x224x224x3)
+         * - an input with the shape (1x299x299x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1512.00567">
          *     Rethinking the Inception Architecture for Computer Vision/a>
@@ -407,10 +407,10 @@ public object TFModels {
          * Instantiates the Xception architecture.
          *
          * The model have
-         * - an input with the shape (1x224x224x3)
+         * - an input with the shape (1x299x299x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1610.02357">
          *     Xception: Deep Learning with Depthwise Separable Convolutions/a>
@@ -433,7 +433,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1608.06993">
          *     Densely Connected Convolutional Networks/a>
@@ -456,7 +456,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1608.06993">
          *     Densely Connected Convolutional Networks/a>
@@ -479,7 +479,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1608.06993">
          *     Densely Connected Convolutional Networks/a>
@@ -502,7 +502,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1707.07012">
          *     Learning Transferable Architectures for Scalable Image Recognition/a>
@@ -525,7 +525,7 @@ public object TFModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * NOTE: This model is converted from Keras.applications, the last few layers in the noTop model have been removed so that the user can fine-tune the model for their specific task.
          *
          * @see <a href="https://arxiv.org/abs/1707.07012">
          *     Learning Transferable Architectures for Scalable Image Recognition/a>
