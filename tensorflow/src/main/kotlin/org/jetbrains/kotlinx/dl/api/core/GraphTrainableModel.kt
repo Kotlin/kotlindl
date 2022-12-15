@@ -127,6 +127,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      */
     private fun frozenLayerVariables(): List<KVariable> = layers.frozenVariables()
 
+    override fun reshape(vararg dims: Long) {
+        throw UnsupportedOperationException("Reshaping model $this is not supported.")
+    }
+
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics) {
         compile(optimizer, Losses.convert(loss), Metric.convert(metric))
     }
