@@ -39,10 +39,6 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     public lateinit var shape: LongArray
         private set
 
-    /** Is true when shape is initialized. */
-    protected val isShapeInitialized: Boolean
-        get() = ::shape.isInitialized
-
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
@@ -52,17 +48,27 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      * @param [inputData] Unlabeled input data to define label.
      */
     override fun predict(inputData: FloatArray): Int {
+        return predict(inputData, input, output)
+    }
+
+    /**
+     * Predicts the class of [inputData].
+     *
+     * @param [inputData] The single example with unknown label.
+     * @param [inputTensorName] The name of input tensor.
+     * @param [outputTensorName] The name of output tensor.
+     * @return Predicted class index.
+     */
+    public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
         require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
+        check(isModelInitialized) { "Model weights are not initialized." }
 
         val preparedData = serializeToBuffer(inputData)
         val tensor = Tensor.create(shape, preparedData)
 
-        tensor.use {
-            val runner = session.runner()
-
-            return runner.feed(DATA_PLACEHOLDER, it)
-                .fetch(output)
+        return tensor.use {
+            session.runner().feed(inputTensorName, it)
+                .fetch(outputTensorName)
                 .run().use { tensors ->
                     tensors.first().copyTo(LongArray(1))[0].toInt()
                 }
@@ -71,18 +77,19 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
         require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method." }
+        check(isModelInitialized) { "Model weights are not initialized." }
 
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
 
-        require(tfGraph.operation(fetchTensorName) != null) { "No such tensor output named [$fetchTensorName] in the TensorFlow graph!" }
+        require(tfGraph.operation(fetchTensorName) != null) {
+            "Output named '$fetchTensorName' not found in the TensorFlow graph."
+        }
 
         val preparedData = serializeToBuffer(inputData)
         val tensor = Tensor.create(shape, preparedData)
 
-        tensor.use {
-            val runner1 = session.runner()
-            return runner1.feed(DATA_PLACEHOLDER, it)
+        return tensor.use {
+            session.runner().feed(input, it)
                 .fetch(fetchTensorName)
                 .run().use { tensors ->
                     tensors.first().convertTensorToMultiDimArray()[0] as FloatArray

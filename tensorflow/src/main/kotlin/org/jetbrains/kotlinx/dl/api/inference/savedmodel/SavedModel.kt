@@ -6,12 +6,10 @@
 package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.core.util.PLACEHOLDER
-import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.SavedModelBundle
-import org.tensorflow.Tensor
 
 /**
  * Inference model built on SavedModelBundle format to predict on images.
@@ -23,46 +21,7 @@ public open class SavedModel(private val bundle: SavedModelBundle) :
 
     init {
         input = PLACEHOLDER
-    }
-
-    override fun predict(inputData: FloatArray): Int {
-        require(isShapeInitialized) { "Data shape is missed!" }
-
-        val preparedData = serializeToBuffer(inputData)
-        val tensor = Tensor.create(shape, preparedData)
-
-        tensor.use {
-            val runner = session.runner()
-            return runner.feed(input, it)
-                .fetch(output)
-                .run().use { tensors ->
-                    tensors.first().copyTo(LongArray(1))[0].toInt()
-                }
-        }
-    }
-
-    /**
-     * Predicts the class of [inputData].
-     *
-     * @param [inputData] The single example with unknown label.
-     * @param [inputTensorName] The name of input tensor.
-     * @param [outputTensorName] The name of output tensor.
-     * @return Predicted class index.
-     */
-    public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
-        require(isShapeInitialized) { "Data shape is missed!" }
-
-        val preparedData = serializeToBuffer(inputData)
-        val tensor = Tensor.create(shape, preparedData)
-
-        tensor.use {
-            val runner = session.runner()
-            return runner.feed(inputTensorName, it)
-                .fetch(outputTensorName)
-                .run().use { tensors ->
-                    tensors.first().copyTo(LongArray(1))[0].toInt()
-                }
-        }
+        isModelInitialized = true
     }
 
     /**
