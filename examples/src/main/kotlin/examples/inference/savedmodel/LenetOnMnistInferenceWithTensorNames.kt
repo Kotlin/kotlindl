@@ -6,8 +6,6 @@
 package examples.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.jetbrains.kotlinx.dl.dataset.evaluate
@@ -26,8 +24,6 @@ fun lenetOnMnistInferenceWithTensorNames() {
         println(it.graphToString())
 
         it.reshape(28, 28, 1)
-        it.input(Input.PLACEHOLDER)
-        it.output(Output.ARGMAX)
 
         val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
@@ -43,6 +39,3 @@ fun lenetOnMnistInferenceWithTensorNames() {
 
 /** */
 fun main(): Unit = lenetOnMnistInferenceWithTensorNames()
-
-
-

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
+import org.jetbrains.kotlinx.dl.api.core.util.PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -20,6 +21,10 @@ import org.tensorflow.Tensor
 public open class SavedModel(private val bundle: SavedModelBundle) :
     TensorFlowInferenceModel(bundle.graph(), bundle.session()) {
 
+    init {
+        input = PLACEHOLDER
+    }
+
     override fun predict(inputData: FloatArray): Int {
         require(isShapeInitialized) { "Data shape is missed!" }
 
@@ -28,8 +33,8 @@ public open class SavedModel(private val bundle: SavedModelBundle) :
 
         tensor.use {
             val runner = session.runner()
-            return runner.feed(input.tfName, it)
-                .fetch(output.tfName)
+            return runner.feed(input, it)
+                .fetch(output)
                 .run().use { tensors ->
                     tensors.first().copyTo(LongArray(1))[0].toInt()
                 }

@@ -9,8 +9,6 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
-import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
 import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.Graph
 import org.tensorflow.Session
@@ -32,10 +30,10 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
 ) : TensorFlowInferenceModelBase(tfGraph, session) {
 
     /** Input operand. */
-    protected var input: Input = Input.PLACEHOLDER
+    protected var input: String = DATA_PLACEHOLDER
 
     /** Output operand. */
-    protected var output: Output = Output.ARGMAX
+    protected var output: String = OUTPUT_ARG_MAX
 
     /** Data shape for prediction. */
     public lateinit var shape: LongArray
@@ -64,7 +62,7 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
             val runner = session.runner()
 
             return runner.feed(DATA_PLACEHOLDER, it)
-                .fetch(output.tfName)
+                .fetch(output)
                 .run().use { tensors ->
                     tensors.first().copyTo(LongArray(1))[0].toInt()
                 }
@@ -93,17 +91,17 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     }
 
     /**
-     * Chain-like setter to set up [inputOp].
+     * Setter for the input name.
      */
-    public fun input(inputOp: Input) {
-        input = inputOp
+    public fun input(inputName: String) {
+        input = inputName
     }
 
     /**
-     * Chain-like setter to set up [outputOp].
+     * Setter for the output name.
      */
-    public fun output(outputOp: Output) {
-        output = outputOp
+    public fun output(outputName: String) {
+        output = outputName
     }
 
     override fun reshape(vararg dims: Long) {
