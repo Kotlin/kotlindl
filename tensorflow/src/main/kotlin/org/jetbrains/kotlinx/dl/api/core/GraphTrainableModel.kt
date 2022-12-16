@@ -124,24 +124,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      */
     private fun frozenLayerVariables(): List<KVariable> = layers.frozenVariables()
 
-    /** Helper method for preprocessing layer names and layer validation. */
-    internal companion object {
-        internal fun preProcessLayerNames(layers: Array<out Layer>) {
-            for ((index, layer) in layers.withIndex()) {
-                if (layer.name.isEmpty()) {
-                    val simpleName = layer::class.simpleName ?: "layer"
-                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
-                }
-            }
-        }
-
-        internal fun layerValidation(layers: List<Layer>) {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
-        }
-    }
-
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics) {
         compile(optimizer, Losses.convert(loss), Metric.convert(metric))
     }
@@ -1007,6 +989,24 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             trainableParamsCount = trainableLayers.sumOf { it.paramCount.toLong() },
             frozenParamsCount = frozenLayers.sumOf { it.paramCount.toLong() },
         )
+    }
+
+    /** Helper method for preprocessing layer names and layer validation. */
+    internal companion object {
+        internal fun preProcessLayerNames(layers: Array<out Layer>) {
+            for ((index, layer) in layers.withIndex()) {
+                if (layer.name.isEmpty()) {
+                    val simpleName = layer::class.simpleName ?: "layer"
+                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
+                }
+            }
+        }
+
+        internal fun layerValidation(layers: List<Layer>) {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+        }
     }
 }
 

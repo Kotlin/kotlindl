@@ -25,6 +25,133 @@ import java.io.FileNotFoundException
  * @constructor Creates a Functional model via sequence of [layers].
  */
 public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
+
+    override fun buildLayers(
+        training: Operand<Boolean>,
+        numberOfLosses: Operand<Float>
+    ): Pair<Placeholder<Float>, Operand<Float>> {
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to input)
+
+        layers.filter { it !is Input }.forEach { layer ->
+            val out = layer.build(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
+            output[layer] = out
+            layer.setOutputShape(out.asOutput().shape())
+        }
+
+        return input to output[layers.last()]!!
+    }
+
+    override fun save(
+        modelDirectory: File,
+        savingFormat: SavingFormat,
+        saveOptimizerState: Boolean,
+        writingMode: WritingMode
+    ) {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        if (saveOptimizerState) {
+            check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
+        }
+
+        val pathToModelDirectory = modelDirectory.absolutePath
+        when (writingMode) {
+            WritingMode.FAIL_IF_EXISTS -> {
+                check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
+                modelDirectory.mkdir()
+            }
+            WritingMode.OVERRIDE -> {
+                if (modelDirectory.exists()) {
+                    modelDirectory.deleteRecursively()
+                }
+                modelDirectory.mkdir()
+            }
+            WritingMode.APPEND -> {
+                if (!modelDirectory.exists()) {
+                    modelDirectory.mkdir()
+                }
+            }
+        }
+
+        when (savingFormat) {
+            SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
+            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
+        }
+    }
+
+    private fun saveInKerasFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
+        saveModel(pathToModelDirectory)
+        saveVariables(pathToModelDirectory, saveOptimizerState)
+    }
+
+    private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean = true) {
+        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+        this.saveModelConfiguration(
+            jsonConfig,
+            isKerasFullyCompatible = isKerasFullyCompatible
+        )
+    }
+
+    private fun saveInSavedModelFormat(pathToModelDirectory: String) {
+        saveGraphDef(pathToModelDirectory)
+    }
+
+    private fun saveInSimpleFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
+        saveGraphDef(pathToModelDirectory)
+        saveVariables(pathToModelDirectory, saveOptimizerState)
+    }
+
+    private fun saveGraphDef(pathToModelDirectory: String) {
+        val file = File("$pathToModelDirectory/graph.pb")
+        file.writeBytes(kGraph.tfGraph.toGraphDef())
+    }
+
+    /** Returns a copy of this model. */
+    // TODO: support saveOptimizerState=true with assignment of intermediate optimizer state
+    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Functional {
+        val serializedModel = serializeModel(true)
+        val deserializedModel = deserializeFunctionalModel(serializedModel)
+        if (!copyWeights) {
+            return deserializedModel
+        } else {
+            // TODO: make deep copies, not just links
+            deserializedModel.compile(
+                optimizer = this.optimizer,
+                loss = this.loss,
+                metrics = this.metrics
+            )
+
+            deserializedModel.layers.forEach {
+                it.weights = this.getLayer(it.name).weights
+            }
+
+            deserializedModel.isModelInitialized = true
+
+            return deserializedModel
+        }
+    }
+
+    /** Removes the last layer from the [Functional] model, if it's not compiled yet! . */
+    public fun removeLastLayer(): Functional {
+        require(!this.isModelCompiled) { "It works for non-compiled models only!" }
+
+        val layers = mutableListOf<Layer>()
+
+        for (layer in this.layers) {
+            layers.add(layer)
+        }
+
+        val lastLayer = layers.last()
+        for (outboundLayer in lastLayer.inboundLayers)
+            outboundLayer.outboundLayers.remove(lastLayer)
+
+        layers.removeLast()
+
+        return of(layers)
+    }
+
     public companion object {
         /**
          * Creates the [Functional] model.
@@ -253,131 +380,5 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             val functionalConfig = loadSerializedModel(configuration)
             return loadFunctionalModelLayers(functionalConfig, inputShape)
         }
-    }
-
-    override fun buildLayers(
-        training: Operand<Boolean>,
-        numberOfLosses: Operand<Float>
-    ): Pair<Placeholder<Float>, Operand<Float>> {
-        val input = inputLayer.build(tf)
-        inputLayer.setOutputShape(input.asOutput().shape())
-        val output = mutableMapOf<Layer, Operand<Float>>(inputLayer to input)
-
-        layers.filter { it !is Input }.forEach { layer ->
-            val out = layer.build(tf, layer.inboundLayers.map { output[it]!! }, training, numberOfLosses)
-            output[layer] = out
-            layer.setOutputShape(out.asOutput().shape())
-        }
-
-        return input to output[layers.last()]!!
-    }
-
-    override fun save(
-        modelDirectory: File,
-        savingFormat: SavingFormat,
-        saveOptimizerState: Boolean,
-        writingMode: WritingMode
-    ) {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-        if (saveOptimizerState) {
-            check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
-        }
-
-        val pathToModelDirectory = modelDirectory.absolutePath
-        when (writingMode) {
-            WritingMode.FAIL_IF_EXISTS -> {
-                check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
-                modelDirectory.mkdir()
-            }
-            WritingMode.OVERRIDE -> {
-                if (modelDirectory.exists()) {
-                    modelDirectory.deleteRecursively()
-                }
-                modelDirectory.mkdir()
-            }
-            WritingMode.APPEND -> {
-                if (!modelDirectory.exists()) {
-                    modelDirectory.mkdir()
-                }
-            }
-        }
-
-        when (savingFormat) {
-            SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
-            SavingFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
-            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
-        }
-    }
-
-    private fun saveInKerasFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        saveModel(pathToModelDirectory)
-        saveVariables(pathToModelDirectory, saveOptimizerState)
-    }
-
-    private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean = true) {
-        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        this.saveModelConfiguration(
-            jsonConfig,
-            isKerasFullyCompatible = isKerasFullyCompatible
-        )
-    }
-
-    private fun saveInSavedModelFormat(pathToModelDirectory: String) {
-        saveGraphDef(pathToModelDirectory)
-    }
-
-    private fun saveInSimpleFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        saveGraphDef(pathToModelDirectory)
-        saveVariables(pathToModelDirectory, saveOptimizerState)
-    }
-
-    private fun saveGraphDef(pathToModelDirectory: String) {
-        val file = File("$pathToModelDirectory/graph.pb")
-        file.writeBytes(kGraph.tfGraph.toGraphDef())
-    }
-
-    /** Returns a copy of this model. */
-    // TODO: support saveOptimizerState=true with assignment of intermediate optimizer state
-    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Functional {
-        val serializedModel = serializeModel(true)
-        val deserializedModel = deserializeFunctionalModel(serializedModel)
-        if (!copyWeights) {
-            return deserializedModel
-        } else {
-            // TODO: make deep copies, not just links
-            deserializedModel.compile(
-                optimizer = this.optimizer,
-                loss = this.loss,
-                metrics = this.metrics
-            )
-
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
-            deserializedModel.isModelInitialized = true
-
-            return deserializedModel
-        }
-    }
-
-    /** Removes the last layer from the [Functional] model, if it's not compiled yet! . */
-    public fun removeLastLayer(): Functional {
-        require(!this.isModelCompiled) { "It works for non-compiled models only!" }
-
-        val layers = mutableListOf<Layer>()
-
-        for (layer in this.layers) {
-            layers.add(layer)
-        }
-
-        val lastLayer = layers.last()
-        for (outboundLayer in lastLayer.inboundLayers)
-            outboundLayer.outboundLayers.remove(lastLayer)
-
-        layers.removeLast()
-
-        return of(layers)
     }
 }

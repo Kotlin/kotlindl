@@ -24,6 +24,47 @@ import java.io.FileNotFoundException
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
 public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
+
+    override fun buildLayers(
+        training: Operand<Boolean>,
+        numberOfLosses: Operand<Float>
+    ): Pair<Placeholder<Float>, Operand<Float>> {
+        val input = inputLayer.build(tf)
+        inputLayer.setOutputShape(input.asOutput().shape())
+        var output: Operand<Float> = input
+
+        layers.filter { it !is Input }.forEach { layer ->
+            output = layer.build(tf, output, training, numberOfLossesOp)
+            layer.setOutputShape(output.asOutput().shape())
+        }
+
+        return input to output
+    }
+
+    /** Returns a copy of this model. */
+    // TODO: implement the saving of optimizer state
+    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
+        val serializedModel = serializeModel(true)
+        val deserializedModel = deserializeSequentialModel(serializedModel)
+        if (!copyWeights) {
+            return deserializedModel
+        } else {
+            deserializedModel.compile(
+                optimizer = this.optimizer,
+                loss = this.loss,
+                metrics = this.metrics
+            )
+
+            deserializedModel.layers.forEach {
+                it.weights = this.getLayer(it.name).weights
+            }
+
+            deserializedModel.isModelInitialized = true
+
+            return deserializedModel
+        }
+    }
+
     public companion object {
         /**
          * Creates the [Sequential] model.
@@ -139,46 +180,6 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
 
             val config = loadSerializedModel(configuration)
             return loadSequentialModelLayers(config, inputShape)
-        }
-    }
-
-    override fun buildLayers(
-        training: Operand<Boolean>,
-        numberOfLosses: Operand<Float>
-    ): Pair<Placeholder<Float>, Operand<Float>> {
-        val input = inputLayer.build(tf)
-        inputLayer.setOutputShape(input.asOutput().shape())
-        var output: Operand<Float> = input
-
-        layers.filter { it !is Input }.forEach { layer ->
-            output = layer.build(tf, output, training, numberOfLossesOp)
-            layer.setOutputShape(output.asOutput().shape())
-        }
-
-        return input to output
-    }
-
-    /** Returns a copy of this model. */
-    // TODO: implement the saving of optimizer state
-    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
-        val serializedModel = serializeModel(true)
-        val deserializedModel = deserializeSequentialModel(serializedModel)
-        if (!copyWeights) {
-            return deserializedModel
-        } else {
-            deserializedModel.compile(
-                optimizer = this.optimizer,
-                loss = this.loss,
-                metrics = this.metrics
-            )
-
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
-            deserializedModel.isModelInitialized = true
-
-            return deserializedModel
         }
     }
 }

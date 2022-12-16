@@ -19,22 +19,6 @@ public open class SavedModel : TensorFlowInferenceModel() {
     /** SavedModelBundle.*/
     private lateinit var bundle: SavedModelBundle
 
-    public companion object {
-        /**
-         * Loads model from SavedModelBundle format.
-         */
-        public fun load(pathToModel: String): SavedModel {
-            val model = SavedModel()
-
-            model.bundle = SavedModelBundle.load(pathToModel, "serve")
-            model.session = model.bundle.session()
-            val graph = model.bundle.graph()
-            val graphDef = graph.toGraphDef()
-            model.kGraph = KGraph(graphDef)
-            return model
-        }
-    }
-
     override fun predict(inputData: FloatArray): Int {
         require(isShapeInitialized) { "Data shape is missed!" }
 
@@ -96,5 +80,21 @@ public open class SavedModel : TensorFlowInferenceModel() {
     override fun close() {
         super.close()
         bundle.close()
+    }
+
+    public companion object {
+        /**
+         * Loads model from SavedModelBundle format.
+         */
+        public fun load(pathToModel: String): SavedModel {
+            val model = SavedModel()
+
+            model.bundle = SavedModelBundle.load(pathToModel, "serve")
+            model.session = model.bundle.session()
+            val graph = model.bundle.graph()
+            val graphDef = graph.toGraphDef()
+            model.kGraph = KGraph(graphDef)
+            return model
+        }
     }
 }

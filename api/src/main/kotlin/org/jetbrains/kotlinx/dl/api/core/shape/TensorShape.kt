@@ -13,14 +13,6 @@ import kotlin.math.abs
 public class TensorShape() {
     private lateinit var dims: LongArray
 
-    public companion object {
-        /** Returns first dimension from all dimensions of this array. */
-        public fun LongArray.head(): Long = this[0]
-
-        /** Returns last dimensions (except first) from this array. */
-        public fun LongArray.tail(): LongArray = copyOfRange(1, size)
-    }
-
     /**
      * Creates a new `TensorShape` with the given dimensions.
      *
@@ -205,6 +197,14 @@ public class TensorShape() {
         }
 
         return almostEqual
+    }
+
+    public companion object {
+        /** Returns first dimension from all dimensions of this array. */
+        public fun LongArray.head(): Long = this[0]
+
+        /** Returns last dimensions (except first) from this array. */
+        public fun LongArray.tail(): LongArray = copyOfRange(1, size)
     }
 }
 
