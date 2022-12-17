@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.loaders
 import io.jhdf.HdfFile
 import mu.KLogger
 import mu.KotlinLogging
+import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import java.io.File
@@ -16,7 +17,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
-private const val MODEL_CONFIG_FILE_NAME = "/modelConfig.json"
+private const val MODEL_CONFIG_FILE_NAME = "/${GraphTrainableModel.MODEL_CONFIG_JSON}"
 private const val WEIGHTS_FILE_NAME = "/weights.h5"
 
 /**

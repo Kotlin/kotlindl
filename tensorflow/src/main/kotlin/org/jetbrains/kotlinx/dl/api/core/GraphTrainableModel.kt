@@ -840,7 +840,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     private fun saveModel(pathToModelDirectory: String) {
-        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+        val jsonConfig = File("$pathToModelDirectory/$MODEL_CONFIG_JSON")
         this.saveModelConfiguration(jsonConfig)
     }
 
@@ -993,6 +993,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
+        internal const val MODEL_CONFIG_JSON = "modelConfig.json"
+
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
             for ((index, layer) in layers.withIndex()) {
                 if (layer.name.isEmpty()) {

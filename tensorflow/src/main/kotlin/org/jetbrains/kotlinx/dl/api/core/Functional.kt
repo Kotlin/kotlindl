@@ -87,7 +87,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean = true) {
-        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
+        val jsonConfig = File("$pathToModelDirectory/$MODEL_CONFIG_JSON")
         this.saveModelConfiguration(
             jsonConfig,
             isKerasFullyCompatible = isKerasFullyCompatible
@@ -344,12 +344,12 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         public fun loadDefaultModelConfiguration(modelDirectory: File, inputShape: IntArray? = null): Functional {
-            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
+            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a '$MODEL_CONFIG_JSON' file with configuration." }
 
-            val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+            val configuration = File("${modelDirectory.absolutePath}/$MODEL_CONFIG_JSON")
 
             if (!configuration.exists()) throw FileNotFoundException(
-                "File 'modelConfig.json' is not found. This file must be in the model directory. " +
+                "File '$MODEL_CONFIG_JSON' is not found. This file must be in the model directory. " +
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
@@ -368,12 +368,12 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             modelDirectory: File,
             inputShape: IntArray? = null
         ): List<Layer> {
-            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a 'modelConfig.json' file with configuration." }
+            require(modelDirectory.isDirectory) { "${modelDirectory.absolutePath} is not a directory. Should be a directory with a '$MODEL_CONFIG_JSON' file with configuration." }
 
-            val configuration = File("${modelDirectory.absolutePath}/modelConfig.json")
+            val configuration = File("${modelDirectory.absolutePath}/$MODEL_CONFIG_JSON")
 
             if (!configuration.exists()) throw FileNotFoundException(
-                "File 'modelConfig.json' is not found. This file must be in the model directory. " +
+                "File '$MODEL_CONFIG_JSON' is not found. This file must be in the model directory. " +
                         "It is generated during Sequential model saving with SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES."
             )
 
