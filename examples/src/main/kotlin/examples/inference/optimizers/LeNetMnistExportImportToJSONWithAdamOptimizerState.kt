@@ -60,7 +60,7 @@ fun lenetOnMnistExportImportToJSONWithAdamOptimizerState() {
         it.save(
             modelDirectory = File(PATH_TO_MODEL),
             saveOptimizerState = true,
-            savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            savingFormat = SavingFormat.JsonConfigCustomVariables(),
             writingMode = WritingMode.OVERRIDE
         )
 

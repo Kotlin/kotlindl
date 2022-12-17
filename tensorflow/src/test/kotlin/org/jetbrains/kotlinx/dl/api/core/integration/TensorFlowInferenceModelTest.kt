@@ -133,7 +133,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -184,7 +184,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -302,7 +302,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -346,7 +346,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }

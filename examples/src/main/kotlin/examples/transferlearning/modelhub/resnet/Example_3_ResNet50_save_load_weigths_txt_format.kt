@@ -83,13 +83,13 @@ fun main() {
 
         it.save(
             File(PATH_TO_MODEL),
-            savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            savingFormat = SavingFormat.JsonConfigCustomVariables(isKerasFullyCompatible = true),
             writingMode = WritingMode.OVERRIDE
         )
 
         it.save(
             File(PATH_TO_MODEL_2),
-            savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+            savingFormat = SavingFormat.TfGraphCustomVariables,
             writingMode = WritingMode.OVERRIDE
         )
     }

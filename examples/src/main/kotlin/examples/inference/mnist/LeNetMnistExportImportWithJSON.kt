@@ -57,7 +57,7 @@ fun lenetOnMnistExportImportToJson() {
 
         it.save(
             File(PATH_TO_MODEL),
-            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            SavingFormat.JsonConfigCustomVariables(),
             writingMode = WritingMode.OVERRIDE
         )
 
