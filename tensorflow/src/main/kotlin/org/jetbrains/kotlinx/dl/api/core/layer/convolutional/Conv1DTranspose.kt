@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.ex
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.withAdded
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D.Companion.withExpandedDimensions
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
+import org.jetbrains.kotlinx.dl.api.core.util.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
