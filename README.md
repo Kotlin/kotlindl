@@ -165,7 +165,7 @@ KotlinDL supports an inference of ONNX models on the Android platform.
 To use KotlinDL in your Android project, add the following dependency to your build.gradle file:
 ```kotlin
 dependencies {
-    implementation ("'org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]")
+    implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-onnx:[KOTLIN-DL-VERSION]")
 }
 ```
 For more details, please refer to the [Quick Start Guide](docs/quick_start_guide.md#working-with-kotlin-dl-in-android-studio).
