@@ -146,14 +146,11 @@ public open class TensorFlowInferenceModel : InferenceModel {
     }
 
     override fun copy(): TensorFlowInferenceModel {
-        return copy(copiedModelName = null, saveOptimizerState = false, copyWeights = true)
+        return copy(copiedModelName = null)
     }
 
-    public fun copy(
-        copiedModelName: String? = null,
-        saveOptimizerState: Boolean = false, // TODO, check this case
-        copyWeights: Boolean = true
-    ): TensorFlowInferenceModel {
+    /** Returns a copy of this model. */
+    public fun copy(copiedModelName: String? = null): TensorFlowInferenceModel {
         val model = TensorFlowInferenceModel()
         model.kGraph = this.kGraph.copy()
         model.tf = Ops.create(model.kGraph.tfGraph)
@@ -162,25 +159,17 @@ public open class TensorFlowInferenceModel : InferenceModel {
         model.input = input
         model.output = output
         if (copiedModelName != null) model.name = name
-        // TODO: check that tensors are closed after usage
-        if (copyWeights) {
+
+        val variableNames = kGraph.variableNames()
+        if (variableNames.isNotEmpty()) {
             val modelWeightsExtractorRunner = session.runner()
-            val variableNames = kGraph.variableNames()
-            check(variableNames.isNotEmpty()) {
-                "Found 0 variable names in TensorFlow graph $kGraph. " +
-                        "If copied model has no weights, set flag `copyWeights` to `false`."
-            }
-
-            val variableNamesToCopy = variableNames.filter { variableName ->
-                saveOptimizerState || !isOptimizerVariable(variableName)
-            }
-            variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
-            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run()).toMap()
-
+            variableNames.forEach(modelWeightsExtractorRunner::fetch)
+            val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
             model.loadVariables(modelWeights.keys) { variableName, _ ->
                 modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
             }
         }
+
         model.isModelInitialized = true
         return model
     }
