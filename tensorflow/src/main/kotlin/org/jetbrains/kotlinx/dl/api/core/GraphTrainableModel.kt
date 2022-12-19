@@ -961,6 +961,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         variable.initializerOperation.run(session)
     }
 
+    protected fun copyWeightsTo(model: GraphTrainableModel, copyOptimizerState: Boolean) {
+        // TODO: make deep copies, not just links
+        model.compile(
+            optimizer = this.optimizer,
+            loss = this.loss,
+            metrics = this.metrics
+        )
+
+        model.layers.forEach {
+            it.weights = this.getLayer(it.name).weights
+        }
+
+        if (copyOptimizerState) {
+            val optimizerVariables = kGraph.variableNames().filter(::isOptimizerVariable)
+            copyVariablesToModel(model, optimizerVariables)
+            model.isOptimizerVariableInitialized = true
+        }
+
+        model.isModelInitialized = true
+    }
+
     /**
      * Return layer by [layerName].
      *

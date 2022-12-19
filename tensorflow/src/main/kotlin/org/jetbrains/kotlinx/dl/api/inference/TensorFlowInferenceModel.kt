@@ -159,19 +159,21 @@ public open class TensorFlowInferenceModel : InferenceModel {
         model.input = input
         model.output = output
         if (copiedModelName != null) model.name = name
-
-        val variableNames = kGraph.variableNames()
-        if (variableNames.isNotEmpty()) {
-            val modelWeightsExtractorRunner = session.runner()
-            variableNames.forEach(modelWeightsExtractorRunner::fetch)
-            val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
-            model.loadVariables(modelWeights.keys) { variableName, _ ->
-                modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
-            }
-        }
-
+        copyVariablesToModel(model, kGraph.variableNames())
         model.isModelInitialized = true
         return model
+    }
+
+    protected fun copyVariablesToModel(model: TensorFlowInferenceModel, variableNames: List<String>) {
+        if (variableNames.isEmpty()) return
+
+        val modelWeightsExtractorRunner = session.runner()
+        variableNames.forEach(modelWeightsExtractorRunner::fetch)
+        val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
+
+        model.loadVariables(modelWeights.keys) { variableName, _ ->
+            modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
+        }
     }
 
     /**
