@@ -488,6 +488,12 @@ public class MishActivation : Activation {
 }
 
 /**
+ * ```
+ * hardshrink(x) = x if x < lower
+ *                 x if x > upper
+ *                 0 otherwise
+ * ```
+ *
  * @property [lower] lower bound for setting values to zeros
  * @property [upper] upper bound for setting values to zeros
  *
@@ -498,12 +504,9 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
         require(lower < upper) {
             "The value of lower should not be higher than upper"
         }
-        val maskLower = tf.math.minimum(features, tf.constant(lower)) != tf.constant(lower)
-        val maskUpper = tf.math.maximum(features, tf.constant(upper)) != tf.constant(upper)
-        return when (maskLower || maskUpper) {
-            false -> tf.constant(0) as Operand<Float>
-            true -> features
-        }
+        val maskLower = tf.math.less(features, tf.constant(lower))
+        val maskUpper = tf.math.greater(features, tf.constant(upper))
+        return tf.where3(tf.math.logicalOr(maskLower, maskUpper), features, tf.zerosLike(features))
     }
 }
 
