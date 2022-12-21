@@ -7,9 +7,8 @@ internal class SnakeActivationTest : ActivationTest() {
     @Test
     fun apply() {
         val input = floatArrayOf(-1.0f, 0.0f, 1.0f)
-        val actual = floatArrayOf(0f, 0f, 0f)
         val expected = floatArrayOf(-0.29192656f, 0.0f, 1.7080734f)
 
-        assertActivationFunction(SnakeActivation(), input, actual, expected)
+        assertActivationFunction(SnakeActivation(), input, expected)
     }
 }

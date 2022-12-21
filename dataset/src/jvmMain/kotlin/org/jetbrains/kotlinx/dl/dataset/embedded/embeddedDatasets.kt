@@ -50,7 +50,6 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
         trainYpath,
         testXpath,
         testYpath,
-        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )
@@ -97,7 +96,6 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
         trainYpath,
         testXpath,
         testYpath,
-        NUMBER_OF_CLASSES,
         ::extractImages,
         ::extractLabels
     )

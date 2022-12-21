@@ -70,7 +70,7 @@ public class WavFile(
 
         var chunkSize: Long
         var fileFormatChunk: WavFileFormat? = null
-        var numFrames: Long? = null
+        var numFrames: Long?
 
         while (true) {
             bytesRead = inputStream.read(buffer, 0, CHUNK_HEADER_LENGTH)

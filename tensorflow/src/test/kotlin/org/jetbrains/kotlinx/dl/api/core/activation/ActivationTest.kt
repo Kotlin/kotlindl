@@ -97,16 +97,4 @@ open class ActivationTest {
             }
         }
     }
-
-    /**
-     * @see assertActivationFunction
-     */
-    protected fun assertActivationFunction(
-        instance: Activation,
-        input: FloatArray,
-        actual: FloatArray,
-        expected: FloatArray
-    ) {
-        assertActivationFunction(instance, input, expected)
-    }
 }
