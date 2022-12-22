@@ -187,7 +187,7 @@ fun vgg() {
         }
 
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive)
     val dataset = OnFlyImageDataset.create(File(cifarImagesArchive), y, preprocessing)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)

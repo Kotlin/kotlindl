@@ -231,7 +231,7 @@ class TensorFlowInferenceModelTest {
 
     @Test
     fun emptyInferenceModel() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {
@@ -250,7 +250,7 @@ class TensorFlowInferenceModelTest {
 
     @Test
     fun missedReshapeFunction() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {

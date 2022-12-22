@@ -179,7 +179,7 @@ fun vgg11OnCifar10ExportImport() {
             scalingCoefficient = 255f
         }
 
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive)
     val dataset = OnFlyImageDataset.create(File(cifarImagesArchive), y, preprocessing)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)

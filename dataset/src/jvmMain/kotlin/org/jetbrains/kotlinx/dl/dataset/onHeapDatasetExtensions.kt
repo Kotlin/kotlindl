@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
 /**
  * Creates [OnHeapDataset] string representation for part of data.
  */
-public fun OnHeapDataset.toString(): String = buildStringRepr(x.partialToString(), y.partialToString())
+public fun OnHeapDataset.partialToString(): String = buildStringRepr(x.partialToString(), y.partialToString())
 
 /**
  * Creates [OnHeapDataset] string representation for full of data.

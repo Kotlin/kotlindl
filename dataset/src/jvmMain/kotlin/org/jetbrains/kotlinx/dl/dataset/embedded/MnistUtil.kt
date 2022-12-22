@@ -63,7 +63,7 @@ public fun extractImages(archivePath: String): Array<FloatArray> {
 /**
  * Extracts (Fashion) Mnist labels from [archivePath] with number of classes [numClasses].
  */
-public fun extractLabels(archivePath: String, numClasses: Int): FloatArray {
+public fun extractLabels(archivePath: String): FloatArray {
     val archiveStream = DataInputStream(
         GZIPInputStream(
             FileInputStream(archivePath)

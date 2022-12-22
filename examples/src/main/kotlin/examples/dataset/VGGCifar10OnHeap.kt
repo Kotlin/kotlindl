@@ -193,7 +193,7 @@ fun main() {
         }
 
     val (cifarImagesArchive, cifarLabelsArchive) = cifar10Paths()
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive)
     val dataset = OnHeapDataset.create(File(cifarImagesArchive), y, preprocessing)
 
 

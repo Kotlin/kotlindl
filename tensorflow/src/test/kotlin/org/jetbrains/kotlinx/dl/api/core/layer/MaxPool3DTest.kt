@@ -67,13 +67,6 @@ internal class MaxPool3DTest {
         expected: Array<Array<Array<Array<FloatArray>>>>,
         input: Array<Array<Array<Array<FloatArray>>>> = inputArr
     ) {
-        val inputShape: Shape = Shape.make(
-            input.size.toLong(),
-            input[0].size.toLong(),
-            input[0][0].size.toLong(),
-            input[0][0][0].size.toLong(),
-            input[0][0][0][0].size.toLong(),
-        )
         EagerSession.create().use {
             val tf = Ops.create()
             val inputOp = tf.constant(input)

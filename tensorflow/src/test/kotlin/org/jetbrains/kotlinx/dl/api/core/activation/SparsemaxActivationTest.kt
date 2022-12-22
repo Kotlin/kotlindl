@@ -228,10 +228,8 @@ internal class SparsemaxActivationTest : ActivationTest() {
         // sparsemax(P x) = P sparsemax(x) where P is permutation matrix
 
         // (perm * inp) calculations are hand calculated these are just here for reference
-        val perm1 =
-            arrayOf(floatArrayOf(0f, 1f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(1f, 0f, 0f))
-        val perm2 =
-            arrayOf(floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(0f, 1f, 0f))
+        // val perm1 = arrayOf(floatArrayOf(0f, 1f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(1f, 0f, 0f))
+        // val perm2 = arrayOf(floatArrayOf(1f, 0f, 0f), floatArrayOf(0f, 0f, 1f), floatArrayOf(0f, 1f, 0f))
 
         val inp =
             arrayOf(floatArrayOf(-5f, 1f, 2f), floatArrayOf(-1f, 0f, 1f), floatArrayOf(-1.2f, -5f, -1.3f))

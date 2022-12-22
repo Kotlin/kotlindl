@@ -109,8 +109,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Takes data located in [trainFeaturesPath], [trainLabelsPath], [testFeaturesPath], [testLabelsPath]
-         * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
+         * Takes data located in [trainFeaturesPath], [trainLabelsPath], [testFeaturesPath], [testLabelsPath],
+         * extracts data and labels via [featuresExtractor] and [labelExtractor]
          * to create a pair of [OnHeapDataset] for training and testing.
          */
         @JvmStatic
@@ -119,14 +119,13 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             trainLabelsPath: String,
             testFeaturesPath: String,
             testLabelsPath: String,
-            numClasses: Int,
             featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> FloatArray
+            labelExtractor: (String) -> FloatArray
         ): Pair<OnHeapDataset, OnHeapDataset> {
             val xTrain = featuresExtractor(trainFeaturesPath)
-            val yTrain = labelExtractor(trainLabelsPath, numClasses)
+            val yTrain = labelExtractor(trainLabelsPath)
             val xTest = featuresExtractor(testFeaturesPath)
-            val yTest = labelExtractor(testLabelsPath, numClasses)
+            val yTest = labelExtractor(testLabelsPath)
             return OnHeapDataset(xTrain, yTrain) to OnHeapDataset(xTest, yTest)
         }
 

@@ -36,7 +36,7 @@ private fun loadImagesFromDirectory(
 
 /** Loads labels from [pathToLabels] csv file to heap memory and converts to Floats. */
 @Throws(IOException::class)
-public fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArray {
+public fun extractCifar10Labels(pathToLabels: String): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelBuffer = ByteArray(labelCount)
@@ -77,7 +77,7 @@ public fun extractCifar10Labels(pathToLabels: String, numClasses: Int): FloatArr
  * NOTE: It's important if you are going to use it with [org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset].
  */
 @Throws(IOException::class)
-public fun extractCifar10LabelsAnsSort(pathToLabels: String, numClasses: Int): FloatArray {
+public fun extractCifar10LabelsAnsSort(pathToLabels: String): FloatArray {
     val labelCount = DATASET_SIZE
     println(String.format("Extracting %d labels from %s", labelCount, pathToLabels))
     val labelSorter = mutableMapOf<String, Int>()

@@ -199,7 +199,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
-        val (train, test) = fashionMnist()
+        val (train, _) = fashionMnist()
 
         testModel.use {
             val exception =
