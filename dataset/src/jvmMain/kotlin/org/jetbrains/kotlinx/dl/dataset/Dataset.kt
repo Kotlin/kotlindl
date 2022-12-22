@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -29,7 +29,7 @@ public abstract class Dataset {
      */
     public inner class BatchIterator internal constructor(
         private val batchSize: Int
-    ) : Iterator<DataBatch?> {
+    ) : Iterator<DataBatch> {
 
         private var batchStart = 0
 
