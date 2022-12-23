@@ -19,13 +19,9 @@ import org.tensorflow.op.train.ApplyGradientDescent
  * NOTE: It's not an equivalent for `keras.sgd`, it is a pure SGD with simple 'variable' update by subtracting 'alpha' * 'delta' from it.
  */
 public class SGD(
+    private var learningRate: Float = 0.2f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private var learningRate: Float = 0.2f
-
-    public constructor(learningRate: Float = 0.2f, clipGradient: ClipGradientAction = NoClipGradient()) : this() {
-        this.learningRate = learningRate
-    }
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
