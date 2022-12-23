@@ -33,6 +33,8 @@ public class Resize(
     public var enableAntialiasing: Boolean = true
 ) : Operation<BufferedImage, BufferedImage> {
     override fun apply(input: BufferedImage): BufferedImage {
+        if (input.width == outputWidth && input.height == outputHeight) return input;
+
         val resizedImage = BufferedImage(outputWidth, outputHeight, input.type)
         val graphics2D = resizedImage.createGraphics()
 
