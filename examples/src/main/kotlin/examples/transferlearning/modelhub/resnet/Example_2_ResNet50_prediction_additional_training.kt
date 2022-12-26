@@ -17,13 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
-import java.awt.image.BufferedImage
 import java.io.File
 
 private const val EPOCHS = 3
@@ -48,24 +45,6 @@ fun resnet50additionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
-
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = IMAGE_SIZE.toInt()
-            outputWidth = IMAGE_SIZE.toInt()
-            interpolation = InterpolationType.BILINEAR
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .call(TFModels.CV.ResNet50().preprocessor)
-
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-    val dataset = OnFlyImageDataset.create(
-        File(dogsCatsImages),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
     val layers = model.layers.toMutableList()
@@ -104,6 +83,14 @@ fun resnet50additionalTraining() {
 
     val model2 = Functional.of(layers)
 
+    val dogsCatsImages = dogsCatsSmallDatasetPath()
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsImages),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(model2)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
     model2.use {
         it.compile(
             optimizer = Adam(),
@@ -129,5 +116,3 @@ fun resnet50additionalTraining() {
 
 /** */
 fun main(): Unit = resnet50additionalTraining()
-
-

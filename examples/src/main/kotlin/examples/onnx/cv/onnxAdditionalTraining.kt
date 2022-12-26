@@ -5,7 +5,6 @@
 
 package examples.onnx.cv
 
-import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
@@ -16,18 +15,14 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
 import java.io.File
 
 private const val EPOCHS = 1
@@ -48,19 +43,15 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
-fun runONNXAdditionalTraining(
-    modelType: ONNXModels.CV,
-    resizeTo: Pair<Int, Int> = Pair(224, 224)
-) {
+fun runONNXAdditionalTraining(modelType: ONNXModels.CV) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val model = modelHub.loadModel(modelType)
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 
-    model.use {
-        println(it)
+    modelHub.loadModel(modelType).use { model ->
+        println(model)
 
-        val preprocessing = preprocessing(resizeTo, it)
+        val preprocessing = modelType.createPreprocessing(model).onnx { onnxModel = model }
 
         val dataset = OnFlyImageDataset.create(
             File(dogsVsCatsDatasetPath),
@@ -73,7 +64,7 @@ fun runONNXAdditionalTraining(
          * This is a simple model based on Dense layers only.
          */
         val topModel = Sequential.of(
-            Input(it.outputShape[1], it.outputShape[2], it.outputShape[3]),
+            Input(model.outputShape[1], model.outputShape[2], model.outputShape[3]),
             GlobalAvgPool2D(),
             Dense(NUM_CLASSES, Activations.Linear, kernelInitializer = HeNormal(12L), biasInitializer = Zeros())
         )
@@ -92,31 +83,4 @@ fun runONNXAdditionalTraining(
             println("Accuracy: $accuracy")
         }
     }
-}
-
-fun preprocessing(
-    resizeTo: Pair<Int, Int>,
-    model: OnnxInferenceModel
-): Operation<BufferedImage, FloatData> {
-    val preprocessing = if (resizeTo.first == 224 && resizeTo.second == 224) {
-        pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .onnx {
-                onnxModel = model
-            }
-    } else {
-        pipeline<BufferedImage>()
-            .resize {
-                outputHeight = resizeTo.first
-                outputWidth = resizeTo.second
-                interpolation = InterpolationType.BILINEAR
-            }
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .onnx {
-                onnxModel = model
-            }
-    }
-    return preprocessing
 }

@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelHub
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
 import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
@@ -24,6 +25,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDMobileNetV1Obj
 import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.posedetection.MultiPoseDetectionModel
 import org.jetbrains.kotlinx.dl.onnx.inference.posedetection.SinglePoseDetectionModel
+import java.awt.image.BufferedImage
 
 /** Models in the ONNX format and running via ONNX Runtime. */
 public object ONNXModels {
@@ -565,6 +567,15 @@ public object ONNXModels {
          * - an output with the shape (1x10)
          */
         public class Lenet : CV("models/onnx/cv/custom/mnist", channelsFirst = false)
+
+        public companion object {
+            /**
+             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             */
+            public fun CV.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+                return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
+            }
+        }
     }
 
     /** Object detection models and preprocessing. */

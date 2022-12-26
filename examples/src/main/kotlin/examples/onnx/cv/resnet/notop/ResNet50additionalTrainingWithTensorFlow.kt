@@ -15,25 +15,20 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
-import org.jetbrains.kotlinx.dl.impl.preprocessing.call
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.*
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
 import java.io.File
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 16
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
-private const val IMAGE_SIZE = 64L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 /**
@@ -61,24 +56,13 @@ fun resnet50additionalTraining() {
     val modelHub = ONNXModelHub(
         cacheDirectory = File("cache/pretrainedModels")
     )
-    val model = modelHub.loadModel(ONNXModels.CV.ResNet50noTopCustom)
+    val modelType = ONNXModels.CV.ResNet50noTopCustom
 
-    model.use {
-        println(it)
-        it.reshape(64, 64, 3)
+    modelHub.loadModel(modelType).use { model ->
+        println(model)
+        model.reshape(64, 64, 3)
 
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.BILINEAR
-            }
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(TFModels.CV.ResNet50().preprocessor)
-            .onnx {
-                onnxModel = model
-            }
+        val preprocessing = modelType.createPreprocessing(model).onnx { onnxModel = model }
 
         val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
         val dataset = OnFlyImageDataset.create(
