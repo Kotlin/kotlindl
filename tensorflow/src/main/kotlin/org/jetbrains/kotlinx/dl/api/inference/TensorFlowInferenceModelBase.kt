@@ -12,10 +12,8 @@ import org.jetbrains.kotlinx.dl.api.core.util.createFloatArray
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
-import org.tensorflow.Graph
-import org.tensorflow.Session
-import org.tensorflow.Shape
-import org.tensorflow.Tensor
+import org.jetbrains.kotlinx.dl.impl.util.use
+import org.tensorflow.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -37,6 +35,46 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
 
     /** Model name. */
     public var name: String? = null
+
+    protected fun <R> runModel(inputs: Map<out InputKey, Tensor<*>>,
+                               outputs: List<OutputKey>,
+                               targets: List<Operand<Float>>,
+                               extractResult: (List<Tensor<*>>) -> R
+    ): R {
+        return inputs.use {
+            val runner = session.runner()
+            inputs.forEach { (operation, tensor) -> operation.feed(runner, tensor) }
+            outputs.forEach { output -> output.fetch(runner) }
+            targets.forEach { target -> runner.addTarget(target) }
+            runner.run().use { tensors -> extractResult(tensors) }
+        }
+    }
+
+    protected sealed class InputKey {
+        public data class Operand(val op: org.tensorflow.Operand<*>) : InputKey() {
+            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner {
+                return runner.feed(op.asOutput(), tensor)
+            }
+        }
+
+        public data class Name(val s: String) : InputKey() {
+            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner = runner.feed(s, tensor)
+        }
+
+        public abstract fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner
+    }
+
+    protected sealed class OutputKey {
+        public data class Operand(val op: org.tensorflow.Operand<Float>) : OutputKey() {
+            override fun fetch(runner: Session.Runner): Session.Runner = runner.fetch(op)
+        }
+
+        public data class Name(val s: String) : OutputKey() {
+            override fun fetch(runner: Session.Runner): Session.Runner = runner.fetch(s)
+        }
+
+        public abstract fun fetch(runner: Session.Runner): Session.Runner
+    }
 
     /**
      * Loads variable data for variable names in the provided collection using a provided function.
