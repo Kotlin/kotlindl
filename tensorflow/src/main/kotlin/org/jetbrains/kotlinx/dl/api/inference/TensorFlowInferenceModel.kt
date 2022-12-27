@@ -14,6 +14,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Output
+import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.Session
 import org.tensorflow.Shape
 import org.tensorflow.Tensor
@@ -81,11 +82,11 @@ public open class TensorFlowInferenceModel : InferenceModel {
         tensor.use {
             val runner = session.runner()
 
-            val result = runner.feed(DATA_PLACEHOLDER, it)
+            return runner.feed(DATA_PLACEHOLDER, it)
                 .fetch(output.tfName)
-                .run()[0]
-
-            return result.copyTo(LongArray(1))[0].toInt()
+                .run().use { tensors ->
+                    tensors.first().copyTo(LongArray(1))[0].toInt()
+                }
         }
     }
 
@@ -102,13 +103,11 @@ public open class TensorFlowInferenceModel : InferenceModel {
 
         tensor.use {
             val runner1 = session.runner()
-            val result1 = runner1.feed(DATA_PLACEHOLDER, it)
+            return runner1.feed(DATA_PLACEHOLDER, it)
                 .fetch(fetchTensorName)
-                .run()[0]
-
-            val arr = result1.convertTensorToMultiDimArray()
-
-            return arr[0] as FloatArray
+                .run().use { tensors ->
+                    tensors.first().convertTensorToMultiDimArray()[0] as FloatArray
+                }
         }
     }
 

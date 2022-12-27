@@ -32,6 +32,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.impl.util.argmax
+import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
@@ -438,16 +439,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
 
         try {
-            val tensorList = runner.run()
-            val lossValue = tensorList[0].floatValue()
-            val metricValues = mutableListOf<Float>()
+            return runner.run().use { tensorList ->
+                val lossValue = tensorList[0].floatValue()
+                val metricValues = mutableListOf<Float>()
 
-            check(tensorList.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensorList.size - 1} metrics are returned!" }
-            for (i in 1..metricOps.size) {
-                metricValues.add(tensorList[i].floatValue())
+                check(tensorList.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensorList.size - 1} metrics are returned!" }
+                for (i in 1..metricOps.size) {
+                    metricValues.add(tensorList[i].floatValue())
+                }
+
+                lossValue to metricValues
             }
-
-            return Pair(lossValue, metricValues)
         } catch (e: TensorFlowException) {
             e.printStackTrace()
             throw RuntimeException(e.message)
@@ -490,7 +492,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                 runner.fetch(it)
                             }
 
-                            val lossAndMetricsTensors = runner
+                            val (lossValue, metricValues) = runner
                                 .feed(xOp.asOutput(), testImagesTensor)
                                 .feed(yTrueOp.asOutput(), testLabelsTensor)
                                 .feed(training.asOutput(), isTraining)
@@ -498,15 +500,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                                     numberOfLossesOp.asOutput(),
                                     numberOfLossesTensor
                                 )
-                                .run()
+                                .run().use { lossAndMetricsTensors ->
+                                    val lossValue = lossAndMetricsTensors[0].floatValue()
+                                    val metricValues = mutableListOf<Float>()
 
-                            val lossValue = lossAndMetricsTensors[0].floatValue()
-                            val metricValues = mutableListOf<Float>()
+                                    check(lossAndMetricsTensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${lossAndMetricsTensors.size - 1} metrics are returned!" }
+                                    for (i in 1..metricOps.size) {
+                                        metricValues.add(lossAndMetricsTensors[i].floatValue())
+                                    }
 
-                            check(lossAndMetricsTensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${lossAndMetricsTensors.size - 1} metrics are returned!" }
-                            for (i in 1..metricOps.size) {
-                                metricValues.add(lossAndMetricsTensors[i].floatValue())
-                            }
+                                    lossValue to metricValues
+                                }
 
                             averageLossAccum += lossValue
                             metrics.forEachIndexed { i, _ ->
@@ -571,25 +575,23 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 serializeToBuffer(batch.x)
             ).use { testImages ->
                 Tensor.create(false).use { isTraining ->
-                    val predictionsTensor = session.runner()
+                    session.runner()
                         .fetch(predictionOp)
                         .feed(xOp.asOutput(), testImages)
                         .feed(training.asOutput(), isTraining)
-                        .run()[0]
+                        .run().use { tensors ->
+                            val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+                            tensors.first().copyTo(dst)
 
-                    val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+                            val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
 
-                    predictionsTensor.copyTo(dst)
-
-                    val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
-
-                    dst.forEachIndexed { index, element ->
-                        argMaxBatchPrediction[index] = element.argmax()
-                    }
-
-                    callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
-                    batchCounter++
-                    argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
+                            dst.forEachIndexed { index, element ->
+                                argMaxBatchPrediction[index] = element.argmax()
+                            }
+                            callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
+                            batchCounter++
+                            argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
+                        }
                 }
             }
         }
@@ -639,18 +641,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 imageShape,
                 serializeToBuffer(batch.x)
             ).use { testImages ->
-                val predictionsTensor = session.runner()
+                session.runner()
                     .fetch(predictionOp)
                     .feed(xOp.asOutput(), testImages)
-                    .run()[0]
+                    .run().use { tensors ->
+                        val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+                        tensors.first().copyTo(dst)
 
-                val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-                predictionsTensor.copyTo(dst)
-
-                callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
-                batchCounter++
-                dst.copyInto(predictions, batchSize * (batchCounter - 1))
+                        callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
+                        batchCounter++
+                        dst.copyInto(predictions, batchSize * (batchCounter - 1))
+                    }
             }
         }
         callbacks.forEach { it.onPredictEnd() }
@@ -679,25 +680,22 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         val imageShape = calculateXShape(1)
 
-        Tensor.create(
-            imageShape,
-            FloatBuffer.wrap(inputData)
-        ).use { testImages ->
-            val tensors =
+        return Tensor.create(imageShape, FloatBuffer.wrap(inputData))
+            .use { testImages ->
                 formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
+                    .use { tensors ->
+                        val prediction = tensors[0].convertTensorToFlattenFloatArray()
 
-            val prediction = tensors[0].convertTensorToFlattenFloatArray()
+                        val activations = mutableListOf<Any>()
+                        if (visualizationIsEnabled && tensors.size > 1) {
+                            for (i in 1 until tensors.size) {
+                                activations.add(tensors[i].convertTensorToMultiDimArray())
+                            }
+                        }
 
-            val activations = mutableListOf<Any>()
-            if (visualizationIsEnabled && tensors.size > 1) {
-                for (i in 1 until tensors.size) {
-                    activations.add(tensors[i].convertTensorToMultiDimArray())
-                }
+                        prediction to activations
+                    }
             }
-
-            tensors.forEach { it.close() }
-            return Pair(prediction, activations.toList())
-        }
     }
 
     private fun formPredictionAndActivationsTensors(
