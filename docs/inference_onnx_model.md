@@ -3,7 +3,7 @@ In this tutorial, we will learn how to use KotlinDL to infer the ONNX models on 
 ## Desktop JVM
 ### Inference of the model included in KotlinDL Model Zoo
 KotlinDL ONNX provides a set of pre-trained models through `OnnxModels` API.
-You can find the list of models here. [here](./onnx_model_zoo.md).
+You can find the list of models [here](./onnx_model_zoo.md).
 In this section, we will use MoveNet model for human pose estimation. 
 
 ```kotlin
@@ -169,7 +169,7 @@ KotlinDL currently supports the following EPs:
 * NNAPI (for Android devices with API 27+)
 
 It is required to have the CUDA configured on your machine to use the CUDA EP.
-Please, also check how to configure dependencies for the execution on a GPU in the [Readme.md](../README.md#running-kotlindl-on-gpu)
+Please, also check how to configure dependencies for the execution on a GPU in the [README.md](../README.md#running-kotlindl-on-gpu).
 
 There are a few options for specifying the EP to use.
 The models loaded using the ONNXModelHub API are instantiated with the default CPU EP.
