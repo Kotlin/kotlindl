@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.SavedModelBundle
 import org.tensorflow.Tensor
 
@@ -45,8 +46,9 @@ public open class SavedModel : TensorFlowInferenceModel() {
             val runner = session.runner()
             return runner.feed(input.tfName, it)
                 .fetch(output.tfName)
-                .run()[0]
-                .copyTo(LongArray(1))[0].toInt()
+                .run().use { tensors ->
+                    tensors.first().copyTo(LongArray(1))[0].toInt()
+                }
         }
     }
 
@@ -68,8 +70,9 @@ public open class SavedModel : TensorFlowInferenceModel() {
             val runner = session.runner()
             return runner.feed(inputTensorName, it)
                 .fetch(outputTensorName)
-                .run()[0]
-                .copyTo(LongArray(1))[0].toInt()
+                .run().use { tensors ->
+                    tensors.first().copyTo(LongArray(1))[0].toInt()
+                }
         }
     }
 
