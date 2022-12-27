@@ -298,23 +298,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
                 fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory) }
 
-                val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
-
-                val (lossValue, metricValues) = Tensor.create(xBatchShape, serializeToBuffer(batch.x))
-                    .use { xTensor ->
-                        Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
-                            .use { yTensor ->
-                                Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
-                                    .use { numberOfLossesTensor ->
-                                        Tensor.create(true).use { isTraining ->
-                                            trainOnBatch(
-                                                targets, xTensor, yTensor, numberOfLossesTensor, isTraining,
-                                                metricOps
-                                            )
-                                        }
-                                    }
-                            }
-                    }
+                val (lossValue, metricValues) = getLossAndMetricValues(batch, true)
                 if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
                     logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
                 }
@@ -367,46 +351,44 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return trainingHistory
     }
 
-
     /**
      * Returns the loss value and metric value on train batch.
      */
-    private fun trainOnBatch(
-        targets: List<Operand<Float>>,
-        xTensor: Tensor<Float>,
-        yTensor: Tensor<Float>,
-        numberOfLosses: Tensor<*>,
-        isTraining: Tensor<*>,
-        metricOps: List<Operand<Float>>
-    ): Pair<Float, List<Float>> {
-        val runner = session.runner()
+    private fun getLossAndMetricValues(batch: DataBatch, isTraining: Boolean): Pair<Float, List<Float>> {
+        val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
+        return Tensor.create(xBatchShape, serializeToBuffer(batch.x))
+            .use { xTensor ->
+                Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
+                    .use { yTensor ->
+                        Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
+                            .use { numberOfLossesTensor ->
+                                Tensor.create(isTraining).use { isTrainingTensor ->
+                                    val runner = session.runner()
+                                        .feed(xOp.asOutput(), xTensor)
+                                        .feed(yTrueOp.asOutput(), yTensor)
+                                        .feed(numberOfLossesOp.asOutput(), numberOfLossesTensor)
+                                        .feed(training.asOutput(), isTrainingTensor)
 
-        targets.forEach { runner.addTarget(it) }
+                                    runner.fetch(TRAINING_LOSS)
 
-        runner
-            .feed(xOp.asOutput(), xTensor)
-            .feed(yTrueOp.asOutput(), yTensor)
-            .feed(numberOfLossesOp.asOutput(), numberOfLosses)
-            .feed(training.asOutput(), isTraining)
+                                    metricOps.forEach { runner.fetch(it) }
 
-        runner.fetch(TRAINING_LOSS)
+                                    if (isTraining) {
+                                        targets.forEach { runner.addTarget(it) }
+                                    }
 
-        metricOps.forEach { runner.fetch(it) }
-
-        try {
-            return runner.run().use { tensors ->
-                check(tensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!" }
-                tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
+                                    runner.run().use { tensors ->
+                                        check(tensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!" }
+                                        tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
+                                    }
+                                }
+                            }
+                    }
             }
-        } catch (e: TensorFlowException) {
-            e.printStackTrace()
-            throw RuntimeException(e.message)
-        }
     }
 
     override fun evaluate(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): EvaluationResult {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
 
         val evaluationHistory = History()
 
@@ -419,35 +401,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         for (batch in dataset.batchSequence(batchSize)) {
             callbacks.forEach { it.onTestBatchBegin(batchCounter, batchSize, evaluationHistory) }
-            val (xShape, yShape) = calculateXYShapes(batch)
 
-            val (lossValue, metricValues) = Tensor.create(xShape, serializeToBuffer(batch.x))
-                .use { xTensor ->
-                    Tensor.create(yShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
-                        .use { yTensor ->
-                            Tensor.create(TensorShape(yShape).numElements().toFloat())
-                                .use { numberOfLossesTensor ->
-                                    Tensor.create(false).use { isTraining ->
-                                        val runner = session.runner().fetch(TRAINING_LOSS)
-
-                                        metricOps.forEach { runner.fetch(it) }
-
-                                        runner
-                                            .feed(xOp.asOutput(), xTensor)
-                                            .feed(yTrueOp.asOutput(), yTensor)
-                                            .feed(training.asOutput(), isTraining)
-                                            .feed(numberOfLossesOp.asOutput(), numberOfLossesTensor)
-                                            .run().use { tensors ->
-                                                check(tensors.size == metricOps.size + 1) {
-                                                    "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!"
-                                                }
-
-                                                tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
-                                            }
-                                    }
-                                }
-                        }
-                }
+            val (lossValue, metricValues) = getLossAndMetricValues(batch, false)
 
             averageLossAccum += lossValue
             metrics.indices.forEach { i -> averageMetricAccum[i] += metricValues[i] }
@@ -475,38 +430,16 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predict(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): IntArray {
         require(dataset.xSize() % batchSize == 0) { "The number of elements in the dataset must be a multiple of batch size." }
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-
-        callbacks.forEach { it.model = this }
-        callbacks.forEach { it.onPredictBegin() }
-
-        val xShape = calculateXShape(batchSize)
+        checkModelInitialized()
 
         val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
-        val buffer = Array(xShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-        for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
-            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
-
-            Tensor.create(xShape, serializeToBuffer(batch.x)).use { xTensor ->
-                Tensor.create(false).use { isTraining ->
-                    session.runner()
-                        .fetch(predictionOp)
-                        .feed(xOp.asOutput(), xTensor)
-                        .feed(training.asOutput(), isTraining)
-                        .run().use { tensors ->
-                            tensors.first().copyTo(buffer)
-                        }
-                }
-            }
-
+        val buffer = Array(batchSize) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+        predictOnDataset(dataset, batchSize, callbacks) { batchCounter, tensors ->
+            tensors.first().copyTo(buffer)
             buffer.forEachIndexed { index, data ->
                 predictions[batchSize * batchCounter + index] = data.argmax()
             }
-            callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
         }
-        callbacks.forEach { it.onPredictEnd() }
         return predictions
     }
 
@@ -527,34 +460,45 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
     override fun predictSoftly(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): Array<FloatArray> {
         require(dataset.xSize() % batchSize == 0) { "The number of elements in the dataset must be a multiple of batch size." }
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
 
+        val predictions = Array(dataset.xSize()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+        val buffer = Array(batchSize) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+        predictOnDataset(dataset, batchSize, callbacks) { batchCounter, tensors ->
+            tensors.first().copyTo(buffer)
+            buffer.copyInto(predictions, batchSize * batchCounter)
+        }
+        return predictions
+    }
+
+    private fun predictOnDataset(dataset: Dataset,
+                                 batchSize: Int,
+                                 callbacks: List<Callback>,
+                                 block: (Int, List<Tensor<*>>) -> Unit
+    ) {
         callbacks.forEach { it.model = this }
         callbacks.forEach { it.onPredictBegin() }
 
         val xShape = calculateXShape(batchSize)
 
-        val predictions = Array(dataset.xSize()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-        val buffer = Array(xShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
         for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
             callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
             Tensor.create(xShape, serializeToBuffer(batch.x)).use { xTensor ->
-                session.runner()
-                    .fetch(predictionOp)
-                    .feed(xOp.asOutput(), xTensor)
-                    .run().use { tensors ->
-                        tensors.first().copyTo(buffer)
-                    }
+                Tensor.create(false).use { isTraining ->
+                    session.runner()
+                        .fetch(predictionOp)
+                        .feed(xOp.asOutput(), xTensor)
+                        .feed(training.asOutput(), isTraining)
+                        .run().use { tensors ->
+                            block(batchCounter, tensors)
+                        }
+                }
             }
 
             callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
-            buffer.copyInto(predictions, batchSize * batchCounter)
         }
         callbacks.forEach { it.onPredictEnd() }
-        return predictions
     }
 
     override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
@@ -574,8 +518,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
 
         val xShape = calculateXShape(1)
 
@@ -658,8 +601,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         saveOptimizerState: Boolean,
         writingMode: WritingMode
     ) {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
         if (saveOptimizerState) {
             check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
         }
@@ -850,6 +792,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      */
     public infix fun getLayer(layerName: String): Layer {
         return layersByName[layerName] ?: error("No such layer $layerName in the model.")
+    }
+
+    private fun checkModelInitialized() {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
     }
 
     override fun toString(): String {

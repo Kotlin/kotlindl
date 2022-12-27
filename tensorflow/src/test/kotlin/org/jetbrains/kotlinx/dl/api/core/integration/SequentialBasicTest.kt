@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -422,14 +422,8 @@ internal class SequentialBasicTest : IntegrationTest() {
         val (_, test) = mnist()
 
         testModel.use {
-            val exception =
-                assertThrows(IllegalArgumentException::class.java) {
-                    it.predict(test, 256)
-                }
-            assertEquals(
-                "The amount of images must be a multiple of batch size.",
-                exception.message
-            )
+            val exception = assertThrows(IllegalArgumentException::class.java) { it.predict(test, 256) }
+            assertEquals("The number of elements in the dataset must be a multiple of batch size.", exception.message)
         }
 
         testModel.use {
