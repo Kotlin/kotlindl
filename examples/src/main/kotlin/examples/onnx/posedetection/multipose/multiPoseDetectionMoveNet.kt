@@ -50,7 +50,7 @@ fun multiPoseDetectionMoveNet() {
             .call(modelType.preprocessor)
 
         val inputData = preprocessor.apply(inputImage)
-        val rawPoseLandmarks = it.predictRaw(inputData) { result ->
+        val rawPoseLandmarks = it.predict(inputData) { result ->
             result.get2DFloatArray("output_0")
         }
         println(rawPoseLandmarks.contentDeepToString())

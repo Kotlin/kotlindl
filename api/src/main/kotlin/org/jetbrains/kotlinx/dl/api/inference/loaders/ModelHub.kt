@@ -28,7 +28,7 @@ public abstract class ModelHub {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading before usage.
      */
-    public abstract fun <T : InferenceModel, U> loadModel(
+    public abstract fun <T : InferenceModel<*>, U> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
     ): T
@@ -40,7 +40,7 @@ public abstract class ModelHub {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Pretrained model.
      */
-    public fun <T : InferenceModel, U> loadPretrainedModel(
+    public fun <T : InferenceModel<*>, U> loadPretrainedModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode = LoadingMode.SKIP_LOADING_IF_EXISTS
     ): U {
@@ -50,10 +50,7 @@ public abstract class ModelHub {
     /**
      * This operator equivalent to [loadPretrainedModel].
      */
-    public operator fun <T : InferenceModel, U> get(modelType: ModelType<T, U>): U {
+    public operator fun <T : InferenceModel<*>, U> get(modelType: ModelType<T, U>): U {
         return loadPretrainedModel(modelType = modelType)
     }
 }
-
-
-

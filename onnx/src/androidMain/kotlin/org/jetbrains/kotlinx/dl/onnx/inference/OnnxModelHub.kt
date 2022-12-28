@@ -42,7 +42,7 @@ public class ONNXModelHub(private val context: Context) : ModelHub() {
      * @param [loadingMode] it's ignored
      */
     @Suppress("UNCHECKED_CAST")
-    override fun <T : InferenceModel, U> loadModel(
+    override fun <T : InferenceModel<*>, U> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode, /* unused */
     ): T {

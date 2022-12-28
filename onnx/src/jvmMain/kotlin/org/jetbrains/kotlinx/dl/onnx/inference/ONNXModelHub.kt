@@ -47,7 +47,7 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
      * @return An instance of [OnnxInferenceModel].
      */
     @Suppress("UNCHECKED_CAST")
-    public override fun <T : InferenceModel, U> loadModel(
+    public override fun <T : InferenceModel<*>, U> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {

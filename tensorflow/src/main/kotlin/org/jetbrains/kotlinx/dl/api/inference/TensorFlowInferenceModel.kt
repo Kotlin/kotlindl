@@ -39,22 +39,8 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
-    private fun <T> predict(inputs: Map<String, FloatData>,
-                            outputs: List<String>,
-                            extractResult: (List<Tensor<*>>) -> T
-    ): T {
-        check(isModelInitialized) { "Model weights are not initialized." }
-        outputs.forEach { outputName ->
-            require(tfGraph.operation(outputName) != null) {
-                "Could not find tensor output $outputName in the TensorFlow graph."
-            }
-        }
-
-        return runModel(
-            inputs.map { InputKey.Name(it.key) to it.value.toTensor() }.toMap(),
-            outputs.map { OutputKey.Name(it) },
-            emptyList(),
-        ) { tensors -> extractResult(tensors) }
+    override fun <T> predict(inputData: FloatData, extractResult: (TensorResult) -> T): T {
+        return predict(mapOf(input to inputData), listOf(output), extractResult)
     }
 
     /**
@@ -75,15 +61,15 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      * @return Predicted class index.
      */
     public fun predict(inputData: FloatData, inputTensorName: String, outputTensorName: String): Int {
-        return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName)) { tensors ->
-            tensors.first().copyTo(LongArray(1))[0].toInt()
+        return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName)) { result ->
+            result.tensors.first().copyTo(LongArray(1))[0].toInt()
         }
     }
 
     override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
-        return predict(mapOf(input to inputData), listOf(fetchTensorName)) { tensors ->
-            tensors.first().convertTensorToMultiDimArray()[0] as FloatArray
+        return predict(mapOf(input to inputData), listOf(fetchTensorName)) { result ->
+            result.tensors.first().convertTensorToMultiDimArray()[0] as FloatArray
         }
     }
 

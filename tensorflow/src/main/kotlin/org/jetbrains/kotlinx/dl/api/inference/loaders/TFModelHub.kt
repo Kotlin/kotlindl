@@ -46,7 +46,7 @@ public class TFModelHub(public val cacheDirectory: File) : ModelHub() {
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return Raw model without weights. Needs in compilation and weights loading via [loadWeights] before usage.
      */
-    public override fun <T : InferenceModel, U> loadModel(
+    public override fun <T : InferenceModel<*>, U> loadModel(
         modelType: ModelType<T, U>,
         loadingMode: LoadingMode
     ): T {

@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.impl.util.argmax
+import org.jetbrains.kotlinx.dl.impl.util.use
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getValues
 import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.throwIfOutputNotSupported
@@ -30,7 +31,7 @@ import java.nio.*
  */
 public open class OnnxInferenceModel private constructor(
     private val modelSource: ModelSource
-) : InferenceModel, ExecutionProviderCompatible, ModelWithSummary {
+) : InferenceModel<OrtSession.Result>, ExecutionProviderCompatible, ModelWithSummary {
     /**
      * The host object for the onnx-runtime system. Can create [session] which encapsulate
      * specific models.
@@ -176,15 +177,10 @@ public open class OnnxInferenceModel private constructor(
 
     override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         val outputTensorName = predictionTensorName.ifEmpty { outputInfo.getName(0) }
-        require(outputTensorName in outputInfo) {
-            "There is no output with name '$outputTensorName'." +
-                    " The model only has following outputs - ${outputInfo.keys}"
-        }
-
         val outputInfo = outputInfo.getValue(outputTensorName).info
         throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
 
-        return predictRaw(inputData) { output -> output.getFloatArray(outputTensorName) }
+        return predict(inputData) { output -> output.getFloatArray(outputTensorName) }
     }
 
     /**
@@ -194,7 +190,7 @@ public open class OnnxInferenceModel private constructor(
      * @return Vector that represents the probability distributions of a list of potential outcomes
      */
     public fun predictSoftly(inputData: FloatData): FloatArray {
-        return predictRaw(inputData) { output ->
+        return predict(inputData) { output ->
             output.getFloatArray(outputInfo.getName(0))
         }
     }
@@ -203,10 +199,10 @@ public open class OnnxInferenceModel private constructor(
      * Returns list of multidimensional arrays with data from model outputs.
      *
      * NOTE: This operation can be quite slow for high dimensional tensors,
-     * use [predictRaw] with custom output processing for better performance.
+     * use [predict] with custom output processing for better performance.
      */
     public fun predictRaw(inputData: FloatData): Map<String, Any> {
-        return predictRaw(inputData) { it.getValues() }
+        return predict(inputData) { it.getValues() }
     }
 
     /**
@@ -214,20 +210,31 @@ public open class OnnxInferenceModel private constructor(
      * For models with multiple inputs, [inputData] is passed as a first input.
      * @see OrtSessionResultConversions
      */
-    public fun <R> predictRaw(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
-        return predictRaw(mapOf(inputInfo.getName(0) to inputData), extractResult)
+    public override fun <R> predict(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
+        return predict(mapOf(inputInfo.getName(0) to inputData), extractResult)
     }
 
     /**
      * Runs prediction on a given [inputs] and calls [extractResult] function to process output.
      * @see OrtSessionResultConversions
      */
-    public fun <R> predictRaw(inputs: Map<String, FloatData>, extractResult: (OrtSession.Result) -> R): R {
-        val tensors = inputs.toTensors()
-        try {
-            return session.run(tensors).use { output -> extractResult(output) }
-        } finally {
-            tensors.values.forEach(OnnxTensor::close)
+    public fun <R> predict(inputs: Map<String, FloatData>, extractResult: (OrtSession.Result) -> R): R {
+        return predict(inputs, outputInfo.keys.toList(), extractResult)
+    }
+
+    override fun <T> predict(inputs: Map<String, FloatData>,
+                             outputs: List<String>,
+                             extractResult: (OrtSession.Result) -> T
+    ): T {
+        outputs.forEach {
+            require(it in outputInfo) {
+                "There is no output with name '$it'." +
+                        " The model only has following outputs - ${outputInfo.keys}"
+            }
+        }
+
+        return inputs.toTensors().use { tensors ->
+            session.run(tensors, LinkedHashSet(outputs)).use { output -> extractResult(output) }
         }
     }
 

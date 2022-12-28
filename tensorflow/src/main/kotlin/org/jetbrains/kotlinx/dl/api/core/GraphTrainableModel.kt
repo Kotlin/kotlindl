@@ -28,6 +28,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
+import org.jetbrains.kotlinx.dl.api.inference.TensorResult
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
@@ -524,6 +525,15 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
             prediction to activations
         }
+    }
+
+    override fun <T> predict(inputData: FloatData, extractResult: (TensorResult) -> T): T {
+        checkModelInitialized()
+
+        val inputs = mapOf(xOp to inputData.toTensor())
+        val outputs = listOf(OutputKey.Operand(predictionOp))
+
+        return runModelInternal(inputs, outputs) { tensors -> extractResult(TensorResult(tensors)) }
     }
 
     private fun <R> runModelInternal(inputs: Map<out Operand<*>, Tensor<*>>,

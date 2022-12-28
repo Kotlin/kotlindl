@@ -47,7 +47,7 @@ public interface OnnxHighLevelModel<I, R> : ExecutionProviderCompatible, ModelWi
      */
     public fun predict(input: I): R {
         val preprocessedInput = preprocessing.apply(input)
-        return internalModel.predictRaw(preprocessedInput) { convert(it) }
+        return internalModel.predict(preprocessedInput) { convert(it) }
     }
 
     override fun initializeWith(vararg executionProviders: ExecutionProvider) {

@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
  *
  * @param [dataset] Dataset.
  */
-public fun InferenceModel.predict(dataset: Dataset): List<Int> {
+public fun InferenceModel<*>.predict(dataset: Dataset): List<Int> {
     val predictedLabels: MutableList<Int> = mutableListOf()
 
     for (i in 0 until dataset.xSize()) {
@@ -31,7 +31,7 @@ public fun InferenceModel.predict(dataset: Dataset): List<Int> {
  *
  * NOTE: Slow method.
  */
-public fun InferenceModel.evaluate(
+public fun InferenceModel<*>.evaluate(
     dataset: Dataset,
     metric: Metrics
 ): Double {

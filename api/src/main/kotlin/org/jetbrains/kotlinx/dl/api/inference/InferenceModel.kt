@@ -9,10 +9,22 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
 
 /**
  * The basic interface for all models which defines the basic functions required for inference tasks only.
+ *
+ * @param [R] type of inference result, produced by this model.
  */
-public interface InferenceModel : AutoCloseable {
+public interface InferenceModel<R> : AutoCloseable {
     /** Input specification for this model. */
     public val inputDimensions: LongArray
+
+    /**
+     * Run inference on the provided [inputData] and pass inference result to the [extractResult] function.
+     */
+    public fun <T> predict(inputData: FloatData, extractResult: (R) -> T): T
+
+    /**
+     * Run inference on the provided [inputs], calculate the specified [outputs] and pass inference result to the [extractResult] function.
+     */
+    public fun <T> predict(inputs: Map<String, FloatData>, outputs: List<String>, extractResult: (R) -> T): T
 
     /**
      * Predicts the class of [inputData].
@@ -36,5 +48,5 @@ public interface InferenceModel : AutoCloseable {
      *
      * @return A copied inference model.
      */
-    public fun copy(): InferenceModel
+    public fun copy(): InferenceModel<R>
 }

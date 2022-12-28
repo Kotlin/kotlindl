@@ -85,9 +85,7 @@ class PoseDetectionTestSuite {
 
             val inputData = fileDataLoader.load(imageFile)
 
-            val rawPoseLandMarks = it.predictRaw(inputData) { result ->
-                result.get2DFloatArray("output_0")
-            }
+            val rawPoseLandMarks = it.predict(inputData) { result -> result.get2DFloatArray("output_0") }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -114,9 +112,7 @@ class PoseDetectionTestSuite {
 
             val inputData = preprocessing.load(imageFile)
 
-            val rawPoseLandMarks = it.predictRaw(inputData) { result ->
-                result.get2DFloatArray("output_0")
-            }
+            val rawPoseLandMarks = it.predict(inputData) { result -> result.get2DFloatArray("output_0") }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -143,9 +139,7 @@ class PoseDetectionTestSuite {
 
 
             val inputData = dataLoader.load(imageFile)
-            val rawPosesLandMarks = inferenceModel.predictRaw(inputData) { result ->
-                result.get2DFloatArray("output_0")
-            }
+            val rawPosesLandMarks = inferenceModel.predict(inputData) { result -> result.get2DFloatArray("output_0") }
             println(rawPosesLandMarks.contentDeepToString())
 
             assertEquals(6, rawPosesLandMarks.size)

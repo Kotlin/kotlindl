@@ -48,7 +48,7 @@ fun poseDetectionMoveNet() {
 
         val inputData = preprocessing.apply(image)
 
-        val rawPoseLandMarks = it.predictRaw(inputData) { result ->
+        val rawPoseLandMarks = it.predict(inputData) { result ->
             result.get2DFloatArray("output_0")
         }
         println(rawPoseLandMarks.contentDeepToString())

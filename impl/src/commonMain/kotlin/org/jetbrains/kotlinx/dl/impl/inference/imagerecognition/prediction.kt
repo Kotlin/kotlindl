@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import java.util.*
 
 /** Returns top-N labels for the given [floatData] encoded with mapping [labels]. */
-public fun InferenceModel.predictTopNLabels(
+public fun InferenceModel<*>.predictTopNLabels(
     floatData: FloatData,
     labels: Map<Int, String>,
     n: Int = 5
@@ -21,7 +21,7 @@ public fun InferenceModel.predictTopNLabels(
 }
 
 /** Returns top-5 labels for the given [data] encoded with mapping [classLabels]. */
-public fun InferenceModel.predictTop5Labels(
+public fun InferenceModel<*>.predictTop5Labels(
     data: FloatData,
     classLabels: Map<Int, String>,
 ): List<Pair<String, Float>> {

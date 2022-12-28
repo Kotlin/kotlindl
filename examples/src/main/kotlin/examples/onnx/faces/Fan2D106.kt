@@ -52,7 +52,7 @@ fun main() {
             val inputImage = ImageConverter.toBufferedImage(inputFile)
             val inputData = preprocessor.apply(inputImage)
 
-            val floats = it.predictRaw(inputData) { output -> output.getFloatArray("fc1") }
+            val floats = it.predict(inputData) { output -> output.getFloatArray("fc1") }
             println(floats.contentToString())
 
             val landMarks = mutableListOf<Landmark>()

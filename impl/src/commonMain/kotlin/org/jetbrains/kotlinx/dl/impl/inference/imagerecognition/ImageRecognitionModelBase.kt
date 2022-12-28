@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
  * For the models from ModelHub it equals to the string representation of the [org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType].
  */
 public abstract class ImageRecognitionModelBase<I>(
-    protected val internalModel: InferenceModel,
+    protected val internalModel: InferenceModel<*>,
     protected val modelKindDescription: String? = null
 ) : ModelWithSummary, AutoCloseable {
     /**
