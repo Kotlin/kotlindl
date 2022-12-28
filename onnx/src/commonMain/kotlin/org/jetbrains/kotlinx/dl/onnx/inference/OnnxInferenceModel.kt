@@ -12,13 +12,11 @@ import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.InferenceResultConverter
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.jetbrains.kotlinx.dl.impl.util.use
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getValues
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.throwIfOutputNotSupported
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CPU
 import java.nio.*
@@ -55,6 +53,9 @@ public open class OnnxInferenceModel private constructor(
 
     /** Model name. */
     public var name: String? = null
+
+    override val resultConverter: InferenceResultConverter<OrtSession.Result>
+        get() = OrtSessionResultConverter
 
     /**
      * Constructs an ONNX inference model from the given model file.
@@ -208,7 +209,7 @@ public open class OnnxInferenceModel private constructor(
     /**
      * Runs prediction on a given [inputData] and calls [extractResult] function to process output.
      * For models with multiple inputs, [inputData] is passed as a first input.
-     * @see OrtSessionResultConversions
+     * @see OrtSessionResultConverter
      */
     public override fun <R> predict(inputData: FloatData, extractResult: (OrtSession.Result) -> R): R {
         return predict(mapOf(inputInfo.getName(0) to inputData), extractResult)
@@ -216,7 +217,7 @@ public open class OnnxInferenceModel private constructor(
 
     /**
      * Runs prediction on a given [inputs] and calls [extractResult] function to process output.
-     * @see OrtSessionResultConversions
+     * @see OrtSessionResultConverter
      */
     public fun <R> predict(inputs: Map<String, FloatData>, extractResult: (OrtSession.Result) -> R): R {
         return predict(inputs, outputInfo.keys.toList(), extractResult)

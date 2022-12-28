@@ -1,7 +1,7 @@
 package org.jetbrains.kotlinx.dl.api.core.initializer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -48,14 +48,14 @@ internal class OrthogonalTest {
 
             Assertions.assertArrayEquals(
                 identityMatrix(size),
-                multiplicationResult.asOutput().tensor().convertTensorToFlattenFloatArray(),
+                multiplicationResult.asOutput().tensor().toFloatArray(),
                 EPS
             )
 
             if (expectedMatrix != null) {
                 Assertions.assertArrayEquals(
                     expectedMatrix,
-                    matrix.asOutput().tensor().convertTensorToFlattenFloatArray(),
+                    matrix.asOutput().tensor().toFloatArray(),
                     EPS
                 )
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.inference.posedetection.DetectedPose
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseEdge
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.PoseLandmark
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.get2DFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.get2DFloatArray
 import kotlin.math.min
 
 private const val OUTPUT_NAME = "output_0"

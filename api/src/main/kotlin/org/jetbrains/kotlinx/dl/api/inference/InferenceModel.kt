@@ -11,10 +11,16 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
  * The basic interface for all models which defines the basic functions required for inference tasks only.
  *
  * @param [R] type of inference result, produced by this model.
+ * @see InferenceResultConverter
  */
 public interface InferenceModel<R> : AutoCloseable {
     /** Input specification for this model. */
     public val inputDimensions: LongArray
+
+    /**
+     * Provides methods for converting inference result from this model to the common data types.
+     */
+    public val resultConverter: InferenceResultConverter<R>
 
     /**
      * Run inference on the provided [inputData] and pass inference result to the [extractResult] function.

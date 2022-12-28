@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage

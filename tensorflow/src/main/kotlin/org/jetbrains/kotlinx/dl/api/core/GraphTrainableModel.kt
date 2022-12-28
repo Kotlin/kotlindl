@@ -25,11 +25,11 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
 import org.jetbrains.kotlinx.dl.api.inference.TensorResult
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toMultiDimensionalArray
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.impl.util.argmax
@@ -520,8 +520,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
 
         return runModelInternal(inputs, outputs) { tensors ->
-            val prediction = tensors.first().convertTensorToFlattenFloatArray()
-            val activations = tensors.drop(1).map { it.convertTensorToMultiDimArray() }
+            val prediction = tensors.first().toFloatArray()
+            val activations = tensors.drop(1).map { it.toMultiDimensionalArray() }
 
             prediction to activations
         }
@@ -643,7 +643,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 variableNameFile.bufferedWriter().use { file ->
 
                     tensorForCopying.use {
-                        val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
+                        val reshaped = tensorForCopying.toFloatArray()
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")

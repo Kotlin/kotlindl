@@ -8,7 +8,7 @@ package examples.onnx
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

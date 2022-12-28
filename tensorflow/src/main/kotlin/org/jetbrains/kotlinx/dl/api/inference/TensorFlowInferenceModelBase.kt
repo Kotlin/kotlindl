@@ -12,7 +12,6 @@ import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.createFloatArray
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
 import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.*
@@ -37,6 +36,9 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
 
     /** Model name. */
     public var name: String? = null
+
+    override val resultConverter: InferenceResultConverter<TensorResult>
+        get() = TensorFlowInferenceResultConverter
 
     override fun <T> predict(inputs: Map<String, FloatData>,
                              outputs: List<String>,
@@ -203,7 +205,7 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
         val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
 
         model.loadVariables(modelWeights.keys) { variableName, _ ->
-            modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
+            modelWeights[variableName]!!.use { it.toMultiDimensionalArray() }
         }
     }
 
@@ -220,6 +222,8 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
 
 /**
  * Inference result for the models inheriting [TensorFlowInferenceModelBase].
+ *
+ * @see TensorFlowInferenceResultConverter
  */
 public data class TensorResult(val tensors: List<Tensor<*>>) : AutoCloseable {
     override fun close() {

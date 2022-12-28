@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -16,7 +16,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 

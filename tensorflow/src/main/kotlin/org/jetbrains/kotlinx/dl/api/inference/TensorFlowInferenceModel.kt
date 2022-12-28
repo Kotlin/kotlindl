@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Graph
 import org.tensorflow.Session
 import org.tensorflow.Tensor
@@ -62,15 +61,13 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      */
     public fun predict(inputData: FloatData, inputTensorName: String, outputTensorName: String): Int {
         return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName)) { result ->
-            result.tensors.first().copyTo(LongArray(1))[0].toInt()
+            result.getLongArray(0)[0].toInt()
         }
     }
 
     override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
-        return predict(mapOf(input to inputData), listOf(fetchTensorName)) { result ->
-            result.tensors.first().convertTensorToMultiDimArray()[0] as FloatArray
-        }
+        return predict(mapOf(input to inputData), listOf(fetchTensorName)) { result -> result.getFloatArray(0) }
     }
 
     /**
