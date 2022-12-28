@@ -15,7 +15,6 @@ import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.InferenceResultConverter
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
-import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.jetbrains.kotlinx.dl.impl.util.use
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CPU
@@ -171,30 +170,6 @@ public open class OnnxInferenceModel private constructor(
 
     override val inputDimensions: LongArray
         get() = TensorShape(inputInfo.getShape(0)).tail()
-
-    public override fun predict(inputData: FloatData): Int {
-        return predictSoftly(inputData).argmax()
-    }
-
-    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
-        val outputTensorName = predictionTensorName.ifEmpty { outputInfo.getName(0) }
-        val outputInfo = outputInfo.getValue(outputTensorName).info
-        throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
-
-        return predict(inputData) { output -> output.getFloatArray(outputTensorName) }
-    }
-
-    /**
-     * Predicts vector of probabilities instead of specific class in [predict] method.
-     *
-     * @param [inputData] The single example with unknown vector of probabilities.
-     * @return Vector that represents the probability distributions of a list of potential outcomes
-     */
-    public fun predictSoftly(inputData: FloatData): FloatArray {
-        return predict(inputData) { output ->
-            output.getFloatArray(outputInfo.getName(0))
-        }
-    }
 
     /**
      * Returns list of multidimensional arrays with data from model outputs.

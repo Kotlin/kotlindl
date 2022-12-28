@@ -29,10 +29,10 @@ class SavedModelTest {
 
             assertEquals(train.getY(0), prediction.toFloat())
 
-            val predictions = it.predict(test)
+            val predictions = it.predict(test, SavedModel::predict)
 
             assertEquals(10000, predictions.size)
-            assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
+            assertTrue(it.evaluate(test, Metrics.ACCURACY, SavedModel::predict) > 0.9)
         }
     }
 
@@ -47,11 +47,11 @@ class SavedModelTest {
 
             assertEquals(train.getY(0), prediction.toFloat())
 
-            val predictions = it.predict(test, "Placeholder", "ArgMax")
+            val predictions = it.predict(test) { data -> predict(data, "Placeholder", "ArgMax") }
 
             assertEquals(10000, predictions.size)
-            assertTrue(it.evaluate(test, Metrics.ACCURACY) > 0.9)
-            assertTrue(it.evaluate(test, Metrics.MAE).isNaN())
+            assertTrue(it.evaluate(test, Metrics.ACCURACY, SavedModel::predict) > 0.9)
+            assertTrue(it.evaluate(test, Metrics.MAE, SavedModel::predict).isNaN())
         }
     }
 }

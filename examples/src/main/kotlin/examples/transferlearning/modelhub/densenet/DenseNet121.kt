@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
@@ -68,7 +69,7 @@ fun denseNet121Prediction() {
 
         for (i in 1..8) {
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
-            val res = it.predict(inputData)
+            val res = it.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)

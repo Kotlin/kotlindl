@@ -5,46 +5,47 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
 /**
- * Predicts labels for all observation in [dataset].
+ * Runs [predictionFunction] for all observation in [dataset]
+ * and collects predictions to the list.
  *
  * NOTE: Slow method.
  *
+ * @param [R] Prediction result type.
+ * @param [T] Model type.
  * @param [dataset] Dataset.
+ * @param [predictionFunction] Prediction function to make predictions with.
  */
-public fun InferenceModel<*>.predict(dataset: Dataset): List<Int> {
-    val predictedLabels: MutableList<Int> = mutableListOf()
-
-    for (i in 0 until dataset.xSize()) {
-        val predictedLabel = predict(dataset.getX(i))
-        predictedLabels.add(predictedLabel)
-    }
-
-    return predictedLabels
+public fun <R, T : InferenceModel<*>> T.predict(dataset: Dataset, predictionFunction: T.(FloatData) -> R): List<R> {
+    return dataset.map { predictionFunction(it) }
 }
 
 /**
- * Evaluates [dataset] via [metric].
+ * Evaluates [dataset] via [metric] with the given [predictionFunction].
  *
  * NOTE: Slow method.
+ *
+ * @param [T] Model type.
+ * @param [dataset] Dataset.
+ * @param [metric] Metric to use.
+ * @param [predictionFunction] Prediction function to make predictions with.
  */
-public fun InferenceModel<*>.evaluate(
-    dataset: Dataset,
-    metric: Metrics
+public fun <T : InferenceModel<*>> T.evaluate(dataset: Dataset,
+                                              metric: Metrics,
+                                              predictionFunction: T.(FloatData) -> Int
 ): Double {
-    return if (metric == Metrics.ACCURACY) {
-        var counter = 0
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
-            if (predictedLabel == dataset.getY(i).toInt())
-                counter++
-        }
+    if (metric != Metrics.ACCURACY) return Double.NaN
 
-        (counter.toDouble() / dataset.xSize())
-    } else {
-        Double.NaN
+    var counter = 0
+    for (i in 0 until dataset.xSize()) {
+        val predictedLabel = predictionFunction(dataset.getX(i))
+        if (predictedLabel == dataset.getY(i).toInt())
+            counter++
     }
+
+    return (counter.toDouble() / dataset.xSize())
 }

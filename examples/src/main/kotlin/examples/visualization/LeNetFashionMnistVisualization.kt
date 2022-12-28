@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.visualization.letsplot.*
 import org.jetbrains.kotlinx.dl.visualization.swing.drawActivations
 import org.jetbrains.kotlinx.dl.visualization.swing.drawFilters
@@ -66,7 +67,7 @@ fun main() {
         val fashionPlots = List(3) { imageIndex ->
             flattenImagePlot(
                 imageIndex, test,
-                predict = it::predict,
+                predict = it::predictLabel,
                 labelEncoding = fashionMnistLabelEncoding::get,
                 plotFeature = PlotFeature.GRAY
             )

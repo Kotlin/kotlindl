@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.jetbrains.kotlinx.dl.visualization.letsplot.columnPlot
 import org.jetbrains.kotlinx.dl.visualization.letsplot.filtersPlot
@@ -56,7 +57,7 @@ fun main() {
         )
 
         val numbersPlots = List(3) { imageIndex ->
-            flattenImagePlot(imageIndex, test, it::predict)
+            flattenImagePlot(imageIndex, test, it::predictLabel)
         }
         columnPlot(numbersPlots, 3, 256).show()
 

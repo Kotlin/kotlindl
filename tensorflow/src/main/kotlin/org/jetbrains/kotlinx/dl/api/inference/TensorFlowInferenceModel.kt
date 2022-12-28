@@ -42,13 +42,12 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
         return predict(mapOf(input to inputData), listOf(output), extractResult)
     }
 
-    /**
-     * Generates output prediction for the input sample.
-     *
-     * @param [inputData] Unlabeled input data to define label.
-     */
-    override fun predict(inputData: FloatData): Int {
-        return predict(inputData, input, output)
+    public fun <T> predict(inputData: FloatData,
+                           inputTensorName: String = input,
+                           outputTensorName: String = output,
+                           extractResult: (TensorResult) -> T
+    ): T {
+        return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName), extractResult)
     }
 
     /**
@@ -59,15 +58,10 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      * @param [outputTensorName] The name of output tensor.
      * @return Predicted class index.
      */
-    public fun predict(inputData: FloatData, inputTensorName: String, outputTensorName: String): Int {
-        return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName)) { result ->
+    public fun predict(inputData: FloatData, inputTensorName: String = input, outputTensorName: String = output): Int {
+        return predict(inputData, inputTensorName, outputTensorName) { result ->
             result.getLongArray(0)[0].toInt()
         }
-    }
-
-    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
-        val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
-        return predict(mapOf(input to inputData), listOf(fetchTensorName)) { result -> result.getFloatArray(0) }
     }
 
     /**

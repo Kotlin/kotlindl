@@ -33,23 +33,6 @@ public interface InferenceModel<R> : AutoCloseable {
     public fun <T> predict(inputs: Map<String, FloatData>, outputs: List<String>, extractResult: (R) -> T): T
 
     /**
-     * Predicts the class of [inputData].
-     *
-     * @param [inputData] The single example with unknown label.
-     * @return Predicted class index.
-     */
-    public fun predict(inputData: FloatData): Int
-
-    /**
-     * Predicts vector of probabilities instead of specific class in [predict] method.
-     *
-     * @param [inputData] The single example with unknown vector of probabilities.
-     * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from model graph.
-     * @return Vector that represents the probability distributions of a list of potential outcomes
-     */
-    public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray
-
-    /**
      * Creates a copy of this model.
      *
      * @return A copied inference model.

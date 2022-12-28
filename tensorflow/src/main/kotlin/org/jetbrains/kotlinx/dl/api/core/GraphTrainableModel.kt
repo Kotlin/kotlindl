@@ -431,11 +431,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return predictions
     }
 
-    override fun predict(inputData: FloatData): Int {
-        val softPrediction = predictSoftly(inputData)
-        return softPrediction.argmax()
-    }
-
     override fun predict(inputData: FloatData, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
         return softPrediction.argmax()
@@ -480,7 +475,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         callbacks.forEach { it.onPredictEnd() }
     }
 
-    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
+    public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray {
         val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
     }

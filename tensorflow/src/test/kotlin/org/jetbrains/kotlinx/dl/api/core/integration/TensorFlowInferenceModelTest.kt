@@ -21,7 +21,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.getFloatArray
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -144,7 +146,9 @@ class TensorFlowInferenceModelTest {
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
                 val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val softPrediction = it.predict(train.getX(imageId), outputTensorName = OUTPUT_NAME) { result ->
+                    result.getFloatArray(0)
+                }
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())
@@ -200,7 +204,9 @@ class TensorFlowInferenceModelTest {
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
                 val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val softPrediction = it.predict(train.getX(imageId), outputTensorName = OUTPUT_NAME) { result ->
+                    result.getFloatArray(0)
+                }
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())

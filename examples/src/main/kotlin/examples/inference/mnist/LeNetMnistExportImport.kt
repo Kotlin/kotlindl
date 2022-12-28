@@ -12,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
@@ -57,16 +58,13 @@ fun lenetOnMnistDatasetExportImportToTxt() {
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
-        val prediction = it.predict(train.getX(imageId1))
-
+        val prediction = it.predictLabel(train.getX(imageId1))
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
-        val prediction2 = it.predict(train.getX(imageId2))
-
+        val prediction2 = it.predictLabel(train.getX(imageId2))
         println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
-        val prediction3 = it.predict(train.getX(imageId3))
-
+        val prediction3 = it.predictLabel(train.getX(imageId3))
         println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]

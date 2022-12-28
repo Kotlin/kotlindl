@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.preprocessing.inputStreamLoader
 import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.InputType
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
 import org.jetbrains.kotlinx.dl.impl.preprocessing.call
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
@@ -70,7 +71,7 @@ fun main() {
             val inputStream = OnHeapDataset::class.java.classLoader.getResourceAsStream("datasets/vgg/image$i.jpg")
             val inputData = inputStreamLoader.load(inputStream)
 
-            val res = it.predict(inputData)
+            val res = it.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)

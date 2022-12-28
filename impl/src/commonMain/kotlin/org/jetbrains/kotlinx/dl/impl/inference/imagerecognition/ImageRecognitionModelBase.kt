@@ -44,7 +44,7 @@ public abstract class ImageRecognitionModelBase<I>(
      */
     public fun predictObject(image: I): String {
         val input = preprocessing.apply(image)
-        return classLabels[internalModel.predict(input)]!!
+        return classLabels[internalModel.predictLabel(input)]!!
     }
 
     /**

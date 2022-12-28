@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.SavedModel
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.jetbrains.kotlinx.dl.dataset.evaluate
+import org.jetbrains.kotlinx.dl.dataset.predict
 
 private const val PATH_TO_MODEL = "examples/src/main/resources/models/savedmodel"
 
@@ -28,10 +29,10 @@ fun lenetOnMnistInferenceWithTensorNames() {
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
 
-        val predictions = it.predict(test, "Placeholder", "ArgMax")
+        val predictions = it.predict(test) { data -> predict(data, "Placeholder", "ArgMax") }
         println(predictions.toString())
 
-        println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY)}")
+        println("Accuracy is : ${it.evaluate(test, Metrics.ACCURACY, SavedModel::predict)}")
     }
 }
 
