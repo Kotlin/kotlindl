@@ -38,13 +38,10 @@ public object ONNXModels {
      *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
     public sealed class CV(
-        relativePath: String,
-        protected val channelsFirst: Boolean,
-        private val inputColorMode: ColorMode = ColorMode.RGB,
-        /** If true, model is shipped without last few layers and could be used for transfer learning and fine-tuning with TF Runtime. */
-        noTop: Boolean = false
+        override val modelRelativePath: String,
+        internal val channelsFirst: Boolean,
+        internal val inputColorMode: ColorMode = ColorMode.RGB
     ) : OnnxModelType<ImageRecognitionModel> {
-        override val modelRelativePath: String = if (noTop) "$relativePath-notop" else relativePath
 
         override fun pretrainedModel(modelHub: ModelHub): ImageRecognitionModel {
             return ImageRecognitionModel(
@@ -317,7 +314,7 @@ public object ONNXModels {
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
-         * NOTE: This model is converted from Keras.applications and could be used to be compared with the [ResNet50noTopCustom] model.
+         * No-top version is available as [CVnoTop.ResNet50Custom].
          *
          * @see <a href="https://arxiv.org/abs/1512.03385">
          *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
@@ -338,49 +335,20 @@ public object ONNXModels {
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
-         * This model has 50 layers with ResNetv1 architecture.
-         *
-         * The model have
-         * - an input with the shape (1x224x224x3)
-         * - an output with the shape (N,M3,M4,2048)
-         *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the model have been removed so that the user can fine-tune the model for his specific task.
-         *
-         * @see <a href="https://arxiv.org/abs/1512.03385">
-         *     Deep Residual Learning for Image Recognition (CVPR 2015)</a>
-         * @see <a href="https://keras.io/api/applications/resnet/#resnet50-function">
-         *    Official ResNet model from Keras.applications.</a>
-         */
-        public object ResNet50noTopCustom :
-            CV("models/onnx/cv/custom/resnet50notop", channelsFirst = false) {
-            override val preprocessor: Operation<FloatData, FloatData>
-                get() = InputType.CAFFE.preprocessing()
-        }
-
-        /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
-         * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
-         *
          * Instantiates the EfficientNetB0 architecture.
          *
          * The model have
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x7x7x1280)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB0].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb0-function">
          *    Official EfficientNetB0 model from Keras.applications.</a>
          */
-        public class EfficientNetB0(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b0",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB0 : CV("models/onnx/cv/efficientnet/efficientnet-b0", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -391,21 +359,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x240x240x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x7x7x1280)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB1].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb1-function">
          *    Official EfficientNetB1 model from Keras.applications.</a>
          */
-        public class EfficientNetB1(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b1",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB1 : CV("models/onnx/cv/efficientnet/efficientnet-b1", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -416,21 +378,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x260x260x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x8x8x1408)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB2].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb2-function">
          *    Official EfficientNetB2 model from Keras.applications.</a>
          */
-        public class EfficientNetB2(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b2",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB2 : CV("models/onnx/cv/efficientnet/efficientnet-b2", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -441,21 +397,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x300x300x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x9x9x1536)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB3].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb3-function">
          *    Official EfficientNetB3 model from Keras.applications.</a>
          */
-        public class EfficientNetB3(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b3",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB3 : CV("models/onnx/cv/efficientnet/efficientnet-b3", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -466,21 +416,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x380x380x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x11x11x1792)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB4].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb4-function">
          *    Official EfficientNetB4 model from Keras.applications.</a>
          */
-        public class EfficientNetB4(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b4",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB4 : CV("models/onnx/cv/efficientnet/efficientnet-b4", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -491,21 +435,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x456x456x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x14x14x2048)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB5].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb5-function">
          *    Official EfficientNetB5 model from Keras.applications.</a>
          */
-        public class EfficientNetB5(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b5",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB5 : CV("models/onnx/cv/efficientnet/efficientnet-b5", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -516,21 +454,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x528x528x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x16x16x2304)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB6].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb6-function">
          *    Official EfficientNetB6 model from Keras.applications.</a>
          */
-        public class EfficientNetB6(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b6",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB6 : CV("models/onnx/cv/efficientnet/efficientnet-b6", channelsFirst = false)
 
         /**
          * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
@@ -541,21 +473,15 @@ public object ONNXModels {
          * The model have
          * - an input with the shape (1x600x600x3)
          * - an output with the shape (1x1000)
-         * - an output for noTop model with the shape (1x18x18x2560)
          *
-         * NOTE: This model is converted from Keras.applications, the last two layers in the noTop model have been removed so that the user can fine-tune the model for his specific task.
+         * No-top version is available as [CVnoTop.EfficientNetB7].
          *
          * @see <a href="https://arxiv.org/abs/1905.11946">
          *     EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</a>
          * @see <a href="https://keras.io/api/applications/efficientnet/#efficientnetb7-function">
          *    Official EfficientNetB7 model from Keras.applications.</a>
          */
-        public class EfficientNetB7(noTop: Boolean = false) :
-            CV(
-                "models/onnx/cv/efficientnet/efficientnet-b7",
-                channelsFirst = false,
-                noTop = noTop
-            )
+        public object EfficientNetB7 : CV("models/onnx/cv/efficientnet/efficientnet-b7", channelsFirst = false)
 
         /**
          * This model is a neural network for digit classification that take grey-scale images of digits as input and classify the major object in the image into a set of 10 different classes.
@@ -573,6 +499,151 @@ public object ONNXModels {
              * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
              */
             public fun CV.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+                return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
+            }
+        }
+    }
+
+    /**
+     * Image classification models without top layers.
+     */
+    public sealed class CVnoTop(
+        override val modelRelativePath: String,
+        protected val channelsFirst: Boolean,
+        private val inputColorMode: ColorMode,
+        override val preprocessor: Operation<FloatData, FloatData>
+    ) : OnnxModelType<OnnxInferenceModel> {
+
+        protected constructor(baseModelType: CV) : this(
+            "${baseModelType.modelRelativePath}-notop",
+            baseModelType.channelsFirst,
+            baseModelType.inputColorMode,
+            baseModelType.preprocessor
+        )
+
+        override fun pretrainedModel(modelHub: ModelHub): OnnxInferenceModel {
+            return modelHub.loadModel(this)
+        }
+
+        /**
+         * This model is a no-top version of the [CV.ResNet50custom] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (N,M3,M4,2048)
+         *
+         * @see CV.ResNet50custom
+         */
+        public object ResNet50Custom :
+            CVnoTop(
+                "models/onnx/cv/custom/resnet50notop",
+                inputColorMode = ColorMode.RGB,
+                channelsFirst = false,
+                preprocessor = InputType.CAFFE.preprocessing()
+            )
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB0] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x224x224x3)
+         * - an output with the shape (1x7x7x1280)
+         *
+         * @see CV.EfficientNetB0
+         */
+        public object EfficientNetB0 : CVnoTop(CV.EfficientNetB0)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB1] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x240x240x3)
+         * - an output with the shape (1x7x7x1280)
+         *
+         * @see CV.EfficientNetB1
+         */
+        public object EfficientNetB1 : CVnoTop(CV.EfficientNetB1)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB2] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x260x260x3)
+         * - an output with the shape (1x8x8x1408)
+         *
+         * @see CV.EfficientNetB2
+         */
+        public object EfficientNetB2 : CVnoTop(CV.EfficientNetB3)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB3] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x300x300x3)
+         * - an output with the shape (1x9x9x1536)
+         *
+         * @see CV.EfficientNetB3
+         */
+        public object EfficientNetB3 : CVnoTop(CV.EfficientNetB3)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB4] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x380x380x3)
+         * - an output with the shape (1x11x11x1792)
+         *
+         * @see CV.EfficientNetB4
+         */
+        public object EfficientNetB4 : CVnoTop(CV.EfficientNetB4)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB5] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x456x456x3)
+         * - an output with the shape (1x14x14x2048)
+         *
+         * @see CV.EfficientNetB5
+         */
+        public object EfficientNetB5 : CVnoTop(CV.EfficientNetB5)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB6] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x528x528x3)
+         * - an output with the shape (1x16x16x2304)
+         *
+         * @see CV.EfficientNetB6
+         */
+        public object EfficientNetB6 : CVnoTop(CV.EfficientNetB6)
+
+        /**
+         * This model is a no-top version of the [CV.EfficientNetB7] model.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * The model has
+         * - an input with the shape (1x600x600x3)
+         * - an output with the shape (1x18x18x2560)
+         *
+         * @see CV.EfficientNetB7
+         */
+        public object EfficientNetB7 : CVnoTop(CV.EfficientNetB7)
+
+        public companion object {
+            /**
+             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             */
+            public fun CVnoTop.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
                 return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
             }
         }

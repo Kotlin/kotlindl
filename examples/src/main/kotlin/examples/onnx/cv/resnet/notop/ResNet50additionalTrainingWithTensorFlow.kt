@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CVnoTop.Companion.createPreprocessing
 import java.io.File
 
 private const val EPOCHS = 3
@@ -56,7 +56,7 @@ fun resnet50additionalTraining() {
     val modelHub = ONNXModelHub(
         cacheDirectory = File("cache/pretrainedModels")
     )
-    val modelType = ONNXModels.CV.ResNet50noTopCustom
+    val modelType = ONNXModels.CVnoTop.ResNet50Custom
 
     modelHub.loadModel(modelType).use { model ->
         println(model)

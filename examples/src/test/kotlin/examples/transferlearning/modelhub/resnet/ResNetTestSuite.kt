@@ -59,8 +59,7 @@ class ResNetTestSuite {
     @Test
     fun resnet50v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet50v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet50v2(
                 inputShape = intArrayOf(150, 150, 3)
             )
         )
@@ -74,8 +73,7 @@ class ResNetTestSuite {
     @Test
     fun resnet101additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet101(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet101(
                 inputShape = intArrayOf(100, 100, 3)
             )
         )
@@ -89,8 +87,7 @@ class ResNetTestSuite {
     @Test
     fun resnet101v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet101v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet101v2(
                 inputShape = intArrayOf(120, 120, 3)
             )
         )
@@ -104,8 +101,7 @@ class ResNetTestSuite {
     @Test
     fun resnet152additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet152(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet152(
                 inputShape = intArrayOf(152, 152, 3)
             )
         )
@@ -119,8 +115,7 @@ class ResNetTestSuite {
     @Test
     fun resnet152v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet152v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet152v2(
                 inputShape = intArrayOf(90, 90, 3)
             )
         )

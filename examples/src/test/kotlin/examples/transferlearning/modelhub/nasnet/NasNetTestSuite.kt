@@ -17,7 +17,7 @@ class NasNetTestSuite {
 
     @Test
     fun nasNetMobileAdditionalTrainingNoTopTest() {
-        runImageRecognitionTransferLearning(modelType = TFModels.CV.NASNetMobile(noTop = true))
+        runImageRecognitionTransferLearning(modelType = TFModels.CVnoTop.NASNetMobile)
     }
 
     @Test
@@ -28,8 +28,7 @@ class NasNetTestSuite {
     @Test
     fun nasNetLargeAdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.NASNetLarge(
-                noTop = true,
+            modelType = TFModels.CVnoTop.NASNetLarge(
                 inputShape = intArrayOf(370, 370, 3)
             )
         )

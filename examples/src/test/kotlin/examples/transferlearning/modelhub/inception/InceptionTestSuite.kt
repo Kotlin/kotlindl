@@ -18,8 +18,7 @@ class InceptionTestSuite {
     @Test
     fun inceptionV3dditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.Inception(
-                noTop = true,
+            modelType = TFModels.CVnoTop.Inception(
                 inputShape = intArrayOf(99, 99, 3)
             )
         )
@@ -33,8 +32,7 @@ class InceptionTestSuite {
     @Test
     fun xceptionAdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.Xception(
-                noTop = true,
+            modelType = TFModels.CVnoTop.Xception(
                 inputShape = intArrayOf(90, 90, 3)
             )
         )

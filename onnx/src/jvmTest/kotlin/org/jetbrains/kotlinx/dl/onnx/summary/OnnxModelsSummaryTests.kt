@@ -53,7 +53,7 @@ class OnnxModelsSummaryTests {
 
     private val efficientNetB0Summary = ModelHubModelSummary(
         internalSummary = efficientNetB0InternalModelSummary,
-        modelKindDescription = ONNXModels.CV.EfficientNetB0()::class.simpleName
+        modelKindDescription = ONNXModels.CV.EfficientNetB0::class.simpleName
     )
 
     private val internalModelExpectedFormat = listOf(

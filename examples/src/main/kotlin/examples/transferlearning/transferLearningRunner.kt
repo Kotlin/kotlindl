@@ -20,6 +20,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CVnoTop.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
@@ -33,7 +34,7 @@ private const val NUM_CLASSES = 2
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 fun runImageRecognitionTransferLearning(
-    modelType: TFModels.CV<out GraphTrainableModel>,
+    modelType: TFModels.CVnoTop<out GraphTrainableModel>,
     epochs: Int = 2
 ) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))

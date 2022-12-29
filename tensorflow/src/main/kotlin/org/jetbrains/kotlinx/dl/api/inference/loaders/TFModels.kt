@@ -37,14 +37,11 @@ public object TFModels {
      *                            Note: the wrong choice of this parameter can significantly impact the model's performance.
      * */
     public sealed class CV<T : GraphTrainableModel>(
-        relativePath: String,
-        private val channelsFirst: Boolean = false,
-        private val inputColorMode: ColorMode = ColorMode.RGB,
-        public var inputShape: IntArray? = null,
-        noTop: Boolean = false
+        override val modelRelativePath: String,
+        internal val channelsFirst: Boolean = false,
+        internal val inputColorMode: ColorMode = ColorMode.RGB,
+        public var inputShape: IntArray? = null
     ) : TFModelType<T, ImageRecognitionModel> {
-
-        override val modelRelativePath: String = if (noTop) "$relativePath/notop" else relativePath
 
         init {
             if (inputShape != null) {
@@ -80,11 +77,10 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/vgg/#vgg16-function">
          *    Official VGG16 model from Keras.applications.</a>
          */
-        public class VGG16(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class VGG16(inputShape: IntArray? = null) :
             CV<Sequential>(
                 "models/tensorflow/cv/vgg16",
                 inputShape = inputShape,
-                noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
             override val preprocessor: Operation<FloatData, FloatData>
@@ -112,11 +108,10 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/vgg/#vgg19-function">
          *    Official VGG19 model from Keras.applications.</a>
          */
-        public class VGG19(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class VGG19(inputShape: IntArray? = null) :
             CV<Sequential>(
                 "models/tensorflow/cv/vgg19",
                 inputShape = inputShape,
-                noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
             override val preprocessor: Operation<FloatData, FloatData>
@@ -188,11 +183,10 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet50-function">
          *    Official ResNet50 model from Keras.applications.</a>
          */
-        public class ResNet50(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class ResNet50(inputShape: IntArray? = null) :
             CV<Functional>(
                 "models/tensorflow/cv/resnet50",
                 inputShape = inputShape,
-                noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
             override val preprocessor: Operation<FloatData, FloatData>
@@ -218,11 +212,10 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet101-function">
          *    Official ResNet101 model from Keras.applications.</a>
          */
-        public class ResNet101(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class ResNet101(inputShape: IntArray? = null) :
             CV<Functional>(
                 "models/tensorflow/cv/resnet101",
                 inputShape = inputShape,
-                noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
             override val preprocessor: Operation<FloatData, FloatData>
@@ -248,11 +241,10 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet152-function">
          *    Official ResNet152 model from Keras.applications.</a>
          */
-        public class ResNet152(noTop: Boolean = false, inputShape: IntArray? = null) :
+        public class ResNet152(inputShape: IntArray? = null) :
             CV<Functional>(
                 "models/tensorflow/cv/resnet152",
                 inputShape = inputShape,
-                noTop = noTop,
                 inputColorMode = ColorMode.BGR
             ) {
             override val preprocessor: Operation<FloatData, FloatData>
@@ -278,8 +270,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet50v2-function">
          *    Official ResNet50v2 model from Keras.applications.</a>
          */
-        public class ResNet50v2(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet50v2", inputShape = inputShape, noTop = noTop) {
+        public class ResNet50v2(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet50v2", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -303,8 +295,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet101v2-function">
          *    Official ResNet101v2 model from Keras.applications.</a>
          */
-        public class ResNet101v2(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet101v2", inputShape = inputShape, noTop = noTop) {
+        public class ResNet101v2(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet101v2", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -328,8 +320,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/resnet/#resnet152v2-function">
          *    Official ResNet152v2 model from Keras.applications.</a>
          */
-        public class ResNet152v2(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/resnet152v2", inputShape = inputShape, noTop = noTop) {
+        public class ResNet152v2(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/resnet152v2", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -351,8 +343,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/mobilenet/">
          *    Official MobileNet model from Keras.applications.</a>
          */
-        public class MobileNet(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/mobilenet", inputShape = inputShape, noTop = noTop) {
+        public class MobileNet(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/mobilenet", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -374,8 +366,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/mobilenet/#mobilenetv2-function">
          *    Official MobileNetV2 model from Keras.applications.</a>
          */
-        public class MobileNetV2(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/mobilenetv2", inputShape = inputShape, noTop = noTop) {
+        public class MobileNetV2(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/mobilenetv2", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -397,8 +389,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/inceptionv3/">
          *    Official InceptionV3 model from Keras.applications.</a>
          */
-        public class Inception(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/inception", inputShape = inputShape, noTop = noTop) {
+        public class Inception(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/inception", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -420,8 +412,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/xception/">
          *    Official Xception model from Keras.applications.</a>
          */
-        public class Xception(noTop: Boolean = false, inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/xception", inputShape = inputShape, noTop = noTop) {
+        public class Xception(inputShape: IntArray? = null) :
+            CV<Functional>("models/tensorflow/cv/xception", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -444,7 +436,7 @@ public object TFModels {
          *    Official DenseNet121 model from Keras.applications.</a>
          */
         public class DenseNet121(inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape, noTop = false) {
+            CV<Functional>("models/tensorflow/cv/densenet121", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
@@ -467,7 +459,7 @@ public object TFModels {
          *    Official DenseNet169 model from Keras.applications.</a>
          */
         public class DenseNet169(inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape, noTop = false) {
+            CV<Functional>("models/tensorflow/cv/densenet169", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
@@ -490,7 +482,7 @@ public object TFModels {
          *    Official DenseNet201 model from Keras.applications.</a>
          */
         public class DenseNet201(inputShape: IntArray? = null) :
-            CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape, noTop = false) {
+            CV<Functional>("models/tensorflow/cv/densenet201", inputShape = inputShape) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TORCH.preprocessing()
         }
@@ -512,8 +504,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/nasnet/#nasnetmobile-function">
          *    Official NASNetMobile model from Keras.applications.</a>
          */
-        public class NASNetMobile(noTop: Boolean = false) :
-            CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3), noTop = noTop) {
+        public object NASNetMobile :
+            CV<Functional>("models/tensorflow/cv/nasnetmobile", inputShape = intArrayOf(224, 224, 3)) {
             override val preprocessor: Operation<FloatData, FloatData>
                 get() = InputType.TF.preprocessing()
         }
@@ -535,8 +527,8 @@ public object TFModels {
          * @see <a href="https://keras.io/api/applications/nasnet/#nasnetlarge-function">
          *    Official NASNetLarge model from Keras.applications.</a>
          */
-        public class NASNetLarge(noTop: Boolean = false, inputShape: IntArray? = intArrayOf(331, 331, 3)) :
-            CV<Functional>("models/tensorflow/cv/nasnetlarge", inputShape = inputShape, noTop = noTop) {
+        public class NASNetLarge(inputShape: IntArray? = intArrayOf(331, 331, 3)) :
+            CV<Functional>("models/tensorflow/cv/nasnetlarge", inputShape = inputShape) {
             init {
                 require(inputShape!![0] >= 331 && inputShape[1] >= 331) { "Width and height should be no smaller than 331 for the model ${this.javaClass.kotlin.simpleName}." }
             }
@@ -555,7 +547,163 @@ public object TFModels {
         }
     }
 
-    private fun loadModel(modelHub: ModelHub, modelType: CV<out GraphTrainableModel>): GraphTrainableModel {
+    /**
+     * Image classification models without top layers.
+     */
+    public sealed class CVnoTop<T : GraphTrainableModel>(private val baseModelType: CV<T>) : TFModelType<T, T> {
+        override val modelRelativePath: String = "${baseModelType.modelRelativePath}/notop"
+
+        override val preprocessor: Operation<FloatData, FloatData>
+            get() = baseModelType.preprocessor
+
+        override fun pretrainedModel(modelHub: ModelHub): T {
+            return loadModel(modelHub, this)
+        }
+
+        override fun loadModelConfiguration(jsonFile: File): T {
+            return baseModelType.loadModelConfiguration(jsonFile)
+        }
+
+        /**
+         * This model is a no-top version of the [CV.VGG16] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.VGG16
+         */
+        public class VGG16(inputShape: IntArray? = null) : CVnoTop<Sequential>(CV.VGG16(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.VGG19] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.VGG19
+         */
+        public class VGG19(inputShape: IntArray? = null) : CVnoTop<Sequential>(CV.VGG19(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet18] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet18
+         */
+        public class ResNet18(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet18(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet34] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet34
+         */
+        public class ResNet34(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet34(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet50] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet50
+         */
+        public class ResNet50(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet50(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet101] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet101
+         */
+        public class ResNet101(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet101(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet152] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet152
+         */
+        public class ResNet152(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet152(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet50v2] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet50v2
+         */
+        public class ResNet50v2(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet50v2(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet101v2] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet101v2
+         */
+        public class ResNet101v2(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet101v2(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.ResNet152v2] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.ResNet152v2
+         */
+        public class ResNet152v2(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.ResNet152v2(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.MobileNet] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.MobileNet
+         */
+        public class MobileNet(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.MobileNet(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.MobileNetV2] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.MobileNetV2
+         */
+        public class MobileNetV2(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.MobileNetV2(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.Inception] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.Inception
+         */
+        public class Inception(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.Inception(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.Xception] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.Xception
+         */
+        public class Xception(inputShape: IntArray? = null) : CVnoTop<Functional>(CV.Xception(inputShape))
+
+        /**
+         * This model is a no-top version of the [CV.NASNetMobile] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.NASNetMobile
+         */
+        public object NASNetMobile : CVnoTop<Functional>(CV.NASNetMobile)
+
+        /**
+         * This model is a no-top version of the [CV.NASNetLarge] model.
+         * The last few layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         *
+         * @see CV.NASNetLarge
+         */
+        public class NASNetLarge(inputShape: IntArray? = intArrayOf(331, 331, 3)) :
+            CVnoTop<Functional>(CV.NASNetLarge(inputShape))
+
+        public companion object {
+            /**
+             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             */
+            public fun CVnoTop<*>.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+                return createPreprocessing(model, baseModelType.channelsFirst, baseModelType.inputColorMode, preprocessor)
+            }
+        }
+    }
+
+    private fun <T : GraphTrainableModel> loadModel(modelHub: ModelHub, modelType: TFModelType<T, *>): T {
         modelHub as TFModelHub
         val model = modelHub.loadModel(modelType)
         // TODO: this part is not needed for inference (if we could add manually Softmax at the end of the graph)
