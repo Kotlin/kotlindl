@@ -385,7 +385,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel(), ModelWithSumm
      */
     public abstract fun save(
         modelDirectory: File,
-        savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+        savingFormat: SavingFormat = SavingFormat.TfGraphCustomVariables,
         saveOptimizerState: Boolean = false,
         writingMode: WritingMode = WritingMode.FAIL_IF_EXISTS
     )

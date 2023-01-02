@@ -826,20 +826,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
 
         when (savingFormat) {
-            SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
-            SavingFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
-            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TfGraphCustomVariables -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TfGraph -> saveInSavedModelFormat(pathToModelDirectory)
+            is SavingFormat.JsonConfigCustomVariables -> saveInKerasFormat(
+                pathToModelDirectory,
+                saveOptimizerState,
+                savingFormat.isKerasFullyCompatible
+            )
         }
     }
 
-    private fun saveInKerasFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        saveModel(pathToModelDirectory)
+    private fun saveInKerasFormat(pathToModelDirectory: String,
+                                  saveOptimizerState: Boolean,
+                                  isKerasFullyCompatible: Boolean
+    ) {
+        saveModel(pathToModelDirectory, isKerasFullyCompatible)
         saveVariables(pathToModelDirectory, saveOptimizerState)
     }
 
-    private fun saveModel(pathToModelDirectory: String) {
+    private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean) {
         val jsonConfig = File("$pathToModelDirectory/$MODEL_CONFIG_JSON")
-        this.saveModelConfiguration(jsonConfig)
+        saveModelConfiguration(jsonConfig, isKerasFullyCompatible)
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {

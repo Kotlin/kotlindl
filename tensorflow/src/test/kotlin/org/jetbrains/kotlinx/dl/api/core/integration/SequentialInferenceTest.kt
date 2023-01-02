@@ -135,7 +135,7 @@ class SequentialInferenceTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -223,7 +223,7 @@ class SequentialInferenceTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -366,7 +366,7 @@ class SequentialInferenceTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -556,7 +556,7 @@ class SequentialInferenceTest {
             it.save(
                 modelDirectory = tempDir!!.toFile(),
                 saveOptimizerState = true,
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
 

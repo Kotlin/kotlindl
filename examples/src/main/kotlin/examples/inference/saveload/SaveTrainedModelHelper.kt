@@ -60,7 +60,7 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
             }
             model.save(
                 modelDirectory = File(path),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
