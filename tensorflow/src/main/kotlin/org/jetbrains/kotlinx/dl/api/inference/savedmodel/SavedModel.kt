@@ -1,11 +1,10 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.util.serializeToBuffer
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -15,10 +14,11 @@ import org.tensorflow.Tensor
 
 /**
  * Inference model built on SavedModelBundle format to predict on images.
+ *
+ * @property [bundle] SavedModelBundle.
  */
-public open class SavedModel : TensorFlowInferenceModel() {
-    /** SavedModelBundle.*/
-    private lateinit var bundle: SavedModelBundle
+public open class SavedModel(private val bundle: SavedModelBundle) :
+    TensorFlowInferenceModel(bundle.graph(), bundle.session()) {
 
     override fun predict(inputData: FloatArray): Int {
         require(isShapeInitialized) { "Data shape is missed!" }
@@ -90,14 +90,7 @@ public open class SavedModel : TensorFlowInferenceModel() {
          * Loads model from SavedModelBundle format.
          */
         public fun load(pathToModel: String): SavedModel {
-            val model = SavedModel()
-
-            model.bundle = SavedModelBundle.load(pathToModel, "serve")
-            model.session = model.bundle.session()
-            val graph = model.bundle.graph()
-            val graphDef = graph.toGraphDef()
-            model.kGraph = KGraph(graphDef)
-            return model
+            return SavedModel(SavedModelBundle.load(pathToModel, "serve"))
         }
     }
 }

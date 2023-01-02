@@ -1,12 +1,14 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.api.core
 
+import org.jetbrains.kotlinx.dl.api.core.util.convertToString
+import org.jetbrains.kotlinx.dl.api.core.util.deserializeGraph
+import org.jetbrains.kotlinx.dl.api.core.util.variableNames
 import org.tensorflow.Graph
-import org.tensorflow.GraphOperation
 import org.tensorflow.Session
 import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.AssignAdd
@@ -17,19 +19,20 @@ import org.tensorflow.op.core.Variable
  *
  * It tracks all model variables (used in optimizers or layers) and its initializers.
  *
- * @param [graphDef] A serialized representation of the graph.
- * @param [prefix] A prefix that will be prepended to names in graphDef.
- *
- * @constructor Creates KGraph by serialized representation of the graph.
+ * @property [tfGraph] Internal static TensorFlow graph.
+ * @constructor Creates KGraph from the TensorFlow [Graph]
  */
-public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
-    public constructor(graphDef: ByteArray) : this(graphDef, "")
-
-    /** Internal static TensorFlow graph. */
-    internal var tfGraph: Graph = Graph()
+public class KGraph(internal val tfGraph: Graph) : AutoCloseable {
+    /**
+     *  Creates KGraph by serialized representation of the graph.
+     *
+     * @param [graphDef] A serialized representation of the graph.
+     * @param [prefix] A prefix that will be prepended to names in graphDef.
+     */
+    public constructor(graphDef: ByteArray, prefix: String = ""): this(deserializeGraph(graphDef, prefix))
 
     /** True if the graph object is closed and the occupied resources are freed. */
-    public var isClosed: Boolean = false
+    private var isClosed: Boolean = false
 
     /** A list of initializer to initialize the trainableVariables. */
     private val optimizerInitializers: MutableList<Assign<*>> = mutableListOf()
@@ -40,14 +43,6 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
     /** A list of optimizers' variables. */
     private val optimizerVariables: MutableList<Variable<Float>> = mutableListOf()
 
-    init {
-        if (prefix.isEmpty()) {
-            tfGraph.importGraphDef(graphDef)
-        } else {
-            tfGraph.importGraphDef(graphDef, prefix)
-        }
-    }
-
     /**
      * Closes internal TensorFlow graph.
      */
@@ -56,34 +51,10 @@ public class KGraph(graphDef: ByteArray, prefix: String) : AutoCloseable {
         tfGraph.close()
     }
 
-    override fun toString(): String {
-        return convertGraphDefToString()
-    }
-
-    private fun convertGraphDefToString(): String {
-        val operations = tfGraph.operations()
-
-        var s = ""
-        while (operations.hasNext()) {
-            val operation = operations.next() as GraphOperation
-            s += "Name: " + operation.name() + "; Type: " + operation.type() + "; Out #tensors:  " + operation.numOutputs() + "\n"
-        }
-        return s
-    }
+    override fun toString(): String = tfGraph.convertToString()
 
     /** Returns list of variable names in TensorFlow graph. */
-    public fun variableNames(): List<String> {
-        val operations = tfGraph.operations()
-        val variableNames = mutableListOf<String>()
-
-        while (operations.hasNext()) {
-            val operation = operations.next() as GraphOperation
-            if (operation.type().equals("VariableV2")) {
-                variableNames.add(operation.name())
-            }
-        }
-        return variableNames.toList()
-    }
+    public fun variableNames(): List<String> = tfGraph.variableNames()
 
     /** Makes a graph copy. */
     public fun copy(): KGraph {

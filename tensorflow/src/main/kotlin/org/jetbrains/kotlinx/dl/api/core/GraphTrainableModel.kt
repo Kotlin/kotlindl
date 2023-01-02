@@ -53,6 +53,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** Logger for the model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
+    /** TensorFlow wrapped computational graph. */
+    public val kGraph: KGraph = KGraph(tfGraph)
+
+    /** The namespace wrapper for all TensorFlow graph operations. */
+    protected val tf: Ops = Ops.create(tfGraph)
+
     /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
 
@@ -109,10 +115,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             @Suppress("LeakingThis")
             layer.parentModel = this
         }
-
-        kGraph = KGraph(Graph().toGraphDef())
-        tf = Ops.create(kGraph.tfGraph)
-        session = Session(kGraph.tfGraph)
     }
 
     /**
@@ -823,6 +825,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             trainableParamsCount = trainableLayers.sumOf { it.paramCount.toLong() },
             frozenParamsCount = frozenLayers.sumOf { it.paramCount.toLong() },
         )
+    }
+
+    override fun close() {
+        session.close()
+        kGraph.close()
     }
 
     /** Helper method for preprocessing layer names and layer validation. */
