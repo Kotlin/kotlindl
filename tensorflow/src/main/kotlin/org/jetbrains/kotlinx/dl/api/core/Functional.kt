@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.freeze
 import org.jetbrains.kotlinx.dl.api.core.layer.setOutputShape
-import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.util.sortTopologically
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
@@ -43,28 +42,26 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return input to output[layers.last()]!!
     }
 
-    /** Returns a copy of this model. */
-    // TODO: support saveOptimizerState=true with assignment of intermediate optimizer state
-    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Functional {
+    override fun copy(): Functional {
+        return copy(copiedModelName = null, copyOptimizerState = false, copyWeights = true)
+    }
+
+    /**
+     * Creates a copy of this model.
+     *
+     * @param [copiedModelName] a name for the copy
+     * @param [copyOptimizerState] whether optimizer state needs to be copied
+     * @param [copyWeights] whether model weights need to be copied
+     * @return A copied inference model.
+     */
+    public fun copy(copiedModelName: String? = null,
+                    copyOptimizerState: Boolean = false,
+                    copyWeights: Boolean = true
+    ): Functional {
         val serializedModel = serializeModel(true)
-        val deserializedModel = deserializeFunctionalModel(serializedModel)
-        if (!copyWeights) {
-            return deserializedModel
-        } else {
-            // TODO: make deep copies, not just links
-            deserializedModel.compile(
-                optimizer = this.optimizer,
-                loss = this.loss,
-                metrics = this.metrics
-            )
-
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
-            deserializedModel.isModelInitialized = true
-
-            return deserializedModel
+        return deserializeFunctionalModel(serializedModel).also { modelCopy ->
+            if (copiedModelName != null) modelCopy.name = copiedModelName
+            if (copyWeights) copyWeightsTo(modelCopy, copyOptimizerState)
         }
     }
 

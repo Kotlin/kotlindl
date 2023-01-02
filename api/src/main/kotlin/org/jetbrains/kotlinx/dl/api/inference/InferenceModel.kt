@@ -37,14 +37,9 @@ public interface InferenceModel : AutoCloseable {
     public fun reshape(vararg dims: Long)
 
     /**
-     * Creates a copy.
+     * Creates a copy of this model.
      *
-     * @param [copiedModelName] Set up this name to make a copy with a new name.
      * @return A copied inference model.
      */
-    public fun copy(
-        copiedModelName: String? = null,
-        saveOptimizerState: Boolean = false,
-        copyWeights: Boolean = true
-    ): InferenceModel
+    public fun copy(): InferenceModel
 }

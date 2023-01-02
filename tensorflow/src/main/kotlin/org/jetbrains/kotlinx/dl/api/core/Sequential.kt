@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.core
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.layer.setOutputShape
-import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import org.tensorflow.op.core.Placeholder
@@ -41,27 +40,26 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         return input to output
     }
 
-    /** Returns a copy of this model. */
-    // TODO: implement the saving of optimizer state
-    public fun copy(saveOptimizerState: Boolean = false, copyWeights: Boolean = true): Sequential {
+    override fun copy(): Sequential {
+        return copy(copiedModelName = null, copyOptimizerState = false, copyWeights = true)
+    }
+
+    /**
+     * Creates a copy of this model.
+     *
+     * @param [copiedModelName] a name for the copy
+     * @param [copyOptimizerState] whether optimizer state needs to be copied
+     * @param [copyWeights] whether model weights need to be copied
+     * @return A copied inference model.
+     */
+    public fun copy(copiedModelName: String? = null,
+                    copyOptimizerState: Boolean = false,
+                    copyWeights: Boolean = true
+    ): Sequential {
         val serializedModel = serializeModel(true)
-        val deserializedModel = deserializeSequentialModel(serializedModel)
-        if (!copyWeights) {
-            return deserializedModel
-        } else {
-            deserializedModel.compile(
-                optimizer = this.optimizer,
-                loss = this.loss,
-                metrics = this.metrics
-            )
-
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
-            deserializedModel.isModelInitialized = true
-
-            return deserializedModel
+        return deserializeSequentialModel(serializedModel).also { modelCopy ->
+            if (copiedModelName != null) modelCopy.name = copiedModelName
+            if (copyWeights) copyWeightsTo(modelCopy, copyOptimizerState)
         }
     }
 

@@ -145,11 +145,12 @@ public open class TensorFlowInferenceModel : InferenceModel {
         }
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean, // TODO, check this case
-        copyWeights: Boolean
-    ): TensorFlowInferenceModel {
+    override fun copy(): TensorFlowInferenceModel {
+        return copy(copiedModelName = null)
+    }
+
+    /** Returns a copy of this model. */
+    public fun copy(copiedModelName: String? = null): TensorFlowInferenceModel {
         val model = TensorFlowInferenceModel()
         model.kGraph = this.kGraph.copy()
         model.tf = Ops.create(model.kGraph.tfGraph)
@@ -158,27 +159,21 @@ public open class TensorFlowInferenceModel : InferenceModel {
         model.input = input
         model.output = output
         if (copiedModelName != null) model.name = name
-        // TODO: check that tensors are closed after usage
-        if (copyWeights) {
-            val modelWeightsExtractorRunner = session.runner()
-            val variableNames = kGraph.variableNames()
-            check(variableNames.isNotEmpty()) {
-                "Found 0 variable names in TensorFlow graph $kGraph. " +
-                        "If copied model has no weights, set flag `copyWeights` to `false`."
-            }
-
-            val variableNamesToCopy = variableNames.filter { variableName ->
-                saveOptimizerState || !isOptimizerVariable(variableName)
-            }
-            variableNamesToCopy.forEach(modelWeightsExtractorRunner::fetch)
-            val modelWeights = variableNamesToCopy.zip(modelWeightsExtractorRunner.run()).toMap()
-
-            model.loadVariables(modelWeights.keys) { variableName, _ ->
-                modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
-            }
-        }
+        copyVariablesToModel(model, kGraph.variableNames())
         model.isModelInitialized = true
         return model
+    }
+
+    protected fun copyVariablesToModel(model: TensorFlowInferenceModel, variableNames: List<String>) {
+        if (variableNames.isEmpty()) return
+
+        val modelWeightsExtractorRunner = session.runner()
+        variableNames.forEach(modelWeightsExtractorRunner::fetch)
+        val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
+
+        model.loadVariables(modelWeights.keys) { variableName, _ ->
+            modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
+        }
     }
 
     /**

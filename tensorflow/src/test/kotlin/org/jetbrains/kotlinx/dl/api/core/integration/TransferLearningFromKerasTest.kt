@@ -306,7 +306,7 @@ class TransferLearningTest : IntegrationTest() {
 
             it.loadWeights(hdfFile)
 
-            val copy = it.copy()
+            val copy = it.copy(copyOptimizerState = false, copyWeights = true)
             assertTrue(copy.layers.size == 11)
             copy.close()
 
