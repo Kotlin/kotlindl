@@ -23,8 +23,7 @@ class MobileNetTestSuite {
     @Test
     fun mobilenetAdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.MobileNet(
-                noTop = true,
+            modelType = TFModels.CVnoTop.MobileNet(
                 inputShape = intArrayOf(100, 100, 3)
             )
         )
@@ -38,8 +37,7 @@ class MobileNetTestSuite {
     @Test
     fun mobilenetv2AdditionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.MobileNetV2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.MobileNetV2(
                 inputShape = intArrayOf(120, 120, 3)
             )
         )

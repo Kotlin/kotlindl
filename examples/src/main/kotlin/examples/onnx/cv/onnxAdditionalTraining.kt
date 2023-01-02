@@ -22,7 +22,7 @@ import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
 import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.onnx
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CVnoTop.Companion.createPreprocessing
 import java.io.File
 
 private const val EPOCHS = 1
@@ -43,7 +43,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.8
  * We use the preprocessing DSL to describe the dataset generation pipeline.
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
-fun runONNXAdditionalTraining(modelType: ONNXModels.CV) {
+fun runONNXAdditionalTraining(modelType: ONNXModels.CVnoTop) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
     val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()

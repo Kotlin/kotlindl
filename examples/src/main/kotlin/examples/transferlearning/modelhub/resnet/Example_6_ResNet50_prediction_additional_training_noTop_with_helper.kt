@@ -17,7 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CVnoTop.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
 import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
@@ -44,7 +44,7 @@ private const val TRAIN_TEST_SPLIT_RATIO = 0.7
  */
 fun resnet50additionalTrainingNoTopWithHelper() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.ResNet50(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
+    val modelType = TFModels.CVnoTop.ResNet50(inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     val noTopModel = modelHub.loadModel(modelType)
 
     val hdfFile = modelHub.loadWeights(modelType)

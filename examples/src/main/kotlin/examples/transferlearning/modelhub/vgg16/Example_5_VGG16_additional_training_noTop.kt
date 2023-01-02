@@ -18,7 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
-import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CVnoTop.Companion.createPreprocessing
 import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
@@ -49,7 +49,7 @@ private const val EPOCHS = 2
  */
 fun vgg16noTopAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG16(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
+    val modelType = TFModels.CVnoTop.VGG16(inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
 
     val layers = mutableListOf<Layer>()
