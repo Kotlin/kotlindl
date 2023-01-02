@@ -29,13 +29,13 @@ private const val OUTPUT_NAME = "output_0"
 public class MultiPoseDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : MultiPoseDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
+) : MultiPoseDetectionModelBase<BufferedImage>(modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
+                outputHeight = internalModel.inputDimensions[0].toInt()
+                outputWidth = internalModel.inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
@@ -60,14 +60,12 @@ public class MultiPoseDetectionModel(
         return detectPoses(ImageConverter.toBufferedImage(imageFile), confidence)
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): MultiPoseDetectionModel {
-        return MultiPoseDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    /**
+     * Setter for input shape of the internal model. Images are going to be resized to this shape.
+     *
+     * @param dims The input shape.
+     */
+    public fun reshape(vararg dims: Long): Unit = internalModel.reshape(*dims)
+
+    override fun close(): Unit = internalModel.close()
 }

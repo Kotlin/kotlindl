@@ -40,13 +40,13 @@ private val SSD_MOBILENET_METADATA = SSDLikeModelMetadata(
 public class SSDMobileNetV1ObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA, modelKindDescription), InferenceModel by internalModel {
+) : SSDLikeModelBase<BufferedImage>(SSD_MOBILENET_METADATA, modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
+                outputHeight = internalModel.inputDimensions[0].toInt()
+                outputWidth = internalModel.inputDimensions[1].toInt()
             }
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
@@ -74,14 +74,12 @@ public class SSDMobileNetV1ObjectDetectionModel(
         return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): SSDMobileNetV1ObjectDetectionModel {
-        return SSDMobileNetV1ObjectDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    /**
+     * Setter for input shape of the internal model. Images are going to be resized to this shape.
+     *
+     * @param dims The input shape.
+     */
+    public fun reshape(vararg dims: Long): Unit = internalModel.reshape(*dims)
+
+    override fun close(): Unit = internalModel.close()
 }

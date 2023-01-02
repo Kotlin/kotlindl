@@ -28,7 +28,7 @@ private const val OUTPUT_NAME = "fc1"
 public class Fan2D106FaceAlignmentModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : FaceAlignmentModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
+) : FaceAlignmentModelBase<BufferedImage>(modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
@@ -57,15 +57,6 @@ public class Fan2D106FaceAlignmentModel(
         return detectLandmarks(ImageConverter.toBufferedImage(imageFile))
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): Fan2D106FaceAlignmentModel {
-        return Fan2D106FaceAlignmentModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }
 

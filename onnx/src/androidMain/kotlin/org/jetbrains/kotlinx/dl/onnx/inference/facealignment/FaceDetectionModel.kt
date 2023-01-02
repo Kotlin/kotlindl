@@ -28,7 +28,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : FaceDetectionModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
+) : FaceDetectionModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel {
     override var targetRotation: Int = 0
     override val preprocessing: Operation<Bitmap, FloatData>
         get() = pipeline<Bitmap>()
@@ -40,12 +40,7 @@ public class FaceDetectionModel(
             .toFloatArray { layout = TensorLayout.NCHW }
             .call(ONNXModels.FaceDetection.defaultPreprocessor)
 
-    override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return FaceDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }
 
 /**

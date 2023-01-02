@@ -31,13 +31,13 @@ import java.io.IOException
 public class EfficientDetObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
+) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = inputDimensions[0].toInt()
-                outputWidth = inputDimensions[1].toInt()
+                outputHeight = internalModel.inputDimensions[0].toInt()
+                outputWidth = internalModel.inputDimensions[1].toInt()
             }
             // the channels of input of EfficientDet models should be in RGB order
             // model is quite sensitive for this
@@ -65,14 +65,12 @@ public class EfficientDetObjectDetectionModel(
         return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): EfficientDetObjectDetectionModel {
-        return EfficientDetObjectDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    /**
+     * Setter for input shape of the internal model. Images are going to be resized to this shape.
+     *
+     * @param dims The input shape.
+     */
+    public fun reshape(vararg dims: Long): Unit = internalModel.reshape(*dims)
+
+    override fun close(): Unit = internalModel.close()
 }

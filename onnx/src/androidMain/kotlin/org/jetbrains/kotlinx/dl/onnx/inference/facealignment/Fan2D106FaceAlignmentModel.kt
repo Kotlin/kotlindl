@@ -29,7 +29,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 public class Fan2D106FaceAlignmentModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : FaceAlignmentModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
+) : FaceAlignmentModelBase<Bitmap>(modelKindDescription), CameraXCompatibleModel {
     override val outputName: String = "fc1"
     override var targetRotation: Int = 0
 
@@ -41,12 +41,7 @@ public class Fan2D106FaceAlignmentModel(
         .rotate { degrees = targetRotation.toFloat() }
         .toFloatArray { layout = TensorLayout.NCHW }
 
-    override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return Fan2D106FaceAlignmentModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }
 
 /**

@@ -27,7 +27,7 @@ import java.awt.image.BufferedImage
 public class FaceDetectionModel(
     override val internalModel: OnnxInferenceModel,
     modelKindDescription: String? = null
-) : FaceDetectionModelBase<BufferedImage>(modelKindDescription), InferenceModel by internalModel {
+) : FaceDetectionModelBase<BufferedImage>(modelKindDescription) {
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
@@ -38,10 +38,5 @@ public class FaceDetectionModel(
             .toFloatArray { }
             .call(ONNXModels.FaceDetection.defaultPreprocessor)
 
-    override fun copy(copiedModelName: String?, saveOptimizerState: Boolean, copyWeights: Boolean): InferenceModel {
-        return FaceDetectionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            modelKindDescription
-        )
-    }
+    override fun close(): Unit = internalModel.close()
 }

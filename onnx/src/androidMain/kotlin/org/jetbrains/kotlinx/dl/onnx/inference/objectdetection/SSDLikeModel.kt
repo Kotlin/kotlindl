@@ -36,7 +36,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.doWithRotation
 public class SSDLikeModel(
     override val internalModel: OnnxInferenceModel, metadata: SSDLikeModelMetadata,
     modelKindDescription: String? = null
-) : SSDLikeModelBase<Bitmap>(metadata, modelKindDescription), CameraXCompatibleModel, InferenceModel by internalModel {
+) : SSDLikeModelBase<Bitmap>(metadata, modelKindDescription), CameraXCompatibleModel {
 
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = true)
 

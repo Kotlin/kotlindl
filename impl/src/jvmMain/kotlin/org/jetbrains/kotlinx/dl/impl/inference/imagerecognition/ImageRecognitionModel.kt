@@ -63,20 +63,6 @@ public class ImageRecognitionModel(
         return predictObject(ImageConverter.toBufferedImage(imageFile))
     }
 
-    override fun copy(
-        copiedModelName: String?,
-        saveOptimizerState: Boolean,
-        copyWeights: Boolean
-    ): ImageRecognitionModel {
-        return ImageRecognitionModel(
-            internalModel.copy(copiedModelName, saveOptimizerState, copyWeights),
-            inputColorMode,
-            channelsFirst,
-            preprocessor,
-            modelKindDescription
-        )
-    }
-
     public companion object {
         /**
          * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData].

@@ -5,13 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.onnx.inference
 
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType
 
 /**
  * Base type for [OnnxInferenceModel].
  */
-public interface OnnxModelType<U : InferenceModel> : ModelType<OnnxInferenceModel, U> {
+public interface OnnxModelType<U> : ModelType<OnnxInferenceModel, U> {
     /**
      * Shape of the input accepted by this model, without batch size.
      */
