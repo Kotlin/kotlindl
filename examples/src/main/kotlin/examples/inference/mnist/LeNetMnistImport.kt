@@ -27,7 +27,7 @@ fun main() {
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getX(imageId))
+            val prediction = it.predict(train.getX(imageId).first)
 
             if (prediction == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)

@@ -144,8 +144,8 @@ class TensorFlowInferenceModelTest {
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
-                val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val prediction = it.predict(train.getX(imageId).first)
+                val softPrediction = it.predictSoftly(train.getX(imageId).first)
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())
@@ -201,8 +201,8 @@ class TensorFlowInferenceModelTest {
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
-                val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val prediction = it.predict(train.getX(imageId).first)
+                val softPrediction = it.predictSoftly(train.getX(imageId).first)
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())
@@ -217,7 +217,7 @@ class TensorFlowInferenceModelTest {
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
-                val prediction = it.predict(train.getX(imageId))
+                val prediction = it.predict(train.getX(imageId).first)
 
                 if (prediction == train.getY(imageId).toInt())
                     accuracy += (1.0 / amountOfTestSet)
@@ -238,7 +238,7 @@ class TensorFlowInferenceModelTest {
             it.reshape(28, 28, 1)
 
             val exception = Assertions.assertThrows(IllegalStateException::class.java) {
-                it.predict(train.getX(0))
+                it.predict(train.getX(0).first)
             }
             assertEquals("Model weights are not initialized.", exception.message)
         }
@@ -252,7 +252,7 @@ class TensorFlowInferenceModelTest {
         inferenceModel.use {
             val exception =
                 Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predict(train.getX(0))
+                    it.predict(train.getX(0).first)
                 }
             assertEquals(
                 "Model input shape is not defined. Call reshape() to set input shape.",
@@ -261,7 +261,7 @@ class TensorFlowInferenceModelTest {
 
             val exception2 =
                 Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predictSoftly(train.getX(0))
+                    it.predictSoftly(train.getX(0).first)
                 }
             assertEquals(
                 "Model input shape is not defined. Call reshape() to set input shape.",

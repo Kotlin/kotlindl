@@ -98,7 +98,7 @@ internal class RegressionTest {
 
             var simpleMae = 0.0f
             repeat(100) { id ->
-                val xReal = test.getX(id)
+                val xReal = test.getX(id).first
                 val yReal = test.getY(id)
 
                 val yPred = it.predictSoftly(xReal)

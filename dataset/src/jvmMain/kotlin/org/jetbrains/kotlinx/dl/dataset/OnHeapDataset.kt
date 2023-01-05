@@ -80,8 +80,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     }
 
     /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return x[idx]
+    override fun getX(idx: Int): FloatData {
+        return x[idx] to elementShape
     }
 
     /** Returns label as [FloatArray] by index [idx]. */

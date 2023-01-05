@@ -69,8 +69,8 @@ public class OnFlyImageDataset<D> internal constructor(
     }
 
     /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return dataLoader.load(x[idx]).first
+    override fun getX(idx: Int): FloatData {
+        return dataLoader.load(x[idx])
     }
 
     /** Returns label as [FloatArray] by index [idx]. */

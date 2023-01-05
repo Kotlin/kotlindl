@@ -92,7 +92,7 @@ fun linearRegressionWithTwoMetrics() {
 
 
         repeat(100) { id ->
-            val xReal = test.getX(id)
+            val xReal = test.getX(id).first
             val yReal = test.getY(id)
             val yPred = it.predictSoftly(xReal)
 
@@ -107,7 +107,7 @@ fun linearRegressionWithTwoMetrics() {
         println("MSE: $mse")
 
         repeat(100) { id ->
-            val xReal = test.getX(id)
+            val xReal = test.getX(id).first
             val yReal = test.getY(id)
 
             val yPred = it.predictSoftly(xReal)

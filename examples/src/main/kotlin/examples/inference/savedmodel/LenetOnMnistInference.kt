@@ -26,7 +26,7 @@ fun lenetOnMnistInference() {
 
         it.reshape(28, 28, 1)
 
-        val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
+        val prediction = it.predict(train.getX(0).first, "Placeholder", "ArgMax")
 
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))

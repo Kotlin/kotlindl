@@ -34,7 +34,7 @@ fun main() {
     val (train, test) = mnist()
 
     val sampleIndex = 42
-    val x = test.getX(sampleIndex)
+    val x = test.getX(sampleIndex).first
     val y = test.getY(sampleIndex).toInt()
 
     lenet5().use {

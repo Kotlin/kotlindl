@@ -27,7 +27,7 @@ fun main() {
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val prediction = it.predict(train.getX(imageId))
+            val prediction = it.predict(train.getX(imageId).first)
 
             if (prediction == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)
@@ -37,7 +37,7 @@ fun main() {
         val amountOfOps = 1000
         val start = System.currentTimeMillis()
         for (i in 0..amountOfOps) {
-            it.predict(train.getX(i % 50000))
+            it.predict(train.getX(i % 50000).first)
         }
         println("Time, s: ${(System.currentTimeMillis() - start) / 1000f}")
         println("Throughput, op/s: ${amountOfOps / ((System.currentTimeMillis() - start) / 1000f)}")

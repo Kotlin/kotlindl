@@ -19,7 +19,7 @@ public fun InferenceModel.predict(dataset: Dataset): List<Int> {
     val predictedLabels: MutableList<Int> = mutableListOf()
 
     for (i in 0 until dataset.xSize()) {
-        val predictedLabel = predict(dataset.getX(i))
+        val predictedLabel = predict(dataset.getX(i).first)
         predictedLabels.add(predictedLabel)
     }
 
@@ -38,7 +38,7 @@ public fun InferenceModel.evaluate(
     return if (metric == Metrics.ACCURACY) {
         var counter = 0
         for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i))
+            val predictedLabel = predict(dataset.getX(i).first)
             if (predictedLabel == dataset.getY(i).toInt())
                 counter++
         }

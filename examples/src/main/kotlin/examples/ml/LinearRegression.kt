@@ -91,7 +91,7 @@ fun linearRegression() {
 
 
         repeat(100) { id ->
-            val xReal = test.getX(id)
+            val xReal = test.getX(id).first
             val yReal = test.getY(id)
             val yPred = it.predictSoftly(xReal)
 
@@ -104,7 +104,7 @@ fun linearRegression() {
         println("MAE: $mae")
 
         repeat(100) { id ->
-            val xReal = test.getX(id)
+            val xReal = test.getX(id).first
             val yReal = test.getY(id)
 
             val yPred = it.predictSoftly(xReal)

@@ -27,7 +27,7 @@ class SavedModelTest {
         SavedModel.load(modelDirectory.absolutePath).use {
             it.reshape(28, 28, 1)
 
-            val prediction = it.predict(train.getX(0))
+            val prediction = it.predict(train.getX(0).first)
 
             assertEquals(train.getY(0), prediction.toFloat())
 
@@ -47,7 +47,7 @@ class SavedModelTest {
         SavedModel.load(modelDirectory.absolutePath).use {
             it.reshape(28, 28, 1)
 
-            val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
+            val prediction = it.predict(train.getX(0).first, "Placeholder", "ArgMax")
 
             assertEquals(train.getY(0), prediction.toFloat())
 

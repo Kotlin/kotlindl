@@ -82,7 +82,7 @@ fun sineRegression() {
         println("Bias: " + it.getLayer("dense_3").weights["dense_3_dense_bias"].contentDeepToString())
 
         repeat(100) { id ->
-            val xReal = test.getX(id)
+            val xReal = test.getX(id).first
             val yReal = test.getY(id)
 
             val yPred = it.predictSoftly(xReal)

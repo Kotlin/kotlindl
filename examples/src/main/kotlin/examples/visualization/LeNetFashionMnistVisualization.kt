@@ -44,7 +44,7 @@ fun main() {
     val (newTrain, validation) = train.split(0.95)
 
     val sampleIndex = 42
-    val x = test.getX(sampleIndex)
+    val x = test.getX(sampleIndex).first
     val y = test.getY(sampleIndex).toInt()
 
     lenet5().use {

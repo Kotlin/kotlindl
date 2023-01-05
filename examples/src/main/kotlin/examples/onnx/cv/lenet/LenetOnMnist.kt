@@ -22,7 +22,7 @@ fun main() {
     model.use {
         println(it)
 
-        val prediction = it.predict(train.getX(0))
+        val prediction = it.predict(train.getX(0).first)
 
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))

@@ -258,7 +258,7 @@ class SequentialInferenceTest {
 
             val predictException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predict(test.getX(0))
+                    it.predict(test.getX(0).first)
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
@@ -296,7 +296,7 @@ class SequentialInferenceTest {
 
             val predictException =
                 Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predict(test.getX(0))
+                    it.predict(test.getX(0).first)
                 }
             assertEquals(
                 "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method.",

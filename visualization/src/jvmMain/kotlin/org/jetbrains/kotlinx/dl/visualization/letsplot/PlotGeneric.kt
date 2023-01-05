@@ -86,7 +86,7 @@ fun flattenImagePlot(
     plotFeature: PlotFeature = PlotFeature.GRAY
 ): Plot {
     val imageSize = 28
-    val imageData = dataset.getX(sampleNumber)
+    val imageData = dataset.getX(sampleNumber).first
     val imageLabel = dataset.getY(sampleNumber).toInt().run(labelEncoding)
     val predictedLabel = predict(imageData)?.run(labelEncoding)
     val title = if (predictedLabel == null) {
