@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -57,15 +57,15 @@ fun lenetOnMnistDatasetExportImportToTxt() {
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
-        val prediction = it.predict(train.getX(imageId1).first)
+        val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
-        val prediction2 = it.predict(train.getX(imageId2).first)
+        val prediction2 = it.predict(train.getX(imageId2))
 
         println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
-        val prediction3 = it.predict(train.getX(imageId3).first)
+        val prediction3 = it.predict(train.getX(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
@@ -78,22 +78,22 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     inferenceModel.use {
         it.reshape(*lenet5.inputDimensions)
 
-        val prediction = it.predict(train.getX(imageId1).first)
+        val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
-        val prediction2 = it.predict(train.getX(imageId2).first)
+        val prediction2 = it.predict(train.getX(imageId2))
 
         println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
-        val prediction3 = it.predict(train.getX(imageId3).first)
+        val prediction3 = it.predict(train.getX(imageId3))
 
         println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {
-            val pred = it.predict(train.getX(imageId).first)
+            val pred = it.predict(train.getX(imageId))
 
             if (pred == train.getY(imageId).toInt())
                 accuracy += (1.0 / amountOfTestSet)

@@ -207,10 +207,10 @@ internal class SequentialBasicTest : IntegrationTest() {
         test: OnHeapDataset
     ) {
         // Prediction testing
-        val label = it.predict(test.getX(0).first)
+        val label = it.predict(test.getX(0))
         assertEquals(test.getY(0), label.toFloat())
 
-        val softPrediction = it.predictSoftly(test.getX(0).first)
+        val softPrediction = it.predictSoftly(test.getX(0))
 
         assertEquals(
             test.getY(0),
@@ -218,11 +218,11 @@ internal class SequentialBasicTest : IntegrationTest() {
         )
 
         // Test predict method with specified tensor name
-        val label2 = it.predict(test.getX(0).first, predictionTensorName = OUTPUT_NAME)
+        val label2 = it.predict(test.getX(0), predictionTensorName = OUTPUT_NAME)
         assertEquals(test.getY(0), label2.toFloat())
 
         // Test predictAndGetActivations method
-        val (label3, activations) = it.predictAndGetActivations(test.getX(0).first)
+        val (label3, activations) = it.predictAndGetActivations(test.getX(0))
         assertEquals(test.getY(0), label3.toFloat())
         assertEquals(3, activations.size)
 
@@ -392,7 +392,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             val exception =
                 assertThrows(IllegalStateException::class.java) {
-                    it.predict(train.getX(0).first)
+                    it.predict(train.getX(0))
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
@@ -408,7 +408,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             val exception =
                 assertThrows(IllegalStateException::class.java) {
-                    it.predictSoftly(train.getX(0).first)
+                    it.predictSoftly(train.getX(0))
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
@@ -445,7 +445,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         testModel.use {
             val exception =
                 assertThrows(IllegalStateException::class.java) {
-                    it.predictAndGetActivations(test.getX(0).first)
+                    it.predictAndGetActivations(test.getX(0))
                 }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",

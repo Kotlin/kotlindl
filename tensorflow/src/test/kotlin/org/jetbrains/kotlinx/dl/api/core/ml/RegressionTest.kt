@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -98,7 +98,7 @@ internal class RegressionTest {
 
             var simpleMae = 0.0f
             repeat(100) { id ->
-                val xReal = test.getX(id).first
+                val xReal = test.getX(id)
                 val yReal = test.getY(id)
 
                 val yPred = it.predictSoftly(xReal)

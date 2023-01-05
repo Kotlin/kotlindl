@@ -19,6 +19,11 @@ public data class DataBatch internal constructor(val x: Array<FloatArray>, val e
      */
     public val size: Int get() = x.size
 
+    /**
+     * Shape of this [DataBatch].
+     */
+    public val shape: TensorShape get() = TensorShape(size.toLong(), *elementShape.dims())
+
     init {
         check(x.size == y.size) {
             "Number of data elements in the batch (${x.size}) is not the same as the number of labels (${y.size})."

@@ -22,12 +22,12 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
@@ -38,7 +38,6 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import org.tensorflow.op.core.Variable
 import java.io.File
-import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -361,8 +360,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      * Returns the loss value and metric value on train batch.
      */
     private fun getLossAndMetricValues(batch: DataBatch, isTraining: Boolean): Pair<Float, List<Float>> {
-        val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
-        return Tensor.create(xBatchShape, serializeToBuffer(batch.x))
+        val yBatchShape = longArrayOf(batch.size.toLong(), numberOfClasses)
+        return batch.toXTensor()
             .use { xTensor ->
                 Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
                     .use { yTensor ->
@@ -449,17 +448,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return predictions
     }
 
-    override fun predict(inputData: FloatArray): Int {
+    override fun predict(inputData: FloatData): Int {
         val softPrediction = predictSoftly(inputData)
         return softPrediction.argmax()
     }
 
-    override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
+    override fun predict(inputData: FloatData, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
         return softPrediction.argmax()
     }
 
-    override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
+    override fun predictAndGetActivations(inputData: FloatData, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
         return Pair(softPrediction.argmax(), activations)
     }
@@ -485,12 +484,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         callbacks.forEach { it.model = this }
         callbacks.forEach { it.onPredictBegin() }
 
-        val xShape = calculateXShape(batchSize)
-
         for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
             callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
-            Tensor.create(xShape, serializeToBuffer(batch.x)).use { xTensor ->
+            batch.toXTensor().use { xTensor ->
                 Tensor.create(false).use { isTraining ->
                     session.runner()
                         .fetch(predictionOp)
@@ -507,28 +504,26 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         callbacks.forEach { it.onPredictEnd() }
     }
 
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
     }
 
     override fun predictSoftlyAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         return internalPredict(inputData, true, predictionTensorName)
     }
 
     private fun internalPredict(
-        inputData: FloatArray,
+        inputData: FloatData,
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         checkModelInitialized()
 
-        val xShape = calculateXShape(1)
-
-        return Tensor.create(xShape, FloatBuffer.wrap(inputData))
+        return inputData.toTensor()
             .use { xTensor ->
                 val runner = session.runner().feed(xOp.asOutput(), xTensor)
                 if (predictionTensorName.isEmpty()) {
@@ -552,44 +547,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     prediction to activations
                 }
             }
-    }
-
-    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
-        val batchSize = batch.size
-
-        val xBatchShape = calculateXShape(batchSize)
-        val yBatchShape = calculateYShape(batchSize)
-
-        if (batchSize > 0) {
-            validateBatchShape(batch, xBatchShape, yBatchShape)
-        }
-
-        return Pair(xBatchShape, yBatchShape)
-    }
-
-    private fun calculateYShape(batchSize: Int) = longArrayOf(batchSize.toLong(), numberOfClasses)
-
-    private fun validateBatchShape(batch: DataBatch, xBatchShape: LongArray, yBatchShape: LongArray) {
-        check(TensorShape(xBatchShape).numElements().toInt() == batch.x.size * batch.x[0].size)
-        {
-            "The calculated [from the Model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.x.size * batch.x[0].size
-            }. Please, check input data."
-        }
-        check(TensorShape(yBatchShape).numElements().toInt() == batch.y.size * numberOfClasses.toInt())
-        {
-            "The calculated [from the model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.y.size * numberOfClasses.toInt()
-            }. " +
-                    "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
-                    "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
-        }
-    }
-
-    private fun calculateXShape(batchSize: Int): LongArray {
-        val inputLayer = layers.first() as Input
-        val xTensorShape = inputLayer.input.asOutput().shape()
-        return longArrayOf(batchSize.toLong(), *xTensorShape.tail())
     }
 
     /**
@@ -839,6 +796,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** Helper method for preprocessing layer names and layer validation. */
     internal companion object {
         internal const val MODEL_CONFIG_JSON = "modelConfig.json"
+
+        private fun DataBatch.toXTensor(): Tensor<Float> {
+            return Tensor.create(shape.dims(), serializeToBuffer(x))
+        }
 
         internal fun preProcessLayerNames(layers: Array<out Layer>) {
             for ((index, layer) in layers.withIndex()) {

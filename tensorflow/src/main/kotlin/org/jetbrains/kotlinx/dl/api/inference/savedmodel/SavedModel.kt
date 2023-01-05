@@ -37,7 +37,7 @@ public open class SavedModel(private val bundle: SavedModelBundle) :
         val predictedLabels: MutableList<Int> = mutableListOf()
 
         for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i).first, inputTensorName, outputTensorName)
+            val predictedLabel = predict(dataset.getX(i), inputTensorName, outputTensorName)
             predictedLabels.add(predictedLabel)
         }
 

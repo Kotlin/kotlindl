@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -33,7 +33,7 @@ fun runImageRecognitionPrediction(
 
         val results = mutableListOf<Pair<String, Float>>()
         for (i in 1..8) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")

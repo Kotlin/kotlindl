@@ -6,6 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.floats
+import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -47,7 +50,7 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      *
      * @param [inputData] Unlabeled input data to define label.
      */
-    override fun predict(inputData: FloatArray): Int {
+    override fun predict(inputData: FloatData): Int {
         return predict(inputData, input, output)
     }
 
@@ -59,14 +62,10 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      * @param [outputTensorName] The name of output tensor.
      * @return Predicted class index.
      */
-    public fun predict(inputData: FloatArray, inputTensorName: String, outputTensorName: String): Int {
-        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+    public fun predict(inputData: FloatData, inputTensorName: String, outputTensorName: String): Int {
         check(isModelInitialized) { "Model weights are not initialized." }
 
-        val preparedData = serializeToBuffer(inputData)
-        val tensor = Tensor.create(shape, preparedData)
-
-        return tensor.use {
+        return inputData.toTensor().use {
             session.runner().feed(inputTensorName, it)
                 .fetch(outputTensorName)
                 .run().use { tensors ->
@@ -75,8 +74,7 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
         }
     }
 
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
-        require(::shape.isInitialized) { "Model input shape is not defined. Call reshape() to set input shape." }
+    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         check(isModelInitialized) { "Model weights are not initialized." }
 
         val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
@@ -85,10 +83,7 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
             "Output named '$fetchTensorName' not found in the TensorFlow graph."
         }
 
-        val preparedData = serializeToBuffer(inputData)
-        val tensor = Tensor.create(shape, preparedData)
-
-        return tensor.use {
+        return inputData.toTensor().use {
             session.runner().feed(input, it)
                 .fetch(fetchTensorName)
                 .run().use { tensors ->
@@ -142,6 +137,11 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
 
     public companion object {
         private val logger = KotlinLogging.logger {}
+
+        internal fun FloatData.toTensor(): Tensor<Float> {
+            val preparedData = serializeToBuffer(floats)
+            return Tensor.create(longArrayOf(1L, *shape.dims()), preparedData)
+        }
 
         /**
          * Loads tensorflow graphs and variable data (if required).
