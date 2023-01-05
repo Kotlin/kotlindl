@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.dataset
 
 import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
 import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
@@ -32,8 +33,11 @@ import kotlin.streams.toList
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
+ * @property [elementShape] shape of the elements in the dataset
  */
-public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) : Dataset() {
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
+                                                public val y: FloatArray,
+                                                private val elementShape: TensorShape) : Dataset() {
 
     init {
         check(x.size == y.size) {
@@ -65,8 +69,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         return Pair(
-            OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex)),
-            OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size))
+            OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex), elementShape),
+            OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size), elementShape)
         )
     }
 
@@ -92,10 +96,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyXToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength)
-        )
+        return DataBatch(copyXToBatch(x, batchStart, batchLength), elementShape, copyLabelsToBatch(y, batchStart, batchLength))
     }
 
     public companion object {
@@ -117,8 +118,10 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
          * Creates an [OnHeapDataset] from [features] and [labels].
          */
         @JvmStatic
-        public fun create(features: Array<FloatArray>, labels: FloatArray): OnHeapDataset {
-            return OnHeapDataset(features, labels)
+        public fun create(features: Array<FloatArray>, labels: FloatArray,
+                          shape: TensorShape = TensorShape(features.first().size.toLong())
+        ): OnHeapDataset {
+            return OnHeapDataset(features, labels, shape)
         }
 
         /**
@@ -132,9 +135,9 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             preprocessing: Operation<BufferedImage, FloatData>
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.fileLoader().prepareX(xFiles)
+            val (x, shape) = preprocessing.fileLoader().prepareX(xFiles)
 
-            return OnHeapDataset(x, labels)
+            return OnHeapDataset(x, labels, shape)
         }
 
         /**
@@ -148,10 +151,10 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             preprocessing: Operation<BufferedImage, FloatData> = ConvertToFloatArray()
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.fileLoader().prepareX(xFiles)
+            val (x, shape) = preprocessing.fileLoader().prepareX(xFiles)
             val y = labelGenerator.prepareY(xFiles)
 
-            return OnHeapDataset(x, y)
+            return OnHeapDataset(x, y, shape)
         }
 
         @Throws(IOException::class)

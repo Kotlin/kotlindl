@@ -5,12 +5,15 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+
 /**
  * This class represents the batch of data in the [Dataset].
  * @param [x] Data observations.
  * @param [y] Labels.
+ * @param [elementShape] Shape of the data elements.
  */
-public data class DataBatch internal constructor(val x: Array<FloatArray>, val y: FloatArray) {
+public data class DataBatch internal constructor(val x: Array<FloatArray>, val elementShape: TensorShape, val y: FloatArray) {
     /**
      * Number of rows in the batch.
      */
