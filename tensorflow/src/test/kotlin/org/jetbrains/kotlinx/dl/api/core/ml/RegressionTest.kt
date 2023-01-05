@@ -68,10 +68,7 @@ internal class RegressionTest {
             return labels
         }
 
-        val dataset = OnHeapDataset.create(
-            ::extractX,
-            ::extractY
-        )
+        val dataset = OnHeapDataset.create(extractX(), extractY())
 
         val (train, test) = dataset.split(0.9)
 

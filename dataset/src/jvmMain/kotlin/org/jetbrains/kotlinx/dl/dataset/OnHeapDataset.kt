@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -34,6 +34,12 @@ import kotlin.streams.toList
  * @property [y] an array of labels
  */
 public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) : Dataset() {
+
+    init {
+        check(x.size == y.size) {
+            "Number of data elements in the dataset (${x.size}) is not the same as the number of labels (${y.size})."
+        }
+    }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
@@ -108,75 +114,10 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         }
 
         /**
-         * Takes data located in [trainFeaturesPath], [trainLabelsPath], [testFeaturesPath], [testLabelsPath],
-         * extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create a pair of [OnHeapDataset] for training and testing.
+         * Creates an [OnHeapDataset] from [features] and [labels].
          */
         @JvmStatic
-        public fun createTrainAndTestDatasets(
-            trainFeaturesPath: String,
-            trainLabelsPath: String,
-            testFeaturesPath: String,
-            testLabelsPath: String,
-            featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String) -> FloatArray
-        ): Pair<OnHeapDataset, OnHeapDataset> {
-            val xTrain = featuresExtractor(trainFeaturesPath)
-            val yTrain = labelExtractor(trainLabelsPath)
-            val xTest = featuresExtractor(testFeaturesPath)
-            val yTest = labelExtractor(testLabelsPath)
-            return OnHeapDataset(xTrain, yTrain) to OnHeapDataset(xTest, yTest)
-        }
-
-        /**
-         * Takes data located in [featuresPath], [labelsPath]
-         * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create an [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            featuresPath: String,
-            labelsPath: String,
-            numClasses: Int,
-            featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> FloatArray
-        ): OnHeapDataset {
-            val features = featuresExtractor(featuresPath)
-            val labels = labelExtractor(labelsPath, numClasses)
-
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
-            return OnHeapDataset(features, labels)
-        }
-
-        /**
-         * Takes the data from generators [featuresGenerator] and [labelGenerator]
-         * to create an [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            featuresGenerator: () -> Array<FloatArray>,
-            labelGenerator: () -> FloatArray
-        ): OnHeapDataset {
-            val features = featuresGenerator()
-            val labels = labelGenerator()
-
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
-            return OnHeapDataset(features, labels)
-        }
-
-        /**
-         * Takes data from external data [features] and [labels]
-         * to create dataset [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            features: Array<FloatArray>,
-            labels: FloatArray
-        ): OnHeapDataset {
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
+        public fun create(features: Array<FloatArray>, labels: FloatArray): OnHeapDataset {
             return OnHeapDataset(features, labels)
         }
 

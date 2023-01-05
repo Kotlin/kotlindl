@@ -38,20 +38,10 @@ import java.util.zip.ZipFile
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    cacheDirectory.existsOrMkdirs()
-
-    val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
-    val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
-    val testXpath = loadFile(cacheDirectory, TEST_IMAGES_ARCHIVE).absolutePath
-    val testYpath = loadFile(cacheDirectory, TEST_LABELS_ARCHIVE).absolutePath
-
-    return OnHeapDataset.createTrainAndTestDatasets(
-        trainXpath,
-        trainYpath,
-        testXpath,
-        testYpath,
-        ::extractImages,
-        ::extractLabels
+    return createDataset(
+        cacheDirectory,
+        TRAIN_IMAGES_ARCHIVE, TRAIN_LABELS_ARCHIVE,
+        TEST_IMAGES_ARCHIVE, TEST_LABELS_ARCHIVE
     )
 }
 
@@ -84,21 +74,27 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
+    return createDataset(
+        cacheDirectory,
+        FASHION_TRAIN_IMAGES_ARCHIVE, FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE, FASHION_TEST_LABELS_ARCHIVE
+    )
+}
+
+private fun createDataset(cacheDirectory: File,
+                          trainImagesArchive: String, trainLabelsArchive: String,
+                          testImagesArchive: String, testLabelsArchive: String
+): Pair<OnHeapDataset, OnHeapDataset> {
     cacheDirectory.existsOrMkdirs()
 
-    val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
-    val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath
-    val testXpath = loadFile(cacheDirectory, FASHION_TEST_IMAGES_ARCHIVE).absolutePath
-    val testYpath = loadFile(cacheDirectory, FASHION_TEST_LABELS_ARCHIVE).absolutePath
+    val trainXpath = loadFile(cacheDirectory, trainImagesArchive).absolutePath
+    val trainYpath = loadFile(cacheDirectory, trainLabelsArchive).absolutePath
+    val testXpath = loadFile(cacheDirectory, testImagesArchive).absolutePath
+    val testYpath = loadFile(cacheDirectory, testLabelsArchive).absolutePath
 
-    return OnHeapDataset.createTrainAndTestDatasets(
-        trainXpath,
-        trainYpath,
-        testXpath,
-        testYpath,
-        ::extractImages,
-        ::extractLabels
-    )
+    val train = OnHeapDataset.create(extractImages(trainXpath), extractLabels(trainYpath))
+    val test = OnHeapDataset.create(extractImages(testXpath), extractLabels(testYpath))
+    return train to test
 }
 
 /** Path to H5 file of Mnist 3D Dataset. */
