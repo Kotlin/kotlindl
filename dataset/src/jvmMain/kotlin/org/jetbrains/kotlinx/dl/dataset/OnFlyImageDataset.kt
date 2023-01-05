@@ -85,8 +85,7 @@ public class OnFlyImageDataset<D> internal constructor(
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
         return DataBatch(
             copySourcesToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
+            copyLabelsToBatch(y, batchStart, batchLength)
         )
     }
 

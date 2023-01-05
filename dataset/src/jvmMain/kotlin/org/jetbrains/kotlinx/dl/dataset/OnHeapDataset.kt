@@ -88,8 +88,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
         return DataBatch(
             copyXToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
+            copyLabelsToBatch(y, batchStart, batchLength)
         )
     }
 
