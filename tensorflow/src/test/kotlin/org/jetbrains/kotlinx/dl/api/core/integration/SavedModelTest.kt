@@ -25,8 +25,6 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(28, 28, 1)
-
             val prediction = it.predict(train.getX(0))
 
             assertEquals(train.getY(0), prediction.toFloat())
@@ -45,8 +43,6 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(28, 28, 1)
-
             val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
             assertEquals(train.getY(0), prediction.toFloat())

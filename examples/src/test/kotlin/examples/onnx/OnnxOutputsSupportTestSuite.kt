@@ -18,10 +18,6 @@ class OnnxOutputsSupportTestSuite {
     private val model = OnnxInferenceModel.load(pathToModel)
     private val features = (1..27).map { Random.nextFloat() }.toFloatArray()
 
-    init {
-        model.reshape(27)
-    }
-
     @Test
     fun predictSoftlyLgbmSequenceOutputTest() {
         assertThrows<IllegalArgumentException> {

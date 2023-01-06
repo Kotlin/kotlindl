@@ -207,8 +207,6 @@ fun vgg11OnCifar10ExportImport() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL))
 
     inferenceModel.use {
-        it.reshape(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-
         var accuracy = 0.0
         val amountOfTestSet = test.xSize()
         for (imageId in 0 until amountOfTestSet) {

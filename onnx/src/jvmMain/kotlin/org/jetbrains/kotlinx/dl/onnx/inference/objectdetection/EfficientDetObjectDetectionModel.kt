@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -30,14 +30,15 @@ import java.io.IOException
  */
 public class EfficientDetObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
+    private var inputShape: LongArray,
     modelKindDescription: String? = null
 ) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
             .resize {
-                outputHeight = internalModel.inputDimensions[0].toInt()
-                outputWidth = internalModel.inputDimensions[1].toInt()
+                outputHeight = inputShape[0].toInt()
+                outputWidth = inputShape[1].toInt()
             }
             // the channels of input of EfficientDet models should be in RGB order
             // model is quite sensitive for this
@@ -49,7 +50,7 @@ public class EfficientDetObjectDetectionModel(
      * Constructs the object detection model from a given path.
      * @param [pathToModel] path to model
      */
-    public constructor(pathToModel: String) : this(OnnxInferenceModel(pathToModel))
+    public constructor(pathToModel: String, inputShape: LongArray) : this(OnnxInferenceModel(pathToModel), inputShape)
 
     /**
      * Returns the detected object for the given image file sorted by the score.
@@ -70,7 +71,9 @@ public class EfficientDetObjectDetectionModel(
      *
      * @param dims The input shape.
      */
-    public fun reshape(vararg dims: Long): Unit = internalModel.reshape(*dims)
+    public fun reshape(vararg dims: Long) {
+        inputShape = longArrayOf(*dims)
+    }
 
     override fun close(): Unit = internalModel.close()
 }

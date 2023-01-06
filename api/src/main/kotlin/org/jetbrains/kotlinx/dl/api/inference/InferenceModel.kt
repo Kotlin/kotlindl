@@ -32,13 +32,6 @@ public interface InferenceModel : AutoCloseable {
     public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray
 
     /**
-     * Chain-like setter to set up input shape.
-     *
-     * @param [dims] The input shape.
-     */
-    public fun reshape(vararg dims: Long)
-
-    /**
      * Creates a copy of this model.
      *
      * @return A copied inference model.

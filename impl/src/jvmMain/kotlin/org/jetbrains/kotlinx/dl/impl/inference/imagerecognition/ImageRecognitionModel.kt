@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -75,11 +75,28 @@ public class ImageRecognitionModel(
                                        inputColorMode: ColorMode,
                                        preprocessor: Operation<FloatData, FloatData> = Identity()
         ): Operation<BufferedImage, FloatData> {
-            val (width, height) = if (channelsFirst)
-                Pair(model.inputDimensions[1], model.inputDimensions[2])
-            else
-                Pair(model.inputDimensions[0], model.inputDimensions[1])
+            val inputDimensions = model.inputDimensions
+            require(inputDimensions.all { it > 0 }) {
+                "Model input dimensions are not defined. Current input dimensions: ${inputDimensions.contentToString()}"
+            }
+            return createPreprocessing(inputDimensions, channelsFirst, inputColorMode, preprocessor)
+        }
 
+        /**
+         * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData].
+         * Image is resized to fit the [inputDimensions] (according to the [channelsFirst] property),
+         * converted to the given [inputColorMode], transformed to the [FloatArray] which is processed with the given
+         * [preprocessor].
+         */
+        public fun createPreprocessing(inputDimensions: LongArray,
+                                       channelsFirst: Boolean,
+                                       inputColorMode: ColorMode,
+                                       preprocessor: Operation<FloatData, FloatData> = Identity()
+        ): Operation<BufferedImage, FloatData> {
+            val (width, height) = if (channelsFirst)
+                Pair(inputDimensions[1], inputDimensions[2])
+            else
+                Pair(inputDimensions[0], inputDimensions[1])
             return pipeline<BufferedImage>()
                 .resize {
                     outputHeight = height.toInt()

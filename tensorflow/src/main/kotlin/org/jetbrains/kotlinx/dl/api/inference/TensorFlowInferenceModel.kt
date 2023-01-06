@@ -38,10 +38,6 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     /** Output operand. */
     protected var output: String = OUTPUT_ARG_MAX
 
-    /** Data shape for prediction. */
-    public lateinit var shape: LongArray
-        private set
-
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
@@ -106,10 +102,6 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
         output = outputName
     }
 
-    override fun reshape(vararg dims: Long) {
-        this.shape = TensorShape(1, *dims).dims()
-    }
-
     /** Forms the graph description in string format. */
     public fun graphToString(): String {
         return tfGraph.convertToString()
@@ -122,7 +114,6 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     /** Returns a copy of this model. */
     public fun copy(copiedModelName: String? = null): TensorFlowInferenceModel {
         val model = TensorFlowInferenceModel(tfGraph.copy())
-        model.shape = shape
         model.input = input
         model.output = output
         if (copiedModelName != null) model.name = name

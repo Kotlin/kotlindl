@@ -53,8 +53,6 @@ fun lenetOnFashionMnistExportImportToTxt() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(28, 28, 1)
-
         var accuracy = 0.0
         val amountOfTestSet = 10000
         for (imageId in 0..amountOfTestSet) {

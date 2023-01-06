@@ -140,7 +140,6 @@ class TensorFlowInferenceModelTest {
 
         val inferenceModel = TensorFlowInferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
         inferenceModel.use {
-            it.reshape(28, 28, 1)
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
@@ -197,7 +196,6 @@ class TensorFlowInferenceModelTest {
         val secondAccuracy: Double
 
         inferenceModel.use {
-            it.reshape(28, 28, 1)
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
@@ -235,38 +233,10 @@ class TensorFlowInferenceModelTest {
 
         val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {
-            it.reshape(28, 28, 1)
-
             val exception = Assertions.assertThrows(IllegalStateException::class.java) {
                 it.predict(train.getX(0))
             }
             assertEquals("Model weights are not initialized.", exception.message)
-        }
-    }
-
-    @Test
-    fun missedReshapeFunction() {
-        val (train, _) = mnist()
-
-        val inferenceModel = TensorFlowInferenceModel()
-        inferenceModel.use {
-            val exception =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predict(train.getX(0))
-                }
-            assertEquals(
-                "Model input shape is not defined. Call reshape() to set input shape.",
-                exception.message
-            )
-
-            val exception2 =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predictSoftly(train.getX(0))
-                }
-            assertEquals(
-                "Model input shape is not defined. Call reshape() to set input shape.",
-                exception2.message
-            )
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -85,7 +85,6 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
     ): OnnxInferenceModel {
         val modelFile = S3_FOLDER_SEPARATOR + modelType.modelRelativePath + MODEL_FILE_EXTENSION
         val inferenceModel = OnnxInferenceModel(getONNXModelFile(modelFile, loadingMode).absolutePath)
-        modelType.inputShape?.let { shape -> inferenceModel.reshape(*shape) }
         inferenceModel.initializeWith(*executionProviders)
         return inferenceModel
     }

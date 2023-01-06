@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape.Companion.tail
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
@@ -49,9 +48,6 @@ public open class OnnxInferenceModel private constructor(
 
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
-
-    /** Data shape of the first input tensor. Set explicitly when the model can accept variable shape input. */
-    private var inputShape: LongArray? = null
 
     /** Data shape of the first output tensor. */
     public val outputShape: LongArray get() = outputInfo.getShape(0)
@@ -171,17 +167,8 @@ public open class OnnxInferenceModel private constructor(
         return uniqueProviders
     }
 
-    /**
-     * Chain-like setter to set up input shape.
-     *
-     * @param dims The input shape.
-     */
-    public override fun reshape(vararg dims: Long) {
-        inputShape = longArrayOf(1, *dims)
-    }
-
     override val inputDimensions: LongArray
-        get() = TensorShape(inputShape ?: inputInfo.getShape(0)).tail()
+        get() = TensorShape(inputInfo.getShape(0)).tail()
 
     public override fun predict(inputData: FloatData): Int {
         return predictSoftly(inputData).argmax()
@@ -270,9 +257,6 @@ public open class OnnxInferenceModel private constructor(
 
     override fun copy(): OnnxInferenceModel {
         val model = OnnxInferenceModel(modelSource)
-        if (inputShape != null) {
-            model.reshape(*inputDimensions)
-        }
         if (::session.isInitialized) {
             model.initializeWith(*executionProvidersInUse.toTypedArray())
         }

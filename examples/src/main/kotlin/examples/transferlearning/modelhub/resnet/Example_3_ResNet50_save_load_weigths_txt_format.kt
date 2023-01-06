@@ -89,8 +89,6 @@ fun main() {
 
     inferenceModel.use {
         for (i in 1..8) {
-            it.reshape(224, 224, 3)
-
             val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
             val res = it.predict(inputData)

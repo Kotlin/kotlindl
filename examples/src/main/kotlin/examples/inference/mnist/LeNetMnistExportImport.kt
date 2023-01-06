@@ -76,8 +76,6 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(*lenet5.inputDimensions)
-
         val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
