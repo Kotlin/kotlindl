@@ -1,25 +1,34 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+
 /**
  * This class represents the batch of data in the [Dataset].
  * @param [x] Data observations.
  * @param [y] Labels.
- * @param [size] Number of rows in batch.
+ * @param [elementShape] Shape of the data elements.
  */
-public data class DataBatch internal constructor(
-    val x: Array<FloatArray>,
-    val y: FloatArray,
-    val size: Int
-) {
+public data class DataBatch internal constructor(val x: Array<FloatArray>, val elementShape: TensorShape, val y: FloatArray) {
     /**
-     * Returns 2-dimensional shape of the data batch.
+     * Number of rows in the batch.
      */
-    public fun shape(elementSize: Int): List<Long> = listOf(size.toLong(), elementSize.toLong())
+    public val size: Int get() = x.size
+
+    /**
+     * Shape of this [DataBatch].
+     */
+    public val shape: TensorShape get() = TensorShape(size.toLong(), *elementShape.dims())
+
+    init {
+        check(x.size == y.size) {
+            "Number of data elements in the batch (${x.size}) is not the same as the number of labels (${y.size})."
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -27,15 +36,12 @@ public data class DataBatch internal constructor(
 
         other as DataBatch
 
-        if (!x.contentDeepEquals(other.x)) return false
-        if (!y.contentEquals(other.y)) return false
-        return size == other.size
+        return x.contentDeepEquals(other.x) && y.contentEquals(other.y)
     }
 
     override fun hashCode(): Int {
         var result = x.contentDeepHashCode()
         result = 31 * result + y.contentHashCode()
-        result = 31 * result + size
         return result
     }
 }

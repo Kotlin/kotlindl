@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape.Companion.tail
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
@@ -49,9 +48,6 @@ public open class OnnxInferenceModel private constructor(
 
     /** Execution providers currently set for the model. */
     private lateinit var executionProvidersInUse: List<ExecutionProvider>
-
-    /** Data shape of the first input tensor. Set explicitly when the model can accept variable shape input. */
-    private var inputShape: LongArray? = null
 
     /** Data shape of the first output tensor. */
     public val outputShape: LongArray get() = outputInfo.getShape(0)
@@ -171,23 +167,14 @@ public open class OnnxInferenceModel private constructor(
         return uniqueProviders
     }
 
-    /**
-     * Chain-like setter to set up input shape.
-     *
-     * @param dims The input shape.
-     */
-    public override fun reshape(vararg dims: Long) {
-        inputShape = longArrayOf(1, *dims)
-    }
-
     override val inputDimensions: LongArray
-        get() = TensorShape(inputShape ?: inputInfo.getShape(0)).tail()
+        get() = TensorShape(inputInfo.getShape(0)).tail()
 
-    public override fun predict(inputData: FloatArray): Int {
+    public override fun predict(inputData: FloatData): Int {
         return predictSoftly(inputData).argmax()
     }
 
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
         val outputTensorName = predictionTensorName.ifEmpty { outputInfo.getName(0) }
         require(outputTensorName in outputInfo) {
             "There is no output with name '$outputTensorName'." +
@@ -197,10 +184,7 @@ public open class OnnxInferenceModel private constructor(
         val outputInfo = outputInfo.getValue(outputTensorName).info
         throwIfOutputNotSupported(outputInfo, outputTensorName, "predictSoftly", OnnxJavaType.FLOAT)
 
-        val shape = (inputShape ?: inputInfo.getShape(0)).tail()
-        val floatData = FloatData(inputData, TensorShape(shape))
-
-        return predictRaw(floatData) { output -> output.getFloatArray(outputTensorName) }
+        return predictRaw(inputData) { output -> output.getFloatArray(outputTensorName) }
     }
 
     /**
@@ -273,9 +257,6 @@ public open class OnnxInferenceModel private constructor(
 
     override fun copy(): OnnxInferenceModel {
         val model = OnnxInferenceModel(modelSource)
-        if (inputShape != null) {
-            model.reshape(*inputDimensions)
-        }
         if (::session.isInitialized) {
             model.initializeWith(*executionProvidersInUse.toTypedArray())
         }

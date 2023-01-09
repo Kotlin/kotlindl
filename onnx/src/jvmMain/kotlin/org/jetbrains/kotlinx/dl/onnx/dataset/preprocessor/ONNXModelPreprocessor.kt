@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor
 
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape.Companion.tail
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
@@ -24,7 +25,7 @@ public class ONNXModelPreprocessor(public var onnxModel: OnnxInferenceModel?, pu
         val (prediction, rawShape) = onnxModel!!.predictRaw(input) { output ->
             return@predictRaw output.getFloatArrayWithShape(outputIndex)
         }
-        return prediction to TensorShape(rawShape)
+        return prediction to TensorShape(rawShape.tail())
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {

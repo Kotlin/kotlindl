@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -60,9 +60,8 @@ fun resnet50additionalTraining() {
 
     modelHub.loadModel(modelType).use { model ->
         println(model)
-        model.reshape(64, 64, 3)
 
-        val preprocessing = modelType.createPreprocessing(model).onnx { onnxModel = model }
+        val preprocessing = modelType.createPreprocessing(longArrayOf(64, 64, 3)).onnx { onnxModel = model }
 
         val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
         val dataset = OnFlyImageDataset.create(

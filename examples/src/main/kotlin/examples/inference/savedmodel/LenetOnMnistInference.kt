@@ -24,8 +24,6 @@ fun lenetOnMnistInference() {
     SavedModel.load(PATH_TO_MODEL).use {
         println(it.graphToString())
 
-        it.reshape(28, 28, 1)
-
         val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
         println("Predicted Label is: $prediction")

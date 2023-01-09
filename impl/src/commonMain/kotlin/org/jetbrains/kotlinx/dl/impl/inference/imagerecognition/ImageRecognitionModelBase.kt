@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -43,7 +43,7 @@ public abstract class ImageRecognitionModelBase<I>(
      * @return The label of the recognized object with the highest probability.
      */
     public fun predictObject(image: I): String {
-        val (input, _) = preprocessing.apply(image)
+        val input = preprocessing.apply(image)
         return classLabels[internalModel.predict(input)]!!
     }
 
@@ -59,7 +59,7 @@ public abstract class ImageRecognitionModelBase<I>(
      * @return The list of pairs <label, probability> sorted from the most probable to the lowest probable.
      */
     public fun predictTopKObjects(image: I, topK: Int = 5): List<Pair<String, Float>> {
-        val (input, _) = preprocessing.apply(image)
+        val input = preprocessing.apply(image)
         return internalModel.predictTopNLabels(input, classLabels, topK)
     }
 

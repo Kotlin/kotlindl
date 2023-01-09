@@ -41,10 +41,7 @@ private val model = Sequential.of(
 fun irisClassification() {
     data.shuffle()
 
-    val dataset = OnHeapDataset.create(
-        ::extractX,
-        ::extractY
-    )
+    val dataset = OnHeapDataset.create(extractX(), extractY())
 
     val (train, test) = dataset.split(0.9)
 

@@ -346,7 +346,7 @@ public abstract class TrainableModel : TensorFlowInferenceModelBase(), ModelWith
      * @param [inputData] Unlabeled input data to define label.
      * @param [predictionTensorName] Name of output tensor to make prediction.
      */
-    public abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
+    public abstract fun predict(inputData: FloatData, predictionTensorName: String): Int
 
     /**
      * Predicts and returns not only prediction but list of activations values from intermediate model layers
@@ -357,7 +357,7 @@ public abstract class TrainableModel : TensorFlowInferenceModelBase(), ModelWith
      * @return Label (class index) and list of activations from intermediate model layers.
      */
     public abstract fun predictAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String = ""
     ): Pair<Int, List<*>>
 
@@ -370,7 +370,7 @@ public abstract class TrainableModel : TensorFlowInferenceModelBase(), ModelWith
      * @return Label (class index) and list of activations from intermediate model layers.
      */
     protected abstract fun predictSoftlyAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.dataset.embedded
 
 import io.jhdf.HdfFile
 import io.jhdf.api.Dataset
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.loaders.AWS_S3_URL
 import org.jetbrains.kotlinx.dl.api.inference.loaders.LoadingMode
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
@@ -38,20 +39,10 @@ import java.util.zip.ZipFile
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
-    cacheDirectory.existsOrMkdirs()
-
-    val trainXpath = loadFile(cacheDirectory, TRAIN_IMAGES_ARCHIVE).absolutePath
-    val trainYpath = loadFile(cacheDirectory, TRAIN_LABELS_ARCHIVE).absolutePath
-    val testXpath = loadFile(cacheDirectory, TEST_IMAGES_ARCHIVE).absolutePath
-    val testYpath = loadFile(cacheDirectory, TEST_LABELS_ARCHIVE).absolutePath
-
-    return OnHeapDataset.createTrainAndTestDatasets(
-        trainXpath,
-        trainYpath,
-        testXpath,
-        testYpath,
-        ::extractImages,
-        ::extractLabels
+    return createDataset(
+        cacheDirectory,
+        TRAIN_IMAGES_ARCHIVE, TRAIN_LABELS_ARCHIVE,
+        TEST_IMAGES_ARCHIVE, TEST_LABELS_ARCHIVE
     )
 }
 
@@ -84,21 +75,29 @@ public fun mnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHe
  * (num_samples, 28, 28). Y data uint8 arrays of digit labels (integers in range 0-9) with shapes (num_samples,).
  */
 public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, OnHeapDataset> {
+    return createDataset(
+        cacheDirectory,
+        FASHION_TRAIN_IMAGES_ARCHIVE, FASHION_TRAIN_LABELS_ARCHIVE,
+        FASHION_TEST_IMAGES_ARCHIVE, FASHION_TEST_LABELS_ARCHIVE
+    )
+}
+
+private fun createDataset(cacheDirectory: File,
+                          trainImagesArchive: String, trainLabelsArchive: String,
+                          testImagesArchive: String, testLabelsArchive: String
+): Pair<OnHeapDataset, OnHeapDataset> {
+    val shape = TensorShape(28, 28, 1)
+
     cacheDirectory.existsOrMkdirs()
 
-    val trainXpath = loadFile(cacheDirectory, FASHION_TRAIN_IMAGES_ARCHIVE).absolutePath
-    val trainYpath = loadFile(cacheDirectory, FASHION_TRAIN_LABELS_ARCHIVE).absolutePath
-    val testXpath = loadFile(cacheDirectory, FASHION_TEST_IMAGES_ARCHIVE).absolutePath
-    val testYpath = loadFile(cacheDirectory, FASHION_TEST_LABELS_ARCHIVE).absolutePath
+    val trainXpath = loadFile(cacheDirectory, trainImagesArchive).absolutePath
+    val trainYpath = loadFile(cacheDirectory, trainLabelsArchive).absolutePath
+    val testXpath = loadFile(cacheDirectory, testImagesArchive).absolutePath
+    val testYpath = loadFile(cacheDirectory, testLabelsArchive).absolutePath
 
-    return OnHeapDataset.createTrainAndTestDatasets(
-        trainXpath,
-        trainYpath,
-        testXpath,
-        testYpath,
-        ::extractImages,
-        ::extractLabels
-    )
+    val train = OnHeapDataset.create(extractImages(trainXpath), extractLabels(trainYpath), shape)
+    val test = OnHeapDataset.create(extractImages(testXpath), extractLabels(testYpath), shape)
+    return train to test
 }
 
 /** Path to H5 file of Mnist 3D Dataset. */
@@ -129,10 +128,11 @@ public fun mnist3D(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, On
 
         val (trainData, trainLabels) = it.extractMnist3DDataset("train")
         val (testData, testLabels) = it.extractMnist3DDataset("test")
+        val shape = TensorShape(16, 16, 16)
 
         Pair(
-            OnHeapDataset.create(trainData, trainLabels),
-            OnHeapDataset.create(testData, testLabels)
+            OnHeapDataset.create(trainData, trainLabels, shape),
+            OnHeapDataset.create(testData, testLabels, shape)
         )
     }
 }
@@ -198,9 +198,11 @@ public fun freeSpokenDigits(
     val (trainData, testData) = data.splitToTrainAndTestByIndex(maxTestIndex)
     val (trainLabels, testLabels) = labels.splitToTrainAndTestByIndex(maxTestIndex)
 
+    val shape = TensorShape(FSDD_SOUND_DATA_SIZE, 1)
+
     return Pair(
-        OnHeapDataset.create(trainData, trainLabels.toFloatArray()),
-        OnHeapDataset.create(testData, testLabels.toFloatArray())
+        OnHeapDataset.create(trainData, trainLabels.toFloatArray(), shape),
+        OnHeapDataset.create(testData, testLabels.toFloatArray(), shape)
     )
 }
 

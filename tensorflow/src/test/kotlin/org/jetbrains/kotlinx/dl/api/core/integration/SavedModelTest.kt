@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -25,8 +25,6 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(28, 28, 1)
-
             val prediction = it.predict(train.getX(0))
 
             assertEquals(train.getY(0), prediction.toFloat())
@@ -45,8 +43,6 @@ class SavedModelTest {
         val modelDirectory = File(PATH_TO_MODEL)
 
         SavedModel.load(modelDirectory.absolutePath).use {
-            it.reshape(28, 28, 1)
-
             val prediction = it.predict(train.getX(0), "Placeholder", "ArgMax")
 
             assertEquals(train.getY(0), prediction.toFloat())

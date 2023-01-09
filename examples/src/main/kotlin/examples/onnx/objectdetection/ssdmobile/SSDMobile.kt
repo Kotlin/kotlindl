@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -36,8 +36,8 @@ fun ssdMobile() {
 
         val fileDataLoader = pipeline<BufferedImage>()
             .resize {
-                outputHeight = it.inputDimensions[0].toInt()
-                outputWidth = it.inputDimensions[1].toInt()
+                outputHeight = 1000
+                outputWidth = 1000
             }
             .convert { colorMode = ColorMode.BGR }
             .toFloatArray { }

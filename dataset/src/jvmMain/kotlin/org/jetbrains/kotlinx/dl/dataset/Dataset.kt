@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import kotlin.math.min
 
 /** Just abstract Dataset. */
@@ -16,7 +17,7 @@ public abstract class Dataset {
     public abstract fun xSize(): Int
 
     /** Returns row by index [idx]. */
-    public abstract fun getX(idx: Int): FloatArray
+    public abstract fun getX(idx: Int): FloatData
 
     /** Returns label as [Int] by index [idx]. */
     public abstract fun getY(idx: Int): Float

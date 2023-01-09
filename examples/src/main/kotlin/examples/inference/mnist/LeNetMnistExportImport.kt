@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -76,8 +76,6 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(*lenet5.inputDimensions)
-
         val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
