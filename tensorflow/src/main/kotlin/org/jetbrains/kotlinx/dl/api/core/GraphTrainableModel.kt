@@ -548,7 +548,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     val prediction = tensors.first().convertTensorToFlattenFloatArray()
                     val activations = tensors.drop(1).map { it.convertTensorToMultiDimArray() }
 
-                    tensors.forEach { it.close() }
                     prediction to activations
                 }
             }
