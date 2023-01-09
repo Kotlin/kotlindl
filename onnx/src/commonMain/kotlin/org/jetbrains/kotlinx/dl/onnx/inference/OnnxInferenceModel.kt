@@ -225,9 +225,11 @@ public open class OnnxInferenceModel private constructor(
             val modelShape = inputInfo.getShape(name)
             val dataShape = longArrayOf(1L, *floatData.shape.dims())
             require(modelShape.matches(dataShape)) {
-                "Data shape for input $name does not match the model input shape. Data shape: $dataShape, model shape: $modelShape"
+                "Data shape for input $name does not match the model input shape. " +
+                        "Data shape: ${dataShape.contentToString()}," +
+                        " model shape: ${modelShape.contentToString()}"
             }
-            require(dataShape.all { it >= 0 }) { "Data shape is not defined: $dataShape" }
+            require(dataShape.all { it >= 0 }) { "Data shape is not defined: ${dataShape.contentToString()}" }
 
             Triple(floatData.floats, dataShape, inputInfo.getType(name))
         }
