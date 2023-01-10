@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
 import org.jetbrains.kotlinx.dl.impl.util.flattenFloats
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.tensorflow.*
@@ -85,7 +85,7 @@ open class LayerTest {
             val expectedShape = expectedOutput.shape.toLongArray()
             assertArrayEquals(expectedShape, outputShape)
 
-            val result = it.convertTensorToFlattenFloatArray()
+            val result = it.toFloatArray()
             val expected = expectedOutput.flattenFloats()
             assertArrayEquals(expected, result)
         }

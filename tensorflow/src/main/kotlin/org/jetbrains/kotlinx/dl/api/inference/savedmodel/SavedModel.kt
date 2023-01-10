@@ -7,8 +7,6 @@ package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
 import org.jetbrains.kotlinx.dl.api.core.util.PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.SavedModelBundle
 
 /**
@@ -22,26 +20,6 @@ public open class SavedModel(private val bundle: SavedModelBundle) :
     init {
         input = PLACEHOLDER
         isModelInitialized = true
-    }
-
-    /**
-     * Predicts labels for all observation in [dataset].
-     *
-     * NOTE: Slow method, executed on client side, not in TensorFlow.
-     *
-     * @param [inputTensorName] The name of input tensor.
-     * @param [outputTensorName] The name of output tensor.
-     * @param [dataset] Dataset.
-     */
-    public fun predict(dataset: OnHeapDataset, inputTensorName: String, outputTensorName: String): List<Int> {
-        val predictedLabels: MutableList<Int> = mutableListOf()
-
-        for (i in 0 until dataset.xSize()) {
-            val predictedLabel = predict(dataset.getX(i), inputTensorName, outputTensorName)
-            predictedLabels.add(predictedLabel)
-        }
-
-        return predictedLabels
     }
 
     override fun close() {

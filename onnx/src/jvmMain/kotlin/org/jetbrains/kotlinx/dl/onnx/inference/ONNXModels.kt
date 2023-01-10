@@ -498,7 +498,7 @@ public object ONNXModels {
             /**
              * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
              */
-            public fun CV.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+            public fun CV.createPreprocessing(model: InferenceModel<*>): Operation<BufferedImage, FloatData> {
                 return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
             }
         }
@@ -643,7 +643,7 @@ public object ONNXModels {
             /**
              * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
              */
-            public fun CVnoTop.createPreprocessing(model: InferenceModel): Operation<BufferedImage, FloatData> {
+            public fun CVnoTop.createPreprocessing(model: InferenceModel<*>): Operation<BufferedImage, FloatData> {
                 return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
             }
 

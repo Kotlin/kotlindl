@@ -15,7 +15,7 @@ import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
@@ -57,7 +57,7 @@ class FacesTestSuite {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
                 val inputData = fileDataLoader.load(imageFile)
 
-                val yhat = it.predictRaw(inputData) { output -> output.getFloatArray(0) }
+                val yhat = it.predict(inputData) { output -> output.getFloatArray(0) }
                 assertEquals(212, yhat.size)
             }
         }

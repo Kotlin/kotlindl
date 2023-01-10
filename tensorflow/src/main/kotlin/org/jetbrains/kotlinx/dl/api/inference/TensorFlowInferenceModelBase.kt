@@ -6,16 +6,15 @@
 package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.contentToString
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.createFloatArray
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
-import org.tensorflow.Graph
-import org.tensorflow.Session
-import org.tensorflow.Shape
-import org.tensorflow.Tensor
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
+import org.jetbrains.kotlinx.dl.impl.util.use
+import org.tensorflow.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -29,7 +28,7 @@ import java.util.*
  */
 public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph = Graph(),
                                                    internal val session: Session = Session(tfGraph)
-) : InferenceModel {
+) : InferenceModel<TensorResult> {
 
     /** Is true when model is initialized. */
     public var isModelInitialized: Boolean = false
@@ -37,6 +36,67 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
 
     /** Model name. */
     public var name: String? = null
+
+    override val resultConverter: InferenceResultConverter<TensorResult>
+        get() = TensorFlowInferenceResultConverter
+
+    override fun <T> predict(inputs: Map<String, FloatData>,
+                             outputs: List<String>,
+                             extractResult: (TensorResult) -> T
+    ): T {
+        check(isModelInitialized) { "Model weights are not initialized." }
+        outputs.forEach { outputName ->
+            require(tfGraph.operation(outputName) != null) {
+                "Could not find tensor output $outputName in the TensorFlow graph."
+            }
+        }
+
+        return runModel(
+            inputs.map { InputKey.Name(it.key) to it.value.toTensor() }.toMap(),
+            outputs.map { OutputKey.Name(it) },
+            emptyList(),
+        ) { tensors -> extractResult(TensorResult(tensors)) }
+    }
+
+    protected fun <R> runModel(inputs: Map<out InputKey, Tensor<*>>,
+                               outputs: List<OutputKey>,
+                               targets: List<Operand<Float>>,
+                               extractResult: (List<Tensor<*>>) -> R
+    ): R {
+        return inputs.use {
+            val runner = session.runner()
+            inputs.forEach { (operation, tensor) -> operation.feed(runner, tensor) }
+            outputs.forEach { output -> output.fetch(runner) }
+            targets.forEach { target -> runner.addTarget(target) }
+            runner.run().use { tensors -> extractResult(tensors) }
+        }
+    }
+
+    protected sealed class InputKey {
+        public data class Operand(val op: org.tensorflow.Operand<*>) : InputKey() {
+            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner {
+                return runner.feed(op.asOutput(), tensor)
+            }
+        }
+
+        public data class Name(val s: String) : InputKey() {
+            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner = runner.feed(s, tensor)
+        }
+
+        public abstract fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner
+    }
+
+    protected sealed class OutputKey {
+        public data class Operand(val op: org.tensorflow.Operand<Float>) : OutputKey() {
+            override fun fetch(runner: Session.Runner): Session.Runner = runner.fetch(op)
+        }
+
+        public data class Name(val s: String) : OutputKey() {
+            override fun fetch(runner: Session.Runner): Session.Runner = runner.fetch(s)
+        }
+
+        public abstract fun fetch(runner: Session.Runner): Session.Runner
+    }
 
     /**
      * Loads variable data for variable names in the provided collection using a provided function.
@@ -145,7 +205,7 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
         val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
 
         model.loadVariables(modelWeights.keys) { variableName, _ ->
-            modelWeights[variableName]!!.use { it.convertTensorToMultiDimArray() }
+            modelWeights[variableName]!!.use { it.toMultiDimensionalArray() }
         }
     }
 
@@ -157,5 +217,21 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
 
     private companion object {
         private val logger = KotlinLogging.logger {}
+    }
+}
+
+/**
+ * Inference result for the models inheriting [TensorFlowInferenceModelBase].
+ *
+ * @see TensorFlowInferenceResultConverter
+ */
+public data class TensorResult(val tensors: List<Tensor<*>>) : AutoCloseable {
+    override fun close() {
+        tensors.forEach {
+            try {
+                it.close()
+            } finally {
+            }
+        }
     }
 }

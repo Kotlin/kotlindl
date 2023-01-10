@@ -8,8 +8,10 @@ package examples.onnx.cv.lenet
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.jetbrains.kotlinx.dl.dataset.evaluate
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
 import java.io.File
 
 fun main() {
@@ -22,10 +24,10 @@ fun main() {
     model.use {
         println(it)
 
-        val prediction = it.predict(train.getX(0))
+        val prediction = it.predictLabel(train.getX(0))
 
         println("Predicted Label is: $prediction")
         println("Correct Label is: " + train.getY(0))
-        println("Accuracy is: ${it.evaluate(test, Metrics.ACCURACY)}")
+        println("Accuracy is: ${it.evaluate(test, Metrics.ACCURACY, OnnxInferenceModel::predictLabel)}")
     }
 }

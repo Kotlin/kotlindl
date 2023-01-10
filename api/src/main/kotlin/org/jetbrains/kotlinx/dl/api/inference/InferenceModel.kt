@@ -9,32 +9,33 @@ import org.jetbrains.kotlinx.dl.api.core.FloatData
 
 /**
  * The basic interface for all models which defines the basic functions required for inference tasks only.
+ *
+ * @param [R] type of inference result, produced by this model.
+ * @see InferenceResultConverter
  */
-public interface InferenceModel : AutoCloseable {
+public interface InferenceModel<R> : AutoCloseable {
     /** Input specification for this model. */
     public val inputDimensions: LongArray
 
     /**
-     * Predicts the class of [inputData].
-     *
-     * @param [inputData] The single example with unknown label.
-     * @return Predicted class index.
+     * Provides methods for converting inference result from this model to the common data types.
      */
-    public fun predict(inputData: FloatData): Int
+    public val resultConverter: InferenceResultConverter<R>
 
     /**
-     * Predicts vector of probabilities instead of specific class in [predict] method.
-     *
-     * @param [inputData] The single example with unknown vector of probabilities.
-     * @param [predictionTensorName] The name of prediction tensor. It could be changed, if you need to get alternative outputs from model graph.
-     * @return Vector that represents the probability distributions of a list of potential outcomes
+     * Run inference on the provided [inputData] and pass inference result to the [extractResult] function.
      */
-    public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray
+    public fun <T> predict(inputData: FloatData, extractResult: (R) -> T): T
+
+    /**
+     * Run inference on the provided [inputs], calculate the specified [outputs] and pass inference result to the [extractResult] function.
+     */
+    public fun <T> predict(inputs: Map<String, FloatData>, outputs: List<String>, extractResult: (R) -> T): T
 
     /**
      * Creates a copy of this model.
      *
      * @return A copied inference model.
      */
-    public fun copy(): InferenceModel
+    public fun copy(): InferenceModel<R>
 }

@@ -8,6 +8,7 @@ package examples.onnx
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -19,9 +20,11 @@ class OnnxOutputsSupportTestSuite {
     private val features = (1..27).map { Random.nextFloat() }.toFloatArray()
 
     @Test
-    fun predictSoftlyLgbmSequenceOutputTest() {
+    fun predictLgbmSequenceOutputTest() {
         assertThrows<IllegalArgumentException> {
-            model.predictSoftly(features to TensorShape(27), "probabilities")
+            model.predict(features to TensorShape(27)) { output ->
+                output.getFloatArray("probabilities")
+            }
         }
     }
 

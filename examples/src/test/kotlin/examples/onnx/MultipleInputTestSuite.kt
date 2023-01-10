@@ -8,7 +8,7 @@ package examples.onnx
 import examples.transferlearning.getFileFromResource
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.onnx.inference.OrtSessionResultConversions.getFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -21,9 +21,7 @@ class MultipleInputTestSuite {
         OnnxInferenceModel.load(pathToModel).use { model ->
             val x = floatArrayOf(1f, 2f, 3f) to TensorShape(3)
             val y = floatArrayOf(1f, 1f, 1f) to TensorShape(3)
-            val result = model.predictRaw(mapOf("X" to x, "Y" to y)) { output ->
-                return@predictRaw output.getFloatArray("Z")
-            }
+            val result = model.predict(mapOf("X" to x, "Y" to y)) { output -> output.getFloatArray("Z") }
             Assertions.assertArrayEquals(floatArrayOf(2f, 3f, 4f), result)
         }
     }
@@ -34,10 +32,10 @@ class MultipleInputTestSuite {
             val x = floatArrayOf(1f, 2f, 3f) to TensorShape(4)
             val y = floatArrayOf(1f, 1f, 1f) to TensorShape(3)
             assertThrows<IllegalArgumentException> {
-                model.predictRaw(mapOf("X" to x, "Y" to y)) {}
+                model.predict(mapOf("X" to x, "Y" to y)) {}
             }
             assertThrows<IllegalArgumentException> {
-                model.predictRaw(mapOf("Xxx" to y, "Y" to y)) {}
+                model.predict(mapOf("Xxx" to y, "Y" to y)) {}
             }
         }
     }

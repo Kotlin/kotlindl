@@ -25,14 +25,14 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
+import org.jetbrains.kotlinx.dl.api.inference.TensorResult
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toMultiDimensionalArray
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.impl.util.argmax
-import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
@@ -357,35 +357,22 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      */
     private fun getLossAndMetricValues(batch: DataBatch, isTraining: Boolean): Pair<Float, List<Float>> {
         val yBatchShape = longArrayOf(batch.size.toLong(), numberOfClasses)
-        return batch.toXTensor()
-            .use { xTensor ->
-                Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
-                    .use { yTensor ->
-                        Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
-                            .use { numberOfLossesTensor ->
-                                Tensor.create(isTraining).use { isTrainingTensor ->
-                                    val runner = session.runner()
-                                        .feed(xOp.asOutput(), xTensor)
-                                        .feed(yTrueOp.asOutput(), yTensor)
-                                        .feed(numberOfLossesOp.asOutput(), numberOfLossesTensor)
-                                        .feed(training.asOutput(), isTrainingTensor)
 
-                                    runner.fetch(TRAINING_LOSS)
+        val inputs = mapOf(
+            xOp to batch.toXTensor(),
+            yTrueOp to Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses)),
+            numberOfLossesOp to Tensor.create(TensorShape(yBatchShape).numElements().toFloat()),
+            training to Tensor.create(isTraining)
+        )
+        val outputs = listOf(OutputKey.Name(TRAINING_LOSS)) + metricOps.map(OutputKey::Operand)
+        val targetsList = if (isTraining) targets else emptyList()
 
-                                    metricOps.forEach { runner.fetch(it) }
-
-                                    if (isTraining) {
-                                        targets.forEach { runner.addTarget(it) }
-                                    }
-
-                                    runner.run().use { tensors ->
-                                        check(tensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!" }
-                                        tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
-                                    }
-                                }
-                            }
-                    }
+        return runModelInternal(inputs, outputs, targetsList) { tensors ->
+            check(tensors.size == metricOps.size + 1) {
+                "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!"
             }
+            tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
+        }
     }
 
     override fun evaluate(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): EvaluationResult {
@@ -444,11 +431,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return predictions
     }
 
-    override fun predict(inputData: FloatData): Int {
-        val softPrediction = predictSoftly(inputData)
-        return softPrediction.argmax()
-    }
-
     override fun predict(inputData: FloatData, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
         return softPrediction.argmax()
@@ -483,24 +465,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
             callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
-            batch.toXTensor().use { xTensor ->
-                Tensor.create(false).use { isTraining ->
-                    session.runner()
-                        .fetch(predictionOp)
-                        .feed(xOp.asOutput(), xTensor)
-                        .feed(training.asOutput(), isTraining)
-                        .run().use { tensors ->
-                            block(batchCounter, tensors)
-                        }
-                }
-            }
+            val inputs = mapOf(xOp to batch.toXTensor(), training to Tensor.create(false))
+            val outputs = listOf(OutputKey.Operand(predictionOp))
+
+            runModelInternal(inputs, outputs) { tensors -> block(batchCounter, tensors) }
 
             callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
         }
         callbacks.forEach { it.onPredictEnd() }
     }
 
-    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
+    public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray {
         val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
     }
@@ -518,30 +493,50 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         checkModelInitialized()
-
-        return inputData.toTensor()
-            .use { xTensor ->
-                val runner = session.runner().feed(xOp.asOutput(), xTensor)
-                if (predictionTensorName.isEmpty()) {
-                    runner.fetch(predictionOp)
-                } else {
-                    require(kGraph().tfGraph.operation(predictionTensorName) != null) {
-                        "Output named '$predictionTensorName' not found in the TensorFlow graph."
-                    }
-                    runner.fetch(predictionTensorName)
-                }
-                if (visualizationIsEnabled) {
-                    for (layer in layers.dropLast(1)) {
-                        if (layer.hasActivation) runner.fetch(defaultActivationName(layer))
-                    }
-                }
-                runner.run().use { tensors ->
-                    val prediction = tensors.first().convertTensorToFlattenFloatArray()
-                    val activations = tensors.drop(1).map { it.convertTensorToMultiDimArray() }
-
-                    prediction to activations
-                }
+        if (predictionTensorName.isNotEmpty()) {
+            require(kGraph().tfGraph.operation(predictionTensorName) != null) {
+                "Output named '$predictionTensorName' not found in the TensorFlow graph."
             }
+        }
+
+        val inputs = mapOf(xOp to inputData.toTensor())
+
+        val outputKey = if (predictionTensorName.isEmpty()) {
+            OutputKey.Operand(predictionOp)
+        } else {
+            OutputKey.Name(predictionTensorName)
+        }
+        val outputs = mutableListOf(outputKey)
+        if (visualizationIsEnabled) {
+            val activations = layers.dropLast(1).filter(Layer::hasActivation).map {
+                OutputKey.Name(defaultActivationName(it))
+            }
+            outputs.addAll(activations)
+        }
+
+        return runModelInternal(inputs, outputs) { tensors ->
+            val prediction = tensors.first().toFloatArray()
+            val activations = tensors.drop(1).map { it.toMultiDimensionalArray() }
+
+            prediction to activations
+        }
+    }
+
+    override fun <T> predict(inputData: FloatData, extractResult: (TensorResult) -> T): T {
+        checkModelInitialized()
+
+        val inputs = mapOf(xOp to inputData.toTensor())
+        val outputs = listOf(OutputKey.Operand(predictionOp))
+
+        return runModelInternal(inputs, outputs) { tensors -> extractResult(TensorResult(tensors)) }
+    }
+
+    private fun <R> runModelInternal(inputs: Map<out Operand<*>, Tensor<*>>,
+                                     outputs: List<OutputKey>,
+                                     targets: List<Operand<Float>> = emptyList(),
+                                     extractResult: (List<Tensor<*>>) -> R
+    ): R {
+        return runModel(inputs.mapKeys { InputKey.Operand(it.key) }, outputs, targets, extractResult)
     }
 
     /**
@@ -643,7 +638,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 variableNameFile.bufferedWriter().use { file ->
 
                     tensorForCopying.use {
-                        val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
+                        val reshaped = tensorForCopying.toFloatArray()
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")

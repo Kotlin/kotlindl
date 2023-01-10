@@ -5,9 +5,17 @@
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.shape.tensorShape
 import kotlin.math.roundToInt
 
+
+/**
+ * Applies the given [transform] function to each element of the dataset and returns a list with results.
+ */
+public fun <R> Dataset.map(transform: (FloatData) -> R): List<R> {
+    return (0 until xSize()).map { i -> transform(getX(i)) }
+}
 
 /**
  * Creates [OnHeapDataset] string representation for part of data.

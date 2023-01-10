@@ -21,7 +21,7 @@ import java.io.IOException
  * The light-weight API for solving Image Recognition task with one of the Model Hub models trained on ImageNet dataset.
  */
 public class ImageRecognitionModel(
-    internalModel: InferenceModel,
+    internalModel: InferenceModel<*>,
     private val inputColorMode: ColorMode,
     private val channelsFirst: Boolean,
     private val preprocessor: Operation<FloatData, FloatData> = Identity(),
@@ -70,7 +70,7 @@ public class ImageRecognitionModel(
          * converted to the given [inputColorMode], transformed to the [FloatArray] which is processed with the given
          * [preprocessor].
          */
-        public fun createPreprocessing(model: InferenceModel,
+        public fun createPreprocessing(model: InferenceModel<*>,
                                        channelsFirst: Boolean,
                                        inputColorMode: ColorMode,
                                        preprocessor: Operation<FloatData, FloatData> = Identity()

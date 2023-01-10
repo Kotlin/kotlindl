@@ -30,6 +30,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -207,7 +208,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         test: OnHeapDataset
     ) {
         // Prediction testing
-        val label = it.predict(test.getX(0))
+        val label = it.predictLabel(test.getX(0))
         assertEquals(test.getY(0), label.toFloat())
 
         val softPrediction = it.predictSoftly(test.getX(0))
@@ -390,10 +391,9 @@ internal class SequentialBasicTest : IntegrationTest() {
         val (train, _) = mnist()
 
         testModel.use {
-            val exception =
-                assertThrows(IllegalStateException::class.java) {
-                    it.predict(train.getX(0))
-                }
+            val exception = assertThrows(IllegalStateException::class.java) {
+                it.predictLabel(train.getX(0))
+            }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
                 exception.message

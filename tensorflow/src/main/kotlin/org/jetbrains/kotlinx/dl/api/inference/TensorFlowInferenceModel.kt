@@ -9,10 +9,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
-import org.jetbrains.kotlinx.dl.impl.util.use
 import org.tensorflow.Graph
 import org.tensorflow.Session
 import org.tensorflow.Tensor
@@ -41,13 +38,16 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
 
-    /**
-     * Generates output prediction for the input sample.
-     *
-     * @param [inputData] Unlabeled input data to define label.
-     */
-    override fun predict(inputData: FloatData): Int {
-        return predict(inputData, input, output)
+    override fun <T> predict(inputData: FloatData, extractResult: (TensorResult) -> T): T {
+        return predict(mapOf(input to inputData), listOf(output), extractResult)
+    }
+
+    public fun <T> predict(inputData: FloatData,
+                           inputTensorName: String = input,
+                           outputTensorName: String = output,
+                           extractResult: (TensorResult) -> T
+    ): T {
+        return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName), extractResult)
     }
 
     /**
@@ -58,33 +58,9 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
      * @param [outputTensorName] The name of output tensor.
      * @return Predicted class index.
      */
-    public fun predict(inputData: FloatData, inputTensorName: String, outputTensorName: String): Int {
-        check(isModelInitialized) { "Model weights are not initialized." }
-
-        return inputData.toTensor().use {
-            session.runner().feed(inputTensorName, it)
-                .fetch(outputTensorName)
-                .run().use { tensors ->
-                    tensors.first().copyTo(LongArray(1))[0].toInt()
-                }
-        }
-    }
-
-    override fun predictSoftly(inputData: FloatData, predictionTensorName: String): FloatArray {
-        check(isModelInitialized) { "Model weights are not initialized." }
-
-        val fetchTensorName = predictionTensorName.ifEmpty { OUTPUT_NAME }
-
-        require(tfGraph.operation(fetchTensorName) != null) {
-            "Output named '$fetchTensorName' not found in the TensorFlow graph."
-        }
-
-        return inputData.toTensor().use {
-            session.runner().feed(input, it)
-                .fetch(fetchTensorName)
-                .run().use { tensors ->
-                    tensors.first().convertTensorToMultiDimArray()[0] as FloatArray
-                }
+    public fun predict(inputData: FloatData, inputTensorName: String = input, outputTensorName: String = output): Int {
+        return predict(inputData, inputTensorName, outputTensorName) { result ->
+            result.getLongArray(0)[0].toInt()
         }
     }
 

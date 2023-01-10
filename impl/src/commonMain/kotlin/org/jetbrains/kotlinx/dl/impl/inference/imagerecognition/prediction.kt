@@ -7,21 +7,44 @@ package org.jetbrains.kotlinx.dl.impl.inference.imagerecognition
 
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
+import org.jetbrains.kotlinx.dl.impl.util.argmax
 import java.util.*
 
+/**
+ * Predicts the class of [inputData].
+ *
+ * @param [inputData] The single example with unknown label.
+ * @return Predicted class index.
+ */
+public fun <R> InferenceModel<R>.predictLabel(inputData: FloatData): Int {
+    return predictProbabilities(inputData).argmax()
+}
+
+/**
+ * Predicts vector of probabilities instead of specific class in [predictLabel] method.
+ *
+ * @param [inputData] The single example with unknown vector of probabilities.
+ * @return Vector that represents the probability distributions of a list of potential outcomes
+ */
+public fun <R> InferenceModel<R>.predictProbabilities(inputData: FloatData): FloatArray {
+    return predict(inputData) { result ->
+        resultConverter.getFloatArray(result, 0)
+    }
+}
+
 /** Returns top-N labels for the given [floatData] encoded with mapping [labels]. */
-public fun InferenceModel.predictTopNLabels(
+public fun InferenceModel<*>.predictTopNLabels(
     floatData: FloatData,
     labels: Map<Int, String>,
     n: Int = 5
 ): List<Pair<String, Float>> {
-    val prediction = predictSoftly(floatData)
+    val prediction = predictProbabilities(floatData)
     val topNIndexes = prediction.indexOfMaxN(n)
     return topNIndexes.map { index -> labels[index]!! to prediction[index] }
 }
 
 /** Returns top-5 labels for the given [data] encoded with mapping [classLabels]. */
-public fun InferenceModel.predictTop5Labels(
+public fun InferenceModel<*>.predictTop5Labels(
     data: FloatData,
     classLabels: Map<Int, String>,
 ): List<Pair<String, Float>> {

@@ -26,6 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.*
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -256,10 +257,9 @@ class SequentialInferenceTest {
                 fitException.message
             )
 
-            val predictException =
-                Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predict(test.getX(0))
-                }
+            val predictException = Assertions.assertThrows(IllegalStateException::class.java) {
+                it.predictLabel(test.getX(0))
+            }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
                 predictException.message
@@ -294,10 +294,9 @@ class SequentialInferenceTest {
                 evaluateException.message
             )
 
-            val predictException =
-                Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predict(test.getX(0))
-                }
+            val predictException = Assertions.assertThrows(IllegalStateException::class.java) {
+                it.predictLabel(test.getX(0))
+            }
             assertEquals(
                 "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method.",
                 predictException.message
