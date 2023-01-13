@@ -13,7 +13,8 @@ compileKotlin {
 
 dependencies {
     implementation gradleApi()
-    implementation "de.undercouch.download:de.undercouch.download.gradle.plugin:5.2.1"
+    //noinspection GradleDependency workaround for https://github.com/Kotlin/kotlindl/issues/516
+    implementation "de.undercouch.download:de.undercouch.download.gradle.plugin:4.1.2"
     implementation "com.android.tools.build:gradle:7.3.1"
 }
 
