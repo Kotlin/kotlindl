@@ -1,3 +1,14 @@
+# 0.5.1 (14/12/2022) Bugfix update
+Bugfixes:
+* Fixed preprocessing in SSDObjectDetectionModel, MultiPoseDetectionModel, 
+  removed explicit shapes from Fan2d106 and UltraFace models [#496](https://github.com/Kotlin/kotlindl/pull/496)
+* Skip image copy creation in Resize operation for the output of the same size as input [#502](https://github.com/Kotlin/kotlindl/pull/502)
+* Fixed SGD secondary constructor ignoring clipGradient parameter [#504](https://github.com/Kotlin/kotlindl/pull/504)
+* Fixed memory leak ensuring used TensorFlow tensors get closed [#507](https://github.com/Kotlin/kotlindl/pull/507)
+* Fix HardShrink activation [#505](https://github.com/Kotlin/kotlindl/pull/505)
+* Fixed a problem with downloading models for Android [#516](https://github.com/Kotlin/kotlindl/issues/516)
+* Minor documentation fixes
+
 # 0.5.0 (14/12/2022) Inference on Android with ONNX Runtime
 Features:
 * Added Android inference support
