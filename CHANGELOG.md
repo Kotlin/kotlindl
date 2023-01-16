@@ -1,4 +1,28 @@
-# 0.5.1 (14/12/2022) Bugfix update
+# 0.6.0-alpha-1 (16/01/2023) New inference api with multiple inputs support
+Api changes:
+* Changed `InferenceModel` interface:
+  * Added type parameter representing inference result. [#515](https://github.com/Kotlin/kotlindl/pull/515)
+  * Replaced classification function with general purpose prediction methods for single and multiple inputs.
+    Extensions `org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.PredictionKt.predictLabel` and 
+    `org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.PredictionKt.predictProbabilities` were added for classification. [#515](https://github.com/Kotlin/kotlindl/pull/515)
+  * Introduced `InferenceModel#resultConverter` to process inference results. [#515](https://github.com/Kotlin/kotlindl/pull/515)
+  * Method `reshape` was removed, in favor of prediction methods receiving input as `FloatData` containing input shape information. [#513](https://github.com/Kotlin/kotlindl/pull/513)
+  * Parameters were removed from the `copy` function. [#503](https://github.com/Kotlin/kotlindl/pull/503)
+* Replaced `SavedModel#predict` with `org.jetbrains.kotlinx.dl.dataset.InferenceModelExtensionsKt.predict` extension. [#515](https://github.com/Kotlin/kotlindl/pull/515)
+* Added `predictionFunction` parameter to the `org.jetbrains.kotlinx.dl.dataset.InferenceModelExtensionsKt.predict` and
+  `org.jetbrains.kotlinx.dl.dataset.InferenceModelExtensionsKt.evaluate` extension functions. [#515](https://github.com/Kotlin/kotlindl/pull/515)
+* Shape information was added to the dataset classes. [#513](https://github.com/Kotlin/kotlindl/pull/513)
+  * Changed return type of the `Dataset.getX` function to `FloatData`.
+  * Added `TensorShape` parameter to `DataBatch` and `OnHeapDataset` constructors.
+  * Removed `OnHeapDataset.Companion#createTrainAndTestDatasets`,
+  `OnHeapDataset.Companion#create(String, String, int, Function1<String,float[][]>, Function2<String,Integer,float[]>)`,
+  `OnHeapDataset.Companion#create(Function0<float[][]>, Function0<float[]>)` functions.
+* No-top models were moved to the separate model types (`TFModels.CVnoTop` and `ONNXModels.CVnoTop`). [#511](https://github.com/Kotlin/kotlindl/pull/511)
+* Changed high-level model classes so they do not implement `InferenceModel`. [#509](https://github.com/Kotlin/kotlindl/pull/509)
+* Converted `SavingFormat` to a class and added `isKerasFullyCompatible` parameter to `SavingFormat.JsonConfigCustomVariables`. [#501](https://github.com/Kotlin/kotlindl/pull/501)
+* Add basic multiple input support to `OnnxInferenceModel`. [#417](https://github.com/Kotlin/kotlindl/issues/417)
+
+# 0.5.1 (14/01/2023) Bugfix update
 Bugfixes:
 * Fixed preprocessing in SSDObjectDetectionModel, MultiPoseDetectionModel, 
   removed explicit shapes from Fan2d106 and UltraFace models [#496](https://github.com/Kotlin/kotlindl/pull/496)
