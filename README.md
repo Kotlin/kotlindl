@@ -67,7 +67,7 @@ private val lenet5Classic = Sequential.of(
         biasInitializer = Constant(0.1f)
     ),
     Dense(
-        outputSize = NUMBER_OF_CLASSES,
+        outputSize = 10,
         activation = Activations.Linear,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Constant(0.1f)
