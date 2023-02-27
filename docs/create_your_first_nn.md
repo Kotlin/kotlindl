@@ -168,13 +168,14 @@ Total params: 266610
 
 ## Training a model
 
-In the previous sections we have defined the structure of our neural network, specified the optimization algorithm that will be used during its training, and identified accuracy as the metric we will use to gauge its success.
+In the previous sections, we defined our neural network's structure,
+specified the optimization algorithm that will be used during its training, and identified accuracy as the metric we will use to gauge its success.
 
 In this section you'll learn how to train this model on the [Fashion-MNIST dataset](https://github.com/zalandoresearch/fashion-mnist).
 
-Before you can use data, typically some preprocessing is required.
+Before you can use data, typically, some preprocessing is required.
 In this case, it's minimal – all the images are already the same size and are grayscale.
-With the built-in functionality, we can convert the [Fashion MNIST image archives](https://github.com/zalandoresearch/fashion-mnist#get-the-data) into a dataset object that we can use for model training.
+With the built-in functionality, we can convert the [Fashion MNIST image archives](https://github.com/zalandoresearch/fashion-mnist#get-the-data) into a dataset object used for model training.
 
 ```kotlin
 val (train, test) = fashionMnist()
@@ -257,9 +258,9 @@ we'll use the test data subset to generate a prediction example that the model h
 
 The example images in the test data have the same size and format as the ones the model has been trained on,
 so we do not need to do any additional preprocessing.
-However, if you are going to train the model on your own data,
-make sure to use the same image preprocessing before using an image for inference as you did while training your model.
-Every model expects to get exactly the same input as it was trained on.
+However, if you train the model on your data,
+use the same image preprocessing before using an image for inference as you did while training your model.
+Every model expects to get the same input as it was trained on.
 
 To load the model simply use the path to it, tell it how incoming images should be reshaped (if needed), and call the
 `predict` method on them.
@@ -284,4 +285,4 @@ Predicted label is: 9. This corresponds to class Ankle boots.
 Actual label is: 9.0.
 ```
 
-Congratulations! You have learned how to create, train, and use your first neural network model!
+Congratulations! You have learned to create, train, and use your first neural network model!
