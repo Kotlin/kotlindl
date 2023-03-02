@@ -236,8 +236,6 @@ We are working on including extensive documentation to help you get started.
 At this point, please feel free to check out the following tutorials we have prepared:
 - [Quick Start Guide](docs/quick_start_guide.md) 
 - [Creating your first neural network](docs/create_your_first_nn.md)
-- [Training a model](docs/training_a_model.md)
-- [Running inference with a trained model](docs/loading_trained_model_for_inference.md)
 - [Importing a Keras model](docs/importing_keras_model.md) 
 - [Transfer learning](docs/transfer_learning.md)
 - [Transfer learning with Functional API](docs/transfer_learning_functional.md)
