@@ -1,17 +1,18 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset
 
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator.Companion.prepareY
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ConvertToFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -20,6 +21,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.math.truncate
 import kotlin.random.Random
+
+// do not remove this import
 import kotlin.streams.toList
 
 /**
@@ -30,8 +33,17 @@ import kotlin.streams.toList
  * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
+ * @property [elementShape] shape of the elements in the dataset
  */
-public class OnHeapDataset internal constructor(public val x: Array<FloatArray>, public val y: FloatArray) : Dataset() {
+public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
+                                                public val y: FloatArray,
+                                                private val elementShape: TensorShape) : Dataset() {
+
+    init {
+        check(x.size == y.size) {
+            "Number of data elements in the dataset (${x.size}) is not the same as the number of labels (${y.size})."
+        }
+    }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
     private fun copyXToBatch(src: Array<FloatArray>, start: Int, length: Int): Array<FloatArray> {
@@ -57,8 +69,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         return Pair(
-            OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex)),
-            OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size))
+            OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex), elementShape),
+            OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size), elementShape)
         )
     }
 
@@ -68,8 +80,8 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     }
 
     /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return x[idx]
+    override fun getX(idx: Int): FloatData {
+        return x[idx] to elementShape
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
@@ -84,11 +96,7 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copyXToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
+        return DataBatch(copyXToBatch(x, batchStart, batchLength), elementShape, copyLabelsToBatch(y, batchStart, batchLength))
     }
 
     public companion object {
@@ -106,90 +114,14 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
             return (label.toInt() and 0xFF).toFloat()
         }
 
-        /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
-        @JvmStatic
-        public fun toNormalizedVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)).toFloat() / 255f }
-        }
-
-        /** Converts [bytes] to [FloatArray]. */
-        @JvmStatic
-        public fun toRawVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF).toFloat()) }
-        }
-
         /**
-         * Takes data located in [trainFeaturesPath], [trainLabelsPath], [testFeaturesPath], [testLabelsPath]
-         * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create a pair of [OnHeapDataset] for training and testing.
+         * Creates an [OnHeapDataset] from [features] and [labels].
          */
         @JvmStatic
-        public fun createTrainAndTestDatasets(
-            trainFeaturesPath: String,
-            trainLabelsPath: String,
-            testFeaturesPath: String,
-            testLabelsPath: String,
-            numClasses: Int,
-            featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> FloatArray
-        ): Pair<OnHeapDataset, OnHeapDataset> {
-            val xTrain = featuresExtractor(trainFeaturesPath)
-            val yTrain = labelExtractor(trainLabelsPath, numClasses)
-            val xTest = featuresExtractor(testFeaturesPath)
-            val yTest = labelExtractor(testLabelsPath, numClasses)
-            return OnHeapDataset(xTrain, yTrain) to OnHeapDataset(xTest, yTest)
-        }
-
-        /**
-         * Takes data located in [featuresPath], [labelsPath]
-         * with [numClasses], extracts data and labels via [featuresExtractor] and [labelExtractor]
-         * to create an [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            featuresPath: String,
-            labelsPath: String,
-            numClasses: Int,
-            featuresExtractor: (String) -> Array<FloatArray>,
-            labelExtractor: (String, Int) -> FloatArray
+        public fun create(features: Array<FloatArray>, labels: FloatArray,
+                          shape: TensorShape = TensorShape(features.first().size.toLong())
         ): OnHeapDataset {
-            val features = featuresExtractor(featuresPath)
-            val labels = labelExtractor(labelsPath, numClasses)
-
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
-            return OnHeapDataset(features, labels)
-        }
-
-        /**
-         * Takes the data from generators [featuresGenerator] and [labelGenerator]
-         * to create an [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            featuresGenerator: () -> Array<FloatArray>,
-            labelGenerator: () -> FloatArray
-        ): OnHeapDataset {
-            val features = featuresGenerator()
-            val labels = labelGenerator()
-
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
-            return OnHeapDataset(features, labels)
-        }
-
-        /**
-         * Takes data from external data [features] and [labels]
-         * to create dataset [OnHeapDataset].
-         */
-        @JvmStatic
-        public fun create(
-            features: Array<FloatArray>,
-            labels: FloatArray
-        ): OnHeapDataset {
-            check(features.size == labels.size) { "The amount of labels is not equal to the amount of images." }
-
-            return OnHeapDataset(features, labels)
+            return OnHeapDataset(features, labels, shape)
         }
 
         /**
@@ -200,12 +132,12 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>>
+            preprocessing: Operation<BufferedImage, FloatData>
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.fileLoader().prepareX(xFiles)
+            val (x, shape) = preprocessing.fileLoader().prepareX(xFiles)
 
-            return OnHeapDataset(x, labels)
+            return OnHeapDataset(x, labels, shape)
         }
 
         /**
@@ -216,13 +148,13 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
+            preprocessing: Operation<BufferedImage, FloatData> = ConvertToFloatArray()
         ): OnHeapDataset {
             val xFiles = prepareFileNames(pathToData)
-            val x = preprocessing.fileLoader().prepareX(xFiles)
+            val (x, shape) = preprocessing.fileLoader().prepareX(xFiles)
             val y = labelGenerator.prepareY(xFiles)
 
-            return OnHeapDataset(x, y)
+            return OnHeapDataset(x, y, shape)
         }
 
         @Throws(IOException::class)

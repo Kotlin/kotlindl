@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -14,8 +14,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 5
@@ -41,10 +41,7 @@ private val model = Sequential.of(
 fun irisClassification() {
     data.shuffle()
 
-    val dataset = OnHeapDataset.create(
-        ::extractX,
-        ::extractY
-    )
+    val dataset = OnHeapDataset.create(extractX(), extractY())
 
     val (train, test) = dataset.split(0.9)
 

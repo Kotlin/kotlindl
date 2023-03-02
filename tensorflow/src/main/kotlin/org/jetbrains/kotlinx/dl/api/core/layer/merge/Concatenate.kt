@@ -26,7 +26,7 @@ public class Concatenate(
     override fun checkInputShapes(inputShapes: List<Shape>) {
         require(inputShapes.size > 1) { "The number of input layers should be more than 1." }
         val firstInputShape = inputShapes.first().toTensorShape()
-        for ((index, inputShape)  in inputShapes.withIndex()) {
+        for ((index, inputShape) in inputShapes.withIndex()) {
             val currentInputShape = inputShape.toTensorShape()
             require(firstInputShape.almostEqual(currentInputShape, except = axis)) {
                 "A Concatenate layer requires inputs with matching shapes except for the concat axis $axis. " +

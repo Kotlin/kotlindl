@@ -42,10 +42,11 @@ public class MaxPool2D(
         name = name
     )
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val paddingName = padding.paddingName
 

@@ -230,10 +230,11 @@ private fun fillLayerWeights(layer: Layer, group: Group, model: GraphTrainableMo
     model.logger.debug { "${layer.paramCount} parameters loaded for the layer ${layer.name}." }
 }
 
-private fun fillLayerVariablesFromKeras(layerName: String,
-                                        variables: Map<String, KVariable>,
-                                        model: GraphTrainableModel,
-                                        group: Group
+private fun fillLayerVariablesFromKeras(
+    layerName: String,
+    variables: Map<String, KVariable>,
+    model: GraphTrainableModel,
+    group: Group
 ) {
     val layerWeightsNode = group.children[layerName] as? Group
     check(layerWeightsNode != null) {

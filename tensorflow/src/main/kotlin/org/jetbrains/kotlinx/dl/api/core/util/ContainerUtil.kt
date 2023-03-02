@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -19,5 +19,29 @@ public fun <K, V> mapOfNotNull(vararg mapping: Pair<K?, V?>): Map<K, V> {
                 put(k, v)
             }
         }
+    }
+}
+
+internal fun IntArray.toLongList(): List<Long> {
+    return when (size) {
+        0 -> emptyList()
+        1 -> listOf(this[0].toLong())
+        else -> this.mapTo(ArrayList(size)) { it.toLong() }
+    }
+}
+
+internal fun IntArray.toLongArray(): LongArray {
+    return when (size) {
+        0 -> longArrayOf()
+        1 -> longArrayOf(this[0].toLong())
+        else -> LongArray(size) { this[it].toLong() }
+    }
+}
+
+internal fun LongArray.toIntArray(): IntArray {
+    return when (size) {
+        0 -> intArrayOf()
+        1 -> intArrayOf(this[0].toInt())
+        else -> IntArray(size) { this[it].toInt() }
     }
 }

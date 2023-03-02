@@ -6,12 +6,13 @@
 package examples.onnx.posedetection.multipose
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.api.inference.posedetection.MultiPoseDetectionResult
-import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.jetbrains.kotlinx.dl.visualization.swing.createMultipleDetectedPosesPanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
@@ -23,11 +24,12 @@ import javax.swing.JPanel
  * This examples demonstrates the inference concept on MoveNetSinglePoseLighting model:
  * - Model is obtained from [ONNXModelHub].
  * - Model predicts on a few images located in resources.
- * - Special preprocessing is applied to images before prediction.
+ * - Special preprocessing is applied to each image before prediction.
  */
 fun multiPoseDetectionMoveNetLightAPI() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.PoseDetection.MoveNetMultiPoseLighting.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { poseDetectionModel ->
         val result = mutableMapOf<BufferedImage, MultiPoseDetectionResult>()
@@ -35,14 +37,14 @@ fun multiPoseDetectionMoveNetLightAPI() {
             val image = ImageConverter.toBufferedImage(getFileFromResource("datasets/poses/multi/$i.jpg"))
             val detectedPoses = poseDetectionModel.detectPoses(image = image, confidence = 0.05f)
 
-            detectedPoses.multiplePoses.forEach { detectedPose ->
-                println("Found ${detectedPose.first.classLabel} with probability ${detectedPose.first.probability}")
-                detectedPose.second.poseLandmarks.forEach {
-                    println("   Found ${it.poseLandmarkLabel} with probability ${it.probability}")
+            detectedPoses.poses.forEach { (bbox, pose) ->
+                println("Found ${bbox.label} with probability ${bbox.probability}")
+                pose.landmarks.forEach {
+                    println("   Found ${it.label} with probability ${it.probability}")
                 }
 
-                detectedPose.second.edges.forEach {
-                    println("   The ${it.poseEdgeLabel} starts at ${it.start.poseLandmarkLabel} and ends with ${it.end.poseLandmarkLabel}")
+                pose.edges.forEach {
+                    println("   The ${it.label} starts at ${it.start.label} and ends with ${it.end.label}")
                 }
             }
             result[image] = detectedPoses

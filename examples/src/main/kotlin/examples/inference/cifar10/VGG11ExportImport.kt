@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -19,16 +19,16 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.cifar10Paths
-import org.jetbrains.kotlinx.dl.dataset.handler.extractCifar10LabelsAnsSort
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.dataset.embedded.cifar10Paths
+import org.jetbrains.kotlinx.dl.dataset.embedded.extractCifar10LabelsAnsSort
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
+import org.jetbrains.kotlinx.dl.impl.preprocessing.rescale
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.awt.image.BufferedImage
 import java.io.File
 
@@ -179,7 +179,7 @@ fun vgg11OnCifar10ExportImport() {
             scalingCoefficient = 255f
         }
 
-    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive, 10)
+    val y = extractCifar10LabelsAnsSort(cifarLabelsArchive)
     val dataset = OnFlyImageDataset.create(File(cifarImagesArchive), y, preprocessing)
 
     val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
@@ -207,8 +207,6 @@ fun vgg11OnCifar10ExportImport() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL))
 
     inferenceModel.use {
-        it.reshape(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS)
-
         var accuracy = 0.0
         val amountOfTestSet = test.xSize()
         for (imageId in 0 until amountOfTestSet) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -21,23 +21,23 @@ import org.jetbrains.kotlinx.dl.api.core.metric.EvaluationResult
 import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
+import org.jetbrains.kotlinx.dl.api.core.summary.TfModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
-import org.jetbrains.kotlinx.dl.api.extension.argmax
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
+import org.jetbrains.kotlinx.dl.api.inference.TensorResult
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toMultiDimensionalArray
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
 import org.tensorflow.op.core.Variable
 import java.io.File
-import java.nio.FloatBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -51,6 +51,12 @@ import java.util.*
 public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
     /** Logger for the model. */
     public val logger: KLogger = KotlinLogging.logger {}
+
+    /** TensorFlow wrapped computational graph. */
+    public val kGraph: KGraph = KGraph(tfGraph)
+
+    /** The namespace wrapper for all TensorFlow graph operations. */
+    protected val tf: Ops = Ops.create(tfGraph)
 
     /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
@@ -105,12 +111,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
             if (layer.parentModel != null) logger.warn { "Layer ${layer.name} is a part of model ${layer.parentModel}" }
 
+            @Suppress("LeakingThis")
             layer.parentModel = this
         }
-
-        kGraph = KGraph(Graph().toGraphDef())
-        tf = Ops.create(kGraph.tfGraph)
-        session = Session(kGraph.tfGraph)
     }
 
     /**
@@ -122,24 +125,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
      * Returns a list of non-trainable, 'frozen' layer variables in this model.
      */
     private fun frozenLayerVariables(): List<KVariable> = layers.frozenVariables()
-
-    /** Helper method for preprocessing layer names and layer validation. */
-    internal companion object {
-        internal fun preProcessLayerNames(layers: Array<out Layer>) {
-            for ((index, layer) in layers.withIndex()) {
-                if (layer.name.isEmpty()) {
-                    val simpleName = layer::class.simpleName ?: "layer"
-                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
-                }
-            }
-        }
-
-        internal fun layerValidation(layers: List<Layer>) {
-            require(layers.isNotEmpty()) { "Model should contain layers!" }
-            val input = layers[0]
-            require(input is Input) { "Model should start from the Input layer" }
-        }
-    }
 
     override fun compile(optimizer: Optimizer, loss: Losses, metric: Metrics) {
         compile(optimizer, Losses.convert(loss), Metric.convert(metric))
@@ -236,21 +221,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         )
     }
 
-    override fun fit(
-        dataset: Dataset,
-        epochs: Int,
-        batchSize: Int,
-        callbacks: List<Callback>
-    ): TrainingHistory {
-        return internalFit(
-            batchSize,
-            epochs,
-            dataset,
-            false,
-            null,
-            null,
-            callbacks
-        )
+    override fun fit(dataset: Dataset, epochs: Int, batchSize: Int, callbacks: List<Callback>): TrainingHistory {
+        return internalFit(batchSize, epochs, dataset, false, null, null, callbacks)
     }
 
     /**
@@ -313,491 +285,258 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         fitCallbacks.forEach { it.model = this }
         fitCallbacks.forEach { it.onTrainBegin() }
 
-        for (i in 1..epochs) {
-            if (!stopTraining) {
-                fitCallbacks.forEach { it.onEpochBegin(i, trainingHistory) }
-                val batchIter: Dataset.BatchIterator = trainingDataset.batchIterator(
-                    trainBatchSize
-                )
+        for (epoch in 1..epochs) {
+            if (stopTraining) break
 
-                var batchCounter = 0
-                var averageTrainingLossAccum = 0.0f
-                val averageTrainingMetricAccum = FloatArray(metrics.size) { 0.0f }
+            fitCallbacks.forEach { it.onEpochBegin(epoch, trainingHistory) }
 
-                while (batchIter.hasNext() && !stopTraining) {
-                    fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory) }
-                    val batch: DataBatch = batchIter.next()
+            var batchCounter = 0
+            var averageTrainingLossAccum = 0.0f
+            val averageTrainingMetricAccum = FloatArray(metrics.size) { 0.0f }
 
-                    val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
+            for (batch in trainingDataset.batchSequence(trainBatchSize)) {
+                if (stopTraining) break
 
-                    Tensor.create(
-                        xBatchShape,
-                        serializeToBuffer(batch.x)
-                    ).use { batchImagesTensor ->
-                        Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
-                            .use { batchLabelsTensor ->
-                                Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
-                                    .use { numberOfLossesTensor ->
-                                        Tensor.create(true).use { isTraining ->
-                                            val (lossValue, metricValues) = trainOnBatch(
-                                                targets,
-                                                batchImagesTensor,
-                                                batchLabelsTensor,
-                                                numberOfLossesTensor as Tensor<Float>,
-                                                isTraining as Tensor<Float>,
-                                                metricOps
-                                            )
-                                            if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
-                                                logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
-                                            }
+                fitCallbacks.forEach { it.onTrainBatchBegin(batchCounter, trainBatchSize, trainingHistory) }
 
-                                            averageTrainingLossAccum += lossValue
-                                            metrics.forEachIndexed { i, _ ->
-                                                averageTrainingMetricAccum[i] += metricValues[i]
-                                            }
-
-                                            val batchTrainingEvent =
-                                                BatchTrainingEvent(
-                                                    i,
-                                                    batchCounter,
-                                                    lossValue.toDouble(),
-                                                    averageTrainingMetricAccum.map { it.toDouble() }
-                                                )
-                                            trainingHistory.appendBatch(batchTrainingEvent)
-
-                                            // TODO: create map (metric name and metric value)
-                                            logger.debug { "Batch stat: { lossValue: $lossValue metricValues: $metricValues }" }
-
-                                            fitCallbacks.forEach {
-                                                it.onTrainBatchEnd(
-                                                    batchCounter,
-                                                    trainBatchSize,
-                                                    batchTrainingEvent,
-                                                    trainingHistory
-                                                )
-                                            }
-                                        }
-                                    }
-                            }
-                    }
-                    batchCounter++
+                val (lossValue, metricValues) = getLossAndMetricValues(batch, true)
+                if (lossValue.isNaN() || lossValue == Float.POSITIVE_INFINITY || lossValue == Float.NEGATIVE_INFINITY) {
+                    logger.debug { "Loss function value is NaN. You could use TerminateOnNaN callback to stop it earlier." }
                 }
 
-                val avgTrainingMetricValue = FloatArray(metrics.size) { 0.0f }
-                averageTrainingMetricAccum.forEachIndexed { index, metricValue ->
-                    avgTrainingMetricValue[index] = metricValue / batchCounter
+                averageTrainingLossAccum += lossValue
+                metrics.indices.forEach { i -> averageTrainingMetricAccum[i] += metricValues[i] }
+
+                val batchTrainingEvent = BatchTrainingEvent(epoch, batchCounter, lossValue.toDouble(),
+                                                            averageTrainingMetricAccum.map { it.toDouble() })
+                trainingHistory.appendBatch(batchTrainingEvent)
+
+                // TODO: create map (metric name and metric value)
+                logger.debug { "Batch stat: { lossValue: $lossValue metricValues: $metricValues }" }
+
+                fitCallbacks.forEach {
+                    it.onTrainBatchEnd(batchCounter, trainBatchSize, batchTrainingEvent, trainingHistory)
                 }
-
-                val avgLossValue = (averageTrainingLossAccum / batchCounter)
-
-                val nanList = mutableListOf<Double>()
-                for (j in 1..metrics.size) {
-                    nanList.add(Double.NaN)
-                }
-
-                val epochTrainingEvent = EpochTrainingEvent(
-                    i,
-                    avgLossValue.toDouble(),
-                    avgTrainingMetricValue.map { it.toDouble() }.toMutableList(),
-                    Double.NaN,
-                    nanList
-                )
-
-                if (validationIsEnabled) {
-                    val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
-                    val validationMetricValues = metrics.map { evaluationResult.metrics[Metric.convertBack(it)] }.toList()
-                    // TODO: probably I should it by name, not by type
-                    val validationLossValue = evaluationResult.lossValue
-                    epochTrainingEvent.valLossValue = validationLossValue
-                    epochTrainingEvent.valMetricValues = validationMetricValues
-                    logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()} val loss: $validationLossValue val metrics: $validationMetricValues" } // TODO: check printing for validation
-                } else {
-                    logger.info { "epochs: $i loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()}" }
-                }
-                trainingHistory.appendEpoch(epochTrainingEvent)
-                fitCallbacks.forEach { it.onEpochEnd(i, epochTrainingEvent, trainingHistory) }
+                batchCounter++
             }
+
+            val avgTrainingMetricValue = FloatArray(metrics.size) {
+                averageTrainingMetricAccum[it] / batchCounter
+            }
+
+            val avgLossValue = (averageTrainingLossAccum / batchCounter)
+
+            val epochTrainingEvent = EpochTrainingEvent(
+                epoch,
+                avgLossValue.toDouble(),
+                avgTrainingMetricValue.map { it.toDouble() }.toMutableList(),
+                Double.NaN,
+                List(metrics.size) { Double.NaN }
+            )
+
+            if (validationIsEnabled) {
+                val evaluationResult = evaluate(validationDataset!!, validationBatchSize!!, listOf())
+                val validationMetricValues = metrics.map { evaluationResult.metrics[Metric.convertBack(it)] }.toList()
+                // TODO: probably I should it by name, not by type
+                val validationLossValue = evaluationResult.lossValue
+                epochTrainingEvent.valLossValue = validationLossValue
+                epochTrainingEvent.valMetricValues = validationMetricValues
+                logger.info { "epochs: $epoch loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()} val loss: $validationLossValue val metrics: $validationMetricValues" } // TODO: check printing for validation
+            } else {
+                logger.info { "epochs: $epoch loss: $avgLossValue metric: ${avgTrainingMetricValue.contentToString()}" }
+            }
+            trainingHistory.appendEpoch(epochTrainingEvent)
+            fitCallbacks.forEach { it.onEpochEnd(epoch, epochTrainingEvent, trainingHistory) }
         }
         fitCallbacks.forEach { it.onTrainEnd(trainingHistory) }
         return trainingHistory
     }
 
-
     /**
      * Returns the loss value and metric value on train batch.
      */
-    private fun trainOnBatch(
-        targets: List<Operand<Float>>,
-        batchImages: Tensor<Float>,
-        batchLabels: Tensor<Float>,
-        numberOfLosses: Tensor<Float>,
-        isTraining: Tensor<Float>,
-        metricOps: List<Operand<Float>>
-    ): Pair<Float, List<Float>> {
-        val runner = session.runner()
+    private fun getLossAndMetricValues(batch: DataBatch, isTraining: Boolean): Pair<Float, List<Float>> {
+        val yBatchShape = longArrayOf(batch.size.toLong(), numberOfClasses)
 
-        targets.forEach {
-            runner.addTarget(it)
-        }
+        val inputs = mapOf(
+            xOp to batch.toXTensor(),
+            yTrueOp to Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses)),
+            numberOfLossesOp to Tensor.create(TensorShape(yBatchShape).numElements().toFloat()),
+            training to Tensor.create(isTraining)
+        )
+        val outputs = listOf(OutputKey.Name(TRAINING_LOSS)) + metricOps.map(OutputKey::Operand)
+        val targetsList = if (isTraining) targets else emptyList()
 
-        runner
-            .feed(xOp.asOutput(), batchImages)
-            .feed(yTrueOp.asOutput(), batchLabels)
-            .feed(numberOfLossesOp.asOutput(), numberOfLosses)
-            .feed(training.asOutput(), isTraining)
-
-        runner
-            .fetch(TRAINING_LOSS)
-
-        metricOps.forEach {
-            runner.fetch(it)
-        }
-
-        try {
-            val tensorList = runner.run()
-            val lossValue = tensorList[0].floatValue()
-            val metricValues = mutableListOf<Float>()
-
-            check(tensorList.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${tensorList.size - 1} metrics are returned!" }
-            for (i in 1..metricOps.size) {
-                metricValues.add(tensorList[i].floatValue())
+        return runModelInternal(inputs, outputs, targetsList) { tensors ->
+            check(tensors.size == metricOps.size + 1) {
+                "${metricOps.size} metrics are monitored, but ${tensors.size - 1} metrics are returned!"
             }
-
-            return Pair(lossValue, metricValues)
-        } catch (e: TensorFlowException) {
-            e.printStackTrace()
-            throw RuntimeException(e.message)
+            tensors.first().floatValue() to tensors.drop(1).map { it.floatValue() }
         }
     }
 
     override fun evaluate(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): EvaluationResult {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
 
         val evaluationHistory = History()
 
         callbacks.forEach { it.model = this }
         callbacks.forEach { it.onTestBegin() }
 
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
-            batchSize
-        )
-
-        val averageMetricAccum = FloatArray(metrics.size) { 0.0f }
-        var averageLossAccum = 0.0f
         var batchCounter = 0
+        var averageLossAccum = 0.0f
+        val averageMetricAccum = FloatArray(metrics.size) { 0.0f }
 
-        while (batchIter.hasNext()) {
+        for (batch in dataset.batchSequence(batchSize)) {
             callbacks.forEach { it.onTestBatchBegin(batchCounter, batchSize, evaluationHistory) }
-            val batch: DataBatch = batchIter.next()
-            val (imageShape, labelShape) = calculateXYShapes(batch)
 
-            Tensor.create(
-                imageShape,
-                serializeToBuffer(batch.x)
-            ).use { testImagesTensor ->
-                Tensor.create(labelShape, serializeLabelsToBuffer(batch.y, numberOfClasses)).use { testLabelsTensor ->
-                    Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
-                        Tensor.create(false).use { isTraining ->
-                            val runner = session.runner()
-                                .fetch(TRAINING_LOSS)
+            val (lossValue, metricValues) = getLossAndMetricValues(batch, false)
 
-                            metricOps.forEach {
-                                runner.fetch(it)
-                            }
+            averageLossAccum += lossValue
+            metrics.indices.forEach { i -> averageMetricAccum[i] += metricValues[i] }
 
-                            val lossAndMetricsTensors = runner
-                                .feed(xOp.asOutput(), testImagesTensor)
-                                .feed(yTrueOp.asOutput(), testLabelsTensor)
-                                .feed(training.asOutput(), isTraining)
-                                .feed(
-                                    numberOfLossesOp.asOutput(),
-                                    numberOfLossesTensor
-                                )
-                                .run()
+            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(), averageMetricAccum.map { it.toDouble() })
+            evaluationHistory.appendBatch(batchEvent)
 
-                            val lossValue = lossAndMetricsTensors[0].floatValue()
-                            val metricValues = mutableListOf<Float>()
-
-                            check(lossAndMetricsTensors.size == metricOps.size + 1) { "${metricOps.size} metrics are monitored, but ${lossAndMetricsTensors.size - 1} metrics are returned!" }
-                            for (i in 1..metricOps.size) {
-                                metricValues.add(lossAndMetricsTensors[i].floatValue())
-                            }
-
-                            averageLossAccum += lossValue
-                            metrics.forEachIndexed { i, _ ->
-                                averageMetricAccum[i] += metricValues[i]
-                            }
-
-                            val batchEvent = BatchEvent(batchCounter, lossValue.toDouble(),
-                                                        averageMetricAccum.map { it.toDouble() })
-                            evaluationHistory.appendBatch(batchEvent)
-
-                            callbacks.forEach {
-                                it.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
-                            }
-                        }
-                    }
-
-                }
+            callbacks.forEach {
+                it.onTestBatchEnd(batchCounter, batchSize, batchEvent, evaluationHistory)
             }
 
             batchCounter++
         }
 
-        val avgMetricValue = FloatArray(metrics.size) { 0.0f }
-        averageMetricAccum.forEachIndexed { index, metricValue -> avgMetricValue[index] = metricValue / batchCounter }
-
+        val avgMetricValue = FloatArray(metrics.size) { averageMetricAccum[it] / batchCounter }
         val avgLossValue = (averageLossAccum / batchCounter).toDouble()
 
         callbacks.forEach { it.onTestEnd(evaluationHistory) }
-        val metricValues = mutableMapOf<Metrics, Double>() // TODO: Metrics -> Metric class
-        metrics.forEachIndexed { index, metric ->
-            metricValues[Metric.convertBack(metric)] = avgMetricValue[index].toDouble()
+        val metricValues = metrics.withIndex().associate { (index, metric) ->
+            Metric.convertBack(metric) to avgMetricValue[index].toDouble()  // TODO: Metrics -> Metric class
         }
 
         return EvaluationResult(avgLossValue, metricValues)
     }
 
     override fun predict(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): IntArray {
-        require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-
-        callbacks.forEach { it.model = this }
-        callbacks.forEach { it.onPredictBegin() }
-
-        val imageShape = calculateXShape(batchSize)
+        require(dataset.xSize() % batchSize == 0) { "The number of elements in the dataset must be a multiple of batch size." }
+        checkModelInitialized()
 
         val predictions = IntArray(dataset.xSize()) { Int.MIN_VALUE }
-
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
-            batchSize
-        )
-
-        var batchCounter = 0
-
-        while (batchIter.hasNext()) {
-            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
-
-            val batch: DataBatch = batchIter.next()
-
-            Tensor.create(
-                imageShape,
-                serializeToBuffer(batch.x)
-            ).use { testImages ->
-                Tensor.create(false).use { isTraining ->
-                    val predictionsTensor = session.runner()
-                        .fetch(predictionOp)
-                        .feed(xOp.asOutput(), testImages)
-                        .feed(training.asOutput(), isTraining)
-                        .run()[0]
-
-                    val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-                    predictionsTensor.copyTo(dst)
-
-                    val argMaxBatchPrediction = IntArray(imageShape[0].toInt()) { 0 }
-
-                    dst.forEachIndexed { index, element ->
-                        argMaxBatchPrediction[index] = element.argmax()
-                    }
-
-                    callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
-                    batchCounter++
-                    argMaxBatchPrediction.copyInto(predictions, batchSize * (batchCounter - 1))
-                }
+        val buffer = Array(batchSize) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+        predictOnDataset(dataset, batchSize, callbacks) { batchCounter, tensors ->
+            tensors.first().copyTo(buffer)
+            buffer.forEachIndexed { index, data ->
+                predictions[batchSize * batchCounter + index] = data.argmax()
             }
         }
-        callbacks.forEach { it.onPredictEnd() }
         return predictions
     }
 
-    override fun predict(inputData: FloatArray): Int {
-        val softPrediction = predictSoftly(inputData)
-        return softPrediction.argmax()
-    }
-
-    override fun predict(inputData: FloatArray, predictionTensorName: String): Int {
+    override fun predict(inputData: FloatData, predictionTensorName: String): Int {
         val softPrediction = predictSoftly(inputData, predictionTensorName)
         return softPrediction.argmax()
     }
 
-    override fun predictAndGetActivations(inputData: FloatArray, predictionTensorName: String): Pair<Int, List<*>> {
+    override fun predictAndGetActivations(inputData: FloatData, predictionTensorName: String): Pair<Int, List<*>> {
         val (softPrediction, activations) = internalPredict(inputData, true, predictionTensorName)
         return Pair(softPrediction.argmax(), activations)
     }
 
     override fun predictSoftly(dataset: Dataset, batchSize: Int, callbacks: List<Callback>): Array<FloatArray> {
-        require(dataset.xSize() % batchSize == 0) { "The amount of images must be a multiple of batch size." }
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-
-        callbacks.forEach { it.model = this }
-        callbacks.forEach { it.onPredictBegin() }
-
-        val imageShape = calculateXShape(batchSize)
+        require(dataset.xSize() % batchSize == 0) { "The number of elements in the dataset must be a multiple of batch size." }
+        checkModelInitialized()
 
         val predictions = Array(dataset.xSize()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-        val batchIter: Dataset.BatchIterator = dataset.batchIterator(
-            batchSize
-        )
-
-        var batchCounter = 0
-
-        while (batchIter.hasNext()) {
-            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
-
-            val batch: DataBatch = batchIter.next()
-
-            Tensor.create(
-                imageShape,
-                serializeToBuffer(batch.x)
-            ).use { testImages ->
-                val predictionsTensor = session.runner()
-                    .fetch(predictionOp)
-                    .feed(xOp.asOutput(), testImages)
-                    .run()[0]
-
-                val dst = Array(imageShape[0].toInt()) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
-
-                predictionsTensor.copyTo(dst)
-
-                callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
-                batchCounter++
-                dst.copyInto(predictions, batchSize * (batchCounter - 1))
-            }
+        val buffer = Array(batchSize) { FloatArray(numberOfClasses.toInt()) { 0.0f } }
+        predictOnDataset(dataset, batchSize, callbacks) { batchCounter, tensors ->
+            tensors.first().copyTo(buffer)
+            buffer.copyInto(predictions, batchSize * batchCounter)
         }
-        callbacks.forEach { it.onPredictEnd() }
         return predictions
     }
 
-    override fun predictSoftly(inputData: FloatArray, predictionTensorName: String): FloatArray {
+    private fun predictOnDataset(dataset: Dataset,
+                                 batchSize: Int,
+                                 callbacks: List<Callback>,
+                                 block: (Int, List<Tensor<*>>) -> Unit
+    ) {
+        callbacks.forEach { it.model = this }
+        callbacks.forEach { it.onPredictBegin() }
+
+        for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
+            callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
+
+            val inputs = mapOf(xOp to batch.toXTensor(), training to Tensor.create(false))
+            val outputs = listOf(OutputKey.Operand(predictionOp))
+
+            runModelInternal(inputs, outputs) { tensors -> block(batchCounter, tensors) }
+
+            callbacks.forEach { it.onPredictBatchEnd(batchCounter, batchSize) }
+        }
+        callbacks.forEach { it.onPredictEnd() }
+    }
+
+    public fun predictSoftly(inputData: FloatData, predictionTensorName: String = ""): FloatArray {
         val (softPrediction, _) = internalPredict(inputData, false, predictionTensorName)
         return softPrediction
     }
 
     override fun predictSoftlyAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
         return internalPredict(inputData, true, predictionTensorName)
     }
 
     private fun internalPredict(
-        inputData: FloatArray,
+        inputData: FloatData,
         visualizationIsEnabled: Boolean,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>> {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
-
-        val imageShape = calculateXShape(1)
-
-        Tensor.create(
-            imageShape,
-            FloatBuffer.wrap(inputData)
-        ).use { testImages ->
-            val tensors =
-                formPredictionAndActivationsTensors(predictionTensorName, testImages, visualizationIsEnabled)
-
-            val prediction = tensors[0].convertTensorToFlattenFloatArray()
-
-            val activations = mutableListOf<Any>()
-            if (visualizationIsEnabled && tensors.size > 1) {
-                for (i in 1 until tensors.size) {
-                    activations.add(tensors[i].convertTensorToMultiDimArray())
-                }
+        checkModelInitialized()
+        if (predictionTensorName.isNotEmpty()) {
+            require(kGraph().tfGraph.operation(predictionTensorName) != null) {
+                "Output named '$predictionTensorName' not found in the TensorFlow graph."
             }
-
-            tensors.forEach { it.close() }
-            return Pair(prediction, activations.toList())
         }
-    }
 
-    private fun formPredictionAndActivationsTensors(
-        predictionTensorName: String,
-        testImages: Tensor<Float>,
-        visualizationIsEnabled: Boolean
-    ): List<Tensor<*>> {
-        val runner = session
-            .runner()
+        val inputs = mapOf(xOp to inputData.toTensor())
 
-        if (predictionTensorName.isEmpty()) {
-            runner
-                .fetch(predictionOp)
-                .feed(xOp.asOutput(), testImages)
-
+        val outputKey = if (predictionTensorName.isEmpty()) {
+            OutputKey.Operand(predictionOp)
         } else {
-            require(kGraph().tfGraph.operation(predictionTensorName) != null) { "No such tensor output named [$predictionTensorName] in the TensorFlow graph!" }
-
-            runner
-                .fetch(predictionTensorName)
-                .feed(xOp.asOutput(), testImages)
+            OutputKey.Name(predictionTensorName)
         }
-
+        val outputs = mutableListOf(outputKey)
         if (visualizationIsEnabled) {
-            for (layer in layers) {
-                if (layer.hasActivation && layer != layers.last()) runner.fetch(defaultActivationName(layer))
+            val activations = layers.dropLast(1).filter(Layer::hasActivation).map {
+                OutputKey.Name(defaultActivationName(it))
             }
-        }
-        return runner.run()
-    }
-
-    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
-        val batchSize = batch.size
-
-        val xBatchShape = calculateXShape(batchSize)
-
-        val yBatchShape = calculateYShape(batchSize)
-
-        if (batchSize > 0) {
-            batchValidation(batch, xBatchShape, yBatchShape)
+            outputs.addAll(activations)
         }
 
-        return Pair(xBatchShape, yBatchShape)
-    }
+        return runModelInternal(inputs, outputs) { tensors ->
+            val prediction = tensors.first().toFloatArray()
+            val activations = tensors.drop(1).map { it.toMultiDimensionalArray() }
 
-    private fun calculateYShape(batchSize: Int) = longArrayOf(
-        batchSize.toLong(),
-        numberOfClasses
-    )
-
-    private fun batchValidation(
-        batch: DataBatch,
-        xBatchShape: LongArray,
-        yBatchShape: LongArray
-    ) {
-        check(
-            TensorShape(xBatchShape).numElements().toInt() == batch.x.size * batch.x[0].size
-        )
-        {
-            "The calculated [from the Model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.x.size * batch.x[0].size
-            }. Please, check input data."
-        }
-        check(
-            TensorShape(yBatchShape).numElements().toInt() == batch.y.size * numberOfClasses.toInt()
-        )
-        {
-            "The calculated [from the model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
-                batch.y.size * numberOfClasses.toInt()
-            }. " +
-                    "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
-                    "\nHighly likely, you have different number of classes presented in data and described in model as desired output."
+            prediction to activations
         }
     }
 
-    private fun calculateXShape(batchSize: Int): LongArray {
-        val inputLayer = layers.first() as Input
+    override fun <T> predict(inputData: FloatData, extractResult: (TensorResult) -> T): T {
+        checkModelInitialized()
 
-        val xTensorShape = inputLayer.input.asOutput().shape()
+        val inputs = mapOf(xOp to inputData.toTensor())
+        val outputs = listOf(OutputKey.Operand(predictionOp))
 
-        return longArrayOf(
-            batchSize.toLong(),
-            *xTensorShape.tail()
-        )
+        return runModelInternal(inputs, outputs) { tensors -> extractResult(TensorResult(tensors)) }
+    }
+
+    private fun <R> runModelInternal(inputs: Map<out Operand<*>, Tensor<*>>,
+                                     outputs: List<OutputKey>,
+                                     targets: List<Operand<Float>> = emptyList(),
+                                     extractResult: (List<Tensor<*>>) -> R
+    ): R {
+        return runModel(inputs.mapKeys { InputKey.Operand(it.key) }, outputs, targets, extractResult)
     }
 
     /**
@@ -815,8 +554,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         saveOptimizerState: Boolean,
         writingMode: WritingMode
     ) {
-        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
-        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+        checkModelInitialized()
         if (saveOptimizerState) {
             check(isOptimizerVariableInitialized) { "The optimizer variables are not initialized yet. Initialize the optimizer variables with init() method or load optimizer weights to use this method." }
         }
@@ -844,20 +582,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
 
         when (savingFormat) {
-            SavingFormat.TF_GRAPH_CUSTOM_VARIABLES -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
-            SavingFormat.TF_GRAPH -> saveInSavedModelFormat(pathToModelDirectory)
-            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES -> saveInKerasFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TfGraphCustomVariables -> saveInSimpleFormat(pathToModelDirectory, saveOptimizerState)
+            SavingFormat.TfGraph -> saveInSavedModelFormat(pathToModelDirectory)
+            is SavingFormat.JsonConfigCustomVariables -> saveInKerasFormat(
+                pathToModelDirectory,
+                saveOptimizerState,
+                savingFormat.isKerasFullyCompatible
+            )
         }
     }
 
-    private fun saveInKerasFormat(pathToModelDirectory: String, saveOptimizerState: Boolean) {
-        saveModel(pathToModelDirectory)
+    private fun saveInKerasFormat(pathToModelDirectory: String,
+                                  saveOptimizerState: Boolean,
+                                  isKerasFullyCompatible: Boolean
+    ) {
+        saveModel(pathToModelDirectory, isKerasFullyCompatible)
         saveVariables(pathToModelDirectory, saveOptimizerState)
     }
 
-    private fun saveModel(pathToModelDirectory: String) {
-        val jsonConfig = File("$pathToModelDirectory/modelConfig.json")
-        this.saveModelConfiguration(jsonConfig)
+    private fun saveModel(pathToModelDirectory: String, isKerasFullyCompatible: Boolean) {
+        val jsonConfig = File("$pathToModelDirectory/$MODEL_CONFIG_JSON")
+        saveModelConfiguration(jsonConfig, isKerasFullyCompatible)
     }
 
     private fun saveInSavedModelFormat(pathToModelDirectory: String) {
@@ -893,7 +638,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 variableNameFile.bufferedWriter().use { file ->
 
                     tensorForCopying.use {
-                        val reshaped = tensorForCopying.convertTensorToFlattenFloatArray()
+                        val reshaped = tensorForCopying.toFloatArray()
 
                         for (i in 0..reshaped.size - 2) {
                             file.write(reshaped[i].toString() + " ")
@@ -972,6 +717,27 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         variable.initializerOperation.run(session)
     }
 
+    protected fun copyWeightsTo(model: GraphTrainableModel, copyOptimizerState: Boolean) {
+        // TODO: make deep copies, not just links
+        model.compile(
+            optimizer = this.optimizer,
+            loss = this.loss,
+            metrics = this.metrics
+        )
+
+        model.layers.forEach {
+            it.weights = this.getLayer(it.name).weights
+        }
+
+        if (copyOptimizerState) {
+            val optimizerVariables = kGraph.variableNames().filter(::isOptimizerVariable)
+            copyVariablesToModel(model, optimizerVariables)
+            model.isOptimizerVariableInitialized = true
+        }
+
+        model.isModelInitialized = true
+    }
+
     /**
      * Return layer by [layerName].
      *
@@ -981,16 +747,21 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return layersByName[layerName] ?: error("No such layer $layerName in the model.")
     }
 
+    private fun checkModelInitialized() {
+        check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
+        check(isModelInitialized) { "The model is not initialized yet. Initialize the model weights with init() method or load weights to use this method." }
+    }
+
     override fun toString(): String {
         return "GraphTrainableModel(numberOfLayers=${layers.size}) ${super.toString()}"
     }
 
-    public override fun summary(): ModelSummary {
+    public override fun summary(): TfModelSummary {
         check(isModelCompiled) { "The model is not compiled yet. Compile the model to use this method." }
 
         val (trainableLayers, frozenLayers) = layers.partition { it.isTrainable }
 
-        return ModelSummary(
+        return TfModelSummary(
             type = this::class.simpleName.toString(),
             name = name,
             layersSummaries = layers.map { layer ->
@@ -1006,6 +777,35 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             frozenParamsCount = frozenLayers.sumOf { it.paramCount.toLong() },
         )
     }
+
+    override fun close() {
+        session.close()
+        kGraph.close()
+    }
+
+    /** Helper method for preprocessing layer names and layer validation. */
+    internal companion object {
+        internal const val MODEL_CONFIG_JSON = "modelConfig.json"
+
+        private fun DataBatch.toXTensor(): Tensor<Float> {
+            return Tensor.create(shape.dims(), serializeToBuffer(x))
+        }
+
+        internal fun preProcessLayerNames(layers: Array<out Layer>) {
+            for ((index, layer) in layers.withIndex()) {
+                if (layer.name.isEmpty()) {
+                    val simpleName = layer::class.simpleName ?: "layer"
+                    layer.name = simpleName.lowercase(Locale.getDefault()) + "_" + (index + 1)
+                }
+            }
+        }
+
+        internal fun layerValidation(layers: List<Layer>) {
+            require(layers.isNotEmpty()) { "Model should contain layers!" }
+            val input = layers[0]
+            require(input is Input) { "Model should start from the Input layer" }
+        }
+    }
 }
 
 /**
@@ -1015,3 +815,5 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 public fun GraphTrainableModel.freeze() {
     layers.forEach(Layer::freeze)
 }
+
+private fun Dataset.batchSequence(size: Int) = batchIterator(size).asSequence()

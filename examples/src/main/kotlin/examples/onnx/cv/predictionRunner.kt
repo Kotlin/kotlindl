@@ -1,29 +1,25 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.api.inference.onnx.executionproviders.ExecutionProvider
-import org.jetbrains.kotlinx.dl.api.inference.onnx.inferAndCloseUsing
-import org.jetbrains.kotlinx.dl.dataset.Imagenet
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider
+import org.jetbrains.kotlinx.dl.onnx.inference.inferAndCloseUsing
 import java.io.File
 
 fun runImageRecognitionPrediction(
-    modelType: ONNXModels.CV<OnnxInferenceModel>,
+    modelType: ONNXModels.CV,
     executionProviders: List<ExecutionProvider> = emptyList()
 ): List<Pair<String, Float>> {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
@@ -34,17 +30,13 @@ fun runImageRecognitionPrediction(
     val inference: (OnnxInferenceModel) -> List<Pair<String, Float>> = {
         println(it)
 
-        val fileDataLoader = pipeline<BufferedImage>()
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .call(modelType.preprocessor)
-            .fileLoader()
+        val fileDataLoader = modelType.createPreprocessing(model).fileLoader()
 
         val results = mutableListOf<Pair<String, Float>>()
         for (i in 1..8) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
-            val res = it.predict(inputData)
+            val res = it.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             results.addAll(it.predictTopNLabels(inputData, imageNetClassLabels))

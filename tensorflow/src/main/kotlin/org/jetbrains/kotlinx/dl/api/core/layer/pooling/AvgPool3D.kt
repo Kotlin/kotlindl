@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
+import org.jetbrains.kotlinx.dl.api.core.util.toLongList
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
@@ -58,10 +58,11 @@ public class AvgPool3D(
         }
     }
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return tf.nn.avgPool3d(
             input,

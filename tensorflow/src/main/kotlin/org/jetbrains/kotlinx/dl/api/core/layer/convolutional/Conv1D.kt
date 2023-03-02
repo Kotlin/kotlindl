@@ -11,9 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
+import org.jetbrains.kotlinx.dl.api.core.util.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.convBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
@@ -163,8 +163,9 @@ public class Conv1D(
          * and squeezes the result by removing the dimension added previously.
          * This allows to perform 2D operations on 1D inputs.
          */
-        internal fun Ops.withExpandedDimensions(input: Operand<Float>,
-                                                operation: (Operand<Float>) -> Operand<Float>
+        internal fun Ops.withExpandedDimensions(
+            input: Operand<Float>,
+            operation: (Operand<Float>) -> Operand<Float>
         ): Operand<Float> {
             val expandedInput = expandDims(input, constant(EXTRA_DIM))
             val expandedOutput = operation(expandedInput)

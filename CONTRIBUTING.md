@@ -18,7 +18,7 @@ Submit issues [here](https://github.com/JetBrains/KotlinDL/issues).
 * When submitting a feature request:
   * Explain why you need the feature &mdash; what's your use-case, what's your domain.
   * Explaining the problem you face is more important than suggesting a solution.
-    Report your problem even if you don't have any proposed solution.
+    Report your issue even if you don't have any proposed solution.
   * If there is an alternative way to do what you need, then show the code of the alternative.
 
 ## Submitting PRs

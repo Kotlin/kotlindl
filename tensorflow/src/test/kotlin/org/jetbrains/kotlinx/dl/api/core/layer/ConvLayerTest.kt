@@ -8,8 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
 import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.util.flattenFloats
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToFlattenFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
+import org.jetbrains.kotlinx.dl.impl.util.flattenFloats
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.tensorflow.Graph
 import org.tensorflow.Session
@@ -37,7 +37,7 @@ open class ConvLayerTest {
                     val expectedShape = expectedOutput.shape.toLongArray()
                     assertArrayEquals(expectedShape, outputShape)
 
-                    val result = outputTensor.convertTensorToFlattenFloatArray()
+                    val result = outputTensor.toFloatArray()
                     val expected = expectedOutput.flattenFloats()
                     assertArrayEquals(expected, result, EPS)
                 }

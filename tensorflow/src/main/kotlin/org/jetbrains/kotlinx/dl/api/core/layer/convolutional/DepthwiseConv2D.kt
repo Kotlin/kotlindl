@@ -11,12 +11,12 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
+import org.jetbrains.kotlinx.dl.api.core.util.toLongList
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops

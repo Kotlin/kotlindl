@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,9 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000
@@ -23,13 +23,13 @@ private const val SEED = 12L
 private const val TEST_BATCH_SIZE = 1000
 
 private val lenet5Classic = buildLetNet5Classic(
-    image_width = IMAGE_SIZE,
-    image_height = IMAGE_SIZE,
-    num_channels = NUM_CHANNELS,
-    num_classes = NUMBER_OF_CLASSES,
-    layers_activation = Activations.Tanh,
-    classifier_activation = Activations.Linear,
-    random_seed = SEED,
+    imageWidth = IMAGE_SIZE,
+    imageHeight = IMAGE_SIZE,
+    numChannels = NUM_CHANNELS,
+    numClasses = NUMBER_OF_CLASSES,
+    layersActivation = Activations.Tanh,
+    classifierActivation = Activations.Linear,
+    randomSeed = SEED,
 )
 
 /**

@@ -39,7 +39,7 @@ project.ext.publishPlatformArtifactsInRootModule = { MavenPublication platformPu
             }
         }
 
-        tasks.matching { it.name == "generatePomFileForKotlinMultiplatformPublication"}.configureEach {
+        tasks.matching { it.name == "generatePomFileForKotlinMultiplatformPublication" }.configureEach {
             dependsOn(tasks["generatePomFileFor${platformPublication.name.capitalize()}Publication"])
         }
     }

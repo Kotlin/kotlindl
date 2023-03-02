@@ -15,21 +15,14 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.printSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CVnoTop.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
 import java.io.File
 
 private const val IMAGE_SIZE = 200
@@ -56,26 +49,8 @@ private const val EPOCHS = 2
  */
 fun vgg16noTopAdditionalTraining() {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val modelType = TFModels.CV.VGG16(noTop = true, inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
+    val modelType = TFModels.CVnoTop.VGG16(inputShape = intArrayOf(IMAGE_SIZE, IMAGE_SIZE, 3))
     val model = modelHub.loadModel(modelType)
-
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = IMAGE_SIZE
-            outputWidth = IMAGE_SIZE
-            interpolation = InterpolationType.BILINEAR
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
-        .call(modelType.preprocessor)
-
-    val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
-    val dataset = OnFlyImageDataset.create(
-        File(dogsVsCatsDatasetPath),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val layers = mutableListOf<Layer>()
 
@@ -107,6 +82,13 @@ fun vgg16noTopAdditionalTraining() {
 
     val newModel = Sequential.of(layers)
 
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsSmallDatasetPath()),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(newModel)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
     newModel.use {
         it.compile(
             optimizer = Adam(),
@@ -136,5 +118,3 @@ fun vgg16noTopAdditionalTraining() {
 
 /** */
 fun main(): Unit = vgg16noTopAdditionalTraining()
-
-

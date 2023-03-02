@@ -16,21 +16,16 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CVnoTop.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
 
 private const val TRAINING_BATCH_SIZE = 8
@@ -39,29 +34,11 @@ private const val NUM_CLASSES = 2
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 fun runImageRecognitionTransferLearning(
-    modelType: TFModels.CV<out GraphTrainableModel>,
+    modelType: TFModels.CVnoTop<out GraphTrainableModel>,
     epochs: Int = 2
 ) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
-
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-                outputHeight = modelType.inputShape?.get(0) ?: 224
-                outputWidth = modelType.inputShape?.get(0) ?: 224
-                interpolation = InterpolationType.BILINEAR
-            }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
-        .call(modelType.preprocessor)
-
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-    val dataset = OnFlyImageDataset.create(
-        File(dogsCatsImages),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
     val layers = mutableListOf<Layer>()
@@ -106,13 +83,20 @@ fun runImageRecognitionTransferLearning(
 
     val model2 = Functional.of(layers)
 
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsSmallDatasetPath()),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(model2)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
+
     model2.use {
         it.compile(
             optimizer = Adam(),
             loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
             metric = Metrics.ACCURACY
         )
-        model2.logSummary()
+        model2.printSummary()
 
         it.loadWeightsForFrozenLayers(hdfFile)
 
@@ -137,24 +121,6 @@ fun runImageRecognitionTransferLearningOnTopModel(
 ) {
     val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = modelHub.loadModel(modelType)
-
-    val preprocessing = pipeline<BufferedImage>()
-        .resize {
-            outputHeight = modelType.inputShape?.get(0) ?: 224
-            outputWidth = modelType.inputShape?.get(0) ?: 224
-            interpolation = InterpolationType.BILINEAR
-        }
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray {  }
-        .call(modelType.preprocessor)
-
-    val dogsCatsImages = dogsCatsSmallDatasetPath()
-    val dataset = OnFlyImageDataset.create(
-        File(dogsCatsImages),
-        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
-        preprocessing
-    ).shuffle()
-    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     val hdfFile = modelHub.loadWeights(modelType)
     val layers = model.layers.toMutableList()
@@ -183,6 +149,13 @@ fun runImageRecognitionTransferLearningOnTopModel(
     )(x)
 
     val model2 = Functional.fromOutput(x)
+
+    val dataset = OnFlyImageDataset.create(
+        File(dogsCatsSmallDatasetPath()),
+        FromFolders(mapping = mapOf("cat" to 0, "dog" to 1)),
+        modelType.createPreprocessing(model2)
+    ).shuffle()
+    val (train, test) = dataset.split(TRAIN_TEST_SPLIT_RATIO)
 
     model2.use {
         it.compile(

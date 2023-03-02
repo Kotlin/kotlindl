@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -60,7 +60,7 @@ class SaveTrainedModelHelper(private val trainBatchSize: Int = 500, private val 
             }
             model.save(
                 modelDirectory = File(path),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }

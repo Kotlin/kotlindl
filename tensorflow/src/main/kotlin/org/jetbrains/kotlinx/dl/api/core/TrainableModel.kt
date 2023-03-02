@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -16,8 +16,8 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
-import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
+import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModelBase
+import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import java.io.File
@@ -26,7 +26,7 @@ import java.io.FileNotFoundException
 /**
  * Base abstract class for all trainable models.
  */
-public abstract class TrainableModel : TensorFlowInferenceModel() {
+public abstract class TrainableModel : TensorFlowInferenceModelBase(), ModelWithSummary {
     /** Optimization algorithm required for compiling a model, and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
@@ -346,7 +346,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @param [inputData] Unlabeled input data to define label.
      * @param [predictionTensorName] Name of output tensor to make prediction.
      */
-    public abstract fun predict(inputData: FloatArray, predictionTensorName: String): Int
+    public abstract fun predict(inputData: FloatData, predictionTensorName: String): Int
 
     /**
      * Predicts and returns not only prediction but list of activations values from intermediate model layers
@@ -357,7 +357,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @return Label (class index) and list of activations from intermediate model layers.
      */
     public abstract fun predictAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String = ""
     ): Pair<Int, List<*>>
 
@@ -370,7 +370,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      * @return Label (class index) and list of activations from intermediate model layers.
      */
     protected abstract fun predictSoftlyAndGetActivations(
-        inputData: FloatArray,
+        inputData: FloatData,
         predictionTensorName: String
     ): Pair<FloatArray, List<*>>
 
@@ -385,7 +385,7 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
      */
     public abstract fun save(
         modelDirectory: File,
-        savingFormat: SavingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+        savingFormat: SavingFormat = SavingFormat.TfGraphCustomVariables,
         saveOptimizerState: Boolean = false,
         writingMode: WritingMode = WritingMode.FAIL_IF_EXISTS
     )
@@ -475,13 +475,6 @@ public abstract class TrainableModel : TensorFlowInferenceModel() {
             callbacks
         )
     }
-
-    /**
-     * Returns model summary.
-     *
-     * @return model summary
-     */
-    public abstract fun summary(): ModelSummary
 
     override fun toString(): String {
         return "TrainableModel(numberOfClasses=$numberOfClasses) ${super.toString()}"

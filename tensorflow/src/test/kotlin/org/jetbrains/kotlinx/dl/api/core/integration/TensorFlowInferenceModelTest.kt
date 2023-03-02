@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -21,8 +21,10 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
+import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.api.inference.getFloatArray
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -133,19 +135,20 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }
 
         val inferenceModel = TensorFlowInferenceModel.load(tempDir.toFile(), loadOptimizerState = false)
         inferenceModel.use {
-            it.reshape(28, 28, 1)
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
                 val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val softPrediction = it.predict(train.getX(imageId), outputTensorName = OUTPUT_NAME) { result ->
+                    result.getFloatArray(0)
+                }
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())
@@ -184,7 +187,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -197,12 +200,13 @@ class TensorFlowInferenceModelTest {
         val secondAccuracy: Double
 
         inferenceModel.use {
-            it.reshape(28, 28, 1)
             var accuracy = 0.0
             val amountOfTestSet = 10000
             for (imageId in 0..amountOfTestSet) {
                 val prediction = it.predict(train.getX(imageId))
-                val softPrediction = it.predictSoftly(train.getX(imageId))
+                val softPrediction = it.predict(train.getX(imageId), outputTensorName = OUTPUT_NAME) { result ->
+                    result.getFloatArray(0)
+                }
                 assertEquals(10, softPrediction.size)
 
                 if (prediction == train.getY(imageId).toInt())
@@ -231,46 +235,14 @@ class TensorFlowInferenceModelTest {
 
     @Test
     fun emptyInferenceModel() {
-        val (train, test) = mnist()
+        val (train, _) = mnist()
 
         val inferenceModel = TensorFlowInferenceModel()
         inferenceModel.use {
-            it.reshape(28, 28, 1)
-
-            val exception =
-                Assertions.assertThrows(IllegalStateException::class.java) {
-                    it.predict(train.getX(0))
-                }
-            assertEquals(
-                "The model is not initialized yet. Initialize the model weights with InferenceModel.load() method.",
-                exception.message
-            )
-        }
-    }
-
-    @Test
-    fun missedReshapeFunction() {
-        val (train, test) = mnist()
-
-        val inferenceModel = TensorFlowInferenceModel()
-        inferenceModel.use {
-            val exception =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predict(train.getX(0))
-                }
-            assertEquals(
-                "Model input shape is not defined. Call reshape() to set input shape.",
-                exception.message
-            )
-
-            val exception2 =
-                Assertions.assertThrows(IllegalArgumentException::class.java) {
-                    it.predictSoftly(train.getX(0))
-                }
-            assertEquals(
-                "Model input shape is not defined. Call reshape() to set input shape.",
-                exception2.message
-            )
+            val exception = Assertions.assertThrows(IllegalStateException::class.java) {
+                it.predict(train.getX(0))
+            }
+            assertEquals("Model weights are not initialized.", exception.message)
         }
     }
 
@@ -302,7 +274,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.JsonConfigCustomVariables(),
                 writingMode = WritingMode.OVERRIDE
             )
         }
@@ -346,7 +318,7 @@ class TensorFlowInferenceModelTest {
 
             it.save(
                 modelDirectory = tempDir.toFile(),
-                savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+                savingFormat = SavingFormat.TfGraphCustomVariables,
                 writingMode = WritingMode.OVERRIDE
             )
         }

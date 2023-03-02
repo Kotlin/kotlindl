@@ -5,14 +5,14 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.convolutional
 
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongArray
-import org.jetbrains.kotlinx.dl.api.core.layer.toLongList
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.util.toLongList
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposeOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.convTransposePadding
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -35,6 +35,9 @@ public abstract class ConvTranspose(
 
     protected abstract val outputPadding: IntArray?
 
+    /**
+     * Computes the output shape of the layer given the input shape.
+     */
     protected fun computeOutputShape(inputShape: Shape): Shape {
         val shapes = (kernelSize.indices).map {
             convTransposeOutputLength(

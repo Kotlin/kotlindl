@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.shape
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.dataset.shape.getDimsOfArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -80,7 +78,7 @@ private fun getShapeOfArray(data: Array<*>): Shape {
 }
 
 /**
- * @see tensorShape
+ * @see TensorShape
  */
 internal val Array<*>.shape: Shape get() = getShapeOfArray(this)
 

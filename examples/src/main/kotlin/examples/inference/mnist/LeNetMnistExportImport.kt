@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,7 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5"
@@ -57,16 +58,13 @@ fun lenetOnMnistDatasetExportImportToTxt() {
 
         it.save(File(PATH_TO_MODEL), writingMode = WritingMode.OVERRIDE)
 
-        val prediction = it.predict(train.getX(imageId1))
-
+        val prediction = it.predictLabel(train.getX(imageId1))
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")
 
-        val prediction2 = it.predict(train.getX(imageId2))
-
+        val prediction2 = it.predictLabel(train.getX(imageId2))
         println("Prediction: $prediction2 Ground Truth: ${train.getY(imageId2)}")
 
-        val prediction3 = it.predict(train.getX(imageId3))
-
+        val prediction3 = it.predictLabel(train.getX(imageId3))
         println("Prediction: $prediction3 Ground Truth: ${train.getY(imageId3)}")
 
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
@@ -76,8 +74,6 @@ fun lenetOnMnistDatasetExportImportToTxt() {
     val inferenceModel = TensorFlowInferenceModel.load(File(PATH_TO_MODEL), loadOptimizerState = true)
 
     inferenceModel.use {
-        it.reshape(*lenet5.inputDimensions)
-
         val prediction = it.predict(train.getX(imageId1))
 
         println("Prediction: $prediction Ground Truth: ${train.getY(imageId1)}")

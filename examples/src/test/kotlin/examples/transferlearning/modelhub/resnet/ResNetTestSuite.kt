@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,7 +7,7 @@ package examples.transferlearning.modelhub.resnet
 
 import examples.transferlearning.runImageRecognitionPrediction
 import examples.transferlearning.runImageRecognitionTransferLearning
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 import org.junit.jupiter.api.Test
 
 class ResNetTestSuite {
@@ -59,8 +59,7 @@ class ResNetTestSuite {
     @Test
     fun resnet50v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet50v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet50v2(
                 inputShape = intArrayOf(150, 150, 3)
             )
         )
@@ -74,8 +73,7 @@ class ResNetTestSuite {
     @Test
     fun resnet101additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet101(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet101(
                 inputShape = intArrayOf(100, 100, 3)
             )
         )
@@ -89,8 +87,7 @@ class ResNetTestSuite {
     @Test
     fun resnet101v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet101v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet101v2(
                 inputShape = intArrayOf(120, 120, 3)
             )
         )
@@ -104,8 +101,7 @@ class ResNetTestSuite {
     @Test
     fun resnet152additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet152(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet152(
                 inputShape = intArrayOf(152, 152, 3)
             )
         )
@@ -119,8 +115,7 @@ class ResNetTestSuite {
     @Test
     fun resnet152v2additionalTrainingNoTopTest() {
         runImageRecognitionTransferLearning(
-            modelType = TFModels.CV.ResNet152v2(
-                noTop = true,
+            modelType = TFModels.CVnoTop.ResNet152v2(
                 inputShape = intArrayOf(90, 90, 3)
             )
         )

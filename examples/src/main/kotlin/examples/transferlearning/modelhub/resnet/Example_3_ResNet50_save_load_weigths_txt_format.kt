@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -13,19 +13,15 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.api.core.util.predictTop5Labels
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeights
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModelHub
-import org.jetbrains.kotlinx.dl.api.inference.keras.loaders.TFModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
+import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels.CV.Companion.createPreprocessing
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTop5Labels
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
@@ -36,7 +32,7 @@ private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
- * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to images before prediction.
+ * - Special preprocessing (used in ResNet'50 during training on ImageNet dataset) is applied to each image before prediction.
  * - Model is exported in  both: Keras-style JSON format and graph .pb format ; weights are exported in custom (TXT) format.
  * - It saves all the data to the project root directory.
  * - The first [TensorFlowInferenceModel] is created via graph and weights loading.
@@ -49,11 +45,7 @@ fun main() {
     val modelType = TFModels.CV.ResNet50()
     val model = modelHub.loadModel(modelType)
 
-    val fileDataLoader = pipeline<BufferedImage>()
-        .convert { colorMode = ColorMode.BGR }
-        .toFloatArray { }
-        .call(modelType.preprocessor)
-        .fileLoader()
+    val fileDataLoader = modelType.createPreprocessing(model).fileLoader()
 
     val imageNetClassLabels = modelHub.loadClassLabels()
 
@@ -71,9 +63,9 @@ fun main() {
         it.loadWeights(hdfFile)
 
         for (i in 1..8) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
-            val res = it.predict(inputData)
+            val res = it.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)
@@ -83,13 +75,13 @@ fun main() {
 
         it.save(
             File(PATH_TO_MODEL),
-            savingFormat = SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            savingFormat = SavingFormat.JsonConfigCustomVariables(isKerasFullyCompatible = true),
             writingMode = WritingMode.OVERRIDE
         )
 
         it.save(
             File(PATH_TO_MODEL_2),
-            savingFormat = SavingFormat.TF_GRAPH_CUSTOM_VARIABLES,
+            savingFormat = SavingFormat.TfGraphCustomVariables,
             writingMode = WritingMode.OVERRIDE
         )
     }
@@ -98,9 +90,7 @@ fun main() {
 
     inferenceModel.use {
         for (i in 1..8) {
-            it.reshape(224, 224, 3)
-
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
             val res = it.predict(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
@@ -124,8 +114,8 @@ fun main() {
         it.loadWeights(File(PATH_TO_MODEL))
 
         for (i in 1..8) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
-            val res = it.predict(inputData)
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
+            val res = it.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
             val top5 = it.predictTop5Labels(inputData, imageNetClassLabels)

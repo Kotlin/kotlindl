@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -255,7 +255,7 @@ private fun stack1(
         x = block1(
             x,
             filters,
-            conv_shortcut = false,
+            convShortcut = false,
             name = name + "_block" + i,
         )
     }
@@ -280,7 +280,7 @@ private fun stack2(
 ): Layer {
     var x = pointer
 
-    x = block2(x, filters, conv_shortcut = true, name = name + "_block1")
+    x = block2(x, filters, convShortcut = true, name = name + "_block1")
     for (i in 2 until blocks) {
         x = block2(
             x,
@@ -296,13 +296,13 @@ private fun block1(
     pointer: Layer,
     filters: Int,
     kernelSize: Int = 3,
-    conv_shortcut: Boolean = true,
+    convShortcut: Boolean = true,
     name: String,
     stride: Int = 1
 ): Layer {
     val shortcut: Layer
 
-    if (conv_shortcut) {
+    if (convShortcut) {
         shortcut = Conv2D(
             filters = 4 * filters,
             kernelSize = intArrayOf(1, 1),
@@ -373,7 +373,7 @@ private fun block2(
     pointer: Layer,
     filters: Int,
     kernelSize: Int = 3,
-    conv_shortcut: Boolean = false,
+    convShortcut: Boolean = false,
     name: String,
     stride: Int = 1
 ): Layer {
@@ -384,7 +384,7 @@ private fun block2(
 
     val shortcut: Layer
 
-    if (conv_shortcut) {
+    if (convShortcut) {
         shortcut = Conv2D(
             filters = 4 * filters,
             kernelSize = intArrayOf(1, 1),

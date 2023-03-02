@@ -19,13 +19,15 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":api")
-                api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
+                api project(":impl")
             }
         }
         jvmMain {
             dependencies {
                 api "org.jetbrains.kotlinx:multik-core:0.2.0"
                 api "org.jetbrains.kotlinx:multik-default:0.2.0"
+                api 'com.microsoft.onnxruntime:onnxruntime:1.12.1'
+                api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
             }
         }
         jvmTest {
@@ -40,7 +42,8 @@ kotlin {
         }
         androidMain {
             dependencies {
-                api 'com.microsoft.onnxruntime:onnxruntime-mobile:1.12.1'
+                api 'com.microsoft.onnxruntime:onnxruntime-android:1.12.1'
+                api 'androidx.camera:camera-core:1.0.0-rc03'
             }
         }
     }

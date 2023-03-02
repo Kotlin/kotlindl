@@ -26,10 +26,11 @@ public abstract class AbstractUpSampling(
     override val hasActivation: Boolean
         get() = false
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         return upSample(tf, input)
     }

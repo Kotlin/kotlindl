@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -7,6 +7,7 @@ package examples.ml
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -15,9 +16,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -87,7 +88,7 @@ fun sineRegression() {
 
             val yPred = it.predictSoftly(xReal)
 
-            println("xReal: ${xReal[0]}, yReal: $yReal, yPred: ${yPred[0]}")
+            println("xReal: ${xReal.floats[0]}, yReal: $yReal, yPred: ${yPred[0]}")
         }
     }
 }

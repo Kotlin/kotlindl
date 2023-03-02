@@ -20,7 +20,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
-import org.jetbrains.kotlinx.dl.dataset.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -199,7 +199,7 @@ class TransferLearningTest : IntegrationTest() {
 
         val testModel = Sequential.loadModelConfiguration(jsonConfigFile)
 
-        val (train, test) = fashionMnist()
+        val (train, _) = fashionMnist()
 
         testModel.use {
             val exception =
@@ -306,7 +306,7 @@ class TransferLearningTest : IntegrationTest() {
 
             it.loadWeights(hdfFile)
 
-            val copy = it.copy()
+            val copy = it.copy(copyOptimizerState = false, copyWeights = true)
             assertTrue(copy.layers.size == 11)
             copy.close()
 

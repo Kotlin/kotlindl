@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -23,16 +23,17 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam;
 import org.jetbrains.kotlinx.dl.api.core.optimizer.NoClipGradient;
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L1;
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2;
-import org.jetbrains.kotlinx.dl.api.core.summary.HelpersKt;
-import org.jetbrains.kotlinx.dl.dataset.EmbeddedDatasetsKt;
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset;
-import org.jetbrains.kotlinx.dl.dataset.handler.MnistUtilKt;
+import org.jetbrains.kotlinx.dl.dataset.embedded.EmbeddedDatasetsKt;
+import org.jetbrains.kotlinx.dl.dataset.embedded.MnistUtilKt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.jetbrains.kotlinx.dl.impl.summary.SummaryExKt.logSummary;
 
 /**
  * This example demonstrates the ability to define and train LeNet-5 model in Java.
@@ -67,7 +68,7 @@ public class LeNetClassic {
         try (Sequential lenet5Classic = Sequential.of(layers, false)) {
             Adam adam = new Adam(0.001f, 0.9f, 0.999f, 1e-07f, false, new NoClipGradient());
             lenet5Classic.compile(adam, new SoftmaxCrossEntropyWithLogits(), Metrics.ACCURACY);
-            HelpersKt.logSummary(lenet5Classic, logger);
+            logSummary(lenet5Classic, logger);
             lenet5Classic.fit(train, EPOCHS, TRAINING_BATCH_SIZE, new Callback());
 
             Double accuracy = lenet5Classic.evaluate(test, TEST_BATCH_SIZE, new Callback()).getMetrics().get(Metrics.ACCURACY);

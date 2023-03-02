@@ -18,10 +18,11 @@ import kotlin.math.abs
  * @constructor Creates [Flatten] object.
  */
 public class Flatten(name: String = "") : Layer(name) {
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         val amountOfNeuronsInFlattenLayer = (inputShape.numElements() / abs(inputShape.size(0))).toInt()

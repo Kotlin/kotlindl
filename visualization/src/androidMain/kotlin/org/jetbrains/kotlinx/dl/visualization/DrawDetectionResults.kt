@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -36,8 +36,10 @@ fun Canvas.drawObject(
 
     drawRect(rect, Paint(paint).apply { strokeWidth = frameWidth })
 
-    val label = "${detectedObject.classLabel} : " + "%.2f".format(detectedObject.probability)
-    drawText(label, rect.left, rect.top - labelPaint.fontMetrics.descent - frameWidth / 2, labelPaint)
+    if (detectedObject.label != null) {
+        val label = "${detectedObject.label} : " + "%.2f".format(detectedObject.probability)
+        drawText(label, rect.left, rect.top - labelPaint.fontMetrics.descent - frameWidth / 2, labelPaint)
+    }
 }
 
 /**
@@ -80,7 +82,7 @@ fun Canvas.drawPose(
         )
     }
 
-    detectedPose.poseLandmarks.forEach { landmark ->
+    detectedPose.landmarks.forEach { landmark ->
         drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), landmarkRadius, landmarkPaint)
     }
 }
@@ -103,7 +105,7 @@ fun Canvas.drawMultiplePoses(
     landmarkRadius: Float,
     bounds: PreviewImageBounds = bounds()
 ) {
-    detectedPoses.multiplePoses.forEach { (detectedObject, detectedPose) ->
+    detectedPoses.poses.forEach { (detectedObject, detectedPose) ->
         drawPose(detectedPose, landmarkPaint, edgePaint, landmarkRadius, bounds)
         drawObject(detectedObject, objectPaint, labelPaint, bounds)
     }
@@ -121,9 +123,21 @@ fun Canvas.drawLandmarks(landmarks: List<Landmark>,
                          paint: Paint, radius: Float,
                          bounds: PreviewImageBounds = bounds()
 ) {
-    landmarks.forEach { landmark ->
-        drawCircle(bounds.toViewX(landmark.xRate), bounds.toViewY(landmark.yRate), radius, paint)
-    }
+    landmarks.forEach { landmark -> drawLandmark(landmark, paint, radius, bounds) }
+}
+
+/**
+ * Draw a given [landmark] on the [Canvas] using [paint] and [radius].
+ *
+ * If the preview image coordinates do not match the [Canvas] coordinates,
+ * [bounds] of the image preview should be provided.
+ *
+ * @see [PreviewImageBounds]
+ */
+fun Canvas.drawLandmark(landmark: Landmark, paint: Paint, radius: Float,
+                        bounds: PreviewImageBounds = bounds()
+) {
+    drawCircle(bounds.toViewX(landmark.x), bounds.toViewY(landmark.y), radius, paint)
 }
 
 /**

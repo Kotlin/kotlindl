@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -26,11 +26,12 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
 import org.jetbrains.kotlinx.dl.api.core.regularizer.L2L1
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.core.util.OUTPUT_NAME
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -207,7 +208,7 @@ internal class SequentialBasicTest : IntegrationTest() {
         test: OnHeapDataset
     ) {
         // Prediction testing
-        val label = it.predict(test.getX(0))
+        val label = it.predictLabel(test.getX(0))
         assertEquals(test.getY(0), label.toFloat())
 
         val softPrediction = it.predictSoftly(test.getX(0))
@@ -390,10 +391,9 @@ internal class SequentialBasicTest : IntegrationTest() {
         val (train, _) = mnist()
 
         testModel.use {
-            val exception =
-                assertThrows(IllegalStateException::class.java) {
-                    it.predict(train.getX(0))
-                }
+            val exception = assertThrows(IllegalStateException::class.java) {
+                it.predictLabel(train.getX(0))
+            }
             assertEquals(
                 "The model is not compiled yet. Compile the model to use this method.",
                 exception.message
@@ -422,14 +422,8 @@ internal class SequentialBasicTest : IntegrationTest() {
         val (_, test) = mnist()
 
         testModel.use {
-            val exception =
-                assertThrows(IllegalArgumentException::class.java) {
-                    it.predict(test, 256)
-                }
-            assertEquals(
-                "The amount of images must be a multiple of batch size.",
-                exception.message
-            )
+            val exception = assertThrows(IllegalArgumentException::class.java) { it.predict(test, 256) }
+            assertEquals("The number of elements in the dataset must be a multiple of batch size.", exception.message)
         }
 
         testModel.use {

@@ -16,8 +16,8 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.jetbrains.kotlinx.dl.api.core.optimizer.SGD
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
 
 private const val PATH_TO_MODEL = "savedmodels/lenet5_keras"
@@ -57,7 +57,7 @@ fun lenetOnMnistExportImportToJson() {
 
         it.save(
             File(PATH_TO_MODEL),
-            SavingFormat.JSON_CONFIG_CUSTOM_VARIABLES,
+            SavingFormat.JsonConfigCustomVariables(),
             writingMode = WritingMode.OVERRIDE
         )
 

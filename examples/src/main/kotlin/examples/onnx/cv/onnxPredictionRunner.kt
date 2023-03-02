@@ -1,39 +1,37 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package examples.onnx.cv
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.core.util.predictTopNLabels
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
-import org.jetbrains.kotlinx.dl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.dataset.Imagenet
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictTopNLabels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CV.Companion.createPreprocessing
 import java.io.File
 
-fun runONNXImageRecognitionPrediction(
-    modelType: ONNXModels.CV<out OnnxInferenceModel>,
-    resizeTo: Pair<Int, Int> = Pair(224, 224)
-) {
+fun runONNXImageRecognitionPrediction(modelType: ONNXModels.CV) {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
-    val model = modelHub.loadModel(modelType)
 
     val imageNetClassLabels = Imagenet.V1k.labels()
 
-    model.use {
-        println(it)
+    modelHub.loadModel(modelType).use { model ->
+        println(model)
 
-        val fileDataLoader = examples.transferlearning.fileDataLoader(modelType, resizeTo)
+        val fileDataLoader = modelType.createPreprocessing(model).fileLoader()
+
         for (i in 1..8) {
-            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg")).first
+            val inputData = fileDataLoader.load(getFileFromResource("datasets/vgg/image$i.jpg"))
 
-            val res = it.predict(inputData)
+            val res = model.predictLabel(inputData)
             println("Predicted object for image$i.jpg is ${imageNetClassLabels[res]}")
 
-            val top5 = it.predictTopNLabels(inputData, imageNetClassLabels)
-
+            val top5 = model.predictTopNLabels(inputData, imageNetClassLabels)
             println(top5.toString())
         }
     }

@@ -39,9 +39,7 @@ val preprocessing = pipeline<BufferedImage>()
     }
     .convert { colorMode = ColorMode.BGR }
     .toFloatArray { }
-    .sharpen {
-        modelTypePreprocessing = TFModels.CV.VGG19()
-    }
+    .call(TFModels.CV.VGG19().preprocessor)
 
 val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
 

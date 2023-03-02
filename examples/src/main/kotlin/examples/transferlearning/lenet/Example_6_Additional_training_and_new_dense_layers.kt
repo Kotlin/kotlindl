@@ -18,9 +18,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadWeightsForFrozenLayers
-import org.jetbrains.kotlinx.dl.dataset.fashionMnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 /**
  * This examples demonstrates the transfer learning concept:

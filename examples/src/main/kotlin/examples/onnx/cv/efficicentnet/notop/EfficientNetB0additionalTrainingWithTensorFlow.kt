@@ -15,27 +15,20 @@ import org.jetbrains.kotlinx.dl.api.core.layer.pooling.GlobalAvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.dataset.preprocessor.onnx
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
 import org.jetbrains.kotlinx.dl.dataset.OnFlyImageDataset
-import org.jetbrains.kotlinx.dl.dataset.dogsCatsDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.dogsCatsSmallDatasetPath
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.FromFolders
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.InterpolationType
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import java.awt.image.BufferedImage
+import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.embedded.dogsCatsSmallDatasetPath
+import org.jetbrains.kotlinx.dl.dataset.generator.FromFolders
+import org.jetbrains.kotlinx.dl.onnx.dataset.preprocessor.onnx
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels.CVnoTop.Companion.createPreprocessing
 import java.io.File
 
 private const val EPOCHS = 1
 private const val TRAINING_BATCH_SIZE = 64
 private const val TEST_BATCH_SIZE = 32
 private const val NUM_CLASSES = 2
-private const val IMAGE_SIZE = 224L
 private const val TRAIN_TEST_SPLIT_RATIO = 0.8
 
 /**
@@ -60,24 +53,12 @@ private val topModel = Sequential.of(
  * We demonstrate the workflow on the subset of Kaggle Cats vs Dogs binary classification dataset.
  */
 fun efficientNetB0AdditionalTraining() {
-    val modelHub = ONNXModelHub(
-        cacheDirectory = File("cache/pretrainedModels")
-    )
-    val model = modelHub.loadModel(ONNXModels.CV.EfficientNetB0(noTop = true))
+    val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
+    val modelType = ONNXModels.CVnoTop.EfficientNetB0
 
-    model.use {
-        println(it)
-        val preprocessing = pipeline<BufferedImage>()
-            .resize {
-                outputHeight = IMAGE_SIZE.toInt()
-                outputWidth = IMAGE_SIZE.toInt()
-                interpolation = InterpolationType.BILINEAR
-            }
-            .convert { colorMode = ColorMode.BGR }
-            .toFloatArray { }
-            .onnx {
-                onnxModel = model
-            }
+    modelHub.loadModel(modelType).use { model ->
+        println(model)
+        val preprocessing = modelType.createPreprocessing(model).onnx { onnxModel = model }
 
         val dogsVsCatsDatasetPath = dogsCatsSmallDatasetPath()
         val dataset = OnFlyImageDataset.create(

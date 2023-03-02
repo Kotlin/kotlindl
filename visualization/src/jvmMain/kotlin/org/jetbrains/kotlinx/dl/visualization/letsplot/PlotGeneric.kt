@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,6 +11,8 @@ import jetbrains.letsPlot.gggrid
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.label.ggtitle
 import jetbrains.letsPlot.letsPlot
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.audio.wav.WavFile
 import kotlin.math.max
@@ -81,7 +83,7 @@ fun xyPlot(imageSize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Pl
 fun flattenImagePlot(
     sampleNumber: Int,
     dataset: Dataset,
-    predict: (FloatArray) -> Int? = { null },
+    predict: (FloatData) -> Int? = { null },
     labelEncoding: (Int) -> Any? = { it },
     plotFeature: PlotFeature = PlotFeature.GRAY
 ): Plot {
@@ -95,7 +97,7 @@ fun flattenImagePlot(
         "Real label: $imageLabel | Predicted label: $predictedLabel"
     }
 
-    return xyPlot(imageSize, plotFeature) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
+    return xyPlot(imageSize, plotFeature) { x, y -> imageData.floats[y * imageSize + x] } + ggtitle(title)
 }
 
 /**

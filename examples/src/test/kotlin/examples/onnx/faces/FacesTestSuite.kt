@@ -6,15 +6,16 @@
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
@@ -48,16 +49,16 @@ class FacesTestSuite {
                     outputWidth = 192
                 }
                 .convert { colorMode = ColorMode.BGR }
-                .toFloatArray {  }
+                .toFloatArray { }
                 .call(modelType.preprocessor)
                 .fileLoader()
 
             for (i in 0..8) {
                 val imageFile = getFileFromResource("datasets/faces/image$i.jpg")
-                val inputData = fileDataLoader.load(imageFile).first
+                val inputData = fileDataLoader.load(imageFile)
 
-                val yhat = it.predictRaw(inputData)
-                assertEquals(212, (yhat.values.toTypedArray()[0] as Array<FloatArray>)[0].size)
+                val yhat = it.predict(inputData) { output -> output.getFloatArray(0) }
+                assertEquals(212, yhat.size)
             }
         }
     }

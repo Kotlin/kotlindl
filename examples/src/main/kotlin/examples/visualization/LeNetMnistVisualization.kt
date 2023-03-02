@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,8 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.summary.logSummary
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.predictLabel
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import org.jetbrains.kotlinx.dl.visualization.letsplot.columnPlot
 import org.jetbrains.kotlinx.dl.visualization.letsplot.filtersPlot
 import org.jetbrains.kotlinx.dl.visualization.letsplot.flattenImagePlot
@@ -56,7 +57,7 @@ fun main() {
         )
 
         val numbersPlots = List(3) { imageIndex ->
-            flattenImagePlot(imageIndex, test, it::predict)
+            flattenImagePlot(imageIndex, test, it::predictLabel)
         }
         columnPlot(numbersPlots, 3, 256).show()
 

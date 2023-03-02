@@ -2,6 +2,7 @@ apply plugin: 'kotlin'
 
 dependencies {
     api project(":api")
+    api project(":impl")
     api project(":dataset")
     api project(":tensorflow")
     api project(":onnx")

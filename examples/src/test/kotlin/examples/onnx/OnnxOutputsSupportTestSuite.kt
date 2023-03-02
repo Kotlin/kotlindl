@@ -1,7 +1,14 @@
+/*
+ * Copyright 2022-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package examples.onnx
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.onnx.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.onnx.inference.OnnxInferenceModel
+import org.jetbrains.kotlinx.dl.onnx.inference.getFloatArray
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -12,21 +19,19 @@ class OnnxOutputsSupportTestSuite {
     private val model = OnnxInferenceModel.load(pathToModel)
     private val features = (1..27).map { Random.nextFloat() }.toFloatArray()
 
-    init {
-        model.reshape(27)
-    }
-
     @Test
-    fun predictSoftlyLgbmSequenceOutputTest() {
+    fun predictLgbmSequenceOutputTest() {
         assertThrows<IllegalArgumentException> {
-            model.predictSoftly(features, "probabilities")
+            model.predict(features to TensorShape(27)) { output ->
+                output.getFloatArray("probabilities")
+            }
         }
     }
 
     @Test
     fun predictRawLgbmSequenceOutputTest() {
         assertDoesNotThrow {
-            model.predictRaw(features)
+            model.predictRaw(features to TensorShape(27))
         }
     }
 }

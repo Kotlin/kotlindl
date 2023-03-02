@@ -66,10 +66,11 @@ public class BatchNorm(
     override val variables: List<KVariable>
         get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         // Compute shapes of kernel and bias matrices

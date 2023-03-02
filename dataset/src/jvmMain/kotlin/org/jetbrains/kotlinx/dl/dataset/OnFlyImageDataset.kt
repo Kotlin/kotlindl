@@ -1,16 +1,18 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
 package org.jetbrains.kotlinx.dl.dataset
 
-import org.jetbrains.kotlinx.dl.dataset.shape.TensorShape
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.Operation
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.generator.LabelGenerator.Companion.prepareY
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.ConvertToFloatArray
+import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
+import org.jetbrains.kotlinx.dl.dataset.DataLoader.Companion.prepareX
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator
+import org.jetbrains.kotlinx.dl.dataset.generator.LabelGenerator.Companion.prepareY
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ConvertToFloatArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -32,8 +34,8 @@ public class OnFlyImageDataset<D> internal constructor(
 ) : Dataset() {
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
-    private fun copySourcesToBatch(src: Array<D>, start: Int, length: Int): Array<FloatArray> {
-        return Array(length) { index -> dataLoader.load(src[start + index]).first }
+    private fun copySourcesToBatch(src: Array<D>, start: Int, length: Int): Pair<Array<FloatArray>, TensorShape> {
+        return dataLoader.prepareX(src, start, length)
     }
 
     /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */
@@ -67,8 +69,8 @@ public class OnFlyImageDataset<D> internal constructor(
     }
 
     /** Returns row by index [idx]. */
-    override fun getX(idx: Int): FloatArray {
-        return dataLoader.load(x[idx]).first
+    override fun getX(idx: Int): FloatData {
+        return dataLoader.load(x[idx])
     }
 
     /** Returns label as [FloatArray] by index [idx]. */
@@ -83,11 +85,8 @@ public class OnFlyImageDataset<D> internal constructor(
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(
-            copySourcesToBatch(x, batchStart, batchLength),
-            copyLabelsToBatch(y, batchStart, batchLength),
-            batchLength
-        )
+        val (data, shape) = copySourcesToBatch(x, batchStart, batchLength)
+        return DataBatch(data, shape, copyLabelsToBatch(y, batchStart, batchLength))
     }
 
     public companion object {
@@ -119,7 +118,7 @@ public class OnFlyImageDataset<D> internal constructor(
         public fun create(
             pathToData: File,
             labels: FloatArray,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
+            preprocessing: Operation<BufferedImage, FloatData> = ConvertToFloatArray()
         ): OnFlyImageDataset<File> {
             return OnFlyImageDataset(OnHeapDataset.prepareFileNames(pathToData), labels, preprocessing.fileLoader())
         }
@@ -132,7 +131,7 @@ public class OnFlyImageDataset<D> internal constructor(
         public fun create(
             pathToData: File,
             labelGenerator: LabelGenerator<File>,
-            preprocessing: Operation<BufferedImage, Pair<FloatArray, TensorShape>> = ConvertToFloatArray()
+            preprocessing: Operation<BufferedImage, FloatData> = ConvertToFloatArray()
         ): OnFlyImageDataset<File> {
             val xFiles = OnHeapDataset.prepareFileNames(pathToData)
             val y = labelGenerator.prepareY(xFiles)

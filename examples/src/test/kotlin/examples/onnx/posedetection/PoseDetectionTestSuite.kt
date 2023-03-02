@@ -6,15 +6,16 @@
 package examples.onnx.posedetection
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.call
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.dataset.preprocessing.fileLoader
+import org.jetbrains.kotlinx.dl.impl.preprocessing.call
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ColorMode
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.convert
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.toFloatArray
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.get2DFloatArray
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
@@ -29,7 +30,7 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
-            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(17, detectedPose.landmarks.size)
             assertEquals(18, detectedPose.edges.size)
         }
     }
@@ -42,7 +43,7 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/single/1.jpg")
             val detectedPose = poseDetectionModel.detectPose(imageFile = imageFile)
-            assertEquals(17, detectedPose.poseLandmarks.size)
+            assertEquals(17, detectedPose.landmarks.size)
             assertEquals(18, detectedPose.edges.size)
         }
     }
@@ -55,9 +56,9 @@ class PoseDetectionTestSuite {
         model.use { poseDetectionModel ->
             val imageFile = getFileFromResource("datasets/poses/multi/1.jpg")
             val detectedPoses = poseDetectionModel.detectPoses(imageFile = imageFile)
-            assertEquals(3, detectedPoses.multiplePoses.size)
-            detectedPoses.multiplePoses.forEach {
-                assertEquals(17, it.second.poseLandmarks.size)
+            assertEquals(3, detectedPoses.poses.size)
+            detectedPoses.poses.forEach {
+                assertEquals(17, it.second.landmarks.size)
                 assertEquals(18, it.second.edges.size)
             }
         }
@@ -82,11 +83,9 @@ class PoseDetectionTestSuite {
                 .call(modelType.preprocessor)
                 .fileLoader()
 
-            val inputData = fileDataLoader.load(imageFile).first
+            val inputData = fileDataLoader.load(imageFile)
 
-            val yhat = it.predictRaw(inputData)
-
-            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+            val rawPoseLandMarks = it.predict(inputData) { result -> result.get2DFloatArray("output_0") }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -111,11 +110,9 @@ class PoseDetectionTestSuite {
                 .call(modelType.preprocessor)
                 .fileLoader()
 
-            val inputData = preprocessing.load(imageFile).first
+            val inputData = preprocessing.load(imageFile)
 
-            val yhat = it.predictRaw(inputData)
-
-            val rawPoseLandMarks = (yhat["output_0"] as Array<Array<Array<FloatArray>>>)[0][0]
+            val rawPoseLandMarks = it.predict(inputData) { result -> result.get2DFloatArray("output_0") }
 
             assertEquals(17, rawPoseLandMarks.size)
         }
@@ -141,11 +138,9 @@ class PoseDetectionTestSuite {
                 .fileLoader()
 
 
-            val inputData = dataLoader.load(imageFile).first
-            val yhat = inferenceModel.predictRaw(inputData)
-            println(yhat.values.toTypedArray().contentDeepToString())
-
-            val rawPosesLandMarks = (yhat["output_0"] as Array<Array<FloatArray>>)[0]
+            val inputData = dataLoader.load(imageFile)
+            val rawPosesLandMarks = inferenceModel.predict(inputData) { result -> result.get2DFloatArray("output_0") }
+            println(rawPosesLandMarks.contentDeepToString())
 
             assertEquals(6, rawPosesLandMarks.size)
             rawPosesLandMarks.forEach {

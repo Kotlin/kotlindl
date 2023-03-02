@@ -12,9 +12,11 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dPointwiseKernelVarName
+import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -129,10 +131,11 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops,
-                       input: Operand<Float>,
-                       isTraining: Operand<Boolean>,
-                       numberOfLosses: Operand<Float>?
+    override fun build(
+        tf: Ops,
+        input: Operand<Float>,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
     ): Operand<Float> {
         val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape (make warning here)

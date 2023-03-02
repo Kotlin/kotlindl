@@ -6,18 +6,13 @@
 package examples.onnx.objectdetection.ssdmobile
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
-import org.jetbrains.kotlinx.dl.api.inference.onnx.objectdetection.SSDObjectDetectionModel
-import org.jetbrains.kotlinx.dl.dataset.image.ColorMode
-import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.pipeline
-import org.jetbrains.kotlinx.dl.dataset.preprocessing.rescale
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.fileLoader
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.convert
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.resize
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.image.toFloatArray
-import org.jetbrains.kotlinx.dl.dataset.preprocessor.toImageShape
+import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
+import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.objectdetection.SSDObjectDetectionModel
 import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedObjectsPanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
@@ -32,6 +27,7 @@ import java.io.File
 fun main() {
     val modelHub = ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
     val model = ONNXModels.ObjectDetection.SSDMobileNetV1.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use { detectionModel ->
         println(detectionModel)
@@ -41,7 +37,7 @@ fun main() {
         val detectedObjects = detectionModel.detectObjects(image, topK = 50)
 
         detectedObjects.forEach {
-            println("Found ${it.classLabel} with probability ${it.probability}")
+            println("Found ${it.label} with probability ${it.probability}")
         }
 
         val displayedImage = pipeline<BufferedImage>()

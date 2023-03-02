@@ -5,9 +5,10 @@
 package examples.onnx.cv.resnet
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.imagerecognition.ImageRecognitionModel
-import org.jetbrains.kotlinx.dl.api.inference.loaders.ONNXModelHub
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.api.summary.printSummary
+import org.jetbrains.kotlinx.dl.impl.inference.imagerecognition.ImageRecognitionModel
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import java.io.File
 
 /**
@@ -19,7 +20,8 @@ fun resnet18LightAPIPrediction() {
     val modelHub =
         ONNXModelHub(cacheDirectory = File("cache/pretrainedModels"))
 
-    val model = ONNXModels.CV.ResNet18().pretrainedModel(modelHub)
+    val model = ONNXModels.CV.ResNet18.pretrainedModel(modelHub)
+    model.printSummary()
 
     model.use {
         for (i in 1..8) {

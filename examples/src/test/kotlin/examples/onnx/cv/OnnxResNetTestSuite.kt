@@ -10,7 +10,7 @@ import examples.onnx.cv.resnet.notop.resnet50CustomPrediction
 import examples.onnx.cv.resnet.notop.resnet50additionalTraining
 import examples.onnx.cv.resnet.resnet18LightAPIPrediction
 import examples.onnx.cv.resnet.resnet18prediction
-import org.jetbrains.kotlinx.dl.api.inference.onnx.ONNXModels
+import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
 import org.junit.jupiter.api.Test
 
 class OnnxResNetTestSuite {
@@ -26,27 +26,27 @@ class OnnxResNetTestSuite {
 
     @Test
     fun resnet18v2predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet18v2())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet18v2)
     }
 
     @Test
     fun resnet34predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet34())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet34)
     }
 
     @Test
     fun resnet34v2predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet34v2())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet34v2)
     }
 
     @Test
     fun resnet50predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet50())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet50)
     }
 
     @Test
     fun resnet50v2predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet50v2())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet50v2)
     }
 
     @Test
@@ -61,22 +61,22 @@ class OnnxResNetTestSuite {
 
     @Test
     fun resnet101predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet101())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet101)
     }
 
     @Test
     fun resnet101v2predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet101v2())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet101v2)
     }
 
     @Test
     fun resnet152predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet152())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet152)
     }
 
     @Test
     fun resnet152v2predictionTest() {
-        runImageRecognitionPrediction(ONNXModels.CV.ResNet152v2())
+        runImageRecognitionPrediction(ONNXModels.CV.ResNet152v2)
     }
 
     @Test
