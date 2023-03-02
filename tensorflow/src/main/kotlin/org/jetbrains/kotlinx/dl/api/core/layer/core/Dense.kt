@@ -31,12 +31,9 @@ import org.tensorflow.op.Ops
  * created by the layer, and `bias` is a bias vector created by the layer
  * (only applicable if `use_bias` is `True`).
  *
- * __Input shape:__  N-D tensor with shape `(batch_size, ..., input_dim)`.
- *                   The most common situation would be a 2D input with shape `(batch_size, input_dim)`.
+ * __Input shape:__  2D tensor with shape `(batch_size, input_dim)`.
  *
- * __Output shape:__ N-D tensor with shape `(batch_size, ..., units)`.
- *                   For instance, for a 2D input with shape `(batch_size, input_dim)`,
- *                   the output would have shape `(batch_size, units)`.
+ * __Output shape:__ 2D tensor with shape `(batch_size, units)`.
  *
  * @property [outputSize] Dimensionality of the output space.
  * @property [activation] Activation function.
