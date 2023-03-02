@@ -212,16 +212,14 @@ For more details, please refer to the [Quick Start Guide](docs/quick_start_guide
 
 This table shows the mapping between KotlinDL, TensorFlow, ONNX Runtime, Compile SDK for Android and minimum supported Java versions.
 
-| KotlinDL Version | ONNX Runtime Version | Minimum Java Version | TensorFlow Version | Android: Compile SDK Version |
+| KotlinDL Version | Minimum Java Version | ONNX Runtime Version | TensorFlow Version | Android: Compile SDK Version |
 |------------------|----------------------|----------------------|--------------------|------------------------------|
-| 0.1.0            |                      | 8                    | 1.15               |                              |
-| 0.1.1            |                      | 8                    | 1.15               |                              |
-| 0.2.0            |                      | 8                    | 1.15               |                              |
-| 0.3.0            | 1.8.1                | 8                    | 1.15               |                              |
-| 0.4.0            | 1.11.0               | 8                    | 1.15               |                              |
-| 0.5.0            | 1.12.1               | 11                   | 1.15               | 31                           |
-| 0.5.1            | 1.12.1               | 11                   | 1.15               | 31                           |
-| 0.6.0-SNAPSHOT   | 1.12.1               | 11                   | 1.15               | 31                           |
+| 0.1.*            | 8                    |                      | 1.15               |                              |
+| 0.2.0            | 8                    |                      | 1.15               |                              |
+| 0.3.0            | 8                    | 1.8.1                | 1.15               |                              |
+| 0.4.0            | 8                    | 1.11.0               | 1.15               |                              |
+| 0.5.*            | 11                   | 1.12.1               | 1.15               | 31                           |
+| 0.6.*            | 11                   | 1.12.1               | 1.15               | 31                           |
 
 ## Documentation
 
@@ -294,15 +292,15 @@ You will also need to add the following dependencies and configuration file ``lo
 
 ```groovy
 // build.gradle
-implementation 'org.apache.logging.log4j:log4j-api:2.16.0'
-implementation 'org.apache.logging.log4j:log4j-core:2.16.0'
-implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.16.0'
+implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
+implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
 ```
 ```kotlin
 // build.gradle.kts
-implementation("org.apache.logging.log4j:log4j-api:2.16.0")
-implementation("org.apache.logging.log4j:log4j-core:2.16.0")
-implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.16.0")
+implementation("org.apache.logging.log4j:log4j-api:2.17.2")
+implementation("org.apache.logging.log4j:log4j-core:2.17.2")
+implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.2")
 ```
 
 ```xml
@@ -329,11 +327,11 @@ If you wish to use Logback, include the following dependency and configuration f
 
 ```groovy
 // build.gradle
-implementation 'ch.qos.logback:logback-classic:1.2.3'
+implementation 'ch.qos.logback:logback-classic:1.4.5'
 ```
 ```kotlin
 // build.gradle.kts
-implementation("ch.qos.logback:logback-classic:1.2.3")
+implementation("ch.qos.logback:logback-classic:1.4.5")
 ```
 
 ```xml
