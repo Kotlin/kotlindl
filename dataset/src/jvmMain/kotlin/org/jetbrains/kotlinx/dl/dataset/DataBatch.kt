@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
  * @param [y] Labels.
  * @param [elementShape] Shape of the data elements.
  */
-public data class DataBatch internal constructor(val x: Array<FloatArray>, val elementShape: TensorShape, val y: FloatArray) {
+public data class DataBatch(val x: Array<FloatArray>, val elementShape: TensorShape, val y: FloatArray) {
     /**
      * Number of rows in the batch.
      */
