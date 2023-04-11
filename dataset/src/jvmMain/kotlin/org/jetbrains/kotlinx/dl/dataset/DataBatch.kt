@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -11,7 +11,7 @@ package org.jetbrains.kotlinx.dl.dataset
  * @param [y] Labels.
  * @param [size] Number of rows in batch.
  */
-public data class DataBatch internal constructor(
+public data class DataBatch(
     val x: Array<FloatArray>,
     val y: FloatArray,
     val size: Int
