@@ -46,9 +46,9 @@ private const val ACCUMULATOR_UPDATE = "accum_update"
  * @property [epsilon] Float >= 0. Fuzz factor.
  */
 public class AdaDelta(
-    private val learningRate: Float = 0.1f,
-    private val rho: Float = 0.95f,
-    private val epsilon: Float = 1e-8f,
+    public val learningRate: Float = 0.1f,
+    public val rho: Float = 0.95f,
+    public val epsilon: Float = 1e-8f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     private lateinit var epsilonConstant: Constant<Float>

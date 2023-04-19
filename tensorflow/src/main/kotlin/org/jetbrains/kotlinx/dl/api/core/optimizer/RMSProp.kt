@@ -31,11 +31,11 @@ private const val MOMENTUM = "momentum"
  * @property [centered] Centered or not.
  */
 public class RMSProp(
-    private val learningRate: Float = 0.001f,
-    private val decay: Float = 0.9f,
-    private val momentum: Float = 0.0f,
-    private val epsilon: Float = 1e-10f,
-    private val centered: Boolean = false,
+    public val learningRate: Float = 0.001f,
+    public val decay: Float = 0.9f,
+    public val momentum: Float = 0.0f,
+    public val epsilon: Float = 1e-10f,
+    public val centered: Boolean = false,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
