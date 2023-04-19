@@ -25,9 +25,9 @@ private const val MOMENTUM = "momentum"
  * @property [useNesterov] If true, applies Nesterov momentum.
  */
 public class Momentum(
-    private val learningRate: Float = 0.001f,
-    private val momentum: Float = 0.99f,
-    private val useNesterov: Boolean = true,
+    public val learningRate: Float = 0.001f,
+    public val momentum: Float = 0.99f,
+    public val useNesterov: Boolean = true,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     private lateinit var momentumConst: Constant<Float>

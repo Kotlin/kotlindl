@@ -46,10 +46,10 @@ private val FIRST_BETA_POWER_NAME = defaultOptimizerVariableName("beta1_power")
  * @property [epsilon] Float >= 0. Fuzz factor.
  */
 public class Adamax(
-    private val learningRate: Float = 0.001f,
-    private val beta1: Float = 0.9f,
-    private val beta2: Float = 0.999f,
-    private val epsilon: Float = 1e-07f,
+    public val learningRate: Float = 0.001f,
+    public val beta1: Float = 0.9f,
+    public val beta2: Float = 0.999f,
+    public val epsilon: Float = 1e-07f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 

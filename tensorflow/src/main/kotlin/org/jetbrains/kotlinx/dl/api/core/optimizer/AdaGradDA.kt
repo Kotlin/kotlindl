@@ -46,10 +46,10 @@ private const val SQUARED_ACCUMULATOR = "gradient_squared_accumulator"
  * @property [l2Strength] A float value, must be greater than or equal to zero.
  */
 public class AdaGradDA(
-    private val learningRate: Float = 0.1f,
-    private val initialAccumulatorValue: Float = 0.01f,
-    private val l1Strength: Float = 0.01f,
-    private val l2Strength: Float = 0.01f,
+    public val learningRate: Float = 0.1f,
+    public val initialAccumulatorValue: Float = 0.01f,
+    public val l1Strength: Float = 0.01f,
+    public val l2Strength: Float = 0.01f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     private lateinit var learningRateConst: Constant<Float>

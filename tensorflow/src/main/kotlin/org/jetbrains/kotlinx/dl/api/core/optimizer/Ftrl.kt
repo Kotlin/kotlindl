@@ -52,12 +52,12 @@ private const val LINEAR_ACCUMULATOR = "linear_accumulator"
  * When input is sparse shrinkage will only happen on the active weights.
  */
 public class Ftrl(
-    private val learningRate: Float = 0.001f,
-    private val l1RegularizationStrength: Float = 0.0f,
-    private val l2RegularizationStrength: Float = 0.0f,
-    private val learningRatePower: Float = -0.5f,
-    private val l2ShrinkageRegularizationStrength: Float = 0.0f,
-    private var initialAccumulatorValue: Float = 0.0f,
+    public val learningRate: Float = 0.001f,
+    public val l1RegularizationStrength: Float = 0.0f,
+    public val l2RegularizationStrength: Float = 0.0f,
+    public val learningRatePower: Float = -0.5f,
+    public val l2ShrinkageRegularizationStrength: Float = 0.0f,
+    public var initialAccumulatorValue: Float = 0.0f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     /**  */
