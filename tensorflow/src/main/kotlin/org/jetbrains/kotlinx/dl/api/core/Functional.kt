@@ -16,6 +16,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.file.Files
 
 /**
  * A Functional model is defined as a directed graph of layers.
@@ -288,17 +289,17 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         when (writingMode) {
             WritingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
-                modelDirectory.mkdirs()
+                Files.createDirectories(modelDirectory.toPath())
             }
             WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
-                modelDirectory.mkdirs()
+                Files.createDirectories(modelDirectory.toPath())
             }
             WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
-                    modelDirectory.mkdirs()
+                    Files.createDirectories(modelDirectory.toPath())
                 }
             }
         }

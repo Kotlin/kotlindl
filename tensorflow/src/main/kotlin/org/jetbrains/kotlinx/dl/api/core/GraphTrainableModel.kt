@@ -825,17 +825,17 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         when (writingMode) {
             WritingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
-                modelDirectory.mkdirs()
+                Files.createDirectories(modelDirectory.toPath())
             }
             WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
-                modelDirectory.mkdirs()
+                Files.createDirectories(modelDirectory.toPath())
             }
             WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
-                    modelDirectory.mkdirs()
+                    Files.createDirectories(modelDirectory.toPath())
                 }
             }
         }
