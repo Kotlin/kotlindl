@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -65,8 +65,8 @@ public class Resize(
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
         return when (inputShape.rank()) {
-            2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
-            3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
+            2 -> TensorShape(outputHeight.toLong(), outputWidth.toLong())
+            3 -> TensorShape(outputHeight.toLong(), outputWidth.toLong(), inputShape[2])
             else -> throw IllegalArgumentException("Resize operation is only supported for 2D and 3D tensors.")
         }
     }

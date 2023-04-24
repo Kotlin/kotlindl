@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -47,12 +47,12 @@ public class Padding(
     }
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
-        val outputWidth = if (inputShape[0] == -1L) -1 else inputShape[0] + left + right
-        val outputHeight = if (inputShape[1] == -1L) -1 else inputShape[1] + top + bottom
+        val outputWidth = if (inputShape[1] == -1L) -1 else inputShape[1] + left + right
+        val outputHeight = if (inputShape[0] == -1L) -1 else inputShape[0] + top + bottom
 
         return when (inputShape.rank()) {
-            2 -> TensorShape(outputWidth, outputHeight)
-            3 -> TensorShape(outputWidth, outputHeight, inputShape[2])
+            2 -> TensorShape(outputHeight, outputWidth)
+            3 -> TensorShape(outputHeight, outputWidth, inputShape[2])
             else -> throw IllegalArgumentException("Padding operation is supported only for 2D and 3D tensors")
         }
     }

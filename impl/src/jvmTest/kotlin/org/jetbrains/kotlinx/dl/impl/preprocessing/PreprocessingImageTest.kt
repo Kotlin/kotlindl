@@ -105,7 +105,7 @@ class PreprocessingImageTest {
         inputImage.setRGB(1, 1, Color.RED.rgb)
         val (imageFloats, tensorShape) = preprocess.apply(inputImage)
 
-        Assertions.assertEquals(TensorShape(9, 5, 3), tensorShape)
+        Assertions.assertEquals(TensorShape(5, 9, 3), tensorShape)
 
         val expectedImage = FloatArray(tensorShape.numElements().toInt()) { Color.GRAY.red / 255f }
         expectedImage.setRGB(3, 1, Color.BLUE, tensorShape, ColorMode.BGR)
@@ -198,7 +198,7 @@ class PreprocessingImageTest {
                 }
             }
             for (i in colorComponents.indices) {
-                set3D(y, x, i, tensorShape[0].toInt(), colorMode.channels, colorComponents[i])
+                set3D(y, x, i, tensorShape[1].toInt(), colorMode.channels, colorComponents[i])
             }
         }
     }

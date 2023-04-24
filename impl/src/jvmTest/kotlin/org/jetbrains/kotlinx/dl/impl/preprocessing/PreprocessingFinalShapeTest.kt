@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -47,7 +47,7 @@ class PreprocessingFinalShapeTest {
                 bottom = 7
             }
             .toFloatArray { }
-        assertEquals(TensorShape(186, 188, 3), preprocess.getOutputShape(TensorShape(200, 200, 3)))
+        assertEquals(TensorShape(178, 186, 3), preprocess.getOutputShape(TensorShape(190, 200, 3)))
     }
 
     @Test
@@ -66,7 +66,7 @@ class PreprocessingFinalShapeTest {
                 bottom = 3
             }
             .toFloatArray { }
-        assertEquals(TensorShape(180, 180, 3), preprocess.getOutputShape(TensorShape(200, 200, 3)))
+        assertEquals(TensorShape(380, 180, 3), preprocess.getOutputShape(TensorShape(400, 200, 3)))
     }
 
     @Test
@@ -84,7 +84,7 @@ class PreprocessingFinalShapeTest {
                 bottom = 5
             }
             .toFloatArray { }
-        assertEquals(TensorShape(140, 90, 3), preprocess.getOutputShape(TensorShape(200, 200, 3)))
+        assertEquals(TensorShape(90, 140, 3), preprocess.getOutputShape(TensorShape(200, 200, 3)))
     }
 
     @Test
@@ -107,7 +107,7 @@ class PreprocessingFinalShapeTest {
                 right = 13
             }
             .toFloatArray { }
-        assertEquals(TensorShape(324, 212, 1), preprocess.getOutputShape(TensorShape(300, 200, 1)))
+        assertEquals(TensorShape(312, 224, 1), preprocess.getOutputShape(TensorShape(300, 200, 1)))
     }
 
     @Test
@@ -127,7 +127,7 @@ class PreprocessingFinalShapeTest {
         val image = BufferedImage(10, 20, BufferedImage.TYPE_3BYTE_BGR)
         val (_, actualShape) = preprocess.apply(image)
 
-        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(10, 20, 1)))
+        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(20, 10, 1)))
     }
 
     @Test
@@ -139,6 +139,6 @@ class PreprocessingFinalShapeTest {
         val image = BufferedImage(10, 20, BufferedImage.TYPE_3BYTE_BGR)
         val (_, actualShape) = preprocess.apply(image)
 
-        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(10, 20, 3)))
+        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(20, 10, 3)))
     }
 }
