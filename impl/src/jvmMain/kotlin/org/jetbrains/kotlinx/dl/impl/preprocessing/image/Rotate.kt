@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -19,7 +19,8 @@ import kotlin.math.sin
  *
  * It rotates the input image on [degrees].
  *
- * The final image quality depends on the following tunable parameters: [interpolation], [renderingSpeed], [enableAntialiasing].
+ * The final image quality depends on the following tunable parameters:
+ * [interpolation], [renderingSpeed], [enableAntialiasing].
  *
  * @property [degrees] The rotation angle.
  * @property [interpolation] Interpolation algorithm.

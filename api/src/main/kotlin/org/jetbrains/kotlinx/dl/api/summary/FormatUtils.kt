@@ -1,23 +1,28 @@
+/*
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.summary
 
 import kotlin.math.max
 
 /**
- * Format list of strings to a single line with appropriate paddings for each column.
+ * Format a list of strings to a single line with appropriate paddings for each column.
  * @param [columnSeparator] sequence of symbols to separate columns
- * @param [columnsWidths] widths of all columns
- * @param [strs] list of strings to substitute to columns
+ * @param [columnWidths] widths of all columns
+ * @param [rows] list of strings to substitute to columns
  */
-public fun formatLine(columnSeparator: String, columnsWidths: List<Int>, strs: List<String>): String {
-    return columnsWidths
-        .mapIndexed { index, columnWidth -> (strs.getOrNull(index) ?: "").padEnd(columnWidth) }
+public fun formatLine(columnSeparator: String, columnWidths: List<Int>, rows: List<String>): String {
+    return columnWidths
+        .mapIndexed { index, columnWidth -> (rows.getOrNull(index) ?: "").padEnd(columnWidth) }
         .joinToString(separator = columnSeparator)
 }
 
 
 /**
  * Pretty print table from multiple sections.
- * Each section consist of multiple rows, each row may consist of multiple lines.
+ * Each section consists of multiple rows, each row may consist of multiple lines.
  * Sections may or may not have columns.
  *
  * @see [Section]
@@ -41,9 +46,9 @@ public fun formatTable(
     }
 
     val simpleSectionsWidth = sections.filterIsInstance<SimpleSection>().maxOfOrNull(SimpleSection::width) ?: 0
-    val sectionsWithColumnsWidth = columnWidth.sum() +
+    val sectionsWithColumnWidth = columnWidth.sum() +
             (columnWidth.size - 1).coerceAtLeast(0) * columnSeparator.length
-    val tableWidth = max(simpleSectionsWidth, sectionsWithColumnsWidth)
+    val tableWidth = max(simpleSectionsWidth, sectionsWithColumnWidth)
 
     val result = mutableListOf<String>()
     for (section in sections) {
@@ -199,8 +204,8 @@ public class TableRow(private val cells: List<Cell>) {
 /**
  * This class represents one cell of table row.
  * Cell may consist of multiple lines.
- * This class is used to simplify the handling of formatting of the rows.
- * @property lines list of lines of the cell. Usually it is a list with one element.
+ * This class is used to simplify the handling of the rows formatting.
+ * @property [lines] The list of cell's lines. Usually it is a list with one element.
  */
 public data class Cell(public val lines: List<String>) {
     public constructor(line: String) : this(listOf(line))

@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.impl.dataset
 /**
  * Type of Imagenet dataset labels.
  * Some models are trained on the vanilla ImageNet dataset, which contains 1000 classes,
- * but some models also output additional 'background' class.
+ * but some models also output additional 'background' classes.
  */
 public enum class Imagenet {
     /**
@@ -22,7 +22,7 @@ public enum class Imagenet {
     V1001;
 
     /**
-     * Returns map of Imagenet labels according to the [Imagenet] version.
+     * Returns a map of Imagenet labels according to the [Imagenet] version.
      * @param [zeroIndexed] if true, then labels are indexed from 0, otherwise from 1.
      */
     public fun labels(zeroIndexed: Boolean = true): Map<Int, String> {

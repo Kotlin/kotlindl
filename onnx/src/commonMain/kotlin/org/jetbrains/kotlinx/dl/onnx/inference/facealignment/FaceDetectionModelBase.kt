@@ -50,7 +50,8 @@ public abstract class FaceDetectionModelBase<I>(override val modelKindDescriptio
         private const val EPS = Float.MIN_VALUE
 
         /**
-         * Performs non-maximum suppression to filter out boxes with the IoU greater than threshold.
+         * Performs non-maximum suppression to filter out boxes with the IoU greater than a threshold.
+         *
          * @param [boxes] boxes to filter
          * @param [topK] how many boxes to include in the result. Negative or zero means to include everything.
          * @param [threshold] threshold IoU value

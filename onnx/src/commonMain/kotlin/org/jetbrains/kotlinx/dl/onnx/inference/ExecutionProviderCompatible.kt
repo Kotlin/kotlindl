@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvi
 import org.jetbrains.kotlinx.dl.onnx.inference.executionproviders.ExecutionProvider.CPU
 
 /**
- * Interface for a different kinds of ONNX models which support different execution providers.
+ * Interface for a different kind of ONNX models which support different execution providers.
  */
 public interface ExecutionProviderCompatible : AutoCloseable {
     /**

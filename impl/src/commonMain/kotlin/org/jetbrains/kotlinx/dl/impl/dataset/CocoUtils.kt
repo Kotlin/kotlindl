@@ -6,8 +6,10 @@
 package org.jetbrains.kotlinx.dl.impl.dataset
 
 /**
- * This enum represents a types of COCO dataset labels.
- * Some models are trained on the COCO dataset with 80 classes (2014), and some models are trained on the COCO dataset with 91 classes (2017).
+ * This enum represents a type of COCO dataset labels.
+ * Some models are trained on the COCO dataset with 80 classes (2014),
+ * and some models are trained on the COCO dataset with 91 classes (2017).
+ *
  * Also, sometimes labels are indexed from 1, and sometimes from 0.
  */
 public enum class Coco {
@@ -22,7 +24,7 @@ public enum class Coco {
     V2017;
 
     /**
-     * Returns map of COCO labels according to the [Coco] version.
+     * Returns a map of COCO labels according to the [Coco] version.
      * @param [zeroIndexed] if true, then labels are indexed from 0, otherwise from 1.
      */
     public fun labels(zeroIndexed: Boolean = false): Map<Int, String> {

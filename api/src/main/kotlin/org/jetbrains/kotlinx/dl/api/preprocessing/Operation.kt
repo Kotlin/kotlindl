@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -9,20 +9,20 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 
 /**
  * Interface for preprocessing operations.
- * @param I is a type of an input.
- * @param O is a type of an output.
+ * @param [I] is a type of input.
+ * @param [O] is a type of output.
  */
 public interface Operation<I, O> {
     /**
      * Performs preprocessing operation on the input.
-     * @param input is an input to the operation of type [I].
+     * @param [input] is an input to the operation of type [I].
      * @return an output of the operation of type [O].
      */
     public fun apply(input: I): O
 
     /**
-     * Returns shape of the output of the operation having input of shape [inputShape].
-     * @param inputShape is a shape of the input.
+     * Returns the output's shape of the operation having input of shape [inputShape].
+     * @param [inputShape] is a shape of the input.
      */
     public fun getOutputShape(inputShape: TensorShape): TensorShape
 }

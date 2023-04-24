@@ -10,7 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 
 /**
- * Runs [predictionFunction] for all observation in [dataset]
+ * Runs [predictionFunction] for all observations in [dataset]
  * and collects predictions to the list.
  *
  * NOTE: Slow method.

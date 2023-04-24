@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 
 import ai.onnxruntime.OrtSession
 import org.jetbrains.kotlinx.dl.api.core.FloatData
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -27,7 +26,7 @@ import java.io.IOException
 private val SSD_RESNET_METADATA = SSDLikeModelMetadata("bboxes", "labels", "scores", 1, 0)
 
 /**
- * Special model class for detection objects on images
+ * Special model class for detection of objects on images
  * with built-in preprocessing and post-processing.
  *
  * It internally uses [ONNXModels.ObjectDetection.SSD] trained on the COCO dataset.
@@ -69,7 +68,7 @@ public class SSDObjectDetectionModel(
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *
-     * NOTE: this method includes the SSD - related preprocessing.
+     * NOTE: this method includes the SSD-related preprocessing.
      *
      * @param [imageFile] File, should be an image.
      * @param [topK] The number of the detected objects with the highest score to be returned.

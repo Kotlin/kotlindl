@@ -20,6 +20,8 @@ import java.nio.FloatBuffer
 import kotlin.math.truncate
 import kotlin.random.Random
 
+internal const val SHIFT_NUMBER = 0xFF
+
 /**
  * This dataset keeps all data on disk and generates batches on the fly using provided [dataLoader].
  *
@@ -63,7 +65,7 @@ public class OnFlyImageDataset<D> internal constructor(
         return Pair(train, test)
     }
 
-    /** Returns amount of data rows. */
+    /** Returns number of data rows. */
     override fun xSize(): Int {
         return x.size
     }
@@ -94,20 +96,20 @@ public class OnFlyImageDataset<D> internal constructor(
         @JvmStatic
         public fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
             val ret = FloatArray(numClasses)
-            ret[label.toInt() and 0xFF] = 1f
+            ret[label.toInt() and SHIFT_NUMBER] = 1f
             return ret
         }
 
         /** Normalizes [bytes] via division on 255 to get values in range '[0; 1)'.*/
         @JvmStatic
         public fun toNormalizedVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF)) / 255f }
+            return FloatArray(bytes.size) { ((bytes[it].toInt() and SHIFT_NUMBER)) / 255f }
         }
 
         /** Converts [bytes] to [FloatArray]. */
         @JvmStatic
         public fun toRawVector(bytes: ByteArray): FloatArray {
-            return FloatArray(bytes.size) { ((bytes[it].toInt() and 0xFF).toFloat()) }
+            return FloatArray(bytes.size) { ((bytes[it].toInt() and SHIFT_NUMBER).toFloat()) }
         }
 
         /**
@@ -124,7 +126,8 @@ public class OnFlyImageDataset<D> internal constructor(
         }
 
         /**
-         * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator] using [preprocessing] to prepare images.
+         * Create dataset [OnFlyImageDataset] from [pathToData] and [labelGenerator]
+         * using [preprocessing] to prepare images.
          */
         @JvmStatic
         @Throws(IOException::class)

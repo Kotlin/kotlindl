@@ -24,7 +24,8 @@ private const val MODEL_FILE_EXTENSION = ".onnx"
 /**
  * This class provides methods for loading ONNX model to the local [cacheDirectory].
  *
- * @param [cacheDirectory] The directory for all loaded models. It should be created before model loading and should have all required permissions for file writing/reading on your OS.
+ * @param [cacheDirectory] The directory for all loaded models.
+ * It should be created before model loading and should have all required permissions for file writing/reading on your OS.
  *
  * @since 0.3
  */
@@ -42,7 +43,7 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
     /**
      * Loads a pre-trained [OnnxInferenceModel] from the ONNX model zoo.
      *
-     * @param [modelType] Model type to load.
+     * @param [modelType] Model's type to load.
      * @param [loadingMode] Strategy of existing model use-case handling.
      * @return An instance of [OnnxInferenceModel].
      */
@@ -74,7 +75,8 @@ public class ONNXModelHub(public val cacheDirectory: File) : ModelHub() {
     /**
      * This method loads model from the ONNX model zoo corresponding to the specified [modelType].
      * The [loadingMode] parameter defines the strategy of existing model use-case handling.
-     * If [loadingMode] is [LoadingMode.SKIP_LOADING_IF_EXISTS] and the model is already loaded, then the model will be loaded from the local [cacheDirectory].
+     * If [loadingMode] is [LoadingMode.SKIP_LOADING_IF_EXISTS] and the model is already loaded,
+     * then the model will be loaded from the local [cacheDirectory].
      * If [loadingMode] is [LoadingMode.OVERRIDE_IF_EXISTS] the model will be overridden even if it is already loaded.
      * [executionProviders] is a list of execution providers which will be used for model inference.
      */

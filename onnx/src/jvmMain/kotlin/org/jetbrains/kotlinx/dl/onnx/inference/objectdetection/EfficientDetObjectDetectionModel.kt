@@ -19,10 +19,11 @@ import java.io.File
 import java.io.IOException
 
 /**
- * Special model class for detection objects on images
+ * Special model class for detection of objects on images
  * with built-in preprocessing and post-processing.
  *
- * It internally uses [ONNXModels.ObjectDetection.EfficientDetD0] or other EfficientDet models trained on the COCO dataset.
+ * It internally uses [ONNXModels.ObjectDetection.EfficientDetD0]
+ * or other EfficientDet models trained on the COCO dataset.
  *
  * @param [internalModel] model used to make predictions
  *
@@ -41,7 +42,7 @@ public class EfficientDetObjectDetectionModel(
                 outputWidth = inputShape[1].toInt()
             }
             // the channels of input of EfficientDet models should be in RGB order
-            // model is quite sensitive for this
+            // model is quite sensitive to this
             .convert { colorMode = ColorMode.RGB }
             .toFloatArray { }
     override val classLabels: Map<Int, String> = Coco.V2017.labels(zeroIndexed = false)

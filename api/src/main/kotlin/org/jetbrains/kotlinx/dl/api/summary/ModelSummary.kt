@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.kotlinx.dl.api.summary
 
 /**
@@ -5,12 +10,13 @@ package org.jetbrains.kotlinx.dl.api.summary
  */
 public interface ModelSummary {
     /**
-     * Formats model summary to array of strings.
+     * Formats model summary to an array of strings.
      * Rows should form a table with clean and readable structure.
      *
      * @param [columnSeparator] text chunk that will be used as column separator for the output table
      * @param [lineSeparatorSymbol] character that will be used to produce a string to separate rows of the output table
-     * @param [thickLineSeparatorSymbol] character that will be used to produce a string to separate blocks of the output table
+     * @param [thickLineSeparatorSymbol] character that will be used to produce
+     * a string to separate blocks of the output table
      *
      * @return formatted model summary
      */

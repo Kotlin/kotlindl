@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -23,13 +23,14 @@ private const val RIFF_CHUNK_ID: Long = 0x46464952
 private const val RIFF_TYPE_ID: Long = 0x45564157
 
 /**
- * Class for reading WAV audio files. The file opened as WAV file can be read
- * only once and the following reading procedures will result in reading empty buffer.
+ * Class for reading WAV audio files.
+ * The file opened as a WAV file can be read
+ * only once, and the following reading procedures will result in reading empty buffer.
  *
  * Based on code written by [Andrew Greensted](http://www.labbookpages.co.uk/)
- * but modified to more Kotlin idiomatic way with only read option for simplicity.
+ * but modified to a more Kotlin idiomatic way with only a read option for simplicity.
  *
- * @property bufferSize is a size of a buffer to read from given file when reading next frames.
+ * @property [bufferSize] It is a size of a buffer to read from a given file when reading next frames.
  * @constructor creates [WavFile]
  *
  * @param file to read the WAV file data from
@@ -70,7 +71,7 @@ public class WavFile(
 
         var chunkSize: Long
         var fileFormatChunk: WavFileFormat? = null
-        var numFrames: Long?
+        val numFrames: Long?
 
         while (true) {
             bytesRead = inputStream.read(buffer, 0, CHUNK_HEADER_LENGTH)

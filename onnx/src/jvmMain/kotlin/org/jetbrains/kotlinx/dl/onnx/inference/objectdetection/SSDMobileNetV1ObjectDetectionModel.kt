@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.onnx.inference.objectdetection
 
 import org.jetbrains.kotlinx.dl.api.core.FloatData
-import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.preprocessing.Operation
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
@@ -28,7 +27,7 @@ private val SSD_MOBILENET_METADATA = SSDLikeModelMetadata(
 )
 
 /**
- * Special model class for detection objects on images
+ * Special model class for detection of objects on images
  * with built-in preprocessing and post-processing.
  *
  * It internally uses [ONNXModels.ObjectDetection.SSDMobileNetV1] model trained on the COCO dataset.
@@ -64,7 +63,7 @@ public class SSDMobileNetV1ObjectDetectionModel(
     /**
      * Returns the top N detected object for the given image file sorted by the score.
      *
-     * NOTE: this method includes the SSD - related preprocessing.
+     * NOTE: this method includes the SSD-related preprocessing.
      *
      * @param [imageFile] File, should be an image.
      * @param [topK] The number of the detected objects with the highest score to be returned.

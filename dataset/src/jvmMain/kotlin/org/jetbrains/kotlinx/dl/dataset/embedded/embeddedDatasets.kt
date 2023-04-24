@@ -21,7 +21,6 @@ import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
-
 /**
  * Loads the [MNIST dataset](http://yann.lecun.com/exdb/mnist/).
  * This is a dataset of 60,000 28x28 grayscale images of the 10 digits,
@@ -82,11 +81,14 @@ public fun fashionMnist(cacheDirectory: File = File("cache")): Pair<OnHeapDatase
     )
 }
 
-private fun createDataset(cacheDirectory: File,
-                          trainImagesArchive: String, trainLabelsArchive: String,
-                          testImagesArchive: String, testLabelsArchive: String
+private const val MNSIT_IMAGE_SIZE = 28L
+
+private fun createDataset(
+    cacheDirectory: File,
+    trainImagesArchive: String, trainLabelsArchive: String,
+    testImagesArchive: String, testLabelsArchive: String
 ): Pair<OnHeapDataset, OnHeapDataset> {
-    val shape = TensorShape(28, 28, 1)
+    val shape = TensorShape(MNSIT_IMAGE_SIZE, MNSIT_IMAGE_SIZE, 1)
 
     cacheDirectory.existsOrMkdirs()
 
@@ -103,6 +105,8 @@ private fun createDataset(cacheDirectory: File,
 /** Path to H5 file of Mnist 3D Dataset. */
 public const val MNIST_3D_DATASET: String = "datasets/mnist-3d/dataset.h5"
 
+private const val MNIST_3D_FRAME_SIZE = 16L
+
 /**
  * Loads the [MNIST 3D dataset](https://www.kaggle.com/daavoo/3d-mnist).
  * This is a dataset of 10,000 16x16x16 grayscale 3D images of the 10 digits,
@@ -113,7 +117,7 @@ public const val MNIST_3D_DATASET: String = "datasets/mnist-3d/dataset.h5"
  * MNIST dataset is made available under the terms of the
  * [Creative Commons Attribution-Share Alike 3.0 license.](https://creativecommons.org/licenses/by-sa/3.0/)
  * MNIST 3D dataset was created by [daavoo](https://github.com/daavoo) as a transformation of
- * original MNIST dataset to 3D images to provide simple example of working with 3D images.
+ * original MNIST dataset to 3D images to provide a simple example of working with 3D images.
  *
  * @param [cacheDirectory] Cache directory to cached models and datasets.
  *
@@ -128,7 +132,7 @@ public fun mnist3D(cacheDirectory: File = File("cache")): Pair<OnHeapDataset, On
 
         val (trainData, trainLabels) = it.extractMnist3DDataset("train")
         val (testData, testLabels) = it.extractMnist3DDataset("test")
-        val shape = TensorShape(16, 16, 16)
+        val shape = TensorShape(MNIST_3D_FRAME_SIZE, MNIST_3D_FRAME_SIZE, MNIST_3D_FRAME_SIZE)
 
         Pair(
             OnHeapDataset.create(trainData, trainLabels, shape),
@@ -161,9 +165,9 @@ public const val FSDD_SOUND_DATA_SIZE: Long = 20480
  * Loads the [Free Spoken Digits Dataset](https://github.com/Jakobovski/free-spoken-digit-dataset).
  * This is a dataset of wav sound files of the 10 digits spoken by different people many times each.
  * The test set officially consists of the first 10% of the recordings. Recordings numbered 0-4 (inclusive)
- * are in the test and 5-49 are in the training set.
+ * are in the test, and 5-49 are in the training set.
  *
- * As the input data files have different number of channels of data we split every input file into separate samples
+ * As the input data files have different number of channels of data, we split every input file into separate samples
  * that are threatened as separate samples with the same label.
  *
  * Free Spoken Digits Dataset is made available under the terms of the
@@ -172,8 +176,9 @@ public const val FSDD_SOUND_DATA_SIZE: Long = 20480
  * @param [cacheDirectory] Cache directory to cached models and datasets.
  * @param [maxTestIndex] Index of max sample to be selected to test part of data.
  *
- * @return Train and test datasets. Each dataset includes X and Y data. X data are float arrays of sound data with shapes
- * (num_samples, FSDD_SOUND_DATA_SIZE) where FSDD_SOUND_DATA_SIZE is at least as long as the longest input sequence and all
+ * @return Train and test datasets. Each dataset includes X and Y data. X data are float arrays of sound data with
+ * shapes (num_samples, FSDD_SOUND_DATA_SIZE)
+ * where FSDD_SOUND_DATA_SIZE is at least as long as the longest input sequence and all
  * sequences are padded with zeros to have equal length. Y data float arrays of digit labels (integers in range 0-9)
  * with shapes (num_samples,).
  */
@@ -207,11 +212,11 @@ public fun freeSpokenDigits(
 }
 
 /**
- * Extract wav file samples from given file and return a list of data from all its
- * channels as a triple of (channel_data, label, sample_index)
+ * Extract wav file samples from a given file and return a list of data from all its
+ * channels as a triple of (channel_data, label, sample_index).
  *
- * @param file to read from the sound data
- * @return list of triples (channel_data, label, sample_index) from all channels from file
+ * @param [file] to read from the sound data.
+ * @return list of triples (channel_data, label, sample_index) from all channels from file.
  */
 private fun extractWavFileSamples(file: File): List<Triple<FloatArray, Float, Int>> =
     WavFile(file).use {
@@ -256,7 +261,10 @@ public fun cifar10Paths(cacheDirectory: File = File("cache")): Pair<String, Stri
         val pathToImageArchive = loadFile(cacheDirectory, CIFAR_10_IMAGES_ARCHIVE)
         extractFromZipArchiveToFolder(pathToImageArchive.toPath(), toFolder)
         val deleted = pathToImageArchive.delete()
-        if (!deleted) throw Exception("Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually.")
+        if (!deleted)
+            throw Exception(
+                "Archive ${pathToImageArchive.absolutePath} could not be deleted! Create this archive manually."
+            )
     }
 
     return Pair(imageDataDirectory.toPath().toAbsolutePath().toString(), pathToLabel)
@@ -302,7 +310,7 @@ public fun freeSpokenDigitDatasetPath(cacheDirectory: File = File("cache")): Str
     }
 
 /**
- * Download the compressed dataset from external source, decompress the file and remove the downloaded file
+ * Download the compressed dataset from an external source, decompress the file and remove the downloaded file
  * but leave the decompressed data from dataset.
  *
  * @param [cacheDirectory] The directory where the downloaded files are stored.
@@ -341,9 +349,10 @@ private fun unzipDatasetPath(cacheDirectory: File, archive: File, dirRelativePat
  * @param [cacheDirectory] where the downloaded file is stored
  * @param [relativePathToFile] where the downloaded file is stored in [cacheDirectory] and which can
  * define the location of file to be downloaded
- * @param [downloadURLFromRelativePath] can produce the download URL of the file using. Defaults to [AWS_S3_URL]/[relativePathToFile].
+ * @param [downloadURLFromRelativePath] can produce the download URL of the file using.
+ * Defaults to [AWS_S3_URL]/[relativePathToFile].
  * @param [loadingMode] of the file to be loaded. Defaults to [LoadingMode.SKIP_LOADING_IF_EXISTS]
- * @return downloaded [File] on local file system.
+ * @return downloaded [File] on a local file system.
  */
 private fun loadFile(
     cacheDirectory: File,

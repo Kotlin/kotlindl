@@ -21,7 +21,7 @@ import java.io.IOException
 private const val OUTPUT_NAME = "fc1"
 
 /**
- * The light-weight API for solving Face Alignment task via Fan2D106 model.
+ * The light-weight API for solving a Face Alignment task via Fan2D106 model.
  *
  * @param [internalModel] model used to make predictions
  */
