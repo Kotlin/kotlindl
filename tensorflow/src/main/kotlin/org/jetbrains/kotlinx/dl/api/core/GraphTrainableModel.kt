@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -826,19 +826,16 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             WritingMode.FAIL_IF_EXISTS -> {
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
                 Files.createDirectories(modelDirectory.toPath())
-                modelDirectory.mkdir()
             }
             WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
                 Files.createDirectories(modelDirectory.toPath())
-                modelDirectory.mkdir()
             }
             WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
                     Files.createDirectories(modelDirectory.toPath())
-                    modelDirectory.mkdir()
                 }
             }
         }
