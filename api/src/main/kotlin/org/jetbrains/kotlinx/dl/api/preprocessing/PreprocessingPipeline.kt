@@ -22,6 +22,6 @@ public class PreprocessingPipeline<I, M, O>(
 }
 
 /**
- * An entry point for a building preprocessing pipeline.
+ * An entry point for building the preprocessing pipeline.
  */
 public fun <I> pipeline(): Identity<I> = Identity()

@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference.posedetection
 import org.jetbrains.kotlinx.dl.api.inference.FlatShape
 
 /**
- * This data class represents the line connecting two points [PoseLandmark] of human's pose or edge.
+ * This data class represents the line connecting two points [PoseLandmark] of human's pose also named as an edge.
  *
  * @property [label] The predicted label of the edge.
  * @property [probability] The probability of the predicted class.

@@ -30,9 +30,6 @@ import kotlin.streams.toList
  *
  * It loads the whole data from the disk to the Heap Memory.
  *
- * NOTE: Labels [y] should have shape <number of rows; number of labels>
- *     and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
- *
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
  * @property [elementShape] shape of the elements in the dataset
