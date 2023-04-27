@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.preprocessing.PreprocessingPipeline
 import java.awt.image.BufferedImage
 
 /**
- * Extension function for building preprocessing pipeline for images.
+ * Extension functions for building a preprocessing pipeline for images.
  */
 
 /** Applies [Rotate] operation to rotate the image by an arbitrary angle (specified in degrees). */

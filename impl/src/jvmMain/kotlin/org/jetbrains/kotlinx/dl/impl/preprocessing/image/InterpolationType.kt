@@ -8,9 +8,9 @@ package org.jetbrains.kotlinx.dl.impl.preprocessing.image
 /**
  * When an image is resized, we need an interpolation algorithm to draw newly created pixels between old pixels.
  *
- * Conceptually the image is viewed as a set of infinitely small
+ * Conceptually, the image is viewed as a set of infinitely small
  * point color samples which have value only at the centers of
- * integer coordinate pixels and the space between those pixel
+ * integer-coordinated pixels, and the space between those pixel
  * centers is filled with linear ramps of colors that connect
  * adjacent discrete samples in a straight line.
  */

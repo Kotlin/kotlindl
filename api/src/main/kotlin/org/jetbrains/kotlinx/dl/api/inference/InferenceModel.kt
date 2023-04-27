@@ -18,7 +18,7 @@ public interface InferenceModel<R> : AutoCloseable {
     public val inputDimensions: LongArray
 
     /**
-     * Provides methods for converting inference result from this model to the common data types.
+     * Provides methods for converting an inference result from this model to the common data types.
      */
     public val resultConverter: InferenceResultConverter<R>
 
@@ -28,7 +28,8 @@ public interface InferenceModel<R> : AutoCloseable {
     public fun <T> predict(inputData: FloatData, extractResult: (R) -> T): T
 
     /**
-     * Run inference on the provided [inputs], calculate the specified [outputs] and pass inference result to the [extractResult] function.
+     * Run inference on the provided [inputs], calculate the specified [outputs]
+     * and pass inference result to the [extractResult] function.
      */
     public fun <T> predict(inputs: Map<String, FloatData>, outputs: List<String>, extractResult: (R) -> T): T
 

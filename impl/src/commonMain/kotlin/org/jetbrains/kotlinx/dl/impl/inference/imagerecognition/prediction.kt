@@ -24,7 +24,7 @@ public fun <R> InferenceModel<R>.predictLabel(inputData: FloatData): Int {
  * Predicts vector of probabilities instead of specific class in [predictLabel] method.
  *
  * @param [inputData] The single example with unknown vector of probabilities.
- * @return Vector that represents the probability distributions of a list of potential outcomes
+ * @return Vector that represents the probability distributions of possible outcomes.
  */
 public fun <R> InferenceModel<R>.predictProbabilities(inputData: FloatData): FloatArray {
     return predict(inputData) { result ->
@@ -52,7 +52,7 @@ public fun InferenceModel<*>.predictTop5Labels(
 }
 
 internal fun FloatArray.indexOfMaxN(n: Int): List<Int> {
-    val predictionsQueue = PriorityQueue<Int>(Comparator.comparing { index -> -this[index] })
-    predictionsQueue.addAll(indices)
-    return predictionsQueue.take(n)
+    val predictionQueue = PriorityQueue<Int>(Comparator.comparing { index -> -this[index] })
+    predictionQueue.addAll(indices)
+    return predictionQueue.take(n)
 }

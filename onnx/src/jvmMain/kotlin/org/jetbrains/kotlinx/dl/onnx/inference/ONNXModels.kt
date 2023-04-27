@@ -54,12 +54,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 18 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -76,12 +77,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 34 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -98,12 +100,12 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -121,12 +123,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 101 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -144,12 +147,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 152 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -167,12 +171,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 18 layers with ResNetv2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -190,12 +195,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 34 layers with ResNetv2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -213,12 +219,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 50 layers with ResNetv2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -236,12 +243,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 101 layers with ResNetv2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -259,12 +267,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 152 layers with ResNetv2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x224x224)
          * - an output with the shape (1x1000)
          *
@@ -282,14 +291,16 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * EfficientNet-Lite 4 is the largest variant and most accurate of the set of EfficientNet-Lite model.
-         * It is an integer-only quantized model that produces the highest accuracy of all of the EfficientNet models.
-         * It achieves 80.4% ImageNet top-1 accuracy, while still running in real-time (e.g. 30ms/image) on a Pixel 4 CPU.
+         * It is an integer-only quantized model that produces the highest accuracy of all the EfficientNet models.
+         * It achieves 80.4% ImageNet top-1 accuracy,
+         * while still running in real-time (e.g. 30ms/image) on a Pixel 4 CPU.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
@@ -305,12 +316,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * This model has 50 layers with ResNetv1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
@@ -332,12 +344,13 @@ public object ONNXModels {
         }
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB0 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x224x224x3)
          * - an output with the shape (1x1000)
          *
@@ -351,12 +364,13 @@ public object ONNXModels {
         public object EfficientNetB0 : CV("models/onnx/cv/efficientnet/efficientnet-b0", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB1 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x240x240x3)
          * - an output with the shape (1x1000)
          *
@@ -370,12 +384,13 @@ public object ONNXModels {
         public object EfficientNetB1 : CV("models/onnx/cv/efficientnet/efficientnet-b1", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB2 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x260x260x3)
          * - an output with the shape (1x1000)
          *
@@ -389,12 +404,13 @@ public object ONNXModels {
         public object EfficientNetB2 : CV("models/onnx/cv/efficientnet/efficientnet-b2", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB3 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x300x300x3)
          * - an output with the shape (1x1000)
          *
@@ -408,12 +424,13 @@ public object ONNXModels {
         public object EfficientNetB3 : CV("models/onnx/cv/efficientnet/efficientnet-b3", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB4 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x380x380x3)
          * - an output with the shape (1x1000)
          *
@@ -427,12 +444,13 @@ public object ONNXModels {
         public object EfficientNetB4 : CV("models/onnx/cv/efficientnet/efficientnet-b4", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB5 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x456x456x3)
          * - an output with the shape (1x1000)
          *
@@ -446,12 +464,13 @@ public object ONNXModels {
         public object EfficientNetB5 : CV("models/onnx/cv/efficientnet/efficientnet-b5", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB6 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x528x528x3)
          * - an output with the shape (1x1000)
          *
@@ -465,12 +484,13 @@ public object ONNXModels {
         public object EfficientNetB6 : CV("models/onnx/cv/efficientnet/efficientnet-b6", channelsFirst = false)
 
         /**
-         * This model is a neural network for image classification that take images as input and classify the major object in the image into a set of 1000 different classes
+         * This model is a neural network for image classification that takes images as input
+         * and classifies the major object in the image into a set of 1000 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Imagenet.V1k.labels] method).
          *
          * Instantiates the EfficientNetB7 architecture.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x600x600x3)
          * - an output with the shape (1x1000)
          *
@@ -484,11 +504,12 @@ public object ONNXModels {
         public object EfficientNetB7 : CV("models/onnx/cv/efficientnet/efficientnet-b7", channelsFirst = false)
 
         /**
-         * This model is a neural network for digit classification that take grey-scale images of digits as input and classify the major object in the image into a set of 10 different classes.
+         * This model is a neural network for digit classification that takes grey-scale images of digits as input
+         * and classifies the major object in the image into a set of 10 different classes.
          *
          * This model is just an implementation of the famous LeNet-5 model.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x1x28x28)
          * - an output with the shape (1x10)
          */
@@ -496,7 +517,8 @@ public object ONNXModels {
 
         public companion object {
             /**
-             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             * Creates a preprocessing [Operation]
+             * which converts given [BufferedImage] to [FloatData] suitable for this [model].
              */
             public fun CV.createPreprocessing(model: InferenceModel<*>): Operation<BufferedImage, FloatData> {
                 return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
@@ -527,7 +549,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.ResNet50custom] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x224x224x3)
@@ -545,7 +568,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB0] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x224x224x3)
@@ -557,7 +581,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB1] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x240x240x3)
@@ -569,7 +594,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB2] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x260x260x3)
@@ -581,7 +607,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB3] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x300x300x3)
@@ -593,7 +620,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB4] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x380x380x3)
@@ -605,7 +633,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB5] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x456x456x3)
@@ -617,7 +646,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB6] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x528x528x3)
@@ -629,7 +659,8 @@ public object ONNXModels {
 
         /**
          * This model is a no-top version of the [CV.EfficientNetB7] model.
-         * The last two layers of the base model have been removed so that the model could be fine-tuned for users specific task.
+         * The last two layers of the base model have been removed so that the model could be fine-tuned for user's
+         * specific task.
          *
          * The model has
          * - an input with the shape (1x600x600x3)
@@ -641,7 +672,8 @@ public object ONNXModels {
 
         public companion object {
             /**
-             * Creates a preprocessing [Operation] which converts given [BufferedImage] to [FloatData] suitable for this [model].
+             * Creates a preprocessing [Operation]
+             * which converts given [BufferedImage] to [FloatData] suitable for this [model].
              */
             public fun CVnoTop.createPreprocessing(model: InferenceModel<*>): Operation<BufferedImage, FloatData> {
                 return createPreprocessing(model, channelsFirst, inputColorMode, preprocessor)
@@ -664,7 +696,7 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 80 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2014.labels] method).
          *
-         * The model have an input with the shape is (1x3x1200x1200).
+         * The model has an input with the shape is (1x3x1200x1200).
          *
          * The model has 3 outputs:
          *  - boxes: (1x'nbox'x4)
@@ -700,7 +732,7 @@ public object ONNXModels {
          * The combination of these two model frameworks produces an efficient,
          * high-accuracy detection model that requires less computational cost.
          *
-         * The model have an input with the shape is (1xHxWx3). H and W could be defined by user. H = W = 1000 by default.
+         * The model has an input with the shape is (1xHxWx3). H and W could be defined by user. H = W = 1000 by default.
          *
          * The model has 4 outputs:
          * - num_detections: the number of detections.
@@ -729,9 +761,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x512x512x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x512x512x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -761,9 +794,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (640x640x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (640x640x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -792,9 +826,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x768x768x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x768x768x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -823,9 +858,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x896x896x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x896x896x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -855,9 +891,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x1024x1024x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x1024x1024x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -886,9 +923,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x1280x1280x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x1280x1280x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -917,9 +955,10 @@ public object ONNXModels {
          * This model is a real-time neural network for object detection that detects 90 different classes
          * (labels are available via [org.jetbrains.kotlinx.dl.impl.dataset.Coco.V2017.labels] method).
          *
-         * Internally it uses the EfficientNets as backbone networks.
+         * Internally, it uses the EfficientNets as backbone networks.
          *
-         * The model have an input with the shape is (1x1280x1280x3) by default. H and W could be changed by user to any values.
+         * The model has an input with the shape is (1x1280x1280x3) by default.
+         * H and W could be changed by user to any values.
          *
          * The model has 1 output:
          * - detections:0 with 7 numbers as `[unknown number, ymin, _xmin_, ymax, xmax, score, coco label]`.
@@ -995,9 +1034,9 @@ public object ONNXModels {
     public sealed class FaceAlignment<U>(override val modelRelativePath: String) :
         OnnxModelType<U> {
         /**
-         * This model is a neural network for face alignment that take RGB images of faces as input and produces coordinates of 106 faces landmarks.
+         * This model is a neural network for face alignment that takes RGB images of faces as input and produces coordinates of 106 faces landmarks.
          *
-         * The model have
+         * The model has
          * - an input with the shape (1x3x192x192)
          * - an output with the shape (1x212)
          */

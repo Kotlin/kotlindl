@@ -6,7 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.inference
 
 /**
- * Provides utility methods for converting inference result to the common data types.
+ * Provides utility methods for converting an inference result to the common data types.
  * @param [R] inference result type.
  * @see InferenceModel
  */

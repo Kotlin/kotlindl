@@ -103,7 +103,7 @@ public abstract class SSDLikeModelBase<I>(
 
 /**
  * This class aggregates the metadata of the SSD-like model used for decoding the output.
- * The class is exists mostly for reducing code duplication.
+ * The class exists mostly to reduce code duplication.
  */
 public data class SSDLikeModelMetadata(
     /**

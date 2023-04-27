@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2021-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -17,8 +17,8 @@ import org.tensorflow.op.Ops
  * f(x) = alpha * (exp(x) - 1), if x <= 0
  * ```
  *
- * In contrast to ReLU it has negative values which push the mean of
- * the activation closer to zero which enable faster learning as they
+ * In contrast to ReLU, it has negative values which push the mean of
+ * the activation closer to zero, which enables faster learning as they
  * bring the gradient to the natural gradient.
  *
  * @property [alpha] Hyperparameter that controls the value to which

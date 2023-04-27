@@ -10,7 +10,8 @@ package org.jetbrains.kotlinx.dl.api.inference
  */
 public interface FlatShape<T : FlatShape<T>> {
     /**
-     * Creates a new geometric shape of the same type by applying the provided [mapping] to the coordinates of the current shape.
+     * Creates a new geometric shape of the same type by applying the provided [mapping]
+     * to the coordinates of the current shape.
      */
     public fun map(mapping: (Float, Float) -> Pair<Float, Float>): T
 }

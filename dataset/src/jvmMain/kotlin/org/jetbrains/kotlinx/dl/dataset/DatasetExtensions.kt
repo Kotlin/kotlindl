@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -37,9 +37,10 @@ public fun OnHeapDataset.buildStringRepr(xString: String, yString: String): Stri
 /**
  * Create String representation of `FloatArray` where only a part of the data is printed to String.
  *
- * @param maxSize max number of elements of array present in its string representation
- * @param lowPercent percent of data of [maxSize] to be printed from the beginning of array data.
- * Rest will be obtained from the tail of the array in order matching the order in array
+ * @param [maxSize] max number of elements of an array present in its string representation
+ * @param [lowPercent] percent of data of [maxSize] to be printed from the beginning of array data.
+ * Rest will be obtained from the tail of the array in order matching the order in an array.
+ *
  * @return string representation of [FloatArray] in format like
  * `[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, ..., 9.0, 10.0]`
  */
@@ -63,9 +64,10 @@ private fun FloatArray.partialToString(maxSize: Int = 10, lowPercent: Double = 0
 /**
  * Create String representation of `Array<FloatArray>` where only a part of the data is printed to String.
  *
- * @param maxSize max number of elements of array present in its string representation
- * @param lowPercent percent of data of [maxSize] to be printed from the beginning of array data.
- * Rest will be obtained from the tail of the array in order matching the order in array
+ * @param [maxSize] max number of elements of an array present in its string representation
+ * @param [lowPercent] percent of data of [maxSize] to be printed from the beginning of array data.
+ *
+ * Rest will be obtained from the tail of the array in order matching the order in an array.
  * @return string representation of [FloatArray] in format like
  * `[[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, ..., 9.0, 10.0],
  *   [11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, ..., 20.0, 21.0],

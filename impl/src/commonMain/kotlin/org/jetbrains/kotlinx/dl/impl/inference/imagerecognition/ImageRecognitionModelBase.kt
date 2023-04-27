@@ -17,7 +17,9 @@ import org.jetbrains.kotlinx.dl.api.summary.ModelWithSummary
  * Base class for image classification models.
  * @property [internalModel] model used for prediction
  * @property [modelKindDescription] High-level description of the model. Used for model summary printing.
- * For the models from ModelHub it equals to the string representation of the [org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType].
+ *
+ * For the models from ModelHub it equals
+ * to the string representation of the [org.jetbrains.kotlinx.dl.api.inference.loaders.ModelType].
  */
 public abstract class ImageRecognitionModelBase<I>(
     protected val internalModel: InferenceModel<*>,
@@ -34,7 +36,7 @@ public abstract class ImageRecognitionModelBase<I>(
     protected abstract val classLabels: Map<Int, String>
 
     /**
-     * Predicts object for the given [image].
+     * Predicts an object for the given [image].
      * Default preprocessing [Operation] is applied to an image.
      *
      * @param [image] Input image.
@@ -52,7 +54,7 @@ public abstract class ImageRecognitionModelBase<I>(
      * Default preprocessing [Operation] is applied to an image.
      *
      * @param [image] Input image.
-     * @param [topK] Number of top ranked predictions to return
+     * @param [topK] Number of top-ranked predictions to return
      *
      * @see preprocessing
      *

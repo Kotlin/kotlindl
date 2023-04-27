@@ -7,9 +7,8 @@ package org.jetbrains.kotlinx.dl.api.preprocessing
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 
-
 /**
- * This class is a special type of Operation which is used to build typesafe pipeline of preprocessing operations.
+ * This class is a special type of Operation which is used to build a typesafe pipeline of preprocessing operations.
  * Kudos to [@juliabeliaeva](https://github.com/juliabeliaeva) for the idea.
  */
 public class PreprocessingPipeline<I, M, O>(
@@ -23,6 +22,6 @@ public class PreprocessingPipeline<I, M, O>(
 }
 
 /**
- * An entry point for building preprocessing pipeline.
+ * An entry point for building the preprocessing pipeline.
  */
 public fun <I> pipeline(): Identity<I> = Identity()

@@ -23,7 +23,11 @@ public interface DataLoader<D> {
             return prepareX(sources, 0, sources.size)
         }
 
-        internal fun <D> DataLoader<D>.prepareX(src: Array<D>, start: Int, length: Int): Pair<Array<FloatArray>, TensorShape> {
+        internal fun <D> DataLoader<D>.prepareX(
+            src: Array<D>,
+            start: Int,
+            length: Int
+        ): Pair<Array<FloatArray>, TensorShape> {
             if (length == 0) return emptyArray<FloatArray>() to TensorShape()
 
             val shapes = mutableSetOf<TensorShape>()

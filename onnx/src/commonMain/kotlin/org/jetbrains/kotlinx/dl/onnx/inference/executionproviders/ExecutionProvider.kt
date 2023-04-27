@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -27,7 +27,7 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
      *  Default CPU execution provider.
      *  Available on all platforms.
      *
-     *  @param useBFCArenaAllocator If true, the CPU provider will use BFC arena allocator.
+     *  @param [useBFCArenaAllocator] If true, the CPU provider will use BFC arena allocator.
      *  @see [OrtProvider.CPU]
      */
     public data class CPU(public val useBFCArenaAllocator: Boolean = true) : ExecutionProvider(OrtProvider.CPU) {
@@ -53,7 +53,7 @@ public sealed class ExecutionProvider(public val internalProviderId: OrtProvider
      *  NNAPI execution provider.
      *  Available only on Android.
      *
-     *  @param flags An NNAPI flags to modify the behavior of the NNAPI execution provider.
+     *  @param [flags] An NNAPI flags to modify the behavior of the NNAPI execution provider.
      *  @see [OrtProvider.NNAPI]
      *  @see <a href=https://onnxruntime.ai/docs/execution-providers/NNAPI-ExecutionProvider.html>NNAPI documentation</a>.
      */

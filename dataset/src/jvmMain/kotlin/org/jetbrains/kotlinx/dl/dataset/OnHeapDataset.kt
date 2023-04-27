@@ -28,16 +28,17 @@ import kotlin.streams.toList
 /**
  * Basic class to handle features [x] and labels [y].
  *
- * It loads the whole data from disk to the Heap Memory.
+ * It loads the whole data from the disk to the Heap Memory.
  *
- * NOTE: Labels [y] should have shape <number of rows; number of labels> and contain exactly one 1 and other 0-es per row to be result of one-hot-encoding.
  * @property [x] an array of feature vectors
  * @property [y] an array of labels
  * @property [elementShape] shape of the elements in the dataset
  */
-public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
-                                                public val y: FloatArray,
-                                                private val elementShape: TensorShape) : Dataset() {
+public class OnHeapDataset internal constructor(
+    public val x: Array<FloatArray>,
+    public val y: FloatArray,
+    private val elementShape: TensorShape
+) : Dataset() {
 
     init {
         check(x.size == y.size) {
@@ -69,12 +70,20 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         val trainDatasetLastIndex = truncate(x.size * splitRatio).toInt()
 
         return Pair(
-            OnHeapDataset(x.copyOfRange(0, trainDatasetLastIndex), y.copyOfRange(0, trainDatasetLastIndex), elementShape),
-            OnHeapDataset(x.copyOfRange(trainDatasetLastIndex, x.size), y.copyOfRange(trainDatasetLastIndex, y.size), elementShape)
+            OnHeapDataset(
+                x.copyOfRange(0, trainDatasetLastIndex),
+                y.copyOfRange(0, trainDatasetLastIndex),
+                elementShape
+            ),
+            OnHeapDataset(
+                x.copyOfRange(trainDatasetLastIndex, x.size),
+                y.copyOfRange(trainDatasetLastIndex, y.size),
+                elementShape
+            )
         )
     }
 
-    /** Returns amount of data rows. */
+    /** Returns number of data rows. */
     override fun xSize(): Int {
         return x.size
     }
@@ -96,7 +105,11 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
     }
 
     override fun createDataBatch(batchStart: Int, batchLength: Int): DataBatch {
-        return DataBatch(copyXToBatch(x, batchStart, batchLength), elementShape, copyLabelsToBatch(y, batchStart, batchLength))
+        return DataBatch(
+            copyXToBatch(x, batchStart, batchLength),
+            elementShape,
+            copyLabelsToBatch(y, batchStart, batchLength)
+        )
     }
 
     public companion object {
@@ -104,22 +117,23 @@ public class OnHeapDataset internal constructor(public val x: Array<FloatArray>,
         @JvmStatic
         public fun toOneHotVector(numClasses: Int, label: Byte): FloatArray {
             val ret = FloatArray(numClasses)
-            ret[label.toInt() and 0xFF] = 1f
+            ret[label.toInt() and SHIFT_NUMBER] = 1f
             return ret
         }
 
         /** Creates float [label]. */
         @JvmStatic
         public fun convertByteToFloat(label: Byte): Float {
-            return (label.toInt() and 0xFF).toFloat()
+            return (label.toInt() and SHIFT_NUMBER).toFloat()
         }
 
         /**
          * Creates an [OnHeapDataset] from [features] and [labels].
          */
         @JvmStatic
-        public fun create(features: Array<FloatArray>, labels: FloatArray,
-                          shape: TensorShape = TensorShape(features.first().size.toLong())
+        public fun create(
+            features: Array<FloatArray>, labels: FloatArray,
+            shape: TensorShape = TensorShape(features.first().size.toLong())
         ): OnHeapDataset {
             return OnHeapDataset(features, labels, shape)
         }

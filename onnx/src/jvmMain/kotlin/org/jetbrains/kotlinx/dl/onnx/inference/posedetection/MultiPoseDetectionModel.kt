@@ -20,7 +20,8 @@ import java.io.File
 private const val OUTPUT_NAME = "output_0"
 
 /**
- * MultiPoseDetectionModel is an ultra-fast and accurate model that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
+ * MultiPoseDetectionModel is an ultra-fast and accurate model
+ * that detects 6 persons with 17 keypoints and 18 basic edges of a body for each of them.
  *
  * It internally uses [ONNXModels.PoseDetection.MoveNetMultiPoseLighting] under the hood to make predictions.
  *

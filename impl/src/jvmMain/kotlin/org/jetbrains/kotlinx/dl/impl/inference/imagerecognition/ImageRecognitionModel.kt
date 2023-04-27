@@ -38,7 +38,7 @@ public class ImageRecognitionModel(
      * Default preprocessing [Operation] is applied to an image.
      *
      * @param [imageFile] Input image [File].
-     * @param [topK] Number of top ranked predictions to return
+     * @param [topK] Number of top-ranked predictions to return
      *
      * @see preprocessing
      *
@@ -50,7 +50,7 @@ public class ImageRecognitionModel(
     }
 
     /**
-     * Predicts object for the given [imageFile].
+     * Predicts an object for the given [imageFile].
      * Default preprocessing [Operation] is applied to an image.
      *
      * @param [imageFile] Input image [File].
