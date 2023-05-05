@@ -18,6 +18,8 @@ import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
 import java.io.File
 
+const val WIDTH = 600
+
 /**
  * This example demonstrates how to combine Fan2d106 face alignment model and UltraFace320 face detection model to
  * find face landmarks on the image. The face alignment model works well only when the face has a certain size and location,
@@ -41,10 +43,9 @@ fun main() {
         faces.associateWith { face -> alignmentModel.predictOnCrop(image, face) }
     }
 
-    val width = 600
     val resize = pipeline<BufferedImage>().resize {
-        outputWidth = width
-        outputHeight = width * image.height / image.width
+        outputWidth = WIDTH
+        outputHeight = WIDTH * image.height / image.width
     }
     showFrame(
         "Detected Landmarks For ${facesToLandmarks.size} Face" + (if (facesToLandmarks.size == 1) "" else "s"),
