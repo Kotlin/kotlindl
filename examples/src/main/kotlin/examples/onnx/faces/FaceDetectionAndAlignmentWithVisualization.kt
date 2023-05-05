@@ -6,16 +6,13 @@
 package examples.onnx.faces
 
 import examples.transferlearning.getFileFromResource
-import org.jetbrains.kotlinx.dl.api.inference.FlatShape
-import org.jetbrains.kotlinx.dl.api.inference.objectdetection.DetectedObject
 import org.jetbrains.kotlinx.dl.api.preprocessing.pipeline
 import org.jetbrains.kotlinx.dl.api.summary.printSummary
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.ImageConverter
-import org.jetbrains.kotlinx.dl.impl.preprocessing.image.crop
 import org.jetbrains.kotlinx.dl.impl.preprocessing.image.resize
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModelHub
 import org.jetbrains.kotlinx.dl.onnx.inference.ONNXModels
-import org.jetbrains.kotlinx.dl.onnx.inference.OnnxHighLevelModel
+import org.jetbrains.kotlinx.dl.onnx.inference.predictOnCrop
 import org.jetbrains.kotlinx.dl.visualization.swing.createDetectedLandmarksPanel
 import org.jetbrains.kotlinx.dl.visualization.swing.showFrame
 import java.awt.image.BufferedImage
@@ -53,28 +50,4 @@ fun main() {
         "Detected Landmarks For ${facesToLandmarks.size} Face" + (if (facesToLandmarks.size == 1) "" else "s"),
         createDetectedLandmarksPanel(resize.apply(image), facesToLandmarks.values.flatten())
     )
-}
-
-private fun <T : FlatShape<T>> OnnxHighLevelModel<BufferedImage, List<T>>.predictOnCrop(image: BufferedImage,
-                                                                                        face: DetectedObject
-): List<T> {
-    val faceWidth = face.xMax - face.xMin
-    val faceHeight = face.yMax - face.yMin
-    val x1 = ((face.xMin - 0.1f * faceWidth) * image.width).toInt().coerceAtLeast(0)
-    val y1 = ((face.yMin - 0.1f * faceHeight) * image.height).toInt().coerceAtLeast(0)
-    val x2 = ((face.xMax + 0.1f * faceWidth) * image.width).toInt().coerceAtMost(image.width)
-    val y2 = ((face.yMax + 0.1f * faceHeight) * image.height).toInt().coerceAtMost(image.height)
-    val cropImage = pipeline<BufferedImage>().crop {
-        left = x1
-        top = y1
-        right = image.width - x2
-        bottom = image.height - y2
-
-    }.apply(image)
-    return predict(cropImage).map { shape ->
-        shape.map { x, y ->
-            (x1 + x * cropImage.width) / image.width to
-                    (y1 + y * cropImage.height) / image.height
-        }
-    }
 }
