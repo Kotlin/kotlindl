@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
+ * Copyright 2020-2023 JetBrains s.r.o. and Kotlin Deep Learning project contributors. All Rights Reserved.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -23,7 +23,7 @@ class PreprocessingFinalShapeTest {
         val image = BufferedImage(10, 20, BufferedImage.TYPE_3BYTE_BGR)
         val (_, actualShape) = preprocess.apply(image)
 
-        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(10, 20, 3)))
+        assertEquals(actualShape, preprocess.getOutputShape(TensorShape(20, 10, 3)))
     }
 
     @Test
