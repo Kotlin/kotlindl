@@ -25,5 +25,5 @@ internal fun BufferedImage.copy(): BufferedImage {
 }
 
 internal fun BufferedImage.getShape(): TensorShape {
-    return TensorShape(width.toLong(), height.toLong(), colorModel.numComponents.toLong())
+    return TensorShape(height.toLong(), width.toLong(), colorModel.numComponents.toLong())
 }
