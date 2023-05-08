@@ -66,8 +66,8 @@ public class Resize(
 
     override fun getOutputShape(inputShape: TensorShape): TensorShape {
         return when (inputShape.rank()) {
-            2 -> TensorShape(outputWidth.toLong(), outputHeight.toLong())
-            3 -> TensorShape(outputWidth.toLong(), outputHeight.toLong(), inputShape[2])
+            2 -> TensorShape(outputHeight.toLong(), outputWidth.toLong())
+            3 -> TensorShape(outputHeight.toLong(), outputWidth.toLong(), inputShape[2])
             else -> throw IllegalArgumentException("Resize operation is only supported for 2D and 3D tensors.")
         }
     }
