@@ -40,8 +40,8 @@ private const val ACCUMULATOR = "accumulator"
  * @property [initialAccumulatorValue] Decay: Float >= 0. Learning rate decay over each update.
  */
 public class AdaGrad(
-    private val learningRate: Float = 0.1f,
-    private val initialAccumulatorValue: Float = 0.01f,
+    public val learningRate: Float = 0.1f,
+    public val initialAccumulatorValue: Float = 0.01f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     private lateinit var initialAccumulatorValueConstant: Constant<Float>
