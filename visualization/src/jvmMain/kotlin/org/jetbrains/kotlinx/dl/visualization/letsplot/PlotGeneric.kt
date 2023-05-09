@@ -92,7 +92,7 @@ fun flattenImagePlot(
     val title = if (predictedLabel == null) {
         "Real label: $imageLabel"
     } else {
-        "Real label: $imageLabel | Predicted label: $predictedLabel"
+        "Real label: $imageLabel \n Predicted label: $predictedLabel"
     }
 
     return xyPlot(imageSize, plotFeature) { x, y -> imageData[y * imageSize + x] } + ggtitle(title)
