@@ -40,7 +40,7 @@ public abstract class ObjectDetectionModelBase<I>(override val modelKindDescript
 /**
  * Base class for object detection models based on EfficientDet architecture.
  */
-public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: String? = null) :
+public abstract class EfficientDetObjectDetectionModelBase<I>(protected var inputShape: LongArray, modelType: String? = null) :
     ObjectDetectionModelBase<I>(modelType) {
 
     override fun convert(output: OrtSession.Result): List<DetectedObject> {
@@ -51,11 +51,11 @@ public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: String?
             val probability = items[i][5]
             if (probability != 0.0f) {
                 val detectedObject = DetectedObject(
-                    xMin = minOf(items[i][2] / internalModel.inputDimensions[1], 1.0f),
-                    xMax = minOf(items[i][4] / internalModel.inputDimensions[1], 1.0f),
+                    xMin = minOf(items[i][2] / inputShape[1], 1.0f),
+                    xMax = minOf(items[i][4] / inputShape[1], 1.0f),
                     // left, bot, right, top
-                    yMin = minOf(items[i][1] / internalModel.inputDimensions[0], 1.0f),
-                    yMax = minOf(items[i][3] / internalModel.inputDimensions[0], 1.0f),
+                    yMin = minOf(items[i][1] / inputShape[0], 1.0f),
+                    yMax = minOf(items[i][3] / inputShape[0], 1.0f),
                     probability = probability,
                     label = classLabels[items[i][6].toInt()]
                 )
@@ -63,6 +63,15 @@ public abstract class EfficientDetObjectDetectionModelBase<I>(modelType: String?
             }
         }
         return foundObjects
+    }
+
+    /**
+     * Setter for input shape of the internal model. Images are going to be resized to this shape.
+     *
+     * @param dims The input shape.
+     */
+    public fun reshape(vararg dims: Long) {
+        inputShape = longArrayOf(*dims)
     }
 
     private companion object {

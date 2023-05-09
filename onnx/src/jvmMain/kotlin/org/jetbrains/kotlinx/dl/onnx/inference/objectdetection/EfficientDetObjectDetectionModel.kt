@@ -31,9 +31,9 @@ import java.io.IOException
  */
 public class EfficientDetObjectDetectionModel(
     override val internalModel: OnnxInferenceModel,
-    private var inputShape: LongArray,
+    inputShape: LongArray,
     modelKindDescription: String? = null
-) : EfficientDetObjectDetectionModelBase<BufferedImage>(modelKindDescription) {
+) : EfficientDetObjectDetectionModelBase<BufferedImage>(inputShape, modelKindDescription) {
 
     override val preprocessing: Operation<BufferedImage, FloatData>
         get() = pipeline<BufferedImage>()
@@ -65,15 +65,6 @@ public class EfficientDetObjectDetectionModel(
     @Throws(IOException::class)
     public fun detectObjects(imageFile: File, topK: Int = 5): List<DetectedObject> {
         return detectObjects(ImageConverter.toBufferedImage(imageFile), topK)
-    }
-
-    /**
-     * Setter for input shape of the internal model. Images are going to be resized to this shape.
-     *
-     * @param dims The input shape.
-     */
-    public fun reshape(vararg dims: Long) {
-        inputShape = longArrayOf(*dims)
     }
 
     override fun close(): Unit = internalModel.close()
