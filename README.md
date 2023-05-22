@@ -1,6 +1,6 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.7.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.8.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
@@ -181,9 +181,11 @@ dependencies {
   implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-visualization:[KOTLIN-DL-VERSION]")
 }
 ```
-The latest stable KotlinDL version is `0.5.1`, latest unstable version is `0.6.0-alpha-1`.
 
-For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to the [Quick Start Guide](docs/quick_start_guide.md).
+The latest stable KotlinDL version is `0.5.2`, latest unstable version is `0.6.0-alpha-1`.
+
+For more details, as well as for `pom.xml` and `build.gradle.kts` examples, please refer to
+the [Quick Start Guide](docs/quick_start_guide.md).
 
 ### Working with KotlinDL in Jupyter Notebook
 
@@ -218,8 +220,9 @@ This table shows the mapping between KotlinDL, TensorFlow, ONNX Runtime, Compile
 | 0.2.0            | 8                    |                      | 1.15               |                              |
 | 0.3.0            | 8                    | 1.8.1                | 1.15               |                              |
 | 0.4.0            | 8                    | 1.11.0               | 1.15               |                              |
-| 0.5.*            | 11                   | 1.12.1               | 1.15               | 31                           |
-| 0.6.*            | 11                   | 1.12.1               | 1.15               | 31                           |
+| 0.5.0-0.5.1      | 11                   | 1.12.1               | 1.15               | 31                           |
+| 0.5.2            | 11                   | 1.14.0               | 1.15               | 31                           |
+| 0.6.*            | 11                   | 1.14.0               | 1.15               | 31                           |
 
 ## Documentation
 
@@ -271,11 +274,11 @@ On Windows, the following distributions are required:
 For inference of ONNX models on a CUDA device, you will also need to add the following dependencies to your project:
 ```groovy
 // build.gradle
-api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1'
+api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.14.0'
 ```
 ```kotlin
 // build.gradle.kts
-api ("com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1")
+api("com.microsoft.onnxruntime:onnxruntime_gpu:1.14.0")
 ```
 
 To find more info about ONNXRuntime and CUDA version compatibility, please refer to the [ONNXRuntime CUDA Execution Provider page](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
