@@ -11,8 +11,15 @@
 8. Run tests and build artifacts on TC for the commit with the release tag
 9. Deploy artifacts on MavenCentral based on the commit with the release tag
 10. Check artifacts' availability on MavenCentral
-11. Update project TFHelloWorld with new dependency to the released artifact
-12. Move examples from the KotlinDL project to the separate branch of TFHelloWorld and run them as tests 
-13. Run TFHelloWorld on different OS (Windows, Ubuntu, macOS)
-14. Make fatJar from TFHelloWorld project and run on independent Amazon instance
+11. Update
+    project [KotlinDL-serverside-release-testing-app](https://github.com/zaleslaw/KotlinDL-serverside-release-testing-app)
+    with new dependency to the released artifact
+12. Move examples from the KotlinDL project to the separate branch
+    of [KotlinDL-serverside-release-testing-app](https://github.com/zaleslaw/KotlinDL-serverside-release-testing-app)
+    and run them as tests
+13. Run [KotlinDL-serverside-release-testing-app](https://github.com/zaleslaw/KotlinDL-serverside-release-testing-app)
+    on different OS (Windows, Ubuntu, macOS)
+14. Make `fatJar` or `shadowJar` tasks
+    from [KotlinDL-serverside-release-testing-app](https://github.com/zaleslaw/KotlinDL-serverside-release-testing-app)
+    project and run on independent Amazon instance
 
