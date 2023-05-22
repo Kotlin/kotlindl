@@ -1,5 +1,5 @@
 # 0.6.0-alpha-1 (16/01/2023) New inference api with multiple inputs support
-Api changes:
+API changes:
 * Changed `InferenceModel` interface:
   * Added type parameter representing inference result. [#515](https://github.com/Kotlin/kotlindl/pull/515)
   * Replaced classification function with general purpose prediction methods for single and multiple inputs.
@@ -15,18 +15,41 @@ Api changes:
   * Changed return type of the `Dataset.getX` function to `FloatData`.
   * Added `TensorShape` parameter to `DataBatch` and `OnHeapDataset` constructors.
   * Removed `OnHeapDataset.Companion#createTrainAndTestDatasets`,
-  `OnHeapDataset.Companion#create(String, String, int, Function1<String,float[][]>, Function2<String,Integer,float[]>)`,
-  `OnHeapDataset.Companion#create(Function0<float[][]>, Function0<float[]>)` functions.
-* No-top models were moved to the separate model types (`TFModels.CVnoTop` and `ONNXModels.CVnoTop`). [#511](https://github.com/Kotlin/kotlindl/pull/511)
-* Changed high-level model classes so they do not implement `InferenceModel`. [#509](https://github.com/Kotlin/kotlindl/pull/509)
-* Converted `SavingFormat` to a class and added `isKerasFullyCompatible` parameter to `SavingFormat.JsonConfigCustomVariables`. [#501](https://github.com/Kotlin/kotlindl/pull/501)
+    `OnHeapDataset.Companion#create(String, String, int, Function1<String,float[][]>, Function2<String,Integer,float[]>)`,
+    `OnHeapDataset.Companion#create(Function0<float[][]>, Function0<float[]>)` functions.
+* No-top models were moved to the separate model types (`TFModels.CVnoTop`
+  and `ONNXModels.CVnoTop`). [#511](https://github.com/Kotlin/kotlindl/pull/511)
+* Changed high-level model classes so they do not
+  implement `InferenceModel`. [#509](https://github.com/Kotlin/kotlindl/pull/509)
+* Converted `SavingFormat` to a class and added `isKerasFullyCompatible` parameter
+  to `SavingFormat.JsonConfigCustomVariables`. [#501](https://github.com/Kotlin/kotlindl/pull/501)
 * Add basic multiple input support to `OnnxInferenceModel`. [#417](https://github.com/Kotlin/kotlindl/issues/417)
 
+# 0.5.2 (22/05/2023) Bugfix + upgrade ONNX and Kotlin versions
+
+API changes:
+
+* Made DataBatch constructor public to allow implementing custom
+  datasets [#533](https://github.com/Kotlin/kotlindl/pull/533)
+* Made properties public [#538](https://github.com/Kotlin/kotlindl/pull/553)
+
+Bug fixes:
+
+* Upgraded the ONNX Runtime version from 0.12 to 0.14 [#551](https://github.com/Kotlin/kotlindl/pull/551)
+* Upgraded the Kotlin version from 1.7.20 to 1.8.21 [#547](https://github.com/Kotlin/kotlindl/pull/547)
+* Created all necessary parent directories when saving models [#534](https://github.com/Kotlin/kotlindl/pull/534)
+* Fixed dimension order in the image shape[#542](https://github.com/Kotlin/kotlindl/pull/542)
+* Fixed transpose shape test [#554](https://github.com/Kotlin/kotlindl/pull/554)
+* Ported fix #531 to the 0.5.2 [#531](https://github.com/Kotlin/kotlindl/pull/552)
+
 # 0.5.1 (14/01/2023) Bugfix update
-Bugfixes:
-* Fixed preprocessing in SSDObjectDetectionModel, MultiPoseDetectionModel, 
+
+Bug fixes:
+
+* Fixed preprocessing in SSDObjectDetectionModel, MultiPoseDetectionModel,
   removed explicit shapes from Fan2d106 and UltraFace models [#496](https://github.com/Kotlin/kotlindl/pull/496)
-* Skip image copy creation in Resize operation for the output of the same size as input [#502](https://github.com/Kotlin/kotlindl/pull/502)
+* Skip image copy creation in Resize operation for the output of the same size as
+  input [#502](https://github.com/Kotlin/kotlindl/pull/502)
 * Fixed SGD secondary constructor ignoring clipGradient parameter [#504](https://github.com/Kotlin/kotlindl/pull/504)
 * Fixed memory leak ensuring used TensorFlow tensors get closed [#507](https://github.com/Kotlin/kotlindl/pull/507)
 * Fix HardShrink activation [#505](https://github.com/Kotlin/kotlindl/pull/505)
