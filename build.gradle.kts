@@ -1,13 +1,16 @@
+val majorVersion: String by project
+val minorVersion: String by project
+
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.8.21' apply false
-    id 'com.android.application' apply false
-    id 'maven-publish'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id "com.gradle.plugin-publish" version "1.0.0" apply false
-    id 'org.jetbrains.dokka' version '1.5.30'
+    kotlin("multiplatform") version "1.8.21" apply false
+    id("com.android.application") apply false
+    id("maven-publish")
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("com.gradle.plugin-publish") version "1.0.0" apply false
+    id("org.jetbrains.dokka") version "1.5.30"
 }
 
-def kotlinDLVersion = "$majorVersion.$minorVersion"
+val kotlinDLVersion = "$majorVersion.$minorVersion"
 
 allprojects {
     repositories {
@@ -15,33 +18,35 @@ allprojects {
         mavenCentral()
     }
 
-    group = 'org.jetbrains.kotlinx'
+    group = "org.jetbrains.kotlinx"
     version = kotlinDLVersion
 }
 
-apply from: project.rootProject.file('gradle/fatJar.gradle')
-apply from: project.rootProject.file('gradle/dokka.gradle')
-
-def unpublishedSubprojects = ["examples", "gradlePlugin"]
-subprojects {
-    if (name in unpublishedSubprojects) return
-    apply from: project.rootProject.file('gradle/publish.gradle')
+apply {
+    from(project.rootProject.file("gradle/fatJar.gradle"))
+    from(project.rootProject.file("gradle/dokka.gradle"))
 }
 
-def sonatypeUser = System.getenv('SONATYPE_USER')
-def sonatypePassword = System.getenv('SONATYPE_PASSWORD')
+val unpublishedSubprojects = setOf("examples", "gradlePlugin")
+subprojects {
+    if (name in unpublishedSubprojects) return@subprojects
+    apply(from = project.rootProject.file("gradle/publish.gradle"))
+}
+
+val sonatypeUser: String? = System.getenv("SONATYPE_USER")
+val sonatypePassword: String? = System.getenv("SONATYPE_PASSWORD")
 nexusPublishing {
-    packageGroup = project.group.toString()
+    packageGroup.set(project.group.toString())
     repositories {
         sonatype {
-            username = sonatypeUser
-            password = sonatypePassword
-            repositoryDescription = "kotlinx.kotlindl staging repository, version: $version"
+            username.set(sonatypeUser)
+            password.set(sonatypePassword)
+            repositoryDescription.set("kotlinx.kotlindl staging repository, version: $version")
         }
     }
 }
 
-task setTeamcityVersion {
+tasks.register("setTeamcityVersion") {
     doLast {
         println("##teamcity[buildNumber '$version']")
     }

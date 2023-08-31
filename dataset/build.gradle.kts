@@ -1,18 +1,20 @@
-project.setDescription("A KotlinDL library provides Dataset API for better Kotlin programming for Deep Learning.")
+project.description = "A KotlinDL library provides Dataset API for better Kotlin programming for Deep Learning."
 
-apply plugin: 'kotlin-multiplatform'
+plugins {
+    kotlin("multiplatform")
+}
 
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
+            kotlinOptions.jvmTarget = "1.8"
         }
     }
     sourceSets {
-        jvmMain {
+        val jvmMain by getting {
             dependencies {
-                api project(':api')
-                api project(':impl')
+                api(project(":api"))
+                api(project(":impl"))
             }
         }
     }
