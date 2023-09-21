@@ -20,9 +20,9 @@ kotlin {
 
                 def excludeSLF4JImpl = { exclude group: 'org.slf4j', module: 'slf4j-simple' }
 
-                api 'org.jetbrains.lets-plot:lets-plot-batik:2.3.0', excludeSLF4JImpl
-                api 'org.jetbrains.lets-plot:lets-plot-common:2.3.0', excludeSLF4JImpl
-                api 'org.jetbrains.lets-plot:lets-plot-kotlin-api:2.0.1', excludeSLF4JImpl
+                api 'org.jetbrains.lets-plot:lets-plot-batik:4.0.1', excludeSLF4JImpl
+                api 'org.jetbrains.lets-plot:lets-plot-common:4.0.1', excludeSLF4JImpl
+                api 'org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.3', excludeSLF4JImpl
             }
         }
         androidMain {

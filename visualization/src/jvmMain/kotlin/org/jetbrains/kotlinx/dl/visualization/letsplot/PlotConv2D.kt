@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.Figure
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.weights
+import org.jetbrains.letsPlot.Figure
 
 internal val FILTER_LAYERS_PERMUTATION = intArrayOf(1, 0, 2, 3)
 

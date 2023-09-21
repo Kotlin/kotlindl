@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.Figure
-import jetbrains.letsPlot.geom.geomPath
-import jetbrains.letsPlot.gggrid
-import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.label.ggtitle
-import jetbrains.letsPlot.letsPlot
+import org.jetbrains.letsPlot.Figure
+import org.jetbrains.letsPlot.geom.geomPath
+import org.jetbrains.letsPlot.gggrid
+import org.jetbrains.letsPlot.intern.Plot
+import org.jetbrains.letsPlot.label.ggtitle
+import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.dataset.Dataset
