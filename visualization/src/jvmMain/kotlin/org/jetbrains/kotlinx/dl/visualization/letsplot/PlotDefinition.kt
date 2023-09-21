@@ -30,7 +30,9 @@ class PlotFeature(val scale: Scale) {
 
 internal val FEATURE_MAP_THEME =
     geomRaster(showLegend = false) +
-            theme()
-//.axisTitleBlank()
-//.axisTextBlank()
-//.axisTicksBlank()
+            theme(
+                axisTitle = "blank",
+                axisText = "blank",
+                axisTicks = "blank"
+            )
+
