@@ -125,9 +125,6 @@ fun lenetClassicWithGPUMemoryConfig() {
     }
 }
 
-
-
-
 /** */
 fun main(): Unit = lenetClassicWithGPUMemoryConfig()
 
