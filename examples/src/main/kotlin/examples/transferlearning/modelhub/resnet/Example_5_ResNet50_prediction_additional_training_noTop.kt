@@ -31,7 +31,7 @@ private const val IMAGE_SIZE = 300
 private const val TRAIN_TEST_SPLIT_RATIO = 0.7
 
 /**
- * This examples demonstrates the transfer learning concept on ResNet'50 model:
+ * This example demonstrates the transfer learning concept on ResNet'50 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, are added to the new Neural Network, its weights are frozen.

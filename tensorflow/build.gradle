@@ -7,8 +7,11 @@ dependencies {
     api project(":api")
     api project(":impl")
     api group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
+    api group: 'org.tensorflow', name: 'proto', version: '1.15.0'
+    api group: 'com.google.protobuf', name: 'protobuf-java', version: '3.21.9'
     api 'com.beust:klaxon:5.5'
     api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
+
     testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'

@@ -23,9 +23,9 @@ import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 /**
- * This examples demonstrates the transfer learning concept:
+ * This example demonstrates the transfer learning concept:
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
- * - Conv2D layer are added to the new Neural Network, its weights are frozen.
+ * - Conv2D layer is added to the new Neural Network, its weights are frozen.
  * - Flatten and new Dense layers are added and initialized via defined initializers.
  *
  * NOTE: Model and weights are resources in `examples` module.

@@ -27,7 +27,7 @@ import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 /**
  * What's about Functional DSL with Functional API usage in KotlinDL directly?
  *
- * Describe the model like the function of functions, where each layer is just a callable function.
+ * Describe the model as the function of functions, where each layer is just a callable function.
  *
  * Combine two functions in special merge layers like Add or Concatenate.
  *

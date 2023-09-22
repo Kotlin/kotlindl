@@ -26,11 +26,11 @@ import java.io.FileNotFoundException
 /**
  * Base abstract class for all trainable models.
  */
-public abstract class TrainableModel : TensorFlowInferenceModelBase(), ModelWithSummary {
-    /** Optimization algorithm required for compiling a model, and its learning rate. */
+public abstract class TrainableModel(config: GpuConfiguration? = null) : TensorFlowInferenceModelBase(config = config), ModelWithSummary {
+    /** Optimization algorithm required for compiling a model and its learning rate. */
     protected var optimizer: Optimizer = SGD(0.2f)
 
-    /** Loss function. */
+    /** Loss of function. */
     public var loss: LossFunction = SoftmaxCrossEntropyWithLogits()
 
     /** List of metrics for evaluation phase. */

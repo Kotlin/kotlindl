@@ -23,7 +23,10 @@ import java.io.FileNotFoundException
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Functional model via sequence of [layers].
  */
-public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
+public class Functional public constructor(vararg layers: Layer, gpuConfiguration: GpuConfiguration?) :
+    GraphTrainableModel(*layers, gpuConfiguration = gpuConfiguration) {
+
+    public constructor(vararg layers: Layer) : this(*layers, gpuConfiguration = null)
 
     override fun buildLayers(
         training: Operand<Boolean>,
@@ -54,9 +57,10 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
      * @param [copyWeights] whether model weights need to be copied
      * @return A copied inference model.
      */
-    public fun copy(copiedModelName: String? = null,
-                    copyOptimizerState: Boolean = false,
-                    copyWeights: Boolean = true
+    public fun copy(
+        copiedModelName: String? = null,
+        copyOptimizerState: Boolean = false,
+        copyWeights: Boolean = true
     ): Functional {
         val serializedModel = serializeModel(true)
         return deserializeFunctionalModel(serializedModel).also { modelCopy ->
@@ -88,43 +92,91 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          *
-         * @property [noInput] If true it disables input layer check.
+         * @param [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
+         * @param [gpuConfiguration] The configuration of a model passed to the Tensorflow Runtime.
+         *
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be an input layer, if you want to compile model.
+         * NOTE: The first layer should be an input layer if you want to compile a model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer, noInput: Boolean = false): Functional {
+        public fun of(
+            vararg layers: Layer,
+            noInput: Boolean = false,
+            gpuConfiguration: GpuConfiguration? = null
+        ): Functional {
             if (!noInput) {
                 layerValidation(layers.toList())
             }
 
-            return preprocessAndCreate(layers.toList())
+            return preprocessAndCreate(layers.toList(), gpuConfiguration)
         }
 
         /**
          * Creates the [Functional] model.
          *
-         * @property [noInput] If true it disables input layer check.
+         * @param [noInput] If true it disables input layer check.
          * @param [layers] The layers to describe the model design.
+         *
          * All connections between the layers must be established and form an acyclic directed graph.
          * Layers could be ordered in free way.
          *
-         * NOTE: First layer should be an input layer, if you want to compile model.
+         * NOTE: The first layer should be an input layer if you want to compile a model.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Functional {
+            return of(layers = layers, noInput = noInput, gpuConfiguration = null)
+        }
+
+        /**
+         * Creates the [Functional] model.
+         *
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         * @param [gpuConfiguration] The configuration of a model passed to the Tensorflow Runtime.
+         *
+         * All connections between the layers must be established and form an acyclic directed graph.
+         * Layers could be ordered in free way.
+         *
+         * NOTE: The first layer should be an input layer if you want to compile a model.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(
+            layers: List<Layer>,
+            noInput: Boolean = false,
+            gpuConfiguration: GpuConfiguration? = null
+        ): Functional {
+            if (!noInput) {
+                layerValidation(layers.toList())
+            }
+
+            return preprocessAndCreate(layers, gpuConfiguration = gpuConfiguration)
+        }
+
+        /**
+         * Creates the [Functional] model.
+         *
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         *
+         * All connections between the layers must be established and form an acyclic directed graph.
+         * Layers could be ordered in free way.
+         *
+         * NOTE: The first layer should be an input layer if you want to compile a model.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
         public fun of(layers: List<Layer>, noInput: Boolean = false): Functional {
-            if (!noInput) {
-                layerValidation(layers.toList())
-            }
-
-            return preprocessAndCreate(layers)
+            return of(layers = layers, noInput = noInput, gpuConfiguration = null)
         }
 
         /**
@@ -133,12 +185,16 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * The input of the [topModel] will be connected to the output of the [pretrainedModel].
          *
          * NOTE: First layer of [pretrainedModel] should be an input layer.
-         * NOTE: Both models should be non-compiled yet.
+         * NOTE: Both models should be non-compiled still.
          *
          * @return the [Functional] model.
          */
         @JvmStatic
-        public fun of(pretrainedModel: GraphTrainableModel, topModel: GraphTrainableModel): Functional {
+        public fun of(
+            pretrainedModel: GraphTrainableModel,
+            topModel: GraphTrainableModel,
+            gpuConfiguration: GpuConfiguration? = null
+        ): Functional {
             require(!pretrainedModel.isModelCompiled) { "Pretrained model should not be compiled!" }
             require(!topModel.isModelCompiled) { "Top model should not be compiled!" }
 
@@ -163,9 +219,43 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                 }
             }
 
-            return of(layers)
+            return of(layers, gpuConfiguration = gpuConfiguration)
         }
 
+
+        /**
+         * Creates the [Functional] model from two models: [pretrainedModel] and [topModel].
+         * All layers of pretrainedModel will be frozen automatically.
+         * The input of the [topModel] will be connected to the output of the [pretrainedModel].
+         *
+         * NOTE: First layer of [pretrainedModel] should be an input layer.
+         * NOTE: Both models should be non-compiled still.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun of(pretrainedModel: GraphTrainableModel, topModel: GraphTrainableModel): Functional {
+            return of(pretrainedModel, topModel, null)
+        }
+
+        /**
+         * Creates the [Functional] model.
+         *
+         * @param [finalLayer] This layer specifies the output tensors that represent the outputs of this model.
+         * All connections between the layers must be established and form an acyclic directed graph.
+         *
+         * @return the [Functional] model.
+         */
+        @JvmStatic
+        public fun fromOutput(finalLayer: Layer, gpuConfiguration: GpuConfiguration? = null): Functional {
+            require(finalLayer.inboundLayers.isNotEmpty()) { "Model should contain more than 1 layer!" }
+            val layers = mutableSetOf<Layer>() // set of unique layers
+
+            layers.add(finalLayer)
+            visitInboundNodes(finalLayer, layers)
+
+            return preprocessAndCreate(layers.toList(), gpuConfiguration)
+        }
 
         /**
          * Creates the [Functional] model.
@@ -177,13 +267,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
          */
         @JvmStatic
         public fun fromOutput(finalLayer: Layer): Functional {
-            require(finalLayer.inboundLayers.isNotEmpty()) { "Model should contain more than 1 layer!" }
-            val layers = mutableSetOf<Layer>() // set of unique layers
-
-            layers.add(finalLayer)
-            visitInboundNodes(finalLayer, layers)
-
-            return preprocessAndCreate(layers.toList())
+            return fromOutput(finalLayer, null)
         }
 
         private fun visitInboundNodes(finalLayer: Layer, layers: MutableSet<Layer>) {
@@ -224,17 +308,19 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Functional] model.
          * @property [layers] The layers to describe the model design.
-         * NOTE: First layer should be input layer.
+         *
+         * NOTE: The first layer should be the input layer.
+         *
          * @return the [Functional] model.
          */
-        private fun preprocessAndCreate(layers: List<Layer>): Functional {
+        private fun preprocessAndCreate(layers: List<Layer>, gpuConfiguration: GpuConfiguration? = null): Functional {
             val inputLayer = findInputLayer(layers)
 
             fillOutputLayers(layers)
             val layerList = topologicalSort(layers, inputLayer)
 
             preProcessLayerNames(layerList.toTypedArray())
-            return Functional(*layerList.toTypedArray())
+            return Functional(*layerList.toTypedArray(), gpuConfiguration = gpuConfiguration)
         }
 
         /**

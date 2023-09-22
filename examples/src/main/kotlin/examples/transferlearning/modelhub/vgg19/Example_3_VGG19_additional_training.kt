@@ -30,7 +30,7 @@ private const val TEST_BATCH_SIZE = 16
 private const val EPOCHS = 2
 
 /**
- * This examples demonstrates the transfer learning concept on VGG'19 model:
+ * This example demonstrates the transfer learning concept on VGG'19 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All layers, excluding the last [Dense], are added to the new Neural Network, its weights are frozen.

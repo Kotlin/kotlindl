@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.inference.savedmodel
 
+import org.jetbrains.kotlinx.dl.api.core.GpuConfiguration
 import org.jetbrains.kotlinx.dl.api.core.util.PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
 import org.tensorflow.SavedModelBundle
@@ -14,8 +15,8 @@ import org.tensorflow.SavedModelBundle
  *
  * @property [bundle] SavedModelBundle.
  */
-public open class SavedModel(private val bundle: SavedModelBundle) :
-    TensorFlowInferenceModel(bundle.graph(), bundle.session()) {
+public open class SavedModel(private val bundle: SavedModelBundle, config: GpuConfiguration? = null) :
+    TensorFlowInferenceModel(bundle.graph(), bundle.session(), config) {
 
     init {
         input = PLACEHOLDER

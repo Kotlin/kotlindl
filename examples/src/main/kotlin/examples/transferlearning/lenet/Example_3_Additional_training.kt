@@ -14,7 +14,7 @@ import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 /**
- * This examples demonstrates the transfer learning concept:
+ * This example demonstrates the transfer learning concept:
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - All model weights are not frozen, and can be changed during the training.
  * - No new layers are added.
