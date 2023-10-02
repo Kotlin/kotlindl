@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.geom.geomRaster
-import jetbrains.letsPlot.intern.Scale
-import jetbrains.letsPlot.scale.scaleFillGrey
-import jetbrains.letsPlot.scale.scaleFillHue
-import jetbrains.letsPlot.theme
+import org.jetbrains.letsPlot.geom.geomRaster
+import org.jetbrains.letsPlot.intern.Scale
+import org.jetbrains.letsPlot.scale.scaleFillGrey
+import org.jetbrains.letsPlot.scale.scaleFillHue
+import org.jetbrains.letsPlot.themes.theme
 
 /**
  * PlotFeature represents the filling options for plots that defines its color scale.
@@ -30,6 +30,9 @@ class PlotFeature(val scale: Scale) {
 
 internal val FEATURE_MAP_THEME =
     geomRaster(showLegend = false) +
-            theme().axisTitleBlank()
-                .axisTextBlank()
-                .axisTicksBlank()
+            theme(
+                axisTitle = "blank",
+                axisText = "blank",
+                axisTicks = "blank"
+            )
+

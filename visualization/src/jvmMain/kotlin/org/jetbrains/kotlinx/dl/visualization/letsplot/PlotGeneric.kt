@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlinx.dl.visualization.letsplot
 
-import jetbrains.letsPlot.Figure
-import jetbrains.letsPlot.geom.geomPath
-import jetbrains.letsPlot.gggrid
-import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.label.ggtitle
-import jetbrains.letsPlot.letsPlot
+import org.jetbrains.letsPlot.Figure
+import org.jetbrains.letsPlot.geom.geomPath
+import org.jetbrains.letsPlot.gggrid
+import org.jetbrains.letsPlot.intern.Plot
+import org.jetbrains.letsPlot.label.ggtitle
+import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.dataset.Dataset
@@ -19,16 +19,16 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Column plot arranges the given iterable of plots in specified number of columns and
+ * Column plot arranges the given iterable of plots in a specified number of columns and
  * creates a single figure from all given plots
  *
- * @param plots that are arranged into single figure
+ * @param plots these are arranged into a single figure
  * @param columns specifies the number of columns in which the plots are arranged
- * @param imageSize is a height and width of the single plot in returned plots figure
+ * @param imageSize is a height and width of the single plot in a returned plots figure
  * @return a [Figure] with all given plots
  */
 fun columnPlot(plots: Iterable<Plot>, columns: Int, imageSize: Int): Figure =
-    gggrid(plots, columns, imageSize, imageSize, fit = true)
+    gggrid(plots, columns)
 
 /**
  * Create a tile plot with weights from specified function `f(x, y)` that specifies the
@@ -66,8 +66,10 @@ fun xyPlot(imageSize: Int, plotFeature: PlotFeature, f: (Int, Int) -> Float): Pl
     xyPlot(imageSize, imageSize, plotFeature, f)
 
 /**
- * Create a [xyPlot] for image data given as array of the following intensities of the
- * plot tiles. Function intended to use with the inputs images from some [Dataset] for
+ * Create a [xyPlot] for image data given as an array of the following intensities of the
+ * plot tiles.
+ *
+ * Function intended to use it with the input images from some [Dataset] for
  * model as it offers to plot extra label that the specified image is labeled by (and
  * additionally supports plotting some predicted label when model prediction is given)
  *
@@ -105,8 +107,8 @@ fun flattenImagePlot(
  * cut from the beginning or its end because there may be extra noises that disturbs visualization.
  *
  * @param wavFile to read sound data from
- * @param beginDrop part of data to drop from begin from range [0, 1]
- * @param endDrop part of data to drop from end from range [0, 1]
+ * @param beginDrop part of data to drop from beginning from range [0, 1]
+ * @param endDrop part of data to drop from an end from range [0, 1]
  * @return [Plot] representing the amplitude of sound of given [WavFile]
  */
 fun soundPlot(
