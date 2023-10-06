@@ -28,7 +28,7 @@ import java.io.FileReader
 import java.util.*
 
 /**
- * This examples demonstrates the inference concept on VGG'16 model:
+ * This example demonstrates the inference concept on VGG'16 model:
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in VGG'16 during training on ImageNet dataset) is applied to each image before prediction.

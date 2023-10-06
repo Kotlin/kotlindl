@@ -48,7 +48,8 @@ import java.util.*
  *
  * @constructor Creates a [GraphTrainableModel] model via sequence of [layers].
  */
-public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel() {
+public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration: GpuConfiguration? = null) :
+    TrainableModel(config = gpuConfiguration) {
     /** Logger for the model. */
     public val logger: KLogger = KotlinLogging.logger {}
 
@@ -61,7 +62,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** The layers to describe the model design. Main part of the internal state of the model. */
     public var layers: List<Layer> = listOf(*layers)
 
-    /** First layer that is responsible for the input shape of the Neural Network. */
+    /** The first layer that is responsible for the input shape of the Neural Network. */
     public val inputLayer: Input
         get() = layers[0] as Input
 
@@ -77,13 +78,13 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     /** TensorFlow operand for prediction phase. */
     private lateinit var yPredOp: Operand<Float>
 
-    /** TensorFlow loss operand. */
+    /** TensorFlow's loss operand. */
     protected lateinit var lossOp: Operand<Float>
 
-    /** TensorFlow prediction operand. */
+    /** TensorFlow's prediction operand. */
     private lateinit var predictionOp: Operand<Float>
 
-    /** TensorFlow prediction operand. */
+    /** TensorFlow's prediction operand. */
     private lateinit var metricOps: List<Operand<Float>>
 
     /** A list of targets to be optimized. */
@@ -308,7 +309,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 metrics.indices.forEach { i -> averageTrainingMetricAccum[i] += metricValues[i] }
 
                 val batchTrainingEvent = BatchTrainingEvent(epoch, batchCounter, lossValue.toDouble(),
-                                                            averageTrainingMetricAccum.map { it.toDouble() })
+                    averageTrainingMetricAccum.map { it.toDouble() })
                 trainingHistory.appendBatch(batchTrainingEvent)
 
                 // TODO: create map (metric name and metric value)
@@ -454,10 +455,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return predictions
     }
 
-    private fun predictOnDataset(dataset: Dataset,
-                                 batchSize: Int,
-                                 callbacks: List<Callback>,
-                                 block: (Int, List<Tensor<*>>) -> Unit
+    private fun predictOnDataset(
+        dataset: Dataset,
+        batchSize: Int,
+        callbacks: List<Callback>,
+        block: (Int, List<Tensor<*>>) -> Unit
     ) {
         callbacks.forEach { it.model = this }
         callbacks.forEach { it.onPredictBegin() }
@@ -531,10 +533,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return runModelInternal(inputs, outputs) { tensors -> extractResult(TensorResult(tensors)) }
     }
 
-    private fun <R> runModelInternal(inputs: Map<out Operand<*>, Tensor<*>>,
-                                     outputs: List<OutputKey>,
-                                     targets: List<Operand<Float>> = emptyList(),
-                                     extractResult: (List<Tensor<*>>) -> R
+    private fun <R> runModelInternal(
+        inputs: Map<out Operand<*>, Tensor<*>>,
+        outputs: List<OutputKey>,
+        targets: List<Operand<Float>> = emptyList(),
+        extractResult: (List<Tensor<*>>) -> R
     ): R {
         return runModel(inputs.mapKeys { InputKey.Operand(it.key) }, outputs, targets, extractResult)
     }
@@ -565,12 +568,14 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 check(!modelDirectory.exists()) { "The directory exists on path $pathToModelDirectory, please be careful it could contain valuable model! Change this mode to OVERRIDE if you want to override this directory." }
                 Files.createDirectories(modelDirectory.toPath())
             }
+
             WritingMode.OVERRIDE -> {
                 if (modelDirectory.exists()) {
                     modelDirectory.deleteRecursively()
                 }
                 Files.createDirectories(modelDirectory.toPath())
             }
+
             WritingMode.APPEND -> {
                 if (!modelDirectory.exists()) {
                     Files.createDirectories(modelDirectory.toPath())
@@ -589,9 +594,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
     }
 
-    private fun saveInKerasFormat(pathToModelDirectory: String,
-                                  saveOptimizerState: Boolean,
-                                  isKerasFullyCompatible: Boolean
+    private fun saveInKerasFormat(
+        pathToModelDirectory: String,
+        saveOptimizerState: Boolean,
+        isKerasFullyCompatible: Boolean
     ) {
         saveModel(pathToModelDirectory, isKerasFullyCompatible)
         saveVariables(pathToModelDirectory, saveOptimizerState)

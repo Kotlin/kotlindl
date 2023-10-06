@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.dataset.embedded.fashionMnist
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 
 /**
- * This examples demonstrates the weird inference case:
+ * This example demonstrates the weird inference case:
  * - Weights are not loaded, but initialized via initialized defined in configuration, configuration is loaded from .json file.
  * - Model is evaluated after loading to obtain accuracy value.
  * - No additional training.

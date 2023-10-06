@@ -28,7 +28,7 @@ private const val PATH_TO_MODEL = "savedmodels/resnet50_1"
 private const val PATH_TO_MODEL_2 = "savedmodels/resnet50_2"
 
 /**
- * This examples demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:
+ * This example demonstrates the inference concept on ResNet'50 model and model, model weight export and import back:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.

@@ -30,7 +30,7 @@ import java.io.FileReader
 import java.util.*
 
 /**
- * This examples demonstrates the inference concept on VGG'16 model and weights loading from outdated or custom weights' schema in .h5 file:
+ * This example demonstrates the inference concept on VGG'16 model and weights loading from outdated or custom weights' schema in .h5 file:
  *
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.

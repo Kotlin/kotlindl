@@ -28,11 +28,11 @@ import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 /**
  * What's about Functional API usage in KotlinDL directly?
  *
- * Describe the model like the function of functions, where each layer is just a callable function.
+ * Describe the model as the function of functions, where each layer is just a callable function.
  *
  * Combine two functions in special merge layers like Add or Concatenate.
  *
- * NOTE: Functional API supports one output and one input for model.
+ * NOTE: Functional API supports one output and one input for a model.
  */
 private const val EPOCHS = 3
 private const val TRAINING_BATCH_SIZE = 1000

@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.GpuConfiguration
 import org.jetbrains.kotlinx.dl.api.core.shape.contentToString
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.createFloatArray
@@ -26,9 +27,18 @@ import java.util.*
  * @property [tfGraph] TensorFlow computational graph.
  * @property [session] TensorFlow session.
  */
-public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph = Graph(),
-                                                   internal val session: Session = Session(tfGraph)
+public abstract class TensorFlowInferenceModelBase(
+    protected val tfGraph: Graph = Graph(),
+    protected val gpuConfiguration: GpuConfiguration? = null,
+    internal val session: Session
 ) : InferenceModel<TensorResult> {
+
+    public constructor(tfGraph: Graph = Graph(), config: GpuConfiguration? = null) :
+            this(
+                tfGraph,
+                config,
+                if (config == null) Session(tfGraph) else Session(tfGraph, config.toTensorFlowSessionConfig())
+            )
 
     /** Is true when model is initialized. */
     public var isModelInitialized: Boolean = false
@@ -40,9 +50,10 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
     override val resultConverter: InferenceResultConverter<TensorResult>
         get() = TensorFlowInferenceResultConverter
 
-    override fun <T> predict(inputs: Map<String, FloatData>,
-                             outputs: List<String>,
-                             extractResult: (TensorResult) -> T
+    override fun <T> predict(
+        inputs: Map<String, FloatData>,
+        outputs: List<String>,
+        extractResult: (TensorResult) -> T
     ): T {
         check(isModelInitialized) { "Model weights are not initialized." }
         outputs.forEach { outputName ->
@@ -58,10 +69,11 @@ public abstract class TensorFlowInferenceModelBase(protected val tfGraph: Graph 
         ) { tensors -> extractResult(TensorResult(tensors)) }
     }
 
-    protected fun <R> runModel(inputs: Map<out InputKey, Tensor<*>>,
-                               outputs: List<OutputKey>,
-                               targets: List<Operand<Float>>,
-                               extractResult: (List<Tensor<*>>) -> R
+    protected fun <R> runModel(
+        inputs: Map<out InputKey, Tensor<*>>,
+        outputs: List<OutputKey>,
+        targets: List<Operand<Float>>,
+        extractResult: (List<Tensor<*>>) -> R
     ): R {
         return inputs.use {
             val runner = session.runner()

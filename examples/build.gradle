@@ -18,10 +18,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
     // to run on GPU (if CUDA is updated and machine with NVIDIA onboard)
-    /*implementation 'org.tensorflow:libtensorflow:1.15.0'
-    implementation 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'
-    api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1'
-    */
+    // implementation 'org.tensorflow:libtensorflow:1.15.0'
+    // implementation 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'
+    // api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.12.1'
+
 }
 
 def publishedArtifactsVersion = System.getenv("KOTLIN_DL_RELEASE_VERSION")

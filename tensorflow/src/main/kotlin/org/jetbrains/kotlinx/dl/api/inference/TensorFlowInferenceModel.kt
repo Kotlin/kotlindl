@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.FloatData
+import org.jetbrains.kotlinx.dl.api.core.GpuConfiguration
 import org.jetbrains.kotlinx.dl.api.core.floats
 import org.jetbrains.kotlinx.dl.api.core.shape
 import org.jetbrains.kotlinx.dl.api.core.util.*
@@ -25,9 +26,11 @@ import java.nio.file.NotDirectoryException
  * @property [tfGraph] TensorFlow computational graph.
  * @property [session] TensorFlow session.
  */
-public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
-                                           session: Session = Session(tfGraph)
-) : TensorFlowInferenceModelBase(tfGraph, session) {
+public open class TensorFlowInferenceModel(
+    tfGraph: Graph = Graph(),
+    session: Session = Session(tfGraph),
+    config: GpuConfiguration? = null
+) : TensorFlowInferenceModelBase(tfGraph = tfGraph, session = session, gpuConfiguration = config) {
 
     /** Input operand. */
     protected var input: String = DATA_PLACEHOLDER
@@ -42,10 +45,11 @@ public open class TensorFlowInferenceModel(tfGraph: Graph = Graph(),
         return predict(mapOf(input to inputData), listOf(output), extractResult)
     }
 
-    public fun <T> predict(inputData: FloatData,
-                           inputTensorName: String = input,
-                           outputTensorName: String = output,
-                           extractResult: (TensorResult) -> T
+    public fun <T> predict(
+        inputData: FloatData,
+        inputTensorName: String = input,
+        outputTensorName: String = output,
+        extractResult: (TensorResult) -> T
     ): T {
         return predict(mapOf(inputTensorName to inputData), listOf(outputTensorName), extractResult)
     }

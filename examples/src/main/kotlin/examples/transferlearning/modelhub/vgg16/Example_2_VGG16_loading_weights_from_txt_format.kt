@@ -26,7 +26,7 @@ import java.io.FileReader
 import java.util.*
 
 /**
- * This examples demonstrates the inference concept on VGG'16 model and weights loading from KotlinDL txt format:
+ * This example demonstrates the inference concept on VGG'16 model and weights loading from KotlinDL txt format:
  * - Weights are loaded from txt files, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.
  * - Special preprocessing (used in VGG'16 during training on ImageNet dataset) is applied to each image before prediction.

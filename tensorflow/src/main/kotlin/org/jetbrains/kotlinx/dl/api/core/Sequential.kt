@@ -22,7 +22,10 @@ import java.io.FileNotFoundException
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
-public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
+public class Sequential public constructor(vararg layers: Layer, gpuConfiguration: GpuConfiguration?) :
+    GraphTrainableModel(*layers, gpuConfiguration = gpuConfiguration) {
+
+    public constructor(vararg layers: Layer) : this(*layers, gpuConfiguration = null)
 
     override fun buildLayers(
         training: Operand<Boolean>,
@@ -52,9 +55,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
      * @param [copyWeights] whether model weights need to be copied
      * @return A copied inference model.
      */
-    public fun copy(copiedModelName: String? = null,
-                    copyOptimizerState: Boolean = false,
-                    copyWeights: Boolean = true
+    public fun copy(
+        copiedModelName: String? = null,
+        copyOptimizerState: Boolean = false,
+        copyWeights: Boolean = true
     ): Sequential {
         val serializedModel = serializeModel(true)
         return deserializeSequentialModel(serializedModel).also { modelCopy ->
@@ -67,41 +71,81 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         /**
          * Creates the [Sequential] model.
          *
-         * @property [noInput] If true it disables input layer check.
-         * @property [layers] The layers to describe the model design.
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         * @param [gpuConfiguration] The configuration of a model passed to the Tensorflow Runtime.
          *
-         * NOTE: First layer should be an input layer, if you want to compile model.
+         * NOTE: The first layer should be an input layer if you want to compile a model.
          *
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer, noInput: Boolean = false): Sequential {
+        public fun of(
+            vararg layers: Layer,
+            noInput: Boolean = false,
+            gpuConfiguration: GpuConfiguration? = null
+        ): Sequential {
             if (!noInput) {
                 layerValidation(layers.toList())
             }
 
             preProcessLayerNames(layers)
-            return Sequential(*layers)
+            return Sequential(*layers, gpuConfiguration = gpuConfiguration)
+        }
+
+        /**
+         * Creates the [Sequential] model.
+         *
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         *
+         * NOTE: The first layer should be an input layer if you want to compile a model.
+         *
+         * @return the [Sequential] model.
+         */
+        @JvmStatic
+        public fun of(vararg layers: Layer, noInput: Boolean = false): Sequential {
+            return of(layers = layers, noInput = noInput, gpuConfiguration = null)
         }
 
         /**
          * Creates the [Functional] model.
          *
-         * @property [noInput] If true it disables input layer check.
-         * @property [layers] The layers to describe the model design.
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         * @param [gpuConfiguration] The configuration of a model passed to the Tensorflow Runtime.
          *
-         * NOTE: First layer should be an input layer, if you want to compile model.
+         * NOTE: The first layer should be an input layer if you want to compile a model.
          *
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(layers: List<Layer>, noInput: Boolean = false): Sequential {
+        public fun of(
+            layers: List<Layer>,
+            noInput: Boolean = false,
+            gpuConfiguration: GpuConfiguration? = null
+        ): Sequential {
             if (!noInput) {
                 layerValidation(layers.toList())
             }
 
             preProcessLayerNames(layers.toTypedArray())
-            return Sequential(*layers.toTypedArray())
+            return Sequential(*layers.toTypedArray(), gpuConfiguration = gpuConfiguration)
+        }
+
+        /**
+         * Creates the [Sequential] model.
+         *
+         * @param [noInput] If true it disables input layer check.
+         * @param [layers] The layers to describe the model design.
+         *
+         * NOTE: The first layer should be an input layer if you want to compile a model.
+         *
+         * @return the [Sequential] model.
+         */
+        @JvmStatic
+        public fun of(layers: List<Layer>, noInput: Boolean = false): Sequential {
+            return of(layers = layers, noInput = noInput, gpuConfiguration = null)
         }
 
         /**

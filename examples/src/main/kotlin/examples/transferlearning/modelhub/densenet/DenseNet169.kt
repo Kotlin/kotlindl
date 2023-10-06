@@ -24,7 +24,7 @@ import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
 
 /**
- * This examples demonstrates the inference concept on DenseNet169 model:
+ * This example demonstrates the inference concept on DenseNet169 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.

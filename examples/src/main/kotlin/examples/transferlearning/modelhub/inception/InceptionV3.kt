@@ -11,7 +11,7 @@ import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModelHub
 import org.jetbrains.kotlinx.dl.api.inference.loaders.TFModels
 
 /**
- * This examples demonstrates the inference concept on InceptionV3 model:
+ * This example demonstrates the inference concept on InceptionV3 model:
  * - Model configuration, model weights and labels are obtained from [TFModelHub].
  * - Weights are loaded from .h5 file, configuration is loaded from .json file.
  * - Model predicts on a few images located in resources.

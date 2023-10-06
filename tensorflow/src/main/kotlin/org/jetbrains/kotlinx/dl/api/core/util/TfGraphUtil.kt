@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.util
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
 
+// TODO: return to KGraph class
 internal fun deserializeGraph(graphDef: ByteArray, prefix: String = ""): Graph {
     return Graph().also { tfGraph ->
         if (prefix.isEmpty()) {
