@@ -11,7 +11,7 @@ package org.jetbrains.kotlinx.dl.api.summary
 public interface ModelSummary {
     /**
      * Formats model summary to an array of strings.
-     * Rows should form a table with clean and readable structure.
+     * Rows should form a table with a clean and readable structure.
      *
      * @param [columnSeparator] text chunk that will be used as column separator for the output table
      * @param [lineSeparatorSymbol] character that will be used to produce a string to separate rows of the output table

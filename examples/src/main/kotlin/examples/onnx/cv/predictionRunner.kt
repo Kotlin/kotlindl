@@ -50,5 +50,4 @@ fun runImageRecognitionPrediction(
     } else {
         model.use { inference(it) }
     }
-
 }

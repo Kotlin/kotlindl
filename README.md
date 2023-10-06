@@ -222,7 +222,7 @@ This table shows the mapping between KotlinDL, TensorFlow, ONNX Runtime, Compile
 | 0.4.0            | 8                    | 1.11.0               | 1.15               |                              |
 | 0.5.0-0.5.1      | 11                   | 1.12.1               | 1.15               | 31                           |
 | 0.5.2            | 11                   | 1.14.0               | 1.15               | 31                           |
-| 0.6.*            | 11                   | 1.14.0               | 1.15               | 31                           |
+| 0.6.*            | 11                   | 1.16.0               | 1.15               | 31                           |
 
 ## Documentation
 
@@ -274,11 +274,11 @@ On Windows, the following distributions are required:
 For inference of ONNX models on a CUDA device, you will also need to add the following dependencies to your project:
 ```groovy
 // build.gradle
-api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.14.0'
+api 'com.microsoft.onnxruntime:onnxruntime_gpu:1.16.0'
 ```
 ```kotlin
 // build.gradle.kts
-api("com.microsoft.onnxruntime:onnxruntime_gpu:1.14.0")
+api("com.microsoft.onnxruntime:onnxruntime_gpu:1.16.0")
 ```
 
 To find more info about ONNXRuntime and CUDA version compatibility, please refer to the [ONNXRuntime CUDA Execution Provider page](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
