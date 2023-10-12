@@ -31,6 +31,10 @@ import org.tensorflow.op.Ops
  * created by the layer, and `bias` is a bias vector created by the layer
  * (only applicable if `use_bias` is `True`).
  *
+ * __Input shape:__  2D tensor with shape `(batch_size, input_dim)`.
+ *
+ * __Output shape:__ 2D tensor with shape `(batch_size, units)`.
+ *
  * @property [outputSize] Dimensionality of the output space.
  * @property [activation] Activation function.
  * @property [kernelInitializer] Initializer function for the 'kernel' weights matrix.

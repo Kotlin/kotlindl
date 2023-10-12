@@ -10,6 +10,11 @@ import org.tensorflow.Shape
 /**
  * Zero-padding layer for 3D input (e.g. video).
  * This layer can add zeros in the rows, cols and depth of a video tensor.
+ *
+ * __Input shape:__  5D tensor with shape `(batch_size, first_axis_to_pad, second_axis_to_pad, third_axis_to_pad, depth)`.
+ *
+ * __Output shape:__ 5D tensor with shape `(batch_size, first_padded_axis, second_padded_axis, third_axis_to_pad, depth)`.
+ *
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
  *
  * @since 0.3

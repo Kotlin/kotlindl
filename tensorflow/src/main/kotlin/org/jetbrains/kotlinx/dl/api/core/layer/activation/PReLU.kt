@@ -26,6 +26,12 @@ import org.tensorflow.op.Ops
  * ```
  * where `alpha` is a learnable weight and has the same shape as `x` (i.e. input).
  *
+ * __Input shape:__  Arbitrary. Use the keyword argument `input_shape`
+ *                   (tuple of integers, does not include the samples axis)
+ *                   when using this layer as the first layer in a model.
+ *
+ * __Output shape:__ Same shape as the input.
+ *
  * @property [alphaInitializer] Initializer instance for the weights.
  * @property [alphaRegularizer] Regularizer instance for the weights.
  * @property [sharedAxes] The axes along which to share learnable parameters.

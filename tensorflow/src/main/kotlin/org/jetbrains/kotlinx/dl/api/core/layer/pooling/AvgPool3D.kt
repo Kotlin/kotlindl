@@ -17,6 +17,10 @@ import org.tensorflow.op.Ops
  *
  * Downsamples the input by taking the average over a window of size [poolSize].
  *
+ * __Input shape:__  5D tensor with shape `(batch_size, spatial_dim1, spatial_dim2, spatial_dim3, channels)`.
+ *
+ * __Output shape:__ 5D tensor with shape `(batch_size, pooled_dim1, pooled_dim2, pooled_dim3, channels)`.
+ *
  * @property [poolSize] Size of the pooling window for each dimension of input.
  * @property [strides] The amount of shift for pooling window per each input dimension in each pooling step.
  * @property [padding] Padding strategy; can be either of [ConvPadding.VALID] which means no

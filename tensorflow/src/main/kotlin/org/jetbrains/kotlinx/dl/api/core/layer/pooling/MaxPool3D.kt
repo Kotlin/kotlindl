@@ -13,7 +13,11 @@ import java.util.*
 
 /**
  * Max pooling operation for 3D data (spatial or spatio-temporal).
- * NOTE: Works with tensors which must have rank 5 (batch, depth, height, width, channels).
+ *
+ * __Input shape:__  5D tensor with shape `(batch_size, spatial_dim1, spatial_dim2, spatial_dim3, channels)`.
+ *
+ * __Output shape:__ 5D tensor with shape: `(batch_size, pooled_dim1, pooled_dim2, pooled_dim3, channels)`.
+ *
  * @property [poolSize] The size of the sliding window for each dimension of input tensor (pool batch, pool depth ,pool height, pool width, pool channels).
  * Usually, pool batch and pool channels are equal to 1.
  * @property [strides] Strides of the pooling operation for each dimension of input tensor.

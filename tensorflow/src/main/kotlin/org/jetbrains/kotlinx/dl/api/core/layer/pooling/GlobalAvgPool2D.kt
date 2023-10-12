@@ -13,11 +13,9 @@ import org.tensorflow.op.Ops
 /**
  * Global average pooling operation for 2D data (images and so on).
  *
- * NOTE: Works with tensors which must have rank 4 (batch, height, width, channels).
+ * __Input shape:__  4D tensor with shape `(batch_size, rows, cols, channels)`.
  *
- * Input shape: 4D tensor with shape `(batch_size, rows, cols, channels)`.
- *
- * Output shape: 2D tensor with shape `(batch_size, channels)`.
+ * __Output shape:__ 2D tensor with shape `(batch_size, channels)`.
  *
  * @property [name] Custom layer name.
  * @constructor Creates [GlobalAvgPool2D] object.
