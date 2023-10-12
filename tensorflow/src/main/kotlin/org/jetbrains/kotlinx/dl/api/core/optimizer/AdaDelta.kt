@@ -6,12 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdadelta
@@ -51,9 +48,6 @@ public class AdaDelta(
     public val epsilon: Float = 1e-8f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var rhoConst: Constant<Float>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -67,18 +61,16 @@ public class AdaDelta(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
-        rhoConst = tf.constant(rho, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        val targets = mutableListOf<Operand<Float>>()
 
-        for (i in weights.indices) {
-            val variable = weights[i]
-            val varName = variable.ref().op().name()
+        val rhoConst = tf.constant(rho, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val epsilonConstant = tf.constant(epsilon, getDType())
 
-            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val accumUpdateSlot: Variable<Float> = getSlot(varName, ACCUMULATOR_UPDATE)
+        for ((i, variable) in weights.withIndex()) {
+            val output = variable.asOutput()
+            val accumSlot = createSlot(ACCUMULATOR, output, tf, graph)
+            val accumUpdateSlot = createSlot(ACCUMULATOR_UPDATE, output, tf, graph)
 
             targets.add(
                 tf.train.applyAdadelta(
@@ -93,24 +85,6 @@ public class AdaDelta(
 
         }
         return targets
-    }
-
-    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-        val accumulatorInitializer = tf.withName(accumInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
-
-        val accumUpdateInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR_UPDATE))
-        val updateInitializer: Operand<Float> = tf.withName(accumUpdateInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaDeltaSlot(graph, tf, v.asOutput())
-        }
     }
 
     override val optimizerName: String get() = "Adadelta"

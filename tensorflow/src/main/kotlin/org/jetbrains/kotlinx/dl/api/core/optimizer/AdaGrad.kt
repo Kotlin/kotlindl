@@ -6,12 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdagrad
@@ -44,8 +41,6 @@ public class AdaGrad(
     public val initialAccumulatorValue: Float = 0.01f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var initialAccumulatorValueConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -58,17 +53,12 @@ public class AdaGrad(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
-        initialAccumulatorValueConstant = tf.constant(initialAccumulatorValue, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
-            val varName = variable.ref().op().name()
-
-            val slot: Variable<Float> = getSlot(varName, ACCUMULATOR)
+        for ((i, variable) in weights.withIndex()) {
+            val slot = createSlot(ACCUMULATOR, variable.asOutput(), tf, graph, initialValue = initialAccumulatorValue)
 
             targets.add(
                 tf.train.applyAdagrad(
@@ -82,20 +72,6 @@ public class AdaGrad(
             )
         }
         return targets
-    }
-
-    private fun createAdaGradSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-
-        val initializer: Operand<Float> = tf.withName(accumInitializerName)
-            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, initializer)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaGradSlot(graph, tf, v.asOutput())
-        }
     }
 
     override val optimizerName: String get() = "Adagrad"

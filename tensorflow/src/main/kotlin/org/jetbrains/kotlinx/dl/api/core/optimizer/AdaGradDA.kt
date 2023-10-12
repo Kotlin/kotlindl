@@ -11,11 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultOptimizerVariableName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdagradDa
@@ -52,10 +50,6 @@ public class AdaGradDA(
     public val l2Strength: Float = 0.01f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var l1StrengthConst: Constant<Float>
-    private lateinit var l2StrengthConst: Constant<Float>
-    private lateinit var globalStep: Variable<Float>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -70,19 +64,22 @@ public class AdaGradDA(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
-        learningRateConst = tf.constant(learningRate, getDType())
-        l1StrengthConst = tf.constant(l1Strength, getDType())
-        l2StrengthConst = tf.constant(l2Strength, getDType())
+        val targets = mutableListOf<Operand<Float>>()
 
-        for (i in weights.indices) {
-            val variable = weights[i]
-            val varName = variable.ref().op().name()
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val l1StrengthConst = tf.constant(l1Strength, getDType())
+        val l2StrengthConst = tf.constant(l2Strength, getDType())
 
-            val gradSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val gradSquaredSlot: Variable<Float> = getSlot(varName, SQUARED_ACCUMULATOR)
+        val globalStep = tf.withName(GLOBAL_STEP).variable(Shape.scalar(), getDType())
+        val globalStepAssignName = defaultAssignOpName(GLOBAL_STEP)
+        val globalStepInit: Assign<*> = tf.withName(globalStepAssignName)
+            .assign(globalStep, tf.withName(defaultInitializerOpName(GLOBAL_STEP)).constant(0.0f))
+        graph.addOptimizerVariableInitializer(globalStepInit)
 
+        for ((i, variable) in weights.withIndex()) {
+            val output = variable.asOutput()
+            val gradSlot = createSlot(ACCUMULATOR, output, tf, graph)
+            val gradSquaredSlot = createSlot(SQUARED_ACCUMULATOR, output, tf, graph)
             targets.add(
                 tf.train.applyAdagradDa(
                     variable,
@@ -102,30 +99,6 @@ public class AdaGradDA(
         graph.addOptimizerVariableAssignAddInitializer(globalStepInitFinish)
         graph.addOptimizerVariable(globalStep)
         return targets
-    }
-
-    private fun createAdaGradDASlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val accumulatorInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
-        val accumInitializer: Operand<Float> = tf.withName(accumulatorInitializerName)
-            .fill(tf.shape(v), tf.constant(0.0f))
-        createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumInitializer)
-
-        val squareAccumInitializerName = defaultInitializerOpName(createName(v, SQUARED_ACCUMULATOR))
-        val sqInitializer: Operand<Float> = tf.withName(squareAccumInitializerName)
-            .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
-
-        createSlot(graph, tf, v.asOutput(), SQUARED_ACCUMULATOR, sqInitializer)
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createAdaGradDASlot(graph, tf, v.asOutput())
-        }
-        globalStep = tf.withName(GLOBAL_STEP).variable(Shape.scalar(), getDType())
-        val globalStepAssignName = defaultAssignOpName(GLOBAL_STEP)
-        val globalStepInit: Assign<*> = tf.withName(globalStepAssignName)
-            .assign(globalStep, tf.withName(defaultInitializerOpName(GLOBAL_STEP)).constant(0.0f))
-        graph.addOptimizerVariableInitializer(globalStepInit)
     }
 
     override val optimizerName: String get() = "AdaGradDA"

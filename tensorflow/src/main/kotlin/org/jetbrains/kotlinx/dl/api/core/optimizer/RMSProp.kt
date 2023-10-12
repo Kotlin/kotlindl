@@ -6,12 +6,9 @@
 package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Output
 import org.tensorflow.op.Ops
-import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyCenteredRmsProp
@@ -39,11 +36,6 @@ public class RMSProp(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var decayConst: Constant<Float>
-    private lateinit var momentumConst: Constant<Float>
-
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
         require(momentum >= 0.0f) { "Momentum $momentum should be >= 0.0." }
@@ -57,23 +49,20 @@ public class RMSProp(
         weights: List<Variable<Float>>,
         gradients: Gradients
     ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
-            ArrayList()
+        val targets = mutableListOf<Operand<Float>>()
 
-        decayConst = tf.constant(decay, getDType())
-        momentumConst = tf.constant(momentum, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        val decayConst = tf.constant(decay, getDType())
+        val momentumConst = tf.constant(momentum, getDType())
+        val learningRateConst = tf.constant(learningRate, getDType())
+        val epsilonConstant = tf.constant(epsilon, getDType())
 
-        for (i in weights.indices) {
-            val variable = weights[i]
-            val varName = variable.ref().op().name()
-
-            val rmsSlot: Variable<Float> = getSlot(varName, RMS)
-            val momentumSlot: Variable<Float> = getSlot(varName, MOMENTUM)
+        for ((i, variable) in weights.withIndex()) {
+            val output = variable.asOutput()
+            val rmsSlot = createSlot(RMS, output, tf, graph)
+            val momentumSlot = createSlot(MOMENTUM, output, tf, graph)
 
             if (centered) {
-                val mgSlot: Variable<Float> = getSlot(varName, MG)
+                val mgSlot = createSlot(MG, output, tf, graph)
                 targets.add(
                     tf.train.applyCenteredRmsProp(
                         variable,
@@ -105,35 +94,6 @@ public class RMSProp(
             }
         }
         return targets
-    }
-
-    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
-        val rmsInitializerName = defaultInitializerOpName(createName(v, RMS))
-
-        val rmsInitializer: Operand<Float> = tf.withName(rmsInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
-
-        val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
-        val momentumInitializer: Operand<Float> = tf.withName(momentumInitializerName)
-            .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
-        createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
-
-        if (centered) {
-            val mgInitializerName = defaultInitializerOpName(createName(v, MG))
-            val mgInitializer: Operand<Float> = tf.withName(mgInitializerName)
-                .fill(
-                    tf.shape(v),
-                    tf.constant(0.0f)
-                )
-            createSlot(graph, tf, v.asOutput(), MG, mgInitializer)
-        }
-    }
-
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
-        for (v in variables) {
-            createRMSPropSlot(graph, tf, v.asOutput())
-        }
     }
 
     override val optimizerName: String get() = "RMSProp"
