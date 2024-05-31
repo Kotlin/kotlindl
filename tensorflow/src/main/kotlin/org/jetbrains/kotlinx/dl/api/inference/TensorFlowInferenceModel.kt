@@ -111,6 +111,9 @@ public open class TensorFlowInferenceModel(
 
         internal fun FloatData.toTensor(): Tensor<Float> {
             val preparedData = serializeToBuffer(floats)
+            require(preparedData.remaining() == shape.dims().reduce(Long::times).toInt()) {
+                // TODO: add more details about the shape and how to fix it.
+            }
             return Tensor.create(longArrayOf(1L, *shape.dims()), preparedData)
         }
 
