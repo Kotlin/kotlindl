@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Permutes the dimensions of the input according to a given pattern.
@@ -31,10 +33,10 @@ public class Permute(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val permArray = intArrayOf(0) + dims
         val perm = tf.constant(permArray)
         return tf.linalg.transpose(input, perm)

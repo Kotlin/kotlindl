@@ -15,9 +15,11 @@ import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingMeanVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingVarianceVarName
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Variable
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * NOTE: This layer is not trainable and does not update its weights. It's frozen by default.
@@ -62,13 +64,13 @@ public class BatchNorm(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         // Compute shapes of kernel and bias matrices
-        val weightShape = Shape.make(inputShape.size(axis[0]))
+        val weightShape = Shape.of(inputShape.size(axis[0]))
 
         if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
@@ -144,14 +146,14 @@ public class BatchNorm(
      */
     private fun batchNorm(
         tf: Ops,
-        x: Operand<Float>,
-        gamma: Variable<Float>?,
-        beta: Operand<Float>?,
-        movingMean: Operand<Float>,
-        movingVar: Operand<Float>,
-        eps: Operand<Float>,
-    ): Operand<Float> {
-        var inv: Operand<Float> = tf.math.rsqrt(tf.math.add(movingVar, eps))
+        x: Operand<TFloat32>,
+        gamma: Variable<TFloat32>?,
+        beta: Operand<TFloat32>?,
+        movingMean: Operand<TFloat32>,
+        movingVar: Operand<TFloat32>,
+        eps: Operand<TFloat32>,
+    ): Operand<TFloat32> {
+        var inv: Operand<TFloat32> = tf.math.rsqrt(tf.math.add(movingVar, eps))
 
         if (scale) inv = tf.math.mul(inv, gamma)
 

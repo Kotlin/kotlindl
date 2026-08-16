@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.inference.floatValue
 
 internal class AccuracyTest {
     @Test
@@ -21,17 +23,17 @@ internal class AccuracyTest {
             val tf = Ops.create(session)
             val instance = Accuracy()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yTrue.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
 
             assertEquals(
                 1.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asTensor().floatValue()
             )
         }
     }
@@ -46,18 +48,18 @@ internal class AccuracyTest {
             val tf = Ops.create(session)
             val instance = Accuracy()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
 
             assertEquals(
                 0.5f,
-                operand.asOutput().tensor().floatValue()
+                operand.asTensor().floatValue()
             )
         }
     }
@@ -71,18 +73,18 @@ internal class AccuracyTest {
             val tf = Ops.create(session)
             val instance = Accuracy()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
 
             assertEquals(
                 0.0f,
-                operand.asOutput().tensor().floatValue()
+                operand.asTensor().floatValue()
             )
         }
     }

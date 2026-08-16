@@ -1,4 +1,6 @@
-apply plugin: 'kotlin'
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
 
 dependencies {
     api project(":api")
@@ -10,13 +12,14 @@ dependencies {
 }
 
 dependencies {
-    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.24.3'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // to run on GPU (if CUDA is updated and machine with NVIDIA onboard)
     // implementation 'org.tensorflow:libtensorflow:1.15.0'
     // implementation 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'
@@ -38,15 +41,18 @@ if (publishedArtifactsVersion != null && !publishedArtifactsVersion.isBlank()) {
     }
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
     // set heap size for the test JVM(s)
     minHeapSize = "1024m"

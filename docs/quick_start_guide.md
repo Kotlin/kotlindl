@@ -3,6 +3,18 @@
 Whether you want to add Kotlin DL to your project or experiment with it in a Jupyter Notebook, 
 first you'll need to set up the appropriate dependencies.  
 
+## Requirements
+
+* **Java 11 or later.** Kotlin DL 0.5.0 and newer target Java 11 bytecode.
+* The TensorFlow backend runs on `linux-x86_64`, `linux-arm64`, `macosx-arm64`, `macosx-x86_64`
+  and `windows-x86_64`. Since 0.6 it is built on [TensorFlow Java](https://github.com/tensorflow/java)
+  (wrapping TensorFlow 2.x), which means Apple Silicon is supported natively; earlier releases used
+  the TensorFlow 1.15 Java API, which had no arm64 build.
+* The ONNX backend additionally runs on Android.
+* On Apple Silicon, TensorFlow models can optionally run on the GPU via the
+  `kotlin-deeplearning-tensorflow-metal` artifact, which needs JDK 22 or later. See
+  [Apple Metal on Apple Silicon](../README.md#apple-metal-on-apple-silicon).
+
 ## Working with Kotlin DL in an IDE
 1. Open a Kotlin project where you want to use Kotlin DL, or create a new Kotlin project in IntelliJ IDEA as described in the [Kotlin documentation](https://kotlinlang.org/docs/tutorials/jvm-get-started.html).
 2. Add the Kotlin DL dependency to your project's build file. 
@@ -13,7 +25,7 @@ first you'll need to set up the appropriate dependencies.
    }
    
    dependencies {
-       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]'
+       implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:[KOTLIN-DL-VERSION]'
    }
     ```  
    * For `build.gradle.kts`: 
@@ -23,14 +35,14 @@ first you'll need to set up the appropriate dependencies.
    }
        
    dependencies {
-       implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
+       implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:[KOTLIN-DL-VERSION]")
    }
    ```   
    * If your project is built with Maven, add Kotlin DL to your `pom.xml`: 
    ```xml
    <dependency>
      <groupId>org.jetbrains.kotlinx</groupId>
-     <artifactId>kotlin-deeplearning-api</artifactId>
+     <artifactId>kotlin-deeplearning-tensorflow</artifactId>
      <version>[KOTLIN-DL-VERSION]</version>
      <type>pom</type>
    </dependency>
@@ -67,7 +79,7 @@ Here are step-by-step instructions to help you get started:
 
 1. To set up Jupyter Notebook, you need to first have [Python](https://www.python.org/) installed on your machine. 
 2. The next step is to install the [Anaconda distribution](https://www.anaconda.com/products/individual) that includes Jupyter Notebook. 
-3. For the Kotlin kernel to work, make sure you have Java v.8 or later installed. 
+3. For the Kotlin kernel to work, make sure you have Java v.11 or later installed. 
 4. Once installed, add the Kotlin Kernel to Jupyter Notebook with the following command: 
 
     ```conda install -c jetbrains kotlin-jupyter-kernel```
@@ -75,7 +87,7 @@ Here are step-by-step instructions to help you get started:
 6. Once Jupyter Notebook is open in your browser, you can create a new Kotlin notebook from the UI. 
 7. In your new Kotlin notebook, add a dependency for Kotlin DL:
 ```
-   @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-api:[KOTLIN-DL-VERSION]")
+   @file:DependsOn("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:[KOTLIN-DL-VERSION]")
 ```
 
 You are now all set! Next, you can start [building your first neural network](create_your_first_nn.md).

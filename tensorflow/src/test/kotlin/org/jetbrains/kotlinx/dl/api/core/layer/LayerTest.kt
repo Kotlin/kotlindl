@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.tensorflow.*
 import org.tensorflow.op.Ops
 import java.nio.FloatBuffer
+import org.tensorflow.ndarray.buffer.DataBuffers
+import org.tensorflow.types.TFloat32
 
 enum class RunMode {
     EAGER,
@@ -20,8 +22,8 @@ enum class RunMode {
 }
 
 open class LayerTest {
-    private fun getInputOp(tf: Ops, input: Array<*>): Operand<Float> =
-        tf.constant(input.shape.toLongArray(), FloatBuffer.wrap(input.flattenFloats()))
+    private fun getInputOp(tf: Ops, input: Array<*>): Operand<TFloat32> =
+        tf.constant(input.shape, DataBuffers.of(FloatBuffer.wrap(input.flattenFloats())))
 
     private fun getLayerOutputOp(
         tf: Ops,
@@ -39,24 +41,24 @@ open class LayerTest {
     private fun runLayerInEagerMode(
         layer: Layer,
         input: Array<*>,
-    ): Tensor<*> {
+    ): Tensor {
         EagerSession.create().use {
             val tf = Ops.create()
             val outputOp = getLayerOutputOp(tf, layer, input)
-            return outputOp.tensor()
+            return outputOp.asTensor()
         }
     }
 
     private fun runLayerInGraphMode(
         layer: Layer,
         input: Array<*>,
-    ): Tensor<*> {
+    ): Tensor {
         Graph().use { graph ->
             Session(graph).use { session ->
                 val tf = Ops.create(graph)
                 val outputOp = getLayerOutputOp(tf, layer, input)
                 (layer as? ParametrizedLayer)?.initialize(session)
-                return session.runner().fetch(outputOp).run().first()
+                return session.runner().fetch(outputOp).run().get(0)
             }
         }
     }
@@ -83,7 +85,7 @@ open class LayerTest {
         output.use {
             val outputShape = output.shape()
             val expectedShape = expectedOutput.shape.toLongArray()
-            assertArrayEquals(expectedShape, outputShape)
+            assertArrayEquals(expectedShape, outputShape.asArray())
 
             val result = it.toFloatArray()
             val expected = expectedOutput.flattenFloats()

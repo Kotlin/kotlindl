@@ -13,6 +13,8 @@ import org.tensorflow.Operand
 import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Sequential model groups a linear stack of layers into a TensorFlow Model.
@@ -28,12 +30,12 @@ public class Sequential public constructor(vararg layers: Layer, gpuConfiguratio
     public constructor(vararg layers: Layer) : this(*layers, gpuConfiguration = null)
 
     override fun buildLayers(
-        training: Operand<Boolean>,
-        numberOfLosses: Operand<Float>
-    ): Pair<Placeholder<Float>, Operand<Float>> {
+        training: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>
+    ): Pair<Placeholder<TFloat32>, Operand<TFloat32>> {
         val input = inputLayer.build(tf)
         inputLayer.setOutputShape(input.asOutput().shape())
-        var output: Operand<Float> = input
+        var output: Operand<TFloat32> = input
 
         layers.filter { it !is Input }.forEach { layer ->
             output = layer.build(tf, output, training, numberOfLossesOp)

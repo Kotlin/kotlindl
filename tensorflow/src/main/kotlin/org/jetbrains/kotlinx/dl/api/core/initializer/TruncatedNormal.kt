@@ -9,6 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.random.TruncatedNormal
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates a truncated normal distribution.
@@ -27,9 +29,9 @@ public class TruncatedNormal(public val seed: Long = 12L) :
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         return tf.withName(name).random.truncatedNormal(
             shape,
             getDType(),

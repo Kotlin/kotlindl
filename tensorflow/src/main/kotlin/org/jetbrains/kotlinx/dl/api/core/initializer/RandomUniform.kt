@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates tensors with a uniform distribution.
@@ -27,13 +29,13 @@ public class RandomUniform(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         require(minVal <= maxVal) { "The minVal parameter value must be less or equal than maxVal parameter value." }
 
         val seeds = longArrayOf(seed, 0L)
-        var distOp: Operand<Float> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())
+        var distOp: Operand<TFloat32> = tf.random.statelessRandomUniform(shape, tf.constant(seeds), getDType())
         if (minVal == 0.0f) {
             if (maxVal != 1.0f) {
                 distOp = tf.math.mul(distOp, tf.constant(maxVal))

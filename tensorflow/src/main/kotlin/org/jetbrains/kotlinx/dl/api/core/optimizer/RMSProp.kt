@@ -16,6 +16,7 @@ import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyCenteredRmsProp
 import org.tensorflow.op.train.ApplyRmsProp
+import org.tensorflow.types.TFloat32
 
 private const val RMS = "rms"
 private const val MG = "mg"
@@ -39,10 +40,10 @@ public class RMSProp(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
 
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var decayConst: Constant<Float>
-    private lateinit var momentumConst: Constant<Float>
+    private lateinit var epsilonConstant: Constant<TFloat32>
+    private lateinit var learningRateConst: Constant<TFloat32>
+    private lateinit var decayConst: Constant<TFloat32>
+    private lateinit var momentumConst: Constant<TFloat32>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -54,26 +55,26 @@ public class RMSProp(
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
+    ): List<Operand<TFloat32>> {
+        val targets: MutableList<Operand<TFloat32>> =
             ArrayList()
 
-        decayConst = tf.constant(decay, getDType())
-        momentumConst = tf.constant(momentum, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        decayConst = tf.constant(decay)
+        momentumConst = tf.constant(momentum)
+        learningRateConst = tf.constant(learningRate)
+        epsilonConstant = tf.constant(epsilon)
 
         for (i in weights.indices) {
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val rmsSlot: Variable<Float> = getSlot(varName, RMS)
-            val momentumSlot: Variable<Float> = getSlot(varName, MOMENTUM)
+            val rmsSlot: Variable<TFloat32> = getSlot(varName, RMS)
+            val momentumSlot: Variable<TFloat32> = getSlot(varName, MOMENTUM)
 
             if (centered) {
-                val mgSlot: Variable<Float> = getSlot(varName, MG)
+                val mgSlot: Variable<TFloat32> = getSlot(varName, MG)
                 targets.add(
                     tf.train.applyCenteredRmsProp(
                         variable,
@@ -107,21 +108,21 @@ public class RMSProp(
         return targets
     }
 
-    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createRMSPropSlot(graph: KGraph, tf: Ops, v: Output<TFloat32>) {
         val rmsInitializerName = defaultInitializerOpName(createName(v, RMS))
 
-        val rmsInitializer: Operand<Float> = tf.withName(rmsInitializerName)
+        val rmsInitializer: Operand<TFloat32> = tf.withName(rmsInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(1.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), RMS, rmsInitializer)
 
         val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
-        val momentumInitializer: Operand<Float> = tf.withName(momentumInitializerName)
+        val momentumInitializer: Operand<TFloat32> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, momentumInitializer)
 
         if (centered) {
             val mgInitializerName = defaultInitializerOpName(createName(v, MG))
-            val mgInitializer: Operand<Float> = tf.withName(mgInitializerName)
+            val mgInitializer: Operand<TFloat32> = tf.withName(mgInitializerName)
                 .fill(
                     tf.shape(v),
                     tf.constant(0.0f)
@@ -130,7 +131,7 @@ public class RMSProp(
         }
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<TFloat32>>) {
         for (v in variables) {
             createRMSPropSlot(graph, tf, v.asOutput())
         }

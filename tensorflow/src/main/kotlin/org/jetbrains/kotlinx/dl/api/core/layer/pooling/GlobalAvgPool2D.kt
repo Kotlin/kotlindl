@@ -9,6 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.util.TF
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Global average pooling operation for 2D data (images and so on).
@@ -29,10 +31,10 @@ public class GlobalAvgPool2D(
 ) : Layer(name) {
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         return TF.mean(tf, input, tf.constant(intArrayOf(1, 2)))
     }
 

@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.Output
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 internal class RepeatVectorLayerTest {
 
@@ -34,7 +36,7 @@ internal class RepeatVectorLayerTest {
         val layer = RepeatVector(n = 2)
         val x = Array(3) { FloatArray(3) { it.toFloat() } }
         val y = layer(x)
-        val actual = y.tensor().copyTo(Array(3) { Array(layer.n) { FloatArray(3) } })
+        val actual = y.asTensor().copyTo(Array(3) { Array(layer.n) { FloatArray(3) } })
         val expected = arrayOf(
             arrayOf(floatArrayOf(0F, 1F, 2F), floatArrayOf(0F, 1F, 2F)),
             arrayOf(floatArrayOf(0F, 1F, 2F), floatArrayOf(0F, 1F, 2F)),
@@ -44,7 +46,7 @@ internal class RepeatVectorLayerTest {
     }
 
     // TODO: generalise this for Layer, see https://github.com/JetBrains/KotlinDL/issues/145
-    private operator fun RepeatVector.invoke(input: Array<FloatArray>): Output<Float> = Ops.create().let { tf ->
+    private operator fun RepeatVector.invoke(input: Array<FloatArray>): Output<TFloat32> = Ops.create().let { tf ->
         val inputOp = tf.constant(input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)

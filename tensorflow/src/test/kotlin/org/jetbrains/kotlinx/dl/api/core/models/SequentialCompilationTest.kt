@@ -26,6 +26,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.tensorflow.ndarray.Shape
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L

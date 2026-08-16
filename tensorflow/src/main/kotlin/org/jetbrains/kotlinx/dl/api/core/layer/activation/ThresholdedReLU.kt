@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Thresholded Rectified Linear Unit.
@@ -30,7 +31,7 @@ public class ThresholdedReLU(
         require(theta >= 0.0f) { "Theta $theta should be >= 0.0." }
     }
 
-    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         return commonRelu(tf, input = input, threshold = theta)
     }
 

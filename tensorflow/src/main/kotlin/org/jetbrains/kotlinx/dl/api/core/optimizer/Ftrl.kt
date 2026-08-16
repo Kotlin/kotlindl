@@ -15,6 +15,7 @@ import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyFtrl
+import org.tensorflow.types.TFloat32
 
 private const val ACCUMULATOR = "gradient_accumulator"
 private const val LINEAR_ACCUMULATOR = "linear_accumulator"
@@ -61,11 +62,11 @@ public class Ftrl(
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
     /**  */
-    private lateinit var learningRatePowerConst: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var l1RegularizationStrengthConst: Constant<Float>
-    private lateinit var l2RegularizationStrengthConst: Constant<Float>
-    private lateinit var l2ShrinkageRegularizationStrengthConst: Constant<Float>
+    private lateinit var learningRatePowerConst: Constant<TFloat32>
+    private lateinit var learningRateConst: Constant<TFloat32>
+    private lateinit var l1RegularizationStrengthConst: Constant<TFloat32>
+    private lateinit var l2RegularizationStrengthConst: Constant<TFloat32>
+    private lateinit var l2ShrinkageRegularizationStrengthConst: Constant<TFloat32>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -79,25 +80,25 @@ public class Ftrl(
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
+    ): List<Operand<TFloat32>> {
+        val targets: MutableList<Operand<TFloat32>> =
             ArrayList()
 
-        l1RegularizationStrengthConst = tf.constant(l1RegularizationStrength, getDType())
-        l2RegularizationStrengthConst = tf.constant(l2RegularizationStrength, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        l2ShrinkageRegularizationStrengthConst = tf.constant(l2ShrinkageRegularizationStrength, getDType())
-        learningRatePowerConst = tf.constant(learningRatePower, getDType())
+        l1RegularizationStrengthConst = tf.constant(l1RegularizationStrength)
+        l2RegularizationStrengthConst = tf.constant(l2RegularizationStrength)
+        learningRateConst = tf.constant(learningRate)
+        l2ShrinkageRegularizationStrengthConst = tf.constant(l2ShrinkageRegularizationStrength)
+        learningRatePowerConst = tf.constant(learningRatePower)
 
         for (i in weights.indices) {
 
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val linearSlot: Variable<Float> = getSlot(varName, LINEAR_ACCUMULATOR)
+            val accumSlot: Variable<TFloat32> = getSlot(varName, ACCUMULATOR)
+            val linearSlot: Variable<TFloat32> = getSlot(varName, LINEAR_ACCUMULATOR)
             val options = ApplyFtrl.useLocking(true)
 
             targets.add(
@@ -119,7 +120,7 @@ public class Ftrl(
         return targets
     }
 
-    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createFtrlSlot(graph: KGraph, tf: Ops, v: Output<TFloat32>) {
         val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
         val accumInitializer = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.constant(initialAccumulatorValue))
@@ -131,7 +132,7 @@ public class Ftrl(
         createSlot(graph, tf, v.asOutput(), LINEAR_ACCUMULATOR, linearAccumInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<TFloat32>>) {
         for (v in variables) {
             createFtrlSlot(graph, tf, v.asOutput())
         }

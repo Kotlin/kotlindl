@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Leaky version of a Rectified Linear Unit.
@@ -30,7 +31,7 @@ public class LeakyReLU(
         }
     }
 
-    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         return commonRelu(tf, input = input, alpha = alpha)
     }
 

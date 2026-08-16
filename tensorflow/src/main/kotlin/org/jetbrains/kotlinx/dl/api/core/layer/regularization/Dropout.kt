@@ -9,6 +9,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
+import org.tensorflow.ndarray.Shape
 
 /**
  * Applies Dropout to the input.
@@ -35,10 +38,10 @@ public class Dropout(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         /* if (isTraining) {
              val trainingFactor = tf.placeholderWithDefault(tf.constant(1.0f), Shape.scalar())
 
@@ -55,7 +58,7 @@ public class Dropout(
              val options = RandomUniform.seed(seed).seed2(seed + 1)
              val randomUniform = tf.random.randomUniform(tf.constant(dims.toLongArray()), getDType(), options)
 
-             val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<Float>))
+             val mask = tf.math.floor(tf.math.add(randomUniform, probability as Operand<TFloat32>))
 
              return tf.math.div(tf.math.mul(input, mask), probability)
          } else {*/

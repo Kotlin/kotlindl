@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Cropping layer for 1D data (e.g. audio, time-series)
@@ -35,7 +36,7 @@ public class Cropping1D(
         }
     }
 
-    override fun crop(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun crop(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val cropSize = inputShape.size(1) - cropping[0] - cropping[1]
         return tf.slice(

@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Stack
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Neural network hyperparameter, activation function of a node defines the output of that node given an input or set of inputs.
@@ -357,7 +359,7 @@ public enum class Activations {
  * @see [Activations.Linear]
  */
 public class LinearActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
         return features
     }
 }
@@ -366,35 +368,35 @@ public class LinearActivation : Activation {
  * @see [Activations.Sigmoid]
  */
 public class SigmoidActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.sigmoid(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.math.sigmoid(features)
 }
 
 /**
  * @see [Activations.Relu]
  */
 public class ReluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.relu(features)
 }
 
 /**
  * @see [Activations.Relu6]
  */
 public class Relu6Activation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.relu6(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.relu6(features)
 }
 
 /**
  * @see [Activations.Tanh]
  */
 public class TanhActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.tanh(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.math.tanh(features)
 }
 
 /**
  * @see [Activations.TanhShrink]
  */
 public class TanhShrinkActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> =
         tf.math.sub(features, tf.math.tanh(features))
 }
 
@@ -402,14 +404,14 @@ public class TanhShrinkActivation : Activation {
  * @see [Activations.Elu]
  */
 public class EluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.elu(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.elu(features)
 }
 
 /**
  * @see [Activations.Selu]
  */
 public class SeluActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.selu(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.selu(features)
 }
 
 /**
@@ -427,28 +429,28 @@ public class SeluActivation : Activation {
  * @see [Activations.Softmax] for explanation.
  */
 public class SoftmaxActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softmax(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.softmax(features)
 }
 
 /**
  * @see [Activations.LogSoftmax]
  */
 public class LogSoftmaxActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.logSoftmax(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.logSoftmax(features)
 }
 
 /**
  * @see [Activations.Exponential]
  */
 public class ExponentialActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.math.exp(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.math.exp(features)
 }
 
 /**
  * @see [Activations.SoftPlus]
  */
 public class SoftPlusActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> =
         tf.math.log(tf.math.add(tf.math.exp(features), tf.constant(1.0f)))
 }
 
@@ -456,16 +458,16 @@ public class SoftPlusActivation : Activation {
  * @see [Activations.SoftSign]
  */
 public class SoftSignActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> = tf.nn.softsign(features)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> = tf.nn.softsign(features)
 }
 
 /**
  * @see [Activations.HardSigmoid]
  */
 public class HardSigmoidActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
-        val point2: Operand<Float> = tf.constant(0.2f)
-        val point5: Operand<Float> = tf.constant(0.5f)
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
+        val point2: Operand<TFloat32> = tf.constant(0.2f)
+        val point5: Operand<TFloat32> = tf.constant(0.5f)
 
         return tf.math.add(tf.math.mul(features, point2), point5)
     }
@@ -475,7 +477,7 @@ public class HardSigmoidActivation : Activation {
  * @see [Activations.Swish]
  */
 public class SwishActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> =
         tf.math.mul(features, tf.math.sigmoid(features))
 }
 
@@ -483,7 +485,7 @@ public class SwishActivation : Activation {
  * @see [Activations.Mish]
  */
 public class MishActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> =
         tf.math.mul(features, tf.math.tanh(tf.math.softplus(features)))
 }
 
@@ -500,13 +502,13 @@ public class MishActivation : Activation {
  * @see [Activations.HardShrink]
  */
 public class HardShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
         require(lower < upper) {
             "The value of lower should not be higher than upper"
         }
         val maskLower = tf.math.less(features, tf.constant(lower))
         val maskUpper = tf.math.greater(features, tf.constant(upper))
-        return tf.where3(tf.math.logicalOr(maskLower, maskUpper), features, tf.zerosLike(features))
+        return tf.select(tf.math.logicalOr(maskLower, maskUpper), features, tf.zerosLike(features))
     }
 }
 
@@ -517,19 +519,19 @@ public class HardShrinkActivation(public val lower: Float = -0.5f, public val up
  * @see [Activations.SoftShrink]
  */
 public class SoftShrinkActivation(public val lower: Float = -0.5f, public val upper: Float = 0.5f) : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
         require((lower < upper) && (lower < 0) && (upper > 0)) {
             "The boundary values have to be non zero and the lower bound has to be lower as the upper"
         }
         val zeros = tf.math.mul(features, tf.constant(0f))
-        val valuesBelowLower = tf.where3(
+        val valuesBelowLower = tf.select(
             tf.math.less(features, tf.constant(lower)),
             tf.math.sub(
                 features, tf.constant(lower)
             ),
             zeros
         )
-        val valuesAboveUpper = tf.where3(
+        val valuesAboveUpper = tf.select(
             tf.math.less(tf.constant(upper), features),
             tf.math.sub(
                 features, tf.constant(upper)
@@ -544,7 +546,7 @@ public class SoftShrinkActivation(public val lower: Float = -0.5f, public val up
  * @see [Activations.LiSHT]
  */
 public class LishtActivation : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> =
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> =
         tf.math.mul(features, tf.math.tanh(features))
 }
 
@@ -553,7 +555,7 @@ public class LishtActivation : Activation {
  * @see [Activations.Snake]
  */
 public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
         val doubleFreqConstant = tf.constant(2 * frequency)
 
         return tf.math.add(
@@ -572,7 +574,7 @@ public class SnakeActivation(private val frequency: Float = 1.0f) : Activation {
  * @see [Activations.Gelu]
  */
 public class GeluActivation(public val approximate: Boolean = false) : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
         if (approximate) {
             val coefficient = tf.constant(0.044715f)
             return tf.math.mul(
@@ -607,7 +609,7 @@ public class GeluActivation(public val approximate: Boolean = false) : Activatio
  * @see [Activations.Sparsemax]
  */
 public class SparsemaxActivation(private val axis: Int = -1) : Activation {
-    override fun apply(tf: Ops, features: Operand<Float>): Operand<Float> {
+    override fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
 
         // Keep references to shape because we perform sparsemax on 2D.
         // If required, we need to reshape features to 2D and back.
@@ -630,7 +632,7 @@ public class SparsemaxActivation(private val axis: Int = -1) : Activation {
         return tf.ensureShape(swapAxis(tf, output, axisNorm, rank - 1), shape)
     }
 
-    private fun swapAxis(tf: Ops, features: Operand<Float>, axis: Int, lastIndex: Int): Operand<Float> {
+    private fun swapAxis(tf: Ops, features: Operand<TFloat32>, axis: Int, lastIndex: Int): Operand<TFloat32> {
         /**
          * swaps features Operand's lastIndex with axis
          */
@@ -638,7 +640,7 @@ public class SparsemaxActivation(private val axis: Int = -1) : Activation {
         val range = (tf.range(tf.constant(0), tf.constant(lastIndex + 1), tf.constant(1)))
         return tf.linalg.transpose(
             features,
-            tf.tensorScatterUpdate(
+            tf.tensorScatterNdUpdate(
                 range,
                 tf.constant(arrayOf(intArrayOf(axis), intArrayOf(lastIndex))),
                 tf.constant(intArrayOf(lastIndex, axis))
@@ -646,25 +648,29 @@ public class SparsemaxActivation(private val axis: Int = -1) : Activation {
         )
     }
 
-    private fun compute2DSparsemax(tf: Ops, features: Operand<Float>): Operand<Float> {
-        val shape = features.asOutput().tensor().shape()
-        val dims = shape[shape.lastIndex]
+    private fun compute2DSparsemax(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32> {
+        // In TensorFlow Java 1.x an Output carries no tensor in graph mode; its static shape is
+        // read directly and Shape.size() already returns the product of all dimensions.
+        val shape = features.asOutput().shape()
+        val dims = shape.size(shape.numDimensions() - 1)
         val dimsOp = tf.constant(dims.toInt())
-        val obs = shape.reduce { acc, l -> acc * l } / dims
+        val obs = shape.size() / dims
         val one = tf.constant(1f)
 
         val z = tf.reshape(features, tf.constant(longArrayOf(obs, dims)))
-        val zSorted = tf.nn.topK(z, dimsOp)
+        // The two-argument overload declares its options as an array rather than varargs, so the
+        // index type is passed explicitly here; TInt32 matches the indices type of the 1.15 API.
+        val zSorted = tf.nn.topK(z, dimsOp, TInt32::class.java)
         val zCumSum = tf.math.cumsum(zSorted.values(), tf.constant(-1))
 
-        val k = tf.range(one, tf.math.add(tf.dtypes.cast(dimsOp, Float::class.javaObjectType), one), one)
+        val k = tf.range(one, tf.math.add(tf.dtypes.cast(dimsOp, TFloat32::class.java), one), one)
 
         // check where (k * z_sorted + 1 > cumsum(z)
         val zCheck = tf.math.greater(tf.math.add(one, tf.math.mul(k, zSorted.values())), zCumSum)
 
         // casting boolean values to Int makes true = 1, false = 0,
         // then summing each row is same as finding last value that is one in such vector [1,1,..1,0,0,..,0]
-        val kz = tf.reduceSum(tf.dtypes.cast(zCheck, Int::class.javaObjectType), tf.constant(-1))
+        val kz = tf.reduceSum(tf.dtypes.cast(zCheck, TInt32::class.java), tf.constant(-1))
 
 
         // If there are inf values or all values are -inf, the k_z will be zero,
@@ -682,7 +688,7 @@ public class SparsemaxActivation(private val axis: Int = -1) : Activation {
         )
 
         val tauSum = tf.gatherNd(zCumSum, indices)
-        val tauZ = tf.math.div(tf.math.sub(tauSum, one), tf.dtypes.cast(kz, Float::class.javaObjectType))
+        val tauZ = tf.math.div(tf.math.sub(tauSum, one), tf.dtypes.cast(kz, TFloat32::class.java))
 
         val p = tf.math.maximum(tf.constant(0f), tf.math.sub(z, tf.expandDims(tauZ, tf.constant(-1))))
 
@@ -694,12 +700,20 @@ public class SparsemaxActivation(private val axis: Int = -1) : Activation {
             ), Stack.axis(1)
         )
 
-        val pSafe = tf.where3(
-            tf.math.logicalOr(
-                tf.math.equal(kz, tf.constant(0)),
-                tf.math.isNan(
-                    tf.gatherNd(zCumSum, zCumsumLastIndex)
-                )
+        // The condition is per-row (shape [obs]) while the branches are [obs, dims]. The 1.15 API's
+        // `where3` mapped to Select v1, which treats a vector condition as selecting whole rows;
+        // Ops.select maps to SelectV2, which instead requires the operands to be broadcastable.
+        // Expanding the condition to [obs, 1] makes it broadcast across each row, which is exactly
+        // the old row-selection behaviour.
+        val pSafe = tf.select(
+            tf.expandDims(
+                tf.math.logicalOr(
+                    tf.math.equal(kz, tf.constant(0)),
+                    tf.math.isNan(
+                        tf.gatherNd(zCumSum, zCumsumLastIndex)
+                    )
+                ),
+                tf.constant(-1)
             ),
             tf.fill(tf.constant(longArrayOf(obs, dims)), tf.constant(Float.NaN)),
             p

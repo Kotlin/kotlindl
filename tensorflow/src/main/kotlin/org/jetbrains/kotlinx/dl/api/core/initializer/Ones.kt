@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates tensors initialized to 1.
@@ -16,9 +18,9 @@ public class Ones : Initializer() {
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         return tf.withName(name).fill(shape, tf.constant(1.0f))
     }
 

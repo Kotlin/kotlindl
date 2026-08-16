@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 internal class MaxPool1DTest {
     @Test
@@ -58,7 +59,7 @@ internal class MaxPool1DTest {
 
             // Check output values are correct.
             val actual = Array(input.size) { Array(2) { FloatArray(input[0][0].size) } }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     Assertions.assertArrayEquals(
@@ -118,7 +119,7 @@ internal class MaxPool1DTest {
 
             // Check output values are correct.
             val actual = Array(input.size) { Array(input[0].size) { FloatArray(input[0][0].size) } }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     Assertions.assertArrayEquals(
@@ -174,7 +175,7 @@ internal class MaxPool1DTest {
 
             // Check output values are correct.
             val actual = Array(input.size) { Array(2) { FloatArray(input[0][0].size) } }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     Assertions.assertArrayEquals(

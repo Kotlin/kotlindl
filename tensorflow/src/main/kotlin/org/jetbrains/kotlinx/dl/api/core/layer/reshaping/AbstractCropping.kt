@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Abstract Cropping layer used as the base layer for all the cropping layers.
@@ -24,10 +26,10 @@ public abstract class AbstractCropping(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         return crop(tf, input)
     }
 
@@ -35,5 +37,5 @@ public abstract class AbstractCropping(
      * The actual implementation of cropping operation which each subclassed layer needs to
      * implement. This method will then be called from [build] method to crop the input tensor.
      */
-    protected abstract fun crop(tf: Ops, input: Operand<Float>): Operand<Float>
+    protected abstract fun crop(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32>
 }

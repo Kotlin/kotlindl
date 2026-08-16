@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 
 /**
  * Zero-padding layer for 2D input (e.g. picture).

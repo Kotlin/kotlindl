@@ -13,8 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 class PReLUTest : LayerTest() {
 
@@ -72,9 +73,9 @@ class PReLUTest : LayerTest() {
                 inputShape[2].toInt(),
                 inputShape[2].toInt(),
                 tf,
-                shapeOperand(tf, Shape.make(1, inputShape[2])),
+                shapeOperand(tf, Shape.of(1, inputShape[2])),
                 "temp_init"
-            ).asOutput().tensor()
+            ).asTensor()
             alphaTensor.copyTo(alpha)
             alphaTensor.close()
         }

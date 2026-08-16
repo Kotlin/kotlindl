@@ -12,9 +12,11 @@ import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import kotlin.math.roundToInt
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Abstract Convolutional layer is a base block for building base types of convolutional layers
@@ -67,10 +69,10 @@ public abstract class AbstractConv(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
@@ -130,7 +132,7 @@ public abstract class AbstractConv(
      * @param numberOfChannels for input of this layer
      */
     protected open fun computeBiasShape(numberOfChannels: Long): Shape =
-        Shape.make(filters.toLong())
+        Shape.of(filters.toLong())
 
     /** Given a layer name specify its kernel name. */
     protected abstract fun kernelVarName(name: String): String
@@ -139,7 +141,7 @@ public abstract class AbstractConv(
     protected abstract fun biasVarName(name: String): String
 
     /** The actual layer operation implementation without adding the bias which is added by the abstract class. */
-    protected abstract fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float>
+    protected abstract fun convImplementation(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32>
 }
 
 private fun multiply(values: LongArray) = values.fold(1L, Long::times)

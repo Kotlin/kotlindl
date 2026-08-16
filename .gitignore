@@ -13,3 +13,6 @@ build/
 /pretrainedModels/
 /examples/savedmodels/
 /tensorflow/cache/
+
+# Local AI-assistant guidance. Useful when working on the code, but not part of the project.
+/CLAUDE.md

@@ -7,7 +7,6 @@ package org.jetbrains.kotlinx.dl.gradle
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.api.AndroidBasePlugin
-import com.android.build.gradle.internal.api.DefaultAndroidSourceDirectorySet
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -48,8 +47,8 @@ class DownloadModelsPlugin : Plugin<Project> {
         if (project.plugins.withType(AndroidBasePlugin::class.java).isEmpty()) return null
         val androidExtension = project.extensions.findByType(CommonExtension::class.java) ?: return null
         val sourceSet = androidExtension.sourceSets.findByName(sourceSetName) ?: return null
-        val resDirectorySet = sourceSet.res as? DefaultAndroidSourceDirectorySet ?: return null
-        return resDirectorySet.srcDirs.first().absolutePath
+        val resDirectory = sourceSet.res.directories.firstOrNull() ?: return null
+        return project.file(resDirectory).absolutePath
     }
 
     companion object {

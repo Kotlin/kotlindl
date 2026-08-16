@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val EPS = 1e-7f
 private const val FAN_IN = 10
@@ -23,13 +24,13 @@ internal class ConstantTest {
         val actual = Array(2) { FloatArray(2) { 0f } }
         val expected = Array(2) { FloatArray(2) { 42.2f } }
 
-        val shape = Shape.make(2, 2)
+        val shape = Shape.of(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Constant(42.2f)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
             assertArrayEquals(
                 expected[0],

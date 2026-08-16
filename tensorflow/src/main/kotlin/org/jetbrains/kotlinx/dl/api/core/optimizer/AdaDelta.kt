@@ -15,6 +15,7 @@ import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyAdadelta
+import org.tensorflow.types.TFloat32
 
 private const val ACCUMULATOR = "accum"
 private const val ACCUMULATOR_UPDATE = "accum_update"
@@ -51,9 +52,9 @@ public class AdaDelta(
     public val epsilon: Float = 1e-8f,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var epsilonConstant: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
-    private lateinit var rhoConst: Constant<Float>
+    private lateinit var epsilonConstant: Constant<TFloat32>
+    private lateinit var learningRateConst: Constant<TFloat32>
+    private lateinit var rhoConst: Constant<TFloat32>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -64,21 +65,21 @@ public class AdaDelta(
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
+    ): List<Operand<TFloat32>> {
+        val targets: MutableList<Operand<TFloat32>> =
             ArrayList()
-        rhoConst = tf.constant(rho, getDType())
-        learningRateConst = tf.constant(learningRate, getDType())
-        epsilonConstant = tf.constant(epsilon, getDType())
+        rhoConst = tf.constant(rho)
+        learningRateConst = tf.constant(learningRate)
+        epsilonConstant = tf.constant(epsilon)
 
         for (i in weights.indices) {
             val variable = weights[i]
             val varName = variable.ref().op().name()
 
-            val accumSlot: Variable<Float> = getSlot(varName, ACCUMULATOR)
-            val accumUpdateSlot: Variable<Float> = getSlot(varName, ACCUMULATOR_UPDATE)
+            val accumSlot: Variable<TFloat32> = getSlot(varName, ACCUMULATOR)
+            val accumUpdateSlot: Variable<TFloat32> = getSlot(varName, ACCUMULATOR_UPDATE)
 
             targets.add(
                 tf.train.applyAdadelta(
@@ -95,19 +96,19 @@ public class AdaDelta(
         return targets
     }
 
-    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createAdaDeltaSlot(graph: KGraph, tf: Ops, v: Output<TFloat32>) {
         val accumInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR))
         val accumulatorInitializer = tf.withName(accumInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR, accumulatorInitializer)
 
         val accumUpdateInitializerName = defaultInitializerOpName(createName(v, ACCUMULATOR_UPDATE))
-        val updateInitializer: Operand<Float> = tf.withName(accumUpdateInitializerName)
+        val updateInitializer: Operand<TFloat32> = tf.withName(accumUpdateInitializerName)
             .fill(tf.shape(v), tf.dtypes.cast(tf.constant(0.0f), getDType()))
         createSlot(graph, tf, v.asOutput(), ACCUMULATOR_UPDATE, updateInitializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<TFloat32>>) {
         for (v in variables) {
             createAdaDeltaSlot(graph, tf, v.asOutput())
         }

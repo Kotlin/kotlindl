@@ -7,12 +7,13 @@ package org.jetbrains.kotlinx.dl.api.core.optimizer
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * No gradient clipping. Gradients go forward without any changes.
  */
 public class NoClipGradient : ClipGradientAction() {
-    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
+    override fun clipGradient(tf: Ops, gradient: Operand<TFloat32>): Operand<TFloat32> {
         return gradient
     }
 }
@@ -24,8 +25,8 @@ public class NoClipGradient : ClipGradientAction() {
  * @property [clipValue] Value limit for gradient.
  */
 public class ClipGradientByValue(private val clipValue: Float) : ClipGradientAction() {
-    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
-        return tf.clipByValue(gradient, tf.constant(-clipValue) as Operand<Float>, tf.constant(clipValue))
+    override fun clipGradient(tf: Ops, gradient: Operand<TFloat32>): Operand<TFloat32> {
+        return tf.clipByValue(gradient, tf.constant(-clipValue) as Operand<TFloat32>, tf.constant(clipValue))
     }
 }
 
@@ -35,7 +36,7 @@ public class ClipGradientByValue(private val clipValue: Float) : ClipGradientAct
  * NOTE: Is not supported yet.
  */
 public class ClipGradientByNorm(private val clipNormValue: Float) : ClipGradientAction() {
-    override fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float> {
+    override fun clipGradient(tf: Ops, gradient: Operand<TFloat32>): Operand<TFloat32> {
         throw UnsupportedOperationException("Is not implemented yet!")
     }
 }
@@ -49,5 +50,5 @@ public abstract class ClipGradientAction {
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public abstract fun clipGradient(tf: Ops, gradient: Operand<Float>): Operand<Float>
+    public abstract fun clipGradient(tf: Ops, gradient: Operand<TFloat32>): Operand<TFloat32>
 }

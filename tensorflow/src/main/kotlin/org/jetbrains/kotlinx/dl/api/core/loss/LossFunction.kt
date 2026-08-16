@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.loss
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.ndarray.Shape
 
 /**
  * Basic interface for all loss functions.
@@ -26,9 +28,9 @@ public abstract class LossFunction(
      */
     public abstract fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float>
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32>
 }
 

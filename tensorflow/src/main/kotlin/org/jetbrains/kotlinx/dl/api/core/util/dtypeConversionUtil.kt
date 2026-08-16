@@ -4,8 +4,9 @@
  */
 
 package org.jetbrains.kotlinx.dl.api.core.util
+import org.tensorflow.types.TFloat32
 
 /** Returns DType. In existing solution it works with Float only. */
-internal fun getDType(): Class<Float> {
-    return Float::class.javaObjectType
+internal fun getDType(): Class<TFloat32> {
+    return TFloat32::class.java
 }

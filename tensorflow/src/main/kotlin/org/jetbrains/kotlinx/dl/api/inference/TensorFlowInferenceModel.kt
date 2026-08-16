@@ -17,6 +17,9 @@ import org.tensorflow.Tensor
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.NotDirectoryException
+import org.tensorflow.types.TFloat32
+import org.tensorflow.ndarray.Shape
+import org.tensorflow.ndarray.buffer.DataBuffers
 
 /**
  * Basic class for model inference.
@@ -109,9 +112,9 @@ public open class TensorFlowInferenceModel(
     public companion object {
         private val logger = KotlinLogging.logger {}
 
-        internal fun FloatData.toTensor(): Tensor<Float> {
+        internal fun FloatData.toTensor(): TFloat32 {
             val preparedData = serializeToBuffer(floats)
-            return Tensor.create(longArrayOf(1L, *shape.dims()), preparedData)
+            return TFloat32.tensorOf(Shape.of(1L, *shape.dims()), DataBuffers.of(preparedData))
         }
 
         /**

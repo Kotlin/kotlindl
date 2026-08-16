@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 internal class MaxPool3DTest {
 
@@ -72,9 +73,9 @@ internal class MaxPool3DTest {
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numOfLosses = tf.constant(1.0f)
-            val output = layer.build(tf, inputOp, isTraining, numOfLosses).asOutput().tensor()
+            val output = layer.build(tf, inputOp, isTraining, numOfLosses).asTensor()
 
-            val expectedShape = Shape.make(
+            val expectedShape = Shape.of(
                 expected.size.toLong(),
                 expected[0].size.toLong(),
                 expected[0][0].size.toLong(),
@@ -82,7 +83,7 @@ internal class MaxPool3DTest {
                 expected[0][0][0][0].size.toLong(),
             )
 
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shapeFromDims(*output.shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             val actual = Array(expected.size) {

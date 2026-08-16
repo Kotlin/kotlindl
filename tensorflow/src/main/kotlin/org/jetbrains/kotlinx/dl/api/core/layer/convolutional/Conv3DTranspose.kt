@@ -17,6 +17,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv3dBackpropInput
+import org.tensorflow.types.TFloat32
 
 /**
  * 3D convolution transpose layer.
@@ -106,7 +107,7 @@ public class Conv3DTranspose(
 
     override val outputPadding: IntArray? get() = null
 
-    override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun convImplementation(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val outputShape = computeOutputShape(input.asOutput().shape()).toTensorShape()
         val options = Conv3dBackpropInput.dilations(dilations.toLongList()).dataFormat("NDHWC")
         return tf.nn.conv3dBackpropInput(

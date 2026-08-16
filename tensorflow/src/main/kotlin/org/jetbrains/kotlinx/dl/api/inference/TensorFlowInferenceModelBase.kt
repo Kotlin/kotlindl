@@ -9,6 +9,7 @@ import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.FloatData
 import org.jetbrains.kotlinx.dl.api.core.GpuConfiguration
 import org.jetbrains.kotlinx.dl.api.core.shape.contentToString
+import org.jetbrains.kotlinx.dl.api.core.util.createFloatTensor
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.createFloatArray
 import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
@@ -19,6 +20,9 @@ import org.tensorflow.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
+import org.tensorflow.types.TFloat32
+import org.tensorflow.ndarray.Shape
+import org.jetbrains.kotlinx.dl.api.inference.toTensorList
 
 
 /**
@@ -70,36 +74,40 @@ public abstract class TensorFlowInferenceModelBase(
     }
 
     protected fun <R> runModel(
-        inputs: Map<out InputKey, Tensor<*>>,
+        inputs: Map<out InputKey, Tensor>,
         outputs: List<OutputKey>,
-        targets: List<Operand<Float>>,
-        extractResult: (List<Tensor<*>>) -> R
+        targets: List<Operand<TFloat32>>,
+        extractResult: (List<Tensor>) -> R
     ): R {
         return inputs.use {
             val runner = session.runner()
             inputs.forEach { (operation, tensor) -> operation.feed(runner, tensor) }
             outputs.forEach { output -> output.fetch(runner) }
             targets.forEach { target -> runner.addTarget(target) }
-            runner.run().use { tensors -> extractResult(tensors) }
+            // Session.Runner.run() returns an AutoCloseable Result rather than a List<Tensor>
+            // as it did in the 1.15 API; index into it to preserve the fetch ordering.
+            runner.run().use { result ->
+                extractResult((0 until result.size()).map { index -> result.get(index) })
+            }
         }
     }
 
     protected sealed class InputKey {
         public data class Operand(val op: org.tensorflow.Operand<*>) : InputKey() {
-            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner {
+            override fun feed(runner: Session.Runner, tensor: Tensor): Session.Runner {
                 return runner.feed(op.asOutput(), tensor)
             }
         }
 
         public data class Name(val s: String) : InputKey() {
-            override fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner = runner.feed(s, tensor)
+            override fun feed(runner: Session.Runner, tensor: Tensor): Session.Runner = runner.feed(s, tensor)
         }
 
-        public abstract fun feed(runner: Session.Runner, tensor: Tensor<*>): Session.Runner
+        public abstract fun feed(runner: Session.Runner, tensor: Tensor): Session.Runner
     }
 
     protected sealed class OutputKey {
-        public data class Operand(val op: org.tensorflow.Operand<Float>) : OutputKey() {
+        public data class Operand(val op: org.tensorflow.Operand<TFloat32>) : OutputKey() {
             override fun fetch(runner: Session.Runner): Session.Runner = runner.fetch(op)
         }
 
@@ -119,7 +127,7 @@ public abstract class TensorFlowInferenceModelBase(
         for (variableName in variableNames) {
             val variableOperation = tfGraph.operation(variableName)
             check(variableOperation != null) { "Operation $variableName is not found in static graph." }
-            val variableShape = variableOperation.output<Float>(0).shape()
+            val variableShape = variableOperation.output<TFloat32>(0).shape()
             val data = getData(variableName, variableShape)
             assignVariable(variableName, variableShape, data)
         }
@@ -201,7 +209,7 @@ public abstract class TensorFlowInferenceModelBase(
             tensorData = (data as Array<Float>).toFloatArray()
         }
 
-        Tensor.create(tensorData).use { tensor ->
+        createFloatTensor(tensorData).use { tensor ->
             session.runner()
                 .feed(initializerName, tensor)
                 .addTarget(assignOpName)
@@ -214,7 +222,7 @@ public abstract class TensorFlowInferenceModelBase(
 
         val modelWeightsExtractorRunner = session.runner()
         variableNames.forEach(modelWeightsExtractorRunner::fetch)
-        val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run()).toMap()
+        val modelWeights = variableNames.zip(modelWeightsExtractorRunner.run().toTensorList()).toMap()
 
         model.loadVariables(modelWeights.keys) { variableName, _ ->
             modelWeights[variableName]!!.use { it.toMultiDimensionalArray() }
@@ -237,7 +245,7 @@ public abstract class TensorFlowInferenceModelBase(
  *
  * @see TensorFlowInferenceResultConverter
  */
-public data class TensorResult(val tensors: List<Tensor<*>>) : AutoCloseable {
+public data class TensorResult(val tensors: List<Tensor>) : AutoCloseable {
     override fun close() {
         tensors.forEach {
             try {

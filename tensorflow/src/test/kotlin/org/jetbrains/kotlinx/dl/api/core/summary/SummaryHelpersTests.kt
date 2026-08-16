@@ -4,6 +4,7 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.print
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.tensorflow.ndarray.Shape
 
 internal class SummaryHelpersTests {
     private val sequentialModel = TfModelSummary(

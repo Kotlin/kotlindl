@@ -10,8 +10,11 @@ import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.core.shape.tailDims
 
 /**
  * Base abstract class for all layers.
@@ -41,10 +44,10 @@ public abstract class Layer(public var name: String) {
      */
     public abstract fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float>
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32>
 
     /**
      * Extend this function to define variables in the layer and compute layer output.
@@ -58,10 +61,10 @@ public abstract class Layer(public var name: String) {
      */
     public open fun build(
         tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: List<Operand<TFloat32>>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         return build(tf, input.first(), isTraining, numberOfLosses)
     }
 
@@ -81,7 +84,7 @@ internal fun requireArraySize(array: IntArray, size: Int, name: String) =
     }
 
 internal fun Layer.setOutputShape(shape: Shape) {
-    check(shape.tail().all { elem -> elem > 0 })
+    check(shape.tailDims().all { elem -> elem > 0 })
     {
         "The last dimensions (except first = -1) of shape of layer $name contains zero or negative dimension values: ${shape}.\n" +
                 "Analyze your model architecture and layer output shapes carefully to discover a problem."

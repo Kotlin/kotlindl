@@ -11,6 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.util.defaultAssignOpName
 import org.jetbrains.kotlinx.dl.api.core.util.defaultInitializerOpName
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
+import org.tensorflow.ndarray.Shape
 
 /**
  * Initializer base class: all initializers inherit this class.
@@ -35,7 +38,7 @@ public abstract class Initializer {
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        input: Operand<Float>,
+        input: Operand<TFloat32>,
         name: String
     ): InitializerOperation {
         val initialize = initialize(
@@ -59,7 +62,7 @@ public abstract class Initializer {
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float>
+    ): Operand<TFloat32>
 }

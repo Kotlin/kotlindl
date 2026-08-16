@@ -1,0 +1,170 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+project.setDescription("Apple Metal acceleration for the KotlinDL TensorFlow backend, via the " +
+        "tensorflow-metal PluggableDevice. macOS arm64 only; requires JDK 22 or later at runtime.")
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+
+dependencies {
+    api project(":tensorflow")
+    implementation 'io.github.microutils:kotlin-logging:2.1.21'
+
+    testImplementation 'ch.qos.logback:logback-classic:1.5.18'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// This module deliberately targets Java 22 rather than the Java 11 used everywhere else: it calls
+// java.lang.foreign (the Foreign Function & Memory API), which is final in JDK 22. Keeping it in a
+// separate artifact is what lets :tensorflow keep its Java 11 floor and all five platform natives.
+//
+// It is *compiled* with the JDK 25 toolchain the rest of the project is verified against, because
+// no JDK 22 is generally installed and 22 is past end of life. -Xjdk-release/--release hold the
+// visible API down to 22, so consumers need only JDK 22 at runtime.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_22
+        freeCompilerArgs.add('-Xjdk-release=22')
+    }
+    explicitApiWarning()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 22
+}
+
+// --- Metal shim -----------------------------------------------------------------------------
+//
+// libmetal_plugin.dylib is linked against @rpath/_pywrap_tensorflow_internal.so, the CPython
+// extension module of the Python TensorFlow build. Every symbol it imports is already exported by
+// the two dylibs TensorFlow Java ships (libtensorflow_cc + libtensorflow_framework), so the only
+// thing missing is a library carrying that install name.
+//
+// This builds a stub that carries the name and re-exports both. It is ~17 KB and contains no code.
+// macOS two-level namespace binds each import to one library, so a symlink would not work: the
+// alias has to re-export both dylibs.
+
+configurations {
+    tfMacosArm64Natives {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    // Linked against only. The install names recorded in the shim (@rpath/libtensorflow_cc.2.dylib,
+    // @rpath/libtensorflow_framework.2.dylib) are version independent, so the shim stays valid
+    // across TensorFlow Java upgrades that keep those names.
+    // Non-transitive: only the classifier jar holding the two dylibs is wanted, not the whole
+    // TensorFlow Java dependency graph.
+    tfMacosArm64Natives('org.tensorflow:tensorflow-core-native:1.0.0:macosx-arm64') {
+        transitive = false
+    }
+}
+
+def shimResourcePath = 'org/jetbrains/kotlinx/dl/api/core/metal/macosx-arm64'
+def shimOutputDir = layout.buildDirectory.dir("generated/metal-shim")
+
+def canBuildShim = {
+    def os = System.getProperty('os.name').toLowerCase()
+    def arch = System.getProperty('os.arch').toLowerCase()
+    return os.contains('mac') && (arch == 'aarch64' || arch == 'arm64')
+}
+
+def buildMetalShim = tasks.register('buildMetalShim') {
+    description = 'Builds the _pywrap_tensorflow_internal.so shim that lets tensorflow-metal load under TensorFlow Java.'
+    group = 'build'
+
+    inputs.files(configurations.tfMacosArm64Natives).withPathSensitivity(PathSensitivity.NAME_ONLY)
+    outputs.dir(shimOutputDir)
+
+    // The shim can only be produced on macOS arm64, where clang and the Mach-O linker are present.
+    // On other hosts the task is skipped and the artifact simply ships without it; MetalAcceleration
+    // then reports the shim as missing rather than failing at class-load time.
+    onlyIf { canBuildShim() }
+
+    doLast {
+        def outDir = shimOutputDir.get().dir(shimResourcePath).asFile
+        outDir.mkdirs()
+        def work = temporaryDir
+
+        def nativeJar = configurations.tfMacosArm64Natives.singleFile
+        def dylibDir = new File(work, 'natives')
+        dylibDir.deleteDir()
+        dylibDir.mkdirs()
+        def wanted = ['libtensorflow_cc.2.dylib', 'libtensorflow_framework.2.dylib']
+        def found = [:]
+        new java.util.zip.ZipFile(nativeJar).withCloseable { zip ->
+            zip.entries().each { entry ->
+                def base = entry.name.substring(entry.name.lastIndexOf('/') + 1)
+                if (!entry.directory && wanted.contains(base) && !found.containsKey(base)) {
+                    def target = new File(dylibDir, base)
+                    zip.getInputStream(entry).withCloseable { input ->
+                        target.withOutputStream { it << input }
+                    }
+                    found[base] = target
+                }
+            }
+        }
+        wanted.each { name ->
+            if (!found.containsKey(name)) {
+                throw new GradleException("$name not found in ${nativeJar.name}; cannot link the Metal shim.")
+            }
+        }
+
+        def stub = new File(work, 'stub.c')
+        stub.text = '/* Intentionally empty: all symbols come from the re-exported TensorFlow dylibs. */\n'
+
+        def output = new File(outDir, '_pywrap_tensorflow_internal.so')
+        def cmd = [
+                'clang', '-dynamiclib', '-arch', 'arm64',
+                '-install_name', '@rpath/_pywrap_tensorflow_internal.so',
+                '-Wl,-rpath,@loader_path',
+                '-Wl,-reexport_library,' + found['libtensorflow_cc.2.dylib'].absolutePath,
+                '-Wl,-reexport_library,' + found['libtensorflow_framework.2.dylib'].absolutePath,
+                '-o', output.absolutePath,
+                stub.absolutePath
+        ]
+        def process = new ProcessBuilder(cmd).redirectErrorStream(true).start()
+        def out = process.inputStream.text
+        if (process.waitFor() != 0) {
+            throw new GradleException("Failed to link the Metal shim:\n$out")
+        }
+        logger.lifecycle("Built Metal shim: ${output.absolutePath} (${output.length()} bytes)")
+    }
+}
+
+sourceSets.main.resources.srcDir(shimOutputDir)
+tasks.named('processResources') { dependsOn(buildMetalShim) }
+
+tasks.named('test') {
+    useJUnitPlatform()
+
+    // Calling a native library through the FFM API is a restricted operation; without this the JVM
+    // prints a warning per call site, and a future release will refuse outright. Consumers of this
+    // module need the same flag.
+    jvmArgs('--enable-native-access=ALL-UNNAMED')
+
+    // MetalDeviceTest is skipped unless a real libmetal_plugin.dylib can be found. Forward the
+    // property so it can be pointed at one:
+    //   ./gradlew :tensorflow-metal:test -Dkotlindl.metal.plugin=/path/to/libmetal_plugin.dylib
+    def pluginPath = System.getProperty('kotlindl.metal.plugin')
+    if (pluginPath != null) {
+        systemProperty 'kotlindl.metal.plugin', pluginPath
+    }
+}
+
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+    // The shim is a linked build output that happens to live on the resource path; it is not source.
+    exclude '**/_pywrap_tensorflow_internal.so'
+    dependsOn(buildMetalShim)
+}

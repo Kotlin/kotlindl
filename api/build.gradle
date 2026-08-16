@@ -1,20 +1,22 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating the Deep Learning models.")
 
-apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
     explicitApiWarning()
 }
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
 }

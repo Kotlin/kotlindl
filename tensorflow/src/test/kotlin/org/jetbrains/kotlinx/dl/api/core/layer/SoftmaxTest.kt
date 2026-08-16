@@ -2,7 +2,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.Softmax
 import org.junit.jupiter.api.Test
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 
 internal class SoftmaxTest : ActivationLayerTest() {
 
@@ -39,8 +39,8 @@ internal class SoftmaxTest : ActivationLayerTest() {
             floatArrayOf(0.5f, 0.5f, 0.5f, 0.5f),
         )
 
-        assertActivationFunction2D(Softmax(), input, Shape.make(2, 4), output0)
-        assertActivationFunction2D(Softmax(listOf(0)), input, Shape.make(2, 4), output1)
-        assertActivationFunction2D(Softmax(listOf(1)), input, Shape.make(2, 4), output0)
+        assertActivationFunction2D(Softmax(), input, Shape.of(2, 4), output0)
+        assertActivationFunction2D(Softmax(listOf(0)), input, Shape.of(2, 4), output1)
+        assertActivationFunction2D(Softmax(listOf(1)), input, Shape.of(2, 4), output0)
     }
 }

@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Cropping layer for 3D data (e.g. video, spatio-temporal)
@@ -38,7 +39,7 @@ public class Cropping3D(
         }
     }
 
-    override fun crop(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun crop(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val cropSize = intArrayOf(
             inputShape.size(1).toInt() - cropping[0][0] - cropping[0][1],

@@ -18,9 +18,10 @@ import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.DepthwiseConv2dNative
+import org.tensorflow.types.TFloat32
 
 /**
  * Depthwise separable 2D convolution. (e.g. spatial convolution over images).
@@ -110,7 +111,7 @@ public class DepthwiseConv2D(
         shapeFromDims(*kernelSize.toLongArray(), numberOfChannels, depthMultiplier.toLong())
 
     protected override fun computeBiasShape(numberOfChannels: Long): Shape =
-        Shape.make(numberOfChannels * depthMultiplier)
+        Shape.of(numberOfChannels * depthMultiplier)
 
     override fun getOutputDepth(numberOfChannels: Long): Long = numberOfChannels * depthMultiplier
 
@@ -120,8 +121,8 @@ public class DepthwiseConv2D(
 
     override fun convImplementation(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         val options = DepthwiseConv2dNative.dilations(dilations.toLongList()).dataFormat("NHWC")
         return tf.nn.depthwiseConv2dNative(input, kernel.variable, strides.toLongList(), padding.paddingName, options)
     }

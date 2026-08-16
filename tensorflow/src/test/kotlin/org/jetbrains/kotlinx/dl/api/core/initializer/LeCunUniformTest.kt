@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val EPS = 1e-5f
 private const val FAN_IN = 2
@@ -29,14 +30,14 @@ internal class LeCunUniformTest {
         expected[1][0] = 0.9672967f
         expected[1][1] = 0.5803521f
 
-        val shape = Shape.make(2, 2)
+        val shape = Shape.of(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = LeCunUniform(seed = SEED)
             val operand =
                 instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), DEFAULT_LAYER_NAME)
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
             assertArrayEquals(
                 expected[0],

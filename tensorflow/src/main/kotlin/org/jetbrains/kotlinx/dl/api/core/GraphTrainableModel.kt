@@ -28,7 +28,10 @@ import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel.Companion.toTensor
 import org.jetbrains.kotlinx.dl.api.inference.TensorResult
 import org.jetbrains.kotlinx.dl.api.inference.keras.saveModelConfiguration
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
+import org.jetbrains.kotlinx.dl.api.inference.floatValue
 import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
+import org.jetbrains.kotlinx.dl.api.inference.toTensorList
 import org.jetbrains.kotlinx.dl.api.inference.toMultiDimensionalArray
 import org.jetbrains.kotlinx.dl.dataset.DataBatch
 import org.jetbrains.kotlinx.dl.dataset.Dataset
@@ -41,6 +44,10 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
+import org.tensorflow.ndarray.Shape
+import org.tensorflow.ndarray.buffer.DataBuffers
 
 /**
  * [GraphTrainableModel] model groups a linear stack of layers into a graph-based TensorFlow Model.
@@ -76,31 +83,31 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
     protected var layersByName: Map<String, Layer> = mapOf()
 
     /** TensorFlow operand for prediction phase. */
-    private lateinit var yPredOp: Operand<Float>
+    private lateinit var yPredOp: Operand<TFloat32>
 
     /** TensorFlow's loss operand. */
-    protected lateinit var lossOp: Operand<Float>
+    protected lateinit var lossOp: Operand<TFloat32>
 
     /** TensorFlow's prediction operand. */
-    private lateinit var predictionOp: Operand<Float>
+    private lateinit var predictionOp: Operand<TFloat32>
 
     /** TensorFlow's prediction operand. */
-    private lateinit var metricOps: List<Operand<Float>>
+    private lateinit var metricOps: List<Operand<TFloat32>>
 
     /** A list of targets to be optimized. */
-    protected lateinit var targets: List<Operand<Float>>
+    protected lateinit var targets: List<Operand<TFloat32>>
 
     /** TensorFlow operand for X data. */
-    private lateinit var xOp: Operand<Float>
+    private lateinit var xOp: Operand<TFloat32>
 
     /** TensorFlow operand for Y data. */
-    private lateinit var yTrueOp: Operand<Float>
+    private lateinit var yTrueOp: Operand<TFloat32>
 
     /** TensorFlow operand for batch size data. */
-    protected lateinit var numberOfLossesOp: Operand<Float>
+    protected lateinit var numberOfLossesOp: Operand<TFloat32>
 
     /** TensorFlow operand for switching between training and inference modes. */
-    protected lateinit var training: Operand<Boolean>
+    protected lateinit var training: Operand<TBool>
 
     init {
         for (layer in layers) {
@@ -143,7 +150,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
         this.optimizer = optimizer
 
         training = tf.withName("training").placeholder(
-            Boolean::class.javaObjectType,
+            TBool::class.java,
             Placeholder.shape(Shape.scalar())
         )
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
@@ -162,7 +169,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
             else -> 1
         }
 
-        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
+        yTrueOp = tf.placeholder(getDType()) as Operand<TFloat32>
         lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, layers.trainableVariables().map { it.variable }, tf, lossOp)
 
@@ -176,7 +183,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
         isModelCompiled = true
     }
 
-    private fun buildLossFunction(loss: LossFunction): Operand<Float> {
+    private fun buildLossFunction(loss: LossFunction): Operand<TFloat32> {
         val basicLoss = loss.apply(tf, yPredOp, yTrueOp, numberOfLossesOp)
         var totalLoss = basicLoss
         // TODO: probably regularization output should be divided on numberOfLossesOp and changed together with loss before averaging
@@ -199,9 +206,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
 
     /** Common method for building model static graph layer by layer via calling build() method on each layer in correct order. */
     protected abstract fun buildLayers(
-        training: Operand<Boolean>,
-        numberOfLosses: Operand<Float>
-    ): Pair<Placeholder<Float>, Operand<Float>>
+        training: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>
+    ): Pair<Placeholder<TFloat32>, Operand<TFloat32>>
 
     override fun fit(
         trainingDataset: Dataset,
@@ -361,9 +368,9 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
 
         val inputs = mapOf(
             xOp to batch.toXTensor(),
-            yTrueOp to Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses)),
-            numberOfLossesOp to Tensor.create(TensorShape(yBatchShape).numElements().toFloat()),
-            training to Tensor.create(isTraining)
+            yTrueOp to TFloat32.tensorOf(Shape.of(*yBatchShape), DataBuffers.of(serializeLabelsToBuffer(batch.y, numberOfClasses))),
+            numberOfLossesOp to TFloat32.scalarOf(TensorShape(yBatchShape).numElements().toFloat()),
+            training to TBool.scalarOf(isTraining)
         )
         val outputs = listOf(OutputKey.Name(TRAINING_LOSS)) + metricOps.map(OutputKey::Operand)
         val targetsList = if (isTraining) targets else emptyList()
@@ -459,7 +466,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
         dataset: Dataset,
         batchSize: Int,
         callbacks: List<Callback>,
-        block: (Int, List<Tensor<*>>) -> Unit
+        block: (Int, List<Tensor>) -> Unit
     ) {
         callbacks.forEach { it.model = this }
         callbacks.forEach { it.onPredictBegin() }
@@ -467,7 +474,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
         for ((batchCounter, batch) in dataset.batchSequence(batchSize).withIndex()) {
             callbacks.forEach { it.onPredictBatchBegin(batchCounter, batchSize) }
 
-            val inputs = mapOf(xOp to batch.toXTensor(), training to Tensor.create(false))
+            val inputs = mapOf(xOp to batch.toXTensor(), training to TBool.scalarOf(false))
             val outputs = listOf(OutputKey.Operand(predictionOp))
 
             runModelInternal(inputs, outputs) { tensors -> block(batchCounter, tensors) }
@@ -534,10 +541,10 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
     }
 
     private fun <R> runModelInternal(
-        inputs: Map<out Operand<*>, Tensor<*>>,
+        inputs: Map<out Operand<*>, Tensor>,
         outputs: List<OutputKey>,
-        targets: List<Operand<Float>> = emptyList(),
-        extractResult: (List<Tensor<*>>) -> R
+        targets: List<Operand<TFloat32>> = emptyList(),
+        extractResult: (List<Tensor>) -> R
     ): R {
         return runModel(inputs.mapKeys { InputKey.Operand(it.key) }, outputs, targets, extractResult)
     }
@@ -620,7 +627,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
     private fun saveGraphDef(pathToModelDirectory: String) {
         val file = File("$pathToModelDirectory/graph.pb")
         Files.createDirectories(Paths.get(pathToModelDirectory))
-        file.writeBytes(kGraph.tfGraph.toGraphDef())
+        file.writeBytes(kGraph.tfGraph.toGraphDef().toByteArray())
     }
 
     /** Saves variables and optimizer state if [saveOptimizerState] is enabled in txt format to the [pathToModelDirectory] directory.*/
@@ -657,7 +664,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
     }
 
     /** Returns a list of variables paired with their data. */
-    private fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<Float>, Tensor<*>>> {
+    private fun getVariablesAndTensors(saveOptimizerState: Boolean): List<Pair<Variable<TFloat32>, Tensor>> {
         var variables = layerVariables().map { it.variable }
         if (saveOptimizerState) {
             variables = variables + kGraph.optimizerVariables()
@@ -665,7 +672,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
 
         val modelWeightsExtractorRunner = session.runner()
         variables.forEach(modelWeightsExtractorRunner::fetch)
-        return variables.zip(modelWeightsExtractorRunner.run())
+        return variables.zip(modelWeightsExtractorRunner.run().toTensorList())
     }
 
     override fun loadWeights(modelDirectory: File, loadOptimizerState: Boolean) {
@@ -699,7 +706,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
         for (variableName in variableNames) {
             val variableOperation = kGraph.tfGraph.operation(variableName)
             check(variableOperation != null) { "Operation $variableName is not found in static graph." }
-            val variableShape = variableOperation.output<Float>(0).shape()
+            val variableShape = variableOperation.output<TFloat32>(0).shape()
 
             val data = getData(variableName, variableShape)
 
@@ -790,8 +797,8 @@ public abstract class GraphTrainableModel(vararg layers: Layer, gpuConfiguration
     internal companion object {
         internal const val MODEL_CONFIG_JSON = "modelConfig.json"
 
-        private fun DataBatch.toXTensor(): Tensor<Float> {
-            return Tensor.create(shape.dims(), serializeToBuffer(x))
+        private fun DataBatch.toXTensor(): TFloat32 {
+            return TFloat32.tensorOf(Shape.of(*shape.dims()), DataBuffers.of(serializeToBuffer(x)))
         }
 
         internal fun preProcessLayerNames(layers: Array<out Layer>) {

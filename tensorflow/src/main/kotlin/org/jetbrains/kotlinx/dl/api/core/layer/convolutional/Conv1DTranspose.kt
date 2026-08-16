@@ -21,6 +21,7 @@ import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * 1D convolution transpose layer.
@@ -81,7 +82,7 @@ public class Conv1DTranspose(
 
     override val kernelSize: IntArray = intArrayOf(kernelLength)
 
-    override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun convImplementation(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val outputShape = computeOutputShape(input.asOutput().shape()).toTensorShape()
         // implementation of a 1D convolution with a 2D convolution
         return tf.withExpandedDimensions(input) { expandedInput ->

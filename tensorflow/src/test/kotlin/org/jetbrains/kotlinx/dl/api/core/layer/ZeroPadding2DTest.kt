@@ -12,8 +12,9 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val BATCH_SIZE = 1
 private const val NUM_CHANNELS = 1
@@ -33,15 +34,15 @@ internal class ZeroPadding2DTest {
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asTensor()
 
-            val expectedShape = Shape.make(
+            val expectedShape = Shape.of(
                 BATCH_SIZE.toLong(),
                 expectedOutputSize.toLong(),
                 expectedOutputSize.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shapeFromDims(*output.shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {
@@ -87,15 +88,15 @@ internal class ZeroPadding2DTest {
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asTensor()
 
-            val expectedShape = Shape.make(
+            val expectedShape = Shape.of(
                 BATCH_SIZE.toLong(),
                 expectedOutputHeight.toLong(),
                 expectedOutputWidth.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shapeFromDims(*output.shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {
@@ -143,15 +144,15 @@ internal class ZeroPadding2DTest {
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, input, isTraining, numberOfLosses).asTensor()
 
-            val expectedShape = Shape.make(
+            val expectedShape = Shape.of(
                 BATCH_SIZE.toLong(),
                 expectedOutputHeight.toLong(),
                 expectedOutputWidth.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shapeFromDims(*output.shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {

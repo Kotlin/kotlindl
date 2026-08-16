@@ -10,6 +10,8 @@ import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import kotlin.math.abs
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Flattens the input. Does not affect the batch size.
@@ -20,10 +22,10 @@ import kotlin.math.abs
 public class Flatten(name: String = "") : Layer(name) {
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val amountOfNeuronsInFlattenLayer = (inputShape.numElements() / abs(inputShape.size(0))).toInt()
         val units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))

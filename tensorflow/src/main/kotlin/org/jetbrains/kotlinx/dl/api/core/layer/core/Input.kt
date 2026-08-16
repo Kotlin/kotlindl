@@ -9,9 +9,11 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Placeholder
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * This layer is responsible for the input shape of the built model.
@@ -23,17 +25,17 @@ import org.tensorflow.op.core.Placeholder
  */
 public class Input(vararg dims: Long, name: String = "") : Layer(name) {
     /** Placeholder for input data. */
-    public lateinit var input: Placeholder<Float>
+    public lateinit var input: Placeholder<TFloat32>
 
     /** Input data dimensions. Rank = 3 or 4 for most popular supported cases. */
     public var packedDims: LongArray = dims
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> = build(tf)
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> = build(tf)
 
     /**
      * Extend this function to define placeholder in layer.
@@ -42,10 +44,10 @@ public class Input(vararg dims: Long, name: String = "") : Layer(name) {
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public fun build(tf: Ops): Placeholder<Float> {
+    public fun build(tf: Ops): Placeholder<TFloat32> {
         input = tf.withName(DATA_PLACEHOLDER).placeholder(
             getDType(),
-            Placeholder.shape(Shape.make(-1L, *packedDims))
+            Placeholder.shape(Shape.of(-1L, *packedDims))
         )
         return input
     }

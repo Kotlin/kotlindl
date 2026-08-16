@@ -10,6 +10,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import java.util.*
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Max pooling operation for 3D data (spatial or spatio-temporal).
@@ -43,14 +45,14 @@ public class MaxPool3D(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val paddingName = padding.paddingName
         val tfPoolSize = Arrays.stream(poolSize).asLongStream().toArray()
         val tfStrides = Arrays.stream(strides).asLongStream().toArray()
-        val tfInput: Operand<Float> = input
+        val tfInput: Operand<TFloat32> = input
 
         return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }

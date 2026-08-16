@@ -12,6 +12,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyGradientDescent
+import org.tensorflow.types.TFloat32
 
 /**
  * Stochastic gradient descent optimizer.
@@ -30,17 +31,17 @@ public class SGD(
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
+    ): List<Operand<TFloat32>> {
+        val targets: MutableList<Operand<TFloat32>> =
             ArrayList()
 
         for (i in weights.indices) {
             targets.add(
                 tf.train.applyGradientDescent(
                     weights[i],
-                    tf.constant(learningRate, getDType()),
+                    tf.constant(learningRate),
                     clipGradient.clipGradient(tf, gradients.dy(i)),
                     ApplyGradientDescent.useLocking(true)
                 )

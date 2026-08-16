@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val EPS = 1e-7f
 private const val FAN_IN = 10
@@ -31,13 +32,13 @@ internal class ParametrizedRandomNormalTest {
         expected[1][0] = 2.1622126f
         expected[1][1] = 3.8308368f
 
-        val shape = Shape.make(2, 2)
+        val shape = Shape.of(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = ParametrizedTruncatedNormal(MEAN, STD_DEV, P1, P2, 12L)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
             assertArrayEquals(
                 expected[0],

@@ -6,19 +6,20 @@
 package org.jetbrains.kotlinx.dl.api.core.shape
 
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import kotlin.math.abs
+import org.tensorflow.types.TInt32
 
 /**
  * Creates constant array.
  */
-internal fun constArray(tf: Ops, vararg data: Int): Operand<Int> {
+internal fun constArray(tf: Ops, vararg data: Int): Operand<TInt32> {
     return tf.constant(data)
 }
 
 /** Creates shape [Operand] from [Shape]. */
-internal fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
+internal fun shapeOperand(tf: Ops, shape: Shape): Operand<TInt32> {
     return tf.constant(shape.toIntArray())
 }
 
@@ -37,13 +38,24 @@ internal fun Shape.contentToString(): String {
     return toLongArray().contentToString()
 }
 
-/** Returns first dimension */
-public fun Shape.head(): Long {
+/**
+ * Returns first dimension.
+ *
+ * NOTE: named [headDim] rather than `head` on purpose. [org.tensorflow.ndarray.Shape] declares its
+ * own `head()` member returning a [Shape], and in Kotlin a member always wins over an extension,
+ * so an extension named `head` would be silently unreachable.
+ */
+public fun Shape.headDim(): Long {
     return size(0)
 }
 
-/** Returns last dimensions (except first). */
-public fun Shape.tail(): LongArray {
+/**
+ * Returns last dimensions (except first).
+ *
+ * NOTE: named [tailDims] rather than `tail` for the same reason as [headDim] --
+ * [org.tensorflow.ndarray.Shape] has a `tail()` member returning a [Shape].
+ */
+public fun Shape.tailDims(): LongArray {
     return LongArray(numDimensions() - 1) { size(it + 1) }
 }
 
@@ -52,13 +64,13 @@ internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
 
 /** Creates [Shape] object from a few [Long] values in [dims]. */
 internal fun shapeFromDims(vararg dims: Long): Shape {
-    return Shape.make(head(*dims), *tail(*dims))
+    return Shape.of(head(*dims), *tail(*dims))
 }
 
 /** Converts [TensorShape] to [Shape] object. */
 public fun TensorShape.toShape(): Shape {
     val d = dims()
-    return Shape.make(head(*d), *tail(*d))
+    return Shape.of(head(*d), *tail(*d))
 }
 
 /** Converts [Shape] to [TensorShape] object. */
@@ -67,7 +79,7 @@ public fun Shape.toTensorShape(): TensorShape {
 }
 
 internal fun Shape.copy(): Shape {
-    return Shape.make(head(), *tail())
+    return Shape.of(*toLongArray())
 }
 
 /**

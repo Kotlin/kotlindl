@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Base class for all layer class representing activation functions.
@@ -29,15 +31,15 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
      */
     public abstract fun forward(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float>
+        input: Operand<TFloat32>
+    ): Operand<TFloat32>
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> = forward(tf, input)
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> = forward(tf, input)
 
     override val hasActivation: Boolean get() = true
 }

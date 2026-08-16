@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference.keras
 
 import io.jhdf.HdfFile
 import io.jhdf.api.Group
+import org.tensorflow.ndarray.Shape
 
 /**
  * Helper function to print out file in hdf5 format for debugging purposes.

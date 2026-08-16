@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.inference.toMultiDimensionalArray
+import org.jetbrains.kotlinx.dl.api.inference.toTensorList
 
 
 /**
@@ -20,7 +21,7 @@ public var Layer.weights: Map<String, Array<*>>
 
         val runner = model.session.runner()
         variables.map { it.variable }.forEach(runner::fetch)
-        val weights = runner.run().map { it.toMultiDimensionalArray() }
+        val weights = runner.run().toTensorList().map { it.toMultiDimensionalArray() }
 
         return variables.map { it.name }.zip(weights).toMap()
     }

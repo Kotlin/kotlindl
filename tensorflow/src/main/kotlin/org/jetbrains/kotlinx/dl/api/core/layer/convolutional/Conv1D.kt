@@ -20,6 +20,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
 import org.tensorflow.op.nn.Conv2d
+import org.tensorflow.types.TFloat32
 
 /**
  * 1D convolution layer (e.g. convolution over audio data).
@@ -114,8 +115,8 @@ public class Conv1D(
 
     override fun convImplementation(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         return tf.withExpandedDimensions(input) { expandedInput ->
             val options = Conv2d.dilations(expand(dilations).toLongList()).dataFormat("NHWC")
             return@withExpandedDimensions tf.nn.conv2d(
@@ -146,7 +147,7 @@ public class Conv1D(
             return kernel.withAdded(EXTRA_DIM - 1, 1)
         }
 
-        internal fun Ops.expandKernel(kernel: Operand<Float>): Operand<Float> {
+        internal fun Ops.expandKernel(kernel: Operand<TFloat32>): Operand<TFloat32> {
             return expandDims(kernel, constant(EXTRA_DIM - 1))
         }
 
@@ -164,9 +165,9 @@ public class Conv1D(
          * This allows to perform 2D operations on 1D inputs.
          */
         internal fun Ops.withExpandedDimensions(
-            input: Operand<Float>,
-            operation: (Operand<Float>) -> Operand<Float>
-        ): Operand<Float> {
+            input: Operand<TFloat32>,
+            operation: (Operand<TFloat32>) -> Operand<TFloat32>
+        ): Operand<TFloat32> {
             val expandedInput = expandDims(input, constant(EXTRA_DIM))
             val expandedOutput = operation(expandedInput)
             return squeeze(expandedOutput, squeezeAxis)

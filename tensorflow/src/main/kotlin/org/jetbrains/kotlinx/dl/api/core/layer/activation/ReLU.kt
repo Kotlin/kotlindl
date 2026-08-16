@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Rectified Linear Unit activation function.
@@ -38,8 +39,8 @@ public class ReLU(
 
     override fun forward(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         // alpha is used for leaky relu slope in activations instead of negativeSlope.
         return commonRelu(tf, input = input, alpha = negativeSlope, maxValue = maxValue, threshold = threshold)
     }

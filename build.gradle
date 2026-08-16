@@ -1,10 +1,11 @@
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.8.21' apply false
-    id 'com.android.application' apply false
+    id 'org.jetbrains.kotlin.multiplatform' version '2.4.10' apply false
+    id 'org.jetbrains.kotlin.jvm' version '2.4.10' apply false
+    id 'com.android.kotlin.multiplatform.library' version '9.3.1' apply false
     id 'maven-publish'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id "com.gradle.plugin-publish" version "1.0.0" apply false
-    id 'org.jetbrains.dokka' version '1.5.30'
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+    id "com.gradle.plugin-publish" version "2.1.1" apply false
+    id 'org.jetbrains.dokka' version '2.2.0'
 }
 
 def kotlinDLVersion = "$majorVersion.$minorVersion"
@@ -36,12 +37,11 @@ nexusPublishing {
         sonatype {
             username = sonatypeUser
             password = sonatypePassword
-            repositoryDescription = "kotlinx.kotlindl staging repository, version: $version"
         }
     }
 }
 
-task setTeamcityVersion {
+tasks.register('setTeamcityVersion') {
     doLast {
         println("##teamcity[buildNumber '$version']")
     }

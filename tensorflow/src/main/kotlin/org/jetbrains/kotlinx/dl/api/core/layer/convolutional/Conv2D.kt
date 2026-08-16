@@ -18,6 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2d.dilations
+import org.tensorflow.types.TFloat32
 
 /**
  * 2D convolution layer (e.g. spatial convolution over images).
@@ -106,8 +107,8 @@ public class Conv2D(
 
     override fun convImplementation(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         val options = dilations(dilations.toLongList()).dataFormat("NHWC")
         return tf.nn.conv2d(
             input,

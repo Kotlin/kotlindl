@@ -47,7 +47,7 @@ public class Crop(
             return Bitmap.createBitmap(input, x, y, width, height)
         }
         val output = Bitmap.createBitmap(
-            width, height, input.config, input.hasAlpha(),
+            width, height, input.config ?: Bitmap.Config.ARGB_8888, input.hasAlpha(),
             input.colorSpace ?: ColorSpace.get(ColorSpace.Named.SRGB)
         )
         val inputRect = Rect(

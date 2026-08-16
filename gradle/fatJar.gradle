@@ -1,4 +1,4 @@
-apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 
 dependencies {
     api project(":api")
@@ -7,18 +7,17 @@ dependencies {
     api project(":tensorflow")
     api project(":onnx")
     api project(":visualization")
+    // :tensorflow-metal is deliberately excluded. It is macOS-arm64 only and compiled for Java 22,
+    // so bundling it would raise the fat jar's runtime floor from Java 11 to Java 22 for everyone.
+    // Depend on kotlin-deeplearning-tensorflow-metal explicitly to opt in.
 }
 
-task fatJar(type: Jar) {
-    classifier 'all'
-    manifest {
-        attributes 'Implementation-Version': '1.15'
-    }
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    // The 'Implementation-Version: 1.15' manifest attribute that used to be set here was a
+    // workaround for TensorFlow 1.x native extraction (tensorflow/tensorflow#30488). TensorFlow
+    // Java loads its natives through JavaCPP, so the attribute is no longer needed.
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+    with tasks.named('jar').get()
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-artifacts {
-    archives fatJar
 }

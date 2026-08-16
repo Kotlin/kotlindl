@@ -1,10 +1,10 @@
 # KotlinDL: High-level Deep Learning API in Kotlin [![official JetBrains project](http://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.8.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.4.10-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Slack channel](https://img.shields.io/badge/chat-slack-green.svg?logo=slack)](https://kotlinlang.slack.com/messages/kotlindl/)
 
 KotlinDL is a high-level Deep Learning API written in Kotlin and inspired by [Keras](https://keras.io). 
-Under the hood, it uses TensorFlow Java API and ONNX Runtime API for Java. KotlinDL offers simple APIs for training deep learning models from scratch, 
+Under the hood, it uses the [TensorFlow Java](https://github.com/tensorflow/java) API (wrapping TensorFlow 2.x) and the ONNX Runtime API for Java. KotlinDL offers simple APIs for training deep learning models from scratch, 
 importing existing Keras and ONNX models for inference, and leveraging transfer learning for tailoring existing pre-trained models to your tasks. 
 
 This project aims to make Deep Learning easier for JVM and Android developers and simplify deploying deep learning models in production environments.
@@ -106,6 +106,7 @@ fun main() {
 - [Documentation](#documentation)
 - [Examples and tutorials](#examples-and-tutorials)
 - [Running KotlinDL on GPU](#running-kotlindl-on-gpu)
+  - [Apple Metal on Apple Silicon](#apple-metal-on-apple-silicon)
 - [Logging](#logging)
 - [Fat Jar issue](#fat-jar-issue)
 - [Limitations](#limitations)
@@ -121,10 +122,12 @@ KotlinDL consists of several modules:
 * `kotlin-deeplearning-impl` implementation classes and utilities
 * `kotlin-deeplearning-onnx` inference with ONNX Runtime
 * `kotlin-deeplearning-tensorflow` learning and inference with TensorFlow
+* `kotlin-deeplearning-tensorflow-metal` optional Apple Metal (GPU) acceleration for the TensorFlow backend
 * `kotlin-deeplearning-visualization` visualization utilities
 * `kotlin-deeplearning-dataset` dataset classes
 
 Modules `kotlin-deeplearning-tensorflow` and `kotlin-deeplearning-dataset` are only available for desktop JVM, while other artifacts could also be used on Android.
+`kotlin-deeplearning-tensorflow-metal` is narrower still: macOS on Apple Silicon only, and it requires JDK 22 or later. See [Apple Metal on Apple Silicon](#apple-metal-on-apple-silicon).
 
 ## How to configure KotlinDL in your project
 
@@ -222,7 +225,34 @@ This table shows the mapping between KotlinDL, TensorFlow, ONNX Runtime, Compile
 | 0.4.0            | 8                    | 1.11.0               | 1.15               |                              |
 | 0.5.0-0.5.1      | 11                   | 1.12.1               | 1.15               | 31                           |
 | 0.5.2            | 11                   | 1.14.0               | 1.15               | 31                           |
-| 0.6.*            | 11                   | 1.16.0               | 1.15               | 31                           |
+| 0.6.*            | 11                   | 1.16.0               | 2.x (TF Java 1.0.0)| 36                           |
+
+Since 0.6, the TensorFlow backend is built on [TensorFlow Java](https://github.com/tensorflow/java)
+1.0.0, which wraps the TensorFlow 2.x C API. Earlier versions used the TensorFlow 1.15 Java API,
+which was last released in 2019.
+
+Building KotlinDL from source requires JDK 17 or newer (JDK 25 is used for development) and Android SDK 36
+with build tools 36.0.0; the published artifacts still target Java 11 bytecode.
+
+### Supported platforms
+
+TensorFlow Java publishes natives for the platforms below, and the `tensorflow-core-platform`
+artifact that KotlinDL depends on bundles all of them:
+
+| Platform            | TensorFlow backend | ONNX Runtime backend |
+|---------------------|--------------------|----------------------|
+| linux-x86_64        | yes (CPU and CUDA) | yes                  |
+| linux-arm64         | yes                | yes                  |
+| macosx-arm64        | yes                | yes                  |
+| macosx-x86_64       | yes                | yes                  |
+| windows-x86_64      | yes                | yes                  |
+
+Apple Silicon runs the TensorFlow backend natively as of 0.6. Before that, KotlinDL was pinned to
+TensorFlow 1.15, which shipped no arm64 native at all.
+
+Note that `tensorflow-core-native` 1.2.0 and later dropped the `macosx-x86_64` and `windows-x86_64`
+classifiers, which is why KotlinDL stays on 1.0.0 — upgrading would silently drop Intel Mac and
+Windows support.
 
 ## Documentation
 
@@ -254,21 +284,22 @@ and install the CUDA framework to allow calculations on a GPU device.
 
 Note that only NVIDIA devices are supported.
 
-You will also need to add the following dependencies in your project if you wish to leverage a GPU: 
+You will also need to add the GPU-enabled TensorFlow native in your project if you wish to leverage a GPU:
 ```groovy
 // build.gradle
-implementation 'org.tensorflow:libtensorflow:1.15.0'
-implementation 'org.tensorflow:libtensorflow_jni_gpu:1.15.0'
+implementation 'org.tensorflow:tensorflow-core-native:1.0.0:linux-x86_64-gpu'
 ```
 ```kotlin
 // build.gradle.kts
-implementation ("org.tensorflow:libtensorflow:1.15.0")
-implementation ("org.tensorflow:libtensorflow_jni_gpu:1.15.0")
+implementation("org.tensorflow:tensorflow-core-native:1.0.0:linux-x86_64-gpu")
 ```
 
+Note that TensorFlow Java publishes a CUDA-enabled native for `linux-x86_64` only, so CUDA
+acceleration is available on Linux. For Apple GPUs, see [Apple Metal](#apple-metal-on-apple-silicon)
+below.
+
 On Windows, the following distributions are required:
-- CUDA cuda_10.0.130_411.31_win10
-- [cudnn-7.6.3](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/7.6.3.30/Production/10.0_20190822/cudnn-10.0-windows10-x64-v7.6.3.30.zip)
+- [cudnn](https://developer.nvidia.com/cudnn)
 - [C++ redistributable parts](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
 For inference of ONNX models on a CUDA device, you will also need to add the following dependencies to your project:
@@ -282,6 +313,62 @@ api("com.microsoft.onnxruntime:onnxruntime_gpu:1.16.0")
 ```
 
 To find more info about ONNXRuntime and CUDA version compatibility, please refer to the [ONNXRuntime CUDA Execution Provider page](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html).
+
+### Apple Metal on Apple Silicon
+
+TensorFlow models can run on the Apple GPU through Apple's
+[tensorflow-metal](https://developer.apple.com/metal/tensorflow-plugin/) PluggableDevice, using the
+optional `kotlin-deeplearning-tensorflow-metal` artifact. It is a separate module because it needs
+**JDK 22 or later** (it uses the Foreign Function & Memory API), while the rest of KotlinDL targets
+Java 11. Nothing changes for other platforms, and no existing artifact gains a JDK requirement.
+
+```groovy
+// build.gradle
+implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow-metal:[KOTLIN-DL-VERSION]'
+```
+
+Apple's plugin binary is not redistributed here, so supply it once. The `tensorflow-metal` wheel is
+an ordinary zip — **Python is not required**:
+
+```bash
+# https://pypi.org/project/tensorflow-metal/ -- version 1.2.0 is recommended
+unzip -j tensorflow_metal-1.2.0-cp311-cp311-macosx_12_0_arm64.whl \
+      tensorflow-plugins/libmetal_plugin.dylib -d ~/.kotlindl/metal
+```
+
+Then enable it, and build models with a configuration that permits soft placement:
+
+```kotlin
+when (val status = MetalAcceleration.enable()) {
+    is MetalStatus.Enabled     -> println("Training on the Apple GPU")
+    is MetalStatus.Unavailable -> println("Using the CPU: ${status.reason}")
+}
+
+val model = Sequential.of(layers, gpuConfiguration = metalGpuConfiguration())
+```
+
+Run the JVM with `--enable-native-access=ALL-UNNAMED`, otherwise it warns on every restricted call.
+Note the JDK 22 requirement is hard: the artifact is Java 22 bytecode, so on an older JVM it fails to
+load with `UnsupportedClassVersionError` rather than reporting Metal as unavailable. Add the
+dependency only where JDK 22+ is guaranteed. Java callers use the same entry points statically —
+`MetalAcceleration.enable()`.
+
+Three things are worth knowing:
+
+- **Soft placement is required, not optional.** The plugin has no Metal kernel for the `Assign` op,
+  so a graph pinned hard to the GPU cannot place its variables and fails before the first step.
+  `metalGpuConfiguration()` enables soft placement by default; those ops fall back to the CPU while
+  the compute stays on Metal.
+- **Coverage is good but not complete.** Conv2D, depthwise convolution, 2D pooling, dense layers,
+  the common activations and the SGD/Adam/Momentum/RMSProp/Adadelta/Adagrad optimizers run on Metal.
+  3D convolution and pooling, the `Elu`/`Selu`/`Softsign`/`Softplus` activations, the
+  `AdaGradDA`/`Ftrl` optimizers and gradient clipping have no Metal kernel and fall back to the CPU.
+- **The win depends on model size.** On an M3 Pro a 224×224 two-layer CNN trains roughly 1.6–2.3×
+  faster than on the CPU, with the advantage growing with batch size; small models can be slower on
+  the GPU because of dispatch overhead.
+
+The figures above were measured on an Apple M3 Pro with `tensorflow-metal` 1.2.0; treat them as
+indicative rather than as a published benchmark.
 
 ## Logging
 
@@ -352,29 +439,30 @@ These configuration files can be found in the `examples` module.
 
 ## Fat Jar issue
 
-There is a known Stack Overflow [question](https://stackoverflow.com/questions/47477069/issue-running-tensorflow-with-java/52003343) 
-and TensorFlow [issue](https://github.com/tensorflow/tensorflow/issues/30488) with Fat Jar creation and execution on Amazon EC2 instances.
+Since KotlinDL 0.6 the TensorFlow backend uses TensorFlow Java, which loads its natives through
+JavaCPP rather than through the TensorFlow 1.x extraction mechanism. The
+`Implementation-Version: 1.15` manifest workaround that older versions of this guide recommended —
+a fix for [this TensorFlow issue](https://github.com/tensorflow/tensorflow/issues/30488), which
+produced errors such as
 
 ```
-java.lang.UnsatisfiedLinkError: /tmp/tensorflow_native_libraries-1562914806051-0/libtensorflow_jni.so: libtensorflow_framework.so.1: cannot open shared object file: No such file or directory
+java.lang.UnsatisfiedLinkError: /tmp/tensorflow_native_libraries-.../libtensorflow_jni.so: libtensorflow_framework.so.1: cannot open shared object file
 ```
 
-Despite the fact that the [bug](https://github.com/tensorflow/tensorflow/issues/30488) describing this problem was closed in the release of TensorFlow 1.14, 
-it was not fully fixed and required an additional line in the build script.
+— is no longer required and should be removed if you are carrying it.
 
-One simple [solution](https://github.com/tensorflow/tensorflow/issues/30635#issuecomment-615513958) is to add a TensorFlow version specification to the Jar's Manifest. 
-Below is an example of a Gradle build task for Fat Jar creation.
+What does still matter when building a fat jar is that the native artifacts survive shading.
+`tensorflow-core-platform` pulls in one `tensorflow-core-native` jar per platform, each carrying a
+native library plus JavaCPP metadata, so make sure duplicate entries are merged rather than dropped:
 
 ```groovy
 // build.gradle
 
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Version': '1.15'
-    }
-    classifier = 'all'
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 ```
 
@@ -382,19 +470,23 @@ task fatJar(type: Jar) {
 // build.gradle.kts
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("jvm") version "2.4.10"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
-tasks{
+tasks {
     shadowJar {
         manifest {
-            attributes(Pair("Main-Class", "MainKt"))
-            attributes(Pair("Implementation-Version", "1.15"))
+            attributes("Main-Class" to "MainKt")
         }
+        mergeServiceFiles()
     }
 }
 ```
+
+If jar size is a concern, depend on `org.tensorflow:tensorflow-core-api` plus only the
+`tensorflow-core-native` classifier for the platforms you ship to, instead of the
+`tensorflow-core-platform` aggregate.
 
 ## Limitations
 
@@ -429,8 +521,8 @@ Currently, only a limited set of deep learning architectures are supported. Here
 * Other layers:
   - `Permute`, `RepeatVector`.
 
-TensorFlow 1.15 Java API is currently used for layer implementation, but this project will be switching to TensorFlow 2.+ in the nearest future. 
-This, however, does not affect the high-level API. Inference with TensorFlow models is currently supported only on desktops. 
+Layers are implemented on the TensorFlow Java 1.0.0 bindings, which wrap the TensorFlow 2.x C API.
+This does not affect the high-level API. Inference with TensorFlow models is currently supported only on desktops.
 
 ## Contributing
 

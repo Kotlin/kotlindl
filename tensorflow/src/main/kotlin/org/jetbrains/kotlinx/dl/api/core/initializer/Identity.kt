@@ -4,6 +4,8 @@ import org.jetbrains.kotlinx.dl.api.core.exception.IdentityDimensionalityExcepti
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates the identity matrix.
@@ -20,7 +22,7 @@ import org.tensorflow.op.Ops
 public class Identity(
     public val gain: Float = 1.0f
 ) : Initializer() {
-    override fun initialize(fanIn: Int, fanOut: Int, tf: Ops, shape: Operand<Int>, name: String): Operand<Float> {
+    override fun initialize(fanIn: Int, fanOut: Int, tf: Ops, shape: Operand<TInt32>, name: String): Operand<TFloat32> {
         val dimensions = shape.asOutput().shape().size(0)
         if (dimensions != 2L) throw IdentityDimensionalityException(dimensions)
 
@@ -29,7 +31,7 @@ public class Identity(
         val diag = tf.tile(tf.constant(floatArrayOf(gain)), reshapedMinSize)
 
         val zeros = tf.withName(name).zeros(shape, getDType())
-        return tf.matrixSetDiagV2(zeros, diag, tf.constant(0))
+        return tf.linalg.matrixSetDiag(zeros, diag, tf.constant(0))
     }
 
     override fun toString(): String {

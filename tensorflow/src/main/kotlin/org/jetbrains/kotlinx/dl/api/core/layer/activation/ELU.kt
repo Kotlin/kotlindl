@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Exponential Unit activation function.
@@ -36,13 +37,13 @@ public class ELU(
 
     override fun forward(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> = when (alpha) {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> = when (alpha) {
         1.0f -> tf.nn.elu(input)
         else -> {
             val greaterThanZero = tf.math.greater(input, tf.constant(0.0f))
             val scaledActivation = tf.math.mul(tf.constant(alpha), tf.nn.elu(input))
-            tf.where3(greaterThanZero, input, scaledActivation)
+            tf.select(greaterThanZero, input, scaledActivation)
         }
     }
 

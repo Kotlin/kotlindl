@@ -8,8 +8,10 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Layer that adds a list of inputs.
@@ -21,28 +23,28 @@ import org.tensorflow.op.Ops
 public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         throw UnsupportedOperationException("$layerTypeName is not supported in Sequential models.")
     }
 
     override fun build(
         tf: Ops,
-        input: List<Operand<Float>>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: List<Operand<TFloat32>>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         checkInputShapes(input.map { it.asOutput().shape() }) //TODO: crash efficientNet models
         return tf.withName(layerTypeName).identity(mergeFunction(input, tf))
     }
 
     /** Should be overridden in all AbstractMerge descendants. */
     protected abstract fun mergeFunction(
-        input: List<Operand<Float>>,
+        input: List<Operand<TFloat32>>,
         tf: Ops
-    ): Operand<Float>
+    ): Operand<TFloat32>
 
     /** Checks shapes of input operands. */
     protected open fun checkInputShapes(inputShapes: List<Shape>) {

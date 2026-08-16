@@ -18,12 +18,14 @@ import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarN
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dPointwiseKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2d
 import org.tensorflow.op.nn.DepthwiseConv2dNative
 import org.tensorflow.op.nn.DepthwiseConv2dNative.dilations
 import kotlin.math.roundToInt
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * 2-D convolution with separable filters.
@@ -128,10 +130,10 @@ public class SeparableConv2D(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         // Amount of channels should be the last value in the inputShape (make warning here)
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
@@ -164,7 +166,7 @@ public class SeparableConv2D(
             pointwiseRegularizer
         )
         if (useBias) {
-            val biasShape = Shape.make(filters.toLong())
+            val biasShape = Shape.of(filters.toLong())
             bias = createVariable(
                 tf,
                 separableConv2dBiasVarName(name),
@@ -179,7 +181,7 @@ public class SeparableConv2D(
         val paddingName = padding.paddingName
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toLongList()).dataFormat("NHWC")
 
-        val depthwiseOutput: Operand<Float> =
+        val depthwiseOutput: Operand<TFloat32> =
             tf.nn.depthwiseConv2dNative(
                 input,
                 depthwiseKernel.variable,
@@ -191,7 +193,7 @@ public class SeparableConv2D(
         val pointwiseStrides = mutableListOf(1L, 1L, 1L, 1L)
 
         val conv2DOptions: Conv2d.Options = Conv2d.dataFormat("NHWC")
-        var output: Operand<Float> =
+        var output: Operand<TFloat32> =
             tf.nn.conv2d(depthwiseOutput, pointwiseKernel.variable, pointwiseStrides, "VALID", conv2DOptions)
 
         bias?.let {

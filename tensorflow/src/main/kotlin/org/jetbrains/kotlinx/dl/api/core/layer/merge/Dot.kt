@@ -14,6 +14,7 @@ import org.tensorflow.op.linalg.Transpose
 import org.tensorflow.op.math.Mul
 import org.tensorflow.op.math.Rsqrt
 import org.tensorflow.op.math.Square
+import org.tensorflow.types.TFloat32
 
 /**
  * Layer that computes a dot product between samples in two tensors.
@@ -31,7 +32,7 @@ public class Dot(
 
     public constructor(axis: Int) : this(axis = IntArray(2) { axis })
 
-    override fun mergeFunction(input: List<Operand<Float>>, tf: Ops): Operand<Float> {
+    override fun mergeFunction(input: List<Operand<TFloat32>>, tf: Ops): Operand<TFloat32> {
         require(input.size == 2) { "A `Dot` layer should be called on exactly 2 input. 'Received: input=${input}" }
         var x1 = input[0]
         var x2 = input[1]
@@ -63,17 +64,17 @@ public class Dot(
  * @param x: Operand
  * @param axis: Axis along which to perform normalization
  */
-public fun l2Normalize(scope: Scope?, x: Operand<Float>, axis: IntArray?): Operand<Float> {
-    val squareSum: Operand<Float> = ReduceSum.create(
+public fun l2Normalize(scope: Scope?, x: Operand<TFloat32>, axis: IntArray?): Operand<TFloat32> {
+    val squareSum: Operand<TFloat32> = ReduceSum.create(
         scope,
         Square.create(scope, x),
-        Constant.create(scope, axis),
+        Constant.vectorOf(scope, axis!!),
         ReduceSum.keepDims(true)
     )
-    val invNorm: Operand<Float> = Rsqrt.create(
+    val invNorm: Operand<TFloat32> = Rsqrt.create(
         scope,
         org.tensorflow.op.math.Maximum.create(
-            scope, squareSum, Constant.create(scope, 1e-12f)
+            scope, squareSum, Constant.scalarOf(scope, 1e-12f)
         )
     )
     return Mul.create(scope, x, invNorm)
@@ -87,12 +88,12 @@ public fun l2Normalize(scope: Scope?, x: Operand<Float>, axis: IntArray?): Opera
  * @param y: Operand with dimensions>=2
  * @param axis: Axis along which to perform batch dot
  */
-public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: IntArray): Operand<Float> {
+public fun batchDot(scope: Scope?, x: Operand<TFloat32>, y: Operand<TFloat32>, axis: IntArray): Operand<TFloat32> {
     val xDim = x.asOutput().shape().numDimensions()
     val yDim = y.asOutput().shape().numDimensions()
     val diff: Int
-    var x2: Operand<Float> = x
-    var y2: Operand<Float> = y
+    var x2: Operand<TFloat32> = x
+    var y2: Operand<TFloat32> = y
     if (xDim > yDim) {
         diff = xDim - yDim
         y2 = Reshape.create(
@@ -100,8 +101,8 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
             y,
             Concat.create(
                 scope,
-                listOf(Shape.create(scope, y)) + List(diff) { Constant.create(scope, 1) },
-                Constant.create(scope, 0)
+                listOf(Shape.create(scope, y)) + List(diff) { Constant.scalarOf(scope, 1) },
+                Constant.scalarOf(scope, 0)
             ),
         )
     } else if (yDim > xDim) {
@@ -111,24 +112,24 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
             x,
             Concat.create(
                 scope,
-                listOf(Shape.create(scope, x)) + List(diff) { Constant.create(scope, 1) },
-                Constant.create(scope, 0)
+                listOf(Shape.create(scope, x)) + List(diff) { Constant.scalarOf(scope, 1) },
+                Constant.scalarOf(scope, 0)
             ),
         )
     } else {
         diff = 0
     }
-    var out: Operand<Float>
+    var out: Operand<TFloat32>
     val x2Dim = x2.asOutput().shape().numDimensions()
     val y2Dim = y2.asOutput().shape().numDimensions()
     if (x2Dim == 2 && y2Dim == 2) {
         out = if (axis[0] == axis[1]) {
-            ReduceSum.create(scope, Mul.create(scope, x2, y2), Constant.create(scope, axis[0]))
+            ReduceSum.create(scope, Mul.create(scope, x2, y2), Constant.scalarOf(scope, axis[0]))
         } else {
             ReduceSum.create(
                 scope,
-                Mul.create(scope, Transpose.create(scope, x2, Constant.create(scope, intArrayOf(1, 0))), y2),
-                Constant.create(scope, axis[1])
+                Mul.create(scope, Transpose.create(scope, x2, Constant.vectorOf(scope, intArrayOf(1, 0))), y2),
+                Constant.scalarOf(scope, axis[1])
             )
         }
     } else {
@@ -149,10 +150,10 @@ public fun batchDot(scope: Scope?, x: Operand<Float>, y: Operand<Float>, axis: I
         } else {
             (xDim - 1).toFloat()
         }
-        out = Squeeze.create(scope, Constant.create(scope, FloatArray(diff) { it + idx }))
+        out = Squeeze.create(scope, Constant.vectorOf(scope, FloatArray(diff) { it + idx }))
     }
     if (out.asOutput().shape().numDimensions() == 1) {
-        ExpandDims.create(scope, out, Constant.create(scope, 1))
+        ExpandDims.create(scope, out, Constant.scalarOf(scope, 1))
     }
     return out
 }

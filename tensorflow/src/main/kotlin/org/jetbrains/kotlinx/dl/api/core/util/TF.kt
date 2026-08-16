@@ -8,35 +8,37 @@ package org.jetbrains.kotlinx.dl.api.core.util
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.math.Mean
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /** Helper class that emulates Keras functions from tensorflow.keras. */
 public object TF {
     /** */
-    internal fun mean(tf: Ops, x: Operand<Float>): Operand<Float> {
+    internal fun mean(tf: Ops, x: Operand<TFloat32>): Operand<TFloat32> {
         return mean(tf, x, null, false)
     }
 
     /** */
     internal fun mean(
         tf: Ops,
-        x: Operand<Float>,
-        axis: Operand<Int>
-    ): Operand<Float> {
+        x: Operand<TFloat32>,
+        axis: Operand<TInt32>
+    ): Operand<TFloat32> {
         return mean(tf, x, axis, false)
     }
 
     /** */
-    internal fun mean(tf: Ops, x: Operand<Float>, keepDims: Boolean): Operand<Float> {
+    internal fun mean(tf: Ops, x: Operand<TFloat32>, keepDims: Boolean): Operand<TFloat32> {
         return mean(tf, x, null, keepDims)
     }
 
     /** */
     internal fun mean(
         tf: Ops,
-        x: Operand<Float>,
-        axis: Operand<Int>?,
+        x: Operand<TFloat32>,
+        axis: Operand<TInt32>?,
         keepDims: Boolean
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         var localAxis = axis
 
         if (localAxis == null) {

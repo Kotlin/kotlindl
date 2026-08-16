@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Layer that subtracts inputs, following from the previous.
@@ -16,9 +17,9 @@ import org.tensorflow.op.Ops
  */
 public class Subtract(name: String = "") : AbstractMerge("SubtractLayer", name) {
     override fun mergeFunction(
-        input: List<Operand<Float>>,
+        input: List<Operand<TFloat32>>,
         tf: Ops
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         var output = input[0]
         for (i in 1 until input.size)
             output = tf.math.sub(output, input[i])

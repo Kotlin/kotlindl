@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Abstract UpSampling layer used as the base layer for all the upsampling layers.
@@ -28,10 +30,10 @@ public abstract class AbstractUpSampling(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         return upSample(tf, input)
     }
 
@@ -39,7 +41,7 @@ public abstract class AbstractUpSampling(
      * The actual implementation of upsampling operation which each subclassed layer needs to
      * implement. This method will then be called from [build] method to upsample the input tensor.
      */
-    protected abstract fun upSample(tf: Ops, input: Operand<Float>): Operand<Float>
+    protected abstract fun upSample(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32>
 }
 
 /**
@@ -48,7 +50,7 @@ public abstract class AbstractUpSampling(
  * For example, if the given tensor is equal to `[1, 2, 3]`, `repeats=2` and `axis=0`,
  * the output of this function would be `[1, 1, 2, 2, 3, 3]`.
  */
-internal fun repeat(tf: Ops, value: Operand<Float>, repeats: Int, axis: Int): Operand<Float> {
+internal fun repeat(tf: Ops, value: Operand<TFloat32>, repeats: Int, axis: Int): Operand<TFloat32> {
     val inputShape = value.asOutput().shape()
     val splits = tf.split(tf.constant(axis), value, inputShape.size(axis))
     val multiples = tf.constant(

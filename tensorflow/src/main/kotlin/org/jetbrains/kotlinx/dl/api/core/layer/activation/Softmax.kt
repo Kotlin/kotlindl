@@ -9,6 +9,7 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.ReduceMax
 import org.tensorflow.op.core.ReduceSum
+import org.tensorflow.types.TFloat32
 
 /**
  * Softmax activation layer
@@ -33,16 +34,16 @@ public class Softmax(
         if (axis.size != 1) throw Exception("Multiple axes are not supported")
     }
 
-    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val shape = tf.shape(input)
         val numDimensions = tf.size(shape)
         return if (numDimensions == tf.constant(2)) {
             tf.nn.softmax(input)
         } else {
-            val e: Operand<Float> = tf.math.exp(
+            val e: Operand<TFloat32> = tf.math.exp(
                 tf.math.sub(input, tf.reduceMax(input, tf.constant(axis.first()), ReduceMax.keepDims(true)))
             )
-            val s: Operand<Float> = tf.reduceSum(e, tf.constant(axis.first()), ReduceSum.keepDims(true))
+            val s: Operand<TFloat32> = tf.reduceSum(e, tf.constant(axis.first()), ReduceSum.keepDims(true))
             tf.math.div(e, s)
         }
     }

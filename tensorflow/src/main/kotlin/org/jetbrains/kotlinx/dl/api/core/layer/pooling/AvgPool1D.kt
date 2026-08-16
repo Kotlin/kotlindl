@@ -11,6 +11,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Squeeze
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Average pooling operation for 1D temporal data (e.g. audio, time-series).
@@ -56,10 +58,10 @@ public class AvgPool1D(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val expandAxis = 2
         val tfInput = tf.expandDims(input, tf.constant(expandAxis))
 

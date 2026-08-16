@@ -17,8 +17,10 @@ import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Densely-connected (fully-connected) layer class.
@@ -63,15 +65,15 @@ public class Dense(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         val fanOut = outputSize
 
-        val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
+        val kernelShape = Shape.of(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         kernel = createVariable(
             tf,
             denseKernelVarName(name),
@@ -83,7 +85,7 @@ public class Dense(
         )
 
         if (useBias) {
-            val biasShape = Shape.make(outputSize.toLong())
+            val biasShape = Shape.of(outputSize.toLong())
             bias = createVariable(
                 tf,
                 denseBiasVarName(name),

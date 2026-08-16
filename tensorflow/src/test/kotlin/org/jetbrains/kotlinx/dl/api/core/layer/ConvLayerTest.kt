@@ -15,6 +15,7 @@ import org.tensorflow.Graph
 import org.tensorflow.Session
 import org.tensorflow.op.Ops
 import java.nio.FloatBuffer
+import org.tensorflow.ndarray.buffer.DataBuffers
 
 open class ConvLayerTest {
     protected fun assertTensorsEquals(
@@ -25,17 +26,17 @@ open class ConvLayerTest {
         Graph().use { graph ->
             Session(graph).use { session ->
                 val tf = Ops.create(graph)
-                val inputOp = tf.constant(input.shape.toLongArray(), FloatBuffer.wrap(input.flattenFloats()))
+                val inputOp = tf.constant(input.shape, DataBuffers.of(FloatBuffer.wrap(input.flattenFloats())))
                 val isTraining = tf.constant(true)
                 val numberOfLosses = tf.constant(1.0f)
 
                 val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput()
                 layer.setOutputShape(output.shape())
                 (layer as? ParametrizedLayer)?.initialize(session)
-                session.runner().fetch(output).run().first().use { outputTensor ->
+                session.runner().fetch(output).run().get(0).use { outputTensor ->
                     val outputShape = outputTensor.shape()
                     val expectedShape = expectedOutput.shape.toLongArray()
-                    assertArrayEquals(expectedShape, outputShape)
+                    assertArrayEquals(expectedShape, outputShape.asArray())
 
                     val result = outputTensor.toFloatArray()
                     val expected = expectedOutput.flattenFloats()

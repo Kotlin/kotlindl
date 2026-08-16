@@ -2,6 +2,7 @@ package org.jetbrains.kotlinx.dl.api.core.summary
 
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.summary.*
+import org.tensorflow.ndarray.Shape
 
 /**
  * The common information about model.

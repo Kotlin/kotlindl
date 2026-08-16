@@ -10,8 +10,9 @@ import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val EPS = 1e-7f
 private const val FAN_IN = 10
@@ -25,13 +26,13 @@ class IdentityTest {
         expected[0][0] = 1f
         expected[1][1] = 1f
 
-        val shape = Shape.make(2, 2)
+        val shape = Shape.of(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Identity()
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
             assertArrayEquals(
                 expected[0],
@@ -59,13 +60,13 @@ class IdentityTest {
         expected[0][0] = 3.4f
         expected[1][1] = 3.4f
 
-        val shape = Shape.make(2, 2)
+        val shape = Shape.of(2, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Identity(3.4f)
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
             assertArrayEquals(
                 expected[0],
@@ -93,13 +94,13 @@ class IdentityTest {
         expected[0][0] = 1f
         expected[1][1] = 1f
 
-        val shape = Shape.make(2, 3)
+        val shape = Shape.of(2, 3)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Identity()
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
 
             assertArrayEquals(
@@ -128,13 +129,13 @@ class IdentityTest {
         expected[0][0] = 1f
         expected[1][1] = 1f
 
-        val shape = Shape.make(3, 2)
+        val shape = Shape.of(3, 2)
 
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Identity()
             val operand = instance.initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
-            operand.asOutput().tensor().copyTo(actual)
+            operand.asTensor().copyTo(actual)
 
 
             assertArrayEquals(
@@ -166,7 +167,7 @@ class IdentityTest {
     fun initializeWith1DShapeFails() {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val shape = Shape.make(5)
+            val shape = Shape.of(5)
 
             val exception = assertThrows(IdentityDimensionalityException::class.java) {
                 Identity().initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")
@@ -183,7 +184,7 @@ class IdentityTest {
     fun initializeWith3DShapeFails() {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val shape = Shape.make(5, 5, 5)
+            val shape = Shape.of(5, 5, 5)
 
             val exception = assertThrows(IdentityDimensionalityException::class.java) {
                 Identity().initialize(FAN_IN, FAN_OUT, tf, shapeOperand(tf, shape), "default_name")

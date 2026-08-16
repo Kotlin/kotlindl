@@ -7,6 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates tensors with a normal distribution.
@@ -26,12 +28,12 @@ public class RandomNormal(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         val seeds = longArrayOf(seed, 0L)
-        val distOp: Operand<Float> = tf.random.statelessRandomNormal(shape, tf.constant(seeds))
-        val op: Operand<Float> = tf.math.mul(distOp, tf.constant(stdev))
+        val distOp: Operand<TFloat32> = tf.random.statelessRandomNormal(shape, tf.constant(seeds))
+        val op: Operand<TFloat32> = tf.math.mul(distOp, tf.constant(stdev))
         return tf.withName(name).math.add(op, tf.constant(mean))
     }
 

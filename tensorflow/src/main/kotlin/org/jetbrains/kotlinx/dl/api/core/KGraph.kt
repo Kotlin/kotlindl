@@ -13,6 +13,7 @@ import org.tensorflow.Session
 import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.AssignAdd
 import org.tensorflow.op.core.Variable
+import org.tensorflow.types.TFloat32
 
 /**
  * A wrapper object to extend functionality and behaviour of static TensorFlow graph.
@@ -41,7 +42,7 @@ public class KGraph(internal val tfGraph: Graph) : AutoCloseable {
     private val optimizerAssignAddInitializers: MutableList<AssignAdd<*>> = mutableListOf()
 
     /** A list of optimizers' variables. */
-    private val optimizerVariables: MutableList<Variable<Float>> = mutableListOf()
+    private val optimizerVariables: MutableList<Variable<TFloat32>> = mutableListOf()
 
     /**
      * Closes internal TensorFlow graph.
@@ -59,7 +60,7 @@ public class KGraph(internal val tfGraph: Graph) : AutoCloseable {
     /** Makes a graph copy. */
     public fun copy(): KGraph {
         require(!isClosed) { "The copied graph and model are closed and could not be reused!" }
-        return KGraph(tfGraph.toGraphDef())
+        return KGraph(tfGraph.toGraphDef().toByteArray())
     }
 
     /**
@@ -67,7 +68,7 @@ public class KGraph(internal val tfGraph: Graph) : AutoCloseable {
      *
      * @param variable Optimizer variable to track in KGraph.
      */
-    public fun addOptimizerVariable(variable: Variable<Float>) {
+    public fun addOptimizerVariable(variable: Variable<TFloat32>) {
         check(!optimizerVariables.contains(variable)) { "$variable is added to graph already. Analyze and fix the static graph building process." }
         optimizerVariables.add(variable)
     }
@@ -86,14 +87,14 @@ public class KGraph(internal val tfGraph: Graph) : AutoCloseable {
      *
      * @param initializer AssignAdd TensorFlow operand to initialize and increase optimizer variable.
      */
-    public fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<Float>) {
+    public fun addOptimizerVariableAssignAddInitializer(initializer: AssignAdd<TFloat32>) {
         optimizerAssignAddInitializers += initializer
     }
 
     /**
      * Returns all variables used in optimizer and initialized by Assign TensorFlow operand.
      */
-    public fun optimizerVariables(): List<Variable<Float>> {
+    public fun optimizerVariables(): List<Variable<TFloat32>> {
         return optimizerVariables.toList()
     }
 

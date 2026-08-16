@@ -7,20 +7,23 @@ package org.jetbrains.kotlinx.dl.api.core.util
 
 import org.tensorflow.Graph
 import org.tensorflow.GraphOperation
+import org.tensorflow.proto.GraphDef
 
 // TODO: return to KGraph class
 internal fun deserializeGraph(graphDef: ByteArray, prefix: String = ""): Graph {
+    // TensorFlow Java 1.x takes a parsed GraphDef message rather than raw bytes.
+    val parsed = GraphDef.parseFrom(graphDef)
     return Graph().also { tfGraph ->
         if (prefix.isEmpty()) {
-            tfGraph.importGraphDef(graphDef)
+            tfGraph.importGraphDef(parsed)
         } else {
-            tfGraph.importGraphDef(graphDef, prefix)
+            tfGraph.importGraphDef(parsed, prefix)
         }
     }
 }
 
 internal fun Graph.copy(): Graph {
-    return deserializeGraph(toGraphDef())
+    return deserializeGraph(toGraphDef().toByteArray())
 }
 
 internal fun Graph.convertToString(): String {

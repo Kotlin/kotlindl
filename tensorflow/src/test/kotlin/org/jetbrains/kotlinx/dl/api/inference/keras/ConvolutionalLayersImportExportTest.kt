@@ -90,7 +90,10 @@ class ConvolutionalLayersImportExportTest {
     fun conv1DTranspose() {
         LayerImportExportTest.run(
             Sequential.of(
-                Input(dims = longArrayOf(3)),
+                // [steps, channels]: Conv1DTranspose needs a rank-3 input (batch, steps, channels).
+                // This previously declared a single dimension, which produced a rank-2 input and a
+                // rank-3 out_backprop; TensorFlow 1.15 accepted that, TensorFlow 2.x rejects it.
+                Input(dims = longArrayOf(3, 3)),
                 Conv1DTranspose(
                     filters = 5,
                     kernelLength = 5,
@@ -115,7 +118,9 @@ class ConvolutionalLayersImportExportTest {
     fun conv2DTranspose() {
         LayerImportExportTest.run(
             Sequential.of(
-                Input(dims = longArrayOf(3, 3)),
+                // [height, width, channels]: Conv2DTranspose needs a rank-4 input.
+                // See the note on conv1DTranspose above.
+                Input(dims = longArrayOf(3, 3, 3)),
                 Conv2DTranspose(
                     filters = 5,
                     kernelSize = intArrayOf(5, 5),

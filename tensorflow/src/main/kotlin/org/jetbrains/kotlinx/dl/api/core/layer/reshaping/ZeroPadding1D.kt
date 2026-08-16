@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 
 /**
  * Zero-padding layer for 1D input (e.g. audio).

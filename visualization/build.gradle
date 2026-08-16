@@ -1,16 +1,24 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 project.setDescription("This module contains the Kotlin API for visualization of the Deep Learning models built with the KotlinDL.")
 
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
+apply plugin: 'com.android.kotlin.multiplatform.library'
 
 kotlin {
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
         }
     }
     android {
-        publishLibraryVariants("release")
+        namespace = 'org.jetbrains.kotlinx.dl.visualization'
+        compileSdk = 36
+        minSdk = 24
+
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
     sourceSets {
         jvmMain {
@@ -28,21 +36,8 @@ kotlin {
         androidMain {
             dependencies {
                 api project(":api")
-                api "androidx.camera:camera-view:1.0.0-alpha22"
+                api "androidx.camera:camera-view:1.6.1"
             }
         }
-    }
-}
-
-android {
-    compileSdkVersion 31
-    namespace = 'org.jetbrains.kotlinx.dl.visualization'
-    defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 31
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 }

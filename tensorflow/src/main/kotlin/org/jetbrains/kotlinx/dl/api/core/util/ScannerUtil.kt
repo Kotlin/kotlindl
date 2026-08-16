@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.util
 
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import java.util.*
 
 internal fun Scanner.createFloatArray(shape: Shape): Any {

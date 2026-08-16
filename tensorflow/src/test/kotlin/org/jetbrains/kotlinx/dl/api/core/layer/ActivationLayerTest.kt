@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.tensorflow.EagerSession
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 internal const val IRRELEVANT_INPUT_SIZE = 8
 
@@ -32,7 +34,7 @@ open class ActivationLayerTest {
             val numberOfLosses = tf.constant(1.0f)
 
             val output = layer.build(tf, inputOp, isTraining, numberOfLosses)
-            val actualShape = shapeFromDims(*output.asOutput().tensor().shape())
+            val actualShape = shapeFromDims(*output.asTensor().shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             assert2DArrayEquals(
@@ -63,13 +65,13 @@ open class ActivationLayerTest {
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
+            val output = layer.build(tf, inputOp, isTraining, numberOfLosses).asTensor()
 
-            val expectedShape = Shape.make(
+            val expectedShape = Shape.of(
                 inputSize.toLong()
             )
 
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shapeFromDims(*output.shape().asArray())
             assertEquals(expectedShape, actualShape)
 
             output.copyTo(actual)
@@ -96,12 +98,12 @@ open class ActivationLayerTest {
     }
 }
 
-private fun Operand<Float>.to2DArray(): Array<FloatArray> = asOutput().tensor().to2DArray()
+private fun Operand<TFloat32>.to2DArray(): Array<FloatArray> = asOutput().asTensor().to2DArray()
 
-private fun Tensor<Float>.to2DArray(): Array<FloatArray> {
-    require(numDimensions() == 2)
+private fun TFloat32.to2DArray(): Array<FloatArray> {
+    require(shape().numDimensions() == 2)
     val shape = shape()
-    val array: Array<FloatArray> = Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
+    val array: Array<FloatArray> = Array(shape.size(0).toInt()) { FloatArray(shape.size(1).toInt()) }
     copyTo(array)
     return array
 }

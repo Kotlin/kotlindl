@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.random.ParameterizedTruncatedNormal
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates a parametrized truncated normal distribution.
@@ -31,9 +33,9 @@ public class ParametrizedTruncatedNormal(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         require(p1 < p2) { "The p1 parameter value must be less than p2 parameter value." }
 
         return tf.withName(name).random.parameterizedTruncatedNormal(

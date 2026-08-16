@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.regularizer
 import org.jetbrains.kotlinx.dl.api.core.loss.allAxes
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /** Default penalty. */
 public const val DEFAULT_PENALTY: Float = 0.00001f
@@ -34,8 +35,8 @@ public open class L2L1(
      */
     public val l2: Float = DEFAULT_PENALTY
 ) : Regularizer() {
-    override fun apply(tf: Ops, input: Operand<Float>): Operand<Float> {
-        var regularization: Operand<Float> = tf.constant(0.0f)
+    override fun apply(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
+        var regularization: Operand<TFloat32> = tf.constant(0.0f)
         if (l1 == 0f && l2 == 0f) {
             return regularization
         } else {

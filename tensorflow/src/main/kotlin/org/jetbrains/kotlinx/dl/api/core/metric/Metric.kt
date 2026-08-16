@@ -14,6 +14,9 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.ReduceSum
 import org.tensorflow.op.math.Mean
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt64
+import org.tensorflow.ndarray.Shape
 
 /**
  * Basic interface for all metric functions.
@@ -31,10 +34,10 @@ public abstract class Metric(
      */
     public abstract fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float>
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32>
 
     public companion object {
         /** Converts enum value to subclass of [Metric]. */
@@ -66,12 +69,12 @@ public abstract class Metric(
 public class Accuracy : Metric(reductionType = ReductionType.SUM_OVER_BATCH_SIZE) {
     override fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float> {
-        val predicted: Operand<Long> = tf.math.argMax(yPred, tf.constant(1))
-        val expected: Operand<Long> = tf.math.argMax(yTrue, tf.constant(1))
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32> {
+        val predicted: Operand<TInt64> = tf.math.argMax(yPred, tf.constant(1))
+        val expected: Operand<TInt64> = tf.math.argMax(yTrue, tf.constant(1))
 
         return tf.math.mean(tf.dtypes.cast(tf.math.equal(predicted, expected), getDType()), tf.constant(0))
     }
@@ -83,10 +86,10 @@ public class Accuracy : Metric(reductionType = ReductionType.SUM_OVER_BATCH_SIZE
 public class MSE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
     override fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float> {
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val squaredError = tf.math.squaredDifference(yPred, yTrue)
         return meanOfMetrics(tf, reductionType, squaredError, numberOfLabels, "Metric_MSE")
     }
@@ -98,10 +101,10 @@ public class MSE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZ
 public class MAE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
     override fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float> {
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val absoluteErrors = tf.math.abs(tf.math.sub(yPred, yTrue))
         return meanOfMetrics(tf, reductionType, absoluteErrors, numberOfLabels, "Metric_MAE")
     }
@@ -113,10 +116,10 @@ public class MAE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZ
 public class MAPE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
     override fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float> {
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val epsilon = 1e-7f
 
         val diff = tf.math.abs(
@@ -136,10 +139,10 @@ public class MAPE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SI
 public class MSLE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SIZE) : Metric(reductionType) {
     override fun apply(
         tf: Ops,
-        yPred: Operand<Float>,
-        yTrue: Operand<Float>,
-        numberOfLabels: Operand<Float>?
-    ): Operand<Float> {
+        yPred: Operand<TFloat32>,
+        yTrue: Operand<TFloat32>,
+        numberOfLabels: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val epsilon = 1e-5f
 
         val firstLog = tf.math.log(tf.math.add(tf.math.maximum(yPred, tf.constant(epsilon)), tf.constant(1.0f)))
@@ -154,13 +157,13 @@ public class MSLE(reductionType: ReductionType = ReductionType.SUM_OVER_BATCH_SI
 internal fun meanOfMetrics(
     tf: Ops,
     reductionType: ReductionType,
-    metric: Operand<Float>,
-    numberOfLabels: Operand<Float>?,
+    metric: Operand<TFloat32>,
+    numberOfLabels: Operand<TFloat32>?,
     metricName: String
-): Operand<Float> {
+): Operand<TFloat32> {
     val meanMetric = tf.math.mean(metric, tf.constant(-1), Mean.keepDims(false))
 
-    var totalMetric: Operand<Float> = tf.reduceSum(
+    var totalMetric: Operand<TFloat32> = tf.reduceSum(
         meanMetric,
         allAxes(tf, meanMetric),
         ReduceSum.keepDims(false)

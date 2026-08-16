@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.EagerSession
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 const val EPS: Float = 1e-2f
 
@@ -36,7 +37,7 @@ open class ActivationTest {
     ) {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            Assertions.assertArrayEquals(exp, act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp), EPS)
+            Assertions.assertArrayEquals(exp, act.apply(tf, tf.constant(inp)).asTensor().copyTo(inp), EPS)
         }
     }
 
@@ -70,7 +71,7 @@ open class ActivationTest {
         // Higher Dimensional assertArrayEquals have no delta option
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
+            val actual = act.apply(tf, tf.constant(inp)).asTensor().copyTo(inp)
             for (i in 0..exp.lastIndex) {
                 Assertions.assertArrayEquals(exp[i], actual[i], EPS)
             }
@@ -89,7 +90,7 @@ open class ActivationTest {
     ) {
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
-            val actual = act.apply(tf, tf.constant(inp)).asOutput().tensor().copyTo(inp)
+            val actual = act.apply(tf, tf.constant(inp)).asTensor().copyTo(inp)
             for (i in 0..exp.lastIndex) {
                 for (j in 0..exp[i].lastIndex) {
                     Assertions.assertArrayEquals(exp[i][j], actual[i][j], EPS)

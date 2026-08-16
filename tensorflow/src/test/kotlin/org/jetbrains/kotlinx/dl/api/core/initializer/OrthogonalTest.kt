@@ -5,7 +5,7 @@ import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 
 private const val EPS = 1e-6f
@@ -32,7 +32,7 @@ internal class OrthogonalTest {
     }
 
     private fun doTest(size: Int, seed: Long = 12L, expectedMatrix: FloatArray? = null) {
-        val shape = Shape.make(size.toLong(), size.toLong())
+        val shape = Shape.of(size.toLong(), size.toLong())
         EagerSession.create().use { session ->
             val tf = Ops.create(session)
             val instance = Orthogonal(gain = 1.0f, seed = seed)
@@ -48,14 +48,14 @@ internal class OrthogonalTest {
 
             Assertions.assertArrayEquals(
                 identityMatrix(size),
-                multiplicationResult.asOutput().tensor().toFloatArray(),
+                multiplicationResult.asTensor().toFloatArray(),
                 EPS
             )
 
             if (expectedMatrix != null) {
                 Assertions.assertArrayEquals(
                     expectedMatrix,
-                    matrix.asOutput().tensor().toFloatArray(),
+                    matrix.asTensor().toFloatArray(),
                     EPS
                 )
             }

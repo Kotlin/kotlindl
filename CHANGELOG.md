@@ -1,3 +1,26 @@
+# Unreleased
+
+API changes:
+* Added the optional `kotlin-deeplearning-tensorflow-metal` module, which runs TensorFlow models on
+  Apple GPUs through Apple's `tensorflow-metal` PluggableDevice.
+  * `MetalAcceleration.enable` registers the device; `metalGpuConfiguration` builds a
+    `GpuConfiguration` with the settings it requires; `MetalPlugin` locates the plugin library.
+  * macOS on Apple Silicon only, and the only module requiring **JDK 22 or later** — it calls the
+    Foreign Function & Memory API. No other artifact changes its Java 11 floor, and the module is
+    excluded from the fat jar so that stays true there too.
+  * Apple's `libmetal_plugin.dylib` is not redistributed and must be supplied by the user; it can be
+    unzipped from the `tensorflow-metal` wheel without installing Python.
+* Added `GpuConfiguration#allowSoftPlacement`, mapping to TensorFlow's `allow_soft_placement`.
+  Defaults to `null`, leaving existing behaviour unchanged. Required for Metal, whose plugin has no
+  kernel for the `Assign` op.
+
+Performance:
+* `MaxPool1D` and `MaxPool2D` now emit the `MaxPool` op instead of `MaxPoolV2`, passing the pooling
+  window and strides as attributes rather than as input tensors. Output is unchanged. `MaxPoolV2`
+  has no Apple Metal kernel, so it forced pooling — and the surrounding graph — back onto the CPU:
+  on a 224x224 CNN training step at batch 32 this took the Metal step from 200 ms to 112 ms, raising
+  the speedup over CPU from 1.35x to 2.26x. It is also marginally faster on the CPU.
+
 # 0.6.0-alpha-1 (16/01/2023) New inference api with multiple inputs support
 API changes:
 * Changed `InferenceModel` interface:

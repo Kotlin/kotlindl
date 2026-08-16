@@ -9,6 +9,7 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.AbstractActivationLayer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Applies an activation function to an output.
@@ -26,8 +27,8 @@ public class ActivationLayer(
 
     override fun forward(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         return Activations.convert(activation).apply(tf, input, name)
     }
 

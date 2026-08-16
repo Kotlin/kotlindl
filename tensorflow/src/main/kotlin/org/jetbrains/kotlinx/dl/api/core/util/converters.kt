@@ -5,8 +5,34 @@
 
 package org.jetbrains.kotlinx.dl.api.core.util
 
+import org.tensorflow.ndarray.StdArrays
+import org.tensorflow.types.TFloat32
 import java.nio.Buffer
 import java.nio.FloatBuffer
+
+/**
+ * Creates a float tensor from a (possibly nested) float array.
+ *
+ * TensorFlow Java 1.x removed the reflective `Tensor.create(Object)` factory that the 1.15 API
+ * provided, so the supported ranks are dispatched explicitly here. Rank is determined by walking
+ * the first element of each level, which matches how the weights loaded from Keras HDF5 files are
+ * shaped (they are always rectangular).
+ */
+@Suppress("UNCHECKED_CAST")
+public fun createFloatTensor(data: Any): TFloat32 = when (data) {
+    is Float -> TFloat32.scalarOf(data)
+    is FloatArray -> TFloat32.tensorOf(StdArrays.ndCopyOf(data))
+    is Array<*> -> when (val second = data.firstOrNull()) {
+        is FloatArray -> TFloat32.tensorOf(StdArrays.ndCopyOf(data as Array<FloatArray>))
+        is Array<*> -> when (second.firstOrNull()) {
+            is FloatArray -> TFloat32.tensorOf(StdArrays.ndCopyOf(data as Array<Array<FloatArray>>))
+            is Array<*> -> TFloat32.tensorOf(StdArrays.ndCopyOf(data as Array<Array<Array<FloatArray>>>))
+            else -> throw IllegalArgumentException("Unsupported tensor data of rank higher than 4.")
+        }
+        else -> throw IllegalArgumentException("Unsupported tensor data element: ${second?.let { it::class }}")
+    }
+    else -> throw IllegalArgumentException("Cannot create a float tensor from ${data::class}.")
+}
 
 
 /** Converts [src] to [FloatBuffer] from [start] position for the next [length] positions. */

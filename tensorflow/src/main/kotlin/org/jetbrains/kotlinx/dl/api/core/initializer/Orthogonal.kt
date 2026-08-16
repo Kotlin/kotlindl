@@ -8,11 +8,13 @@ package org.jetbrains.kotlinx.dl.api.core.initializer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeOperand
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.linalg.Qr
 import kotlin.math.max
 import kotlin.math.min
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Initializer that generates an orthogonal matrix.
@@ -29,14 +31,14 @@ public class Orthogonal(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         val dimsShape = shape.asOutput().shape().size(0)
         require(dimsShape >= 2) { "The tensor to initialize must be at least two-dimensional" }
 
         // Generate a random matrix
-        val distOpND: Operand<Float> = tf.random.statelessRandomNormal(
+        val distOpND: Operand<TFloat32> = tf.random.statelessRandomNormal(
             shape,
             tf.constant(longArrayOf(seed, 0L)), getDType()
         )
@@ -51,18 +53,18 @@ public class Orthogonal(
         }
 
         val numCols = distOpND.asOutput().shape().size(i - 1)
-        val flatShape = Shape.make(max(numRows, numCols), min(numRows, numCols))
-        val distOp: Operand<Float> = tf.reshape(distOpND, shapeOperand(tf, flatShape))
+        val flatShape = Shape.of(max(numRows, numCols), min(numRows, numCols))
+        val distOp: Operand<TFloat32> = tf.reshape(distOpND, shapeOperand(tf, flatShape))
 
         // Compute the qr factorization
         val qrOptions = Qr.fullMatrices(false)
-        val qrOp: Qr<Float> = tf.linalg.qr(distOp, qrOptions)
-        val qo: Operand<Float> = qrOp.q()
-        val ro: Operand<Float> = qrOp.r()
+        val qrOp: Qr<TFloat32> = tf.linalg.qr(distOp, qrOptions)
+        val qo: Operand<TFloat32> = qrOp.q()
+        val ro: Operand<TFloat32> = qrOp.r()
 
         //Make Q uniform
-        val d: Operand<Float> = tf.linalg.tensorDiagPart(ro)
-        var qop: Operand<Float> = tf.withName(name).math.mul(qo, tf.math.sign(d))
+        val d: Operand<TFloat32> = tf.linalg.tensorDiagPart(ro)
+        var qop: Operand<TFloat32> = tf.withName(name).math.mul(qo, tf.math.sign(d))
         if (numRows < numCols) qop = tf.withName(name).linalg.transpose(qop, tf.constant(intArrayOf(1, 0)))
 
         return tf.math.mul(tf.reshape(qop, shape), tf.dtypes.cast(tf.constant(this.gain), getDType()))

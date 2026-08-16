@@ -18,6 +18,7 @@ import org.jetbrains.kotlinx.dl.api.core.util.convKernelVarName
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv3d.dilations
+import org.tensorflow.types.TFloat32
 
 /**
  * 3D convolution layer (e.g. spatial convolution over video frames or 3D images).
@@ -110,8 +111,8 @@ public class Conv3D(
 
     override fun convImplementation(
         tf: Ops,
-        input: Operand<Float>
-    ): Operand<Float> {
+        input: Operand<TFloat32>
+    ): Operand<TFloat32> {
         val options = dilations(dilations.toLongList()).dataFormat("NDHWC")
         return tf.nn.conv3d(
             input,

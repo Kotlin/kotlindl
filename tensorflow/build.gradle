@@ -1,44 +1,51 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 project.setDescription("This module contains the Kotlin API for building, training, and evaluating TensorFlow models.")
 
-apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.jvm'
 
 dependencies {
     api project(":dataset")
     api project(":api")
     api project(":impl")
-    api group: 'org.tensorflow', name: 'tensorflow', version: '1.15.0'
-    api group: 'org.tensorflow', name: 'proto', version: '1.15.0'
-    api group: 'com.google.protobuf', name: 'protobuf-java', version: '3.21.9'
+    // TensorFlow Java 1.0.0 wraps the TensorFlow 2.x C API and, unlike the 1.15 line,
+    // ships a macosx-arm64 native, so this module runs natively on Apple Silicon.
+    //
+    // 1.0.0 rather than the newer 1.2.0 deliberately: tensorflow-core-native 1.2.0 dropped the
+    // macosx-x86_64 and windows-x86_64 classifiers, which would silently drop Windows and
+    // Intel-Mac support for this library. 1.0.0 still publishes all five platforms
+    // (linux-x86_64, linux-arm64, macosx-arm64, macosx-x86_64, windows-x86_64) and
+    // tensorflow-core-platform aggregates them into a single dependency.
+    api 'org.tensorflow:tensorflow-core-platform:1.0.0'
+    api 'org.tensorflow:ndarray:1.0.0'
+    api 'com.google.protobuf:protobuf-java:3.25.5'
     api 'com.beust:klaxon:5.5'
     api 'io.github.microutils:kotlin-logging:2.1.21' // for logging
 
-    testImplementation 'ch.qos.logback:logback-classic:1.2.11'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.18'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-test {
-    useJUnitPlatform()
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
     explicitApiWarning()
 }
 
-task sourcesJar(type: Jar) {
-    classifier 'sources'
-    from sourceSets.main.allSource
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
-artifacts {
-    archives sourcesJar
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
 }

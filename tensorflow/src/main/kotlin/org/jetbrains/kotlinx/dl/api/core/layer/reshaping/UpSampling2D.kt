@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.image.ResizeBilinear
+import org.tensorflow.types.TFloat32
 
 /**
  * Upsampling layer for 2D input.
@@ -48,7 +49,7 @@ public class UpSampling2D(
         }
     }
 
-    protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {
+    protected override fun upSample(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val newSize = tf.constant(
             intArrayOf(

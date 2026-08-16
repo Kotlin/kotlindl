@@ -10,6 +10,8 @@ import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import kotlin.math.max
 import kotlin.math.sqrt
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * The Glorot normal initializer, also called Xavier normal initializer.
@@ -167,9 +169,9 @@ public open class VarianceScaling(
         fanIn: Int,
         fanOut: Int,
         tf: Ops,
-        shape: Operand<Int>,
+        shape: Operand<TInt32>,
         name: String
-    ): Operand<Float> {
+    ): Operand<TFloat32> {
         require(scale > 0.0) { "The 'scale' parameter value must be more than 0.0." }
         var lscale = scale
 
@@ -179,8 +181,8 @@ public open class VarianceScaling(
             Mode.FAN_AVG -> max(1.0, (fanIn + fanOut).toDouble() / 2.0)
         }
 
-        val distOp: Operand<Float>
-        val mulOp: Operand<Float>
+        val distOp: Operand<TFloat32>
+        val mulOp: Operand<TFloat32>
         val stddev: Double
         val seeds = longArrayOf(seed, 0L)
         when (distribution) {

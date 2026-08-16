@@ -14,6 +14,7 @@ import org.tensorflow.op.core.Constant
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
 import org.tensorflow.op.train.ApplyMomentum
+import org.tensorflow.types.TFloat32
 
 private const val MOMENTUM = "momentum"
 
@@ -30,8 +31,8 @@ public class Momentum(
     public val useNesterov: Boolean = true,
     clipGradient: ClipGradientAction = NoClipGradient()
 ) : Optimizer(clipGradient) {
-    private lateinit var momentumConst: Constant<Float>
-    private lateinit var learningRateConst: Constant<Float>
+    private lateinit var momentumConst: Constant<TFloat32>
+    private lateinit var learningRateConst: Constant<TFloat32>
 
     init {
         require(learningRate >= 0.0f) { "Learning rate $learningRate should be >= 0.0." }
@@ -41,10 +42,10 @@ public class Momentum(
     override fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>> {
-        val targets: MutableList<Operand<Float>> =
+    ): List<Operand<TFloat32>> {
+        val targets: MutableList<Operand<TFloat32>> =
             ArrayList()
 
         learningRateConst = tf.constant(learningRate)
@@ -70,14 +71,14 @@ public class Momentum(
         return targets
     }
 
-    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<Float>) {
+    private fun createMomentumSlot(graph: KGraph, tf: Ops, v: Output<TFloat32>) {
         val momentumInitializerName = defaultInitializerOpName(createName(v, MOMENTUM))
-        val initializer: Operand<Float> = tf.withName(momentumInitializerName)
+        val initializer: Operand<TFloat32> = tf.withName(momentumInitializerName)
             .fill(tf.shape(v), tf.constant(0.0f))
         createSlot(graph, tf, v.asOutput(), MOMENTUM, initializer)
     }
 
-    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
+    override fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<TFloat32>>) {
         for (v in variables) {
             createMomentumSlot(graph, tf, v.asOutput())
         }

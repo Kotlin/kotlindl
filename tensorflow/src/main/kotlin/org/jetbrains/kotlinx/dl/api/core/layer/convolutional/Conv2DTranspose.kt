@@ -16,6 +16,7 @@ import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * 2D convolution transpose layer.
@@ -107,7 +108,7 @@ public class Conv2DTranspose(
         if (outputPadding != null) requireArraySize(outputPadding, 2 * (dimensions + 2), "outputPadding")
     }
 
-    override fun convImplementation(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun convImplementation(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val outputShape = computeOutputShape(input.asOutput().shape()).toTensorShape()
         return tf.nn.conv2dBackpropInput(
             tf.shapeWithDynamicBatchSize(outputShape, input),

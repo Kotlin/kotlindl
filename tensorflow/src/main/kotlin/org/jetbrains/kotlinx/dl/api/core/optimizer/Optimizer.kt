@@ -15,6 +15,7 @@ import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Assign
 import org.tensorflow.op.core.Gradients
 import org.tensorflow.op.core.Variable
+import org.tensorflow.types.TFloat32
 
 /**
  * Base class for all optimizers.
@@ -25,7 +26,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     /**
      * Top level map key is the variable name, lower level map key is the slot name.
      */
-    private lateinit var slots: MutableMap<String, MutableMap<String, Variable<Float>>>
+    private lateinit var slots: MutableMap<String, MutableMap<String, Variable<TFloat32>>>
 
     /**
      * Prepares targets for optimization process.
@@ -39,10 +40,10 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      */
     internal fun prepareTargets(
         graph: KGraph,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         tf: Ops,
-        loss: Operand<Float>
-    ): List<Operand<Float>> {
+        loss: Operand<TFloat32>
+    ): List<Operand<TFloat32>> {
         slots = mutableMapOf()
 
         val gradients: Gradients = computeGradients(tf, loss, weights)
@@ -54,8 +55,8 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
         return applyGradients(graph, tf, weights, gradients)
     }
 
-    private fun variablesToOutputs(variables: List<Variable<Float>>): List<Output<Float>> {
-        val variableOutputs: MutableList<Output<Float>> = mutableListOf()
+    private fun variablesToOutputs(variables: List<Variable<TFloat32>>): List<Output<TFloat32>> {
+        val variableOutputs: MutableList<Output<TFloat32>> = mutableListOf()
         for (i in variables.indices) {
             variableOutputs.add(i, variables[i].asOutput())
         }
@@ -76,14 +77,14 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     protected abstract fun applyGradients(
         graph: KGraph,
         tf: Ops,
-        weights: List<Variable<Float>>,
+        weights: List<Variable<TFloat32>>,
         gradients: Gradients
-    ): List<Operand<Float>>
+    ): List<Operand<TFloat32>>
 
     private fun computeGradients(
         tf: Ops,
-        loss: Operand<Float>,
-        weights: List<Variable<Float>>
+        loss: Operand<TFloat32>,
+        weights: List<Variable<TFloat32>>
     ): Gradients {
         return tf.gradients(loss, weights)
     }
@@ -93,7 +94,7 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
      *
      * @param variables The variables to create slots for.
      */
-    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<Float>>) {
+    protected open fun createSlots(graph: KGraph, tf: Ops, variables: List<Output<TFloat32>>) {
 
     }
 
@@ -113,22 +114,22 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     protected open fun createSlot(
         graph: KGraph,
         tf: Ops,
-        variable: Output<Float>,
+        variable: Output<TFloat32>,
         slotName: String,
-        initializer: Operand<Float>
+        initializer: Operand<TFloat32>
     ) {
         val createName: String = createName(variable, slotName)
-        val slot: Variable<Float> = tf.withName(createName).variable(variable.shape(), getDType())
+        val slot: Variable<TFloat32> = tf.withName(createName).variable(variable.shape(), getDType())
 
         val assignName = defaultAssignOpName(createName(variable, slotName))
-        val slotInit: Assign<Float> = tf.withName(assignName).assign(slot, initializer)
+        val slotInit: Assign<TFloat32> = tf.withName(assignName).assign(slot, initializer)
 
         graph.addOptimizerVariableInitializer(slotInit)
         graph.addOptimizerVariable(slot)
 
         val varName = variable.op().name()
 
-        val variables: MutableMap<String, Variable<Float>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
+        val variables: MutableMap<String, Variable<TFloat32>> = slots.computeIfAbsent(slotName) { mutableMapOf() }
         variables[varName] = slot
     }
 
@@ -142,15 +143,15 @@ public abstract class Optimizer(public val clipGradient: ClipGradientAction) {
     protected fun getSlot(
         varName: String,
         slotName: String
-    ): Variable<Float> {
-        val variables: MutableMap<String, Variable<Float>> = slots[slotName]!!
+    ): Variable<TFloat32> {
+        val variables: MutableMap<String, Variable<TFloat32>> = slots[slotName]!!
         return variables[varName]!!
     }
 
     /**
      * Creates name for [variable] used in slot with name [slotName].
      */
-    internal open fun createName(variable: Output<Float>, slotName: String): String {
+    internal open fun createName(variable: Output<TFloat32>, slotName: String): String {
         return defaultOptimizerVariableName(variable.op().name() + "-" + slotName)
     }
 

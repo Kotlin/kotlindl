@@ -8,6 +8,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Layer that repeats the input [n] times.
@@ -33,10 +35,10 @@ public class RepeatVector(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         val x = tf.expandDims(input, tf.constant(1))
         val pattern = tf.stack(listOf(tf.constant(1), tf.constant(n), tf.constant(1)))
         return tf.tile(x, pattern)

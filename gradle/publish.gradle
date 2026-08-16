@@ -6,8 +6,8 @@
 apply plugin: 'maven-publish'
 apply from: project.rootProject.file('gradle/maven-metadata.gradle')
 
-task javadocJar(type: Jar) {
-    classifier 'javadoc'
+def javadocJar = tasks.register('javadocJar', Jar) {
+    archiveClassifier = 'javadoc'
 }
 
 def moduleName = "kotlin-deeplearning-" + project.name
@@ -20,11 +20,11 @@ afterEvaluate {
                 maven(MavenPublication) {
                     pom.withXml(configureMavenCentralMetadata)
                     from components.java
-                    artifactId moduleName
-                    groupId project.group
-                    version project.version
+                    artifactId = moduleName
+                    groupId = project.group
+                    version = project.version
                     artifact javadocJar
-                    artifact sourcesJar
+                    artifact tasks.named('sourcesJar')
                 }
             }
         } else {
@@ -32,7 +32,7 @@ afterEvaluate {
                 def type = it.name
                 switch (type) {
                     case 'kotlinMultiplatform':
-                        it.artifactId "$moduleName"
+                        it.artifactId = "$moduleName"
                         // in order to be compatible with the clients which can't read module metadata and get the correct variant
                         // this code changes the pom file so that these clients get the jvm variant
                         // same as done in the kotlinx.serialization library
@@ -40,17 +40,18 @@ afterEvaluate {
                         apply from: "$rootDir/gradle/publish-mpp-root-module-in-platform.gradle"
                         publishPlatformArtifactsInRootModule(publications.jvm)
                         break
+                    case 'android':
                     case 'androidRelease':
                         def artifact = it
                         // afterEvaluate here is needed to workaround https://youtrack.jetbrains.com/issue/KT-53520
-                        afterEvaluate { artifact.artifactId "$moduleName-android" }
+                        afterEvaluate { artifact.artifactId = "$moduleName-android" }
                         break
                     default:
-                        it.artifactId "$moduleName-$type"
+                        it.artifactId = "$moduleName-$type"
                         break
                 }
-                groupId project.group
-                version project.version
+                groupId = project.group
+                version = project.version
                 pom.withXml(configureMavenCentralMetadata)
                 if (name != "kotlinMultiplatform") {
                     artifact javadocJar

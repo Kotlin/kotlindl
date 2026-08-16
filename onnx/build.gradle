@@ -1,19 +1,24 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 project.setDescription("This module contains the Kotlin API for loading and executing the ONNX models.")
 
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
+apply plugin: 'com.android.kotlin.multiplatform.library'
 
 kotlin {
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
         }
     }
     android {
-        publishLibraryVariants("release")
+        namespace = 'org.jetbrains.kotlinx.dl.onnx'
+        compileSdk = 36
+        minSdk = 24
+
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
     sourceSets {
         commonMain {
@@ -32,10 +37,10 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
-                implementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+                implementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+                implementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+                implementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+                runtimeOnly 'org.junit.platform:junit-platform-launcher'
                 implementation project(":api")
                 implementation project(":dataset")
             }
@@ -43,22 +48,13 @@ kotlin {
         androidMain {
             dependencies {
                 api 'com.microsoft.onnxruntime:onnxruntime-android:1.16.0'
-                api 'androidx.camera:camera-core:1.0.0-rc03'
+                api 'androidx.camera:camera-core:1.6.1'
             }
         }
     }
     explicitApiWarning()
 }
 
-android {
-    compileSdkVersion 31
-    namespace = 'org.jetbrains.kotlinx.dl.onnx'
-    defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 31
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+tasks.named('jvmTest') {
+    useJUnitPlatform()
 }

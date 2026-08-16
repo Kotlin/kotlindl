@@ -1,6 +1,7 @@
 package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.junit.jupiter.api.Test
+import org.jetbrains.kotlinx.dl.api.inference.toFloatArray
 
 internal class SparsemaxActivationTest : ActivationTest() {
     private val inp1 = floatArrayOf(-5.0f, 1.0f, 2.0f)

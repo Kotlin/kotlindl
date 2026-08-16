@@ -1,11 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 project.setDescription("A KotlinDL library provides Dataset API for better Kotlin programming for Deep Learning.")
 
-apply plugin: 'kotlin-multiplatform'
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
 
 kotlin {
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
         }
     }
     sourceSets {

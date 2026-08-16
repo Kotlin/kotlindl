@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Upsampling layer for 1D input.
@@ -35,7 +36,7 @@ public class UpSampling1D(
         }
     }
 
-    protected override fun upSample(tf: Ops, input: Operand<Float>): Operand<Float> {
+    protected override fun upSample(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         return repeat(tf, input, repeats = size, axis = 1)
     }
 

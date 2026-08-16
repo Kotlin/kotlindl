@@ -9,6 +9,8 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
 
 /**
  * Max pooling layer for 2D inputs (e.g. images).
@@ -42,18 +44,12 @@ public class MaxPool2D(
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val paddingName = padding.paddingName
-
-        return tf.nn.maxPool(
-            input,
-            tf.constant(poolSize),
-            tf.constant(strides),
-            paddingName
-        )
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
+        // Emits "MaxPool" rather than "MaxPoolV2"; see maxPoolWithStaticWindow for why that matters.
+        return tf.maxPoolWithStaticWindow(input, poolSize, strides, padding.paddingName)
     }
 
     override fun toString(): String {

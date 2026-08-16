@@ -9,6 +9,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
+import org.tensorflow.types.TBool
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * Layer that reshapes inputs into the given shape.
@@ -27,14 +30,14 @@ public class Reshape(
     public val targetShape: List<Int>,
     name: String = ""
 ) : Layer(name) {
-    private lateinit var units: Constant<Int>
+    private lateinit var units: Constant<TInt32>
 
     override fun build(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+        input: Operand<TFloat32>,
+        isTraining: Operand<TBool>,
+        numberOfLosses: Operand<TFloat32>?
+    ): Operand<TFloat32> {
         units = tf.constant(IntArray(targetShape.size + 1) {
             if (it == 0) -1 else targetShape[it - 1]
         })

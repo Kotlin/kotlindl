@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.regularizer
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Regularizers allow you to apply penalties on layer parameters or layer
@@ -28,6 +29,6 @@ public abstract class Regularizer {
     /** Applies regularization to the input. */
     public abstract fun apply(
         tf: Ops,
-        input: Operand<Float>,
-    ): Operand<Float>
+        input: Operand<TFloat32>,
+    ): Operand<TFloat32>
 }

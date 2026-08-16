@@ -12,8 +12,9 @@ import org.jetbrains.kotlinx.dl.api.core.shape.toIntArray
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.jetbrains.kotlinx.dl.api.inference.copyTo
 
 private const val EPS: Float = 1e-6f
 
@@ -86,7 +87,7 @@ internal class AvgPool3DTest {
             val actual = Array(input.size) {
                 Array(1) { Array(1) { Array(2) { FloatArray(input[0][0][0][0].size) } } }
             }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     for (k in expected[i][j].indices) {
@@ -163,7 +164,7 @@ internal class AvgPool3DTest {
                     }
                 }
             }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     for (k in expected[i][j].indices) {
@@ -212,7 +213,7 @@ internal class AvgPool3DTest {
             val actual = Array(input.size) {
                 Array(1) { Array(1) { Array(2) { FloatArray(input[0][0][0][0].size) } } }
             }
-            output.tensor().copyTo(actual)
+            output.asTensor().copyTo(actual)
             for (i in expected.indices) {
                 for (j in expected[i].indices) {
                     for (k in expected[i][j].indices) {

@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.activation
 
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Basic interface for all activation functions.
@@ -19,7 +20,7 @@ public interface Activation {
      * @param [features] TensorFlow graph leaf node representing layer output before activation function.
      * @param [name] Activation name for TensorFlow graph building purposes.
      */
-    public fun apply(tf: Ops, features: Operand<Float>, name: String = ""): Operand<Float> {
+    public fun apply(tf: Ops, features: Operand<TFloat32>, name: String = ""): Operand<TFloat32> {
         return if (name.isEmpty()) features else tf.withName("Activation_$name").identity(apply(tf, features))
     }
 
@@ -29,5 +30,5 @@ public interface Activation {
      * @param [tf] TensorFlow graph API for building operations.
      * @param [features] TensorFlow graph leaf node representing layer output before activation function.
      */
-    public fun apply(tf: Ops, features: Operand<Float>): Operand<Float>
+    public fun apply(tf: Ops, features: Operand<TFloat32>): Operand<TFloat32>
 }

@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Rectified linear unit.
@@ -28,19 +29,19 @@ import org.tensorflow.op.Ops
  */
 internal fun commonRelu(
     tf: Ops,
-    input: Operand<Float>,
+    input: Operand<TFloat32>,
     alpha: Float = 0.0f,
     maxValue: Float? = null,
     threshold: Float = 0.0f
-): Operand<Float> {
+): Operand<TFloat32> {
     var input2 = input
-    var negativePart: Operand<Float> = tf.nn.relu(input2) // fake init
+    var negativePart: Operand<TFloat32> = tf.nn.relu(input2) // fake init
     if (alpha != 0.0f) {
         if (maxValue == null && threshold == 0.0f) {
             // LeakyReLU
             val greaterThanZero = tf.math.greater(input2, tf.constant(0.0f))
             val negativeActivation = tf.math.mul(tf.constant(alpha), input2)
-            return tf.where3(greaterThanZero, input2, negativeActivation)
+            return tf.select(greaterThanZero, input2, negativeActivation)
         }
         negativePart = if (threshold != 0.0f)
             tf.nn.relu(tf.math.add(tf.math.mul(input2, tf.constant(-1.0f)), tf.constant(threshold)))
@@ -63,11 +64,11 @@ internal fun commonRelu(
     }
 
     if (clipMax) {
-        input2 = tf.math.minimum(tf.constant(maxValue!!) as Operand<Float>, tf.math.maximum(input2, tf.constant(0.0f)))
+        input2 = tf.math.minimum(tf.constant(maxValue!!) as Operand<TFloat32>, tf.math.maximum(input2, tf.constant(0.0f)))
         // original code replaced on composition of min and max calls due to missed gradients for clipByValue op
         /*tf.clipByValue(
                 input2,
-                tf.constant(0.0f) as Operand<Float>,
+                tf.constant(0.0f) as Operand<TFloat32>,
                 tf.constant(maxValue!!)
             )*/
     }

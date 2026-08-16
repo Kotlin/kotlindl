@@ -4,6 +4,10 @@ Core API.
 # Module dataset
 Basic Dataset API and Image Preprocessing DSL.
 
+# Module tensorflow-metal
+Optional Apple Metal acceleration for the TensorFlow backend. macOS on Apple Silicon only, and
+requires JDK 22 or later.
+
 # Module onnx
 ONNX model support.
 

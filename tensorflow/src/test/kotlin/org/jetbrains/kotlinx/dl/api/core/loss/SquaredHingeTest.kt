@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.inference.floatValue
 
 internal class SquaredHingeTest {
     @Test
@@ -21,17 +23,17 @@ internal class SquaredHingeTest {
             val tf = Ops.create(session)
             val instance = SquaredHinge()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yTrue.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
 
             assertEquals(
                 0.16666667f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -46,18 +48,18 @@ internal class SquaredHingeTest {
             val tf = Ops.create(session)
             val instance = SquaredHinge()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
 
             assertEquals(
                 0.6666667f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -72,18 +74,18 @@ internal class SquaredHingeTest {
             val tf = Ops.create(session)
             val instance = SquaredHinge(reductionType = ReductionType.SUM_OVER_BATCH_SIZE)
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 4)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 4)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 4)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 4)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(8f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(8f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, numberOfLosses)
 
             assertEquals(
                 0.3640625f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -98,14 +100,14 @@ internal class SquaredHingeTest {
             val tf = Ops.create(session)
             val instance = SquaredHinge(reductionType = ReductionType.SUM)
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 4)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 4)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 4)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 4)))
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, null)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, null)
 
             assertEquals(
                 0.728125f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }

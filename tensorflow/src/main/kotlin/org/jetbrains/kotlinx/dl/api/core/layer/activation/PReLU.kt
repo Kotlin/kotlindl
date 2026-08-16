@@ -13,8 +13,9 @@ import org.jetbrains.kotlinx.dl.api.core.layer.createVariable
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Parametric Rectified Linear Unit.
@@ -51,7 +52,7 @@ public class PReLU(
 
     override var isTrainable: Boolean = true
 
-    override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
+    override fun forward(tf: Ops, input: Operand<TFloat32>): Operand<TFloat32> {
         val inputShape = input.asOutput().shape()
         val alphaShapeArray = inputShape.toLongArray().drop(1).toLongArray()
         if (sharedAxes != null) {
@@ -63,7 +64,7 @@ public class PReLU(
         val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         val fanOut = fanIn
 
-        val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
+        val alphaShape = Shape.of(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
         alpha = createVariable(
             tf,
             alphaVariableName(),

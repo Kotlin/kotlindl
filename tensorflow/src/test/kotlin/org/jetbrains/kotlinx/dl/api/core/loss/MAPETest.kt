@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
+import org.jetbrains.kotlinx.dl.api.inference.floatValue
 
 internal class MAPETest {
     @Test
@@ -21,17 +23,17 @@ internal class MAPETest {
             val tf = Ops.create(session)
             val instance = MAPE()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yTrue.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yTrue, yTrue, numberOfLosses)
 
             assertEquals(
                 0.0f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -46,18 +48,18 @@ internal class MAPETest {
             val tf = Ops.create(session)
             val instance = MAPE()
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred, yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred, yTrue, numberOfLosses)
 
             assertEquals(
                 1.66666672E8f,
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -72,18 +74,18 @@ internal class MAPETest {
             val tf = Ops.create(session)
             val instance = MAPE(reductionType = ReductionType.SUM_OVER_BATCH_SIZE)
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
             val numberOfLosses = tf.constant(yPred.asOutput().shape().numElements().toFloat())
 
-            assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
+            assertEquals(6f, numberOfLosses.asTensor().floatValue())
 
-            val operand: Operand<Float> = instance.apply(tf, yPred, yTrue, numberOfLosses)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred, yTrue, numberOfLosses)
 
             assertEquals(
                 211.85185f, // TODO: differs from Keras values
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }
@@ -98,14 +100,14 @@ internal class MAPETest {
             val tf = Ops.create(session)
             val instance = MAPE(reductionType = ReductionType.SUM)
 
-            val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
-            val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
+            val yTrue: Operand<TFloat32> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
+            val yPred: Operand<TFloat32> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
-            val operand: Operand<Float> = instance.apply(tf, yPred = yPred, yTrue = yTrue, null)
+            val operand: Operand<TFloat32> = instance.apply(tf, yPred = yPred, yTrue = yTrue, null)
 
             assertEquals(
                 423.70367f, // TODO: differs from Keras values
-                operand.asOutput().tensor().floatValue(),
+                operand.asTensor().floatValue(),
                 EPS
             )
         }

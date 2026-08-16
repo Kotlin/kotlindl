@@ -8,8 +8,9 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.toTensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
+import org.tensorflow.types.TFloat32
 
 /**
  * Layer that concatenates a list of inputs.
@@ -35,7 +36,7 @@ public class Concatenate(
         }
     }
 
-    override fun mergeFunction(input: List<Operand<Float>>, tf: Ops): Operand<Float> {
+    override fun mergeFunction(input: List<Operand<TFloat32>>, tf: Ops): Operand<TFloat32> {
         return tf.concat(input, tf.constant(axis))
     }
 

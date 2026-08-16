@@ -14,9 +14,11 @@ import org.jetbrains.kotlinx.dl.api.core.util.convTransposeBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.convTransposeKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.toLongArray
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.ndarray.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.nn.Conv2dBackpropInput
+import org.tensorflow.types.TFloat32
+import org.tensorflow.types.TInt32
 
 /**
  * A base class for defining transposed convolution layers (sometimes called deconvolution) of different dimensions.
@@ -50,7 +52,7 @@ public abstract class ConvTranspose(
                 dilations[it + 1]
             )
         }
-        return Shape.make(inputShape.size(0), *(shapes + filters.toLong()).toLongArray())
+        return Shape.of(inputShape.size(0), *(shapes + filters.toLong()).toLongArray())
     }
 
     override fun kernelVarName(name: String): String = convTransposeKernelVarName(name, dimensions)
@@ -128,7 +130,7 @@ public abstract class ConvTranspose(
          * This why here a first value of the [input] shape is used, which is going to be known at runtime.
          * See also [https://github.com/tensorflow/tensorflow/issues/833](https://github.com/tensorflow/tensorflow/issues/833)
          */
-        internal fun Ops.shapeWithDynamicBatchSize(tensorShape: TensorShape, input: Operand<Float>): Operand<Int> {
+        internal fun Ops.shapeWithDynamicBatchSize(tensorShape: TensorShape, input: Operand<TFloat32>): Operand<TInt32> {
             val batchSize = squeeze(slice(shape(input), constant(intArrayOf(0)), constant(intArrayOf(1))))
             val otherDims = tensorShape.dims().toList().drop(1).map { constant(it.toInt()) }
             return stack(listOf(batchSize) + otherDims)
