@@ -285,7 +285,7 @@ To find more info about ONNXRuntime and CUDA version compatibility, please refer
 
 ## Logging
 
-By default, the API module uses the [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) library to organize the logging process separately from the specific logger implementation.
+By default, the API module uses the [kotlin-logging](https://github.com/oshai/kotlin-logging) library to organize the logging process separately from the specific logger implementation.
 
 You could use any widely known JVM logging library with a [Simple Logging Facade for Java (SLF4J)](http://www.slf4j.org/) implementation such as Logback or Log4j/Log4j2.
 
